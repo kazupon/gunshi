@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      args-tokens:
+        specifier: ^0.10.0
+        version: 0.10.0
     devDependencies:
       '@eslint/markdown':
         specifier: ^6.2.2
@@ -871,6 +875,10 @@ packages:
 
   args-tokenizer@0.3.0:
     resolution: {integrity: sha512-xXAd7G2Mll5W8uo37GETpQ2VrE84M181Z7ugHFGQnJZ50M2mbOv0osSZ9VsSgPfJQ+LVG0prSi0th+ELMsno7Q==}
+
+  args-tokens@0.10.0:
+    resolution: {integrity: sha512-IjjPsYg8OxfDjjoZki1QMebKBrU3GPP0/k4Rc/5/QsIRzOexQqvQIZ+7FsuOnx9R1hJ0pQDAwAvksCxq5PD2WQ==}
+    engines: {node: '>= 20'}
 
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
@@ -2991,6 +2999,8 @@ snapshots:
   argparse@2.0.1: {}
 
   args-tokenizer@0.3.0: {}
+
+  args-tokens@0.10.0: {}
 
   assertion-error@2.0.1: {}
 

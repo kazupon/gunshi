@@ -1,0 +1,16 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`gunji > simple > help 1`] = `
+"USAGE:
+  COMMAND <OPTIONS> 
+
+OPTIONS:
+  --foo <foo>            
+  --bar                  
+  --baz <baz>            
+  --qux <qux>            
+  -h, --help             Display this help message
+  -v, --version          Display this version
+
+"
+`;
