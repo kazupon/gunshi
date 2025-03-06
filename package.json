@@ -49,7 +49,7 @@
       "require": "./lib/context.js",
       "default": "./lib/context.js"
     },
-    "./rednerer": {
+    "./renderer": {
       "types": "./lib/renderer.d.ts",
       "import": "./lib/renderer.js",
       "require": "./lib/renderer.js",
