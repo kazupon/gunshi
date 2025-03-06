@@ -43,6 +43,18 @@
       "require": "./lib/index.js",
       "default": "./lib/index.js"
     },
+    "./context": {
+      "types": "./lib/context.d.ts",
+      "import": "./lib/context.js",
+      "require": "./lib/context.js",
+      "default": "./lib/context.js"
+    },
+    "./rednerer": {
+      "types": "./lib/renderer.d.ts",
+      "import": "./lib/renderer.js",
+      "require": "./lib/renderer.js",
+      "default": "./lib/renderer.js"
+    },
     "./package.json": "./package.json",
     "./*": "./*"
   },
