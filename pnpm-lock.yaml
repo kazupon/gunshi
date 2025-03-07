@@ -79,12 +79,6 @@ importers:
         specifier: ^3.0.7
         version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(jiti@2.4.2)(yaml@2.7.0)
 
-  playground/simple:
-    dependencies:
-      gunshi:
-        specifier: workspace:*
-        version: link:../..
-
 packages:
 
   '@antfu/utils@9.1.0':
