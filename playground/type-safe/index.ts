@@ -1,4 +1,5 @@
 import type { ArgOptions, Command, CommandContext } from 'gunshi'
+
 import { cli } from 'gunshi'
 
 // Define the interface for our command options

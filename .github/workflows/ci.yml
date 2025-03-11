@@ -120,5 +120,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Building
+        run: pnpm build
+
       - name: Type checking
         run: pnpm typecheck
