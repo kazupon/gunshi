@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { defineMockLog } from '../test/utils'
 import { cli } from './cli'
-import { renderValidationErrors } from './renderer'
+import { renderValidationErrors } from './renderer/index.js'
 
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandOptions, LazyCommand } from './types'

@@ -1,23 +1,7 @@
-import { create } from './utils.js'
+import { create } from '../utils.js'
 
 import type { ArgOptions } from 'args-tokens'
-import type { CommandContext } from './types'
-
-/**
- * Render the header
- * @param ctx A {@link CommandContext | command context}
- * @returns A rendered header
- */
-export function renderHeader<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
-): Promise<string> {
-  const title = ctx.env.description || ctx.env.name || ''
-  return Promise.resolve(
-    title
-      ? `${title} (${ctx.env.name || ''}${ctx.env.version ? ` v${ctx.env.version}` : ''})`
-      : title
-  )
-}
+import type { CommandContext } from '../types'
 
 /**
  * Render the usage
@@ -56,23 +40,10 @@ export async function renderUsage<Options extends ArgOptions>(
 }
 
 /**
- * Render the validation errors
+ * Render the options section
  * @param ctx A {@link CommandContext | command context}
- * @param error An {@link AggregateError} of option in `args-token` validation
- * @returns A rendered validation error
+ * @returns A rendered options section
  */
-export function renderValidationErrors<Options extends ArgOptions>(
-  _ctx: CommandContext<Options>,
-  error: AggregateError
-): Promise<string> {
-  const messages = [] as string[]
-  for (const err of error.errors as Error[]) {
-    messages.push(err.message)
-  }
-  // messages.push('', `For more info, run \`${resolveEntry(ctx)} ${resolveSubCommand(ctx)} --help\``)
-  return Promise.resolve(messages.join('\n'))
-}
-
 async function renderOptionsSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
@@ -83,6 +54,11 @@ async function renderOptionsSection<Options extends ArgOptions>(
   return messages
 }
 
+/**
+ * Render the examples section
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A rendered examples section
+ */
 function renderExamplesSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): string[] {
@@ -94,6 +70,11 @@ function renderExamplesSection<Options extends ArgOptions>(
   return messages
 }
 
+/**
+ * Render the usage section
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A rendered usage section
+ */
 async function renderUsageSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
@@ -112,6 +93,11 @@ async function renderUsageSection<Options extends ArgOptions>(
   return messages
 }
 
+/**
+ * Render the commands section
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A rendered commands section
+ */
 async function renderCommandsSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
@@ -136,20 +122,40 @@ async function renderCommandsSection<Options extends ArgOptions>(
   return messages
 }
 
+/**
+ * Resolve the entry command name
+ * @param ctx A {@link CommandContext | command context}
+ * @returns The entry command name
+ */
 function resolveEntry<Options extends ArgOptions>(ctx: Readonly<CommandContext<Options>>): string {
   return ctx.env.name || ctx.translation('COMMAND')
 }
 
+/**
+ * Resolve the sub command name
+ * @param ctx A {@link CommandContext | command context}
+ * @returns The sub command name
+ */
 function resolveSubCommand<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): string {
   return ctx.name || ctx.translation('SUBCOMMAND')
 }
 
+/**
+ * Check if the command has a description
+ * @param ctx A {@link CommandContext | command context}
+ * @returns True if the command has a description
+ */
 function hasDescription<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
   return !!ctx.description
 }
 
+/**
+ * Check if the command has sub commands
+ * @param ctx A {@link CommandContext | command context}
+ * @returns True if the command has sub commands
+ */
 async function hasCommands<Options extends ArgOptions>(
   ctx: CommandContext<Options>
 ): Promise<boolean> {
@@ -157,18 +163,38 @@ async function hasCommands<Options extends ArgOptions>(
   return loadedCommands.length > 1
 }
 
+/**
+ * Check if the command has options
+ * @param ctx A {@link CommandContext | command context}
+ * @returns True if the command has options
+ */
 function hasOptions<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
   return !!(ctx.options && Object.keys(ctx.options).length > 0)
 }
 
+/**
+ * Check if the command has examples
+ * @param ctx A {@link CommandContext | command context}
+ * @returns True if the command has examples
+ */
 function hasExamples<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
   return !!ctx.usage.examples
 }
 
+/**
+ * Check if all options have default values
+ * @param ctx A {@link CommandContext | command context}
+ * @returns True if all options have default values
+ */
 function hasAllDefaultOptions<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
   return !!(ctx.options && Object.values(ctx.options).every(opt => opt.default))
 }
 
+/**
+ * Generate options symbols for usage
+ * @param ctx A {@link CommandContext | command context}
+ * @returns Options symbols for usage
+ */
 function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
   return hasOptions(ctx)
     ? hasAllDefaultOptions(ctx)
@@ -177,6 +203,11 @@ function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<
     : ''
 }
 
+/**
+ * Get options pairs for usage
+ * @param ctx A {@link CommandContext | command context}
+ * @returns Options pairs for usage
+ */
 function getOptionsPairs<Options extends ArgOptions>(
   ctx: CommandContext<Options>
 ): Record<string, string> {
@@ -194,6 +225,12 @@ function getOptionsPairs<Options extends ArgOptions>(
   }, create<Record<string, string>>())
 }
 
+/**
+ * Generate options usage
+ * @param ctx A {@link CommandContext | command context}
+ * @param optionsPairs Options pairs for usage
+ * @returns Generated options usage
+ */
 async function generateOptionsUsage<Options extends ArgOptions>(
   ctx: CommandContext<Options>,
   optionsPairs: Record<string, string>
