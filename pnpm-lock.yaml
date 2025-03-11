@@ -76,7 +76,7 @@ importers:
         specifier: ^0.6.4
         version: 0.6.4(typescript@5.8.2)
       typescript:
-        specifier: 'catalog:'
+        specifier: ^5.4.2
         version: 5.8.2
       typescript-eslint:
         specifier: ^8.26.0
@@ -121,7 +121,7 @@ importers:
         specifier: workspace:*
         version: link:../..
 
-  playground/minimal:
+  playground/simple:
     dependencies:
       gunshi:
         specifier: workspace:*
