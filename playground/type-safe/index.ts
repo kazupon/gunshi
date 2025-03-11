@@ -22,7 +22,7 @@ interface UserOptions extends ArgOptions {
 interface UserValues {
   name?: string
   age: number
-  verbose: boolean
+  verbose?: boolean
   help?: boolean
   version?: boolean
 }
