@@ -107,7 +107,7 @@
     "gh-changelogen": "^0.2.8",
     "knip": "^5.45.0",
     "lint-staged": "^15.4.3",
-    "pkg-pr-new": "^0.0.40",
+    "pkg-pr-new": "^0.0.41",
     "prettier": "^3.5.3",
     "tsdown": "^0.6.4",
     "typescript": "^5.4.2",
