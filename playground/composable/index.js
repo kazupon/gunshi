@@ -10,14 +10,12 @@ const createCommand = {
   options: {
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Name of the resource to create'
+      short: 'n'
     },
     type: {
       type: 'string',
       short: 't',
-      default: 'default',
-      description: 'Type of resource to create'
+      default: 'default'
     }
   },
   usage: {
@@ -40,14 +38,12 @@ const listCommand = {
   options: {
     type: {
       type: 'string',
-      short: 't',
-      description: 'Filter by resource type'
+      short: 't'
     },
     limit: {
       type: 'number',
       short: 'l',
-      default: 10,
-      description: 'Maximum number of resources to list'
+      default: 10
     }
   },
   usage: {
@@ -77,13 +73,11 @@ const deleteCommand = {
     name: {
       type: 'string',
       short: 'n',
-      description: 'Name of the resource to delete',
       required: true
     },
     force: {
       type: 'boolean',
-      short: 'f',
-      description: 'Force deletion without confirmation'
+      short: 'f'
     }
   },
   usage: {
@@ -118,8 +112,7 @@ const mainCommand = {
   options: {
     verbose: {
       type: 'boolean',
-      short: 'v',
-      description: 'Enable verbose output'
+      short: 'v'
     }
   },
   usage: {

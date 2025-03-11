@@ -1,4 +1,5 @@
 import { cli } from 'gunshi'
+import enUS from './locales/en-US.json' with { type: 'json' }
 
 // Internationalization (i18n) example
 // This demonstrates how to use the i18n features of gunshi
@@ -6,23 +7,15 @@ import { cli } from 'gunshi'
 // Define a command with internationalization support
 const command = {
   name: 'greeter',
-  description: 'A greeting application with internationalization support',
 
   options: {
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Name to greet'
+      short: 'n'
     },
     formal: {
       type: 'boolean',
-      short: 'f',
-      description: 'Use formal greeting'
-    },
-    locale: {
-      type: 'string',
-      short: 'l',
-      description: 'Locale to use (en-US, ja-JP)'
+      short: 'f'
     }
   },
 
@@ -30,11 +23,10 @@ const command = {
   usage: {
     options: {
       name: 'Name to greet',
-      formal: 'Use formal greeting',
-      locale: 'Locale to use (en-US, ja-JP)'
+      formal: 'Use formal greeting'
     },
     examples:
-      '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ node index.js --name 田中 --formal --locale ja-JP'
+      '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal'
   },
 
   // Define a resource fetcher for translations
@@ -46,32 +38,12 @@ const command = {
 
     // Check the locale and return appropriate translations
     if (ctx.locale.toString() === 'ja-JP') {
-      return {
-        // Command description
-        description: '国際化対応の挨拶アプリケーション',
-        // Option descriptions
-        options: {
-          name: '挨拶する相手の名前',
-          formal: '丁寧な挨拶を使用する',
-          locale: '使用するロケール (en-US, ja-JP)'
-        },
-        // Examples
-        examples:
-          '# 基本的な挨拶\n$ node index.js --name 田中\n\n# 日本語での丁寧な挨拶\n$ node index.js --name 田中 --formal --locale ja-JP'
-      }
+      const resource = await import('./locales/ja-JP.json', { with: { type: 'json' } })
+      return resource.default
     }
 
     // Default to English
-    return {
-      description: 'A greeting application with internationalization support',
-      options: {
-        name: 'Name to greet',
-        formal: 'Use formal greeting',
-        locale: 'Locale to use (en-US, ja-JP)'
-      },
-      examples:
-        '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ node index.js --name 田中 --formal --locale ja-JP'
-    }
+    return enUS
   },
 
   // Command execution function
@@ -81,23 +53,9 @@ const command = {
 
     console.log(`Current locale: ${locale}`)
 
-    // Greetings in different languages
-    const greetings = {
-      'en-US': {
-        informal: 'Hello',
-        formal: 'Good day'
-      },
-      'ja-JP': {
-        informal: 'こんにちは',
-        formal: 'はじめまして'
-      }
-    }
-
-    // Default to English if the locale is not supported
-    const localeGreetings = greetings[locale] || greetings['en-US']
-
     // Choose between formal and informal greeting
-    const greeting = formal ? localeGreetings.formal : localeGreetings.informal
+    // const greeting = formal ? localeGreetings.formal : localeGreetings.informal
+    const greeting = formal ? ctx.translation('formal') : ctx.translation('informal')
 
     // Display the greeting
     console.log(`${greeting}, ${name}!`)
@@ -110,25 +68,27 @@ const command = {
   }
 }
 
-// Create a locale option for the CLI
-const localeOption = {
-  locale: {
-    type: 'string',
-    description: 'Locale to use (en-US, ja-JP)'
-  }
+async function main() {
+  // Run the command with i18n support
+  await cli(process.argv.slice(2), command, {
+    name: 'i18n-example',
+    version: '1.0.0',
+    description: 'Example of internationalization support',
+    // Set the locale via an environment variable
+    // If Node v21 or later is used, you can use the built-in `navigator.language` instead)
+    locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
+  })
+
+  // Note: Run this example with different locales to see the translations
+  // $ node index.js --help
+  // $ MY_LOCALE=ja-JP node index.js --help
+  // $ node index.js --name John
+  // $ MY_LOCALE=ja-JP node index.js --name 田中 --formal
 }
 
-// Run the command with i18n support
-cli(process.argv.slice(2), command, {
-  name: 'i18n-example',
-  version: '1.0.0',
-  description: 'Example of internationalization support',
-  // Add the locale option to the CLI options
-  ...localeOption
+// eslint-disable-next-line unicorn/prefer-top-level-await
+main().catch(error => {
+  console.error(error)
+  // eslint-disable-next-line unicorn/no-process-exit
+  process.exit(1)
 })
-
-// Note: Run this example with different locales to see the translations
-// $ node index.js --help
-// $ node index.js --help --locale ja-JP
-// $ node index.js --name John
-// $ node index.js --name 田中 --formal --locale ja-JP

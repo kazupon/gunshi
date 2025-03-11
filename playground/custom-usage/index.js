@@ -11,28 +11,23 @@ const command = {
   options: {
     add: {
       type: 'string',
-      short: 'a',
-      description: 'Add a new task'
+      short: 'a'
     },
     list: {
       type: 'boolean',
-      short: 'l',
-      description: 'List all tasks'
+      short: 'l'
     },
     complete: {
       type: 'string',
-      short: 'c',
-      description: 'Mark a task as complete'
+      short: 'c'
     },
     priority: {
       type: 'string',
-      short: 'p',
-      description: 'Set task priority (low, medium, high)'
+      short: 'p'
     },
     due: {
       type: 'string',
-      short: 'd',
-      description: 'Set due date (YYYY-MM-DD)'
+      short: 'd'
     }
   },
 

@@ -1,5 +1,5 @@
 {
-  "name": "minimal",
+  "name": "simple",
   "private": true,
   "type": "module",
   "scripts": {

@@ -22,8 +22,7 @@ const lazyCommand = async () => {
       delay: {
         type: 'number',
         short: 'd',
-        default: 500,
-        description: 'Delay in milliseconds for command execution'
+        default: 500
       }
     },
     usage: {
@@ -77,8 +76,7 @@ const asyncDataCommand = async () => {
     options: {
       id: {
         type: 'number',
-        short: 'i',
-        description: 'Filter by item ID'
+        short: 'i'
       }
     },
     usage: {

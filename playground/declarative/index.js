@@ -13,20 +13,17 @@ const command = {
   options: {
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Name to greet'
+      short: 'n'
     },
     greeting: {
       type: 'string',
       short: 'g',
-      default: 'Hello',
-      description: 'Greeting to use'
+      default: 'Hello'
     },
     times: {
       type: 'number',
       short: 't',
-      default: 1,
-      description: 'Number of times to repeat the greeting'
+      default: 1
     }
   },
 

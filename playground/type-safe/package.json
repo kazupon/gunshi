@@ -3,9 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "build": "tsc -p .",
+    "start": "tsx index.ts"
   },
   "dependencies": {
     "gunshi": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.1",
+    "typescript": "catalog:"
   }
 }

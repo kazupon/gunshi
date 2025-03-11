@@ -14,13 +14,13 @@
 Gunshi is a modern javascript command-line library
 
 > [!TIP]
-> gunshi (軍師) is a position in ancient Japanese samurai battle in which a amurai devised strategies and gave orders. That name is inspired by the word "command.”
+> gunshi (軍師) is a position in ancient Japanese samurai battle in which a amurai devised strategies and gave orders. That name is inspired by the word "command".
 
 ## ✨ Features
 
 Gunshi is designed to simplify the creation of modern command-line interfaces:
 
-- 📏 **Minimal**: Run the commands with a minimum API.
+- 📏 **Simple**: Run the commands with a simple API.
 - 🛡️ **Type Safe**: Arguments parsing and options value resolution type-safely by [args-tokens](https://github.com/kazupon/args-tokens)
 - ⚙️ **Declarative configuration**: Configure the command modules declaratively.
 - 🧩 **Composable**: Sub-commands that can be composed with modularized commands.

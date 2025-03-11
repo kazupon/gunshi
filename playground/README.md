@@ -1,114 +1,103 @@
 # Gunshi Examples
 
 This directory contains examples demonstrating the features of Gunshi, a modern JavaScript command-line library.
+Each example is a standalone project with its own `package.json` file
 
 ## Examples
 
-### 1. Minimal API (`minimal`)
+### 1. Simple API (`simple`)
 
-Demonstrates how to use Gunshi with the minimum API.
+Demonstrates how to use Gunshi with the Simple API.
 
-```bash
-cd minimal
-npm start
+```sh
+cd simple
+node index.js
 ```
 
 ### 2. Type-Safe Arguments (`type-safe`)
 
-Demonstrates type-safe argument parsing with different option types.
+Demonstrates type-safe argument parsing with different option types using TypeScript.
 
-```bash
+```sh
 cd type-safe
-npm start -- --name John --age 30 --verbose
+npx tsx index.ts --name John --age 30 --verbose
+# or if you will use pnpm
+# pnpx tsx index.ts --name John --age 30 --verbose
 ```
 
 ### 3. Declarative Configuration (`declarative`)
 
 Demonstrates how to configure commands declaratively.
 
-```bash
+```sh
 cd declarative
-npm start -- --name World --greeting "Hey there" --times 3
+node index.js --name World --greeting "Hey there" --times 3
 ```
 
 ### 4. Composable Sub-commands (`composable`)
 
 Demonstrates how to create a CLI with composable sub-commands.
 
-```bash
-# Show help
+```sh
 cd composable
-npm start -- --help
+node index.js --help
 
 # Create a resource
-npm start -- create --name my-resource --type special
+node index.js create --name my-resource --type special
 
 # List resources
-npm start -- list --type special --limit 5
+node index.js list --type special --limit 5
 
 # Delete a resource
-npm start -- delete --name my-resource --force
+node index.js delete --name my-resource --force
 ```
 
 ### 5. Lazy & Async Command Loading (`lazy-async`)
 
 Demonstrates lazy loading and asynchronous execution of commands.
 
-```bash
+```sh
 cd lazy-async
-npm start -- --help
-npm start -- lazy --delay 2000
-npm start -- data --id 2
+node index.js --help
+node index.js lazy --delay 2000
+node index.js data --id 2
 ```
 
 ### 6. Auto Usage Generation (`auto-usage`)
 
 Demonstrates automatic usage message generation.
 
-```bash
+```sh
 cd auto-usage
-npm start -- --help
-npm start -- --operation list --format json
+node index.js --help
+node index.js --operation list --format json
 ```
 
 ### 7. Custom Usage Generation (`custom-usage`)
 
 Demonstrates customizing the usage message generation.
 
-```bash
+```sh
 cd custom-usage
-npm start -- --help
-npm start -- --add "Complete the project" --priority high --due 2023-12-31
+
+node index.js --help
+node index.js --add "Complete the project" --priority high --due 2023-12-31
 ```
 
 ### 8. Internationalization (`i18n`)
 
 Demonstrates internationalization support.
 
-```bash
+```sh
 cd i18n
-# English
-npm start -- --name John
+node index.js --name John
+
 # Japanese
-npm start -- --name 田中 --formal --locale ja-JP
+MY_LOCALE=ja-JP node index.js --name 田中 --formal
+
 # Help in English
-npm start -- --help
+node index.js --help
+
 # Help in Japanese
-npm start -- --help --locale ja-JP
+MY_LOCALE=ja-JP node index.js --help
 ```
-
-## Running the Examples
-
-Each example is a standalone project with its own `package.json` file. To run an example:
-
-1. Navigate to the example directory
-2. Run `npm start` with any additional arguments
-
-For example:
-
-```bash
-cd minimal
-npm start
-```
-
-Some examples have additional npm scripts for specific scenarios. Check the `package.json` file in each example directory for details.

@@ -13,39 +13,41 @@ const command = {
     // String option with short alias
     path: {
       type: 'string',
-      short: 'p',
-      description: 'File or directory path'
+      short: 'p'
     },
     // Boolean flag
     recursive: {
       type: 'boolean',
-      short: 'r',
-      description: 'Operate recursively on directories'
+      short: 'r'
     },
     // Number option with default value
     depth: {
       type: 'number',
       short: 'd',
-      default: 1,
-      description: 'Maximum depth for recursive operations'
+      default: 1
     },
     // Required option
     operation: {
       type: 'string',
       short: 'o',
-      required: true,
-      description: 'Operation to perform (list, copy, move, delete)'
+      required: true
     },
     // String option with choices (not enforced by args-tokens, but documented)
     format: {
       type: 'string',
-      short: 'f',
-      description: 'Output format (text, json, csv)'
+      short: 'f'
     }
   },
 
   // Define usage examples
   usage: {
+    options: {
+      path: 'File or directory path',
+      recursive: 'Operate recursively on directories',
+      depth: 'Maximum depth for recursive operations',
+      operation: 'Operation to perform (list, copy, move, delete)',
+      format: 'Output format (text, json, csv)'
+    },
     examples: `# List files in current directory
 $ node index.js --operation list
 
