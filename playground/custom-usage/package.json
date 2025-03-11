@@ -1,0 +1,11 @@
+{
+  "name": "custom-usage",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "gunshi": "workspace:*"
+  }
+}
