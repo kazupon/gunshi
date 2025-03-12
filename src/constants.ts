@@ -1,7 +1,17 @@
 import type { ArgOptions } from 'args-tokens'
 import type { CommandOptions } from './types'
 
-export const COMMON_OPTIONS = {
+type CommonOptionType = {
+  readonly help: {
+    readonly type: 'boolean'
+    readonly short: 'h'
+  }
+  readonly version: {
+    readonly type: 'boolean'
+    readonly short: 'v'
+  }
+}
+export const COMMON_OPTIONS: CommonOptionType = {
   help: {
     type: 'boolean',
     short: 'h'
@@ -10,7 +20,7 @@ export const COMMON_OPTIONS = {
     type: 'boolean',
     short: 'v'
   }
-} as const satisfies ArgOptions
+}
 
 export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
   name: undefined,
