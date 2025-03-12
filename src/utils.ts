@@ -1,7 +1,7 @@
 import type { ArgOptions } from 'args-tokens'
 import type { Command, LazyCommand } from './types'
 
-export async function resolveLazyCommand<Options extends ArgOptions>(
+export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
   cmd: Command<Options> | LazyCommand<Options>,
   name: string | undefined,
   entry: boolean = false

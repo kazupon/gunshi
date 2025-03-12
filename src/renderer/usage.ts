@@ -8,7 +8,7 @@ import type { CommandContext } from '../types'
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered usage
  */
-export async function renderUsage<Options extends ArgOptions>(
+export async function renderUsage<Options extends ArgOptions = ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string> {
   const messages: string[] = []

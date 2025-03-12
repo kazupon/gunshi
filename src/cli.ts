@@ -13,7 +13,7 @@ import type { Command, CommandContext, CommandOptions, CommandRunner, LazyComman
  * @param entry - A {@link Command | entry command} or an {@link CommandRunner | inline command runner}
  * @param opts - A {@link CommandOptions | command options}
  */
-export async function cli<Options extends ArgOptions>(
+export async function cli<Options extends ArgOptions = ArgOptions>(
   args: string[],
   entry: Command<Options> | CommandRunner<Options>,
   opts: CommandOptions<Options> = {}

@@ -97,7 +97,7 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
 /**
  * Command options
  */
-export interface CommandOptions<Options extends ArgOptions> {
+export interface CommandOptions<Options extends ArgOptions = ArgOptions> {
   /**
    * Current working directory
    */
@@ -155,7 +155,10 @@ export interface CommandOptions<Options extends ArgOptions> {
  * Command context
  * @description Command context is the context of the command execution
  */
-export interface CommandContext<Options extends ArgOptions, Values = ArgValues<Options>> {
+export interface CommandContext<
+  Options extends ArgOptions = ArgOptions,
+  Values = ArgValues<Options>
+> {
   /**
    * Command name, that is the command that is executed
    * @description The command name is same {@link CommandEnvironment.name}
@@ -217,7 +220,7 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
 /**
  * Command usage
  */
-interface CommandUsage<Options extends ArgOptions> {
+interface CommandUsage<Options extends ArgOptions = ArgOptions> {
   /**
    * Options usage
    */
@@ -233,7 +236,7 @@ interface CommandUsage<Options extends ArgOptions> {
 /**
  * Command interface
  */
-export interface Command<Options extends ArgOptions> {
+export interface Command<Options extends ArgOptions = ArgOptions> {
   /**
    * Command name
    * @description
@@ -276,7 +279,7 @@ export interface Command<Options extends ArgOptions> {
  * Command resource
  * @experimental
  */
-export interface CommandResource<Options extends ArgOptions> {
+export interface CommandResource<Options extends ArgOptions = ArgOptions> {
   /**
    * Command description
    */
@@ -299,7 +302,7 @@ export interface CommandResource<Options extends ArgOptions> {
  * @returns A fetched {@link CommandResource | command resource}
  * @experimental
  */
-export type CommandResourceFetcher<Options extends ArgOptions> = (
+export type CommandResourceFetcher<Options extends ArgOptions = ArgOptions> = (
   ctx: Readonly<CommandContext<Options>>
 ) => Promise<CommandResource<Options>>
 
@@ -307,7 +310,7 @@ export type CommandResourceFetcher<Options extends ArgOptions> = (
  * Command runner
  * @param ctx A {@link CommandContext | command context}
  */
-export type CommandRunner<Options extends ArgOptions> = (
+export type CommandRunner<Options extends ArgOptions = ArgOptions> = (
   ctx: Readonly<CommandContext<Options>>
 ) => Awaitable<void>
 
@@ -315,4 +318,4 @@ export type CommandRunner<Options extends ArgOptions> = (
  * Lazy command interface
  * @description lazy command that's not loaded until it is executed
  */
-export type LazyCommand<Options extends ArgOptions> = () => Awaitable<Command<Options>>
+export type LazyCommand<Options extends ArgOptions = ArgOptions> = () => Awaitable<Command<Options>>

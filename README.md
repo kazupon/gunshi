@@ -303,7 +303,7 @@ const customUsageRenderer = ctx => {
   lines.push('')
   lines.push('OPTIONS:')
 
-  for (const [key, option] of Object.entries(ctx.options || {})) {
+  for (const [key, option] of Object.entries(ctx.options || Object.create(null))) {
     const shortFlag = option.short ? `-${option.short}, ` : '    '
     lines.push(`  ${shortFlag}--${key.padEnd(10)} ${ctx.translation(key)}`)
   }

@@ -7,7 +7,7 @@ import type { CommandContext } from '../types'
  * @param error An {@link AggregateError} of option in `args-token` validation
  * @returns A rendered validation error
  */
-export function renderValidationErrors<Options extends ArgOptions>(
+export function renderValidationErrors<Options extends ArgOptions = ArgOptions>(
   _ctx: CommandContext<Options>,
   error: AggregateError
 ): Promise<string> {

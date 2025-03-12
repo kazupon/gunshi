@@ -6,7 +6,7 @@ import type { CommandContext } from '../types'
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered header
  */
-export function renderHeader<Options extends ArgOptions>(
+export function renderHeader<Options extends ArgOptions = ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string> {
   const title = ctx.env.description || ctx.env.name || ''

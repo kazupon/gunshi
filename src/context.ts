@@ -53,7 +53,7 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
  * @returns A {@link CommandContext | command context}, which is readonly
  */
 export async function createCommandContext<
-  Options extends ArgOptions,
+  Options extends ArgOptions = ArgOptions,
   Values = ArgValues<Options>
 >({
   options,
