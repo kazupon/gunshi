@@ -18,8 +18,8 @@ Gunshi is a modern javascript command-line library
 Gunshi is designed to simplify the creation of modern command-line interfaces:
 
 - 📏 **Simple**: Run the commands with a simple API.
-- 🛡️ **Type Safe**: Arguments parsing and options value resolution type-safely by [args-tokens](https://github.com/kazupon/args-tokens)
 - ⚙️ **Declarative configuration**: Configure the command modules declaratively.
+- 🛡️ **Type Safe**: Arguments parsing and options value resolution type-safely by [args-tokens](https://github.com/kazupon/args-tokens)
 - 🧩 **Composable**: Sub-commands that can be composed with modularized commands.
 - ⏳ **Lazy & Async**: Command modules lazy loading and asynchronously executing.
 - 📜 **Auto usage generation**: Automatic usage message generation with modularized commands.
@@ -68,56 +68,6 @@ cli(process.argv.slice(2), () => {
 })
 ```
 
-### 🛡️ Type-Safe Arguments
-
-Gunshi provides type-safe argument parsing with TypeScript:
-
-```ts
-import { cli } from 'gunshi'
-import type { ArgOptions, Command, CommandContext } from 'gunshi'
-
-// Type-safe arguments parsing example
-// This demonstrates how to define and use typed command options with `satisfies`
-
-// Define options with types
-const options = {
-  // Define string option with short alias
-  name: {
-    type: 'string',
-    short: 'n'
-  },
-  // Define number option with default value
-  age: {
-    type: 'number',
-    short: 'a',
-    default: 25
-  },
-  // Define boolean flag
-  verbose: {
-    type: 'boolean',
-    short: 'v'
-  }
-} satisfies ArgOptions
-
-// Create a type-safe command
-const command = {
-  name: 'type-safe',
-  options: {
-    name: { type: 'string', short: 'n' },
-    age: { type: 'number', short: 'a', default: 25 },
-    verbose: { type: 'boolean', short: 'v' }
-  },
-  run: (ctx: CommandContext<UserOptions, UserValues>) => {
-    const { name, age, verbose } = ctx.values
-    console.log(`Hello, ${name || 'World'}! You are ${age} years old.`)
-  }
-} satisfies Command<typeof options>
-
-await cli(process.argv.slice(2), command)
-```
-
-For more detailed examples, check out the [playground/type-safe](https://github.com/kazupon/gunshi/tree/main/playground/type-safe) in the repository.
-
 ### ⚙️ Declarative Configuration
 
 Configure commands declaratively:
@@ -157,6 +107,52 @@ cli(process.argv.slice(2), command, {
 ```
 
 For more detailed examples, check out the [playground/declarative](https://github.com/kazupon/gunshi/tree/main/playground/declarative) in the repository.
+
+### 🛡️ Type-Safe Arguments
+
+Gunshi provides type-safe argument parsing with TypeScript:
+
+```ts
+import { cli } from 'gunshi'
+import type { ArgOptions, Command, CommandContext } from 'gunshi'
+
+// Type-safe arguments parsing example
+// This demonstrates how to define and use typed command options with `satisfies`
+
+// Define options with types
+const options = {
+  // Define string option with short alias
+  name: {
+    type: 'string',
+    short: 'n'
+  },
+  // Define number option with default value
+  age: {
+    type: 'number',
+    short: 'a',
+    default: 25
+  },
+  // Define boolean flag
+  verbose: {
+    type: 'boolean',
+    short: 'v'
+  }
+} satisfies ArgOptions
+
+// Create a type-safe command
+const command = {
+  name: 'type-safe',
+  options,
+  run: (ctx: CommandContext<UserOptions, UserValues>) => {
+    const { name, age, verbose } = ctx.values
+    console.log(`Hello, ${name || 'World'}! You are ${age} years old.`)
+  }
+} satisfies Command<typeof options>
+
+await cli(process.argv.slice(2), command)
+```
+
+For more detailed examples, check out the [playground/type-safe](https://github.com/kazupon/gunshi/tree/main/playground/type-safe) in the repository.
 
 ### 🧩 Composable Sub-commands
 

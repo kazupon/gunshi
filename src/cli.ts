@@ -5,7 +5,7 @@ import { renderHeader, renderUsage, renderValidationErrors } from './renderer/in
 import { create, log, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'
-import type { Command, CommandContext, CommandOptions, CommandRunner, LazyCommand } from './types'
+import type { Command, Commandable, CommandContext, CommandOptions, CommandRunner } from './types'
 
 /**
  * Run the command
@@ -71,7 +71,7 @@ function resolveArgOptions<Options extends ArgOptions>(options?: Options): Optio
 function resolveCommandOptions<Options extends ArgOptions>(
   options: CommandOptions<Options>
 ): CommandOptions<Options> {
-  const subCommands = new Map<string, Command<Options> | LazyCommand<Options>>(options.subCommands) // shallow copy
+  const subCommands = new Map<string, Commandable<Options>>(options.subCommands) // shallow copy
   return Object.assign(
     create<CommandOptions<Options>>(),
     COMMAND_OPTIONS_DEFAULT,

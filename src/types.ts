@@ -76,7 +76,7 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
    * Sub commands
    * @see {@link CommandOptions.subCommands}
    */
-  subCommands: Map<string, Command<Options> | LazyCommand<Options>> | undefined
+  subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
    * Render function the command usage
    */
@@ -122,7 +122,7 @@ export interface CommandOptions<Options extends ArgOptions = ArgOptions> {
   /**
    * Sub commands
    */
-  subCommands?: Map<string, Command<Options> | LazyCommand<Options>>
+  subCommands?: Map<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
    * Left margin of the command output
    */
@@ -319,3 +319,8 @@ export type CommandRunner<Options extends ArgOptions = ArgOptions> = (
  * @description lazy command that's not loaded until it is executed
  */
 export type LazyCommand<Options extends ArgOptions = ArgOptions> = () => Awaitable<Command<Options>>
+
+/**
+ * Define a command type
+ */
+export type Commandable<Options extends ArgOptions> = Command<Options> | LazyCommand<Options>

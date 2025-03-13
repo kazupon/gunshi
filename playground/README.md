@@ -14,7 +14,16 @@ cd simple
 node index.js
 ```
 
-### 2. Type-Safe Arguments (`type-safe`)
+### 2. Declarative Configuration (`declarative`)
+
+Demonstrates how to configure commands declaratively.
+
+```sh
+cd declarative
+node index.js --name World --greeting "Hey there" --times 3
+```
+
+### 3. Type-Safe Arguments (`type-safe`)
 
 Demonstrates type-safe argument parsing with different option types using TypeScript.
 
@@ -23,15 +32,6 @@ cd type-safe
 npx tsx index.ts --name John --age 30 --verbose
 # or if you will use pnpm
 # pnpx tsx index.ts --name John --age 30 --verbose
-```
-
-### 3. Declarative Configuration (`declarative`)
-
-Demonstrates how to configure commands declaratively.
-
-```sh
-cd declarative
-node index.js --name World --greeting "Hey there" --times 3
 ```
 
 ### 4. Composable Sub-commands (`composable`)

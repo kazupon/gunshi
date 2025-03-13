@@ -235,11 +235,13 @@ describe('aute generate usage', () => {
         },
         examples: '# Example 1\n$ gunshi command2 --bar 42\n# Example 2\n$ gunshi command2 -b 42'
       },
-      run: vi.fn()
+      // run: vi.fn()
+      run: ctx => {
+        console.log(ctx.values)
+      }
     } satisfies Command<typeof command2Options>
 
-    type CommandArgs = typeof entryOptions | typeof command2Options
-    const subCommands = new Map<string, Command<CommandArgs> | LazyCommand<CommandArgs>>()
+    const subCommands = new Map()
     subCommands.set('command2', command2)
 
     await cli(['-h'], entry, {

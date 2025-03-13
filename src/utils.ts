@@ -1,8 +1,8 @@
 import type { ArgOptions } from 'args-tokens'
-import type { Command, LazyCommand } from './types'
+import type { Command, Commandable } from './types'
 
 export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
-  cmd: Command<Options> | LazyCommand<Options>,
+  cmd: Commandable<Options>,
   name: string | undefined,
   entry: boolean = false
 ): Promise<Command<Options>> {
