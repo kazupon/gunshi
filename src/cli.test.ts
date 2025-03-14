@@ -246,7 +246,7 @@ describe('aute generate usage', () => {
     const subCommands = new Map()
     subCommands.set('command2', command2)
 
-    const mainUsageRedered = await cli(['-h'], entry, {
+    const mainUsageRendered = await cli(['-h'], entry, {
       subCommands,
       name: 'gunshi',
       description: 'Modern CLI tool',
@@ -255,7 +255,7 @@ describe('aute generate usage', () => {
       locale: 'ja-JP',
       middleMargin: 15
     })
-    expect(mainUsageRedered).toMatchSnapshot('main')
+    expect(mainUsageRendered).toMatchSnapshot('main')
 
     const command2UsageRendered = await cli(['command2', '-h'], entry, {
       subCommands,
