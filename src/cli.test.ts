@@ -103,16 +103,17 @@ describe('aute generate usage', () => {
   test('inline function', async () => {
     const utils = await import('./utils')
     const log = defineMockLog(utils)
-    await cli(['-h'], vi.fn())
+    const renderedUsage = await cli(['-h'], vi.fn())
 
     const message = log()
     expect(message).toMatchSnapshot()
+    expect(message).toMatchSnapshot(renderedUsage)
   })
 
   test('loosely entry command', async () => {
     const utils = await import('./utils')
     const log = defineMockLog(utils)
-    await cli(['-h'], {
+    const renderedUsage = await cli(['-h'], {
       options: {
         foo: {
           type: 'string',
@@ -124,12 +125,13 @@ describe('aute generate usage', () => {
 
     const message = log()
     expect(message).toMatchSnapshot()
+    expect(message).toMatchSnapshot(renderedUsage)
   })
 
   test('strictly entry command', async () => {
     const utils = await import('./utils')
     const log = defineMockLog(utils)
-    await cli(
+    const renderedUsage = await cli(
       ['-h'],
       {
         options: {
@@ -156,7 +158,7 @@ describe('aute generate usage', () => {
     )
 
     const message = log()
-    expect(message).toMatchSnapshot()
+    expect(message).toMatchSnapshot(renderedUsage)
   })
 
   test('loosely sub commands', async () => {
@@ -190,8 +192,8 @@ describe('aute generate usage', () => {
     const subCommands = new Map<string, Command<CommandArgs> | LazyCommand<CommandArgs>>()
     subCommands.set('command2', command2)
 
-    await cli(['-h'], entry, { subCommands })
-    await cli(['command2', '-h'], entry, { subCommands })
+    expect(await cli(['-h'], entry, { subCommands })).toMatchSnapshot('main')
+    expect(await cli(['command2', '-h'], entry, { subCommands })).toMatchSnapshot('command2')
 
     const message = log()
     expect(message).toMatchSnapshot()
@@ -244,7 +246,7 @@ describe('aute generate usage', () => {
     const subCommands = new Map()
     subCommands.set('command2', command2)
 
-    await cli(['-h'], entry, {
+    const mainUsageRedered = await cli(['-h'], entry, {
       subCommands,
       name: 'gunshi',
       description: 'Modern CLI tool',
@@ -253,13 +255,15 @@ describe('aute generate usage', () => {
       locale: 'ja-JP',
       middleMargin: 15
     })
+    expect(mainUsageRedered).toMatchSnapshot('main')
 
-    await cli(['command2', '-h'], entry, {
+    const command2UsageRendered = await cli(['command2', '-h'], entry, {
       subCommands,
       name: 'gunshi',
       description: 'Modern CLI tool',
       version: '0.0.0'
     })
+    expect(command2UsageRendered).toMatchSnapshot('command2')
 
     const message = log()
     expect(message).toMatchSnapshot()

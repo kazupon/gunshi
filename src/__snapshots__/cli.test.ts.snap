@@ -1,5 +1,21 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`aute generate usage > inline function > USAGE:
+  COMMAND <OPTIONS> 
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+ 1`] = `
+"USAGE:
+  COMMAND <OPTIONS> 
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
 exports[`aute generate usage > inline function 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 
@@ -29,7 +45,47 @@ EXAMPLES:
 "
 `;
 
+exports[`aute generate usage > loosely entry command > USAGE:
+  COMMAND <OPTIONS> 
+
+OPTIONS:
+  -f, --foo <foo>          
+  -h, --help               Display this help message
+  -v, --version            Display this version
+ 1`] = `
+"USAGE:
+  COMMAND <OPTIONS> 
+
+OPTIONS:
+  -f, --foo <foo>          
+  -h, --help               Display this help message
+  -v, --version            Display this version
+"
+`;
+
 exports[`aute generate usage > loosely entry command 1`] = `
+"USAGE:
+  COMMAND <OPTIONS> 
+
+OPTIONS:
+  -f, --foo <foo>          
+  -h, --help               Display this help message
+  -v, --version            Display this version
+"
+`;
+
+exports[`aute generate usage > loosely sub commands > command2 1`] = `
+"USAGE:
+  COMMAND command2 <OPTIONS>
+
+OPTIONS:
+  -b, --bar [bar]          
+  -h, --help               Display this help message
+  -v, --version            Display this version
+"
+`;
+
+exports[`aute generate usage > loosely sub commands > main 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 
 
@@ -59,7 +115,21 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > strictly entry command 1`] = `
+exports[`aute generate usage > strictly entry command > Modern CLI tool (gunshi v0.0.0)
+USAGE:
+  gunshi <OPTIONS> 
+
+OPTIONS:
+  -f, --foo <foo>          [string]  The foo option
+  -h, --help               [boolean] Display this help message
+  -v, --version            [boolean] Display this version
+
+EXAMPLES:
+  # Example 1
+  $ gunshi --foo bar
+  # Example 2
+  $ gunshi -f bar
+ 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
 USAGE:
@@ -75,6 +145,51 @@ EXAMPLES:
   $ gunshi --foo bar
   # Example 2
   $ gunshi -f bar
+"
+`;
+
+exports[`aute generate usage > strictly sub commands > command2 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+USAGE:
+  gunshi command2 <OPTIONS>
+
+OPTIONS:
+  -b, --bar [bar]          The bar option
+  -h, --help               Display this help message
+  -v, --version            Display this version
+
+EXAMPLES:
+  # Example 1
+  $ gunshi command2 --bar 42
+  # Example 2
+  $ gunshi command2 -b 42
+"
+`;
+
+exports[`aute generate usage > strictly sub commands > main 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+使い方:
+    gunshi [command1] <オプション> 
+    gunshi <コマンド>
+
+コマンド:
+    command2                 
+    command1                 
+
+詳細は、コマンドと\`--help\`フラグを実行してください:
+    gunshi command2 --help
+    gunshi command1 --help
+
+オプション:
+    -f, --foo <foo>               The foo option
+    -h, --help                    Display this help message
+    -v, --version                 Display this version
+
+例:
+    # Example 1
+    $ gunshi --foo bar
+    # Example 2
+    $ gunshi -f bar
 "
 `;
 

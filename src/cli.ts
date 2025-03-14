@@ -17,7 +17,7 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
   args: string[],
   entry: Command<Options> | CommandRunner<Options>,
   opts: CommandOptions<Options> = {}
-): Promise<void> {
+): Promise<string | undefined> {
   const tokens = parseArgs(args)
 
   const subCommand = getSubCommand(tokens)
@@ -49,11 +49,19 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
     return
   }
 
-  await showHeader(ctx)
+  const usageBuffer: string[] = []
+
+  const header = await showHeader(ctx)
+  if (header) {
+    usageBuffer.push(header)
+  }
 
   if (values.help) {
-    await showUsage(ctx)
-    return
+    const usage = await showUsage(ctx)
+    if (usage) {
+      usageBuffer.push(usage)
+    }
+    return usageBuffer.join('\n')
   }
 
   if (error) {
@@ -90,19 +98,26 @@ function getSubCommand(tokens: ArgToken[]): string {
     : ''
 }
 
-async function showUsage<Options extends ArgOptions>(ctx: CommandContext<Options>): Promise<void> {
+async function showUsage<Options extends ArgOptions>(
+  ctx: CommandContext<Options>
+): Promise<string | undefined> {
   if (ctx.env.renderUsage === null) {
     return
   }
-  const render = ctx.env.renderUsage || renderUsage
-  log(await render(ctx))
+  const usage = await (ctx.env.renderUsage || renderUsage)(ctx)
+  if (usage) {
+    log(usage)
+    return usage
+  }
 }
 
 function showVersion<Options extends ArgOptions>(ctx: CommandContext<Options>): void {
   log(ctx.env.version)
 }
 
-async function showHeader<Options extends ArgOptions>(ctx: CommandContext<Options>): Promise<void> {
+async function showHeader<Options extends ArgOptions>(
+  ctx: CommandContext<Options>
+): Promise<string | undefined> {
   if (ctx.env.renderHeader === null) {
     return
   }
@@ -110,6 +125,7 @@ async function showHeader<Options extends ArgOptions>(ctx: CommandContext<Option
   if (header) {
     log(header)
     log()
+    return header
   }
 }
 
