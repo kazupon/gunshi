@@ -14,8 +14,11 @@ export async function renderUsage<Options extends ArgOptions = ArgOptions>(
   const messages: string[] = []
 
   // render description section (sub command executed only)
-  if (!ctx.omitted && hasDescription(ctx)) {
-    messages.push(ctx.description!, '')
+  if (!ctx.omitted) {
+    const description = resolveDescription(ctx)
+    if (description) {
+      messages.push(description, '')
+    }
   }
 
   // render usage section
@@ -127,7 +130,7 @@ async function renderCommandsSection<Options extends ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns The entry command name
  */
-function resolveEntry<Options extends ArgOptions>(ctx: Readonly<CommandContext<Options>>): string {
+function resolveEntry<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
   return ctx.env.name || ctx.translation('COMMAND')
 }
 
@@ -143,12 +146,12 @@ function resolveSubCommand<Options extends ArgOptions>(
 }
 
 /**
- * Check if the command has a description
+ * Resolve the command description
  * @param ctx A {@link CommandContext | command context}
- * @returns True if the command has a description
+ * @returns resolved command description
  */
-function hasDescription<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
-  return !!ctx.description
+function resolveDescription<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
+  return ctx.translation('description') || ctx.description || ''
 }
 
 /**
