@@ -21,12 +21,8 @@ const command = {
 
   // Define usage information (will be translated)
   usage: {
-    options: {
-      name: 'Name to greet',
-      formal: 'Use formal greeting'
-    },
-    examples:
-      '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal'
+    options: enUS.options,
+    examples: enUS.examples
   },
 
   // Define a resource fetcher for translations

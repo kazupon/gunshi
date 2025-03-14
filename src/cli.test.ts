@@ -4,7 +4,7 @@ import { cli } from './cli'
 import { renderValidationErrors } from './renderer/index.js'
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command, CommandOptions, LazyCommand } from './types'
+import type { Command, CommandOptions } from './types'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -33,7 +33,7 @@ describe('execute command', () => {
       name: 'show',
       run: mockShow
     }
-    const subCommands = new Map<string, Command<ArgOptions> | LazyCommand<ArgOptions>>()
+    const subCommands = new Map()
     subCommands.set('command1', {
       name: 'command1',
       run: mockCommand1
@@ -65,7 +65,7 @@ describe('execute command', () => {
     const anonymous = {
       run: mockAnonymous
     }
-    const subCommands = new Map<string, Command<ArgOptions> | LazyCommand<ArgOptions>>()
+    const subCommands = new Map()
     subCommands.set('show', {
       run: mockShow
     })
@@ -96,6 +96,31 @@ describe('execute command', () => {
     await expect(async () => {
       await cli(['show'], { run: vi.fn() }, {})
     }).rejects.toThrowError('Command not found: show')
+  })
+
+  test('not registered entry in sub commands', async () => {
+    const mockEntry = vi.fn()
+    const mockCommand1 = vi.fn()
+
+    const entry = {
+      name: 'main',
+      run: mockEntry
+    }
+    const subCommands = new Map()
+    subCommands.set('command1', {
+      name: 'command1',
+      run: mockCommand1
+    })
+    const options = {
+      subCommands
+    }
+
+    await cli([''], entry, options)
+    await cli(['main'], entry, options)
+    await cli(['command1'], entry, options)
+
+    expect(mockEntry).toBeCalledTimes(2)
+    expect(mockCommand1).toBeCalledTimes(1)
   })
 })
 
@@ -188,8 +213,7 @@ describe('aute generate usage', () => {
       run: vi.fn()
     } satisfies Command<typeof command2Options>
 
-    type CommandArgs = typeof entryOptions | typeof command2Options
-    const subCommands = new Map<string, Command<CommandArgs> | LazyCommand<CommandArgs>>()
+    const subCommands = new Map()
     subCommands.set('command2', command2)
 
     expect(await cli(['-h'], entry, { subCommands })).toMatchSnapshot('main')

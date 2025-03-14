@@ -5,7 +5,7 @@ import { renderHeader, renderUsage, renderValidationErrors } from './renderer/in
 import { create, log, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'
-import type { Command, Commandable, CommandContext, CommandOptions, CommandRunner } from './types'
+import type { Command, CommandContext, CommandOptions, CommandRunner } from './types'
 
 /**
  * Run the command
@@ -21,14 +21,10 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
   const tokens = parseArgs(args)
 
   const subCommand = getSubCommand(tokens)
-  const resolvedCommandOptions = resolveCommandOptions(opts)
+  const resolvedCommandOptions = resolveCommandOptions(opts, entry)
   const [name, command] = await resolveCommand(subCommand, entry, resolvedCommandOptions)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
-  }
-
-  if (command.name && !resolvedCommandOptions.subCommands!.has(command.name)) {
-    resolvedCommandOptions.subCommands!.set(command.name, command)
   }
 
   const options = resolveArgOptions(command.options)
@@ -41,7 +37,8 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
     positionals,
     omitted,
     command,
-    commandOptions: opts
+    // commandOptions: opts
+    commandOptions: resolvedCommandOptions
   })
 
   if (values.version) {
@@ -77,15 +74,16 @@ function resolveArgOptions<Options extends ArgOptions>(options?: Options): Optio
 }
 
 function resolveCommandOptions<Options extends ArgOptions>(
-  options: CommandOptions<Options>
+  options: CommandOptions<Options>,
+  entry: Command<Options> | CommandRunner<Options>
 ): CommandOptions<Options> {
-  const subCommands = new Map<string, Commandable<Options>>(options.subCommands) // shallow copy
-  return Object.assign(
-    create<CommandOptions<Options>>(),
-    COMMAND_OPTIONS_DEFAULT,
-    { subCommands },
-    options
-  ) as CommandOptions<Options>
+  const subCommands = new Map(options.subCommands)
+  if (typeof entry === 'object' && entry.name) {
+    subCommands.set(entry.name, entry)
+  }
+  return Object.assign(create<CommandOptions<Options>>(), COMMAND_OPTIONS_DEFAULT, options, {
+    subCommands
+  }) as CommandOptions<Options>
 }
 
 function getSubCommand(tokens: ArgToken[]): string {
