@@ -328,6 +328,10 @@ export type TranslationAdapterFactory = (
  */
 export interface TranslationAdapterFactoryOptions {
   /**
+   * A locale
+   */
+  locale: string
+  /**
    * A fallback locale
    */
   fallbackLocale: string

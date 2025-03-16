@@ -93,6 +93,7 @@
   },
   "devDependencies": {
     "@eslint/markdown": "^6.2.2",
+    "@intlify/core": "^11.1.2",
     "@kazupon/eslint-config": "^0.22.0",
     "@kazupon/prettier-config": "^0.1.1",
     "@types/node": "^22.13.9",

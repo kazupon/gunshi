@@ -92,7 +92,10 @@ export async function createCommandContext<
   const locale = resolveLocale(commandOptions.locale)
   const translationAdapterFactory =
     commandOptions.translationAdapterFactory || createTranslationAdapter
-  const adapter = translationAdapterFactory({ fallbackLocale: DEFAULT_LOCALE })
+  const adapter = translationAdapterFactory({
+    locale: locale.toString(),
+    fallbackLocale: DEFAULT_LOCALE
+  })
 
   // store built-in locale resources in the environment
   const localeResources: Map<string, Record<string, string>> = new Map()
