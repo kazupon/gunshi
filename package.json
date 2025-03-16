@@ -109,6 +109,7 @@
     "jsr": "^0.13.4",
     "knip": "^5.45.0",
     "lint-staged": "^15.4.3",
+    "messageformat": "4.0.0-9",
     "pkg-pr-new": "^0.0.41",
     "prettier": "^3.5.3",
     "tsdown": "^0.6.4",

@@ -92,7 +92,7 @@ export async function createCommandContext<
   const locale = resolveLocale(commandOptions.locale)
   const translationAdapterFactory =
     commandOptions.translationAdapterFactory || createTranslationAdapter
-  const adapter = translationAdapterFactory({ locale })
+  const adapter = translationAdapterFactory({ fallbackLocale: DEFAULT_LOCALE })
 
   // store built-in locale resources in the environment
   const localeResources: Map<string, Record<string, string>> = new Map()
@@ -134,12 +134,7 @@ export async function createCommandContext<
       // NOTE:
       // for otherwise, if the key is not found in the command resources, then return an empty string.
       // because should not render the key in usage.
-      return adapter.translate(
-        adapter.getMessage(locale.toString(), strKey) ||
-          adapter.getMessage(DEFAULT_LOCALE, strKey) ||
-          '',
-        values
-      )
+      return adapter.translate(locale.toString(), strKey, values) || ''
     }
   }
 
