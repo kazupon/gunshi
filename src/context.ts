@@ -92,7 +92,7 @@ export async function createCommandContext<
   const locale = resolveLocale(commandOptions.locale)
   const translationAdapterFactory =
     commandOptions.translationAdapterFactory || createTranslationAdapter
-  const translation = translationAdapterFactory({ locale })
+  const adapter = translationAdapterFactory({ locale })
 
   // store built-in locale resources in the environment
   const localeResources: Map<string, Record<string, string>> = new Map()
@@ -134,9 +134,9 @@ export async function createCommandContext<
       // NOTE:
       // for otherwise, if the key is not found in the command resources, then return an empty string.
       // because should not render the key in usage.
-      return translation.translate(
-        translation.getMessage(locale.toString(), strKey) ||
-          translation.getMessage(DEFAULT_LOCALE, strKey) ||
+      return adapter.translate(
+        adapter.getMessage(locale.toString(), strKey) ||
+          adapter.getMessage(DEFAULT_LOCALE, strKey) ||
           '',
         values
       )
@@ -196,7 +196,7 @@ export async function createCommandContext<
   }, create<Record<string, string>>())
   defaultCommandResource.description = command.description || ''
   defaultCommandResource.examples = usage.examples || ''
-  translation.setResource(DEFAULT_LOCALE, defaultCommandResource)
+  adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
   const originalResource = await loadCommandResource(ctx, command)
   if (originalResource) {
@@ -212,7 +212,7 @@ export async function createCommandContext<
       resource.help = builtInLoadedResources.help
       resource.version = builtInLoadedResources.version
     }
-    translation.setResource(locale.toString(), resource)
+    adapter.setResource(locale.toString(), resource)
   }
 
   return ctx

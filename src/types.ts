@@ -327,8 +327,7 @@ export type TranslationAdapterFactory = (
  * Translation adapter factory options
  */
 export interface TranslationAdapterFactoryOptions {
-   
-  // TODO:
+  // TODO: add options, if we need thems
 }
 
 /**
