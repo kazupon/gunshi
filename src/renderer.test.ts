@@ -92,7 +92,7 @@ describe('renderHeader', () => {
 
   test('basic', async () => {
     const ctx = await createCommandContext({
-      options: command.options,
+      options: {},
       values: {},
       positionals: [],
       omitted: true,
@@ -110,7 +110,7 @@ describe('renderHeader', () => {
 
   test('no description', async () => {
     const ctx = await createCommandContext({
-      options: command.options,
+      options: {},
       values: {},
       positionals: [],
       omitted: true,
@@ -127,7 +127,7 @@ describe('renderHeader', () => {
 
   test('no name & no description', async () => {
     const ctx = await createCommandContext({
-      options: command.options,
+      options: {},
       values: {},
       positionals: [],
       omitted: true,
@@ -140,7 +140,7 @@ describe('renderHeader', () => {
 
   test('no version', async () => {
     const ctx = await createCommandContext({
-      options: command.options,
+      options: {},
       values: {},
       positionals: [],
       omitted: true,
@@ -192,7 +192,7 @@ describe('renderUsage', () => {
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
-      options: command.options,
+      options: command.options!,
       values: {},
       positionals: [],
       omitted: false,
@@ -219,7 +219,7 @@ describe('renderUsage', () => {
       }
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
-      options: command.options,
+      options: {},
       values: {},
       positionals: [],
       omitted: false,
@@ -262,7 +262,7 @@ describe('renderUsage', () => {
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
-      options: command.options,
+      options: command.options!,
       values: {},
       positionals: [],
       omitted: false,
@@ -311,7 +311,7 @@ describe('renderUsage', () => {
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
-      options: command.options,
+      options: command.options!,
       values: {},
       positionals: [],
       omitted: false,
@@ -361,7 +361,7 @@ describe('renderUsage', () => {
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
-      options: command.options,
+      options: command.options!,
       values: {},
       positionals: [],
       omitted: false,
@@ -381,7 +381,7 @@ describe('renderUsage', () => {
 
   test('sub commands', async () => {
     const ctx = await createCommandContext({
-      options: SHOW.options,
+      options: SHOW.options!,
       values: {},
       omitted: true,
       positionals: [],
@@ -400,7 +400,7 @@ describe('renderUsage', () => {
 
 test('renderValidationErrors', async () => {
   const ctx = await createCommandContext({
-    options: SHOW.options,
+    options: SHOW.options!,
     values: {},
     positionals: [],
     omitted: false,

@@ -112,7 +112,7 @@ const customUsageRenderer = ctx => {
       const type = `[${option.type}]`
 
       // Format the option with custom styling
-      const formattedOption = `  ${shortFlag}${longFlag.padEnd(15)} ${type.padEnd(10)} ${ctx.translation(key)}`
+      const formattedOption = `  ${shortFlag}${longFlag.padEnd(15)} ${type.padEnd(10)} ${ctx.translate(key)}`
       lines.push(formattedOption)
     }
 

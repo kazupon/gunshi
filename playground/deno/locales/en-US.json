@@ -1,8 +1,6 @@
 {
   "description": "create a new resource",
-  "options": {
-    "name": "Name of the resource to create",
-    "type": "Type of resource to create (default: \"default\")"
-  },
-  "examples": "# Create a resource example1\n$ deno run index.ts create --name my-resource --type special"
+  "examples": "# Create a resource example1\n$ deno run index.ts create --name my-resource --type special",
+  "name": "Name of the resource to create",
+  "type": "Type of resource to create (default: \"default\")"
 }

@@ -317,7 +317,7 @@ const customUsageRenderer = ctx => {
 
   for (const [key, option] of Object.entries(ctx.options || Object.create(null))) {
     const shortFlag = option.short ? `-${option.short}, ` : '    '
-    lines.push(`  ${shortFlag}--${key.padEnd(10)} ${ctx.translation(key)}`)
+    lines.push(`  ${shortFlag}--${key.padEnd(10)} ${ctx.translate(key)}`)
   }
 
   return Promise.resolve(lines.join('\n'))
@@ -365,7 +365,7 @@ const command = {
   },
   run: ctx => {
     const { name = 'World', formal } = ctx.values
-    const greeting = formal ? ctx.translation('formal') : ctx.translation('informal')
+    const greeting = formal ? ctx.translate('formal_greeting') : ctx.translate('informal_greeting')
     console.log(`${greeting}, ${name}!`)
   }
 }

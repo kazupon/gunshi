@@ -21,7 +21,7 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
   /**
    * An options of target command
    */
-  options: Options | undefined
+  options: Options
   /**
    * A values of target command
    */
@@ -64,13 +64,10 @@ export async function createCommandContext<
    * tweak the options and values
    */
 
-  const _options =
-    options == null
-      ? undefined
-      : Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
-          acc[key] = Object.assign(create<ArgOptionSchema>(), value)
-          return acc
-        }, create<ArgOptions>())
+  const _options = Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
+    acc[key] = Object.assign(create<ArgOptionSchema>(), value)
+    return acc
+  }, create<ArgOptions>())
   const _values = Object.assign(create<ArgValues<Options>>(), values)
 
   /**
@@ -115,7 +112,7 @@ export async function createCommandContext<
   }
 
   /**
-   * define the translation function, which is used to {@link CommandContext.translation}.
+   * define the translation function, which is used to {@link CommandContext.translate}.
    *
    */
 
@@ -194,16 +191,24 @@ export async function createCommandContext<
 
   const originalResource = await loadCommandResource(ctx, command)
   if (originalResource) {
-    const resource = Object.entries(originalResource.options).reduce(
-      (res, [key, value]) => {
-        res[key] = value
-        return res
-      },
-      Object.assign(create<Record<string, string>>(), {
+    const resource = Object.assign(
+      create<Record<string, string>>(),
+      {
         description: originalResource.description,
         examples: originalResource.examples
-      } as Record<string, string>)
+      } as Record<string, string>,
+      originalResource as Record<string, string>
     )
+    // const resource = Object.entries(originalResource.options).reduce(
+    //   (res, [key, value]) => {
+    //     res[key] = value
+    //     return res
+    //   },
+    //   Object.assign(create<Record<string, string>>(), {
+    //     description: originalResource.description,
+    //     examples: originalResource.examples
+    //   } as Record<string, string>)
+    // )
     if (builtInLoadedResources) {
       resource.help = builtInLoadedResources.help
       resource.version = builtInLoadedResources.version
@@ -228,6 +233,7 @@ async function loadCommandResource<Options extends ArgOptions>(
 ): Promise<CommandResource<Options> | undefined> {
   let resource: CommandResource<Options> | undefined
   try {
+    // TODO: should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)
   } catch {} // eslint-disable-line no-empty
   return resource

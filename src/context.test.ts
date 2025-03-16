@@ -109,7 +109,7 @@ test('basic', async () => {
   expect(hasPrototype(ctx)).toEqual(false)
   expect(hasPrototype(ctx.env)).toEqual(false)
   expect(hasPrototype(ctx.options)).toEqual(false)
-  for (const value of Object.values(ctx.options!)) {
+  for (const value of Object.values(ctx.options)) {
     expect(hasPrototype(value)).toEqual(false)
   }
   expect(hasPrototype(ctx.values)).toEqual(false)
@@ -122,7 +122,7 @@ test('basic', async () => {
   expect(Object.isFrozen(ctx.env)).toEqual(true)
   expect(Object.isFrozen(ctx.env.subCommands)).toEqual(true)
   expect(Object.isFrozen(ctx.options)).toEqual(true)
-  for (const value of Object.values(ctx.options!)) {
+  for (const value of Object.values(ctx.options)) {
     expect(Object.isFrozen(value)).toEqual(true)
   }
   expect(Object.isFrozen(ctx.values)).toEqual(true)
@@ -133,7 +133,7 @@ test('default', async () => {
     run: vi.fn()
   }
   const ctx = await createCommandContext({
-    options: undefined,
+    options: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     command,
@@ -148,7 +148,7 @@ test('default', async () => {
   expect(ctx).toMatchObject({
     name: undefined,
     description: undefined,
-    options: undefined,
+    options: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     omitted: false
@@ -179,7 +179,7 @@ describe('translation', () => {
       run: vi.fn()
     }
     const ctx = await createCommandContext({
-      options: undefined,
+      options: {},
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
       command,
@@ -209,7 +209,23 @@ describe('translation', () => {
   })
 
   test('basic', async () => {
+    const options = {
+      foo: {
+        type: 'string',
+        short: 'f'
+      },
+      bar: {
+        type: 'boolean'
+      },
+      baz: {
+        type: 'number',
+        short: 'b',
+        default: 42
+      }
+    } satisfies ArgOptions
+
     const command = {
+      options,
       name: 'cmd1',
       description: 'this is cmd1',
       usage: {
@@ -223,7 +239,7 @@ describe('translation', () => {
       run: vi.fn()
     } satisfies Command<ArgOptions>
     const ctx = await createCommandContext({
-      options: undefined,
+      options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
       command,
@@ -231,15 +247,13 @@ describe('translation', () => {
       commandOptions: {}
     })
 
-    type OptionsKeys = keyof typeof command.usage.options
-
     // description, options, and examples
     expect(ctx.translate(resolveBuiltInKey('help'))).toEqual(DefaultLocale.help)
     expect(ctx.translate(resolveBuiltInKey('version'))).toEqual(DefaultLocale.version)
     expect(ctx.translate('description')).toEqual('this is cmd1')
-    expect(ctx.translate<OptionsKeys>('foo')).toEqual('this is foo option')
-    expect(ctx.translate<OptionsKeys>('bar')).toEqual('this is bar option')
-    expect(ctx.translate<OptionsKeys>('baz')).toEqual('this is baz option')
+    expect(ctx.translate('foo')).toEqual('this is foo option')
+    expect(ctx.translate('bar')).toEqual('this is bar option')
+    expect(ctx.translate('baz')).toEqual('this is baz option')
     expect(ctx.translate('examples')).toEqual('this is an cmd1 example')
   })
 
@@ -261,12 +275,11 @@ describe('translation', () => {
 
     const jaJPResource = {
       description: 'これはコマンド1です',
-      options: {
-        foo: 'これは foo オプションです',
-        bar: 'これは bar オプションです',
-        baz: 'これは baz オプションです'
-      },
-      examples: 'これはコマンド1の例です'
+      foo: 'これは foo オプションです',
+      bar: 'これは bar オプションです',
+      baz: 'これは baz オプションです',
+      examples: 'これはコマンド1の例です',
+      test: 'これはテストです'
     } satisfies CommandResource<typeof options>
 
     const loadLocale = 'ja-JP'
@@ -307,8 +320,6 @@ describe('translation', () => {
 
     expect(ctx.locale.toString()).toEqual(loadLocale)
 
-    type OptionsKeys = keyof typeof command.usage.options
-
     // built-in command resources
     expect(ctx.translate(resolveBuiltInKey('help'))).toEqual(jaLocale.help)
     expect(ctx.translate(resolveBuiltInKey('version'))).toEqual(jaLocale.version)
@@ -316,9 +327,12 @@ describe('translation', () => {
 
     // description, options, and examples
     expect(ctx.translate('description')).toEqual(jaJPResource.description)
-    expect(ctx.translate<OptionsKeys>('foo')).toEqual(jaJPResource.options.foo)
-    expect(ctx.translate<OptionsKeys>('bar')).toEqual(jaJPResource.options.bar)
-    expect(ctx.translate<OptionsKeys>('baz')).toEqual(jaJPResource.options.baz)
+    expect(ctx.translate('foo')).toEqual(jaJPResource.foo)
+    expect(ctx.translate('bar')).toEqual(jaJPResource.bar)
+    expect(ctx.translate('baz')).toEqual(jaJPResource.baz)
     expect(ctx.translate('examples')).toEqual(jaJPResource.examples)
+
+    // user defined resource
+    expect(ctx.translate<keyof typeof jaJPResource>('test')).toEqual(jaJPResource.test)
   })
 })

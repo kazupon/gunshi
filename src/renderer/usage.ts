@@ -52,8 +52,7 @@ async function renderOptionsSection<Options extends ArgOptions>(
 ): Promise<string[]> {
   const messages: string[] = []
   messages.push(`${ctx.translate(resolveBuiltInKey('OPTIONS'))}:`)
-  const optionsPairs = getOptionsPairs(ctx)
-  messages.push(await generateOptionsUsage(ctx, optionsPairs))
+  messages.push(await generateOptionsUsage(ctx, getOptionsPairs(ctx)))
   return messages
 }
 
@@ -214,7 +213,7 @@ function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<
 function getOptionsPairs<Options extends ArgOptions>(
   ctx: CommandContext<Options>
 ): Record<string, string> {
-  return Object.entries(ctx.options!).reduce((acc, [name, value]) => {
+  return Object.entries(ctx.options).reduce((acc, [name, value]) => {
     let key = `--${name}`
     if (value.short) {
       key = `-${value.short}, ${key}`
@@ -242,13 +241,13 @@ async function generateOptionsUsage<Options extends ArgOptions>(
   )
 
   const optionSchemaMaxLength = ctx.env.usageOptionType
-    ? Math.max(...Object.entries(optionsPairs).map(([key, _]) => ctx.options![key].type.length))
+    ? Math.max(...Object.entries(optionsPairs).map(([key, _]) => ctx.options[key].type.length))
     : 0
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(([key, value]) => {
       const rawDesc = ctx.translate(key)
-      const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options![key].type}] ` : ''
+      const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options[key].type}] ` : ''
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
       const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}`

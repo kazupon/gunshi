@@ -379,7 +379,7 @@ describe('custom generate usage', () => {
 
         // render options section
         messages.push('Options:')
-        for (const [key, value] of Object.entries(ctx.options!)) {
+        for (const [key, value] of Object.entries(ctx.options)) {
           const usageOptions = (ctx.usage.options ?? Object.create(null)) as Record<string, string>
           const usage = usageOptions[key] || ''
           messages.push(`  --${key.padEnd(10)} ${`[${value.type}]`.padEnd(12)}`.padEnd(20) + usage)

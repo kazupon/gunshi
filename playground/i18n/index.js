@@ -51,16 +51,16 @@ const command = {
 
     // Choose between formal and informal greeting
     // const greeting = formal ? localeGreetings.formal : localeGreetings.informal
-    const greeting = formal ? ctx.translation('formal') : ctx.translation('informal')
+    const greeting = formal ? ctx.translate('formal_greeting') : ctx.translate('informal_greeting')
 
     // Display the greeting
     console.log(`${greeting}, ${name}!`)
 
     // Show translation information
     console.log('\nTranslation Information:')
-    console.log(`Command Description: ${ctx.translation('description')}`)
-    console.log(`Name Option: ${ctx.translation('name')}`)
-    console.log(`Formal Option: ${ctx.translation('formal')}`)
+    console.log(`Command Description: ${ctx.translate('description')}`)
+    console.log(`Name Option: ${ctx.translate('name')}`)
+    console.log(`Formal Option: ${ctx.translate('formal')}`)
   }
 }
 

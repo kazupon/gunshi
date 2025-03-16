@@ -1,10 +1,8 @@
 {
   "description": "国際化対応の挨拶アプリケーション",
-  "informal": "こんにちは",
-  "formal": "はじめまして",
-  "options": {
-    "name": "挨拶する相手の名前",
-    "formal": "丁寧な挨拶を使用する"
-  },
-  "examples": "# 基本的な挨拶\n$ node index.js --name 田中\n\n# 日本語での丁寧な挨拶\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal"
+  "examples": "# 基本的な挨拶\n$ node index.js --name 田中\n\n# 日本語での丁寧な挨拶\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal",
+  "name": "挨拶する相手の名前",
+  "formal": "丁寧な挨拶を使用する",
+  "formal_greeting": "はじめまして",
+  "informal_greeting": "こんにちは"
 }
