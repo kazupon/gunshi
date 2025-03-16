@@ -1,5 +1,13 @@
+import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.js'
+
 import type { ArgOptions } from 'args-tokens'
-import type { Command, Commandable } from './types'
+import type {
+  Command,
+  Commandable,
+  CommandBuiltinOptionsKeys,
+  CommandBuiltinResourceKeys,
+  GenerateNamespacedKey
+} from './types'
 
 export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
   cmd: Commandable<Options>,
@@ -16,6 +24,21 @@ export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions
     resolved.name = name
   }
   return deepFreeze(resolved)
+}
+
+export function resolveBuiltInKey<
+  Key extends string = CommandBuiltinOptionsKeys | CommandBuiltinResourceKeys
+>(key: Key): GenerateNamespacedKey<Key> {
+  return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+}
+
+export function mapResourceWithBuiltinKey(
+  resource: Record<string, string>
+): Record<string, string> {
+  return Object.entries(resource).reduce((acc, [key, value]) => {
+    acc[resolveBuiltInKey(key)] = value
+    return acc
+  }, create<Record<string, string>>())
 }
 
 export function create<T>(obj: object | null = null): T {

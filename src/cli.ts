@@ -37,7 +37,6 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
     positionals,
     omitted,
     command,
-    // commandOptions: opts
     commandOptions: resolvedCommandOptions
   })
 
@@ -81,9 +80,16 @@ function resolveCommandOptions<Options extends ArgOptions>(
   if (typeof entry === 'object' && entry.name) {
     subCommands.set(entry.name, entry)
   }
-  return Object.assign(create<CommandOptions<Options>>(), COMMAND_OPTIONS_DEFAULT, options, {
-    subCommands
-  }) as CommandOptions<Options>
+  const resolvedOptions = Object.assign(
+    create<CommandOptions<Options>>(),
+    COMMAND_OPTIONS_DEFAULT,
+    options,
+    {
+      subCommands
+    }
+  ) as CommandOptions<Options>
+
+  return resolvedOptions
 }
 
 function getSubCommand(tokens: ArgToken[]): string {

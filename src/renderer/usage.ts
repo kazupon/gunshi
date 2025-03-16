@@ -1,4 +1,4 @@
-import { create } from '../utils.js'
+import { create, resolveBuiltInKey } from '../utils.js'
 
 import type { ArgOptions } from 'args-tokens'
 import type { CommandContext } from '../types'
@@ -51,7 +51,7 @@ async function renderOptionsSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
   const messages: string[] = []
-  messages.push(`${ctx.translation('OPTIONS')}:`)
+  messages.push(`${ctx.translate(resolveBuiltInKey('OPTIONS'))}:`)
   const optionsPairs = getOptionsPairs(ctx)
   messages.push(await generateOptionsUsage(ctx, optionsPairs))
   return messages
@@ -69,7 +69,7 @@ function renderExamplesSection<Options extends ArgOptions>(
   const examples = ctx.usage
     .examples!.split('\n')
     .map(example => example.padStart(ctx.env.leftMargin + example.length))
-  messages.push(`${ctx.translation('EXAMPLES')}:`, ...examples)
+  messages.push(`${ctx.translate(resolveBuiltInKey('EXAMPLES'))}:`, ...examples)
   return messages
 }
 
@@ -81,12 +81,12 @@ function renderExamplesSection<Options extends ArgOptions>(
 async function renderUsageSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
-  const messages: string[] = [`${ctx.translation('USAGE')}:`]
+  const messages: string[] = [`${ctx.translate(resolveBuiltInKey('USAGE'))}:`]
   if (ctx.omitted) {
-    const defaultCommand = `${resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${resolveSubCommand(ctx)}]` : ''} ${hasOptions(ctx) ? `<${ctx.translation('OPTIONS')}>` : ''} `
+    const defaultCommand = `${resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${resolveSubCommand(ctx)}]` : ''} ${hasOptions(ctx) ? `<${ctx.translate(resolveBuiltInKey('OPTIONS'))}>` : ''} `
     messages.push(defaultCommand.padStart(ctx.env.leftMargin + defaultCommand.length))
     if (await hasCommands(ctx)) {
-      const commandsUsage = `${resolveEntry(ctx)} <${ctx.translation('COMMANDS')}>`
+      const commandsUsage = `${resolveEntry(ctx)} <${ctx.translate(resolveBuiltInKey('COMMANDS'))}>`
       messages.push(commandsUsage.padStart(ctx.env.leftMargin + commandsUsage.length))
     }
   } else {
@@ -104,7 +104,7 @@ async function renderUsageSection<Options extends ArgOptions>(
 async function renderCommandsSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
-  const messages: string[] = [`${ctx.translation('COMMANDS')}:`]
+  const messages: string[] = [`${ctx.translate(resolveBuiltInKey('COMMANDS'))}:`]
   const loadedCommands = await ctx.loadCommands()
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
   const commandsStr = await Promise.all(
@@ -115,7 +115,7 @@ async function renderCommandsSection<Options extends ArgOptions>(
       return `${command.padStart(ctx.env.leftMargin + command.length)} `
     })
   )
-  messages.push(...commandsStr, '', ctx.translation('FORMORE'))
+  messages.push(...commandsStr, '', ctx.translate(resolveBuiltInKey('FORMORE')))
   messages.push(
     ...loadedCommands.map(cmd => {
       const commandHelp = `${ctx.env.name} ${cmd.name} --help`
@@ -131,7 +131,7 @@ async function renderCommandsSection<Options extends ArgOptions>(
  * @returns The entry command name
  */
 function resolveEntry<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
-  return ctx.env.name || ctx.translation('COMMAND')
+  return ctx.env.name || ctx.translate(resolveBuiltInKey('COMMAND'))
 }
 
 /**
@@ -142,7 +142,7 @@ function resolveEntry<Options extends ArgOptions>(ctx: CommandContext<Options>):
 function resolveSubCommand<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): string {
-  return ctx.name || ctx.translation('SUBCOMMAND')
+  return ctx.name || ctx.translate(resolveBuiltInKey('SUBCOMMAND'))
 }
 
 /**
@@ -151,7 +151,7 @@ function resolveSubCommand<Options extends ArgOptions>(
  * @returns resolved command description
  */
 function resolveDescription<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
-  return ctx.translation('description') || ctx.description || ''
+  return ctx.translate('description') || ctx.description || ''
 }
 
 /**
@@ -201,8 +201,8 @@ function hasAllDefaultOptions<Options extends ArgOptions>(ctx: CommandContext<Op
 function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
   return hasOptions(ctx)
     ? hasAllDefaultOptions(ctx)
-      ? `[${ctx.translation('OPTIONS')}]`
-      : `<${ctx.translation('OPTIONS')}>`
+      ? `[${ctx.translate('_:OPTIONS')}]`
+      : `<${ctx.translate('_:OPTIONS')}>`
     : ''
 }
 
@@ -214,7 +214,6 @@ function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<
 function getOptionsPairs<Options extends ArgOptions>(
   ctx: CommandContext<Options>
 ): Record<string, string> {
-  // eslint-disable-next-line unicorn/no-array-reduce
   return Object.entries(ctx.options!).reduce((acc, [name, value]) => {
     let key = `--${name}`
     if (value.short) {
@@ -248,7 +247,7 @@ async function generateOptionsUsage<Options extends ArgOptions>(
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(([key, value]) => {
-      const rawDesc = ctx.translation(key)
+      const rawDesc = ctx.translate(key)
       const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options![key].type}] ` : ''
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`

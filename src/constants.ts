@@ -1,6 +1,14 @@
 import type { ArgOptions } from 'args-tokens'
 import type { CommandOptions } from './types'
 
+/**
+ * The default locale string, which format is BCP 47 language tag
+ */
+export const DEFAULT_LOCALE = 'en-US'
+
+export const BUILT_IN_PREFIX = '_'
+export const BUILT_IN_KEY_SEPARATOR = ':'
+
 type CommonOptionType = {
   readonly help: {
     readonly type: 'boolean'
@@ -36,7 +44,7 @@ export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
   renderValidationErrors: undefined
 }
 
-export const COMMAND_I18N_RESOURCE_KEYS = [
+export const COMMAND_BUILTIN_RESOURCE_KEYS = [
   'USAGE',
   'COMMAND',
   'SUBCOMMAND',

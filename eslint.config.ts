@@ -26,6 +26,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   unicorn({
     rules: {
       'unicorn/no-array-push-push': 'off',
+      'unicorn/no-array-reduce': 'off',
       'unicorn/prevent-abbreviations': 'off',
       'unicorn/filename-case': 'off',
       'unicorn/no-null': 'off'

@@ -1,9 +1,16 @@
 import type { ArgOptions, ArgValues } from 'args-tokens'
 
+import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.js'
+
 /**
  * Define a promise type that can be await from T
  */
 type Awaitable<T> = T | Promise<T>
+
+export type GenerateNamespacedKey<
+  Key extends string,
+  Prefixed extends string = typeof BUILT_IN_PREFIX
+> = `${Prefixed}${typeof BUILT_IN_KEY_SEPARATOR}${Key}`
 
 /**
  * Command i18n built-in options keys
@@ -16,7 +23,7 @@ export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants'))['CO
  * @experimental
  */
 export type CommandBuiltinResourceKeys =
-  (typeof import('./constants'))['COMMAND_I18N_RESOURCE_KEYS'][number]
+  (typeof import('./constants'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
 
 /**
  * Command i18n built-in keys
@@ -24,8 +31,8 @@ export type CommandBuiltinResourceKeys =
  * @experimental
  */
 export type CommandBuiltinKeys =
-  | CommandBuiltinOptionsKeys
-  | CommandBuiltinResourceKeys
+  | GenerateNamespacedKey<CommandBuiltinOptionsKeys>
+  | GenerateNamespacedKey<CommandBuiltinResourceKeys>
   | 'description'
   | 'examples'
 
@@ -209,12 +216,12 @@ export interface CommandContext<
    */
   loadCommands: () => Promise<Command<Options>[]>
   /**
-   * Translation function
+   * Translate function
    * @param key the key to be translated
    * @returns A translated string
    * @experimental
    */
-  translation: <T = CommandBuiltinKeys, Key = CommandBuiltinKeys | T>(key: Key) => string
+  translate: <T = CommandBuiltinKeys, Key = CommandBuiltinKeys | T>(key: Key) => string
 }
 
 /**
@@ -295,6 +302,18 @@ export interface CommandResource<Options extends ArgOptions = ArgOptions> {
    */
   examples: string
 }
+
+export type ResourceMessages = ResourceMessageDictionary | string
+
+export type ResourceMessageDictionary<T = Record<string, unknown>> = {
+  [K in keyof T]: ResourceMessageValue<T[K]>
+}
+
+export type ResourceMessageValue<T> = T extends string
+  ? string
+  : T extends Record<string, unknown>
+    ? ResourceMessageDictionary<Record<string, unknown>>
+    : T
 
 /**
  * Command resource fetcher
