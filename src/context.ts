@@ -1,11 +1,12 @@
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
 import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE } from './constants.js'
+import { createTranslationAdapter } from './translation.js'
 import { create, deepFreeze, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type {
   Command,
-  CommandBuiltinResourceKeys,
+  CommandBuiltinKeys,
   CommandContext,
   CommandEnvironment,
   CommandOptions,
@@ -89,11 +90,12 @@ export async function createCommandContext<
   )
 
   const locale = resolveLocale(commandOptions.locale)
+  const translationAdapterFactory =
+    commandOptions.translationAdapterFactory || createTranslationAdapter
+  const translation = translationAdapterFactory({ locale })
 
   // store built-in locale resources in the environment
   const localeResources: Map<string, Record<string, string>> = new Map()
-  // store command resources in sub-commands
-  const commandResources = new Map<string, Record<string, string>>()
 
   let builtInLoadedResources: Record<string, string> | undefined
 
@@ -116,21 +118,28 @@ export async function createCommandContext<
    *
    */
 
-  function translate<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
-    if ((key as string).codePointAt(0) === BUILT_IN_PREFIX_CODE) {
+  function translate<
+    T extends string = CommandBuiltinKeys,
+    Key = CommandBuiltinKeys | keyof Options | T
+  >(key: Key, values: Record<string, unknown> = create<Record<string, unknown>>()): string {
+    const strKey = key as string
+    if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
       // NOTE:
       // if the key is one of the `COMMAND_BUILTIN_RESOURCE_KEYS` and the key is not found in the locale resources,
       // then return the key itself.
       const resource =
         localeResources.get(locale.toString()) || localeResources.get(DEFAULT_LOCALE)!
-      return resource[key as CommandBuiltinResourceKeys] || (key as string)
+      return resource[strKey as CommandBuiltinKeys] || strKey
     } else {
       // NOTE:
       // for otherwise, if the key is not found in the command resources, then return an empty string.
       // because should not render the key in usage.
-      const resource =
-        commandResources.get(locale.toString()) || commandResources.get(DEFAULT_LOCALE)!
-      return resource[key as string] || ''
+      return translation.translate(
+        translation.getMessage(locale.toString(), strKey) ||
+          translation.getMessage(DEFAULT_LOCALE, strKey) ||
+          '',
+        values
+      )
     }
   }
 
@@ -187,7 +196,7 @@ export async function createCommandContext<
   }, create<Record<string, string>>())
   defaultCommandResource.description = command.description || ''
   defaultCommandResource.examples = usage.examples || ''
-  commandResources.set(DEFAULT_LOCALE, defaultCommandResource)
+  translation.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
   const originalResource = await loadCommandResource(ctx, command)
   if (originalResource) {
@@ -199,21 +208,11 @@ export async function createCommandContext<
       } as Record<string, string>,
       originalResource as Record<string, string>
     )
-    // const resource = Object.entries(originalResource.options).reduce(
-    //   (res, [key, value]) => {
-    //     res[key] = value
-    //     return res
-    //   },
-    //   Object.assign(create<Record<string, string>>(), {
-    //     description: originalResource.description,
-    //     examples: originalResource.examples
-    //   } as Record<string, string>)
-    // )
     if (builtInLoadedResources) {
       resource.help = builtInLoadedResources.help
       resource.version = builtInLoadedResources.version
     }
-    commandResources.set(locale.toString(), resource)
+    translation.setResource(locale.toString(), resource)
   }
 
   return ctx

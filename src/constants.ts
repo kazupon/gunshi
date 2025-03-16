@@ -7,6 +7,7 @@ import type { CommandOptions } from './types'
 export const DEFAULT_LOCALE = 'en-US'
 
 export const BUILT_IN_PREFIX = '_'
+
 export const BUILT_IN_KEY_SEPARATOR = ':'
 
 type CommonOptionType = {
@@ -19,6 +20,7 @@ type CommonOptionType = {
     readonly short: 'v'
   }
 }
+
 export const COMMON_OPTIONS: CommonOptionType = {
   help: {
     type: 'boolean',
@@ -41,7 +43,8 @@ export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
   usageOptionType: false,
   renderHeader: undefined,
   renderUsage: undefined,
-  renderValidationErrors: undefined
+  renderValidationErrors: undefined,
+  translationAdapterFactory: undefined
 }
 
 export const COMMAND_BUILTIN_RESOURCE_KEYS = [

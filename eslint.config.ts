@@ -17,6 +17,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   javascript(),
   typescript({
     rules: {
+      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/ban-ts-comment': 'off'
     }
   }),
