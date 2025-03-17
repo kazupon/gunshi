@@ -3,7 +3,7 @@ import { MessageFormat } from 'messageformat'
 import { vi } from 'vitest'
 import { DefaultTranslation } from '../src/translation.js'
 
-import type { CoreContext, LocaleMessages, NamedValue } from '@intlify/core'
+import type { CoreContext, LocaleMessage } from '@intlify/core'
 import type { TranslationAdapter, TranslationAdapterFactoryOptions } from '../src/types'
 
 export function defineMockLog(utils: typeof import('../src/utils')) {
@@ -77,12 +77,12 @@ export function createTranslationAdapterForIntlifyMessageFormat(
 
 class IntlifyMessageFormatTranslation implements TranslationAdapter {
   options: TranslationAdapterFactoryOptions
-  #context: CoreContext
+  #context: CoreContext<string, LocaleMessage, {}>
   constructor(options: TranslationAdapterFactoryOptions) {
     this.options = options
 
     const { locale, fallbackLocale } = options
-    const messages: LocaleMessages<{}> = {
+    const messages: LocaleMessage = {
       [locale]: {}
     }
 
@@ -90,22 +90,19 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
       messages[fallbackLocale] = {}
     }
 
-    this.#context = createCoreContext({
+    this.#context = createCoreContext<string, {}, typeof messages>({
       locale,
       fallbackLocale,
-
       messages
     })
   }
 
   getResource(locale: string): Record<string, string> | undefined {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    return (this.#context.messages as any)[locale] as Record<string, string> | undefined
+    return this.#context.messages[locale] as Record<string, string> | undefined
   }
 
   setResource(locale: string, resource: Record<string, string>): void {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    ;(this.#context.messages as any)[locale] = resource
+    this.#context.messages[locale] = resource
   }
 
   getMessage(locale: string, key: string): string | undefined {
@@ -123,7 +120,7 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
       return undefined
     }
 
-    const ret = translate(this.#context, key, values as unknown as NamedValue)
+    const ret = translate(this.#context, key, values)
     return typeof ret === 'number' && ret === NOT_REOSLVED ? undefined : (ret as string)
   }
 }
