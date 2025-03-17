@@ -8,24 +8,110 @@ A translation adapter offers several benefits:
 
 - **Integration**: Connect Gunshi with your existing i18n infrastructure
 - **Consistency**: Use the same translation system across your entire application
-- **Advanced features**: Leverage features of specialized i18n libraries
-- **Workflow**: Maintain your existing translation workflow and tools
+- **Advanced features**: Leverage features of specialized i18n libraries like message formatting
+- **Resource management**: Let your i18n library manage translation resources directly
 
-## Basic Translation Adapter
+## Understanding the TranslationAdapter Interface
 
-Here's how to create a basic translation adapter for Gunshi:
+Gunshi defines a `TranslationAdapter` interface that allows you to integrate with any i18n library. The interface is designed to let the i18n library manage resources directly:
+
+```typescript
+interface TranslationAdapter<MessageResource = string> {
+  /**
+   * Get a resource of locale
+   * @param locale A Locale at the time of command execution (BCP 47)
+   * @returns A resource of locale. if resource not found, return `undefined`
+   */
+  getResource(locale: string): Record<string, string> | undefined
+
+  /**
+   * Set a resource of locale
+   * @param locale A Locale at the time of command execution (BCP 47)
+   * @param resource A resource of locale
+   */
+  setResource(locale: string, resource: Record<string, string>): void
+
+  /**
+   * Get a message of locale
+   * @param locale A Locale at the time of command execution (BCP 47)
+   * @param key A key of message resource
+   * @returns A message of locale. if message not found, return `undefined`
+   */
+  getMessage(locale: string, key: string): MessageResource | undefined
+
+  /**
+   * Translate a message
+   * @param locale A Locale at the time of command execution (BCP 47)
+   * @param key A key of message resource
+   * @param values A values to be resolved in the message
+   * @returns A translated message, if message is not translated, return `undefined`
+   */
+  translate(locale: string, key: string, values?: Record<string, unknown>): string | undefined
+}
+```
+
+## Creating a Translation Adapter Factory
+
+To use a custom translation adapter with Gunshi, you need to create a translation adapter factory function that returns an implementation of the `TranslationAdapter` interface:
 
 ```js
 import { cli } from 'gunshi'
 
-// Create a translation adapter
-function createTranslationAdapter(i18nSystem) {
-  return async ctx => {
-    // Return a function that translates keys using your i18n system
-    return key => {
-      // Use your i18n system to translate the key
-      return i18nSystem.translate(key, ctx.locale.toString())
+// Create a translation adapter factory
+function createTranslationAdapterFactory() {
+  return options => {
+    // options contains locale and fallbackLocale
+    return new MyTranslationAdapter(options)
+  }
+}
+
+// Implement the TranslationAdapter interface
+class MyTranslationAdapter {
+  #resources = new Map()
+  #options
+
+  constructor(options) {
+    this.#options = options
+    // Initialize with empty resources for the locale and fallback locale
+    this.#resources.set(options.locale, {})
+    if (options.locale !== options.fallbackLocale) {
+      this.#resources.set(options.fallbackLocale, {})
     }
+  }
+
+  getResource(locale) {
+    return this.#resources.get(locale)
+  }
+
+  setResource(locale, resource) {
+    this.#resources.set(locale, resource)
+  }
+
+  getMessage(locale, key) {
+    const resource = this.getResource(locale)
+    if (resource) {
+      return resource[key]
+    }
+    return
+  }
+
+  translate(locale, key, values = {}) {
+    // Try to get the message from the specified locale
+    let message = this.getMessage(locale, key)
+
+    // Fall back to the fallback locale if needed
+    if (message === undefined && locale !== this.#options.fallbackLocale) {
+      message = this.getMessage(this.#options.fallbackLocale, key)
+    }
+
+    if (message === undefined) {
+      return
+    }
+
+    // Simple interpolation for demonstration
+    return message.replaceAll(/\{\{(\w+)\}\}/g, (_, name) => {
+      return values[name] === undefined ? `{{${name}}}` : values[name]
+    })
   }
 }
 
@@ -36,313 +122,126 @@ const command = {
     name: {
       type: 'string',
       short: 'n'
-    },
-    formal: {
-      type: 'boolean',
-      short: 'f'
     }
   },
 
-  // Use the translation adapter
-  translation: createTranslationAdapter(myI18nSystem),
-
-  run: ctx => {
-    const { name = 'World', formal } = ctx.values
-
-    // Use the translation function
-    const greeting = formal
-      ? ctx.translation('formal_greeting')
-      : ctx.translation('informal_greeting')
-
-    console.log(`${greeting}, ${name}!`)
-  }
-}
-
-// Run the command
-cli(process.argv.slice(2), command, {
-  name: 'i18n-example',
-  version: '1.0.0',
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
-})
-```
-
-## Integrating with Popular i18n Libraries
-
-### i18next
-
-[i18next](https://www.i18next.com/) is a popular internationalization framework for JavaScript. Here's how to integrate it with Gunshi:
-
-```js
-import { cli } from 'gunshi'
-import i18next from 'i18next'
-import Backend from 'i18next-fs-backend'
-
-// Initialize i18next
-i18next.use(Backend).init({
-  lng: 'en',
-  fallbackLng: 'en',
-  ns: ['translation'],
-  defaultNS: 'translation',
-  backend: {
-    loadPath: './locales/{{lng}}/{{ns}}.json'
-  }
-})
-
-// Create an i18next adapter
-function createI18nextAdapter() {
-  return async ctx => {
-    // Change the language based on the context locale
-    await i18next.changeLanguage(ctx.locale.toString())
-
-    // Return a function that translates keys using i18next
-    return (key, options) => {
-      return i18next.t(key, options)
+  // Define a resource fetcher to provide translations
+  resource: async ctx => {
+    if (ctx.locale.toString() === 'ja-JP') {
+      return {
+        description: '挨拶アプリケーション',
+        options: {
+          name: '挨拶する相手の名前'
+        },
+        greeting: 'こんにちは、{{name}}さん！'
+      }
     }
-  }
-}
 
-// Define your command
-const command = {
-  name: 'greeter',
-  options: {
-    name: {
-      type: 'string',
-      short: 'n'
-    },
-    formal: {
-      type: 'boolean',
-      short: 'f'
-    }
-  },
-
-  // Use the i18next adapter
-  translation: createI18nextAdapter(),
-
-  run: ctx => {
-    const { name = 'World', formal } = ctx.values
-
-    // Use the translation function with i18next features
-    const greeting = ctx.translation(formal ? 'formal_greeting' : 'informal_greeting')
-
-    // You can also use i18next's interpolation
-    const message = ctx.translation('greeting_message', { name, greeting })
-
-    console.log(message)
-  }
-}
-
-// Run the command
-cli(process.argv.slice(2), command, {
-  name: 'i18next-example',
-  version: '1.0.0',
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
-})
-```
-
-Example i18next locale files:
-
-`locales/en/translation.json`:
-
-```json
-{
-  "description": "Greeting application",
-  "options": {
-    "name": "Name to greet",
-    "formal": "Use formal greeting"
-  },
-  "informal_greeting": "Hello",
-  "formal_greeting": "Good day",
-  "greeting_message": "{{greeting}}, {{name}}!"
-}
-```
-
-`locales/ja/translation.json`:
-
-```json
-{
-  "description": "挨拶アプリケーション",
-  "options": {
-    "name": "挨拶する相手の名前",
-    "formal": "丁寧な挨拶を使用する"
-  },
-  "informal_greeting": "こんにちは",
-  "formal_greeting": "はじめまして",
-  "greeting_message": "{{greeting}}、{{name}}さん！"
-}
-```
-
-### vue-i18n
-
-If you're using Vue.js with [vue-i18n](https://vue-i18n.intlify.dev/), you can integrate it with Gunshi:
-
-```js
-import { cli } from 'gunshi'
-import { createI18n } from 'vue-i18n'
-
-// Create vue-i18n instance
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  fallbackLocale: 'en',
-  messages: {
-    en: {
+    return {
       description: 'Greeting application',
       options: {
-        name: 'Name to greet',
-        formal: 'Use formal greeting'
+        name: 'Name to greet'
       },
-      informal_greeting: 'Hello',
-      formal_greeting: 'Good day',
-      greeting_message: '{greeting}, {name}!'
-    },
-    ja: {
-      description: '挨拶アプリケーション',
-      options: {
-        name: '挨拶する相手の名前',
-        formal: '丁寧な挨拶を使用する'
-      },
-      informal_greeting: 'こんにちは',
-      formal_greeting: 'はじめまして',
-      greeting_message: '{greeting}、{name}さん！'
-    }
-  }
-})
-
-// Create a vue-i18n adapter
-function createVueI18nAdapter() {
-  return async ctx => {
-    // Set the locale based on the context locale
-    i18n.global.locale.value = ctx.locale.toString()
-
-    // Return a function that translates keys using vue-i18n
-    return (key, options) => {
-      return i18n.global.t(key, options)
-    }
-  }
-}
-
-// Define your command
-const command = {
-  name: 'greeter',
-  options: {
-    name: {
-      type: 'string',
-      short: 'n'
-    },
-    formal: {
-      type: 'boolean',
-      short: 'f'
+      greeting: 'Hello, {{name}}!'
     }
   },
 
-  // Use the vue-i18n adapter
-  translation: createVueI18nAdapter(),
-
   run: ctx => {
-    const { name = 'World', formal } = ctx.values
+    const { name = 'World' } = ctx.values
 
-    // Use the translation function with vue-i18n features
-    const greeting = ctx.translation(formal ? 'formal_greeting' : 'informal_greeting')
-
-    // You can also use vue-i18n's named interpolation
-    const message = ctx.translation('greeting_message', { name, greeting })
+    // Use the translation function
+    const message = ctx.translation('greeting', { name })
 
     console.log(message)
   }
 }
 
-// Run the command
+// Run the command with the custom translation adapter
 cli(process.argv.slice(2), command, {
-  name: 'vue-i18n-example',
+  name: 'translation-adapter-example',
   version: '1.0.0',
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
+  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
+  translationAdapterFactory: createTranslationAdapterFactory()
 })
 ```
 
-## Advanced Translation Adapter
+## Integrating with MessageFormat
 
-For more complex scenarios, you can create an advanced translation adapter that handles nested keys, pluralization, and other features:
+[MessageFormat](https://messageformat.github.io/) is a library for handling pluralization, gender, and other complex message formatting. Here's how to create a translation adapter for MessageFormat:
 
 ```js
 import { cli } from 'gunshi'
+import { MessageFormat } from 'messageformat'
 
-// Create an advanced translation adapter
-function createAdvancedAdapter(i18nSystem) {
-  return async ctx => {
-    // Initialize the i18n system with the current locale
-    await i18nSystem.init(ctx.locale.toString())
-
-    // Return a function that translates keys with advanced features
-    return (key, options = {}) => {
-      // Handle nested keys (e.g., 'options.name')
-      if (key.includes('.')) {
-        const keys = key.split('.')
-        let value = i18nSystem.translations
-
-        for (const k of keys) {
-          if (value && typeof value === 'object' && k in value) {
-            value = value[k]
-          } else {
-            return key
-          }
-        }
-
-        return typeof value === 'string' ? value : key
-      }
-
-      // Handle pluralization
-      if ('count' in options) {
-        return i18nSystem.plural(key, options.count, options)
-      }
-
-      // Handle simple translation
-      return i18nSystem.translate(key, options)
-    }
-  }
+// Create a MessageFormat translation adapter factory
+function createMessageFormatAdapterFactory() {
+  return options => new MessageFormatTranslation(options)
 }
 
-// Example i18n system
-const myI18nSystem = {
-  translations: {},
+class MessageFormatTranslation {
+  #resources = new Map()
+  #options
+  #formatters = new Map()
 
-  async init(locale) {
-    // Load translations for the specified locale
+  constructor(options) {
+    this.#options = options
+    // Initialize with empty resources
+    this.#resources.set(options.locale, {})
+    if (options.locale !== options.fallbackLocale) {
+      this.#resources.set(options.fallbackLocale, {})
+    }
+  }
+
+  getResource(locale) {
+    return this.#resources.get(locale)
+  }
+
+  setResource(locale, resource) {
+    this.#resources.set(locale, resource)
+  }
+
+  getMessage(locale, key) {
+    const resource = this.getResource(locale)
+    if (resource) {
+      return resource[key]
+    }
+    return
+  }
+
+  translate(locale, key, values = {}) {
+    // Try to get the message from the specified locale
+    let message = this.getMessage(locale, key)
+
+    // Fall back to the fallback locale if needed
+    if (message === undefined && locale !== this.#options.fallbackLocale) {
+      message = this.getMessage(this.#options.fallbackLocale, key)
+    }
+
+    if (message === undefined) {
+      return
+    }
+
+    // Create a formatter for this message if it doesn't exist
+    const cacheKey = `${locale}:${key}:${message}`
+    if (!this.#formatters.has(cacheKey)) {
+      try {
+        const messageFormat = new MessageFormat(locale)
+        const formatter = messageFormat.compile(message)
+        this.#formatters.set(cacheKey, formatter)
+      } catch (error) {
+        console.error(`[gunshi] MessageFormat error: ${error.message}`)
+        return
+      }
+    }
+
+    // Format the message with the values
     try {
-      this.translations = await import(`./locales/${locale}.json`)
+      const formatter = this.#formatters.get(cacheKey)
+      return formatter(values)
     } catch (error) {
-      console.error(`Failed to load translations for ${locale}:`, error)
-      // Fall back to English
-      this.translations = await import('./locales/en-US.json')
+      console.error(`[gunshi] MessageFormat error: ${error.message}`)
+      return
     }
-  },
-
-  translate(key, options = {}) {
-    const translation = this.translations[key]
-
-    if (!translation) {
-      return key
-    }
-
-    // Handle interpolation
-    if (typeof translation === 'string' && Object.keys(options).length > 0) {
-      return translation.replaceAll(/\{\{(\w+)\}\}/g, (_, name) => {
-        return options[name] === undefined ? `{{${name}}}` : options[name]
-      })
-    }
-
-    return translation
-  },
-
-  plural(key, count, options = {}) {
-    const pluralForms = this.translations[`${key}_plural`]
-
-    if (!pluralForms) {
-      return this.translate(key, options)
-    }
-
-    // Simple English-style pluralization for demonstration
-    const form = count === 1 ? key : `${key}_plural`
-    return this.translate(form, { ...options, count })
   }
 }
 
@@ -361,156 +260,119 @@ const command = {
     }
   },
 
-  // Use the advanced adapter
-  translation: createAdvancedAdapter(myI18nSystem),
+  // Define a resource fetcher with MessageFormat syntax
+  resource: async ctx => {
+    if (ctx.locale.toString() === 'ja-JP') {
+      return {
+        description: '挨拶アプリケーション',
+        options: {
+          name: '挨拶する相手の名前',
+          count: '挨拶の回数'
+        },
+        greeting:
+          '{count, plural, one{こんにちは、{name}さん！} other{こんにちは、{name}さん！({count}回)}}'
+      }
+    }
+
+    return {
+      description: 'Greeting application',
+      options: {
+        name: 'Name to greet',
+        count: 'Number of greetings'
+      },
+      greeting: '{count, plural, one{Hello, {name}!} other{Hello, {name}! ({count} times)}}'
+    }
+  },
 
   run: ctx => {
     const { name = 'World', count } = ctx.values
 
-    // Use nested key translation
-    const nameLabel = ctx.translation('options.name')
-
-    // Use pluralization
+    // Use the translation function with MessageFormat
     const message = ctx.translation('greeting', { name, count })
 
-    console.log(`${nameLabel}: ${name}`)
     console.log(message)
   }
 }
 
-// Run the command
+// Run the command with the MessageFormat translation adapter
 cli(process.argv.slice(2), command, {
-  name: 'advanced-i18n-example',
+  name: 'messageformat-example',
   version: '1.0.0',
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
+  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
+  translationAdapterFactory: createMessageFormatAdapterFactory()
 })
 ```
 
-Example locale files for the advanced adapter:
+## Integrating with Intlify (Vue I18n Core)
 
-`locales/en-US.json`:
-
-```json
-{
-  "description": "Greeting application",
-  "options": {
-    "name": "Name to greet",
-    "count": "Number of greetings"
-  },
-  "greeting": "Hello, {{name}}!",
-  "greeting_plural": "Hello, {{name}}! ({{count}} times)"
-}
-```
-
-`locales/ja-JP.json`:
-
-```json
-{
-  "description": "挨拶アプリケーション",
-  "options": {
-    "name": "挨拶する相手の名前",
-    "count": "挨拶の回数"
-  },
-  "greeting": "こんにちは、{{name}}さん！",
-  "greeting_plural": "こんにちは、{{name}}さん！({{count}}回)"
-}
-```
-
-## Sharing Translation Adapters
-
-You can create reusable translation adapters and share them across your projects:
-
-```js
-// translation-adapters.js
-export function createI18nextAdapter(i18next) {
-  return async ctx => {
-    await i18next.changeLanguage(ctx.locale.toString())
-    return (key, options) => i18next.t(key, options)
-  }
-}
-
-export function createVueI18nAdapter(i18n) {
-  return async ctx => {
-    i18n.global.locale.value = ctx.locale.toString()
-    return (key, options) => i18n.global.t(key, options)
-  }
-}
-
-// Other adapters...
-```
-
-Then use them in your commands:
+[Intlify](https://github.com/intlify/core) is the core of Vue I18n, but it can be used independently. Here's how to create a translation adapter for Intlify:
 
 ```js
 import { cli } from 'gunshi'
-import i18next from 'i18next'
-import { createI18nextAdapter } from './translation-adapters.js'
+import {
+  createCoreContext,
+  getLocaleMessage,
+  NOT_REOSLVED,
+  setLocaleMessage,
+  translate as intlifyTranslate
+} from '@intlify/core'
 
-// Initialize i18next
-i18next.init({
-  lng: 'en',
-  resources: {
-    en: {
-      translation: {
-        /* translations */
-      }
-    },
-    ja: {
-      translation: {
-        /* translations */
-      }
-    }
-  }
-})
-
-// Define your command
-const command = {
-  name: 'greeter',
-  // Use the shared adapter
-  translation: createI18nextAdapter(i18next)
-  // Command implementation...
+// Create an Intlify translation adapter factory
+function createIntlifyAdapterFactory() {
+  return options => new IntlifyTranslation(options)
 }
 
-// Run the command
-cli(process.argv.slice(2), command, {
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
-})
-```
+class IntlifyTranslation {
+  #options
+  #context
 
-## Complete Example
+  constructor(options) {
+    this.#options = options
 
-Here's a complete example of a CLI with a translation adapter for i18next:
-
-```js
-import { cli } from 'gunshi'
-import i18next from 'i18next'
-import Backend from 'i18next-fs-backend'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-// Initialize i18next
-await i18next.use(Backend).init({
-  lng: 'en',
-  fallbackLng: 'en',
-  ns: ['translation'],
-  defaultNS: 'translation',
-  backend: {
-    loadPath: path.join(__dirname, 'locales/{{lng}}/{{ns}}.json')
-  }
-})
-
-// Create an i18next adapter
-function createI18nextAdapter() {
-  return async ctx => {
-    // Change the language based on the context locale
-    await i18next.changeLanguage(ctx.locale.toString())
-
-    // Return a function that translates keys using i18next
-    return (key, options) => {
-      return i18next.t(key, options)
+    const { locale, fallbackLocale } = options
+    const messages = {
+      [locale]: {}
     }
+
+    if (locale !== fallbackLocale) {
+      messages[fallbackLocale] = {}
+    }
+
+    // Create the Intlify core context
+    this.#context = createCoreContext({
+      locale,
+      fallbackLocale,
+      messages
+    })
+  }
+
+  getResource(locale) {
+    return getLocaleMessage(this.#context, locale)
+  }
+
+  setResource(locale, resource) {
+    setLocaleMessage(this.#context, locale, resource)
+  }
+
+  getMessage(locale, key) {
+    const resource = this.getResource(locale)
+    if (resource) {
+      return resource[key]
+    }
+    return
+  }
+
+  translate(locale, key, values = {}) {
+    // Check if the message exists in the specified locale or fallback locale
+    const message =
+      this.getMessage(locale, key) || this.getMessage(this.#options.fallbackLocale, key)
+    if (message === undefined) {
+      return
+    }
+
+    // Use Intlify's translate function
+    const result = intlifyTranslate(this.#context, key, values)
+    return typeof result === 'number' && result === NOT_REOSLVED ? undefined : result
   }
 }
 
@@ -521,93 +383,232 @@ const command = {
     name: {
       type: 'string',
       short: 'n'
+    }
+  },
+
+  // Define a resource fetcher with Intlify syntax
+  resource: async ctx => {
+    if (ctx.locale.toString() === 'ja-JP') {
+      return {
+        description: '挨拶アプリケーション',
+        options: {
+          name: '挨拶する相手の名前'
+        },
+        greeting: 'こんにちは、{name}さん！'
+      }
+    }
+
+    return {
+      description: 'Greeting application',
+      options: {
+        name: 'Name to greet'
+      },
+      greeting: 'Hello, {name}!'
+    }
+  },
+
+  run: ctx => {
+    const { name = 'World' } = ctx.values
+
+    // Use the translation function with Intlify
+    const message = ctx.translation('greeting', { name })
+
+    console.log(message)
+  }
+}
+
+// Run the command with the Intlify translation adapter
+cli(process.argv.slice(2), command, {
+  name: 'intlify-example',
+  version: '1.0.0',
+  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
+  translationAdapterFactory: createIntlifyAdapterFactory()
+})
+```
+
+## Complete Example with MessageFormat
+
+Here's a complete example of a CLI with a MessageFormat translation adapter:
+
+```js
+import { cli } from 'gunshi'
+import { MessageFormat } from 'messageformat'
+
+// Create a MessageFormat translation adapter factory
+function createMessageFormatAdapterFactory() {
+  return options => new MessageFormatTranslation(options)
+}
+
+class MessageFormatTranslation {
+  #resources = new Map()
+  #options
+  #formatters = new Map()
+
+  constructor(options) {
+    this.#options = options
+    this.#resources.set(options.locale, {})
+    if (options.locale !== options.fallbackLocale) {
+      this.#resources.set(options.fallbackLocale, {})
+    }
+  }
+
+  getResource(locale) {
+    return this.#resources.get(locale)
+  }
+
+  setResource(locale, resource) {
+    this.#resources.set(locale, resource)
+  }
+
+  getMessage(locale, key) {
+    const resource = this.getResource(locale)
+    if (resource) {
+      return resource[key]
+    }
+    return
+  }
+
+  translate(locale, key, values = {}) {
+    let message = this.getMessage(locale, key)
+
+    if (message === undefined && locale !== this.#options.fallbackLocale) {
+      message = this.getMessage(this.#options.fallbackLocale, key)
+    }
+
+    if (message === undefined) {
+      return
+    }
+
+    const cacheKey = `${locale}:${key}:${message}`
+    if (!this.#formatters.has(cacheKey)) {
+      try {
+        const messageFormat = new MessageFormat(locale)
+        const formatter = messageFormat.compile(message)
+        this.#formatters.set(cacheKey, formatter)
+      } catch (error) {
+        console.error(`[gunshi] MessageFormat error: ${error.message}`)
+        return
+      }
+    }
+
+    try {
+      const formatter = this.#formatters.get(cacheKey)
+      return formatter(values)
+    } catch (error) {
+      console.error(`[gunshi] MessageFormat error: ${error.message}`)
+      return
+    }
+  }
+}
+
+// Define a task manager command
+const command = {
+  name: 'task-manager',
+  options: {
+    action: {
+      type: 'string',
+      short: 'a',
+      description: 'Action to perform (add, list, complete)'
     },
-    formal: {
-      type: 'boolean',
-      short: 'f'
+    task: {
+      type: 'string',
+      short: 't',
+      description: 'Task description'
     },
     count: {
       type: 'number',
       short: 'c',
-      default: 1
+      default: 0,
+      description: 'Number of tasks'
     }
   },
 
-  // Use the i18next adapter
-  translation: createI18nextAdapter(),
+  // Define resources with MessageFormat syntax
+  resource: async ctx => {
+    if (ctx.locale.toString() === 'ja-JP') {
+      return {
+        description: 'タスク管理アプリケーション',
+        options: {
+          action: '実行するアクション（add, list, complete）',
+          task: 'タスクの説明',
+          count: 'タスクの数'
+        },
+        add_success: 'タスク「{task}」を追加しました',
+        list_tasks:
+          '{count, plural, =0{タスクはありません} one{1つのタスクがあります} other{{count}つのタスクがあります}}',
+        complete_success: 'タスク「{task}」を完了しました',
+        unknown_action: '不明なアクション: {action}'
+      }
+    }
+
+    return {
+      description: 'Task management application',
+      options: {
+        action: 'Action to perform (add, list, complete)',
+        task: 'Task description',
+        count: 'Number of tasks'
+      },
+      add_success: 'Added task: "{task}"',
+      list_tasks: '{count, plural, =0{No tasks} one{1 task} other{{count} tasks}}',
+      complete_success: 'Completed task: "{task}"',
+      unknown_action: 'Unknown action: {action}'
+    }
+  },
 
   run: ctx => {
-    const { name = 'World', formal, count } = ctx.values
+    const { action, task, count } = ctx.values
 
-    // Get the current locale
-    const locale = ctx.locale.toString()
-    console.log(`Current locale: ${locale}`)
+    console.log(`Current locale: ${ctx.locale}`)
 
-    // Use i18next's translation features
-    const greeting = ctx.translation(formal ? 'formal_greeting' : 'informal_greeting')
-
-    // Use i18next's pluralization
-    const message = ctx.translation('greeting', {
-      name,
-      greeting,
-      count
-    })
-
-    console.log(message)
-
-    // Show translation information
-    console.log('\nTranslation Information:')
-    console.log(`Command Description: ${ctx.translation('description')}`)
-    console.log(`Name Option: ${ctx.translation('options.name')}`)
-    console.log(`Formal Option: ${ctx.translation('options.formal')}`)
-    console.log(`Count Option: ${ctx.translation('options.count')}`)
+    switch (action) {
+      case 'add': {
+        if (task) {
+          console.log(ctx.translation('add_success', { task }))
+        }
+        break
+      }
+      case 'list': {
+        console.log(ctx.translation('list_tasks', { count }))
+        break
+      }
+      case 'complete': {
+        if (task) {
+          console.log(ctx.translation('complete_success', { task }))
+        }
+        break
+      }
+      default: {
+        console.log(ctx.translation('unknown_action', { action: action || 'none' }))
+      }
+    }
   }
 }
 
-// Run the command
+// Run the command with the MessageFormat translation adapter
 cli(process.argv.slice(2), command, {
-  name: 'i18next-example',
+  name: 'task-manager',
   version: '1.0.0',
   description: ctx => ctx.translation('description'),
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
+  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
+  translationAdapterFactory: createMessageFormatAdapterFactory()
 })
 ```
 
-Example i18next locale files:
+## How It Works
 
-`locales/en/translation.json`:
+Here's how the translation adapter works with Gunshi:
 
-```json
-{
-  "description": "Greeting application with i18next integration",
-  "options": {
-    "name": "Name to greet",
-    "formal": "Use formal greeting",
-    "count": "Number of greetings"
-  },
-  "informal_greeting": "Hello",
-  "formal_greeting": "Good day",
-  "greeting": "{{greeting}}, {{name}}!",
-  "greeting_plural": "{{greeting}}, {{name}}! ({{count}} times)"
-}
-```
+1. You provide a `translationAdapterFactory` function in the CLI options
+2. Gunshi calls this factory with locale information to create a translation adapter
+3. When a command has a `resource` function, Gunshi fetches the resources and passes them to the translation adapter using `setResource`
+4. When `ctx.translation(key, values)` is called in your command, Gunshi uses the translation adapter to translate the key with the values
 
-`locales/ja/translation.json`:
+This architecture allows you to:
 
-```json
-{
-  "description": "i18next統合の挨拶アプリケーション",
-  "options": {
-    "name": "挨拶する相手の名前",
-    "formal": "丁寧な挨拶を使用する",
-    "count": "挨拶の回数"
-  },
-  "informal_greeting": "こんにちは",
-  "formal_greeting": "はじめまして",
-  "greeting": "{{greeting}}、{{name}}さん！",
-  "greeting_plural": "{{greeting}}、{{name}}さん！({{count}}回)"
-}
-```
+- Use any i18n library with Gunshi
+- Let the i18n library manage resources directly
+- Use advanced features like pluralization and formatting
+- Share translation adapters across your projects
 
 ## Next Steps
 
