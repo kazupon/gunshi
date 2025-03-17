@@ -5,6 +5,8 @@ node_modules
 .clinerules
 lib
 dist
+docs/.vitepress/dist
+docs/.vitepress/cache
 
 *.log
 *.swp

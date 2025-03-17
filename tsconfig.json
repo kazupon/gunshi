@@ -108,6 +108,6 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["**/*.ts", "playground/type-safe/index.ts"],
+  "include": ["**/*.ts", "docs/.vitepress/config.ts", "playground/type-safe/index.ts"],
   "exclude": ["playground/bun/index.ts", "playground/deno/main.ts"]
 }

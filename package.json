@@ -73,6 +73,9 @@
     "clean": "git clean -df",
     "dev": "pnpx @eslint/config-inspector --config eslint.config.ts",
     "dev:eslint": "pnpx @eslint/config-inspector --config eslint.config.ts",
+    "docs:build": "vitepress build docs",
+    "docs:dev": "vitepress dev docs",
+    "docs:preview": "vitepress preview docs",
     "fix": "pnpm run --stream --color \"/^fix:/\"",
     "fix:eslint": "eslint . --fix",
     "fix:knip": "knip --fix --no-exit-code",
@@ -116,6 +119,7 @@
     "tsdown": "^0.6.4",
     "typescript": "^5.4.2",
     "typescript-eslint": "^8.26.0",
+    "vitepress": "^1.6.3",
     "vitest": "^3.0.7"
   },
   "pnpm": {

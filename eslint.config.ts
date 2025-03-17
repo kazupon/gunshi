@@ -46,6 +46,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     ignores: [
       '.vscode',
       '.github',
+      'docs/.vitepress/cache',
+      '**/dist/**',
       'lib',
       'tsconfig.json',
       'pnpm-lock.yaml',
