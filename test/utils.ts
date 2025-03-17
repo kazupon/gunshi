@@ -1,9 +1,15 @@
-import { createCoreContext, NOT_REOSLVED, translate } from '@intlify/core'
+import {
+  createCoreContext,
+  getLocaleMessage,
+  NOT_REOSLVED,
+  setLocaleMessage,
+  translate
+} from '@intlify/core'
 import { MessageFormat } from 'messageformat'
 import { vi } from 'vitest'
 import { DefaultTranslation } from '../src/translation.js'
 
-import type { CoreContext, LocaleMessage } from '@intlify/core'
+import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core'
 import type { TranslationAdapter, TranslationAdapterFactoryOptions } from '../src/types'
 
 export function defineMockLog(utils: typeof import('../src/utils')) {
@@ -98,11 +104,11 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
   }
 
   getResource(locale: string): Record<string, string> | undefined {
-    return this.#context.messages[locale] as Record<string, string> | undefined
+    return getLocaleMessage(this.#context, locale)
   }
 
   setResource(locale: string, resource: Record<string, string>): void {
-    this.#context.messages[locale] = resource
+    setLocaleMessage(this.#context, locale, resource as LocaleMessageValue)
   }
 
   getMessage(locale: string, key: string): string | undefined {
