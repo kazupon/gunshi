@@ -37,24 +37,20 @@ const command = {
     if (ctx.locale.toString() === 'ja-JP') {
       return {
         description: '挨拶アプリケーション',
-        options: {
-          name: '挨拶する相手の名前',
-          formal: '丁寧な挨拶を使用する'
-        },
-        informal: 'こんにちは',
-        formal: 'はじめまして'
+        name: '挨拶する相手の名前',
+        formal: '丁寧な挨拶を使用する',
+        informal_greeting: 'こんにちは',
+        formal_greeting: 'はじめまして'
       }
     }
 
     // Default to English
     return {
       description: 'Greeting application',
-      options: {
-        name: 'Name to greet',
-        formal: 'Use formal greeting'
-      },
-      informal: 'Hello',
-      formal: 'Good day'
+      name: 'Name to greet',
+      formal: 'Use formal greeting',
+      informal_greeting: 'Hello',
+      formal_greeting: 'Good day'
     }
   },
 
@@ -63,14 +59,14 @@ const command = {
     const { name = 'World', formal } = ctx.values
 
     // Use translated greeting based on the formal option
-    const greeting = formal ? ctx.translation('formal') : ctx.translation('informal')
+    const greeting = formal ? ctx.translate('formal_greeting') : ctx.translate('informal_greeting')
 
     console.log(`${greeting}, ${name}!`)
 
     // Show translation information
     console.log('\nTranslation Information:')
     console.log(`Current locale: ${ctx.locale}`)
-    console.log(`Command Description: ${ctx.translation('description')}`)
+    console.log(`Command Description: ${ctx.translate('description')}`)
   }
 }
 
@@ -89,11 +85,27 @@ To run this example with different locales:
 # English (default)
 node index.js --name John
 
+# i18n-example (i18n-example v1.0.0)
+#
+# Hello, John!
+#
+# Translation Information:
+# Current locale: en-US
+# Command Description: Greeting application
+
 # Japanese
 MY_LOCALE=ja-JP node index.js --name 田中 --formal
+
+# i18n-example (i18n-example v1.0.0)
+#
+# こんにちは, John!
+#
+# Translation Information:
+# Current locale: ja-JP
+# Command Description: 挨拶アプリケーション
 ```
 
-## Loading Translations from Files
+## Translations with loading resources
 
 For better organization, you can load translations from separate JSON files:
 
@@ -122,7 +134,7 @@ const command = {
 
   run: ctx => {
     const { name = 'World', formal } = ctx.values
-    const greeting = formal ? ctx.translation('formal') : ctx.translation('informal')
+    const greeting = formal ? ctx.translate('formal_greeting') : ctx.translate('informal_greeting')
     console.log(`${greeting}, ${name}!`)
   }
 }
@@ -141,12 +153,10 @@ Example locale files:
 ```json
 {
   "description": "Greeting application",
-  "options": {
-    "name": "Name to greet",
-    "formal": "Use formal greeting"
-  },
-  "informal": "Hello",
-  "formal": "Good day"
+  "name": "Name to greet",
+  "formal": "Use formal greeting",
+  "informal_greeting": "Hello",
+  "formal_greeting": "Good day"
 }
 ```
 
@@ -155,12 +165,10 @@ Example locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "options": {
-    "name": "挨拶する相手の名前",
-    "formal": "丁寧な挨拶を使用する"
-  },
-  "informal": "こんにちは",
-  "formal": "はじめまして"
+  "name": "挨拶する相手の名前",
+  "formal": "丁寧な挨拶を使用する",
+  "informal_greeting": "こんにちは",
+  "formal_greeting": "はじめまして"
 }
 ```
 
@@ -192,29 +200,27 @@ When users run `node index.js --help` with different locales, they'll see help m
 English:
 
 ```
-greeter
+USAGE:
+  COMMAND <OPTIONS>
 
-Greeting application
-
-Options:
-  -n, --name     Name to greet
-  -f, --formal   Use formal greeting
-  -h, --help     Show help
-  --version      Show version
+OPTIONS:
+  -n, --name <name>      Name to greet
+  -f, --formal           Use formal greeting
+  -h, --help             Display this help message
+  -v, --version          Display this version
 ```
 
 Japanese:
 
 ```
-greeter
+USAGE:
+  COMMAND <OPTIONS>
 
-挨拶アプリケーション
-
-Options:
-  -n, --name     挨拶する相手の名前
-  -f, --formal   丁寧な挨拶を使用する
-  -h, --help     ヘルプを表示
-  --version      バージョンを表示
+OPTIONS:
+  -n, --name <name>     挨拶する相手の名前
+  -f, --formal          丁寧な挨拶を使用する
+  -h, --help            このヘルプメッセージを表示
+  -v, --version         このバージョンを表示"
 ```
 
 ## Detecting the User's Locale
@@ -235,25 +241,9 @@ cli(process.argv.slice(2), command, {
 
 For earlier Node.js versions, you can use environment variables or configuration files to determine the locale.
 
-## Translation Context
+## Resource structure and reserved resource keys
 
-The `ctx.translation()` function provides access to translations based on the current locale:
-
-```js
-ctx => {
-  // Get a simple translation
-  const greeting = ctx.translation('greeting')
-
-  // Get a nested translation
-  const nameLabel = ctx.translation('options.name')
-
-  // Get a translation with a default value
-  const farewell = ctx.translation('farewell', 'Goodbye')
-
-  // Format a translation with variables
-  const welcome = ctx.translation('welcome', { name: ctx.values.name })
-}
-```
+TODO:
 
 ## Internationalization with Sub-commands
 
@@ -261,7 +251,8 @@ You can apply internationalization to CLIs with sub-commands:
 
 ```js
 import { cli } from 'gunshi'
-import enUS from './locales/en-US.json' with { type: 'json' }
+import enUSForCreate from './locales/create/en-US.json' with { type: 'json' }
+import enUSForMain from './locales/main/en-US.json' with { type: 'json' }
 
 // Define sub-commands
 const createCommand = {
@@ -277,12 +268,7 @@ const createCommand = {
       return resource.default
     }
 
-    return {
-      description: 'Create a new resource',
-      options: {
-        name: 'Name of the resource'
-      }
-    }
+    return enUSForCreate
   },
 
   run: ctx => {
@@ -301,12 +287,7 @@ const mainCommand = {
       return resource.default
     }
 
-    return {
-      description: 'Manage resources',
-      subCommands: {
-        create: 'Create a new resource'
-      }
-    }
+    return enUSForMain
   },
 
   run: () => {
@@ -374,16 +355,16 @@ const command = {
     console.log(`Current locale: ${locale}`)
 
     // Choose between formal and informal greeting
-    const greeting = formal ? ctx.translation('formal') : ctx.translation('informal')
+    const greeting = formal ? ctx.translate('formal_greeting') : ctx.translate('informal_greeting')
 
     // Display the greeting
     console.log(`${greeting}, ${name}!`)
 
     // Show translation information
     console.log('\nTranslation Information:')
-    console.log(`Command Description: ${ctx.translation('description')}`)
-    console.log(`Name Option: ${ctx.translation('options.name')}`)
-    console.log(`Formal Option: ${ctx.translation('options.formal')}`)
+    console.log(`Command Description: ${ctx.translate('description')}`)
+    console.log(`Name Option: ${ctx.translate('name')}`)
+    console.log(`Formal Option: ${ctx.translate('formal')}`)
   }
 }
 
@@ -404,12 +385,10 @@ With locale files:
 ```json
 {
   "description": "Greeting application",
-  "options": {
-    "name": "Name to greet",
-    "formal": "Use formal greeting"
-  },
-  "informal": "Hello",
-  "formal": "Good day"
+  "name": "Name to greet",
+  "formal": "Use formal greeting",
+  "informal_greeting": "Hello",
+  "formal_greeting": "Good day"
 }
 ```
 
@@ -418,19 +397,9 @@ With locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "options": {
-    "name": "挨拶する相手の名前",
-    "formal": "丁寧な挨拶を使用する"
-  },
-  "informal": "こんにちは",
-  "formal": "はじめまして"
+  "name": "挨拶する相手の名前",
+  "formal": "丁寧な挨拶を使用する",
+  "informal_greeting": "こんにちは",
+  "formal_greeting": "はじめまして"
 }
 ```
-
-## Next Steps
-
-Now that you understand internationalization in Gunshi, you can:
-
-- [Customize usage generation](/guide/advanced/custom-usage-generation) for more control over help messages
-- [Create a translation adapter](/guide/advanced/translation-adapter) for integration with other i18n libraries
-- [Generate documentation](/guide/advanced/documentation-generation) for your CLI in multiple languages

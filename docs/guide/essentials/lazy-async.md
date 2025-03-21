@@ -70,8 +70,12 @@ const command = {
   options: {
     delay: {
       type: 'number',
-      default: 1000,
-      description: 'Delay in milliseconds'
+      default: 1000
+    }
+  },
+  usage: {
+    options: {
+      delay: 'Delay in milliseconds'
     }
   },
   run: async ctx => {
@@ -113,8 +117,12 @@ const lazyCommand = async () => {
       delay: {
         type: 'number',
         short: 'd',
-        default: 500,
-        description: 'Delay in milliseconds for command execution'
+        default: 500
+      }
+    },
+    usage: {
+      options: {
+        delay: 'Delay in milliseconds for command execution'
       }
     },
     run: async ctx => {
@@ -180,8 +188,12 @@ const dataCommand = async () => {
     options: {
       id: {
         type: 'number',
-        short: 'i',
-        description: 'Filter by item ID'
+        short: 'i'
+      }
+    },
+    usage: {
+      options: {
+        id: 'Filter by item ID'
       }
     },
     run: ctx => {
@@ -223,132 +235,34 @@ cli(
 
 In this example, the data is fetched asynchronously when the command is loaded, and then made available to the command's `run` function.
 
-## Complete Example
+## Type-Safe Async Commands
 
-Here's a complete example that demonstrates both lazy loading and async execution:
+For async commands, you can use TypeScript's async/await with proper typing:
 
-```js
+```ts
 import { cli } from 'gunshi'
+import type { ArgOptions, Command, CommandContext } from 'gunshi'
 
-// Define a command that will be loaded lazily
-const lazyCommand = async () => {
-  console.log('Loading lazy command...')
-
-  // Simulate a delay to demonstrate async loading
-  await new Promise(resolve => setTimeout(resolve, 1000))
-
-  console.log('Lazy command loaded!')
-
-  // Return the actual command
-  return {
-    name: 'lazy',
-    description: 'A command that is loaded lazily',
-    options: {
-      delay: {
-        type: 'number',
-        short: 'd',
-        default: 500,
-        description: 'Delay in milliseconds for command execution'
-      }
-    },
-    run: async ctx => {
-      const { delay } = ctx.values
-
-      console.log(`Executing lazy command with ${delay}ms delay...`)
-
-      // Simulate async work
-      await new Promise(resolve => setTimeout(resolve, delay))
-
-      console.log('Lazy command execution completed!')
-      console.log('Command context:', {
-        name: ctx.name,
-        description: ctx.description,
-        values: ctx.values
-      })
+// Define a type-safe async command
+const command: Command<ArgOptions> = {
+  name: 'async-example',
+  options: {
+    delay: {
+      type: 'number',
+      default: 1000
     }
+  },
+  run: async (ctx: CommandContext<ArgOptions>) => {
+    const { delay } = ctx.values
+
+    console.log(`Waiting for ${delay}ms...`)
+    await new Promise(resolve => setTimeout(resolve, delay as number))
+    console.log('Done!')
   }
 }
 
-// Define another lazy command that depends on an async operation
-const asyncDataCommand = async () => {
-  console.log('Loading async data command...')
-
-  // Simulate fetching data from an API
-  const fetchData = async () => {
-    console.log('Fetching data...')
-    await new Promise(resolve => setTimeout(resolve, 800))
-    return [
-      { id: 1, name: 'Item 1' },
-      { id: 2, name: 'Item 2' },
-      { id: 3, name: 'Item 3' }
-    ]
-  }
-
-  // Fetch the data asynchronously
-  const data = await fetchData()
-
-  console.log('Async data command loaded with data!')
-
-  // Return the command with the fetched data
-  return {
-    name: 'data',
-    description: 'A command that loads data asynchronously',
-    options: {
-      id: {
-        type: 'number',
-        short: 'i',
-        description: 'Filter by item ID'
-      }
-    },
-    run: ctx => {
-      const { id } = ctx.values
-
-      console.log('Available data:')
-
-      if (id) {
-        const item = data.find(item => item.id === id)
-        if (item) {
-          console.log(`- ${item.id}: ${item.name}`)
-        } else {
-          console.log(`No item found with ID: ${id}`)
-        }
-      } else {
-        for (const item of data) {
-          console.log(`- ${item.id}: ${item.name}`)
-        }
-      }
-    }
-  }
-}
-
-// Create a Map of sub-commands with lazy-loaded commands
-const subCommands = new Map()
-subCommands.set('lazy', lazyCommand)
-subCommands.set('data', asyncDataCommand)
-
-// Define the main command
-const mainCommand = {
-  name: 'lazy-async-example',
-  description: 'Example of lazy loading and async command execution',
-  run: () => {
-    console.log('Lazy & Async Command Example')
-    console.log('----------------------------')
-    console.log('Available commands:')
-    console.log('  lazy - A command that is loaded lazily')
-    console.log('  data - A command that loads data asynchronously')
-    console.log('\nRun with --help for more information')
-  }
-}
-
-// Run the CLI with lazy-loaded commands
-cli(process.argv.slice(2), mainCommand, {
-  name: 'lazy-async-example',
-  version: '1.0.0',
-  description: 'Example of lazy loading and async command execution',
-  subCommands
-})
-
-console.log('CLI setup complete. Waiting for command execution...')
+// Execute the async command
+cli(process.argv.slice(2), command)
 ```
 
 ## Performance Benefits
@@ -359,11 +273,3 @@ Lazy loading and async execution can provide significant performance benefits:
 2. **Reduced memory usage**: Avoid loading unnecessary dependencies
 3. **Better responsiveness**: Perform heavy operations asynchronously without blocking the main thread
 4. **Improved user experience**: Provide feedback during long-running operations
-
-## Next Steps
-
-Now that you understand lazy loading and async execution, you can:
-
-- [Add auto usage generation](/guide/essentials/auto-usage-generation) for better help documentation
-- [Explore internationalization](/guide/essentials/internationalization) for multi-language support
-- [Customize usage generation](/guide/advanced/custom-usage-generation) for more control over help messages

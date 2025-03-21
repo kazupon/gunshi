@@ -70,13 +70,17 @@ const command = {
   options: {
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Name to greet'
+      short: 'n'
     },
     uppercase: {
       type: 'boolean',
-      short: 'u',
-      description: 'Convert greeting to uppercase'
+      short: 'u'
+    }
+  },
+  usage: {
+    options: {
+      name: 'Name to greet',
+      uppercase: 'Convert greeting to uppercase'
     }
   },
   run: ctx => {
@@ -121,11 +125,3 @@ You'll see a help message that includes:
 - Command description
 - Available options
 - Option descriptions
-
-## Next Steps
-
-Now that you've created your first CLI application with Gunshi, you can explore more advanced features:
-
-- [Declarative Configuration](/guide/essentials/declarative-configuration) - Learn how to configure commands declaratively
-- [Type Safe](/guide/essentials/type-safe) - Add type safety to your CLI with TypeScript
-- [Composable](/guide/essentials/composable) - Create modular sub-commands

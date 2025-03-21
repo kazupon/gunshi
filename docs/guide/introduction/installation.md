@@ -43,26 +43,5 @@ bun add gunshi
 Gunshi requires:
 
 - **Node.js**: Version 20 or higher
+- **ES Modules**: `"type": "module"` in `package.json`
 - **TypeScript**: Version 5.0 or higher (if using TypeScript)
-
-## TypeScript Configuration
-
-If you're using TypeScript, make sure your `tsconfig.json` includes:
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
-    "strict": true
-  }
-}
-```
-
-Note: Set `"target"` to `"ES2022"` or higher.
-
-## Next Steps
-
-Once you have installed Gunshi, you can proceed to the [Getting Started](/guide/essentials/getting-started) guide to learn how to use it in your project.

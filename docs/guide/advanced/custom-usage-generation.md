@@ -59,8 +59,12 @@ const command = {
   options: {
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Name to use'
+      short: 'n'
+    }
+  },
+  usage: {
+    options: {
+      name: 'Name to use'
     }
   },
   run: ctx => {
@@ -81,17 +85,19 @@ When users run `node app.js --help`, they'll see your custom header:
 
 ```
 ╔═════════════════════════════════════════╗
-║                 MY-APP                  ║
+║               MY-APP                    ║
 ╚═════════════════════════════════════════╝
 A CLI application with custom usage generation
 Version: 1.0.0
 
-Usage: my-app [options]
 
-Options:
-  -n, --name     Name to use
-  -h, --help     Show help
-  --version      Show version
+USAGE:
+  my-app <OPTIONS>
+
+OPTIONS:
+  -n, --name <name>          Name to use
+  -h, --help                 Display this help message
+  -v, --version              Display this version
 ```
 
 ## Custom Usage Section
@@ -193,10 +199,17 @@ cli(process.argv.slice(2), command, {
 When users run the command with invalid options, they'll see your custom error message:
 
 ```
+╔═════════════════════════════════════════╗
+║               MY-APP                    ║
+╚═════════════════════════════════════════╝
+A CLI application with custom usage generation
+Version: 1.0.0
+
+
 ERROR:
 ======
 
-• Option 'name' is required
+• Option '--name' or '-n' is required
 
 Please correct the above errors and try again.
 Run 'my-app --help' for usage information.
@@ -235,13 +248,17 @@ const command = {
     action: {
       type: 'string',
       short: 'a',
-      required: true,
-      description: 'Action to perform (add, list, remove)'
+      required: true
     },
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Task name'
+      short: 'n'
+    }
+  },
+  usage: {
+    options: {
+      action: 'Action to perform (add, list, remove)',
+      name: 'Task name'
     }
   },
   run: ctx => {
@@ -261,9 +278,11 @@ cli(process.argv.slice(2), command, {
 When users run the command without the required `--action` option, they'll see your custom error message:
 
 ```
+A task management utility (task-manager v1.0.0)
+
 ❌ ERROR:
 ═════════
-  • Missing required option: action
+  • Option '--action' or '-a' is required
 
 Please correct the above errors and try again.
 Run 'task-manager --help' for usage information.
@@ -283,31 +302,33 @@ const command = {
   options: {
     add: {
       type: 'string',
-      short: 'a',
-      description: 'Add a new task'
+      short: 'a'
     },
     list: {
       type: 'boolean',
-      short: 'l',
-      description: 'List all tasks'
+      short: 'l'
     },
     complete: {
       type: 'string',
-      short: 'c',
-      description: 'Mark a task as complete'
+      short: 'c'
     },
     priority: {
       type: 'string',
-      short: 'p',
-      description: 'Set task priority (low, medium, high)'
+      short: 'p'
     },
     due: {
       type: 'string',
-      short: 'd',
-      description: 'Set due date in YYYY-MM-DD format'
+      short: 'd'
     }
   },
   usage: {
+    options: {
+      add: 'Add a new task',
+      list: 'List all tasks',
+      complete: 'Mark a task as complete',
+      priority: 'Set task priority (low, medium, high)',
+      due: 'Set due date in YYYY-MM-DD format'
+    },
     examples: `# Add a new task
 $ task-manager --add "Complete the project"
 
@@ -338,7 +359,13 @@ cli(process.argv.slice(2), command, {
 
 ## Using Colors
 
-You can enhance your custom renderers with colors using libraries like [chalk](https://github.com/chalk/chalk) or [kleur](https://github.com/lukeed/kleur):
+You can enhance your custom renderers with colors using libraries like the belows:
+
+- [chalk](https://github.com/chalk/chalk)
+- [kleur](https://github.com/lukeed/kleur):
+- [picocolors](https://github.com/alexeyraspopov/picocolors)
+
+The following is an example using chalk:
 
 ```js
 import { cli } from 'gunshi'
@@ -385,7 +412,7 @@ const coloredUsageRenderer = ctx => {
       const required = option.required ? chalk.red(' (required)') : ''
 
       lines.push(
-        `  ${shortFlag}${longFlag.padEnd(15)} ${type.padEnd(10)} ${ctx.translation(key)}${required}`
+        `  ${shortFlag}${longFlag.padEnd(15)} ${type.padEnd(10)} ${ctx.translate(key)}${required}`
       )
     }
 
@@ -429,7 +456,7 @@ The renderer functions receive a context object (`ctx`) with the following prope
 - `description`: Command description
 - `options`: Command options
 - `usage`: Usage information (options, examples)
-- `translation`: Translation function
+- `translate`: Translation function
 - `locale`: Current locale
 
 You can use these properties to customize the output based on the command's configuration.
@@ -484,7 +511,7 @@ const customUsageRenderer = ctx => {
       const type = `[${option.type}]`
 
       // Format the option with custom styling
-      const formattedOption = `  ${shortFlag}${longFlag.padEnd(15)} ${type.padEnd(10)} ${ctx.translation(key)}`
+      const formattedOption = `  ${shortFlag}${longFlag.padEnd(15)} ${type.padEnd(10)} ${ctx.translate(key)}`
       lines.push(formattedOption)
     }
 
@@ -536,31 +563,33 @@ const command = {
   options: {
     add: {
       type: 'string',
-      short: 'a',
-      description: 'Add a new task with the specified description'
+      short: 'a'
     },
     list: {
       type: 'boolean',
-      short: 'l',
-      description: 'List all tasks'
+      short: 'l'
     },
     complete: {
       type: 'string',
-      short: 'c',
-      description: 'Mark a task as complete by ID or description'
+      short: 'c'
     },
     priority: {
       type: 'string',
-      short: 'p',
-      description: 'Set task priority (low, medium, high)'
+      short: 'p'
     },
     due: {
       type: 'string',
-      short: 'd',
-      description: 'Set due date in YYYY-MM-DD format'
+      short: 'd'
     }
   },
   usage: {
+    options: {
+      add: 'Add a new task',
+      list: 'List all tasks',
+      complete: 'Mark a task as complete',
+      priority: 'Set task priority (low, medium, high)',
+      due: 'Set due date in YYYY-MM-DD format'
+    },
     examples: `# Add a new task
 $ task-manager --add "Complete the project"
 
@@ -600,218 +629,4 @@ cli(process.argv.slice(2), command, {
   renderUsage: customUsageRenderer,
   renderValidationErrors: customValidationErrorsRenderer
 })
-```
-
-## Next Steps
-
-Now that you understand how to customize usage generation, you can:
-
-- [Generate documentation](/guide/advanced/documentation-generation) for your CLI
-- [Create a translation adapter](/guide/advanced/translation-adapter) for better internationalization support
-- Explore other ways to enhance your CLI's user experience
-
-// Define a colorful header renderer
-const colorfulHeaderRenderer = ctx => {
-const lines = []
-
-lines.push(colors.bold(colors.cyan('┌─────────────────────────────────────────┐')))
-lines.push(colors.bold(colors.cyan(`│ ${ctx.env.name.toUpperCase().padStart(20).padEnd(39)} │`)))
-lines.push(colors.bold(colors.cyan('└─────────────────────────────────────────┘')))
-
-if (ctx.env.description) {
-lines.push(colors.yellow(ctx.env.description))
-}
-
-if (ctx.env.version) {
-lines.push(colors.green(`Version: ${ctx.env.version}`))
-}
-
-lines.push('')
-
-return lines.join('\n')
-}
-
-// Define a colorful usage renderer
-const colorfulUsageRenderer = ctx => {
-const lines = []
-
-lines.push(colors.bold(colors.magenta('USAGE:')))
-lines.push(`  $ ${colors.cyan(ctx.env.name)} [options]`)
-lines.push('')
-
-if (ctx.options && Object.keys(ctx.options).length > 0) {
-lines.push(colors.bold(colors.magenta('OPTIONS:')))
-
-    for (const [key, option] of Object.entries(ctx.options)) {
-      const shortFlag = option.short ? `-${option.short}, ` : '    '
-      const required = option.required ? colors.red(' (required)') : ''
-
-      lines.push(
-        `  ${colors.green(shortFlag)}${colors.green(`--${key}`)} ${colors.yellow(ctx.translation(key))}${required}`
-      )
-    }
-
-    lines.push('')
-
-}
-
-if (ctx.usage?.examples) {
-lines.push(colors.bold(colors.magenta('EXAMPLES:')))
-lines.push(colors.cyan(ctx.usage.examples))
-lines.push('')
-}
-
-return lines.join('\n')
-}
-
-// Run the command with colorful renderers
-cli(process.argv.slice(2), command, {
-name: 'my-app',
-version: '1.0.0',
-description: 'A CLI application with colorful usage generation',
-renderHeader: colorfulHeaderRenderer,
-renderUsage: colorfulUsageRenderer
-})
-
-````
-
-## Conditional Rendering
-
-You can conditionally render different help messages based on the context:
-
-```js
-import { cli } from 'gunshi'
-
-// Define a context-aware renderer
-const contextAwareRenderer = ctx => {
-  const lines = []
-
-  // Check if we're showing help for a specific command
-  const isSubCommand = ctx.commandPath && ctx.commandPath.length > 1
-
-  if (isSubCommand) {
-    // Render help for a sub-command
-    const commandName = ctx.commandPath.at(-1)
-    lines.push(`Help for sub-command: ${commandName}`)
-  } else {
-    // Render help for the main command
-    lines.push('Help for main command')
-  }
-
-  // Add common sections
-  lines.push('')
-  lines.push('USAGE:')
-
-  if (isSubCommand) {
-    lines.push(`  $ ${ctx.env.name} ${ctx.commandPath.join(' ')} [options]`)
-  } else {
-    lines.push(`  $ ${ctx.env.name} [command] [options]`)
-  }
-
-  lines.push('')
-
-  // Add options
-  if (ctx.options && Object.keys(ctx.options).length > 0) {
-    lines.push('OPTIONS:')
-
-    for (const [key, option] of Object.entries(ctx.options)) {
-      const shortFlag = option.short ? `-${option.short}, ` : '    '
-      lines.push(`  ${shortFlag}--${key}  ${ctx.translation(key)}`)
-    }
-
-    lines.push('')
-  }
-
-  // Add available commands if this is the main command
-  if (!isSubCommand && ctx.env.subCommands && ctx.env.subCommands.size > 0) {
-    lines.push('COMMANDS:')
-
-    for (const [name, command] of ctx.env.subCommands.entries()) {
-      const description =
-        typeof command === 'function' ? 'Lazy-loaded command' : command.description || ''
-
-      lines.push(`  ${name.padEnd(15)} ${description}`)
-    }
-
-    lines.push('')
-    lines.push(`Run '${ctx.env.name} [command] --help' for more information on a command.`)
-  }
-
-  return lines.join('\n')
-}
-
-// Run the command with the context-aware renderer
-cli(process.argv.slice(2), mainCommand, {
-  name: 'my-app',
-  version: '1.0.0',
-  subCommands,
-  renderUsage: contextAwareRenderer
-})
-````
-
-## Internationalized Renderers
-
-You can create renderers that support multiple languages:
-
-```js
-import { cli } from 'gunshi'
-
-// Define an internationalized renderer
-const i18nRenderer = ctx => {
-  const lines = []
-
-  // Translate section titles based on locale
-  const titles = {
-    usage: ctx.translation('titles.usage', 'USAGE'),
-    options: ctx.translation('titles.options', 'OPTIONS'),
-    examples: ctx.translation('titles.examples', 'EXAMPLES')
-  }
-
-  // Add usage section
-  lines.push(titles.usage)
-  lines.push(`  $ ${ctx.env.name} [options]`)
-  lines.push('')
-
-  // Add options section
-  if (ctx.options && Object.keys(ctx.options).length > 0) {
-    lines.push(titles.options)
-
-    for (const [key, option] of Object.entries(ctx.options)) {
-      const shortFlag = option.short ? `-${option.short}, ` : '    '
-      lines.push(`  ${shortFlag}--${key}  ${ctx.translation(key)}`)
-    }
-
-    lines.push('')
-  }
-
-  // Add examples section
-  if (ctx.usage?.examples) {
-    lines.push(titles.examples)
-    lines.push(ctx.usage.examples)
-    lines.push('')
-  }
-
-  return lines.join('\n')
-}
-
-// Run the command with the internationalized renderer
-cli(process.argv.slice(2), command, {
-  name: 'i18n-app',
-  version: '1.0.0',
-  description: ctx => ctx.translation('description'),
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
-  renderUsage: i18nRenderer
-})
-```
-
-## Next Steps
-
-Now that you understand how to customize usage generation, you can:
-
-- [Generate documentation](/guide/advanced/documentation-generation) for your CLI
-- [Create a translation adapter](/guide/advanced/translation-adapter) for better internationalization support
-- Explore other ways to enhance your CLI's user experience
-
-```
-
 ```

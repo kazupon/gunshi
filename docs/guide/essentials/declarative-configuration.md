@@ -46,20 +46,17 @@ const command = {
   options: {
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Name to greet'
+      short: 'n'
     },
     greeting: {
       type: 'string',
       short: 'g',
-      default: 'Hello',
-      description: 'Greeting to use'
+      default: 'Hello'
     },
     times: {
       type: 'number',
       short: 't',
-      default: 1,
-      description: 'Number of times to repeat the greeting'
+      default: 1
     }
   },
 
@@ -107,7 +104,6 @@ Each option can have the following properties:
 
 - `type`: The data type ('string', 'number', 'boolean')
 - `short`: A single-character alias for the option
-- `description`: Description of the option for help text
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required
 
@@ -150,11 +146,3 @@ Using declarative configuration offers several advantages:
 2. **Self-documentation**: The structure clearly documents the command's capabilities
 3. **Maintainability**: Easier to understand and modify
 4. **Consistency**: Enforces a consistent structure across commands
-
-## Next Steps
-
-Now that you understand declarative configuration, you can:
-
-- [Add type safety](/guide/essentials/type-safe) to your commands with TypeScript
-- [Create composable sub-commands](/guide/essentials/composable) for more complex CLIs
-- [Explore lazy loading](/guide/essentials/lazy-async) for better performance
