@@ -408,3 +408,51 @@ describe('custom generate usage', () => {
     expect(message).toMatchSnapshot()
   })
 })
+
+test('usageSilent', async () => {
+  const utils = await import('./utils.ts')
+  const log = defineMockLog(utils)
+
+  const entryOptions = {
+    foo: {
+      type: 'string',
+      short: 'f'
+    },
+    bar: {
+      type: 'boolean',
+      required: true
+    },
+    baz: {
+      type: 'number',
+      short: 'b',
+      default: 42
+    }
+  } satisfies ArgOptions
+
+  const entry = {
+    options: entryOptions,
+    name: 'command1',
+    usage: {
+      options: {
+        foo: 'this is foo option',
+        bar: 'this is bar option',
+        baz: 'this is baz option'
+      }
+    },
+    run: vi.fn()
+  } satisfies Command<typeof entryOptions>
+
+  const options = {
+    name: 'gunshi',
+    description: 'Modern CLI tool',
+    version: '0.0.0',
+    usageSilent: true
+  } satisfies CommandOptions<typeof entryOptions>
+
+  // usage with silent
+  const usage = await cli(['-h'], entry, options)
+  expect(usage).toMatchSnapshot()
+
+  const stdout = log()
+  expect(stdout).toBe('')
+})

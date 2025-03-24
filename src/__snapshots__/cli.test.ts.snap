@@ -252,3 +252,17 @@ Options:
 * Option '--bar' is required *
 ******************************"
 `;
+
+exports[`usageSilent 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+USAGE:
+  gunshi <OPTIONS> 
+
+OPTIONS:
+  -f, --foo <foo>          this is foo option
+  --bar                    this is bar option
+  -b, --baz [baz]          this is baz option
+  -h, --help               Display this help message
+  -v, --version            Display this version
+"
+`;

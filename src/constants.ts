@@ -10,6 +10,8 @@ export const BUILT_IN_PREFIX = '_'
 
 export const BUILT_IN_KEY_SEPARATOR = ':'
 
+export const NOOP: () => void = () => {}
+
 type CommonOptionType = {
   readonly help: {
     readonly type: 'boolean'
@@ -37,6 +39,7 @@ export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
   description: undefined,
   version: undefined,
   cwd: undefined,
+  usageSilent: false,
   subCommands: undefined,
   leftMargin: 2,
   middleMargin: 10,

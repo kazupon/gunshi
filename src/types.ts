@@ -80,6 +80,12 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
    */
   usageOptionType: boolean
   /**
+   * Whether to display the command usage
+   * @default false
+   * @see {@link}
+   */
+  usageSilent: boolean
+  /**
    * Sub commands
    * @see {@link CommandOptions.subCommands}
    */
@@ -142,6 +148,10 @@ export interface CommandOptions<Options extends ArgOptions = ArgOptions> {
    * Whether to display the usage option type
    */
   usageOptionType?: boolean
+  /**
+   * Whether to display the command usage
+   */
+  usageSilent?: boolean
   /**
    * Render function the command usage
    */
@@ -214,6 +224,13 @@ export interface CommandContext<
    * @description Usage of the command is same {@link Command.usage}, and more has `--help` and `--version` options
    */
   usage: CommandUsage<Options>
+  /**
+   * Output a message
+   * @description if {@link CommandEnvironment.usageSilent} is true, the message is not output
+   * @param message an output message, @see {@link console.log}
+   * @param optionalParams an optional parameters, @see {@link console.log}
+   */
+  log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
    * Load sub-commands
    * @description The loaded commands are cached and returned when called again

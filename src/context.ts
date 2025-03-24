@@ -1,7 +1,7 @@
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
-import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE } from './constants.ts'
+import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE, NOOP } from './constants.ts'
 import { createTranslationAdapter } from './translation.ts'
-import { create, deepFreeze, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.ts'
+import { create, deepFreeze, log, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.ts'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type {
@@ -172,6 +172,7 @@ export async function createCommandContext<
       values: _values,
       positionals,
       usage,
+      log: commandOptions.usageSilent ? NOOP : log,
       loadCommands,
       translate
     })

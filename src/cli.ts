@@ -2,7 +2,7 @@ import { parseArgs, resolveArgs } from 'args-tokens'
 import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer/index.ts'
-import { create, log, resolveLazyCommand } from './utils.ts'
+import { create, resolveLazyCommand } from './utils.ts'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'
 import type { Command, CommandContext, CommandOptions, CommandRunner } from './types.ts'
@@ -110,13 +110,13 @@ async function showUsage<Options extends ArgOptions>(
   }
   const usage = await (ctx.env.renderUsage || renderUsage)(ctx)
   if (usage) {
-    log(usage)
+    ctx.log(usage)
     return usage
   }
 }
 
 function showVersion<Options extends ArgOptions>(ctx: CommandContext<Options>): void {
-  log(ctx.env.version)
+  ctx.log(ctx.env.version)
 }
 
 async function showHeader<Options extends ArgOptions>(
@@ -127,8 +127,8 @@ async function showHeader<Options extends ArgOptions>(
   }
   const header = await (ctx.env.renderHeader || renderHeader)(ctx)
   if (header) {
-    log(header)
-    log()
+    ctx.log(header)
+    ctx.log()
     return header
   }
 }
@@ -141,7 +141,7 @@ async function showValidationErrors<Options extends ArgOptions>(
     return
   }
   const render = ctx.env.renderValidationErrors || renderValidationErrors
-  log(await render(ctx, error))
+  ctx.log(await render(ctx, error))
 }
 
 async function resolveCommand<Options extends ArgOptions>(
