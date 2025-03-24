@@ -85,8 +85,8 @@ importers:
         specifier: ^15.4.3
         version: 15.5.0
       messageformat:
-        specifier: 4.0.0-9
-        version: 4.0.0-9
+        specifier: 4.0.0-10
+        version: 4.0.0-10
       pkg-pr-new:
         specifier: ^0.0.41
         version: 0.0.41
@@ -2942,8 +2942,8 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
-  messageformat@4.0.0-9:
-    resolution: {integrity: sha512-4QHEgN5EiK0w8XmMztn+hdnuJuaChp0bv6D1iw1GvFMR9FVDF9sDk0KfIM9XnBjqa0ekK8wBsX7lyMNfD53dqQ==}
+  messageformat@4.0.0-10:
+    resolution: {integrity: sha512-yzGCa7Y6qmZ8zeNxEvlNRrTWsW0zABsSOEOtDjaSOvFWYUJxXsOetG8+S41P7LUmVUZixjCk7l3j5zI9zyZHkQ==}
 
   micromark-core-commonmark@2.0.2:
     resolution: {integrity: sha512-FKjQKbxd1cibWMM1P9N+H8TwlgGgSkWZMmfuVucLCHaYqeSvJ0hFeHsIa65pA2nYbes0f8LDHPMrd9X7Ujxg9w==}
@@ -6697,7 +6697,7 @@ snapshots:
 
   merge2@1.4.1: {}
 
-  messageformat@4.0.0-9: {}
+  messageformat@4.0.0-10: {}
 
   micromark-core-commonmark@2.0.2:
     dependencies:
