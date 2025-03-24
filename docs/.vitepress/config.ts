@@ -42,6 +42,7 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Custom Usage Generation', link: '/guide/advanced/custom-usage-generation' },
+          { text: 'Documentation Generation', link: '/guide/advanced/documentation-generation' },
           { text: 'Translation Adapter', link: '/guide/advanced/translation-adapter' }
         ]
       }

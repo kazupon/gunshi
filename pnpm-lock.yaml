@@ -146,6 +146,12 @@ importers:
         specifier: workspace:*
         version: link:../..
 
+  playground/docs-gen:
+    dependencies:
+      gunshi:
+        specifier: workspace:*
+        version: link:../..
+
   playground/i18n:
     dependencies:
       gunshi:

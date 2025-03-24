@@ -84,7 +84,16 @@ node index.js --help
 node index.js --add "Complete the project" --priority high --due 2023-12-31
 ```
 
-### 8. Internationalization (`i18n`)
+### 8. Documentation Generation (`docs-gen`)
+
+Documentation generation support
+
+```sh
+cd docs-gen
+node index.js
+```
+
+### 9. Internationalization (`i18n`)
 
 Demonstrates internationalization support.
 

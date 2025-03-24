@@ -53,7 +53,12 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   yaml({
     prettier: true
   }),
-  markdown(),
+  markdown({
+    rules: {
+      'unicorn/prefer-top-level-await': 'off',
+      'unicorn/no-process-exit': 'off'
+    }
+  }),
   vitest(),
   prettier(),
   globalIgnores([
