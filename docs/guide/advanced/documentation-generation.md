@@ -46,7 +46,7 @@ async function main() {
   })
 
   // Now you can use the usage text to generate documentation
-  await fs.writeFile('docs/cli-usage.md', `# CLI Usage\n\n\`\`\`\n${usageText}\n\`\`\``, 'utf8')
+  await fs.writeFile('docs/cli-usage.md', `# CLI Usage\n\n\`\`\`sh\n${usageText}\n\`\`\``, 'utf8')
 
   console.log('Documentation generated successfully!')
 }
@@ -129,14 +129,14 @@ async function main() {
 
   // Generate main help
   const mainUsage = await cli(['--help'], mainCommand, cliOptions)
-  await fs.writeFile('docs/cli-main.md', `# CLI Usage\n\n\`\`\`\n${mainUsage}\n\`\`\``, 'utf8')
+  await fs.writeFile('docs/cli-main.md', `# CLI Usage\n\n\`\`\`sh\n${mainUsage}\n\`\`\``, 'utf8')
 
   // Generate help for each sub-command
   for (const [name, _] of subCommands.entries()) {
     const commandUsage = await cli([name, '--help'], mainCommand, cliOptions)
     await fs.writeFile(
       `docs/cli-${name}.md`,
-      `# ${name.charAt(0).toUpperCase() + name.slice(1)} Command\n\n\`\`\`\n${commandUsage}\n\`\`\``,
+      `# ${name.charAt(0).toUpperCase() + name.slice(1)} Command\n\n\`\`\`sh\n${commandUsage}\n\`\`\``,
       'utf8'
     )
   }
@@ -176,7 +176,7 @@ async function main() {
         short: 'o'
       }
     },
-    usages: {
+    usage: {
       options: {
         input: 'Input file path',
         format: 'Output format (json, csv, xml)',
@@ -342,13 +342,62 @@ Man pages follow a specific format and are organized into sections:
 
 ### Generating Man Pages with Gunshi
 
-You can convert Gunshi's usage information to man page format using tools like [marked-man](https://github.com/kapouer/marked-man) or [roff](https://github.com/wooorm/roff):
+You can convert Gunshi's usage information to man page format using tools like [marked-man](https://github.com/kapouer/marked-man):
 
 ```js
 import { cli } from 'gunshi'
-import { promises as fs } from 'node:fs'
 import { execSync } from 'node:child_process'
+import { promises as fs } from 'node:fs'
 import path from 'node:path'
+
+// Define custom usage renderer,
+// This custom usage renderer outputs in the markdown that can be converted to a man page format (roff) using marked-man.
+function renderManPageUsage(ctx) {
+  const lines = []
+
+  // NAME
+  lines.push(`# ${ctx.name}(1) -- ${ctx.description}`, '')
+
+  // SYNOPSIS
+  lines.push('## SYNOPSIS')
+  lines.push(`${ctx.env.name} <OPTIONS>`, '')
+
+  // DESCRIPTION
+  lines.push('## DESCRIPTION')
+  lines.push(ctx.translate('description'), '')
+
+  // OPTIONS
+  lines.push('## OPTIONS')
+  for (const [name, schema] of Object.entries(ctx.options)) {
+    const options = [`\`--${name}\``]
+    if (schema.short) {
+      options.unshift(`\`-${schema.short}\``)
+    }
+    let value = ''
+    if (schema.type !== 'boolean') {
+      value = schema.default ? `[${name}]` : `<${name}>`
+    }
+    lines.push(`- ${options.join(', ')}${value ? ` ${value}` : ''}`)
+    lines.push(ctx.translate(name))
+    lines.push('')
+  }
+
+  // EXAMPLES
+  lines.push('## EXAMPLES')
+  lines.push(ctx.usage.examples, '')
+
+  // AUTHOR
+  lines.push('## AUTHOR')
+  lines.push('Created by yours', '')
+
+  // SEE ALSO
+  lines.push('## SEE ALSO')
+  lines.push('- man: `man my-tool`', '')
+  lines.push('- website: https://my-tools.com/references/cli', '')
+  lines.push('- repository: https://github.com/your-username/my-tool', '')
+
+  return Promise.resolve(lines.join('\n'))
+}
 
 async function main() {
   const command = {
@@ -380,13 +429,13 @@ async function main() {
         format: 'Output format (json, yaml, xml)',
         verbose: 'Enable verbose output'
       },
-      examples: `# Process a file and output to stdout
+      examples: `1. Process a file and output to stdout
 $ my-tool --input data.csv
 
-# Process a file and save to a specific format
+2. Process a file and save to a specific format
 $ my-tool --input data.csv --output result.yaml --format yaml
 
-# Enable verbose output
+3. Enable verbose output
 $ my-tool --input data.csv --verbose`
     },
     run: ctx => {
@@ -394,55 +443,22 @@ $ my-tool --input data.csv --verbose`
     }
   }
 
-  // Capture the usage information
+  // Capture the usage from `cli` function reutnr value
   const usageText = await cli(['--help'], command, {
     name: 'my-tool',
     version: '1.0.0',
     description: 'A utility for processing data',
+    renderHeader: null, // no display header on console
+    renderUsage: renderManPageUsage, // set custom usage renderer
     usageSilent: true
   })
 
-  // Create markdown content in man page format
-  const manContent = `# my-tool(1) -- A utility for processing data
-
-## SYNOPSIS
-
-\`\`\`sh
-${usageText.split('\n')[3].trim()}
-\`\`\`
-
-## DESCRIPTION
-
-my-tool is a command-line utility for processing data files in various formats.
-
-## OPTIONS
-
-${usageText
-  .split('OPTIONS:')[1]
-  .split('\n')
-  .filter(line => line.trim())
-  .map(line => line.trim())
-  .join('\n')}
-
-## EXAMPLES
-
-${command.usage.examples}
-
-## AUTHOR
-
-Generated by Gunshi
-
-## SEE ALSO
-
-https://github.com/your-username/my-tool
-`
-
   // Write the markdown file
   const mdFile = path.join(process.cwd(), 'my-tool.1.md')
-  await fs.writeFile(mdFile, manContent, 'utf8')
+  await fs.writeFile(mdFile, usageText, 'utf8')
 
   // Convert markdown to man page format using marked-man
-  // Note: You need to install marked-man first: npm install -g marked-man
+  // Note: You need to install `marked-man` first: `npm install -g marked-man`
   try {
     execSync(`marked-man --input ${mdFile} --output my-tool.1`)
     console.log('Man page generated successfully: my-tool.1')
@@ -494,7 +510,7 @@ After installation, users can view your man page using:
 man my-tool
 ```
 
-## Best Practices
+## Recommended Approach
 
 When generating documentation with Gunshi:
 
