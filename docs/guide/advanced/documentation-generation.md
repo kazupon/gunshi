@@ -51,10 +51,8 @@ async function main() {
   console.log('Documentation generated successfully!')
 }
 
-main().catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+// Generate!
+await main()
 ```
 
 ## Generating Documentation for Multiple Commands
@@ -146,10 +144,8 @@ async function main() {
   console.log('All documentation generated successfully!')
 }
 
-main().catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+// Generate!
+await main()
 ```
 
 ## Creating Rich Documentation
@@ -249,10 +245,8 @@ The CLI is built on top of the data-processor library, which you can also use pr
   console.log('Rich documentation generated successfully!')
 }
 
-main().catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+// Generate!
+await main()
 ```
 
 ## Automating Documentation Generation
@@ -315,10 +309,8 @@ ${commandUsage}
   console.log('Documentation generated successfully!')
 }
 
-main().catch(error => {
-  console.error('Error generating documentation:', error)
-  process.exit(1)
-})
+// Generate!
+await main()
 ```
 
 Then add a script to your `package.json`:
@@ -460,10 +452,8 @@ https://github.com/your-username/my-tool
   }
 }
 
-main().catch(error => {
-  console.error('Error generating documentation:', error)
-  process.exit(1)
-})
+// Generate!
+await main()
 ```
 
 ### Installing Man Pages

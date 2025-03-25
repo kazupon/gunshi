@@ -25,8 +25,8 @@ importers:
         specifier: next
         version: 12.0.0-alpha.2
       '@kazupon/eslint-config':
-        specifier: ^0.26.0
-        version: 0.26.0(61b1fa46de6832d2ef686167dd751518)
+        specifier: ^0.26.1
+        version: 0.26.1(61b1fa46de6832d2ef686167dd751518)
       '@kazupon/prettier-config':
         specifier: ^0.1.1
         version: 0.1.1
@@ -859,8 +859,8 @@ packages:
     resolution: {integrity: sha512-f5DRIOZf7wxogefH03RjMPMdBF7ADTWUMoOs9kaJo06EfwF+aFhMZMDZxHg/Xe12hptN9xoZjGso2fdjapBRIA==}
     engines: {node: '>=10'}
 
-  '@kazupon/eslint-config@0.26.0':
-    resolution: {integrity: sha512-BR4CvcT83zrKBmgEK20GjhAGFPNTRT7yIMUFoeqUub7fjQQAspfL9CMSOVFc5FcB9AdgIW83qdiZKBLBAG828Q==}
+  '@kazupon/eslint-config@0.26.1':
+    resolution: {integrity: sha512-RMZdI03wcuDiOZEtNP4AzJ49Jcqr1MEpK5/QcENoKRmyuJU+7OCRmAiw91X44qxA1NygIjo4z96a9MEZ8P0pEQ==}
     engines: {node: '>= 20'}
     peerDependencies:
       '@eslint/css': '>=0.4.0'
@@ -4505,7 +4505,7 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.26.0(61b1fa46de6832d2ef686167dd751518)':
+  '@kazupon/eslint-config@0.26.1(61b1fa46de6832d2ef686167dd751518)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.4.1(eslint@9.23.0(jiti@2.4.2))
       '@eslint/js': 9.23.0
