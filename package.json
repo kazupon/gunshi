@@ -110,7 +110,7 @@
     "eslint-plugin-module-interop": "^0.3.0",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-regexp": "^2.7.0",
-    "eslint-plugin-unicorn": "^57.0.0",
+    "eslint-plugin-unicorn": "^58.0.0",
     "eslint-plugin-unused-imports": "^4.1.4",
     "eslint-plugin-yml": "^1.17.0",
     "gh-changelogen": "^0.2.8",
