@@ -8,6 +8,7 @@
   "publish": {
     "include": [
       "src/**/*.ts",
+      "assets/*.png",
       "locales/*.json",
       "package.json",
       "jsr.json",
