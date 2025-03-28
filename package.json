@@ -92,7 +92,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "args-tokens": "^0.10.2"
+    "args-tokens": "^0.12.0"
   },
   "devDependencies": {
     "@eslint/markdown": "^6.2.2",
