@@ -16,21 +16,25 @@ type CommonOptionType = {
   readonly help: {
     readonly type: 'boolean'
     readonly short: 'h'
+    readonly description: string
   }
   readonly version: {
     readonly type: 'boolean'
     readonly short: 'v'
+    readonly description: string
   }
 }
 
 export const COMMON_OPTIONS: CommonOptionType = {
   help: {
     type: 'boolean',
-    short: 'h'
+    short: 'h',
+    description: 'Display this help message'
   },
   version: {
     type: 'boolean',
-    short: 'v'
+    short: 'v',
+    description: 'Display this version'
   }
 }
 

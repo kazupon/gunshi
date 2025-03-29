@@ -162,16 +162,12 @@ describe('aute generate usage', () => {
         options: {
           foo: {
             type: 'string',
-            short: 'f'
+            short: 'f',
+            description: 'The foo option'
           }
         },
         name: 'command1',
-        usage: {
-          options: {
-            foo: 'The foo option'
-          },
-          examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar'
-        },
+        examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
         run: vi.fn()
       },
       {
@@ -230,18 +226,14 @@ describe('aute generate usage', () => {
     const entryOptions = {
       foo: {
         type: 'string',
-        short: 'f'
+        short: 'f',
+        description: 'The foo option'
       }
     } satisfies ArgOptions
     const entry = {
       options: entryOptions,
       name: 'command1',
-      usage: {
-        options: {
-          foo: 'The foo option'
-        },
-        examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar'
-      },
+      examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
       run: vi.fn()
     } satisfies Command<typeof entryOptions>
 
@@ -249,18 +241,14 @@ describe('aute generate usage', () => {
       bar: {
         type: 'number',
         short: 'b',
-        default: 42
+        default: 42,
+        description: 'The bar option'
       }
     } satisfies ArgOptions
     const command2 = {
       options: command2Options,
       name: 'command2',
-      usage: {
-        options: {
-          bar: 'The bar option'
-        },
-        examples: '# Example 1\n$ gunshi command2 --bar 42\n# Example 2\n$ gunshi command2 -b 42'
-      },
+      examples: '# Example 1\n$ gunshi command2 --bar 42\n# Example 2\n$ gunshi command2 -b 42',
       // run: vi.fn()
       run: ctx => {
         console.log(ctx.values)
@@ -303,16 +291,12 @@ describe('aute generate usage', () => {
         options: {
           foo: {
             type: 'string',
-            short: 'f'
+            short: 'f',
+            description: 'The foo option'
           }
         },
         name: 'command1',
-        usage: {
-          options: {
-            foo: 'The foo option'
-          },
-          examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar'
-        },
+        examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
         resource: mockResource,
         run: vi.fn()
       },
@@ -338,29 +322,25 @@ describe('custom generate usage', () => {
     const entryOptions = {
       foo: {
         type: 'string',
-        short: 'f'
+        short: 'f',
+        description: 'this is foo option'
       },
       bar: {
         type: 'boolean',
-        required: true
+        required: true,
+        description: 'this is bar option'
       },
       baz: {
         type: 'number',
         short: 'b',
-        default: 42
+        default: 42,
+        description: 'this is baz option'
       }
     } satisfies ArgOptions
 
     const entry = {
       options: entryOptions,
       name: 'command1',
-      usage: {
-        options: {
-          foo: 'this is foo option',
-          bar: 'this is bar option',
-          baz: 'this is baz option'
-        }
-      },
       run: vi.fn()
     } satisfies Command<typeof entryOptions>
 
@@ -380,9 +360,10 @@ describe('custom generate usage', () => {
         // render options section
         messages.push('Options:')
         for (const [key, value] of Object.entries(ctx.options)) {
-          const usageOptions = (ctx.usage.options ?? Object.create(null)) as Record<string, string>
-          const usage = usageOptions[key] || ''
-          messages.push(`  --${key.padEnd(10)} ${`[${value.type}]`.padEnd(12)}`.padEnd(20) + usage)
+          const description = value.description || ''
+          messages.push(
+            `  --${key.padEnd(10)} ${`[${value.type}]`.padEnd(12)}`.padEnd(20) + description
+          )
         }
         messages.push('')
 
@@ -416,29 +397,25 @@ test('usageSilent', async () => {
   const entryOptions = {
     foo: {
       type: 'string',
-      short: 'f'
+      short: 'f',
+      description: 'this is foo option'
     },
     bar: {
       type: 'boolean',
-      required: true
+      required: true,
+      description: 'this is bar option'
     },
     baz: {
       type: 'number',
       short: 'b',
-      default: 42
+      default: 42,
+      description: 'this is baz option'
     }
   } satisfies ArgOptions
 
   const entry = {
     options: entryOptions,
     name: 'command1',
-    usage: {
-      options: {
-        foo: 'this is foo option',
-        bar: 'this is bar option',
-        baz: 'this is baz option'
-      }
-    },
     run: vi.fn()
   } satisfies Command<typeof entryOptions>
 

@@ -17,17 +17,13 @@ const command = {
   options: {
     input: {
       type: 'string',
-      short: 'i'
+      short: 'i',
+      description: 'Input file'
     },
     output: {
       type: 'string',
-      short: 'o'
-    }
-  },
-  usage: {
-    options: {
-      input: 'Input file',
-      output: 'Output file'
+      short: 'o',
+      description: 'Output file'
     }
   },
   run: ctx => {
@@ -71,12 +67,8 @@ const createCommand = {
     name: {
       type: 'string',
       short: 'n',
-      required: true
-    }
-  },
-  usage: {
-    options: {
-      name: 'Name of the resource'
+      required: true,
+      description: 'Name of the resource'
     }
   },
   run: ctx => {
@@ -90,12 +82,8 @@ const listCommand = {
   options: {
     format: {
       type: 'string',
-      short: 'f'
-    }
-  },
-  usage: {
-    options: {
-      format: 'Output format (json, table)'
+      short: 'f',
+      description: 'Output format (json, table)'
     }
   },
   run: ctx => {
@@ -165,22 +153,18 @@ async function main() {
       input: {
         type: 'string',
         short: 'i',
-        required: true
+        required: true,
+        description: 'Input file path'
       },
       format: {
         type: 'string',
-        short: 'f'
+        short: 'f',
+        description: 'Output format (json, csv, xml)'
       },
       output: {
         type: 'string',
-        short: 'o'
-      }
-    },
-    usage: {
-      options: {
-        input: 'Input file path',
-        format: 'Output format (json, csv, xml)',
-        output: 'Output file path'
+        short: 'o',
+        description: 'Output file path'
       }
     },
     run: ctx => {
@@ -407,37 +391,33 @@ async function main() {
       input: {
         type: 'string',
         short: 'i',
-        required: true
+        required: true,
+        description: 'Input file path'
       },
       output: {
         type: 'string',
-        short: 'o'
+        short: 'o',
+        description: 'Output file path (defaults to stdout)'
       },
       format: {
         type: 'string',
-        short: 'f'
+        short: 'f',
+        description: 'Output format (json, yaml, xml)'
       },
       verbose: {
         type: 'boolean',
-        short: 'V'
+        short: 'V',
+        description: 'Enable verbose output'
       }
     },
-    usage: {
-      options: {
-        input: 'Input file path',
-        output: 'Output file path (defaults to stdout)',
-        format: 'Output format (json, yaml, xml)',
-        verbose: 'Enable verbose output'
-      },
-      examples: `1. Process a file and output to stdout
+    examples: `1. Process a file and output to stdout
 $ my-tool --input data.csv
 
 2. Process a file and save to a specific format
 $ my-tool --input data.csv --output result.yaml --format yaml
 
 3. Enable verbose output
-$ my-tool --input data.csv --verbose`
-    },
+$ my-tool --input data.csv --verbose`,
     run: ctx => {
       // Command implementation
     }

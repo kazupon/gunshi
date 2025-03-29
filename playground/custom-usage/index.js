@@ -11,35 +11,32 @@ const command = {
   options: {
     add: {
       type: 'string',
-      short: 'a'
+      short: 'a',
+      description: 'Add a new task with the specified description'
     },
     list: {
       type: 'boolean',
-      short: 'l'
+      short: 'l',
+      description: 'List all tasks'
     },
     complete: {
       type: 'string',
-      short: 'c'
+      short: 'c',
+      description: 'Mark a task as complete by ID or description'
     },
     priority: {
       type: 'string',
-      short: 'p'
+      short: 'p',
+      description: 'Set task priority (low, medium, high)'
     },
     due: {
       type: 'string',
-      short: 'd'
+      short: 'd',
+      description: 'Set due date in YYYY-MM-DD format'
     }
   },
 
-  usage: {
-    options: {
-      add: 'Add a new task with the specified description',
-      list: 'List all tasks',
-      complete: 'Mark a task as complete by ID or description',
-      priority: 'Set task priority (low, medium, high)',
-      due: 'Set due date in YYYY-MM-DD format'
-    },
-    examples: `# Add a new task
+  examples: `# Add a new task
 $ node index.js --add "Complete the project"
 
 # Add a task with priority and due date
@@ -49,8 +46,7 @@ $ node index.js --add "Important meeting" --priority high --due 2023-12-31
 $ node index.js --list
 
 # Mark a task as complete
-$ node index.js --complete "Complete the project"`
-  },
+$ node index.js --complete "Complete the project"`,
 
   run: ctx => {
     const { add, list, complete, priority, due } = ctx.values
@@ -120,9 +116,9 @@ const customUsageRenderer = ctx => {
   }
 
   // Add examples section with custom formatting
-  if (ctx.usage.examples) {
+  if (command.examples) {
     lines.push('EXAMPLES:')
-    const examples = ctx.usage.examples.split('\n')
+    const examples = command.examples.split('\n')
 
     for (const example of examples) {
       // Add extra indentation to examples

@@ -1,7 +1,7 @@
 import { cli } from '@kazupon/gunshi'
 import enUS from './locales/en-US.json' with { type: 'json' }
 
-import type { ArgOptions, Command } from '@kazupon/gunshi'
+import type { ArgOptions } from '@kazupon/gunshi'
 
 if (import.meta.main) {
   // define options
@@ -22,10 +22,6 @@ if (import.meta.main) {
     name: 'create',
     description: enUS.description,
     options,
-    usage: {
-      options: enUS.options,
-      examples: enUS.examples
-    },
     resource: async ctx => {
       if (ctx.locale.toString() === 'ja-JP') {
         const resource = await import('./locales/ja-JP.json', { with: { type: 'json' } })
@@ -36,7 +32,7 @@ if (import.meta.main) {
     run: ctx => {
       console.log(`Creating ${ctx.values.type} resource: ${ctx.values.name}`)
     }
-  } satisfies Command<typeof options>
+  }
 
   // prepare sub commands map
   const subCommands = new Map()

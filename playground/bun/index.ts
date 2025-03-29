@@ -6,12 +6,14 @@ if (import.meta.main) {
   const options = {
     name: {
       type: 'string',
-      short: 'n'
+      short: 'n',
+      description: 'Name of the resource to create'
     },
     type: {
       type: 'string',
       short: 't',
-      default: 'default'
+      default: 'default',
+      description: 'Type of resource to create (default: "default")'
     }
   } satisfies ArgOptions
 
@@ -19,13 +21,7 @@ if (import.meta.main) {
     name: 'create',
     description: 'Create a new resource',
     options,
-    usage: {
-      options: {
-        name: 'Name of the resource to create',
-        type: 'Type of resource to create (default: "default")'
-      },
-      examples: '# Create a resource\n$ bun index.ts create --name my-resource --type special'
-    },
+    examples: '# Create a resource\n$ bun index.ts create --name my-resource --type special',
     run: ctx => {
       console.log(`Creating ${ctx.values.type} resource: ${ctx.values.name}`)
     }

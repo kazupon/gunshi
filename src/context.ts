@@ -52,7 +52,7 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
  */
 export async function createCommandContext<
   Options extends ArgOptions = ArgOptions,
-  Values = ArgValues<Options>
+  Values extends ArgValues<Options> = ArgValues<Options>
 >({
   options,
   values,
@@ -62,22 +62,13 @@ export async function createCommandContext<
   omitted = false
 }: CommandContextParams<Options, Values>): Promise<Readonly<CommandContext<Options, Values>>> {
   /**
-   * tweak the options and values
+   * normailize the options schema and values, to avoid prototype pollution
    */
 
   const _options = Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
     acc[key] = Object.assign(create<ArgOptionSchema>(), value)
     return acc
   }, create<ArgOptions>())
-  const _values = Object.assign(create<ArgValues<Options>>(), values)
-
-  /**
-   * normalize the usage
-   */
-
-  const usage = Object.assign(create<Options>(), command.usage)
-  const { help, version } = DefaultResource as unknown as ArgOptions
-  usage.options = Object.assign(create<Options>(), usage.options, { help, version })
 
   /**
    * setup the environment
@@ -90,10 +81,12 @@ export async function createCommandContext<
   )
 
   const locale = resolveLocale(commandOptions.locale)
+  const localeStr = locale.toString() // NOTE: `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
+
   const translationAdapterFactory =
     commandOptions.translationAdapterFactory || createTranslationAdapter
   const adapter = translationAdapterFactory({
-    locale: locale.toString(),
+    locale: localeStr,
     fallbackLocale: DEFAULT_LOCALE
   })
 
@@ -107,12 +100,12 @@ export async function createCommandContext<
    */
 
   localeResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
-  if (DEFAULT_LOCALE !== locale.toString()) {
+  if (DEFAULT_LOCALE !== localeStr) {
     try {
-      builtInLoadedResources = (await import(`../locales/${locale.toString()}.json`, {
+      builtInLoadedResources = (await import(`../locales/${localeStr}.json`, {
         with: { type: 'json' }
       })) as Record<string, string>
-      localeResources.set(locale.toString(), mapResourceWithBuiltinKey(builtInLoadedResources))
+      localeResources.set(localeStr, mapResourceWithBuiltinKey(builtInLoadedResources))
     } catch {}
   }
 
@@ -130,8 +123,7 @@ export async function createCommandContext<
       // NOTE:
       // if the key is one of the `COMMAND_BUILTIN_RESOURCE_KEYS` and the key is not found in the locale resources,
       // then return the key itself.
-      const resource =
-        localeResources.get(locale.toString()) || localeResources.get(DEFAULT_LOCALE)!
+      const resource = localeResources.get(localeStr) || localeResources.get(DEFAULT_LOCALE)!
       return resource[strKey as CommandBuiltinKeys] || strKey
     } else {
       // NOTE:
@@ -151,7 +143,7 @@ export async function createCommandContext<
       return cachedCommands
     }
 
-    const subCommands = [...(env.subCommands || [])] as [string, Command<Options>][]
+    const subCommands = [...(commandOptions.subCommands || [])] as [string, Command<Options>][]
     return (cachedCommands = await Promise.all(
       subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
     ))
@@ -169,9 +161,8 @@ export async function createCommandContext<
       locale,
       env,
       options: _options,
-      values: _values,
+      values,
       positionals,
-      usage,
       log: commandOptions.usageSilent ? NOOP : log,
       loadCommands,
       translate
@@ -182,22 +173,23 @@ export async function createCommandContext<
    * load the command resources
    */
 
-  const loadedOptionsResources = Object.entries(usage.options || create<Options>()).map(
-    ([key, _]) => {
-      const option = usage.options![key]
-      return [key, option] as [string, string]
-    }
-  )
+  // Extract option descriptions from command options
+  // const loadedOptionsResources = Object.entries(command.options || create<Options>()).map(
+  const loadedOptionsResources = Object.entries(options).map(([key, option]) => {
+    // get description from option if available
+    const description = option.description || ''
+    return [key, description] as [string, string]
+  })
 
   const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
     res[key] = value
     return res
   }, create<Record<string, string>>())
   defaultCommandResource.description = command.description || ''
-  defaultCommandResource.examples = usage.examples || ''
+  defaultCommandResource.examples = command.examples || ''
   adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-  const originalResource = await loadCommandResource(ctx, command)
+  const originalResource = await loadCommandResource<Options, Values>(ctx, command)
   if (originalResource) {
     const resource = Object.assign(
       create<Record<string, string>>(),
@@ -211,7 +203,7 @@ export async function createCommandContext<
       resource.help = builtInLoadedResources.help
       resource.version = builtInLoadedResources.version
     }
-    adapter.setResource(locale.toString(), resource)
+    adapter.setResource(localeStr, resource)
   }
 
   return ctx
@@ -225,8 +217,8 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadCommandResource<Options extends ArgOptions>(
-  ctx: CommandContext<Options>,
+async function loadCommandResource<Options extends ArgOptions, Values extends ArgValues<Options>>(
+  ctx: CommandContext<Options, Values>,
   command: Command<Options>
 ): Promise<CommandResource<Options> | undefined> {
   let resource: CommandResource<Options> | undefined

@@ -86,15 +86,22 @@ const command = {
   name: 'greet',
   description: 'A greeting command',
   options: {
-    name: { type: 'string', short: 'n' },
-    greeting: { type: 'string', short: 'g', default: 'Hello' },
-    times: { type: 'number', short: 't', default: 1 }
-  },
-  usage: {
-    options: {
-      name: 'Name to greet',
-      greeting: 'Greeting to use (default: "Hello")',
-      times: 'Number of times to repeat the greeting (default: 1)'
+    name: {
+      type: 'string',
+      short: 'n',
+      description: 'Name to greet'
+    },
+    greeting: {
+      type: 'string',
+      short: 'g',
+      default: 'Hello',
+      description: 'Greeting to use (default: "Hello")'
+    },
+    times: {
+      type: 'number',
+      short: 't',
+      default: 1,
+      description: 'Number of times to repeat the greeting (default: 1)'
     }
   },
   run: ctx => {
@@ -266,19 +273,25 @@ const command = {
   name: 'app',
   description: 'My application',
   options: {
-    path: { type: 'string', short: 'p' },
-    recursive: { type: 'boolean', short: 'r' },
-    operation: { type: 'string', short: 'o', required: true }
-  },
-  // define usage with object
-  usage: {
-    options: {
-      path: 'File or directory path',
-      recursive: 'Operate recursively on directories',
-      operation: 'Operation to perform (list, copy, move, delete)'
+    path: {
+      type: 'string',
+      short: 'p',
+      description: 'File or directory path'
     },
-    examples: '# Example\n$ my-app --operation list --path ./src'
+    recursive: {
+      type: 'boolean',
+      short: 'r',
+      description: 'Operate recursively on directories'
+    },
+    operation: {
+      type: 'string',
+      short: 'o',
+      required: true,
+      description: 'Operation to perform (list, copy, move, delete)'
+    }
   },
+  // define examples
+  examples: '# Example\n$ my-app --operation list --path ./src',
   run: ctx => {
     // command implementation
   }
@@ -354,9 +367,19 @@ import enUS from './locales/en-US.json' with { type: 'json' }
 const command = {
   name: 'greeter',
   options: {
-    name: { type: 'string', short: 'n' },
-    formal: { type: 'boolean', short: 'f' }
+    name: {
+      type: 'string',
+      short: 'n',
+      description: 'Name to greet'
+    },
+    formal: {
+      type: 'boolean',
+      short: 'f',
+      description: 'Use formal greeting'
+    }
   },
+  examples:
+    '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal',
   // resource fetcher for translations
   resource: async ctx => {
     if (ctx.locale.toString() === 'ja-JP') {

@@ -10,21 +10,17 @@ const createCommand = {
   options: {
     name: {
       type: 'string',
-      short: 'n'
+      short: 'n',
+      description: 'Name of the resource to create'
     },
     type: {
       type: 'string',
       short: 't',
-      default: 'default'
+      default: 'default',
+      description: 'Type of resource to create (default: "default")'
     }
   },
-  usage: {
-    options: {
-      name: 'Name of the resource to create',
-      type: 'Type of resource to create (default: "default")'
-    },
-    examples: '# Create a resource\n$ node index.js create --name my-resource --type special'
-  },
+  examples: '# Create a resource\n$ node index.js create --name my-resource --type special',
   run: ctx => {
     const { name, type } = ctx.values
     console.log(`Creating ${type} resource: ${name}`)
@@ -38,22 +34,17 @@ const listCommand = {
   options: {
     type: {
       type: 'string',
-      short: 't'
+      short: 't',
+      description: 'Filter by resource type'
     },
     limit: {
       type: 'number',
       short: 'l',
-      default: 10
+      default: 10,
+      description: 'Maximum number of resources to list (default: 10)'
     }
   },
-  usage: {
-    options: {
-      type: 'Filter by resource type',
-      limit: 'Maximum number of resources to list (default: 10)'
-    },
-    examples:
-      '# List resources\n$ node index.js list\n$ node index.js list --type special --limit 5'
-  },
+  examples: '# List resources\n$ node index.js list\n$ node index.js list --type special --limit 5',
   run: ctx => {
     const { type, limit } = ctx.values
     console.log(`Listing ${limit} resources${type ? ` of type ${type}` : ''}`)
@@ -73,21 +64,17 @@ const deleteCommand = {
     name: {
       type: 'string',
       short: 'n',
-      required: true
+      required: true,
+      description: 'Name of the resource to delete (required)'
     },
     force: {
       type: 'boolean',
-      short: 'f'
+      short: 'f',
+      description: 'Force deletion without confirmation'
     }
   },
-  usage: {
-    options: {
-      name: 'Name of the resource to delete (required)',
-      force: 'Force deletion without confirmation'
-    },
-    examples:
-      '# Delete a resource\n$ node index.js delete --name my-resource\n$ node index.js delete -n my-resource -f'
-  },
+  examples:
+    '# Delete a resource\n$ node index.js delete --name my-resource\n$ node index.js delete -n my-resource -f',
   run: ctx => {
     const { name, force } = ctx.values
     if (force) {
@@ -112,16 +99,12 @@ const mainCommand = {
   options: {
     verbose: {
       type: 'boolean',
-      short: 'v'
+      short: 'v',
+      description: 'Enable verbose output'
     }
   },
-  usage: {
-    options: {
-      verbose: 'Enable verbose output'
-    },
-    examples:
-      '# Use sub-commands\n$ node index.js create --name my-resource\n$ node index.js list\n$ node index.js delete --name my-resource'
-  },
+  examples:
+    '# Use sub-commands\n$ node index.js create --name my-resource\n$ node index.js list\n$ node index.js delete --name my-resource',
   // This run function is executed when no sub-command is specified
   run: ctx => {
     const { verbose } = ctx.values

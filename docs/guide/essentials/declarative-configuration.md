@@ -17,10 +17,8 @@ const command = {
     // Option definitions
   },
 
-  // Command usage documentation
-  usage: {
-    // Usage information
-  },
+  // Command examples
+  examples: 'Example usage',
 
   // Command execution function
   run: ctx => {
@@ -42,34 +40,30 @@ const command = {
   name: 'greet',
   description: 'A greeting command with declarative configuration',
 
-  // Command options
+  // Command options with descriptions
   options: {
     name: {
       type: 'string',
-      short: 'n'
+      short: 'n',
+      description: 'Name to greet'
     },
     greeting: {
       type: 'string',
       short: 'g',
-      default: 'Hello'
+      default: 'Hello',
+      description: 'Greeting to use (default: "Hello")'
     },
     times: {
       type: 'number',
       short: 't',
-      default: 1
+      default: 1,
+      description: 'Number of times to repeat the greeting (default: 1)'
     }
   },
 
-  // Command usage documentation
-  usage: {
-    options: {
-      name: 'Name to greet',
-      greeting: 'Greeting to use (default: "Hello")',
-      times: 'Number of times to repeat the greeting (default: 1)'
-    },
-    examples:
-      '# Examples\n$ node index.js --name World\n$ node index.js -n World -g "Hey there" -t 3'
-  },
+  // Command examples
+  examples:
+    '# Examples\n$ node index.js --name World\n$ node index.js -n World -g "Hey there" -t 3',
 
   // Command execution function
   run: ctx => {
@@ -106,13 +100,11 @@ Each option can have the following properties:
 - `short`: A single-character alias for the option
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required
+- `description`: A description of what the option does
 
-### Usage Documentation
+### Examples
 
-The `usage` object helps generate helpful documentation:
-
-- `options`: Descriptions for each option
-- `examples`: Example commands showing how to use the CLI
+The `examples` property provides example commands showing how to use the CLI.
 
 ### Command Execution
 

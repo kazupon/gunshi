@@ -4,7 +4,7 @@ Gunshi automatically generates usage information for your commands, making it ea
 
 ## Usage Documentation
 
-By adding a `usage` object to your command, Gunshi automatically generates usage information that users can access with the `--help` flag:
+Gunshi automatically generates usage information that users can access with the `--help` flag. You can add descriptions to your options and provide examples:
 
 ```js
 import { cli } from 'gunshi'
@@ -13,42 +13,35 @@ const command = {
   name: 'file-manager',
   description: 'A file management utility',
 
-  // Define options
+  // Define options with descriptions
   options: {
     path: {
       type: 'string',
-      short: 'p'
+      short: 'p',
+      description: 'File or directory path to operate on'
     },
     recursive: {
       type: 'boolean',
-      short: 'r'
+      short: 'r',
+      description: 'Operate recursively on directories'
     },
     operation: {
       type: 'string',
       short: 'o',
-      required: true
+      required: true,
+      description: 'Operation to perform: list, copy, move, or delete'
     }
   },
 
-  // usage documentation
-  usage: {
-    // Option descriptions
-    options: {
-      path: 'File or directory path to operate on',
-      recursive: 'Operate recursively on directories',
-      operation: 'Operation to perform: list, copy, move, or delete'
-    },
-
-    // Example commands
-    examples: `# List files in current directory
+  // Example commands
+  examples: `# List files in current directory
 $ app --operation list
 
 # Copy files recursively
 $ app --operation copy --path ./source --recursive
 
 # Delete files
-$ app --operation delete --path ./temp`
-  },
+$ app --operation delete --path ./temp`,
 
   run: ctx => {
     // Command implementation
@@ -125,15 +118,11 @@ const createCommand = {
     name: {
       type: 'string',
       short: 'n',
-      required: true
+      required: true,
+      description: 'Name of the resource'
     }
   },
-  usage: {
-    options: {
-      name: 'Name of the resource'
-    },
-    examples: '$ app create --name my-resource'
-  },
+  examples: '$ app create --name my-resource',
   run: ctx => {
     // Command implementation
   }
@@ -142,9 +131,7 @@ const createCommand = {
 const listCommand = {
   name: 'list',
   description: 'List all resources',
-  usage: {
-    examples: '$ app list'
-  },
+  examples: '$ app list',
   run: ctx => {
     // Command implementation
   }

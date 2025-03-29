@@ -8,47 +8,44 @@ const command = {
   name: 'file-manager',
   description: 'A file management utility with automatic usage generation',
 
-  // Define various types of options to showcase auto usage generation
+  // Define various types of options with descriptions to showcase auto usage generation
   options: {
     // String option with short alias
     path: {
       type: 'string',
-      short: 'p'
+      short: 'p',
+      description: 'File or directory path'
     },
     // Boolean flag
     recursive: {
       type: 'boolean',
-      short: 'r'
+      short: 'r',
+      description: 'Operate recursively on directories'
     },
     // Number option with default value
     depth: {
       type: 'number',
       short: 'd',
-      default: 1
+      default: 1,
+      description: 'Maximum depth for recursive operations'
     },
     // Required option
     operation: {
       type: 'string',
       short: 'o',
-      required: true
+      required: true,
+      description: 'Operation to perform (list, copy, move, delete)'
     },
     // String option with choices (not enforced by args-tokens, but documented)
     format: {
       type: 'string',
-      short: 'f'
+      short: 'f',
+      description: 'Output format (text, json, csv)'
     }
   },
 
-  // Define usage examples
-  usage: {
-    options: {
-      path: 'File or directory path',
-      recursive: 'Operate recursively on directories',
-      depth: 'Maximum depth for recursive operations',
-      operation: 'Operation to perform (list, copy, move, delete)',
-      format: 'Output format (text, json, csv)'
-    },
-    examples: `# List files in current directory
+  // Define examples
+  examples: `# List files in current directory
 $ node index.js --operation list
 
 # Copy files recursively
@@ -58,8 +55,7 @@ $ node index.js --operation copy --path ./source --recursive
 $ node index.js --operation delete --path ./temp --recursive --depth 2
 
 # List files in JSON format
-$ node index.js --operation list --format json`
-  },
+$ node index.js --operation list --format json`,
 
   // Command execution function
   run: ctx => {

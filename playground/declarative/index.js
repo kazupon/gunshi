@@ -9,34 +9,30 @@ const command = {
   name: 'greet',
   description: 'A greeting command with declarative configuration',
 
-  // Command options
+  // Command options with descriptions
   options: {
     name: {
       type: 'string',
-      short: 'n'
+      short: 'n',
+      description: 'Name to greet'
     },
     greeting: {
       type: 'string',
       short: 'g',
-      default: 'Hello'
+      default: 'Hello',
+      description: 'Greeting to use (default: "Hello")'
     },
     times: {
       type: 'number',
       short: 't',
-      default: 1
+      default: 1,
+      description: 'Number of times to repeat the greeting (default: 1)'
     }
   },
 
-  // Command usage documentation
-  usage: {
-    options: {
-      name: 'Name to greet',
-      greeting: 'Greeting to use (default: "Hello")',
-      times: 'Number of times to repeat the greeting (default: 1)'
-    },
-    examples:
-      '# Examples\n$ node index.js --name World\n$ node index.js -n World -g "Hey there" -t 3'
-  },
+  // Command examples
+  examples:
+    '# Examples\n$ node index.js --name World\n$ node index.js -n World -g "Hey there" -t 3',
 
   // Command execution function
   run: ctx => {

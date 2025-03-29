@@ -19,12 +19,6 @@ const command = {
     }
   },
 
-  // Define usage information (will be translated)
-  usage: {
-    options: enUS.options,
-    examples: enUS.examples
-  },
-
   // Define a resource fetcher for translations
   resource: async ctx => {
     // This function is called when the command is executed

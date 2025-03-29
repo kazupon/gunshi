@@ -1,7 +1,7 @@
 import { create, resolveBuiltInKey } from '../utils.ts'
 
 import type { ArgOptions } from 'args-tokens'
-import type { CommandContext } from '../types.ts'
+import type { Command, CommandContext } from '../types.ts'
 
 /**
  * Render the usage
@@ -35,8 +35,9 @@ export async function renderUsage<Options extends ArgOptions = ArgOptions>(
   }
 
   // render examples section
-  if (hasExamples(ctx)) {
-    messages.push(...renderExamplesSection(ctx), '')
+  const examples = renderExamplesSection(ctx)
+  if (examples.length > 0) {
+    messages.push(...examples, '')
   }
 
   return messages.join('\n')
@@ -65,10 +66,15 @@ function renderExamplesSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): string[] {
   const messages: string[] = []
-  const examples = ctx.usage
-    .examples!.split('\n')
-    .map(example => example.padStart(ctx.env.leftMargin + example.length))
-  messages.push(`${ctx.translate(resolveBuiltInKey('EXAMPLES'))}:`, ...examples)
+
+  const resolvedExamples = resolveExamples(ctx)
+  if (resolvedExamples) {
+    const examples = resolvedExamples
+      .split('\n')
+      .map((example: string) => example.padStart(ctx.env.leftMargin + example.length))
+    messages.push(`${ctx.translate(resolveBuiltInKey('EXAMPLES'))}:`, ...examples)
+  }
+
   return messages
 }
 
@@ -154,6 +160,20 @@ function resolveDescription<Options extends ArgOptions>(ctx: CommandContext<Opti
 }
 
 /**
+ * Resolve the command examples
+ * @param ctx A {@link CommandContext | command context}
+ * @returns resolved command examples, if not resolved, return empty string
+ */
+function resolveExamples<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
+  const ret = ctx.translate('examples')
+  if (ret) {
+    return ret
+  }
+  const command = ctx.env.subCommands?.get(ctx.name || '') as Command<Options> | undefined
+  return command?.examples ?? ''
+}
+
+/**
  * Check if the command has sub commands
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has sub commands
@@ -175,15 +195,6 @@ function hasOptions<Options extends ArgOptions>(ctx: CommandContext<Options>): b
 }
 
 /**
- * Check if the command has examples
- * @param ctx A {@link CommandContext | command context}
- * @returns True if the command has examples
- */
-function hasExamples<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
-  return !!ctx.usage.examples
-}
-
-/**
  * Check if all options have default values
  * @param ctx A {@link CommandContext | command context}
  * @returns True if all options have default values
@@ -200,8 +211,8 @@ function hasAllDefaultOptions<Options extends ArgOptions>(ctx: CommandContext<Op
 function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
   return hasOptions(ctx)
     ? hasAllDefaultOptions(ctx)
-      ? `[${ctx.translate('_:OPTIONS')}]`
-      : `<${ctx.translate('_:OPTIONS')}>`
+      ? `[${ctx.translate(resolveBuiltInKey('OPTIONS'))}]`
+      : `<${ctx.translate(resolveBuiltInKey('OPTIONS'))}>`
     : ''
 }
 

@@ -199,7 +199,7 @@ export interface CommandContext<
    * Command environment, that is the environment of the command that is executed
    * @description The command environment is same {@link CommandEnvironment}
    */
-  env: CommandEnvironment<Options>
+  env: Readonly<CommandEnvironment<Options>>
   /**
    * Command options, that is the options of the command that is executed
    * @description The command options is same {@link Command.options}
@@ -219,11 +219,6 @@ export interface CommandContext<
    * Whether the currently executing command has been executed with the sub-command name omitted
    */
   omitted: boolean
-  /**
-   * Command usage
-   * @description Usage of the command is same {@link Command.usage}, and more has `--help` and `--version` options
-   */
-  usage: CommandUsage<Options>
   /**
    * Output a message
    * @description if {@link CommandEnvironment.usageSilent} is true, the message is not output
@@ -251,22 +246,6 @@ export interface CommandContext<
 }
 
 /**
- * Command usage
- */
-interface CommandUsage<Options extends ArgOptions = ArgOptions> {
-  /**
-   * Options usage
-   */
-  options?: {
-    [Option in keyof Options]: string
-  }
-  /**
-   * Examples usage
-   */
-  examples?: string
-}
-
-/**
  * Command interface
  */
 export interface Command<Options extends ArgOptions = ArgOptions> {
@@ -278,8 +257,7 @@ export interface Command<Options extends ArgOptions = ArgOptions> {
   name?: string
   /**
    * Command description
-   * @description
-   * Command description is used to describe the command in usage, so it's recommended to specify.
+   * @description command description is used to describe the command in usage, so it's recommended to specify.
    */
   description?: string
   /**
@@ -289,14 +267,14 @@ export interface Command<Options extends ArgOptions = ArgOptions> {
   default?: boolean
   /**
    * Command options
+   * @description each option can include a description property to describe the option in usage.
    */
   options?: Options
   /**
-   * Command usage
-   * @description
-   * Command usage is used to describe the command in usage, so it's recommended to specify.
+   * Command examples
+   * @description examples of how to use the command.
    */
-  usage?: CommandUsage<Options>
+  examples?: string
   /**
    * Command runner, that's the command to be executed
    */
@@ -329,9 +307,10 @@ export type CommandResource<Options extends ArgOptions = ArgOptions> = {
  * @returns A fetched {@link CommandResource | command resource}
  * @experimental
  */
-export type CommandResourceFetcher<Options extends ArgOptions = ArgOptions> = (
-  ctx: Readonly<CommandContext<Options>>
-) => Promise<CommandResource<Options>>
+export type CommandResourceFetcher<
+  Options extends ArgOptions = ArgOptions,
+  Values = ArgValues<Options>
+> = (ctx: Readonly<CommandContext<Options, Values>>) => Promise<CommandResource<Options>>
 
 /**
  * Translation adapter factory

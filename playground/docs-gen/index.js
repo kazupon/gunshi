@@ -10,31 +10,27 @@ const command = {
     output: {
       type: 'string',
       short: 'o',
-      default: './docs'
+      default: './docs',
+      description: 'Output directory for documentation'
     },
     format: {
       type: 'string',
       short: 'f',
-      default: 'markdown'
+      default: 'markdown',
+      description: 'Output format (markdown, html)'
     },
     title: {
       type: 'string',
       short: 't',
-      default: 'CLI Documentation'
+      default: 'CLI Documentation',
+      description: 'Documentation title'
     }
   },
-  usage: {
-    options: {
-      output: 'Output directory for documentation',
-      format: 'Output format (markdown, html)',
-      title: 'Documentation title'
-    },
-    examples: `# Generate markdown documentation
+  examples: `# Generate markdown documentation
 $ node index.js --format markdown --output ./docs
 
 # Generate HTML documentation with custom title
-$ node index.js --format html --title "My CLI Tool" --output ./public`
-  },
+$ node index.js --format html --title "My CLI Tool" --output ./public`,
   run: async ctx => {
     const { output, format } = ctx.values
     // title is not used in this simple example but would be used in a real implementation

@@ -22,15 +22,11 @@ const lazyCommand = async () => {
       delay: {
         type: 'number',
         short: 'd',
-        default: 500
+        default: 500,
+        description: 'Delay in milliseconds for command execution (default: 500)'
       }
     },
-    usage: {
-      options: {
-        delay: 'Delay in milliseconds for command execution (default: 500)'
-      },
-      examples: '# Run the lazy command\n$ node index.js lazy\n$ node index.js lazy --delay 2000'
-    },
+    examples: '# Run the lazy command\n$ node index.js lazy\n$ node index.js lazy --delay 2000',
     run: async ctx => {
       const { delay } = ctx.values
 
@@ -76,15 +72,11 @@ const asyncDataCommand = async () => {
     options: {
       id: {
         type: 'number',
-        short: 'i'
+        short: 'i',
+        description: 'Filter by item ID'
       }
     },
-    usage: {
-      options: {
-        id: 'Filter by item ID'
-      },
-      examples: '# Show data\n$ node index.js data\n$ node index.js data --id 2'
-    },
+    examples: '# Show data\n$ node index.js data\n$ node index.js data --id 2',
     // The command has access to the pre-fetched data
     run: ctx => {
       const { id } = ctx.values

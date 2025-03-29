@@ -70,17 +70,13 @@ const command = {
   options: {
     name: {
       type: 'string',
-      short: 'n'
+      short: 'n',
+      description: 'Name to greet'
     },
     uppercase: {
       type: 'boolean',
-      short: 'u'
-    }
-  },
-  usage: {
-    options: {
-      name: 'Name to greet',
-      uppercase: 'Convert greeting to uppercase'
+      short: 'u',
+      description: 'Convert greeting to uppercase'
     }
   },
   run: ctx => {

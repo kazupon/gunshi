@@ -15,33 +15,29 @@ const SHOW = {
   options: {
     foo: {
       type: 'string',
-      short: 'f'
+      short: 'f',
+      description: 'The foo option'
     },
     bar: {
-      type: 'boolean'
+      type: 'boolean',
+      description: 'The bar option'
     },
     baz: {
       type: 'number',
       short: 'b',
-      default: 42
+      default: 42,
+      description: 'The baz option'
     },
     qux: {
       type: 'string',
       short: 'q',
-      required: true
+      required: true,
+      description: 'The qux option'
     }
   },
   name: 'show',
   description: 'A show command',
-  usage: {
-    options: {
-      foo: 'The foo option',
-      bar: 'The bar option',
-      baz: 'The baz option',
-      qux: 'The qux option'
-    },
-    examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`
-  },
+  examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
   run: NOOP
 } as Command<ArgOptions>
 
@@ -52,16 +48,12 @@ COMMANDS.set('command1', {
   options: {
     foo: {
       type: 'string',
-      short: 'f'
+      short: 'f',
+      description: 'The foo option'
     }
   },
   default: true,
   description: 'this is command1',
-  usage: {
-    options: {
-      foo: 'The foo option'
-    }
-  },
   run: NOOP
 })
 COMMANDS.set('command2', () =>
@@ -70,15 +62,11 @@ COMMANDS.set('command2', () =>
     options: {
       bar: {
         type: 'boolean',
-        short: 'b'
+        short: 'b',
+        description: 'The bar option'
       }
     },
     description: 'this is command2',
-    usage: {
-      options: {
-        bar: 'The bar option'
-      }
-    },
     run: NOOP
   })
 )
@@ -162,33 +150,29 @@ describe('renderUsage', () => {
       options: {
         foo: {
           type: 'string',
-          short: 'f'
+          short: 'f',
+          description: 'The foo option'
         },
         bar: {
-          type: 'boolean'
+          type: 'boolean',
+          description: 'The bar option'
         },
         baz: {
           type: 'number',
           short: 'b',
-          default: 42
+          default: 42,
+          description: 'The baz option'
         },
         qux: {
           type: 'string',
           short: 'q',
-          required: true
+          required: true,
+          description: 'The qux option'
         }
       },
       name: 'test',
       description: 'A test command',
-      usage: {
-        options: {
-          foo: 'The foo option',
-          bar: 'The bar option',
-          baz: 'The baz option',
-          qux: 'The qux option'
-        },
-        examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`
-      },
+      examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
@@ -211,9 +195,7 @@ describe('renderUsage', () => {
     const command = {
       name: 'test',
       description: 'A test command',
-      usage: {
-        examples: `# Example 1\n$test\n# Example 2\n$ test`
-      },
+      examples: `# Example 1\n$test\n# Example 2\n$ test`,
       run: async () => {
         // something here
       }
@@ -239,26 +221,22 @@ describe('renderUsage', () => {
       options: {
         foo: {
           type: 'string',
-          short: 'f'
+          short: 'f',
+          description: 'The foo option'
         },
         bar: {
-          type: 'boolean'
+          type: 'boolean',
+          description: 'The bar option'
         },
         baz: {
           type: 'number',
           short: 'b',
-          default: 42
+          default: 42,
+          description: 'The baz option'
         }
       },
       name: 'test',
       description: 'A test command',
-      usage: {
-        options: {
-          foo: 'The foo option',
-          bar: 'The bar option',
-          baz: 'The baz option'
-        }
-      },
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
@@ -282,32 +260,28 @@ describe('renderUsage', () => {
       options: {
         foo: {
           type: 'string',
-          short: 'f'
+          short: 'f',
+          description: 'The foo option'
         },
         bar: {
-          type: 'boolean'
+          type: 'boolean',
+          description: 'The bar option'
         },
         baz: {
           type: 'number',
           short: 'b',
-          default: 42
+          default: 42,
+          description: 'The baz option'
         },
         qux: {
           type: 'string',
           short: 'q',
-          required: true
+          required: true,
+          description: 'The qux option'
         }
       },
       name: 'test',
       description: 'A test command',
-      usage: {
-        options: {
-          foo: 'The foo option',
-          bar: 'The bar option',
-          baz: 'The baz option',
-          qux: 'The qux option'
-        }
-      },
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({
@@ -331,33 +305,29 @@ describe('renderUsage', () => {
       options: {
         foo: {
           type: 'string',
-          short: 'f'
+          short: 'f',
+          description: 'The foo option'
         },
         bar: {
-          type: 'boolean'
+          type: 'boolean',
+          description: 'The bar option'
         },
         baz: {
           type: 'number',
           short: 'b',
-          default: 42
+          default: 42,
+          description: 'The baz option'
         },
         qux: {
           type: 'string',
           short: 'q',
-          required: true
+          required: true,
+          description: 'The qux option'
         }
       },
       name: 'test',
       description: 'A test command',
-      usage: {
-        options: {
-          foo: 'The foo option',
-          bar: 'The bar option',
-          baz: 'The baz option',
-          qux: 'The qux option'
-        },
-        examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`
-      },
+      examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
       run: NOOP
     } as Command<ArgOptions>
     const ctx = await createCommandContext({

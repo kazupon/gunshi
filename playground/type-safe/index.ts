@@ -10,18 +10,21 @@ const options = {
   // Define string option with short alias
   name: {
     type: 'string',
-    short: 'n'
+    short: 'n',
+    description: 'Your name (string)'
   },
   // Define number option with default value
   age: {
     type: 'number',
     short: 'a',
-    default: 25
+    default: 25,
+    description: 'Your age (number, default: 25)'
   },
   // Define boolean flag
   verbose: {
     type: 'boolean',
-    short: 'v'
+    short: 'v',
+    description: 'Enable verbose output (boolean)'
   }
 } satisfies ArgOptions
 
@@ -29,15 +32,8 @@ const command = {
   name: 'type-safe',
   description: 'Demonstrates type-safe argument parsing',
   options,
-  usage: {
-    options: {
-      name: 'Your name (string)',
-      age: 'Your age (number, default: 25)',
-      verbose: 'Enable verbose output (boolean)'
-    },
-    examples:
-      '# Example usage\n$ tsx index.ts --name John --age 30 --verbose\n$ tsx index.ts -n John -a 30 -v'
-  },
+  examples:
+    '# Example usage\n$ tsx index.ts --name John --age 30 --verbose\n$ tsx index.ts -n John -a 30 -v',
   run: ctx => {
     // Access typed values with proper types
     const { name, age, verbose } = ctx.values
