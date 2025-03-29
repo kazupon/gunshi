@@ -29,7 +29,7 @@ const command: Command<typeof options> = {
   examples: `# Register the dependency to the catalog:
 generator register --dependency typescript --alias ^5.7.9 --catalog tools`,
   async run(_ctx) {
-    // somthing logic ...
+    // something logic ...
   }
 }
 
