@@ -90,7 +90,6 @@ await cli(process.argv.slice(2), command, {
 
 - `name`: The name of the command
 - `description`: A description of what the command does
-- `default`: (Optional) Set to `true` to make this the default command when no sub-command is specified
 
 ### Command Options
 
