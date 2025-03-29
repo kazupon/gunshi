@@ -28,6 +28,6 @@
     ".": "./src/index.ts",
     "./context": "./src/context.ts",
     "./renderer": "./src/renderer/index.ts",
-    "./generator": "./src/generate.ts"
+    "./generator": "./src/generator.ts"
   }
 }
