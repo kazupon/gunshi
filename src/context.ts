@@ -102,9 +102,11 @@ export async function createCommandContext<
   localeResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
   if (DEFAULT_LOCALE !== localeStr) {
     try {
-      builtInLoadedResources = (await import(`./locales/${localeStr}.json`, {
-        with: { type: 'json' }
-      })) as Record<string, string>
+      builtInLoadedResources = (
+        (await import(`./locales/${localeStr}.json`, {
+          with: { type: 'json' }
+        })) as { default: Record<string, string> }
+      ).default
       localeResources.set(localeStr, mapResourceWithBuiltinKey(builtInLoadedResources))
     } catch {}
   }
