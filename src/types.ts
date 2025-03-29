@@ -16,14 +16,14 @@ export type GenerateNamespacedKey<
  * Command i18n built-in options keys
  * @experimental
  */
-export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants'))['COMMON_OPTIONS']
+export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants.ts'))['COMMON_OPTIONS']
 
 /**
  * Command i18n built-in resource keys
  * @experimental
  */
 export type CommandBuiltinResourceKeys =
-  (typeof import('./constants'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
+  (typeof import('./constants.ts'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
 
 /**
  * Command i18n built-in keys
