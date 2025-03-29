@@ -1,0 +1,37 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`single 1`] = `
+"This is a generator (generator v1.0.0)
+USAGE:
+  generator <OPTIONS> 
+
+OPTIONS:
+  -c, --catalog             Display the catalog only
+  -d, --dependency          Display the catalogable dependencies only
+  -h, --help                Display this help message
+  -v, --version             Display this version
+
+EXAMPLES:
+  # Show the catalog and catalogable dependencies:
+  generator  # \`generator\` is equivalent to \`generator show\`
+"
+`;
+
+exports[`subcomments 1`] = `
+"This is a generator (generator v1.0.0)
+Show the catalog and catalogable dependencies (default command)
+
+USAGE:
+  generator show <OPTIONS>
+
+OPTIONS:
+  -c, --catalog             Display the catalog only
+  -d, --dependency          Display the catalogable dependencies only
+  -h, --help                Display this help message
+  -v, --version             Display this version
+
+EXAMPLES:
+  # Show the catalog and catalogable dependencies:
+  generator  # \`generator\` is equivalent to \`generator show\`
+"
+`;

@@ -55,6 +55,12 @@
       "require": "./lib/renderer/index.js",
       "default": "./lib/renderer/index.js"
     },
+    "./generator": {
+      "types": "./lib/generator/index.d.ts",
+      "import": "./lib/generator/index.js",
+      "require": "./lib/generator/index.js",
+      "default": "./lib/generator/index.js"
+    },
     "./package.json": "./package.json",
     "./*": "./*"
   },
