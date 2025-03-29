@@ -53,7 +53,11 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   yaml({
     prettier: true
   }),
-  markdown(),
+  markdown({
+    rules: {
+      'import/extensions': 'off'
+    }
+  }),
   vitest(),
   prettier(),
   globalIgnores([

@@ -1,13 +1,13 @@
 # Documentation Generation
 
-Gunshi provides a powerful feature for automatically generating documentation for your CLI applications. This guide explains how to use the `usageSilent` option and the return value of the `cli` function to generate documentation programmatically.
+Gunshi provides a powerful feature for automatically generating documentation for your CLI applications. This guide explains how to use the `generate` function to generate documentation programmatically.
 
-## Capturing Usage Information
+## Using the `generate` Function
 
-When you run a command with the `--help` flag, Gunshi generates usage information. Normally, this information is displayed in the console, but you can also capture it programmatically using the `usageSilent` option:
+The `generate` function is a convenient way to generate usage documentation for your commands:
 
 ```js
-import { cli } from 'gunshi'
+import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 
 // Define your command
@@ -33,12 +33,11 @@ const command = {
 
 // Generate documentation
 async function main() {
-  // Capture the usage information by simulating --help
-  const usageText = await cli(['--help'], command, {
+  // Generate the usage information
+  const usageText = await generate(null, command, {
     name: 'my-cli',
     version: '1.0.0',
-    description: 'My CLI tool',
-    usageSilent: true // Prevent output to console
+    description: 'My CLI tool'
   })
 
   // Now you can use the usage text to generate documentation
@@ -51,12 +50,18 @@ async function main() {
 await main()
 ```
 
+The `generate` function takes three parameters:
+
+- `command`: The command name to generate documentation for, or `null` for the default command
+- `entry`: The command object or function
+- `opts`: Command options (name, version, description, etc.)
+
 ## Generating Documentation for Multiple Commands
 
 For CLIs with sub-commands, you can generate documentation for each command:
 
 ```js
-import { cli } from 'gunshi'
+import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 
 // Define your commands
@@ -111,17 +116,16 @@ async function main() {
     name: 'my-cli',
     version: '1.0.0',
     description: 'My CLI tool',
-    subCommands,
-    usageSilent: true
+    subCommands
   }
 
   // Generate main help
-  const mainUsage = await cli(['--help'], mainCommand, cliOptions)
+  const mainUsage = await generate(null, mainCommand, cliOptions)
   await fs.writeFile('docs/cli-main.md', `# CLI Usage\n\n\`\`\`sh\n${mainUsage}\n\`\`\``, 'utf8')
 
   // Generate help for each sub-command
   for (const [name, _] of subCommands.entries()) {
-    const commandUsage = await cli([name, '--help'], mainCommand, cliOptions)
+    const commandUsage = await generate(name, mainCommand, cliOptions)
     await fs.writeFile(
       `docs/cli-${name}.md`,
       `# ${name.charAt(0).toUpperCase() + name.slice(1)} Command\n\n\`\`\`sh\n${commandUsage}\n\`\`\``,
@@ -138,10 +142,10 @@ await main()
 
 ## Creating Rich Documentation
 
-You can combine the captured usage information with additional content to create rich documentation:
+You can combine the generated usage information with additional content to create rich documentation:
 
 ```js
-import { cli } from 'gunshi'
+import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 
 // Generate rich documentation
@@ -172,12 +176,11 @@ async function main() {
     }
   }
 
-  // Capture the usage information
-  const usageText = await cli(['--help'], command, {
+  // Generate the usage information
+  const usageText = await generate(null, command, {
     name: 'data-processor',
     version: '1.0.0',
-    description: 'A data processing utility',
-    usageSilent: true
+    description: 'A data processing utility'
   })
 
   // Create rich documentation
@@ -239,7 +242,7 @@ You can automate documentation generation as part of your build process:
 
 ```js
 // scripts/generate-docs.js
-import { cli } from 'gunshi'
+import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
@@ -255,12 +258,11 @@ async function main() {
     name: 'my-cli',
     version: '1.0.0',
     description: 'My CLI tool',
-    subCommands,
-    usageSilent: true
+    subCommands
   }
 
   // Generate main help
-  const mainUsage = await cli(['--help'], mainCommand, cliOptions)
+  const mainUsage = await generate(null, mainCommand, cliOptions)
 
   // Create the CLI reference page
   const cliReference = `# CLI Reference
@@ -278,7 +280,7 @@ ${mainUsage}
   // Add each sub-command
   let fullReference = cliReference
   for (const [name, _] of subCommands.entries()) {
-    const commandUsage = await cli([name, '--help'], mainCommand, cliOptions)
+    const commandUsage = await generate(name, mainCommand, cliOptions)
     fullReference += `### ${name.charAt(0).toUpperCase() + name.slice(1)}
 
 \`\`\`sh
@@ -310,7 +312,7 @@ Then add a script to your `package.json`:
 
 ## Generating Unix Man Pages
 
-Unix man pages (short for "manual pages") are a traditional form of documentation for command-line tools on Unix-like operating systems. You can use Gunshi's `usageSilent` option to generate man pages for your CLI applications.
+Unix man pages (short for "manual pages") are a traditional form of documentation for command-line tools on Unix-like operating systems. You can use Gunshi's `generate` function to generate man pages for your CLI applications.
 
 ### Introduction to Man Pages
 
@@ -329,7 +331,7 @@ Man pages follow a specific format and are organized into sections:
 You can convert Gunshi's usage information to man page format using tools like [marked-man](https://github.com/kapouer/marked-man):
 
 ```js
-import { cli } from 'gunshi'
+import { generate } from 'gunshi/generator'
 import { execSync } from 'node:child_process'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
@@ -423,14 +425,13 @@ $ my-tool --input data.csv --verbose`,
     }
   }
 
-  // Capture the usage from `cli` function reutnr value
-  const usageText = await cli(['--help'], command, {
+  // Generate the usage with custom renderer
+  const usageText = await generate(null, command, {
     name: 'my-tool',
     version: '1.0.0',
     description: 'A utility for processing data',
     renderHeader: null, // no display header on console
-    renderUsage: renderManPageUsage, // set custom usage renderer
-    usageSilent: true
+    renderUsage: renderManPageUsage // set custom usage renderer
   })
 
   // Write the markdown file
