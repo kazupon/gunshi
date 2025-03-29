@@ -14,7 +14,7 @@ import { resolveBuiltInKey } from './utils.ts'
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
 
-test.only('basic', async () => {
+test('basic', async () => {
   const options = {
     foo: {
       type: 'string',
@@ -61,7 +61,6 @@ test.only('basic', async () => {
       leftMargin: 4,
       middleMargin: 2,
       usageOptionType: true,
-
       renderHeader: null,
       renderUsage: mockRenderUsage,
       renderValidationErrors: mockRenderValidationErrors,
@@ -210,41 +209,29 @@ describe('translation', () => {
     const options = {
       foo: {
         type: 'string',
-        short: 'f'
+        short: 'f',
+        description: 'this is foo option'
       },
       bar: {
-        type: 'boolean'
+        type: 'boolean',
+        description: 'this is bar option'
       },
       baz: {
         type: 'number',
         short: 'b',
-        default: 42
+        default: 42,
+        description: 'this is baz option'
       }
     } satisfies ArgOptions
 
     const command = {
-      options: {
-        foo: {
-          type: 'string',
-          short: 'f',
-          description: 'this is foo option'
-        },
-        bar: {
-          type: 'boolean',
-          description: 'this is bar option'
-        },
-        baz: {
-          type: 'number',
-          short: 'b',
-          default: 42,
-          description: 'this is baz option'
-        }
-      },
+      options,
       name: 'cmd1',
       description: 'this is cmd1',
       examples: 'this is an cmd1 example',
       run: vi.fn()
     } satisfies Command<ArgOptions>
+
     const ctx = await createCommandContext({
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
