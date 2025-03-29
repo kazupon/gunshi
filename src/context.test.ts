@@ -1,7 +1,5 @@
 import { MessageFormat } from 'messageformat'
 import { describe, expect, test, vi } from 'vitest'
-import DefaultLocale from '../locales/en-US.json' with { type: 'json' }
-import jaLocale from '../locales/ja-JP.json' with { type: 'json' }
 import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2,
@@ -9,6 +7,8 @@ import {
 } from '../test/utils.ts'
 import { DEFAULT_LOCALE } from './constants.ts'
 import { createCommandContext } from './context.ts'
+import DefaultLocale from './locales/en-US.json' with { type: 'json' }
+import jaLocale from './locales/ja-JP.json' with { type: 'json' }
 import { resolveBuiltInKey } from './utils.ts'
 
 import type { ArgOptions } from 'args-tokens'

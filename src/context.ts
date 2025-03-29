@@ -1,5 +1,5 @@
-import DefaultResource from '../locales/en-US.json' with { type: 'json' }
 import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE, NOOP } from './constants.ts'
+import DefaultResource from './locales/en-US.json' with { type: 'json' }
 import { createTranslationAdapter } from './translation.ts'
 import { create, deepFreeze, log, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.ts'
 
@@ -102,7 +102,7 @@ export async function createCommandContext<
   localeResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
   if (DEFAULT_LOCALE !== localeStr) {
     try {
-      builtInLoadedResources = (await import(`../locales/${localeStr}.json`, {
+      builtInLoadedResources = (await import(`./locales/${localeStr}.json`, {
         with: { type: 'json' }
       })) as Record<string, string>
       localeResources.set(localeStr, mapResourceWithBuiltinKey(builtInLoadedResources))
