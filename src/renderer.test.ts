@@ -52,7 +52,6 @@ COMMANDS.set('command1', {
       description: 'The foo option'
     }
   },
-  default: true,
   description: 'this is command1',
   run: NOOP
 })

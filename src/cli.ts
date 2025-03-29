@@ -156,7 +156,7 @@ async function resolveCommand<Options extends ArgOptions>(
   } else {
     if (omitted) {
       return typeof entry === 'object'
-        ? [entry.name, await resolveLazyCommand(entry, undefined, true)]
+        ? [entry.name, await resolveLazyCommand(entry)]
         : [undefined, undefined]
     } else {
       if (options.subCommands == null) {

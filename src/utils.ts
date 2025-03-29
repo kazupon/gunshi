@@ -11,7 +11,7 @@ import type {
 
 export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
   cmd: Commandable<Options>,
-  name: string | undefined
+  name?: string | undefined
 ): Promise<Command<Options>> {
   const resolved = Object.assign(
     create<Command<Options>>(),
