@@ -261,11 +261,6 @@ export interface Command<Options extends ArgOptions = ArgOptions> {
    */
   description?: string
   /**
-   * whether the command is default or not
-   * @description if the command is default, it is executed when no sub-command is specified
-   */
-  default?: boolean
-  /**
    * Command options
    * @description each option can include a description property to describe the option in usage.
    */

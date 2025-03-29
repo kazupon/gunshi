@@ -11,13 +11,11 @@ import type {
 
 export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
   cmd: Commandable<Options>,
-  name: string | undefined,
-  entry: boolean = false
+  name: string | undefined
 ): Promise<Command<Options>> {
   const resolved = Object.assign(
     create<Command<Options>>(),
-    typeof cmd == 'function' ? await cmd() : cmd,
-    { default: entry }
+    typeof cmd == 'function' ? await cmd() : cmd
   )
 
   if (resolved.name == null && name) {

@@ -152,7 +152,7 @@ async function resolveCommand<Options extends ArgOptions>(
 ): Promise<[string | undefined, Command<Options> | undefined]> {
   const omitted = !sub
   if (typeof entry === 'function') {
-    return [undefined, { run: entry, default: true }]
+    return [undefined, { run: entry }]
   } else {
     if (omitted) {
       return typeof entry === 'object'
