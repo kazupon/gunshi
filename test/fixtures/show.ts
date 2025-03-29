@@ -22,7 +22,7 @@ const command: Command<typeof options> = {
   examples: `# Show the catalog and catalogable dependencies:
 generator  # \`generator\` is equivalent to \`generator show\``,
   async run() {
-    // somthing logic ...
+    // something logic ...
   }
 }
 
