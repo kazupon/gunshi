@@ -26,7 +26,6 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./context": "./src/context.ts",
     "./renderer": "./src/renderer/index.ts",
     "./generator": "./src/generator.ts"
   }

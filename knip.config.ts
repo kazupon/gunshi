@@ -10,5 +10,5 @@ export default {
     'docs/.vitepress/theme/index.ts'
   ],
   ignore: ['playground/deno/main.ts', 'src/constants.ts'],
-  ignoreDependencies: ['lint-staged', 'deno', 'typedoc-vitepress-theme']
+  ignoreDependencies: ['lint-staged', 'deno']
 } satisfies KnipConfig

@@ -42,12 +42,6 @@
       "require": "./lib/index.js",
       "default": "./lib/index.js"
     },
-    "./context": {
-      "types": "./lib/context.d.ts",
-      "import": "./lib/context.js",
-      "require": "./lib/context.js",
-      "default": "./lib/context.js"
-    },
     "./renderer": {
       "types": "./lib/renderer/index.d.ts",
       "import": "./lib/renderer/index.js",
