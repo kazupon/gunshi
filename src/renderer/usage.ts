@@ -4,9 +4,9 @@ import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandContext } from '../types.ts'
 
 /**
- * Render the usage
+ * Render the usage.
  * @param ctx A {@link CommandContext | command context}
- * @returns A rendered usage
+ * @returns A rendered usage.
  */
 export async function renderUsage<Options extends ArgOptions = ArgOptions>(
   ctx: Readonly<CommandContext<Options>>

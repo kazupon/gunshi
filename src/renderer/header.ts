@@ -2,9 +2,9 @@ import type { ArgOptions } from 'args-tokens'
 import type { CommandContext } from '../types.ts'
 
 /**
- * Render the header
+ * Render the header.
  * @param ctx A {@link CommandContext | command context}
- * @returns A rendered header
+ * @returns A rendered header.
  */
 export function renderHeader<Options extends ArgOptions = ArgOptions>(
   ctx: Readonly<CommandContext<Options>>

@@ -2,10 +2,10 @@ import type { ArgOptions } from 'args-tokens'
 import type { CommandContext } from '../types.ts'
 
 /**
- * Render the validation errors
+ * Render the validation errors.
  * @param ctx A {@link CommandContext | command context}
  * @param error An {@link AggregateError} of option in `args-token` validation
- * @returns A rendered validation error
+ * @returns A rendered validation error.
  */
 export function renderValidationErrors<Options extends ArgOptions = ArgOptions>(
   _ctx: CommandContext<Options>,

@@ -72,6 +72,7 @@
     "clean": "git clean -df",
     "dev": "pnpx @eslint/config-inspector --config eslint.config.ts",
     "dev:eslint": "pnpx @eslint/config-inspector --config eslint.config.ts",
+    "dev:typedoc": "typedoc --watch --preserveWatchOutput",
     "docs:build": "pnpm run docs:build:typedoc && pnpm docs:build:vitepress",
     "docs:build:typedoc": "typedoc",
     "docs:build:vitepress": "vitepress build docs",

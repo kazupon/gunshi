@@ -2,11 +2,19 @@
 
 /** @type {import('typedoc').TypeDocOptions & import('typedoc-plugin-markdown').PluginOptions & { docsRoot?: string } } */
 export default {
-  entryPoints: ['./src/index.ts', './src/generator.ts'],
+  /**
+   * typedoc options
+   * ref: https://typedoc.org/documents/Options.html
+   */
+  entryPoints: ['./src/index.ts', './src/generator.ts', './src/renderer/index.ts'],
   out: 'docs/api',
   plugin: ['typedoc-plugin-markdown', 'typedoc-vitepress-theme'],
   readme: 'none',
-  docsRoot: './docs',
+  groupOrder: ['Variables', 'Functions', 'Class'],
+  /**
+   * typedoc-plugin-markdown options
+   * ref: https://typedoc-plugin-markdown.org/docs/options
+   */
   entryFileName: 'index',
   hidePageTitle: true,
   useCodeBlocks: true,
@@ -17,5 +25,10 @@ export default {
   classPropertiesFormat: 'table',
   propertyMembersFormat: 'table',
   typeAliasPropertiesFormat: 'table',
-  enumMembersFormat: 'table'
+  enumMembersFormat: 'table',
+  /**
+   * typedoc-vitepress-theme options
+   * ref: https://typedoc-plugin-markdown.org/plugins/vitepress/options
+   */
+  docsRoot: './docs'
 }
