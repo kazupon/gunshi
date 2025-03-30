@@ -10,11 +10,14 @@ export function createTranslationAdapter(
 
 export class DefaultTranslation implements TranslationAdapter {
   #resources: Map<string, Record<string, string>> = new Map()
-  options: TranslationAdapterFactoryOptions
+  #options: TranslationAdapterFactoryOptions
 
   constructor(options: TranslationAdapterFactoryOptions) {
-    this.options = options
-    this.#resources = new Map()
+    this.#options = options
+    this.#resources.set(options.locale, create<Record<string, string>>())
+    if (options.locale !== options.fallbackLocale) {
+      this.#resources.set(options.fallbackLocale, create<Record<string, string>>())
+    }
   }
 
   getResource(locale: string): Record<string, string> | undefined {
@@ -36,14 +39,22 @@ export class DefaultTranslation implements TranslationAdapter {
   translate(
     locale: string,
     key: string,
-    _values: Record<string, unknown> = create<Record<string, unknown>>()
+    values: Record<string, unknown> = create<Record<string, unknown>>()
   ): string | undefined {
-    /**
-     * NOTE:
-     * DefaultTranslation support static message only
-     * If you want to resolve message with values and use the complex message format,
-     * you should inherit this class or implement your own translation adapter.
-     */
-    return this.getMessage(locale, key) || this.getMessage(this.options.fallbackLocale, key)
+    // Try to get the message from the specified locale
+    let message = this.getMessage(locale, key)
+
+    // Fall back to the fallback locale if needed
+    if (message === undefined && locale !== this.#options.fallbackLocale) {
+      message = this.getMessage(this.#options.fallbackLocale, key)
+    }
+
+    if (message === undefined) {
+      return
+    }
+
+    return message.replaceAll(/\{\{(\w+)\}\}/g, (_: string | RegExp, name: string): string => {
+      return values[name] == null ? '' : values[name].toString()
+    })
   }
 }

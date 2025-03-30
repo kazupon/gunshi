@@ -11,6 +11,13 @@ A translation adapter offers several benefits:
 - **Advanced features**: Leverage features of specialized i18n libraries like message formatting
 - **Resource management**: Let your i18n library manage translation resources directly
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!IMPORTANT]
+> Gunshi has a [built-in translation adapter](../../api/default/classes/DefaultTranslation.md) that supports simple interpolation. It does not support complex forms such as plurals.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 ## Understanding the TranslationAdapter Interface
 
 Gunshi defines a `TranslationAdapter` interface that allows you to integrate with any i18n library. The interface is designed to let the i18n library manage resources directly:
