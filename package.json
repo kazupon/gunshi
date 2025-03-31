@@ -124,7 +124,7 @@
     "knip": "^5.46.3",
     "lint-staged": "^15.5.0",
     "messageformat": "4.0.0-10",
-    "pkg-pr-new": "^0.0.41",
+    "pkg-pr-new": "^0.0.42",
     "prettier": "^3.5.3",
     "tsdown": "^0.6.10",
     "typedoc": "^0.28.1",
