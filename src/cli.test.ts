@@ -433,3 +433,10 @@ test('usageSilent', async () => {
   const stdout = log()
   expect(stdout).toBe('')
 })
+
+test('rawArgs', async () => {
+  const args = ['--foo', 'bar', '--baz', 'qux']
+  const fn = vi.fn()
+  await cli(args, fn)
+  expect(fn.mock.calls[0][0]._).toEqual(args)
+})

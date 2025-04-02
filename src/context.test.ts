@@ -51,6 +51,7 @@ test('basic', async () => {
     options,
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
+    args: ['bar'],
     omitted: true,
     command,
     commandOptions: {
@@ -136,6 +137,7 @@ test('default', async () => {
     options: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
+    args: ['bar'],
     command,
     omitted: false,
     commandOptions: {}
@@ -179,6 +181,7 @@ describe('translation', () => {
       options: {},
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      args: ['bar'],
       command,
       omitted: false,
       commandOptions: {}
@@ -236,6 +239,7 @@ describe('translation', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      args: ['bar'],
       command,
       omitted: false,
       commandOptions: {}
@@ -301,6 +305,7 @@ describe('translation', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      args: ['bar'],
       command,
       omitted: false,
       commandOptions: {
@@ -367,6 +372,7 @@ describe('translation adapter', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      args: ['bar'],
       command,
       omitted: false,
       commandOptions: {
@@ -418,6 +424,7 @@ describe('translation adapter', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      args: ['bar'],
       command,
       omitted: false,
       commandOptions: {

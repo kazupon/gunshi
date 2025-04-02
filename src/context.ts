@@ -32,6 +32,10 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
    */
   positionals: string[]
   /**
+   * Original command line arguments
+   */
+  args: string[]
+  /**
    * Whether the command is omitted
    */
   omitted: boolean
@@ -57,6 +61,7 @@ export async function createCommandContext<
   options,
   values,
   positionals,
+  args,
   command,
   commandOptions,
   omitted = false
@@ -165,6 +170,7 @@ export async function createCommandContext<
       options: _options,
       values,
       positionals,
+      _: args,
       log: commandOptions.usageSilent ? NOOP : log,
       loadCommands,
       translate

@@ -212,6 +212,11 @@ export interface CommandContext<
    */
   positionals: string[]
   /**
+   * Original command line arguments.
+   * This argument is passed from `cli` function.
+   */
+  _: string[]
+  /**
    * Whether the currently executing command has been executed with the sub-command name omitted.
    */
   omitted: boolean

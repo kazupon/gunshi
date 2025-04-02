@@ -82,6 +82,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      args: [],
       omitted: true,
       command,
       commandOptions: {
@@ -100,6 +101,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      args: [],
       omitted: true,
       command,
       commandOptions: {
@@ -117,6 +119,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      args: [],
       omitted: true,
       command,
       commandOptions: { cwd: '/path/to/cmd1' }
@@ -130,6 +133,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      args: [],
       omitted: true,
       command,
       commandOptions: {
@@ -178,6 +182,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      args: [],
       omitted: false,
       command,
       commandOptions: {
@@ -203,6 +208,7 @@ describe('renderUsage', () => {
       options: {},
       values: {},
       positionals: [],
+      args: [],
       omitted: false,
       command,
       commandOptions: {
@@ -242,6 +248,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      args: [],
       omitted: false,
       command,
       commandOptions: {
@@ -287,6 +294,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      args: [],
       omitted: false,
       command,
       commandOptions: {
@@ -333,6 +341,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      args: [],
       omitted: false,
       command,
       commandOptions: {
@@ -354,6 +363,7 @@ describe('renderUsage', () => {
       values: {},
       omitted: true,
       positionals: [],
+      args: [],
       command: SHOW,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -372,6 +382,7 @@ test('renderValidationErrors', async () => {
     options: SHOW.options!,
     values: {},
     positionals: [],
+    args: [],
     omitted: false,
     command: SHOW,
     commandOptions: {
