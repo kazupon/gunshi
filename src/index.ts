@@ -7,6 +7,7 @@
  * @module default
  */
 
+export { parseArgs, resolveArgs } from 'args-tokens'
 export type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 export * from './cli.ts'
 export { DEFAULT_LOCALE } from './constants.ts'
