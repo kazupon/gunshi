@@ -37,6 +37,7 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
     values,
     positionals,
     args,
+    tokens,
     omitted,
     command,
     commandOptions: resolvedCommandOptions

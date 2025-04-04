@@ -83,6 +83,7 @@ describe('renderHeader', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: true,
       command,
       commandOptions: {
@@ -102,6 +103,7 @@ describe('renderHeader', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: true,
       command,
       commandOptions: {
@@ -120,6 +122,7 @@ describe('renderHeader', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: true,
       command,
       commandOptions: { cwd: '/path/to/cmd1' }
@@ -134,6 +137,7 @@ describe('renderHeader', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: true,
       command,
       commandOptions: {
@@ -183,6 +187,7 @@ describe('renderUsage', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: false,
       command,
       commandOptions: {
@@ -209,6 +214,7 @@ describe('renderUsage', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: false,
       command,
       commandOptions: {
@@ -249,6 +255,7 @@ describe('renderUsage', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: false,
       command,
       commandOptions: {
@@ -295,6 +302,7 @@ describe('renderUsage', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: false,
       command,
       commandOptions: {
@@ -342,6 +350,7 @@ describe('renderUsage', () => {
       values: {},
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       omitted: false,
       command,
       commandOptions: {
@@ -364,6 +373,7 @@ describe('renderUsage', () => {
       omitted: true,
       positionals: [],
       args: [],
+      tokens: [], // dummy, due to test
       command: SHOW,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -383,6 +393,7 @@ test('renderValidationErrors', async () => {
     values: {},
     positionals: [],
     args: [],
+    tokens: [], // dummy, due to test
     omitted: false,
     command: SHOW,
     commandOptions: {

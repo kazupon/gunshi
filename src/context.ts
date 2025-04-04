@@ -3,7 +3,7 @@ import DefaultResource from './locales/en-US.json' with { type: 'json' }
 import { createTranslationAdapter } from './translation.ts'
 import { create, deepFreeze, log, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.ts'
 
-import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
+import type { ArgOptions, ArgOptionSchema, ArgToken, ArgValues } from 'args-tokens'
 import type {
   Command,
   CommandBuiltinKeys,
@@ -36,6 +36,10 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
    */
   args: string[]
   /**
+   * Arguments tokens, which parsed by `parseArgs` function
+   */
+  tokens: ArgToken[]
+  /**
    * Whether the command is omitted
    */
   omitted: boolean
@@ -62,6 +66,7 @@ export async function createCommandContext<
   values,
   positionals,
   args,
+  tokens,
   command,
   commandOptions,
   omitted = false
@@ -171,6 +176,7 @@ export async function createCommandContext<
       values,
       positionals,
       _: args,
+      tokens,
       log: commandOptions.usageSilent ? NOOP : log,
       loadCommands,
       translate

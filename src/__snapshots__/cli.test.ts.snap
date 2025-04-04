@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`aute generate usage > inline function > USAGE:
+exports[`auto generate usage > inline function > USAGE:
   COMMAND <OPTIONS> 
 
 OPTIONS:
@@ -16,7 +16,7 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > inline function 1`] = `
+exports[`auto generate usage > inline function 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 
 
@@ -26,7 +26,7 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > locale resource not found 1`] = `
+exports[`auto generate usage > locale resource not found 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
 USAGE:
@@ -45,7 +45,7 @@ EXAMPLES:
 "
 `;
 
-exports[`aute generate usage > loosely entry command > USAGE:
+exports[`auto generate usage > loosely entry command > USAGE:
   COMMAND <OPTIONS> 
 
 OPTIONS:
@@ -63,7 +63,7 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > loosely entry command 1`] = `
+exports[`auto generate usage > loosely entry command 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 
 
@@ -74,7 +74,7 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > loosely sub commands > command2 1`] = `
+exports[`auto generate usage > loosely sub commands > command2 1`] = `
 "USAGE:
   COMMAND command2 <OPTIONS>
 
@@ -85,7 +85,7 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > loosely sub commands > main 1`] = `
+exports[`auto generate usage > loosely sub commands > main 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 
 
@@ -96,7 +96,7 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > loosely sub commands 1`] = `
+exports[`auto generate usage > loosely sub commands 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 
 
@@ -115,7 +115,7 @@ OPTIONS:
 "
 `;
 
-exports[`aute generate usage > strictly entry command > Modern CLI tool (gunshi v0.0.0)
+exports[`auto generate usage > strictly entry command > Modern CLI tool (gunshi v0.0.0)
 USAGE:
   gunshi <OPTIONS> 
 
@@ -148,7 +148,7 @@ EXAMPLES:
 "
 `;
 
-exports[`aute generate usage > strictly sub commands > command2 1`] = `
+exports[`auto generate usage > strictly sub commands > command2 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 USAGE:
   gunshi command2 <OPTIONS>
@@ -166,7 +166,7 @@ EXAMPLES:
 "
 `;
 
-exports[`aute generate usage > strictly sub commands > main 1`] = `
+exports[`auto generate usage > strictly sub commands > main 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 使い方:
     gunshi [command1] <オプション> 
@@ -193,7 +193,7 @@ exports[`aute generate usage > strictly sub commands > main 1`] = `
 "
 `;
 
-exports[`aute generate usage > strictly sub commands 1`] = `
+exports[`auto generate usage > strictly sub commands 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
 使い方:

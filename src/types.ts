@@ -1,4 +1,4 @@
-import type { ArgOptions, ArgValues } from 'args-tokens'
+import type { ArgOptions, ArgToken, ArgValues } from 'args-tokens'
 
 import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
@@ -216,6 +216,10 @@ export interface CommandContext<
    * This argument is passed from `cli` function.
    */
   _: string[]
+  /**
+   * Argument tokens, that is parsed by `parseArgs` function.
+   */
+  tokens: ArgToken[]
   /**
    * Whether the currently executing command has been executed with the sub-command name omitted.
    */

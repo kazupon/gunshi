@@ -124,7 +124,7 @@ describe('execute command', () => {
   })
 })
 
-describe('aute generate usage', () => {
+describe('auto generate usage', () => {
   test('inline function', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
@@ -434,9 +434,30 @@ test('usageSilent', async () => {
   expect(stdout).toBe('')
 })
 
-test('rawArgs', async () => {
+test('_ (rawArgs)', async () => {
   const args = ['--foo', 'bar', '--baz', 'qux']
   const fn = vi.fn()
   await cli(args, fn)
   expect(fn.mock.calls[0][0]._).toEqual(args)
+})
+
+test('tokens', async () => {
+  const args = ['--foo', 'bar']
+  const fn = vi.fn()
+  await cli(args, fn)
+  expect(fn.mock.calls[0][0].tokens).toEqual([
+    {
+      index: 0,
+      kind: 'option',
+      name: 'foo',
+      rawName: '--foo',
+      value: undefined,
+      inlineValue: undefined
+    },
+    {
+      index: 1,
+      kind: 'positional',
+      value: 'bar'
+    }
+  ])
 })

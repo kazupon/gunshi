@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`issue #63 1`] = `
+"USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -t, --title <title>                      Test title
+  -d, --description <description>          Test description [Optional]
+  -h, --help                               Display this help message
+  -v, --version                            Display this version
+"
+`;
