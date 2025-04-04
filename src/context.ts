@@ -36,7 +36,7 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
    */
   args: string[]
   /**
-   * Arguments tokens, which parsed by `parseArgs` function
+   * Argument tokens that are parsed by the `parseArgs` function
    */
   tokens: ArgToken[]
   /**
