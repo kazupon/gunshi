@@ -1,6 +1,6 @@
 # Type Safe
 
-Gunshi provides excellent TypeScript support, allowing you to create type-safe command-line interfaces. This guide shows how to leverage TypeScript with Gunshi for better developer experience and code reliability.
+Gunshi provides excellent TypeScript support, allowing you to create type-safe command-line interfaces. The `define` function is the recommended way to leverage TypeScript with Gunshi for the best developer experience and code reliability.
 
 ## Benefits of Type Safety
 
@@ -11,120 +11,74 @@ Using TypeScript with Gunshi offers several advantages:
 - **Better documentation**: Types serve as documentation for your code
 - **Refactoring confidence**: Make changes with the safety net of type checking
 
-## Basic TypeScript Usage
+## Using `define` for Type Safety
 
-Here's a simple example of using Gunshi with TypeScript:
+The `define` function automatically infers types from your command definition, providing autocompletion and compile-time checks without explicit type annotations.
 
-```ts
-import { cli } from 'gunshi'
-import type { ArgOptions, Command, CommandContext } from 'gunshi'
-
-// Define a command with TypeScript types
-const command: Command<ArgOptions> = {
-  name: 'hello',
-  options: {
-    name: {
-      type: 'string',
-      short: 'n'
-    }
-  },
-  run: (ctx: CommandContext<ArgOptions>) => {
-    const { name = 'World' } = ctx.values
-    console.log(`Hello, ${name}!`)
-  }
-}
-
-// Execute the command
-await cli(process.argv.slice(2), command)
-```
-
-## Type-Safe Options and Values
-
-For more precise type safety, you can define interfaces for your options and values:
+Here's how to use `define`:
 
 ```ts
-import { cli } from 'gunshi'
-import type { ArgOptions, Command, CommandContext } from 'gunshi'
+import { cli, define } from 'gunshi'
 
-// Define interfaces for options and values
-interface UserOptions extends ArgOptions {
-  name: {
-    type: 'string'
-    short: 'n'
-  }
-  age: {
-    type: 'number'
-    short: 'a'
-    default: number
-  }
-}
-
-interface UserValues {
-  name?: string
-  age: number
-}
-
-// Create a type-safe command
-const command: Command<UserOptions> = {
-  name: 'type-safe',
+// Define a command using the `define` function
+const command = define({
+  name: 'greet',
   options: {
+    // Define a string option 'name' with a short alias 'n'
     name: {
       type: 'string',
-      short: 'n'
+      short: 'n',
+      description: 'Your name'
     },
+    // Define a number option 'age' with a default value
     age: {
       type: 'number',
       short: 'a',
-      default: 25
+      description: 'Your age',
+      default: 30
+    },
+    // Define a boolean flag 'verbose'
+    verbose: {
+      type: 'boolean',
+      short: 'v',
+      description: 'Enable verbose output'
     }
   },
-  run: (ctx: CommandContext<UserOptions, UserValues>) => {
-    // TypeScript knows the types of these values
-    const { name, age } = ctx.values
-
-    console.log(`Name: ${name || 'Not provided'} (${typeof name})`)
-    console.log(`Age: ${age} (${typeof age})`)
-  }
-}
-
-// Execute the command with type safety
-await cli(process.argv.slice(2), command)
-```
-
-## Using `satisfies` for Type Checking
-
-TypeScript 4.9+ introduced the `satisfies` operator, which provides a more flexible way to type-check your commands:
-
-```ts
-import { cli } from 'gunshi'
-import type { ArgOptions, Command } from 'gunshi'
-
-// Define options with types
-const options = {
-  name: {
-    type: 'string',
-    short: 'n'
-  },
-  age: {
-    type: 'number',
-    short: 'a',
-    default: 25
-  }
-} satisfies ArgOptions
-
-// Create a type-safe command
-const command = {
-  name: 'type-safe',
-  options,
+  // The 'ctx' parameter is automatically typed based on the options
   run: ctx => {
-    // TypeScript infers the correct types from options
-    const { name, age } = ctx.values
-    console.log(`Hello, ${name || 'World'}! You are ${age} years old.`)
+    // `ctx.values` is fully typed!
+    const { name, age, verbose } = ctx.values
+
+    // TypeScript knows the types:
+    // - name: string | undefined
+    // - age: number (because it has a default)
+    // - verbose: boolean | undefined
+
+    let greeting = `Hello, ${name || 'stranger'}!`
+    if (age !== undefined) {
+      greeting += ` You are ${age} years old.`
+    }
+
+    console.log(greeting)
+
+    if (verbose) {
+      console.log('Verbose mode enabled.')
+      console.log('Parsed values:', ctx.values)
+    }
   }
-} satisfies Command<typeof options>
+})
 
 // Execute the command
 await cli(process.argv.slice(2), command)
 ```
 
-The `satisfies` approach has the advantage of letting TypeScript infer the types from your options definition, while still ensuring type safety.
+With `define`:
+
+- You don't need to import types like `Command` or `CommandContext`.
+- The `ctx` parameter in the `run` function automatically gets the correct type, derived from the `options` definition.
+- Accessing `ctx.values.optionName` provides type safety and autocompletion based on the option's `type` and whether it has a `default`.
+  - Options without a `default` are typed as `T | undefined`.
+  - Options with a `default` are typed as `T`.
+  - Boolean flags are `boolean | undefined` unless they have a `default: false`.
+
+This approach significantly simplifies creating type-safe CLIs with Gunshi.
