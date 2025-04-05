@@ -5,7 +5,7 @@ import { defineConfig } from 'tsdown'
 const dirname = import.meta.dirname
 
 const config: ReturnType<typeof defineConfig> = defineConfig({
-  entry: ['src/index.ts', 'src/define.ts', 'src/renderer/index.ts', 'src/generator.ts'],
+  entry: ['src/index.ts', 'src/definition.ts', 'src/renderer/index.ts', 'src/generator.ts'],
   outDir: 'lib',
   dts: true,
   plugins: [

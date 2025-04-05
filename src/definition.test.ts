@@ -1,6 +1,6 @@
 import { expectTypeOf, test } from 'vitest'
 import { cli } from './cli.ts'
-import { define } from './define.ts'
+import { define } from './definition.ts'
 
 // eslint-disable-next-line vitest/expect-expect
 test('define', async () => {

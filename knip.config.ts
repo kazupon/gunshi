@@ -3,6 +3,9 @@ import type { KnipConfig } from 'knip'
 export default {
   entry: [
     'src/index.ts',
+    'src/definition.ts',
+    'src/generator.ts',
+    'src/renderer/index.ts',
     'eslint.config.ts',
     'tsdown.config.ts',
     'typedoc.config.mjs',

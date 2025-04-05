@@ -42,11 +42,11 @@
       "require": "./lib/index.js",
       "default": "./lib/index.js"
     },
-    "./define": {
-      "types": "./lib/define.d.ts",
-      "import": "./lib/define.js",
-      "require": "./lib/define.js",
-      "default": "./lib/define.js"
+    "./definition": {
+      "types": "./lib/definition.d.ts",
+      "import": "./lib/definition.js",
+      "require": "./lib/definition.js",
+      "default": "./lib/definition.js"
     },
     "./renderer": {
       "types": "./lib/renderer/index.d.ts",
