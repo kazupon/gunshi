@@ -1,6 +1,6 @@
 {
   "description": "リソースの新規作成",
   "examples": "# リソースの作成例1\n$ deno run index.ts create --name my-resource --type special",
-  "name": "作成するリソースの名前",
-  "type": "作成するリソースのタイプ (デフォルト: \"default\")"
+  "Option:name": "作成するリソースの名前",
+  "Option:type": "作成するリソースのタイプ (デフォルト: \"default\")"
 }

@@ -37,8 +37,8 @@ const command = {
     if (ctx.locale.toString() === 'ja-JP') {
       return {
         description: '挨拶アプリケーション',
-        name: '挨拶する相手の名前',
-        formal: '丁寧な挨拶を使用する',
+        'Option:name': '挨拶する相手の名前',
+        'Option:formal': '丁寧な挨拶を使用する',
         informal_greeting: 'こんにちは',
         formal_greeting: 'はじめまして'
       }
@@ -47,8 +47,8 @@ const command = {
     // Default to English
     return {
       description: 'Greeting application',
-      name: 'Name to greet',
-      formal: 'Use formal greeting',
+      'Option:name': 'Name to greet',
+      'Option:formal': 'Use formal greeting',
       informal_greeting: 'Hello',
       formal_greeting: 'Good day'
     }
@@ -153,8 +153,8 @@ Example locale files:
 ```json
 {
   "description": "Greeting application",
-  "name": "Name to greet",
-  "formal": "Use formal greeting",
+  "Option:name": "Name to greet",
+  "Option:formal": "Use formal greeting",
   "informal_greeting": "Hello",
   "formal_greeting": "Good day"
 }
@@ -165,8 +165,8 @@ Example locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "name": "挨拶する相手の名前",
-  "formal": "丁寧な挨拶を使用する",
+  "Option:name": "挨拶する相手の名前",
+  "Option:formal": "丁寧な挨拶を使用する",
   "informal_greeting": "こんにちは",
   "formal_greeting": "はじめまして"
 }
@@ -361,8 +361,8 @@ const command = {
     // Show translation information
     console.log('\nTranslation Information:')
     console.log(`Command Description: ${ctx.translate('description')}`)
-    console.log(`Name Option: ${ctx.translate('name')}`)
-    console.log(`Formal Option: ${ctx.translate('formal')}`)
+    console.log(`Name Option: ${ctx.translate('Option:name')}`)
+    console.log(`Formal Option: ${ctx.translate('Option:formal')}`)
   }
 }
 
@@ -383,8 +383,8 @@ With locale files:
 ```json
 {
   "description": "Greeting application",
-  "name": "Name to greet",
-  "formal": "Use formal greeting",
+  "Option:name": "Name to greet",
+  "Option:formal": "Use formal greeting",
   "informal_greeting": "Hello",
   "formal_greeting": "Good day"
 }
@@ -395,8 +395,8 @@ With locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "name": "挨拶する相手の名前",
-  "formal": "丁寧な挨拶を使用する",
+  "Option:name": "挨拶する相手の名前",
+  "Option:formal": "丁寧な挨拶を使用する",
   "informal_greeting": "こんにちは",
   "formal_greeting": "はじめまして"
 }
