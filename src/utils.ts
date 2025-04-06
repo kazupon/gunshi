@@ -1,4 +1,4 @@
-import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
+import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, OPTION_PREFIX } from './constants.ts'
 
 import type { ArgOptions } from 'args-tokens'
 import type {
@@ -6,7 +6,8 @@ import type {
   Commandable,
   CommandBuiltinOptionsKeys,
   CommandBuiltinResourceKeys,
-  GenerateNamespacedKey
+  GenerateNamespacedKey,
+  RemovedIndex
 } from './types.ts'
 
 export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
@@ -28,6 +29,13 @@ export function resolveBuiltInKey<
   Key extends string = CommandBuiltinOptionsKeys | CommandBuiltinResourceKeys
 >(key: Key): GenerateNamespacedKey<Key> {
   return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+}
+
+export function resolveOptionKey<
+  Options extends ArgOptions = {},
+  Key extends string = keyof RemovedIndex<Options>
+>(key: Key): GenerateNamespacedKey<Key, typeof OPTION_PREFIX> {
+  return `${OPTION_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
 export function mapResourceWithBuiltinKey(

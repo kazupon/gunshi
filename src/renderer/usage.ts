@@ -1,4 +1,4 @@
-import { create, resolveBuiltInKey } from '../utils.ts'
+import { create, resolveBuiltInKey, resolveOptionKey } from '../utils.ts'
 
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandContext } from '../types.ts'
@@ -257,7 +257,7 @@ async function generateOptionsUsage<Options extends ArgOptions>(
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(([key, value]) => {
-      const rawDesc = ctx.translate(key)
+      const rawDesc = ctx.translate(resolveOptionKey(key))
       const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options[key].type}] ` : ''
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`

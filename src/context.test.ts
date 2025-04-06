@@ -9,7 +9,7 @@ import { DEFAULT_LOCALE } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import DefaultLocale from './locales/en-US.json' with { type: 'json' }
 import jaLocale from './locales/ja-JP.json' with { type: 'json' }
-import { resolveBuiltInKey } from './utils.ts'
+import { resolveBuiltInKey, resolveOptionKey } from './utils.ts'
 
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
@@ -95,9 +95,9 @@ test('basic', async () => {
     renderValidationErrors: mockRenderValidationErrors
   })
 
-  expect(ctx.translate('foo')).toEqual('this is foo option')
-  expect(ctx.translate('bar')).toEqual('this is bar option')
-  expect(ctx.translate('baz')).toEqual('this is baz option')
+  expect(ctx.translate(resolveOptionKey<typeof options>('foo'))).toEqual('this is foo option')
+  expect(ctx.translate(resolveOptionKey<typeof options>('bar'))).toEqual('this is bar option')
+  expect(ctx.translate(resolveOptionKey<typeof options>('baz'))).toEqual('this is baz option')
   expect(ctx.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
   expect(ctx.translate(resolveBuiltInKey('version'))).toEqual('Display this version')
   expect(ctx.translate('examples')).toEqual('examples')
@@ -252,10 +252,10 @@ describe('translation', () => {
     // description, options, and examples
     expect(ctx.translate(resolveBuiltInKey('help'))).toEqual(DefaultLocale.help)
     expect(ctx.translate(resolveBuiltInKey('version'))).toEqual(DefaultLocale.version)
+    expect(ctx.translate(resolveOptionKey<typeof options>('foo'))).toEqual('this is foo option')
+    expect(ctx.translate(resolveOptionKey<typeof options>('bar'))).toEqual('this is bar option')
+    expect(ctx.translate(resolveOptionKey<typeof options>('baz'))).toEqual('this is baz option')
     expect(ctx.translate('description')).toEqual('this is cmd1')
-    expect(ctx.translate('foo')).toEqual('this is foo option')
-    expect(ctx.translate('bar')).toEqual('this is bar option')
-    expect(ctx.translate('baz')).toEqual('this is baz option')
     expect(ctx.translate('examples')).toEqual('this is an cmd1 example')
   })
 
@@ -280,9 +280,9 @@ describe('translation', () => {
 
     const jaJPResource = {
       description: 'これはコマンド1です',
-      foo: 'これは foo オプションです',
-      bar: 'これは bar オプションです',
-      baz: 'これは baz オプションです',
+      'Option:foo': 'これは foo オプションです',
+      'Option:bar': 'これは bar オプションです',
+      'Option:baz': 'これは baz オプションです',
       examples: 'これはコマンド1の例です',
       test: 'これはテストです'
     } satisfies CommandResource<typeof options>
@@ -328,9 +328,15 @@ describe('translation', () => {
 
     // description, options, and examples
     expect(ctx.translate('description')).toEqual(jaJPResource.description)
-    expect(ctx.translate('foo')).toEqual(jaJPResource.foo)
-    expect(ctx.translate('bar')).toEqual(jaJPResource.bar)
-    expect(ctx.translate('baz')).toEqual(jaJPResource.baz)
+    expect(ctx.translate(resolveOptionKey<typeof options>('foo'))).toEqual(
+      jaJPResource['Option:foo']
+    )
+    expect(ctx.translate(resolveOptionKey<typeof options>('bar'))).toEqual(
+      jaJPResource['Option:bar']
+    )
+    expect(ctx.translate(resolveOptionKey<typeof options>('baz'))).toEqual(
+      jaJPResource['Option:baz']
+    )
     expect(ctx.translate('examples')).toEqual(jaJPResource.examples)
 
     // user defined resource
@@ -350,7 +356,7 @@ describe('translation adapter', () => {
 
     const jaJPResource = {
       description: 'これはコマンド1です',
-      foo: 'これは foo オプションです',
+      'Option:foo': 'これは foo オプションです',
       examples: 'これはコマンド1の例です',
       user: 'こんにちは、{$user}'
     } satisfies CommandResource<typeof options>
@@ -388,8 +394,10 @@ describe('translation adapter', () => {
       }
     })
 
-    const mf = new MessageFormat('ja-JP', jaJPResource.user)
-    expect(ctx.translate('user', { user: 'kazupon' })).toEqual(mf.format({ user: 'kazupon' }))
+    const mf1 = new MessageFormat('ja-JP', jaJPResource['Option:foo'])
+    expect(ctx.translate('Option:foo')).toEqual(mf1.format())
+    const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
+    expect(ctx.translate('user', { user: 'kazupon' })).toEqual(mf2.format({ user: 'kazupon' }))
   })
 
   test('Intlify Message Format', async () => {
@@ -403,7 +411,7 @@ describe('translation adapter', () => {
 
     const jaJPResource = {
       description: 'これはコマンド1です',
-      foo: 'これは foo オプションです',
+      'Option:foo': 'これは foo オプションです',
       examples: 'これはコマンド1の例です',
       user: 'こんにちは、{user}'
     } satisfies CommandResource<typeof options>
@@ -441,6 +449,7 @@ describe('translation adapter', () => {
       }
     })
 
+    expect(ctx.translate('Option:foo')).toEqual(jaJPResource['Option:foo'])
     expect(ctx.translate('user', { user: 'kazupon' })).toEqual(`こんにちは、kazupon`)
   })
 })

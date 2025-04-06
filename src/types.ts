@@ -1,12 +1,23 @@
 import type { ArgOptions, ArgToken, ArgValues } from 'args-tokens'
 
-import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
+import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, OPTION_PREFIX } from './constants.ts'
 
-/**
- * Define a promise type that can be await from T.
- */
 type Awaitable<T> = T | Promise<T>
 
+type RemoveIndexSignature<T> = {
+  [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]
+}
+
+/**
+ * Remove index signature from object or record type.
+ */
+export type RemovedIndex<T> = RemoveIndexSignature<{
+  [K in keyof T]: T[K]
+}>
+
+/**
+ * Generate a namespaced key.
+ */
 export type GenerateNamespacedKey<
   Key extends string,
   Prefixed extends string = typeof BUILT_IN_PREFIX
@@ -32,6 +43,15 @@ export type CommandBuiltinKeys =
   | GenerateNamespacedKey<CommandBuiltinResourceKeys>
   | 'description'
   | 'examples'
+
+/**
+ * Command i18n option keys.
+ * The command i18n option keys are used to {@link CommandContext.translate | translate} function.
+ */
+export type CommandOptionKeys<Options extends ArgOptions> = GenerateNamespacedKey<
+  keyof RemovedIndex<Options>,
+  typeof OPTION_PREFIX
+>
 
 /**
  * Command environment.
@@ -243,7 +263,11 @@ export interface CommandContext<
    * @param values the values to be formatted
    * @returns A translated string.
    */
-  translate: <T extends string = CommandBuiltinKeys, Key = CommandBuiltinKeys | keyof Options | T>(
+  translate: <
+    T extends string = CommandBuiltinKeys,
+    O = CommandOptionKeys<Options>,
+    Key = CommandBuiltinKeys | O | T
+  >(
     key: Key,
     values?: Record<string, unknown>
   ) => string
@@ -295,7 +319,9 @@ export type CommandResource<Options extends ArgOptions = ArgOptions> = {
    * Examples usage.
    */
   examples: string
-} & { [Option in keyof Options]: string } & { [key: string]: string } // Infer the options usage // Define the user resources
+} & {
+  [Option in GenerateNamespacedKey<keyof RemovedIndex<Options>, typeof OPTION_PREFIX>]: string
+} & { [key: string]: string } // Infer the options usage, Define the user resources
 
 /**
  * Command resource fetcher.

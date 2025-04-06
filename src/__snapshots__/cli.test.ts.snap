@@ -253,6 +253,19 @@ Options:
 ******************************"
 `;
 
+exports[`edge cases > 'description' option 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+
+USAGE:
+  gunshi <OPTIONS> 
+
+OPTIONS:
+  -d, --description <description>          This is a description of description option
+  -h, --help                               Display this help message
+  -v, --version                            Display this version
+"
+`;
+
 exports[`usageSilent 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 USAGE:

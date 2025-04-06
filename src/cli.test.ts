@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
+import { define } from './definition.ts'
 import { renderValidationErrors } from './renderer/index.ts'
 
 import type { ArgOptions } from 'args-tokens'
@@ -460,4 +461,33 @@ test('tokens', async () => {
       value: 'bar'
     }
   ])
+})
+
+describe('edge cases', () => {
+  test(`'description' option`, async () => {
+    const command = define({
+      name: 'test',
+      description: 'This is a test command',
+      options: {
+        description: {
+          type: 'string',
+          short: 'd',
+          description: 'This is a description of description option'
+        }
+      },
+      run: vi.fn()
+    })
+
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['-h'], command, {
+      name: 'gunshi',
+      description: 'Modern CLI tool',
+      version: '0.0.0'
+    })
+
+    const stdout = log()
+    expect(stdout).toMatchSnapshot()
+  })
 })
