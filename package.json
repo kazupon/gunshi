@@ -108,7 +108,7 @@
   "devDependencies": {
     "@eslint/markdown": "^6.3.0",
     "@intlify/core": "next",
-    "@kazupon/eslint-config": "^0.26.1",
+    "@kazupon/eslint-config": "^0.27.0",
     "@kazupon/prettier-config": "^0.1.1",
     "@types/node": "^22.14.0",
     "@vitest/eslint-plugin": "^1.1.39",
