@@ -158,11 +158,11 @@ async function resolveCommand<Options extends ArgOptions>(
   } else {
     if (omitted) {
       return typeof entry === 'object'
-        ? [entry.name, await resolveLazyCommand(entry)]
+        ? [resolveEntryName(entry), await resolveLazyCommand(entry)]
         : [undefined, undefined]
     } else {
-      if (options.subCommands == null) {
-        return [sub, undefined]
+      if (options.subCommands == null || options.subCommands.size === 0) {
+        return [resolveEntryName(entry), await resolveLazyCommand(entry)]
       }
 
       const cmd = options.subCommands?.get(sub)
@@ -174,4 +174,8 @@ async function resolveCommand<Options extends ArgOptions>(
       return [sub, await resolveLazyCommand(cmd, sub)]
     }
   }
+}
+
+function resolveEntryName<Options extends ArgOptions>(entry: Command<Options>): string {
+  return entry.name || '(anonymous)'
 }

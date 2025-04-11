@@ -26,6 +26,30 @@ describe('execute command', () => {
     expect(mockFn).toBeCalled()
   })
 
+  test('entry command with options', async () => {
+    const mockFn = vi.fn()
+    await cli(['--outDir', 'dist/', 'foo', 'bar'], {
+      options: {
+        outDir: {
+          type: 'string',
+          short: 'f'
+        }
+      },
+      run: mockFn
+    })
+    expect(mockFn.mock.calls[0][0].values).toEqual({ outDir: 'dist/' })
+    expect(mockFn.mock.calls[0][0].positionals).toEqual(['dist/', 'foo', 'bar'])
+  })
+
+  test('entry command without options', async () => {
+    const mockFn = vi.fn()
+    await cli(['dist/', 'test/'], {
+      run: mockFn
+    })
+    expect(mockFn.mock.calls[0][0].values).toEqual({})
+    expect(mockFn.mock.calls[0][0].positionals).toEqual(['dist/', 'test/'])
+  })
+
   test('entry strictly command + sub commands', async () => {
     const mockShow = vi.fn()
     const mockCommand1 = vi.fn()
@@ -37,10 +61,22 @@ describe('execute command', () => {
     const subCommands = new Map()
     subCommands.set('command1', {
       name: 'command1',
+      options: {
+        foo: {
+          type: 'string',
+          short: 'f'
+        }
+      },
       run: mockCommand1
     })
     subCommands.set('command2', {
       name: 'command2',
+      options: {
+        bar: {
+          type: 'number',
+          short: 'b'
+        }
+      },
       run: mockCommand2
     })
     const options = {
@@ -49,12 +85,16 @@ describe('execute command', () => {
 
     await cli([''], show, options) // omit
     await cli(['show'], show, options)
-    await cli(['command1'], show, options)
-    await cli(['command2'], show, options)
+    await cli(['command1', '--foo', 'foo', 'position1'], show, options)
+    await cli(['command2', '--bar=1', 'position2'], show, options)
 
     expect(mockShow).toBeCalledTimes(2)
     expect(mockCommand1).toBeCalledTimes(1)
+    expect(mockCommand1.mock.calls[0][0].values).toEqual({ foo: 'foo' })
+    expect(mockCommand1.mock.calls[0][0].positionals).toEqual(['command1', 'foo', 'position1'])
     expect(mockCommand2).toBeCalledTimes(1)
+    expect(mockCommand2.mock.calls[0][0].values).toEqual({ bar: 1 })
+    expect(mockCommand2.mock.calls[0][0].positionals).toEqual(['command2', 'position2'])
   })
 
   test('entry loose command + sub commands', async () => {
@@ -94,8 +134,12 @@ describe('execute command', () => {
   })
 
   test('command not found', async () => {
+    const subCommands = new Map()
+    subCommands.set('foo', {
+      run: vi.fn()
+    })
     await expect(async () => {
-      await cli(['show'], { run: vi.fn() }, {})
+      await cli(['show'], { run: vi.fn() }, { subCommands })
     }).rejects.toThrowError('Command not found: show')
   })
 
