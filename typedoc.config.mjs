@@ -6,12 +6,7 @@ export default {
    * typedoc options
    * ref: https://typedoc.org/documents/Options.html
    */
-  entryPoints: [
-    './src/index.ts',
-    './src/definition.ts',
-    './src/generator.ts',
-    './src/renderer/index.ts'
-  ],
+  entryPoints: ['./src/index.ts', './src/definition.ts', './src/generator.ts', './src/renderer.ts'],
   out: 'docs/api',
   plugin: ['typedoc-plugin-markdown', 'typedoc-vitepress-theme'],
   readme: 'none',

@@ -5,14 +5,14 @@ import { defineConfig } from 'tsdown'
 const dirname = import.meta.dirname
 
 const config: ReturnType<typeof defineConfig> = defineConfig({
-  entry: ['src/index.ts', 'src/definition.ts', 'src/renderer/index.ts', 'src/generator.ts'],
+  entry: ['./src/index.ts', './src/definition.ts', './src/renderer.ts', './src/generator.ts'],
   outDir: 'lib',
   publint: true,
   dts: true,
   plugins: [
     {
       name: 'locale-copy',
-      closeBundle(this) {
+      closeBundle() {
         console.log('Copying locales...')
         const localesDir = path.join(dirname, './src/locales')
         const outDir = path.join(dirname, 'lib', 'locales')

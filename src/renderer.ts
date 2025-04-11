@@ -8,6 +8,6 @@
  *
  * @module
  */
-export { renderHeader } from './header.ts'
-export { renderUsage } from './usage.ts'
-export { renderValidationErrors } from './validation.ts'
+export { renderHeader } from './renderer/header.ts'
+export { renderUsage } from './renderer/usage.ts'
+export { renderValidationErrors } from './renderer/validation.ts'

@@ -5,7 +5,7 @@ export default {
     'src/index.ts',
     'src/definition.ts',
     'src/generator.ts',
-    'src/renderer/index.ts',
+    'src/renderer.ts',
     'eslint.config.ts',
     'tsdown.config.ts',
     'typedoc.config.mjs',

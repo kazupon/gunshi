@@ -1,7 +1,7 @@
 import { parseArgs, resolveArgs } from 'args-tokens'
 import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS } from './constants.ts'
 import { createCommandContext } from './context.ts'
-import { renderHeader, renderUsage, renderValidationErrors } from './renderer/index.ts'
+import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 import { create, resolveLazyCommand } from './utils.ts'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define } from './definition.ts'
-import { renderValidationErrors } from './renderer/index.ts'
+import { renderValidationErrors } from './renderer.ts'
 
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandOptions } from './types.ts'

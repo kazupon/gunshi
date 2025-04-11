@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from './context.ts'
-import { renderHeader, renderUsage, renderValidationErrors } from './renderer/index.ts'
+import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 
 import type { ArgOptions } from 'args-tokens'
 import type { Command, LazyCommand } from './types.ts'

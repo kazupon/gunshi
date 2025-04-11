@@ -49,10 +49,10 @@
       "default": "./lib/definition.js"
     },
     "./renderer": {
-      "types": "./lib/renderer/index.d.ts",
-      "import": "./lib/renderer/index.js",
-      "require": "./lib/renderer/index.js",
-      "default": "./lib/renderer/index.js"
+      "types": "./lib/renderer.d.ts",
+      "import": "./lib/renderer.js",
+      "require": "./lib/renderer.js",
+      "default": "./lib/renderer.js"
     },
     "./generator": {
       "types": "./lib/generator.d.ts",
@@ -60,8 +60,7 @@
       "require": "./lib/generator.js",
       "default": "./lib/generator.js"
     },
-    "./package.json": "./package.json",
-    "./*": "./*"
+    "./package.json": "./package.json"
   },
   "types": "lib/index.d.ts",
   "typesVersions": {
