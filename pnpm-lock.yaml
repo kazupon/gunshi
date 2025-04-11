@@ -106,8 +106,8 @@ importers:
         specifier: ^0.3.11
         version: 0.3.11
       tsdown:
-        specifier: 0.7.4
-        version: 0.7.4(publint@0.3.11)(typescript@5.8.3)
+        specifier: 0.6.10
+        version: 0.6.10(publint@0.3.11)(typescript@5.8.3)
       typedoc:
         specifier: ^0.28.2
         version: 0.28.2(typescript@5.8.3)
@@ -3054,10 +3054,6 @@ packages:
   lunr@2.3.9:
     resolution: {integrity: sha512-zTU3DaZaF3Rt9rhN3uBMGQD3dD2/vFQqnvZCDv4dl5iOzq2IZQqTxu90r4E5J+nP70J3ilqVCrbho2eWaeW8Ow==}
 
-  magic-string-ast@0.9.1:
-    resolution: {integrity: sha512-18dv2ZlSSgJ/jDWlZGKfnDJx56ilNlYq9F7NnwuWTErsmYmqJ2TWE4l1o2zlUHBYUGBy3tIhPCC1gxq8M5HkMA==}
-    engines: {node: '>=20.18.0'}
-
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
 
@@ -3589,10 +3585,6 @@ packages:
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
 
-  rolldown-plugin-types@0.0.0:
-    resolution: {integrity: sha512-Jk7TXLiTQiSktmOi2UNvU0IcPMwFYTSS7LiJBWcMQteD1cmxdKBJikL8p/zrqxuJ9tUKI5GX77i9V8Cpd9zDfg==}
-    engines: {node: '>=20.18.0'}
-
   rolldown@1.0.0-beta.7:
     resolution: {integrity: sha512-IUa/9lZVqgFilYggiY7jxUbmvU4Q8wVvVqsru+AeMldBccBEhTYZ6/XP6cWsznb8Fv49zfYGaeEpJ5WeVdo6Mg==}
     hasBin: true
@@ -3892,19 +3884,6 @@ packages:
 
   tsdown@0.6.10:
     resolution: {integrity: sha512-z8+r/9ToKADbsCoGY29z6h7gzJGCB/65NMFou492ZwqXSO50Z3RaV9FHnB8zqpR1tVdSdQJJap7vE3IpjwDV/Q==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
-    peerDependencies:
-      publint: ^0.3.0
-      unplugin-unused: ^0.4.0
-    peerDependenciesMeta:
-      publint:
-        optional: true
-      unplugin-unused:
-        optional: true
-
-  tsdown@0.7.4:
-    resolution: {integrity: sha512-hgBD66mh9GGeV7CYdQxcx9u6GQr8fQmNlVMA/jGbJB4HV3tSCwswy2bjeLea9a+4WZaGQftOjx8uuvK8DHQoRg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -7040,10 +7019,6 @@ snapshots:
 
   lunr@2.3.9: {}
 
-  magic-string-ast@0.9.1:
-    dependencies:
-      magic-string: 0.30.17
-
   magic-string@0.30.17:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
@@ -7802,11 +7777,6 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rolldown-plugin-types@0.0.0:
-    dependencies:
-      magic-string-ast: 0.9.1
-      oxc-parser: 0.62.0
-
   rolldown@1.0.0-beta.7(typescript@5.8.3):
     dependencies:
       '@oxc-project/types': 0.61.2
@@ -8184,29 +8154,6 @@ snapshots:
       rolldown: 1.0.0-beta.7(typescript@5.8.3)
       rollup: 4.37.0
       rollup-plugin-dts: 6.2.1(rollup@4.37.0)(typescript@5.8.3)
-      tinyglobby: 0.2.12
-      unconfig: 7.3.1
-      unplugin-isolated-decl: 0.13.6(typescript@5.8.3)
-    optionalDependencies:
-      publint: 0.3.11
-    transitivePeerDependencies:
-      - '@oxc-project/runtime'
-      - '@swc/core'
-      - supports-color
-      - typescript
-
-  tsdown@0.7.4(publint@0.3.11)(typescript@5.8.3):
-    dependencies:
-      ansis: 3.17.0
-      cac: 6.7.14
-      chokidar: 4.0.3
-      consola: 3.4.2
-      debug: 4.4.0
-      diff: 7.0.0
-      find-up-simple: 1.0.1
-      oxc-resolver: 5.1.1
-      rolldown: 1.0.0-beta.7(typescript@5.8.3)
-      rolldown-plugin-types: 0.0.0
       tinyglobby: 0.2.12
       unconfig: 7.3.1
       unplugin-isolated-decl: 0.13.6(typescript@5.8.3)
