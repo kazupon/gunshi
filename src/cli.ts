@@ -85,7 +85,7 @@ function resolveCommandOptions<Options extends ArgOptions>(
   entry: Command<Options> | CommandRunner<Options>
 ): CommandOptions<Options> {
   const subCommands = new Map(options.subCommands)
-  if (typeof entry === 'object' && entry.name) {
+  if (typeof entry === 'object' && entry.name && options.subCommands) {
     subCommands.set(entry.name, entry)
   }
   const resolvedOptions = Object.assign(

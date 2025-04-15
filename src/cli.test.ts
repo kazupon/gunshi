@@ -26,6 +26,15 @@ describe('execute command', () => {
     expect(mockFn).toBeCalled()
   })
 
+  test('entry command with name', async () => {
+    const mockFn = vi.fn()
+    await cli(['dist/'], {
+      name: 'publish',
+      run: mockFn
+    })
+    expect(mockFn).toBeCalled()
+  })
+
   test('entry command with options', async () => {
     const mockFn = vi.fn()
     await cli(['--outDir', 'dist/', 'foo', 'bar'], {
