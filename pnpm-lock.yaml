@@ -106,8 +106,8 @@ importers:
         specifier: ^0.3.11
         version: 0.3.11
       tsdown:
-        specifier: 0.8.1
-        version: 0.8.1(publint@0.3.11)(typescript@5.8.3)
+        specifier: 0.9.0
+        version: 0.9.0(publint@0.3.11)(typescript@5.8.3)
       typedoc:
         specifier: ^0.28.2
         version: 0.28.2(typescript@5.8.3)
@@ -3848,8 +3848,8 @@ packages:
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
 
-  rolldown-plugin-dts@0.7.8:
-    resolution: {integrity: sha512-GVh9lUxfxpZ+rFCb10qq6S2yVeWjGW71EO501DNjfa86uSaMwD9M6B59y2aUSluO/UsSMboGqfpwSJbnMoxhnA==}
+  rolldown-plugin-dts@0.8.1:
+    resolution: {integrity: sha512-6F/BrP1tmroEz33fiyZ8MARph07Z/UWmsT6ihbs11dK1qAaw5s+D/5sojTzH8zcTO3TQSzOcsdZ4Vmql+1XrVw==}
     engines: {node: '>=20.18.0'}
     peerDependencies:
       rolldown: ^1.0.0-beta.7
@@ -4166,8 +4166,8 @@ packages:
       unplugin-unused:
         optional: true
 
-  tsdown@0.8.1:
-    resolution: {integrity: sha512-qGyXNeF9tF5hLEJ9/C5qf7kqMJpjUVekk08RgzSRVLMe3ryBLhtPDMjQPXfbVf14wnMQ+tkQZJVEJ0N69zF3AQ==}
+  tsdown@0.9.0:
+    resolution: {integrity: sha512-4fTdnr1d2RrWUWTzBlMFjmeKyWV6J+qALBAZUh3xJ7YbBNTefz0btpZhFRX+tQj+sf4kKyTjUEsu/W/Vv9vMsw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -5371,7 +5371,7 @@ snapshots:
 
   '@oxc-parser/binding-wasm32-wasi@0.62.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.8
+      '@napi-rs/wasm-runtime': 0.2.9
     optional: true
 
   '@oxc-parser/binding-wasm32-wasi@0.64.0':
@@ -5453,12 +5453,12 @@ snapshots:
 
   '@oxc-resolver/binding-wasm32-wasi@5.1.1':
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.8
+      '@napi-rs/wasm-runtime': 0.2.9
     optional: true
 
   '@oxc-resolver/binding-wasm32-wasi@5.2.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.8
+      '@napi-rs/wasm-runtime': 0.2.9
     optional: true
 
   '@oxc-resolver/binding-win32-arm64-msvc@5.1.1':
@@ -5517,7 +5517,7 @@ snapshots:
 
   '@oxc-transform/binding-wasm32-wasi@0.62.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.8
+      '@napi-rs/wasm-runtime': 0.2.9
     optional: true
 
   '@oxc-transform/binding-wasm32-wasi@0.64.0':
@@ -5569,7 +5569,7 @@ snapshots:
 
   '@rolldown/binding-wasm32-wasi@1.0.0-beta.7':
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.8
+      '@napi-rs/wasm-runtime': 0.2.9
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.0.0-beta.7':
@@ -8333,7 +8333,7 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rolldown-plugin-dts@0.7.8(rolldown@1.0.0-beta.7(typescript@5.8.3))(typescript@5.8.3):
+  rolldown-plugin-dts@0.8.1(rolldown@1.0.0-beta.7(typescript@5.8.3))(typescript@5.8.3):
     dependencies:
       debug: 4.4.0
       dts-resolver: 1.0.0
@@ -8730,7 +8730,7 @@ snapshots:
       - supports-color
       - typescript
 
-  tsdown@0.8.1(publint@0.3.11)(typescript@5.8.3):
+  tsdown@0.9.0(publint@0.3.11)(typescript@5.8.3):
     dependencies:
       ansis: 3.17.0
       cac: 6.7.14
@@ -8740,7 +8740,7 @@ snapshots:
       diff: 7.0.0
       find-up-simple: 1.0.1
       rolldown: 1.0.0-beta.7(typescript@5.8.3)
-      rolldown-plugin-dts: 0.7.8(rolldown@1.0.0-beta.7(typescript@5.8.3))(typescript@5.8.3)
+      rolldown-plugin-dts: 0.8.1(rolldown@1.0.0-beta.7(typescript@5.8.3))(typescript@5.8.3)
       tinyexec: 1.0.1
       tinyglobby: 0.2.12
       unconfig: 7.3.1
