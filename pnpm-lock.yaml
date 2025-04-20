@@ -106,8 +106,8 @@ importers:
         specifier: ^0.3.11
         version: 0.3.11
       tsdown:
-        specifier: 0.9.0
-        version: 0.9.0(publint@0.3.11)(typescript@5.8.3)
+        specifier: 0.9.1
+        version: 0.9.1(publint@0.3.11)(typescript@5.8.3)
       typedoc:
         specifier: ^0.28.2
         version: 0.28.2(typescript@5.8.3)
@@ -4166,8 +4166,8 @@ packages:
       unplugin-unused:
         optional: true
 
-  tsdown@0.9.0:
-    resolution: {integrity: sha512-4fTdnr1d2RrWUWTzBlMFjmeKyWV6J+qALBAZUh3xJ7YbBNTefz0btpZhFRX+tQj+sf4kKyTjUEsu/W/Vv9vMsw==}
+  tsdown@0.9.1:
+    resolution: {integrity: sha512-WHvsmYwb/0ohcDxNOYglElPvGGI1xNz8TXCB9Kv3/wG1uHbzLnpwXsyykO5afOQBkl9ovy3A17Z2JeVe3sRqkQ==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -8730,7 +8730,7 @@ snapshots:
       - supports-color
       - typescript
 
-  tsdown@0.9.0(publint@0.3.11)(typescript@5.8.3):
+  tsdown@0.9.1(publint@0.3.11)(typescript@5.8.3):
     dependencies:
       ansis: 3.17.0
       cac: 6.7.14
