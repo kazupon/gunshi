@@ -1,14 +1,17 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'tsdown'
+import { jsrExportsLint } from 'tsdown-jsr-exports-lint'
 
 const dirname = import.meta.dirname
 
 const config: ReturnType<typeof defineConfig> = defineConfig({
   entry: ['./src/index.ts', './src/definition.ts', './src/renderer.ts', './src/generator.ts'],
   outDir: 'lib',
+  clean: true,
   publint: true,
   dts: true,
+  onSuccess: jsrExportsLint(),
   plugins: [
     {
       name: 'locale-copy',
