@@ -51,6 +51,7 @@ test('basic', async () => {
     options,
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
+    rest: [],
     args: ['bar'],
     tokens: [], // dummy, due to test
     omitted: true,
@@ -138,6 +139,7 @@ test('default', async () => {
     options: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
+    rest: [],
     args: ['bar'],
     tokens: [], // dummy, due to test
     command,
@@ -183,6 +185,7 @@ describe('translation', () => {
       options: {},
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      rest: [],
       args: ['bar'],
       tokens: [], // dummy, due to test
       command,
@@ -242,6 +245,7 @@ describe('translation', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      rest: [],
       args: ['bar'],
       tokens: [], // dummy, due to test
       command,
@@ -309,6 +313,7 @@ describe('translation', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      rest: [],
       args: ['bar'],
       tokens: [], // dummy, due to test
       command,
@@ -383,6 +388,7 @@ describe('translation adapter', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      rest: [],
       args: ['bar'],
       tokens: [], // dummy, due to test
       command,
@@ -438,6 +444,7 @@ describe('translation adapter', () => {
       options,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
+      rest: [],
       args: ['bar'],
       tokens: [], // dummy, due to test
       command,

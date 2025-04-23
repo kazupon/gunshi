@@ -35,7 +35,7 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
 
   const options = resolveArgOptions(command.options)
 
-  const { values, positionals, error } = resolveArgs(options, tokens, {
+  const { values, positionals, rest, error } = resolveArgs(options, tokens, {
     optionGrouping: true
   })
   const omitted = !subCommand
@@ -43,6 +43,7 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
     options,
     values,
     positionals,
+    rest,
     args,
     tokens,
     omitted,

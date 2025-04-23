@@ -536,6 +536,22 @@ test('option grouping', async () => {
   expect(mockFn.mock.calls[0][0].values).toEqual({ silent: true, verbose: true })
 })
 
+test('rest arguments', async () => {
+  const args = ['--foo', 'bar', '--', '--baz', 'qux']
+  const mockFn = vi.fn()
+  await cli(args, {
+    options: {
+      foo: {
+        type: 'string',
+        short: 'f'
+      }
+    },
+    run: mockFn
+  })
+
+  expect(mockFn.mock.calls[0][0].rest).toEqual(['--baz', 'qux'])
+})
+
 describe('edge cases', () => {
   test(`'description' option`, async () => {
     const command = define({

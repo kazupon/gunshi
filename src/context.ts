@@ -44,6 +44,10 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
    */
   positionals: string[]
   /**
+   * A rest arguments, which passed to the target command
+   */
+  rest: string[]
+  /**
    * Original command line arguments
    */
   args: string[]
@@ -77,6 +81,7 @@ export async function createCommandContext<
   options,
   values,
   positionals,
+  rest,
   args,
   tokens,
   command,
@@ -187,6 +192,7 @@ export async function createCommandContext<
       options: _options,
       values,
       positionals,
+      rest,
       _: args,
       tokens,
       log: commandOptions.usageSilent ? NOOP : log,

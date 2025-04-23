@@ -237,6 +237,10 @@ export interface CommandContext<
    */
   positionals: string[]
   /**
+   * Command rest arguments, that is the remaining argument not resolved by the optional command option delimiter `--`.
+   */
+  rest: string[]
+  /**
    * Original command line arguments.
    * This argument is passed from `cli` function.
    */
