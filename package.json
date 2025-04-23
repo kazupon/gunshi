@@ -131,7 +131,7 @@
     "knip": "^5.50.2",
     "lint-staged": "^15.5.0",
     "messageformat": "4.0.0-10",
-    "pkg-pr-new": "^0.0.42",
+    "pkg-pr-new": "^0.0.43",
     "prettier": "^3.5.3",
     "publint": "^0.3.11",
     "tsdown": "^0.9.1",
