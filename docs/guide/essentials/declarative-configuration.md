@@ -79,6 +79,8 @@ $ node index.js --name World
 $ node index.js -n World -g "Hey there" -t 3
 # Boolean short options can be grouped: -V -b is the same as -Vb
 $ node index.js -Vb -n World
+# Using rest arguments after \`--\` (arguments after \`--\` are not parsed by gunshi)
+$ node index.js -n User -- --foo --bar buz
 `,
 
   // Command execution function
@@ -92,11 +94,20 @@ $ node index.js -Vb -n World
     if (verbose) {
       console.log('Running in verbose mode...')
       console.log('Context values:', ctx.values)
+      console.log('Positional arguments:', ctx.positionals) // Show positionals
     }
 
     // Repeat the greeting the specified number of times
     for (let i = 0; i < times; i++) {
       console.log(`${greeting}, ${name}!`)
+    }
+
+    // Print rest arguments if they exist
+    if (ctx.rest.length > 0) {
+      console.log('\nRest arguments received:')
+      for (const [index, arg] of ctx.rest.entries()) {
+        console.log(`  ${index + 1}: ${arg}`)
+      }
     }
   }
 }
@@ -141,6 +152,7 @@ The `run` function receives a command context object (`ctx`) with:
 - `options`: The command options configuration
 - `values`: The resolved option values
 - `positionals`: Positional arguments
+- `rest`: Rest arguments (arguments appearing after `--`)
 - `_`: The raw arguments is passed from `cli` function
 - `name`: The command name
 - `description`: The command description
