@@ -82,6 +82,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: true,
@@ -102,6 +103,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: true,
@@ -121,6 +123,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: true,
@@ -136,6 +139,7 @@ describe('renderHeader', () => {
       options: {},
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: true,
@@ -186,6 +190,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: false,
@@ -213,6 +218,7 @@ describe('renderUsage', () => {
       options: {},
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: false,
@@ -254,6 +260,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: false,
@@ -301,6 +308,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: false,
@@ -349,6 +357,7 @@ describe('renderUsage', () => {
       options: command.options!,
       values: {},
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       omitted: false,
@@ -372,6 +381,7 @@ describe('renderUsage', () => {
       values: {},
       omitted: true,
       positionals: [],
+      rest: [],
       args: [],
       tokens: [], // dummy, due to test
       command: SHOW,
@@ -392,6 +402,7 @@ test('renderValidationErrors', async () => {
     options: SHOW.options!,
     values: {},
     positionals: [],
+    rest: [],
     args: [],
     tokens: [], // dummy, due to test
     omitted: false,
