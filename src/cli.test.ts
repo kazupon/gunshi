@@ -533,7 +533,7 @@ test('option grouping', async () => {
     run: mockFn
   })
 
-  expect(mockFn.mock.calls[0][0].values).toEqual({ silent: true, vebose: true })
+  expect(mockFn.mock.calls[0][0].values).toEqual({ silent: true, verbose: true })
 })
 
 describe('edge cases', () => {
