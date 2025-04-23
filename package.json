@@ -102,7 +102,7 @@
     "typecheck:tsc": "tsc --noEmit"
   },
   "dependencies": {
-    "args-tokens": "^0.14.0"
+    "args-tokens": "^0.15.0"
   },
   "devDependencies": {
     "@eslint/markdown": "^6.3.0",
@@ -150,7 +150,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "deno",
-      "esbuild"
+      "esbuild",
+      "unrs-resolver"
     ]
   },
   "prettier": "@kazupon/prettier-config",

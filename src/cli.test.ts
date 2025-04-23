@@ -47,7 +47,7 @@ describe('execute command', () => {
       run: mockFn
     })
     expect(mockFn.mock.calls[0][0].values).toEqual({ outDir: 'dist/' })
-    expect(mockFn.mock.calls[0][0].positionals).toEqual(['dist/', 'foo', 'bar'])
+    expect(mockFn.mock.calls[0][0].positionals).toEqual(['foo', 'bar'])
   })
 
   test('entry command without options', async () => {
@@ -100,7 +100,7 @@ describe('execute command', () => {
     expect(mockShow).toBeCalledTimes(2)
     expect(mockCommand1).toBeCalledTimes(1)
     expect(mockCommand1.mock.calls[0][0].values).toEqual({ foo: 'foo' })
-    expect(mockCommand1.mock.calls[0][0].positionals).toEqual(['command1', 'foo', 'position1'])
+    expect(mockCommand1.mock.calls[0][0].positionals).toEqual(['command1', 'position1'])
     expect(mockCommand2).toBeCalledTimes(1)
     expect(mockCommand2.mock.calls[0][0].values).toEqual({ bar: 1 })
     expect(mockCommand2.mock.calls[0][0].positionals).toEqual(['command2', 'position2'])
@@ -514,6 +514,26 @@ test('tokens', async () => {
       value: 'bar'
     }
   ])
+})
+
+test('option grouping', async () => {
+  const args = ['-sV']
+  const mockFn = vi.fn()
+  await cli(args, {
+    options: {
+      silent: {
+        type: 'boolean',
+        short: 's'
+      },
+      vebose: {
+        type: 'boolean',
+        short: 'V'
+      }
+    },
+    run: mockFn
+  })
+
+  expect(mockFn.mock.calls[0][0].values).toEqual({ silent: true, vebose: true })
 })
 
 describe('edge cases', () => {
