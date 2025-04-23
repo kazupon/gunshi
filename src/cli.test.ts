@@ -525,7 +525,7 @@ test('option grouping', async () => {
         type: 'boolean',
         short: 's'
       },
-      vebose: {
+      verbose: {
         type: 'boolean',
         short: 'V'
       }
