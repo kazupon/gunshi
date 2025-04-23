@@ -58,16 +58,41 @@ const command = {
       short: 't',
       default: 1,
       description: 'Number of times to repeat the greeting (default: 1)'
+    },
+    verbose: {
+      // Added a boolean option for grouping example
+      type: 'boolean',
+      short: 'V',
+      description: 'Enable verbose output'
+    },
+    banner: {
+      // Added another boolean option for grouping example
+      type: 'boolean',
+      short: 'b',
+      description: 'Show banner'
     }
   },
 
   // Command examples
-  examples:
-    '# Examples\n$ node index.js --name World\n$ node index.js -n World -g "Hey there" -t 3',
+  examples: `# Examples
+$ node index.js --name World
+$ node index.js -n World -g "Hey there" -t 3
+# Boolean short options can be grouped: -V -b is the same as -Vb
+$ node index.js -Vb -n World
+`,
 
   // Command execution function
   run: ctx => {
-    const { name = 'World', greeting, times } = ctx.values
+    const { name = 'World', greeting, times, verbose, banner } = ctx.values // Added banner
+
+    if (banner) {
+      // Added check for banner
+      console.log('*** GREETING ***')
+    }
+    if (verbose) {
+      console.log('Running in verbose mode...')
+      console.log('Context values:', ctx.values)
+    }
 
     // Repeat the greeting the specified number of times
     for (let i = 0; i < times; i++) {
@@ -96,7 +121,7 @@ await cli(process.argv.slice(2), command, {
 Each option can have the following properties:
 
 - `type`: The data type ('string', 'number', 'boolean')
-- `short`: A single-character alias for the option
+- `short`: A single-character alias for the option. Multiple **boolean** short options can be grouped together (e.g., `-Vb` is equivalent to `-V -b`). Options requiring values (like `string` or `number`) cannot be part of a group.
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required
