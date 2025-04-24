@@ -14,7 +14,7 @@ import { resolveBuiltInKey, resolveOptionKey } from './utils.ts'
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
 
-test.only('basic', async () => {
+test('basic', async () => {
   const options = {
     foo: {
       type: 'string',
