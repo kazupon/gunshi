@@ -574,6 +574,33 @@ test('negatable options', async () => {
   })
 })
 
+test('enum options', async () => {
+  const utils = await import('./utils.ts')
+  const log = defineMockLog(utils)
+
+  // success case
+  const options = {
+    foo: {
+      type: 'enum',
+      choices: ['a', 'b', 'c']
+    }
+  } satisfies ArgOptions
+  const mockFn1 = vi.fn()
+  await cli(['--foo', 'a'], {
+    options,
+    run: mockFn1
+  })
+  expect(mockFn1.mock.calls[0][0].values).toEqual({ foo: 'a' })
+
+  // failure case
+  await cli(['--foo', 'z'], {
+    options,
+    run: vi.fn()
+  })
+  const stdout = log()
+  expect(stdout).toEqual(`Option '--foo' should be chosen from 'enum' ["a", "b", "c"] values`)
+})
+
 describe('edge cases', () => {
   test(`'description' option`, async () => {
     const command = define({

@@ -266,6 +266,8 @@ OPTIONS:
 "
 `;
 
+exports[`enum options 1`] = `"Option '--foo' should be chosen from 'enum' ["a", "b", "c"] values"`;
+
 exports[`usageSilent 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 USAGE:
