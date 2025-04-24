@@ -22,7 +22,13 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   stylistic(),
   comments({
     kazupon: {
-      ignores: ['./playground/**', './docs/**', './test/**', './src/**.test.ts']
+      ignores: [
+        './playground/**',
+        './docs/**',
+        './test/**',
+        './src/**.test.ts',
+        './src/**.test-d.ts'
+      ]
     }
   }),
   imports({

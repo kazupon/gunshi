@@ -274,6 +274,7 @@ USAGE:
 OPTIONS:
   -f, --foo <foo>          this is foo option
   --bar                    this is bar option
+  --no-bar                 Negatable of --bar
   -b, --baz [baz]          this is baz option
   -h, --help               Display this help message
   -v, --version            Display this version

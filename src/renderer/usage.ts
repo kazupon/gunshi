@@ -5,7 +5,7 @@
 
 import { create, resolveBuiltInKey, resolveOptionKey } from '../utils.ts'
 
-import type { ArgOptions } from 'args-tokens'
+import type { ArgOptions, ArgOptionSchema } from 'args-tokens'
 import type { Command, CommandContext } from '../types.ts'
 
 /**
@@ -221,6 +221,14 @@ function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<
     : ''
 }
 
+function makeShortLongOptionPair(schema: ArgOptionSchema, name: string): string {
+  let key = `--${name}`
+  if (schema.short) {
+    key = `-${schema.short}, ${key}`
+  }
+  return key
+}
+
 /**
  * Get options pairs for usage
  * @param ctx A {@link CommandContext | command context}
@@ -230,16 +238,25 @@ function getOptionsPairs<Options extends ArgOptions>(
   ctx: CommandContext<Options>
 ): Record<string, string> {
   return Object.entries(ctx.options).reduce((acc, [name, value]) => {
-    let key = `--${name}`
-    if (value.short) {
-      key = `-${value.short}, ${key}`
-    }
+    let key = makeShortLongOptionPair(value, name)
     if (value.type !== 'boolean') {
       key = value.default ? `${key} [${name}]` : `${key} <${name}>`
     }
     acc[name] = key
+    if (value.type === 'boolean' && !(name === 'help' || name === 'version')) {
+      acc[`no-${name}`] = `--no-${name}`
+    }
     return acc
   }, create<Record<string, string>>())
+}
+
+const resolveNegatableKey = (key: string): string => key.split('no-')[1]
+
+function resolveNegatableType<Options extends ArgOptions>(
+  key: string,
+  ctx: Readonly<CommandContext<Options>>
+) {
+  return ctx.options[key.startsWith('no-') ? resolveNegatableKey(key) : key].type
 }
 
 /**
@@ -257,13 +274,21 @@ async function generateOptionsUsage<Options extends ArgOptions>(
   )
 
   const optionSchemaMaxLength = ctx.env.usageOptionType
-    ? Math.max(...Object.entries(optionsPairs).map(([key, _]) => ctx.options[key].type.length))
+    ? Math.max(
+        ...Object.entries(optionsPairs).map(([key, _]) => resolveNegatableType(key, ctx).length)
+      )
     : 0
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(([key, value]) => {
-      const rawDesc = ctx.translate(resolveOptionKey(key))
-      const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options[key].type}] ` : ''
+      let rawDesc = ctx.translate(resolveOptionKey(key))
+      if (!rawDesc && key.startsWith('no-')) {
+        const name = resolveNegatableKey(key)
+        const schema = ctx.options[name]
+        const optionKey = makeShortLongOptionPair(schema, name)
+        rawDesc = `${ctx.translate(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
+      }
+      const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
       const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}`

@@ -96,7 +96,7 @@
     "prepack": "pnpm build",
     "prepare": "git config --local core.hooksPath .githooks",
     "release": "bumpp --commit \"release: v%s\" --all --push --tag",
-    "test": "vitest run",
+    "test": "vitest --typecheck run",
     "typecheck": "pnpm run --stream --color \"/^typecheck:/\"",
     "typecheck:deno": "deno check --all ./src",
     "typecheck:tsc": "tsc --noEmit"

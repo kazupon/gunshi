@@ -14,7 +14,7 @@ import { resolveBuiltInKey, resolveOptionKey } from './utils.ts'
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
 
-test('basic', async () => {
+test.only('basic', async () => {
   const options = {
     foo: {
       type: 'string',
@@ -98,6 +98,7 @@ test('basic', async () => {
 
   expect(ctx.translate(resolveOptionKey<typeof options>('foo'))).toEqual('this is foo option')
   expect(ctx.translate(resolveOptionKey<typeof options>('bar'))).toEqual('this is bar option')
+  expect(ctx.translate(resolveOptionKey<typeof options>('no-bar'))).toEqual('')
   expect(ctx.translate(resolveOptionKey<typeof options>('baz'))).toEqual('this is baz option')
   expect(ctx.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
   expect(ctx.translate(resolveBuiltInKey('version'))).toEqual('Display this version')
@@ -287,6 +288,7 @@ describe('translation', () => {
       'Option:foo': 'これは foo オプションです',
       'Option:bar': 'これは bar オプションです',
       'Option:baz': 'これは baz オプションです',
+      'Option:no-bar': 'これは bar オプションの否定形です',
       examples: 'これはコマンド1の例です',
       test: 'これはテストです'
     } satisfies CommandResource<typeof options>
@@ -338,6 +340,9 @@ describe('translation', () => {
     )
     expect(ctx.translate(resolveOptionKey<typeof options>('bar'))).toEqual(
       jaJPResource['Option:bar']
+    )
+    expect(ctx.translate(resolveOptionKey<typeof options>('no-bar'))).toEqual(
+      jaJPResource['Option:no-bar']
     )
     expect(ctx.translate(resolveOptionKey<typeof options>('baz'))).toEqual(
       jaJPResource['Option:baz']

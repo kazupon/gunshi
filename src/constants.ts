@@ -68,5 +68,6 @@ export const COMMAND_BUILTIN_RESOURCE_KEYS = [
   'COMMANDS',
   'OPTIONS',
   'EXAMPLES',
-  'FORMORE'
+  'FORMORE',
+  'NEGATABLE'
 ] as const
