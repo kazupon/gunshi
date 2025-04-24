@@ -552,6 +552,28 @@ test('rest arguments', async () => {
   expect(mockFn.mock.calls[0][0].rest).toEqual(['--baz', 'qux'])
 })
 
+test('negatable options', async () => {
+  const args = ['dev', '--bar', '--no-foo']
+  await cli(args, {
+    options: {
+      foo: {
+        type: 'boolean'
+      },
+      bar: {
+        type: 'boolean',
+        short: 'b'
+      },
+      baz: {
+        type: 'boolean'
+      }
+    },
+    run: ctx => {
+      expect(ctx.positionals).toEqual(['dev'])
+      expect(ctx.values).toEqual({ foo: false, bar: true })
+    }
+  })
+})
+
 describe('edge cases', () => {
   test(`'description' option`, async () => {
     const command = define({

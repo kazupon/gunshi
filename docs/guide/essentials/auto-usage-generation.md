@@ -65,6 +65,7 @@ USAGE:
 OPTIONS:
   -p, --path <path>                    File or directory path to operate on
   -r, --recursive                      Operate recursively on directories
+  --no-recursive                       Negatable of -r, --recursive
   -o, --operation <operation>          Operation to perform: list, copy, move, or delete
   -h, --help                           Display this help message
   -v, --version                        Display this version
@@ -98,6 +99,7 @@ This will show the data type for each option:
 Options:
   -p, --path        [string]   File or directory path
   -r, --recursive   [boolean]  Operate recursively
+  --no-recursive    [boolean]  Negatable of -r, --recursive
   -o, --operation   [string]   Operation to perform (required)
   -h, --help        [boolean]  Display this help message
   -v, --version     [boolean]  Display this version

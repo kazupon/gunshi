@@ -50,9 +50,9 @@ const command = define({
     const { name, age, verbose } = ctx.values
 
     // TypeScript knows the types:
-    // - name: string | undefined
-    // - age: number (because it has a default)
-    // - verbose: boolean | undefined
+    // - name: string | undefined (undefined if not provided)
+    // - age: number (always a number due to the default)
+    // - verbose: boolean (always boolean: true if --verbose, false if --no-verbose or omitted)
 
     let greeting = `Hello, ${name || 'stranger'}!`
     if (age !== undefined) {
@@ -77,8 +77,8 @@ With `define`:
 - You don't need to import types like `Command` or `CommandContext`.
 - The `ctx` parameter in the `run` function automatically gets the correct type, derived from the `options` definition.
 - Accessing `ctx.values.optionName` provides type safety and autocompletion based on the option's `type` and whether it has a `default`.
-  - Options without a `default` are typed as `T | undefined`.
-  - Options with a `default` are typed as `T`.
-  - Boolean flags are `boolean | undefined` unless they have a `default: false`.
+  - Options without a `default` (like `name`) are typed as `T | undefined`.
+  - Options with a `default` (like `age`) are typed simply as `T`.
+  - Boolean flags (like `verbose`) are always typed as `boolean`. They resolve to `true` if the flag is present (e.g., `--verbose`), `false` if the negating flag is present (e.g., `--no-verbose`), and `false` if neither is present.
 
 This approach significantly simplifies creating type-safe CLIs with Gunshi.

@@ -247,9 +247,10 @@ When defining your localization resources (either directly in the `resource` fun
 
 - **Command Description**: Use the key `description` for the main description of the command.
 - **Examples**: Use the key `examples` for usage examples.
-- **Option Descriptions**: Keys for the descriptions of command options **must** be prefixed with `Option:`. For example, if you have an option named `target`, its description key must be `Option:target`. This prefix is crucial to avoid naming conflicts with other keys like `description` or custom keys.
+- **Option Descriptions**: Keys for the descriptions of command options **must** be prefixed with `Option:`. For example, if you have an option named `target`, its description key must be `Option:target`.
+  - **Negatable Option Descriptions**: For boolean options (e.g., `--verbose`), Gunshi automatically generates a description for the negatable version (e.g., `--no-verbose`) using the built-in `NEGATABLE` key (e.g., "Negatable of --verbose"). To provide a custom translation for a specific negatable option, use the pattern `Option:no-<optionName>`, for example, `Option:no-verbose`.
 - **Custom Keys**: Any other keys you define for custom translation messages (like greetings, error messages, etc.) do not require a prefix and can be named freely (e.g., `informal_greeting`, `error_file_not_found`).
-- **Built-in Keys**: Keys for built-in functionalities like `help` and `version` are generally handled by Gunshi's default locales. While you can technically override them using keys like `_help` and `_version`, it's usually sufficient to rely on the default translations provided.
+- **Built-in Keys**: Keys for built-in functionalities like `help`, `version`, `USAGE`, `OPTIONS`, `EXAMPLES`, `FORMORE`, and the new `NEGATABLE` key are handled by Gunshi's default locales (found in `src/locales`). You can override these by defining them in your resource file (e.g., providing your own translation for `NEGATABLE`).
 
 Here's an example illustrating the convention:
 
@@ -269,6 +270,7 @@ const command = define({
       examples: '$ my-command --target file.txt', // No prefix
       'Option:target': 'The target file to process.', // 'Option:' prefix
       'Option:verbose': 'Enable verbose output.', // 'Option:' prefix
+      'Option:no-verbose': 'Disable verbose logging specifically.', // Optional custom translation for the negatable option
       processing_message: 'Processing target...' // No prefix
     }
   },

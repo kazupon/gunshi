@@ -60,10 +60,10 @@ const command = {
       description: 'Number of times to repeat the greeting (default: 1)'
     },
     verbose: {
-      // Added a boolean option for grouping example
       type: 'boolean',
       short: 'V',
-      description: 'Enable verbose output'
+      description: 'Enable verbose output (use --no-verbose to disable)'
+      // Boolean options automatically get a negatable --no- prefix
     },
     banner: {
       // Added another boolean option for grouping example
@@ -79,12 +79,16 @@ $ node index.js --name World
 $ node index.js -n World -g "Hey there" -t 3
 # Boolean short options can be grouped: -V -b is the same as -Vb
 $ node index.js -Vb -n World
+# Using the negatable option
+$ node index.js --no-verbose -n World
 # Using rest arguments after \`--\` (arguments after \`--\` are not parsed by gunshi)
 $ node index.js -n User -- --foo --bar buz
 `,
 
   // Command execution function
   run: ctx => {
+    // 'verbose' will be true if -V or --verbose is passed,
+    // false if --no-verbose is passed.
     const { name = 'World', greeting, times, verbose, banner } = ctx.values // Added banner
 
     if (banner) {
@@ -140,6 +144,16 @@ Each option can have the following properties:
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required
+
+#### Negatable Boolean Options
+
+For any option defined with `type: 'boolean'`, Gunshi automatically provides a corresponding negatable option by prefixing the name with `no-`.
+
+- If you define `--verbose`, `--no-verbose` becomes available automatically.
+- If `-V` or `--verbose` is passed, the value will be `true`.
+- If `--no-verbose` is passed, the value will be `false`.
+
+The description for the negatable option (e.g., `--no-verbose`) is automatically generated (e.g., "Negatable of --verbose"). You can customize this message using [internationalization resource files](../essentials/internationalization.md) by providing a translation for the specific `Option:no-<optionName>` key (e.g., `Option:no-verbose`).
 
 ### Examples
 
