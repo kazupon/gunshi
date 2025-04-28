@@ -6,7 +6,13 @@ import { defineConfig } from 'tsdown'
 const dirname = import.meta.dirname
 
 const config: ReturnType<typeof defineConfig> = defineConfig({
-  entry: ['./src/index.ts', './src/definition.ts', './src/renderer.ts', './src/generator.ts'],
+  entry: [
+    './src/index.ts',
+    './src/definition.ts',
+    './src/context.ts',
+    './src/renderer.ts',
+    './src/generator.ts'
+  ],
   outDir: 'lib',
   clean: true,
   publint: true,

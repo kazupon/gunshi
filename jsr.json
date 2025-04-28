@@ -28,6 +28,7 @@
     ".": "./src/index.ts",
     "./renderer": "./src/renderer.ts",
     "./definition": "./src/definition.ts",
+    "./context": "./src/context.ts",
     "./generator": "./src/generator.ts"
   }
 }

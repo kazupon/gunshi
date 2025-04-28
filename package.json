@@ -48,6 +48,12 @@
       "require": "./lib/definition.js",
       "default": "./lib/definition.js"
     },
+    "./context": {
+      "types": "./lib/context.d.ts",
+      "import": "./lib/context.js",
+      "require": "./lib/context.js",
+      "default": "./lib/context.js"
+    },
     "./renderer": {
       "types": "./lib/renderer.d.ts",
       "import": "./lib/renderer.js",
