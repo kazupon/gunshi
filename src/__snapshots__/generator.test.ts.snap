@@ -7,7 +7,6 @@ USAGE:
 
 OPTIONS:
   -c, --catalog             Display the catalog only
-  --no-catalog              Negatable of -c, --catalog
   -d, --dependency          Display the catalogable dependencies only
   --no-dependency           Negatable of -d, --dependency
   -h, --help                Display this help message
@@ -28,7 +27,6 @@ USAGE:
 
 OPTIONS:
   -c, --catalog             Display the catalog only
-  --no-catalog              Negatable of -c, --catalog
   -d, --dependency          Display the catalogable dependencies only
   --no-dependency           Negatable of -d, --dependency
   -h, --help                Display this help message

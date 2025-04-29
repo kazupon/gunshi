@@ -266,8 +266,6 @@ OPTIONS:
 "
 `;
 
-exports[`enum options 1`] = `"Option '--foo' should be chosen from 'enum' ["a", "b", "c"] values"`;
-
 exports[`usageSilent 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 USAGE:
@@ -276,7 +274,6 @@ USAGE:
 OPTIONS:
   -f, --foo <foo>          this is foo option
   --bar                    this is bar option
-  --no-bar                 Negatable of --bar
   -b, --baz [baz]          this is baz option
   -h, --help               Display this help message
   -v, --version            Display this version

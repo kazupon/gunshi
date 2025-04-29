@@ -3,9 +3,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'tsdown'
 
+import type { UserConfig } from 'tsdown'
+
 const dirname = import.meta.dirname
 
-const config: ReturnType<typeof defineConfig> = defineConfig({
+const config: UserConfig = defineConfig({
   entry: [
     './src/index.ts',
     './src/definition.ts',

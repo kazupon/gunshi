@@ -243,7 +243,7 @@ function getOptionsPairs<Options extends ArgOptions>(
       key = value.default ? `${key} [${name}]` : `${key} <${name}>`
     }
     acc[name] = key
-    if (value.type === 'boolean' && !(name === 'help' || name === 'version')) {
+    if (value.type === 'boolean' && value.negatable && !(name === 'help' || name === 'version')) {
       acc[`no-${name}`] = `--no-${name}`
     }
     return acc

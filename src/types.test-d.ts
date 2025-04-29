@@ -10,7 +10,11 @@ test('KeyOfArgOptions', () => {
     },
     bar: {
       type: 'boolean'
+    },
+    baz: {
+      type: 'boolean',
+      negatable: true
     }
   } satisfies ArgOptions
-  expectTypeOf<KeyOfArgOptions<typeof _options>>().toEqualTypeOf<'foo' | 'bar' | 'no-bar'>()
+  expectTypeOf<KeyOfArgOptions<typeof _options>>().toEqualTypeOf<'foo' | 'bar' | 'baz' | 'no-baz'>()
 })

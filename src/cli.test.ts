@@ -557,7 +557,8 @@ test('negatable options', async () => {
   await cli(args, {
     options: {
       foo: {
-        type: 'boolean'
+        type: 'boolean',
+        negatable: true
       },
       bar: {
         type: 'boolean',

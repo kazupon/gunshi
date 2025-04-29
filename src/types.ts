@@ -24,7 +24,9 @@ export type KeyOfArgOptions<Options extends ArgOptions> =
   | keyof Options
   | {
       [K in keyof Options]: Options[K]['type'] extends 'boolean'
-        ? `no-${Extract<K, string>}`
+        ? Options[K]['negatable'] extends true
+          ? `no-${Extract<K, string>}`
+          : never
         : never
     }[keyof Options]
 

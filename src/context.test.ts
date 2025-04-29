@@ -30,6 +30,12 @@ test('basic', async () => {
       short: 'b',
       default: 42,
       description: 'this is baz option'
+    },
+    qux: {
+      type: 'boolean',
+      short: 'q',
+      negatable: true,
+      description: 'this is qux option'
     }
   } satisfies ArgOptions
 
@@ -98,8 +104,9 @@ test('basic', async () => {
 
   expect(ctx.translate(resolveOptionKey<typeof options>('foo'))).toEqual('this is foo option')
   expect(ctx.translate(resolveOptionKey<typeof options>('bar'))).toEqual('this is bar option')
-  expect(ctx.translate(resolveOptionKey<typeof options>('no-bar'))).toEqual('')
   expect(ctx.translate(resolveOptionKey<typeof options>('baz'))).toEqual('this is baz option')
+  expect(ctx.translate(resolveOptionKey<typeof options>('qux'))).toEqual('this is qux option')
+  expect(ctx.translate(resolveOptionKey<typeof options>('no-qux'))).toEqual('')
   expect(ctx.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
   expect(ctx.translate(resolveBuiltInKey('version'))).toEqual('Display this version')
   expect(ctx.translate('examples')).toEqual('examples')
@@ -280,6 +287,10 @@ describe('translation', () => {
         short: 'b',
         default: 42,
         description: 'this is baz option'
+      },
+      qux: {
+        type: 'boolean',
+        negatable: true
       }
     } satisfies ArgOptions
 
@@ -288,7 +299,8 @@ describe('translation', () => {
       'Option:foo': 'これは foo オプションです',
       'Option:bar': 'これは bar オプションです',
       'Option:baz': 'これは baz オプションです',
-      'Option:no-bar': 'これは bar オプションの否定形です',
+      'Option:qux': 'これは qux オプションです',
+      'Option:no-qux': 'これは qux オプションの否定形です',
       examples: 'これはコマンド1の例です',
       test: 'これはテストです'
     } satisfies CommandResource<typeof options>
@@ -341,11 +353,14 @@ describe('translation', () => {
     expect(ctx.translate(resolveOptionKey<typeof options>('bar'))).toEqual(
       jaJPResource['Option:bar']
     )
-    expect(ctx.translate(resolveOptionKey<typeof options>('no-bar'))).toEqual(
-      jaJPResource['Option:no-bar']
-    )
     expect(ctx.translate(resolveOptionKey<typeof options>('baz'))).toEqual(
       jaJPResource['Option:baz']
+    )
+    expect(ctx.translate(resolveOptionKey<typeof options>('qux'))).toEqual(
+      jaJPResource['Option:qux']
+    )
+    expect(ctx.translate(resolveOptionKey<typeof options>('no-qux'))).toEqual(
+      jaJPResource['Option:no-qux']
     )
     expect(ctx.translate('examples')).toEqual(jaJPResource.examples)
 

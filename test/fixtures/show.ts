@@ -10,7 +10,7 @@ const options = {
   dependency: {
     type: 'boolean',
     short: 'd',
-    default: false,
+    negatable: true,
     description: 'Display the catalogable dependencies only'
   }
 } as const
