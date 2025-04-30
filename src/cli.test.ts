@@ -5,7 +5,8 @@ import { define } from './definition.ts'
 import { renderValidationErrors } from './renderer.ts'
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command, CommandOptions } from './types.ts'
+import type { Mocked } from 'vitest'
+import type { Command, CommandOptions, CommandRunner, LazyCommand } from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -176,6 +177,82 @@ describe('execute command', () => {
     expect(mockEntry).toBeCalledTimes(2)
     expect(mockCommand1).toBeCalledTimes(1)
   })
+})
+
+test('lazy command', async () => {
+  const mockEntry = vi.fn()
+  const entry = {
+    name: 'main',
+    run: mockEntry
+  }
+  const subCommands = new Map()
+
+  // lazy load function style command
+  const mockCommand1: Mocked<CommandRunner> = vi.fn()
+  const command1: LazyCommand = () => {
+    return new Promise<CommandRunner>(resolve => {
+      setTimeout(() => {
+        resolve(mockCommand1)
+      }, 5)
+    })
+  }
+  command1.commandName = 'command1'
+  command1.description = 'command1 description'
+  command1.options = {
+    foo: {
+      type: 'string',
+      short: 'f'
+    }
+  }
+  subCommands.set(command1.commandName, command1)
+
+  // lazy load object style command
+  const mockCommand2: Mocked<CommandRunner> = vi.fn()
+  const remoteCommand2: Command = {
+    name: 'command2',
+    description: 'command2 description',
+    options: {
+      bar: {
+        type: 'string',
+        short: 'b'
+      }
+    },
+    run: mockCommand2
+  }
+  const command2 = () => {
+    return new Promise<Command>(resolve => {
+      setTimeout(() => {
+        resolve(remoteCommand2)
+      }, 5)
+    })
+  }
+  subCommands.set(command2.name, command2)
+
+  // regulary load command
+  const command3 = {
+    name: 'command3',
+    description: 'command3 description',
+    options: {
+      qux: {
+        type: 'number',
+        short: 'q'
+      }
+    },
+    run: vi.fn()
+  }
+  subCommands.set(command3.name, command3)
+
+  const options = {
+    subCommands
+  }
+
+  await cli(['command1'], entry, options)
+  await cli(['command2'], entry, options)
+  await cli(['command3'], entry, options)
+
+  expect(mockCommand1).toBeCalledTimes(1)
+  expect(mockCommand2).toBeCalledTimes(1)
+  expect(command3.run).toBeCalledTimes(1)
 })
 
 describe('auto generate usage', () => {

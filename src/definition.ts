@@ -13,7 +13,7 @@
  */
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command } from './types.ts'
+import type { Command, CommandLoader, LazyCommand } from './types.ts'
 
 export type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 
@@ -26,4 +26,18 @@ export function define<Options extends ArgOptions = ArgOptions>(
   definition: Command<Options>
 ): Command<Options> {
   return definition
+}
+
+export function lazy<Options extends ArgOptions = ArgOptions>(
+  loader: CommandLoader<Options>,
+  definition?: Command<Options>
+): LazyCommand<Options> {
+  if (definition != null) {
+    ;(loader as LazyCommand<Options>).commandName = definition.name
+    ;(loader as LazyCommand<Options>).description = definition.description
+    ;(loader as LazyCommand<Options>).options = definition.options
+    ;(loader as LazyCommand<Options>).examples = definition.examples
+    ;(loader as LazyCommand<Options>).resource = definition.resource
+  }
+  return loader
 }

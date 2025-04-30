@@ -1,6 +1,6 @@
-import { expectTypeOf, test } from 'vitest'
+import { expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
-import { define } from './definition.ts'
+import { define, lazy } from './definition.ts'
 
 // eslint-disable-next-line vitest/expect-expect
 test('define', async () => {
@@ -19,4 +19,39 @@ test('define', async () => {
   })
 
   await cli(['test', '--foo', 'bar'], command)
+})
+
+test('lazy', async () => {
+  const subCommands = new Map()
+  const test = define({
+    name: 'test',
+    description: 'A test command',
+    options: {
+      foo: {
+        type: 'string',
+        description: 'A string option'
+      }
+    }
+  })
+
+  const mock = vi.fn()
+  const testLazy = lazy(() => {
+    return Promise.resolve(mock)
+  }, test)
+  subCommands.set('test', testLazy)
+
+  expect(testLazy).toBeInstanceOf(Function)
+  expect(testLazy.commandName).toBe(test.name)
+  expect(testLazy.description).toBe(test.description)
+  expect(testLazy.options).toEqual(test.options)
+
+  await cli(
+    ['test', '--foo', 'bar'],
+    {
+      run: _ctx => {}
+    },
+    { subCommands }
+  )
+
+  expect(mock).toHaveBeenCalled()
 })

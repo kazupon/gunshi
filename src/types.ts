@@ -319,7 +319,7 @@ export interface Command<Options extends ArgOptions = ArgOptions> {
   /**
    * Command runner. it's the command to be executed
    */
-  run: CommandRunner<Options>
+  run?: CommandRunner<Options>
   /**
    * Command resource fetcher.
    */
@@ -419,11 +419,24 @@ export type CommandRunner<Options extends ArgOptions = ArgOptions> = (
   ctx: Readonly<CommandContext<Options>>
 ) => Awaitable<void>
 
+export type CommandLoader<Options extends ArgOptions = ArgOptions> = () => Awaitable<
+  Command<Options> | CommandRunner<Options>
+>
+
 /**
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
  */
-export type LazyCommand<Options extends ArgOptions = ArgOptions> = () => Awaitable<Command<Options>>
+export type LazyCommand<Options extends ArgOptions = ArgOptions> = {
+  /**
+   * Command load function
+   */
+  (): Awaitable<Command<Options> | CommandRunner<Options>>
+  /**
+   * Command name
+   */
+  commandName?: string
+} & Omit<Command<Options>, 'run' | 'name'>
 
 /**
  * Define a command type.

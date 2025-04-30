@@ -57,7 +57,7 @@ COMMANDS.set('command1', {
 })
 COMMANDS.set('command2', () =>
   Promise.resolve({
-    name: 'command1',
+    name: 'command2',
     options: {
       bar: {
         type: 'boolean',

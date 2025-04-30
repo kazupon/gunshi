@@ -89,12 +89,12 @@ exports[`renderUsage > sub commands 1`] = `
 COMMANDS:
   show              A show command  
   command1          this is command1  
-  command1          this is command2  
+  command2            
 
 For more info, run any command with the \`--help\` flag:
   cmd1 show --help
   cmd1 command1 --help
-  cmd1 command1 --help
+  cmd1 command2 --help
 
 OPTIONS:
   -f, --foo <foo>          The foo option

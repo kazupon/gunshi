@@ -18,17 +18,46 @@ import type {
 
 export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
   cmd: Commandable<Options>,
-  name?: string | undefined
+  name?: string | undefined,
+  needRunResolving: boolean = false
 ): Promise<Command<Options>> {
-  const resolved = Object.assign(
-    create<Command<Options>>(),
-    typeof cmd == 'function' ? await cmd() : cmd
-  )
+  let command: Command<Options> | undefined
+  if (typeof cmd === 'function') {
+    command = Object.assign(create<Command<Options>>(), {
+      name: cmd.commandName,
+      description: cmd.description,
+      options: cmd.options,
+      examples: cmd.examples,
+      resource: cmd.resource
+    })
 
-  if (resolved.name == null && name) {
-    resolved.name = name
+    if (needRunResolving) {
+      const loaded = await cmd()
+      if (typeof loaded === 'function') {
+        command.run = loaded
+      } else if (typeof loaded === 'object') {
+        if (loaded.run == null) {
+          throw new TypeError(`'run' is required in command: ${cmd.name || name}`)
+        }
+        command.run = loaded.run
+        command.name = loaded.name
+        command.description = loaded.description
+        command.options = loaded.options
+        command.examples = loaded.examples
+        command.resource = loaded.resource
+      } else {
+        throw new TypeError(`Cannot resolve command: ${cmd.name || name}`)
+      }
+    }
+  } else {
+    command = Object.assign(create<Command<Options>>(), cmd)
   }
-  return deepFreeze(resolved)
+
+  if (command.name == null && name) {
+    command.name = name
+  }
+
+  return deepFreeze(command)
 }
 
 export function resolveBuiltInKey<

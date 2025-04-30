@@ -28,7 +28,7 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
 
   const subCommand = getSubCommand(tokens)
   const resolvedCommandOptions = resolveCommandOptions(opts, entry)
-  const [name, command] = await resolveCommand(subCommand, entry, resolvedCommandOptions)
+  const [name, command] = await resolveCommand(subCommand, entry, resolvedCommandOptions, true)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
@@ -74,6 +74,10 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
   if (error) {
     await showValidationErrors(ctx, error)
     return
+  }
+
+  if (!command.run) {
+    throw new Error(`'run' not found on Command \`${name || ''}\``)
   }
 
   await command.run(ctx)
@@ -158,7 +162,8 @@ async function showValidationErrors<Options extends ArgOptions>(
 async function resolveCommand<Options extends ArgOptions>(
   sub: string,
   entry: Command<Options> | CommandRunner<Options>,
-  options: CommandOptions<Options>
+  options: CommandOptions<Options>,
+  needRunResolving: boolean = false
 ): Promise<[string | undefined, Command<Options> | undefined]> {
   const omitted = !sub
   if (typeof entry === 'function') {
@@ -166,11 +171,11 @@ async function resolveCommand<Options extends ArgOptions>(
   } else {
     if (omitted) {
       return typeof entry === 'object'
-        ? [resolveEntryName(entry), await resolveLazyCommand(entry)]
+        ? [resolveEntryName(entry), await resolveLazyCommand(entry, '', needRunResolving)]
         : [undefined, undefined]
     } else {
       if (options.subCommands == null || options.subCommands.size === 0) {
-        return [resolveEntryName(entry), await resolveLazyCommand(entry)]
+        return [resolveEntryName(entry), await resolveLazyCommand(entry, '', needRunResolving)]
       }
 
       const cmd = options.subCommands?.get(sub)
@@ -179,7 +184,7 @@ async function resolveCommand<Options extends ArgOptions>(
         return [sub, undefined]
       }
 
-      return [sub, await resolveLazyCommand(cmd, sub)]
+      return [sub, await resolveLazyCommand(cmd, sub, needRunResolving)]
     }
   }
 }
