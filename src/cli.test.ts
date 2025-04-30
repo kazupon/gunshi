@@ -228,7 +228,7 @@ test('lazy command', async () => {
   }
   subCommands.set(command2.name, command2)
 
-  // regulary load command
+  // regularly load command
   const command3 = {
     name: 'command3',
     description: 'command3 description',
