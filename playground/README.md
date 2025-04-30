@@ -63,7 +63,17 @@ node index.js lazy --delay 2000
 node index.js data --id 2
 ```
 
-### 6. Auto Usage Generation (`auto-usage`)
+### 6. Type-Safe Lazy & Async Command Loading (`type-safe-lazy-async`)
+
+Demonstrates type-safe lazy loading and asynchronous execution using TypeScript.
+
+```sh
+cd type-safe-lazy-async
+pnpx tsx index.ts --help
+pnpx tsx index.ts hello --name "Lazy TypeScript"
+```
+
+### 7. Auto Usage Generation (`auto-usage`)
 
 Demonstrates automatic usage message generation.
 
@@ -73,7 +83,7 @@ node index.js --help
 node index.js --operation list --format json
 ```
 
-### 7. Custom Usage Generation (`custom-usage`)
+### 8. Custom Usage Generation (`custom-usage`)
 
 Demonstrates customizing the usage message generation.
 
@@ -84,7 +94,7 @@ node index.js --help
 node index.js --add "Complete the project" --priority high --due 2023-12-31
 ```
 
-### 8. Documentation Generation (`docs-gen`)
+### 9. Documentation Generation (`docs-gen`)
 
 Documentation generation support
 
@@ -93,7 +103,7 @@ cd docs-gen
 node index.js
 ```
 
-### 9. Internationalization (`i18n`)
+### 10. Internationalization (`i18n`)
 
 Demonstrates internationalization support.
 
