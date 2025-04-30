@@ -220,7 +220,10 @@ subCommands.set(lazyTypedHello.commandName, lazyTypedHello)
 
 await cli(
   process.argv.slice(2),
-  { name: 'main', run: () => console.log('Use the hello-typed sub-command') },
+  {
+    name: 'main',
+    run: () => console.log('Use the hello-typed sub-command')
+  },
   {
     name: 'typed-lazy-example', // Application name
     version: '1.0.0',

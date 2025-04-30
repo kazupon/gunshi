@@ -1,0 +1,16 @@
+{
+  "name": "type-safe-lazy-async",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "gunshi": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.1",
+    "typescript": "catalog:"
+  }
+}
