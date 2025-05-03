@@ -33,6 +33,13 @@ const SHOW = {
       short: 'q',
       required: true,
       description: 'The qux option'
+    },
+    log: {
+      type: 'enum',
+      short: 'l',
+      description: 'The log option',
+      choices: ['debug', 'info', 'warn', 'error'],
+      default: 'info'
     }
   },
   name: 'show',

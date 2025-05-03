@@ -7,6 +7,8 @@
   "EXAMPLES": "例",
   "FORMORE": "詳細は、コマンドと`--help`フラグを実行してください:",
   "NEGATABLE": "否定可能な",
+  "DEFAULT": "デフォルト",
+  "CHOICES": "選択肢",
   "help": "このヘルプメッセージを表示",
   "version": "このバージョンを表示"
 }

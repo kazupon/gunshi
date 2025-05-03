@@ -6,7 +6,7 @@ USAGE:
   generator <OPTIONS> 
 
 OPTIONS:
-  -c, --catalog             Display the catalog only
+  -c, --catalog             Display the catalog only (default: false)
   -d, --dependency          Display the catalogable dependencies only
   --no-dependency           Negatable of -d, --dependency
   -h, --help                Display this help message
@@ -26,7 +26,7 @@ USAGE:
   generator show <OPTIONS>
 
 OPTIONS:
-  -c, --catalog             Display the catalog only
+  -c, --catalog             Display the catalog only (default: false)
   -d, --dependency          Display the catalogable dependencies only
   --no-dependency           Negatable of -d, --dependency
   -h, --help                Display this help message

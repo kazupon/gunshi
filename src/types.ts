@@ -112,9 +112,15 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
    */
   usageOptionType: boolean
   /**
+   * Whether to display the option value.
+   * @default true
+   * @see {@link CommandOptions.usageOptionValue}
+   */
+  usageOptionValue: boolean
+  /**
    * Whether to display the command usage.
    * @default false
-   * @see {@link}
+   * @see {@link CommandOptions.usageSilent}
    */
   usageSilent: boolean
   /**
@@ -180,6 +186,10 @@ export interface CommandOptions<Options extends ArgOptions = ArgOptions> {
    * Whether to display the usage option type.
    */
   usageOptionType?: boolean
+  /**
+   * Whether to display the option value.
+   */
+  usageOptionValue?: boolean
   /**
    * Whether to display the command usage.
    */

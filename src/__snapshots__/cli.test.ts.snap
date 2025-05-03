@@ -79,7 +79,7 @@ exports[`auto generate usage > loosely sub commands > command2 1`] = `
   COMMAND command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]          
+  -b, --bar [bar]           (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
 "
@@ -109,7 +109,7 @@ USAGE:
   COMMAND command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]          
+  -b, --bar [bar]           (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
 "
@@ -154,7 +154,7 @@ USAGE:
   gunshi command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]          The bar option
+  -b, --bar [bar]          The bar option (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
 
@@ -225,7 +225,7 @@ USAGE:
   gunshi command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]          The bar option
+  -b, --bar [bar]          The bar option (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
 
@@ -274,7 +274,7 @@ USAGE:
 OPTIONS:
   -f, --foo <foo>          this is foo option
   --bar                    this is bar option
-  -b, --baz [baz]          this is baz option
+  -b, --baz [baz]          this is baz option (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
 "

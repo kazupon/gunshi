@@ -55,6 +55,7 @@ export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
   leftMargin: 2,
   middleMargin: 10,
   usageOptionType: false,
+  usageOptionValue: true,
   renderHeader: undefined,
   renderUsage: undefined,
   renderValidationErrors: undefined,
@@ -69,5 +70,7 @@ export const COMMAND_BUILTIN_RESOURCE_KEYS = [
   'OPTIONS',
   'EXAMPLES',
   'FORMORE',
-  'NEGATABLE'
+  'NEGATABLE',
+  'DEFAULT',
+  'CHOICES'
 ] as const
