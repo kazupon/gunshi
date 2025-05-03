@@ -262,6 +262,13 @@ function resolveNegatableType<Options extends ArgOptions>(
   return ctx.options[key.startsWith('no-') ? resolveNegatableKey(key) : key].type
 }
 
+function generateDefaultDisplayValue<Options extends ArgOptions>(
+  ctx: Readonly<CommandContext<Options>>,
+  schema: ArgOptionSchema
+): string {
+  return `${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
+}
+
 function resolveDisplayValue<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>,
   key: string
@@ -271,20 +278,17 @@ function resolveDisplayValue<Options extends ArgOptions>(
   }
 
   const schema = ctx.options[key]
-  if (schema.type === 'boolean' && schema.default !== undefined) {
-    return `(${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default})`
-  }
-  if (schema.type === 'number' && schema.default !== undefined) {
-    return `(${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default})`
-  }
-  if (schema.type === 'string' && schema.default !== undefined) {
-    return `(${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default})`
+  if (
+    (schema.type === 'boolean' || schema.type === 'number' || schema.type === 'string') &&
+    schema.default !== undefined
+  ) {
+    return `(${generateDefaultDisplayValue(ctx, schema)})`
   }
   if (schema.type === 'enum') {
     const _default =
-      schema.default === null
-        ? ''
-        : `${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
+      schema.default !== undefined // eslint-disable-line unicorn/no-negated-condition
+        ? generateDefaultDisplayValue(ctx, schema)
+        : ''
     const choices = `${ctx.translate(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
     return `(${_default ? `${_default}, ${choices}` : choices})`
   }
