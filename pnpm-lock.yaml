@@ -15,8 +15,8 @@ importers:
   .:
     dependencies:
       args-tokens:
-        specifier: ^0.16.2
-        version: 0.16.2
+        specifier: ^0.17.0
+        version: 0.17.0
     devDependencies:
       '@eslint/markdown':
         specifier: ^6.4.0
@@ -159,7 +159,7 @@ importers:
     devDependencies:
       '@types/bun':
         specifier: latest
-        version: 1.2.10
+        version: 1.2.12
 
   playground/composable:
     dependencies:
@@ -1601,8 +1601,8 @@ packages:
   '@tybys/wasm-util@0.9.0':
     resolution: {integrity: sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw==}
 
-  '@types/bun@1.2.10':
-    resolution: {integrity: sha512-eilv6WFM3M0c9ztJt7/g80BDusK98z/FrFwseZgT4bXCq2vPhXD4z8R3oddmAn+R/Nmz9vBn4kweJKmGTZj+lg==}
+  '@types/bun@1.2.12':
+    resolution: {integrity: sha512-lY/GQTXDGsolT/TiH72p1tuyUORuRrdV7VwOTOjDOt8uTBJQOJc5zz3ufwwDl0VBaoxotSk4LdP0hhjLJ6ypIQ==}
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
@@ -2001,8 +2001,8 @@ packages:
   args-tokenizer@0.3.0:
     resolution: {integrity: sha512-xXAd7G2Mll5W8uo37GETpQ2VrE84M181Z7ugHFGQnJZ50M2mbOv0osSZ9VsSgPfJQ+LVG0prSi0th+ELMsno7Q==}
 
-  args-tokens@0.16.2:
-    resolution: {integrity: sha512-jWJC6T4FjLssDxBPb/05+e/3xt3CkNiZWWNZaWpN5Q4dI7CZDZgO/2WxLM/ippwRnT1jm/ZZ8LSsV73MSwiGEQ==}
+  args-tokens@0.17.0:
+    resolution: {integrity: sha512-NRpp00rqKOKCBadQYbz2XldBvX2watxVl9EJzPCvVgzPkTLNvtZxQZZ6/4lUAPK13ej0M64syQY190VPfxM60g==}
     engines: {node: '>= 20'}
 
   array-buffer-byte-length@1.0.2:
@@ -2084,8 +2084,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  bun-types@1.2.10:
-    resolution: {integrity: sha512-b5ITZMnVdf3m1gMvJHG+gIfeJHiQPJak0f7925Hxu6ZN5VKA8AGy4GZ4lM+Xkn6jtWxg5S3ldWvfmXdvnkp3GQ==}
+  bun-types@1.2.12:
+    resolution: {integrity: sha512-tvWMx5vPqbRXgE8WUZI94iS1xAYs8bkqESR9cxBB1Wi+urvfTrF1uzuDgBHFAdO0+d2lmsbG3HmeKMvUyj6pWA==}
 
   byte-size@9.0.1:
     resolution: {integrity: sha512-YLe9x3rabBrcI0cueCdLS2l5ONUKywcRpTs02B8KP9/Cimhj7o3ZccGrPnRvcbyHMbb7W79/3MUJl7iGgTXKEw==}
@@ -5584,9 +5584,9 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@types/bun@1.2.10':
+  '@types/bun@1.2.12':
     dependencies:
-      bun-types: 1.2.10
+      bun-types: 1.2.12
 
   '@types/debug@4.1.12':
     dependencies:
@@ -6010,7 +6010,7 @@ snapshots:
 
   args-tokenizer@0.3.0: {}
 
-  args-tokens@0.16.2: {}
+  args-tokens@0.17.0: {}
 
   array-buffer-byte-length@1.0.2:
     dependencies:
@@ -6121,7 +6121,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  bun-types@1.2.10:
+  bun-types@1.2.12:
     dependencies:
       '@types/node': 22.15.3
 
