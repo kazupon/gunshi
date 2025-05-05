@@ -17,7 +17,7 @@
 import { cli } from './cli.ts'
 import { create } from './utils.ts'
 
-import { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type { Command, CommandOptions } from './types.ts'
 
 /**
@@ -27,10 +27,10 @@ import type { Command, CommandOptions } from './types.ts'
  * @param opts - A {@link CommandOptions | command options}
  * @returns A rendered usage.
  */
-export async function generate<Options extends ArgOptions = ArgOptions>(
+export async function generate<A extends Args = Args>(
   command: string | null,
-  entry: Command<Options>,
-  opts: CommandOptions<Options> = {}
+  entry: Command<A>,
+  opts: CommandOptions<A> = {}
 ): Promise<string> {
   const args = ['-h']
   if (command != null) {

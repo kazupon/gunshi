@@ -5,7 +5,7 @@
 
 import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, OPTION_PREFIX } from './constants.ts'
 
-import type { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type {
   Command,
   Commandable,
@@ -16,17 +16,17 @@ import type {
   RemovedIndex
 } from './types.ts'
 
-export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
-  cmd: Commandable<Options>,
+export async function resolveLazyCommand<A extends Args = Args>(
+  cmd: Commandable<A>,
   name?: string | undefined,
   needRunResolving: boolean = false
-): Promise<Command<Options>> {
-  let command: Command<Options> | undefined
+): Promise<Command<A>> {
+  let command: Command<A> | undefined
   if (typeof cmd === 'function') {
-    command = Object.assign(create<Command<Options>>(), {
+    command = Object.assign(create<Command<A>>(), {
       name: cmd.commandName,
       description: cmd.description,
-      options: cmd.options,
+      args: cmd.args,
       examples: cmd.examples,
       resource: cmd.resource
     })
@@ -42,7 +42,7 @@ export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions
         command.run = loaded.run
         command.name = loaded.name
         command.description = loaded.description
-        command.options = loaded.options
+        command.args = loaded.args
         command.examples = loaded.examples
         command.resource = loaded.resource
       } else {
@@ -50,7 +50,7 @@ export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions
       }
     }
   } else {
-    command = Object.assign(create<Command<Options>>(), cmd)
+    command = Object.assign(create<Command<A>>(), cmd)
   }
 
   if (command.name == null && name) {
@@ -61,15 +61,15 @@ export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions
 }
 
 export function resolveBuiltInKey<
-  Key extends string = CommandBuiltinOptionsKeys | CommandBuiltinResourceKeys
->(key: Key): GenerateNamespacedKey<Key> {
+  K extends string = CommandBuiltinOptionsKeys | CommandBuiltinResourceKeys
+>(key: K): GenerateNamespacedKey<K> {
   return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
 export function resolveOptionKey<
-  Options extends ArgOptions = {},
-  Key extends string = KeyOfArgOptions<RemovedIndex<Options>>
->(key: Key): GenerateNamespacedKey<Key, typeof OPTION_PREFIX> {
+  A extends Args = {},
+  K extends string = KeyOfArgOptions<RemovedIndex<A>>
+>(key: K): GenerateNamespacedKey<K, typeof OPTION_PREFIX> {
   return `${OPTION_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 

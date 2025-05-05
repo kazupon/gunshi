@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from './context.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 
-import type { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type { Command, LazyCommand } from './types.ts'
 
 const NOOP = async () => {}
@@ -12,7 +12,7 @@ afterEach(() => {
 })
 
 const SHOW = {
-  options: {
+  args: {
     foo: {
       type: 'string',
       short: 'f',
@@ -46,13 +46,13 @@ const SHOW = {
   description: 'A show command',
   examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
   run: NOOP
-} as Command<ArgOptions>
+} as Command<Args>
 
-const COMMANDS = new Map<string, Command<ArgOptions> | LazyCommand<ArgOptions>>()
+const COMMANDS = new Map<string, Command<Args> | LazyCommand<Args>>()
 COMMANDS.set('show', SHOW)
 COMMANDS.set('command1', {
   name: 'command1',
-  options: {
+  args: {
     foo: {
       type: 'string',
       short: 'f',
@@ -82,15 +82,15 @@ describe('renderHeader', () => {
     name: 'test',
     description: 'A test command',
     run: NOOP
-  } as Command<ArgOptions>
+  } as Command<Args>
 
   test('basic', async () => {
     const ctx = await createCommandContext({
-      options: {},
+      args: {},
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
       command,
@@ -107,11 +107,11 @@ describe('renderHeader', () => {
 
   test('no description', async () => {
     const ctx = await createCommandContext({
-      options: {},
+      args: {},
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
       command,
@@ -127,11 +127,11 @@ describe('renderHeader', () => {
 
   test('no name & no description', async () => {
     const ctx = await createCommandContext({
-      options: {},
+      args: {},
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
       command,
@@ -143,11 +143,11 @@ describe('renderHeader', () => {
 
   test('no version', async () => {
     const ctx = await createCommandContext({
-      options: {},
+      args: {},
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
       command,
@@ -165,7 +165,7 @@ describe('renderHeader', () => {
 describe('renderUsage', () => {
   test('basic', async () => {
     const command = {
-      options: {
+      args: {
         foo: {
           type: 'string',
           short: 'f',
@@ -192,13 +192,13 @@ describe('renderUsage', () => {
       description: 'A test command',
       examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
       run: NOOP
-    } as Command<ArgOptions>
+    } as Command<Args>
     const ctx = await createCommandContext({
-      options: command.options!,
+      args: command.args!,
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
       command,
@@ -220,13 +220,13 @@ describe('renderUsage', () => {
       run: async () => {
         // something here
       }
-    } as Command<ArgOptions>
+    } as Command<Args>
     const ctx = await createCommandContext({
-      options: {},
+      args: {},
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
       command,
@@ -242,7 +242,7 @@ describe('renderUsage', () => {
 
   test('no required options', async () => {
     const command = {
-      options: {
+      args: {
         foo: {
           type: 'string',
           short: 'f',
@@ -262,13 +262,13 @@ describe('renderUsage', () => {
       name: 'test',
       description: 'A test command',
       run: NOOP
-    } as Command<ArgOptions>
+    } as Command<Args>
     const ctx = await createCommandContext({
-      options: command.options!,
+      args: command.args!,
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
       command,
@@ -284,7 +284,7 @@ describe('renderUsage', () => {
 
   test('no examples', async () => {
     const command = {
-      options: {
+      args: {
         foo: {
           type: 'string',
           short: 'f',
@@ -310,13 +310,13 @@ describe('renderUsage', () => {
       name: 'test',
       description: 'A test command',
       run: NOOP
-    } as Command<ArgOptions>
+    } as Command<Args>
     const ctx = await createCommandContext({
-      options: command.options!,
+      args: command.args!,
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
       command,
@@ -332,7 +332,7 @@ describe('renderUsage', () => {
 
   test('enable usageOptionType', async () => {
     const command = {
-      options: {
+      args: {
         foo: {
           type: 'string',
           short: 'f',
@@ -359,13 +359,13 @@ describe('renderUsage', () => {
       description: 'A test command',
       examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
       run: NOOP
-    } as Command<ArgOptions>
+    } as Command<Args>
     const ctx = await createCommandContext({
-      options: command.options!,
+      args: command.args!,
       values: {},
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
       command,
@@ -384,12 +384,12 @@ describe('renderUsage', () => {
 
   test('sub commands', async () => {
     const ctx = await createCommandContext({
-      options: SHOW.options!,
+      args: SHOW.args!,
       values: {},
       omitted: true,
       positionals: [],
       rest: [],
-      args: [],
+      argv: [],
       tokens: [], // dummy, due to test
       command: SHOW,
       commandOptions: {
@@ -406,11 +406,11 @@ describe('renderUsage', () => {
 
 test('renderValidationErrors', async () => {
   const ctx = await createCommandContext({
-    options: SHOW.options!,
+    args: SHOW.args!,
     values: {},
     positionals: [],
     rest: [],
-    args: [],
+    argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
     command: SHOW,

@@ -15,7 +15,7 @@
  */
 
 export { parseArgs, resolveArgs } from 'args-tokens'
-export type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
+export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 export * from './cli.ts'
 export { DEFAULT_LOCALE } from './constants.ts'
 export { define, lazy } from './definition.ts'

@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type { CommandContext } from '../types.ts'
 
 /**
@@ -11,8 +11,8 @@ import type { CommandContext } from '../types.ts'
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered header.
  */
-export function renderHeader<Options extends ArgOptions = ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
+export function renderHeader<A extends Args = Args>(
+  ctx: Readonly<CommandContext<A>>
 ): Promise<string> {
   const title = ctx.env.description || ctx.env.name || ''
   return Promise.resolve(

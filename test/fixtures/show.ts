@@ -1,6 +1,6 @@
 import type { Command } from '../../src/types.ts'
 
-const options = {
+const args = {
   catalog: {
     type: 'boolean',
     short: 'c',
@@ -15,10 +15,10 @@ const options = {
   }
 } as const
 
-const command: Command<typeof options> = {
+const command: Command<typeof args> = {
   name: 'show',
   description: 'Show the catalog and catalogable dependencies (default command)',
-  options,
+  args,
   examples: `# Show the catalog and catalogable dependencies:
 generator  # \`generator\` is equivalent to \`generator show\``,
   async run() {

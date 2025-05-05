@@ -9,7 +9,7 @@ import { createCommandContext } from './context.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 import { create, resolveLazyCommand } from './utils.ts'
 
-import type { ArgOptions, ArgToken } from 'args-tokens'
+import type { Args, ArgToken } from 'args-tokens'
 import type { Command, CommandContext, CommandOptions, CommandRunner } from './types.ts'
 
 /**
@@ -19,12 +19,12 @@ import type { Command, CommandContext, CommandOptions, CommandRunner } from './t
  * @param opts A {@link CommandOptions | command options}
  * @returns A rendered usage or undefined. if you will use {@link CommandOptions.usageSilent} option, it will return rendered usage string.
  */
-export async function cli<Options extends ArgOptions = ArgOptions>(
-  args: string[],
-  entry: Command<Options> | CommandRunner<Options>,
-  opts: CommandOptions<Options> = {}
+export async function cli<A extends Args = Args>(
+  argv: string[],
+  entry: Command<A> | CommandRunner<A>,
+  opts: CommandOptions<A> = {}
 ): Promise<string | undefined> {
-  const tokens = parseArgs(args)
+  const tokens = parseArgs(argv)
 
   const subCommand = getSubCommand(tokens)
   const resolvedCommandOptions = resolveCommandOptions(opts, entry)
@@ -33,18 +33,18 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
     throw new Error(`Command not found: ${name || ''}`)
   }
 
-  const options = resolveArgOptions(command.options)
+  const args = resolveArgments(command.args)
 
-  const { values, positionals, rest, error } = resolveArgs(options, tokens, {
+  const { values, positionals, rest, error } = resolveArgs(args, tokens, {
     optionGrouping: true
   })
   const omitted = !subCommand
   const ctx = await createCommandContext({
-    options,
+    args,
     values,
     positionals,
     rest,
-    args,
+    argv,
     tokens,
     omitted,
     command,
@@ -83,26 +83,26 @@ export async function cli<Options extends ArgOptions = ArgOptions>(
   await command.run(ctx)
 }
 
-function resolveArgOptions<Options extends ArgOptions>(options?: Options): Options {
-  return Object.assign(create<Options>(), options, COMMON_OPTIONS)
+function resolveArgments<A extends Args>(options?: A): A {
+  return Object.assign(create<A>(), options, COMMON_OPTIONS)
 }
 
-function resolveCommandOptions<Options extends ArgOptions>(
-  options: CommandOptions<Options>,
-  entry: Command<Options> | CommandRunner<Options>
-): CommandOptions<Options> {
+function resolveCommandOptions<A extends Args>(
+  options: CommandOptions<A>,
+  entry: Command<A> | CommandRunner<A>
+): CommandOptions<A> {
   const subCommands = new Map(options.subCommands)
   if (typeof entry === 'object' && entry.name && options.subCommands) {
     subCommands.set(entry.name, entry)
   }
   const resolvedOptions = Object.assign(
-    create<CommandOptions<Options>>(),
+    create<CommandOptions<A>>(),
     COMMAND_OPTIONS_DEFAULT,
     options,
     {
       subCommands
     }
-  ) as CommandOptions<Options>
+  ) as CommandOptions<A>
 
   return resolvedOptions
 }
@@ -117,9 +117,7 @@ function getSubCommand(tokens: ArgToken[]): string {
     : ''
 }
 
-async function showUsage<Options extends ArgOptions>(
-  ctx: CommandContext<Options>
-): Promise<string | undefined> {
+async function showUsage<A extends Args>(ctx: CommandContext<A>): Promise<string | undefined> {
   if (ctx.env.renderUsage === null) {
     return
   }
@@ -130,13 +128,11 @@ async function showUsage<Options extends ArgOptions>(
   }
 }
 
-function showVersion<Options extends ArgOptions>(ctx: CommandContext<Options>): void {
+function showVersion<A extends Args>(ctx: CommandContext<A>): void {
   ctx.log(ctx.env.version)
 }
 
-async function showHeader<Options extends ArgOptions>(
-  ctx: CommandContext<Options>
-): Promise<string | undefined> {
+async function showHeader<A extends Args>(ctx: CommandContext<A>): Promise<string | undefined> {
   if (ctx.env.renderHeader === null) {
     return
   }
@@ -148,8 +144,8 @@ async function showHeader<Options extends ArgOptions>(
   }
 }
 
-async function showValidationErrors<Options extends ArgOptions>(
-  ctx: CommandContext<Options>,
+async function showValidationErrors<A extends Args>(
+  ctx: CommandContext<A>,
   error: AggregateError
 ): Promise<void> {
   if (ctx.env.renderValidationErrors === null) {
@@ -159,12 +155,12 @@ async function showValidationErrors<Options extends ArgOptions>(
   ctx.log(await render(ctx, error))
 }
 
-async function resolveCommand<Options extends ArgOptions>(
+async function resolveCommand<A extends Args>(
   sub: string,
-  entry: Command<Options> | CommandRunner<Options>,
-  options: CommandOptions<Options>,
+  entry: Command<A> | CommandRunner<A>,
+  options: CommandOptions<A>,
   needRunResolving: boolean = false
-): Promise<[string | undefined, Command<Options> | undefined]> {
+): Promise<[string | undefined, Command<A> | undefined]> {
   const omitted = !sub
   if (typeof entry === 'function') {
     return [undefined, { run: entry }]
@@ -189,6 +185,6 @@ async function resolveCommand<Options extends ArgOptions>(
   }
 }
 
-function resolveEntryName<Options extends ArgOptions>(entry: Command<Options>): string {
+function resolveEntryName<A extends Args>(entry: Command<A>): string {
   return entry.name || '(anonymous)'
 }

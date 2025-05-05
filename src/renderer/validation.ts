@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type { CommandContext } from '../types.ts'
 
 /**
@@ -12,8 +12,8 @@ import type { CommandContext } from '../types.ts'
  * @param error An {@link AggregateError} of option in `args-token` validation
  * @returns A rendered validation error.
  */
-export function renderValidationErrors<Options extends ArgOptions = ArgOptions>(
-  _ctx: CommandContext<Options>,
+export function renderValidationErrors<A extends Args = Args>(
+  _ctx: CommandContext<A>,
   error: AggregateError
 ): Promise<string> {
   const messages = [] as string[]

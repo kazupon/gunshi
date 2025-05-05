@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type { CommandOptions } from './types.ts'
 
 /**
@@ -45,7 +45,7 @@ export const COMMON_OPTIONS: CommonOptionType = {
   }
 }
 
-export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
+export const COMMAND_OPTIONS_DEFAULT: CommandOptions<Args> = {
   name: undefined,
   description: undefined,
   version: undefined,

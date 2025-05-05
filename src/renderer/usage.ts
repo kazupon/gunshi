@@ -6,7 +6,7 @@
 import { COMMON_OPTIONS } from '../constants.ts'
 import { create, resolveBuiltInKey, resolveOptionKey } from '../utils.ts'
 
-import type { ArgOptions, ArgOptionSchema } from 'args-tokens'
+import type { Args, ArgSchema } from 'args-tokens'
 import type { Command, CommandContext } from '../types.ts'
 
 const COMMON_OPTIONS_KEYS = Object.keys(COMMON_OPTIONS)
@@ -16,8 +16,8 @@ const COMMON_OPTIONS_KEYS = Object.keys(COMMON_OPTIONS)
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered usage.
  */
-export async function renderUsage<Options extends ArgOptions = ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
+export async function renderUsage<A extends Args = Args>(
+  ctx: Readonly<CommandContext<A>>
 ): Promise<string> {
   const messages: string[] = []
 
@@ -56,8 +56,8 @@ export async function renderUsage<Options extends ArgOptions = ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered options section
  */
-async function renderOptionsSection<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
+async function renderOptionsSection<A extends Args>(
+  ctx: Readonly<CommandContext<A>>
 ): Promise<string[]> {
   const messages: string[] = []
   messages.push(`${ctx.translate(resolveBuiltInKey('OPTIONS'))}:`)
@@ -70,9 +70,7 @@ async function renderOptionsSection<Options extends ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered examples section
  */
-function renderExamplesSection<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
-): string[] {
+function renderExamplesSection<A extends Args>(ctx: Readonly<CommandContext<A>>): string[] {
   const messages: string[] = []
 
   const resolvedExamples = resolveExamples(ctx)
@@ -91,8 +89,8 @@ function renderExamplesSection<Options extends ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered usage section
  */
-async function renderUsageSection<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
+async function renderUsageSection<A extends Args>(
+  ctx: Readonly<CommandContext<A>>
 ): Promise<string[]> {
   const messages: string[] = [`${ctx.translate(resolveBuiltInKey('USAGE'))}:`]
   if (ctx.omitted) {
@@ -114,8 +112,8 @@ async function renderUsageSection<Options extends ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered commands section
  */
-async function renderCommandsSection<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
+async function renderCommandsSection<A extends Args>(
+  ctx: Readonly<CommandContext<A>>
 ): Promise<string[]> {
   const messages: string[] = [`${ctx.translate(resolveBuiltInKey('COMMANDS'))}:`]
   const loadedCommands = await ctx.loadCommands()
@@ -143,7 +141,7 @@ async function renderCommandsSection<Options extends ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns The entry command name
  */
-function resolveEntry<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
+function resolveEntry<A extends Args>(ctx: CommandContext<A>): string {
   return ctx.env.name || ctx.translate(resolveBuiltInKey('COMMAND'))
 }
 
@@ -152,9 +150,7 @@ function resolveEntry<Options extends ArgOptions>(ctx: CommandContext<Options>):
  * @param ctx A {@link CommandContext | command context}
  * @returns The sub command name
  */
-function resolveSubCommand<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>
-): string {
+function resolveSubCommand<A extends Args>(ctx: Readonly<CommandContext<A>>): string {
   return ctx.name || ctx.translate(resolveBuiltInKey('SUBCOMMAND'))
 }
 
@@ -163,7 +159,7 @@ function resolveSubCommand<Options extends ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns resolved command description
  */
-function resolveDescription<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
+function resolveDescription<A extends Args>(ctx: CommandContext<A>): string {
   return ctx.translate('description') || ctx.description || ''
 }
 
@@ -172,12 +168,12 @@ function resolveDescription<Options extends ArgOptions>(ctx: CommandContext<Opti
  * @param ctx A {@link CommandContext | command context}
  * @returns resolved command examples, if not resolved, return empty string
  */
-function resolveExamples<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
+function resolveExamples<A extends Args>(ctx: CommandContext<A>): string {
   const ret = ctx.translate('examples')
   if (ret) {
     return ret
   }
-  const command = ctx.env.subCommands?.get(ctx.name || '') as Command<Options> | undefined
+  const command = ctx.env.subCommands?.get(ctx.name || '') as Command<A> | undefined
   return command?.examples ?? ''
 }
 
@@ -186,9 +182,7 @@ function resolveExamples<Options extends ArgOptions>(ctx: CommandContext<Options
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has sub commands
  */
-async function hasCommands<Options extends ArgOptions>(
-  ctx: CommandContext<Options>
-): Promise<boolean> {
+async function hasCommands<A extends Args>(ctx: CommandContext<A>): Promise<boolean> {
   const loadedCommands = await ctx.loadCommands()
   return loadedCommands.length > 1
 }
@@ -198,8 +192,8 @@ async function hasCommands<Options extends ArgOptions>(
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has options
  */
-function hasOptions<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
-  return !!(ctx.options && Object.keys(ctx.options).length > 0)
+function hasOptions<A extends Args>(ctx: CommandContext<A>): boolean {
+  return !!(ctx.args && Object.keys(ctx.args).length > 0)
 }
 
 /**
@@ -207,8 +201,8 @@ function hasOptions<Options extends ArgOptions>(ctx: CommandContext<Options>): b
  * @param ctx A {@link CommandContext | command context}
  * @returns True if all options have default values
  */
-function hasAllDefaultOptions<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
-  return !!(ctx.options && Object.values(ctx.options).every(opt => opt.default))
+function hasAllDefaultOptions<A extends Args>(ctx: CommandContext<A>): boolean {
+  return !!(ctx.args && Object.values(ctx.args).every(arg => arg.default))
 }
 
 /**
@@ -216,7 +210,7 @@ function hasAllDefaultOptions<Options extends ArgOptions>(ctx: CommandContext<Op
  * @param ctx A {@link CommandContext | command context}
  * @returns Options symbols for usage
  */
-function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
+function generateOptionsSymbols<A extends Args>(ctx: CommandContext<A>): string {
   return hasOptions(ctx)
     ? hasAllDefaultOptions(ctx)
       ? `[${ctx.translate(resolveBuiltInKey('OPTIONS'))}]`
@@ -224,7 +218,7 @@ function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<
     : ''
 }
 
-function makeShortLongOptionPair(schema: ArgOptionSchema, name: string): string {
+function makeShortLongOptionPair(schema: ArgSchema, name: string): string {
   let key = `--${name}`
   if (schema.short) {
     key = `-${schema.short}, ${key}`
@@ -237,10 +231,8 @@ function makeShortLongOptionPair(schema: ArgOptionSchema, name: string): string 
  * @param ctx A {@link CommandContext | command context}
  * @returns Options pairs for usage
  */
-function getOptionsPairs<Options extends ArgOptions>(
-  ctx: CommandContext<Options>
-): Record<string, string> {
-  return Object.entries(ctx.options).reduce((acc, [name, value]) => {
+function getOptionsPairs<A extends Args>(ctx: CommandContext<A>): Record<string, string> {
+  return Object.entries(ctx.args).reduce((acc, [name, value]) => {
     let key = makeShortLongOptionPair(value, name)
     if (value.type !== 'boolean') {
       key = value.default ? `${key} [${name}]` : `${key} <${name}>`
@@ -255,29 +247,26 @@ function getOptionsPairs<Options extends ArgOptions>(
 
 const resolveNegatableKey = (key: string): string => key.split('no-')[1]
 
-function resolveNegatableType<Options extends ArgOptions>(
-  key: string,
-  ctx: Readonly<CommandContext<Options>>
-) {
-  return ctx.options[key.startsWith('no-') ? resolveNegatableKey(key) : key].type
+function resolveNegatableType<A extends Args>(key: string, ctx: Readonly<CommandContext<A>>) {
+  return ctx.args[key.startsWith('no-') ? resolveNegatableKey(key) : key].type
 }
 
-function generateDefaultDisplayValue<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>,
-  schema: ArgOptionSchema
+function generateDefaultDisplayValue<A extends Args>(
+  ctx: Readonly<CommandContext<A>>,
+  schema: ArgSchema
 ): string {
   return `${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
 }
 
-function resolveDisplayValue<Options extends ArgOptions>(
-  ctx: Readonly<CommandContext<Options>>,
+function resolveDisplayValue<A extends Args>(
+  ctx: Readonly<CommandContext<A>>,
   key: string
 ): string {
   if (COMMON_OPTIONS_KEYS.includes(key)) {
     return ''
   }
 
-  const schema = ctx.options[key]
+  const schema = ctx.args[key]
   if (
     (schema.type === 'boolean' || schema.type === 'number' || schema.type === 'string') &&
     schema.default !== undefined
@@ -302,8 +291,8 @@ function resolveDisplayValue<Options extends ArgOptions>(
  * @param optionsPairs Options pairs for usage
  * @returns Generated options usage
  */
-async function generateOptionsUsage<Options extends ArgOptions>(
-  ctx: CommandContext<Options>,
+async function generateOptionsUsage<A extends Args>(
+  ctx: CommandContext<A>,
   optionsPairs: Record<string, string>
 ): Promise<string> {
   const optionsMaxLength = Math.max(
@@ -321,7 +310,7 @@ async function generateOptionsUsage<Options extends ArgOptions>(
       let rawDesc = ctx.translate(resolveOptionKey(key))
       if (!rawDesc && key.startsWith('no-')) {
         const name = resolveNegatableKey(key)
-        const schema = ctx.options[name]
+        const schema = ctx.args[name]
         const optionKey = makeShortLongOptionPair(schema, name)
         rawDesc = `${ctx.translate(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
       }

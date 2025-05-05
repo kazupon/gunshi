@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { ArgOptions, ArgToken, ArgValues } from 'args-tokens'
+import type { Args, ArgToken, ArgValues } from 'args-tokens'
 
 import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, OPTION_PREFIX } from './constants.ts'
 
@@ -20,15 +20,15 @@ export type RemovedIndex<T> = RemoveIndexSignature<{
   [K in keyof T]: T[K]
 }>
 
-export type KeyOfArgOptions<Options extends ArgOptions> =
-  | keyof Options
+export type KeyOfArgOptions<A extends Args> =
+  | keyof A
   | {
-      [K in keyof Options]: Options[K]['type'] extends 'boolean'
-        ? Options[K]['negatable'] extends true
+      [K in keyof A]: A[K]['type'] extends 'boolean'
+        ? A[K]['negatable'] extends true
           ? `no-${Extract<K, string>}`
           : never
         : never
-    }[keyof Options]
+    }[keyof A]
 
 /**
  * Generate a namespaced key.
@@ -63,15 +63,15 @@ export type CommandBuiltinKeys =
  * Command i18n option keys.
  * The command i18n option keys are used to {@link CommandContext.translate | translate} function.
  */
-export type CommandOptionKeys<Options extends ArgOptions> = GenerateNamespacedKey<
-  KeyOfArgOptions<RemovedIndex<Options>>,
+export type CommandOptionKeys<A extends Args> = GenerateNamespacedKey<
+  KeyOfArgOptions<RemovedIndex<A>>,
   typeof OPTION_PREFIX
 >
 
 /**
  * Command environment.
  */
-export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
+export interface CommandEnvironment<A extends Args = Args> {
   /**
    * Current working directory.
    * @see {@link CommandOptions.cwd}
@@ -131,16 +131,16 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
   /**
    * Render function the command usage.
    */
-  renderUsage: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
+  renderUsage: ((ctx: CommandContext<A>) => Promise<string>) | null | undefined
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
+  renderHeader: ((ctx: CommandContext<A>) => Promise<string>) | null | undefined
   /**
    * Render function the validation errors.
    */
   renderValidationErrors:
-    | ((ctx: CommandContext<Options>, error: AggregateError) => Promise<string>)
+    | ((ctx: CommandContext<A>, error: AggregateError) => Promise<string>)
     | null
     | undefined
 }
@@ -148,7 +148,7 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
 /**
  * Command options.
  */
-export interface CommandOptions<Options extends ArgOptions = ArgOptions> {
+export interface CommandOptions<A extends Args = Args> {
   /**
    * Current working directory.
    */
@@ -197,16 +197,16 @@ export interface CommandOptions<Options extends ArgOptions = ArgOptions> {
   /**
    * Render function the command usage.
    */
-  renderUsage?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
+  renderUsage?: ((ctx: Readonly<CommandContext<A>>) => Promise<string>) | null
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
+  renderHeader?: ((ctx: Readonly<CommandContext<A>>) => Promise<string>) | null
   /**
    * Render function the validation errors.
    */
   renderValidationErrors?:
-    | ((ctx: Readonly<CommandContext<Options>>, error: AggregateError) => Promise<string>)
+    | ((ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string>)
     | null
   /**
    * Translation adapter factory.
@@ -218,10 +218,7 @@ export interface CommandOptions<Options extends ArgOptions = ArgOptions> {
  * Command context.
  * Command context is the context of the command execution.
  */
-export interface CommandContext<
-  Options extends ArgOptions = ArgOptions,
-  Values = ArgValues<Options>
-> {
+export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
   /**
    * Command name, that is the command that is executed.
    * The command name is same {@link CommandEnvironment.name}.
@@ -240,17 +237,17 @@ export interface CommandContext<
    * Command environment, that is the environment of the command that is executed.
    * The command environment is same {@link CommandEnvironment}.
    */
-  env: Readonly<CommandEnvironment<Options>>
+  env: Readonly<CommandEnvironment<A>>
   /**
-   * Command options, that is the options of the command that is executed.
-   * The command options is same {@link Command.options}.
+   * Command arguments, that is the arguments of the command that is executed.
+   * The command arguments is same {@link Command.args}.
    */
-  options: Options
+  args: A
   /**
    * Command values, that is the values of the command that is executed.
-   * Resolve values with `resolveArgs` from command arguments and {@link Command.options}.
+   * Resolve values with `resolveArgs` from command arguments and {@link Command.args}.
    */
-  values: Values
+  values: V
   /**
    * Command positionals arguments, that is the positionals of the command that is executed.
    * Resolve positionals with `resolveArgs` from command arguments.
@@ -285,7 +282,7 @@ export interface CommandContext<
    * The loaded commands are cached and returned when called again.
    * @returns loaded commands.
    */
-  loadCommands: () => Promise<Command<Options>[]>
+  loadCommands: () => Promise<Command<A>[]>
   /**
    * Translate function.
    * @param key the key to be translated
@@ -294,10 +291,10 @@ export interface CommandContext<
    */
   translate: <
     T extends string = CommandBuiltinKeys,
-    O = CommandOptionKeys<Options>,
-    Key = CommandBuiltinKeys | O | T
+    O = CommandOptionKeys<A>,
+    K = CommandBuiltinKeys | O | T
   >(
-    key: Key,
+    key: K,
     values?: Record<string, unknown>
   ) => string
 }
@@ -305,7 +302,7 @@ export interface CommandContext<
 /**
  * Command interface.
  */
-export interface Command<Options extends ArgOptions = ArgOptions> {
+export interface Command<A extends Args = Args> {
   /**
    * Command name.
    * It's used to find command line arguments to execute from sub commands, and it's recommended to specify.
@@ -317,10 +314,10 @@ export interface Command<Options extends ArgOptions = ArgOptions> {
    */
   description?: string
   /**
-   * Command options.
-   * Each option can include a description property to describe the option in usage.
+   * Command arguments.
+   * Each argument can include a description property to describe the argument in usage.
    */
-  options?: Options
+  args?: A
   /**
    * Command examples.
    * examples of how to use the command.
@@ -329,17 +326,17 @@ export interface Command<Options extends ArgOptions = ArgOptions> {
   /**
    * Command runner. it's the command to be executed
    */
-  run?: CommandRunner<Options>
+  run?: CommandRunner<A>
   /**
    * Command resource fetcher.
    */
-  resource?: CommandResourceFetcher<Options>
+  resource?: CommandResourceFetcher<A>
 }
 
 /**
  * Command resource.
  */
-export type CommandResource<Options extends ArgOptions = ArgOptions> = {
+export type CommandResource<A extends Args = Args> = {
   /**
    * Command description.
    */
@@ -349,10 +346,7 @@ export type CommandResource<Options extends ArgOptions = ArgOptions> = {
    */
   examples: string
 } & {
-  [Option in GenerateNamespacedKey<
-    KeyOfArgOptions<RemovedIndex<Options>>,
-    typeof OPTION_PREFIX
-  >]: string
+  [Option in GenerateNamespacedKey<KeyOfArgOptions<RemovedIndex<A>>, typeof OPTION_PREFIX>]: string
 } & { [key: string]: string } // Infer the options usage, Define the user resources
 
 /**
@@ -360,10 +354,9 @@ export type CommandResource<Options extends ArgOptions = ArgOptions> = {
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched {@link CommandResource | command resource}.
  */
-export type CommandResourceFetcher<
-  Options extends ArgOptions = ArgOptions,
-  Values = ArgValues<Options>
-> = (ctx: Readonly<CommandContext<Options, Values>>) => Promise<CommandResource<Options>>
+export type CommandResourceFetcher<A extends Args = Args, V = ArgValues<A>> = (
+  ctx: Readonly<CommandContext<A, V>>
+) => Promise<CommandResource<A>>
 
 /**
  * Translation adapter factory.
@@ -425,30 +418,28 @@ export interface TranslationAdapter<MessageResource = string> {
  * Command runner.
  * @param ctx A {@link CommandContext | command context}
  */
-export type CommandRunner<Options extends ArgOptions = ArgOptions> = (
-  ctx: Readonly<CommandContext<Options>>
+export type CommandRunner<A extends Args = Args> = (
+  ctx: Readonly<CommandContext<A>>
 ) => Awaitable<void>
 
-export type CommandLoader<Options extends ArgOptions = ArgOptions> = () => Awaitable<
-  Command<Options> | CommandRunner<Options>
->
+export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | CommandRunner<A>>
 
 /**
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
  */
-export type LazyCommand<Options extends ArgOptions = ArgOptions> = {
+export type LazyCommand<A extends Args = Args> = {
   /**
    * Command load function
    */
-  (): Awaitable<Command<Options> | CommandRunner<Options>>
+  (): Awaitable<Command<A> | CommandRunner<A>>
   /**
    * Command name
    */
   commandName?: string
-} & Omit<Command<Options>, 'run' | 'name'>
+} & Omit<Command<A>, 'run' | 'name'>
 
 /**
  * Define a command type.
  */
-export type Commandable<Options extends ArgOptions> = Command<Options> | LazyCommand<Options>
+export type Commandable<A extends Args> = Command<A> | LazyCommand<A>

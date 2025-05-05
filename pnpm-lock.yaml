@@ -15,8 +15,8 @@ importers:
   .:
     dependencies:
       args-tokens:
-        specifier: ^0.16.2
-        version: 0.16.2
+        specifier: ^0.17.0
+        version: 0.17.0
     devDependencies:
       '@eslint/markdown':
         specifier: ^6.4.0
@@ -2001,8 +2001,8 @@ packages:
   args-tokenizer@0.3.0:
     resolution: {integrity: sha512-xXAd7G2Mll5W8uo37GETpQ2VrE84M181Z7ugHFGQnJZ50M2mbOv0osSZ9VsSgPfJQ+LVG0prSi0th+ELMsno7Q==}
 
-  args-tokens@0.16.2:
-    resolution: {integrity: sha512-jWJC6T4FjLssDxBPb/05+e/3xt3CkNiZWWNZaWpN5Q4dI7CZDZgO/2WxLM/ippwRnT1jm/ZZ8LSsV73MSwiGEQ==}
+  args-tokens@0.17.0:
+    resolution: {integrity: sha512-NRpp00rqKOKCBadQYbz2XldBvX2watxVl9EJzPCvVgzPkTLNvtZxQZZ6/4lUAPK13ej0M64syQY190VPfxM60g==}
     engines: {node: '>= 20'}
 
   array-buffer-byte-length@1.0.2:
@@ -6010,7 +6010,7 @@ snapshots:
 
   args-tokenizer@0.3.0: {}
 
-  args-tokens@0.16.2: {}
+  args-tokens@0.17.0: {}
 
   array-buffer-byte-length@1.0.2:
     dependencies:

@@ -4,7 +4,7 @@ import { cli } from './cli.ts'
 import { define } from './definition.ts'
 import { renderValidationErrors } from './renderer.ts'
 
-import type { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type { Mocked } from 'vitest'
 import type { Command, CommandOptions, CommandRunner, LazyCommand } from './types.ts'
 
@@ -39,7 +39,7 @@ describe('execute command', () => {
   test('entry command with options', async () => {
     const mockFn = vi.fn()
     await cli(['--outDir', 'dist/', 'foo', 'bar'], {
-      options: {
+      args: {
         outDir: {
           type: 'string',
           short: 'f'
@@ -71,7 +71,7 @@ describe('execute command', () => {
     const subCommands = new Map()
     subCommands.set('command1', {
       name: 'command1',
-      options: {
+      args: {
         foo: {
           type: 'string',
           short: 'f'
@@ -81,7 +81,7 @@ describe('execute command', () => {
     })
     subCommands.set('command2', {
       name: 'command2',
-      options: {
+      args: {
         bar: {
           type: 'number',
           short: 'b'
@@ -198,7 +198,7 @@ test('lazy command', async () => {
   }
   command1.commandName = 'command1'
   command1.description = 'command1 description'
-  command1.options = {
+  command1.args = {
     foo: {
       type: 'string',
       short: 'f'
@@ -211,7 +211,7 @@ test('lazy command', async () => {
   const remoteCommand2: Command = {
     name: 'command2',
     description: 'command2 description',
-    options: {
+    args: {
       bar: {
         type: 'string',
         short: 'b'
@@ -270,7 +270,7 @@ describe('auto generate usage', () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const renderedUsage = await cli(['-h'], {
-      options: {
+      args: {
         foo: {
           type: 'string',
           short: 'f'
@@ -290,7 +290,7 @@ describe('auto generate usage', () => {
     const renderedUsage = await cli(
       ['-h'],
       {
-        options: {
+        args: {
           foo: {
             type: 'string',
             short: 'f',
@@ -317,28 +317,28 @@ describe('auto generate usage', () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
 
-    const entryOptions = {
+    const entryArgs = {
       foo: {
         type: 'string',
         short: 'f'
       }
-    } satisfies ArgOptions
+    } satisfies Args
     const entry = {
-      options: entryOptions,
+      args: entryArgs,
       run: vi.fn()
-    } satisfies Command<typeof entryOptions>
+    } satisfies Command<typeof entryArgs>
 
-    const command2Options = {
+    const command2Args = {
       bar: {
         type: 'number',
         short: 'b',
         default: 42
       }
-    } satisfies ArgOptions
+    } satisfies Args
     const command2 = {
-      options: command2Options,
+      args: command2Args,
       run: vi.fn()
-    } satisfies Command<typeof command2Options>
+    } satisfies Command<typeof command2Args>
 
     const subCommands = new Map()
     subCommands.set('command2', command2)
@@ -354,37 +354,37 @@ describe('auto generate usage', () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
 
-    const entryOptions = {
+    const entryArgs = {
       foo: {
         type: 'string',
         short: 'f',
         description: 'The foo option'
       }
-    } satisfies ArgOptions
+    } satisfies Args
     const entry = {
-      options: entryOptions,
+      args: entryArgs,
       name: 'command1',
       examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
       run: vi.fn()
-    } satisfies Command<typeof entryOptions>
+    } satisfies Command<typeof entryArgs>
 
-    const command2Options = {
+    const command2Args = {
       bar: {
         type: 'number',
         short: 'b',
         default: 42,
         description: 'The bar option'
       }
-    } satisfies ArgOptions
+    } satisfies Args
     const command2 = {
-      options: command2Options,
+      args: command2Args,
       name: 'command2',
       examples: '# Example 1\n$ gunshi command2 --bar 42\n# Example 2\n$ gunshi command2 -b 42',
       // run: vi.fn()
       run: ctx => {
         console.log(ctx.values)
       }
-    } satisfies Command<typeof command2Options>
+    } satisfies Command<typeof command2Args>
 
     const subCommands = new Map()
     subCommands.set('command2', command2)
@@ -419,7 +419,7 @@ describe('auto generate usage', () => {
     await cli(
       ['-h'],
       {
-        options: {
+        args: {
           foo: {
             type: 'string',
             short: 'f',
@@ -467,10 +467,10 @@ describe('custom generate usage', () => {
         default: 42,
         description: 'this is baz option'
       }
-    } satisfies ArgOptions
+    } satisfies Args
 
     const entry = {
-      options: entryOptions,
+      args: entryOptions,
       name: 'command1',
       run: vi.fn()
     } satisfies Command<typeof entryOptions>
@@ -490,7 +490,7 @@ describe('custom generate usage', () => {
 
         // render options section
         messages.push('Options:')
-        for (const [key, value] of Object.entries(ctx.options)) {
+        for (const [key, value] of Object.entries(ctx.args)) {
           const description = value.description || ''
           messages.push(
             `  --${key.padEnd(10)} ${`[${value.type}]`.padEnd(12)}`.padEnd(20) + description
@@ -525,7 +525,7 @@ test('usageSilent', async () => {
   const utils = await import('./utils.ts')
   const log = defineMockLog(utils)
 
-  const entryOptions = {
+  const entryArgs = {
     foo: {
       type: 'string',
       short: 'f',
@@ -542,20 +542,20 @@ test('usageSilent', async () => {
       default: 42,
       description: 'this is baz option'
     }
-  } satisfies ArgOptions
+  } satisfies Args
 
   const entry = {
-    options: entryOptions,
+    args: entryArgs,
     name: 'command1',
     run: vi.fn()
-  } satisfies Command<typeof entryOptions>
+  } satisfies Command<typeof entryArgs>
 
   const options = {
     name: 'gunshi',
     description: 'Modern CLI tool',
     version: '0.0.0',
     usageSilent: true
-  } satisfies CommandOptions<typeof entryOptions>
+  } satisfies CommandOptions<typeof entryArgs>
 
   // usage with silent
   const usage = await cli(['-h'], entry, options)
@@ -597,7 +597,7 @@ test('option grouping', async () => {
   const args = ['-sV']
   const mockFn = vi.fn()
   await cli(args, {
-    options: {
+    args: {
       silent: {
         type: 'boolean',
         short: 's'
@@ -617,7 +617,7 @@ test('rest arguments', async () => {
   const args = ['--foo', 'bar', '--', '--baz', 'qux']
   const mockFn = vi.fn()
   await cli(args, {
-    options: {
+    args: {
       foo: {
         type: 'string',
         short: 'f'
@@ -632,7 +632,7 @@ test('rest arguments', async () => {
 test('negatable options', async () => {
   const args = ['dev', '--bar', '--no-foo']
   await cli(args, {
-    options: {
+    args: {
       foo: {
         type: 'boolean',
         negatable: true
@@ -657,22 +657,22 @@ test('enum options', async () => {
   const log = defineMockLog(utils)
 
   // success case
-  const options = {
+  const args = {
     foo: {
       type: 'enum',
       choices: ['a', 'b', 'c']
     }
-  } satisfies ArgOptions
+  } satisfies Args
   const mockFn1 = vi.fn()
   await cli(['--foo', 'a'], {
-    options,
+    args,
     run: mockFn1
   })
   expect(mockFn1.mock.calls[0][0].values).toEqual({ foo: 'a' })
 
   // failure case
   await cli(['--foo', 'z'], {
-    options,
+    args,
     run: vi.fn()
   })
   const stdout = log()
@@ -684,7 +684,7 @@ describe('edge cases', () => {
     const command = define({
       name: 'test',
       description: 'This is a test command',
-      options: {
+      args: {
         description: {
           type: 'string',
           short: 'd',

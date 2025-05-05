@@ -14,19 +14,17 @@
  * @license MIT
  */
 
-import type { ArgOptions } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type { Command, CommandLoader, LazyCommand } from './types.ts'
 
-export type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
+export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 
 /**
  * Define a {@link Command | command} with type inference
  * @param definition A {@link Command | command} definition
  * @returns A {@link Command | command} definition with type inference
  */
-export function define<Options extends ArgOptions = ArgOptions>(
-  definition: Command<Options>
-): Command<Options> {
+export function define<A extends Args = Args>(definition: Command<A>): Command<A> {
   return definition
 }
 
@@ -36,16 +34,16 @@ export function define<Options extends ArgOptions = ArgOptions>(
  * @param definition A {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} loader
  */
-export function lazy<Options extends ArgOptions = ArgOptions>(
-  loader: CommandLoader<Options>,
-  definition?: Command<Options>
-): LazyCommand<Options> {
+export function lazy<A extends Args = Args>(
+  loader: CommandLoader<A>,
+  definition?: Command<A>
+): LazyCommand<A> {
   if (definition != null) {
-    ;(loader as LazyCommand<Options>).commandName = definition.name
-    ;(loader as LazyCommand<Options>).description = definition.description
-    ;(loader as LazyCommand<Options>).options = definition.options
-    ;(loader as LazyCommand<Options>).examples = definition.examples
-    ;(loader as LazyCommand<Options>).resource = definition.resource
+    ;(loader as LazyCommand<A>).commandName = definition.name
+    ;(loader as LazyCommand<A>).description = definition.description
+    ;(loader as LazyCommand<A>).args = definition.args
+    ;(loader as LazyCommand<A>).examples = definition.examples
+    ;(loader as LazyCommand<A>).resource = definition.resource
   }
   return loader
 }

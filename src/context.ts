@@ -27,7 +27,7 @@ import {
   resolveOptionKey
 } from './utils.ts'
 
-import type { ArgOptions, ArgOptionSchema, ArgToken, ArgValues } from 'args-tokens'
+import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 import type {
   Command,
   CommandBuiltinKeys,
@@ -42,15 +42,15 @@ const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 /**
  * Parameters of {@link createCommandContext}
  */
-interface CommandContextParams<Options extends ArgOptions, Values> {
+interface CommandContextParams<A extends Args, V> {
   /**
-   * An options of target command
+   * An arguments of target command
    */
-  options: Options
+  args: A
   /**
    * A values of target command
    */
-  values: Values
+  values: V
   /**
    * A positionals arguments, which passed to the target command
    */
@@ -62,7 +62,7 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
   /**
    * Original command line arguments
    */
-  args: string[]
+  argv: string[]
   /**
    * Argument tokens that are parsed by the `parseArgs` function
    */
@@ -74,11 +74,11 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
   /**
    * A target {@link Command | command}
    */
-  command: Command<Options>
+  command: Command<A>
   /**
    * A command options, which is spicialized from `cli` function
    */
-  commandOptions: CommandOptions<Options>
+  commandOptions: CommandOptions<A>
 }
 
 /**
@@ -87,34 +87,34 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
  * @returns A {@link CommandContext | command context}, which is readonly
  */
 export async function createCommandContext<
-  Options extends ArgOptions = ArgOptions,
-  Values extends ArgValues<Options> = ArgValues<Options>
+  A extends Args = Args,
+  V extends ArgValues<A> = ArgValues<A>
 >({
-  options,
+  args,
   values,
   positionals,
   rest,
-  args,
+  argv,
   tokens,
   command,
   commandOptions,
   omitted = false
-}: CommandContextParams<Options, Values>): Promise<Readonly<CommandContext<Options, Values>>> {
+}: CommandContextParams<A, V>): Promise<Readonly<CommandContext<A, V>>> {
   /**
    * normailize the options schema and values, to avoid prototype pollution
    */
 
-  const _options = Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
-    acc[key] = Object.assign(create<ArgOptionSchema>(), value)
+  const _args = Object.entries(args as Args).reduce((acc, [key, value]) => {
+    acc[key] = Object.assign(create<ArgSchema>(), value)
     return acc
-  }, create<ArgOptions>())
+  }, create<Args>())
 
   /**
    * setup the environment
    */
 
   const env = Object.assign(
-    create<CommandEnvironment<Options>>(),
+    create<CommandEnvironment<A>>(),
     COMMAND_OPTIONS_DEFAULT,
     commandOptions
   )
@@ -155,10 +155,10 @@ export async function createCommandContext<
    *
    */
 
-  function translate<
-    T extends string = CommandBuiltinKeys,
-    Key = CommandBuiltinKeys | keyof Options | T
-  >(key: Key, values: Record<string, unknown> = create<Record<string, unknown>>()): string {
+  function translate<T extends string = CommandBuiltinKeys, K = CommandBuiltinKeys | keyof A | T>(
+    key: K,
+    values: Record<string, unknown> = create<Record<string, unknown>>()
+  ): string {
     const strKey = key as string
     if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
       // NOTE:
@@ -178,13 +178,13 @@ export async function createCommandContext<
    * load the sub commands
    */
 
-  let cachedCommands: Command<Options>[] | undefined
-  async function loadCommands(): Promise<Command<Options>[]> {
+  let cachedCommands: Command<A>[] | undefined
+  async function loadCommands(): Promise<Command<A>[]> {
     if (cachedCommands) {
       return cachedCommands
     }
 
-    const subCommands = [...(commandOptions.subCommands || [])] as [string, Command<Options>][]
+    const subCommands = [...(commandOptions.subCommands || [])] as [string, Command<A>][]
     return (cachedCommands = await Promise.all(
       subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
     ))
@@ -195,17 +195,17 @@ export async function createCommandContext<
    */
 
   const ctx = deepFreeze(
-    Object.assign(create<CommandContext<Options, Values>>(), {
+    Object.assign(create<CommandContext<A, V>>(), {
       name: command.name,
       description: command.description,
       omitted,
       locale,
       env,
-      options: _options,
+      args: _args,
       values,
       positionals,
       rest,
-      _: args,
+      _: argv,
       tokens,
       log: commandOptions.usageSilent ? NOOP : log,
       loadCommands,
@@ -219,9 +219,9 @@ export async function createCommandContext<
 
   // Extract option descriptions from command options
   // const loadedOptionsResources = Object.entries(command.options || create<Options>()).map(
-  const loadedOptionsResources = Object.entries(options).map(([key, option]) => {
+  const loadedOptionsResources = Object.entries(args).map(([key, arg]) => {
     // get description from option if available
-    const description = option.description || ''
+    const description = arg.description || ''
     return [key, description] as [string, string]
   })
 
@@ -233,7 +233,7 @@ export async function createCommandContext<
   defaultCommandResource.examples = command.examples || ''
   adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-  const originalResource = await loadCommandResource<Options, Values>(ctx, command)
+  const originalResource = await loadCommandResource<A, V>(ctx, command)
   if (originalResource) {
     const resource = Object.assign(
       create<Record<string, string>>(),
@@ -261,11 +261,11 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadCommandResource<Options extends ArgOptions, Values extends ArgValues<Options>>(
-  ctx: CommandContext<Options, Values>,
-  command: Command<Options>
-): Promise<CommandResource<Options> | undefined> {
-  let resource: CommandResource<Options> | undefined
+async function loadCommandResource<A extends Args, V extends ArgValues<A>>(
+  ctx: CommandContext<A, V>,
+  command: Command<A>
+): Promise<CommandResource<A> | undefined> {
+  let resource: CommandResource<A> | undefined
   try {
     // TODO: should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)

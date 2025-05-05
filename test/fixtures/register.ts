@@ -1,6 +1,6 @@
 import type { Command } from '../../src/types.ts'
 
-const options = {
+const args = {
   catalog: {
     type: 'string',
     short: 'c',
@@ -22,10 +22,10 @@ const options = {
   }
 } as const
 
-const command: Command<typeof options> = {
+const command: Command<typeof args> = {
   name: 'register',
   description: 'Register the dependency to the catalog',
-  options,
+  args,
   examples: `# Register the dependency to the catalog:
 generator register --dependency typescript --alias ^5.7.9 --catalog tools`,
   async run(_ctx) {

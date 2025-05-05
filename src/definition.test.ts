@@ -7,7 +7,7 @@ test('define', async () => {
   const command = define({
     name: 'test',
     description: 'A test command',
-    options: {
+    args: {
       foo: {
         type: 'string',
         description: 'A string option'
@@ -26,7 +26,7 @@ test('lazy', async () => {
   const test = define({
     name: 'test',
     description: 'A test command',
-    options: {
+    args: {
       foo: {
         type: 'string',
         description: 'A string option'
@@ -43,7 +43,7 @@ test('lazy', async () => {
   expect(testLazy).toBeInstanceOf(Function)
   expect(testLazy.commandName).toBe(test.name)
   expect(testLazy.description).toBe(test.description)
-  expect(testLazy.options).toEqual(test.options)
+  expect(testLazy.args).toEqual(test.args)
 
   await cli(
     ['test', '--foo', 'bar'],
