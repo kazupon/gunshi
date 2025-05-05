@@ -37,8 +37,8 @@ const command = {
     if (ctx.locale.toString() === 'ja-JP') {
       return {
         description: '挨拶アプリケーション',
-        'Option:name': '挨拶する相手の名前',
-        'Option:formal': '丁寧な挨拶を使用する',
+        'arg:name': '挨拶する相手の名前',
+        'arg:formal': '丁寧な挨拶を使用する',
         informal_greeting: 'こんにちは',
         formal_greeting: 'はじめまして'
       }
@@ -47,8 +47,8 @@ const command = {
     // Default to English
     return {
       description: 'Greeting application',
-      'Option:name': 'Name to greet',
-      'Option:formal': 'Use formal greeting',
+      'arg:name': 'Name to greet',
+      'arg:formal': 'Use formal greeting',
       informal_greeting: 'Hello',
       formal_greeting: 'Good day'
     }
@@ -153,8 +153,8 @@ Example locale files:
 ```json
 {
   "description": "Greeting application",
-  "Option:name": "Name to greet",
-  "Option:formal": "Use formal greeting",
+  "arg:name": "Name to greet",
+  "arg:formal": "Use formal greeting",
   "informal_greeting": "Hello",
   "formal_greeting": "Good day"
 }
@@ -165,8 +165,8 @@ Example locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "Option:name": "挨拶する相手の名前",
-  "Option:formal": "丁寧な挨拶を使用する",
+  "arg:name": "挨拶する相手の名前",
+  "arg:formal": "丁寧な挨拶を使用する",
   "informal_greeting": "こんにちは",
   "formal_greeting": "はじめまして"
 }
@@ -247,8 +247,8 @@ When defining your localization resources (either directly in the `resource` fun
 
 - **Command Description**: Use the key `description` for the main description of the command.
 - **Examples**: Use the key `examples` for usage examples.
-- **Option Descriptions**: Keys for the descriptions of command options **must** be prefixed with `Option:`. For example, if you have an option named `target`, its description key must be `Option:target`.
-  - **Negatable Option Descriptions**: For boolean options (e.g., `--verbose`), Gunshi automatically generates a description for the negatable version (e.g., `--no-verbose`) using the built-in `NEGATABLE` key (e.g., "Negatable of --verbose"). To provide a custom translation for a specific negatable option, use the pattern `Option:no-<optionName>`, for example, `Option:no-verbose`.
+- **Argument Descriptions**: Keys for the descriptions of command arguments (options and operands) **must** be prefixed with `arg:`. For example, if you have an argument named `target`, its description key must be `arg:target`.
+  - **Negatable Argument Descriptions**: For boolean options (e.g., `--verbose`), Gunshi automatically generates a description for the negatable version (e.g., `--no-verbose`) using the built-in `NEGATABLE` key (e.g., "Negatable of --verbose"). To provide a custom translation for a specific negatable option, use the pattern `arg:no-<optionName>`, for example, `arg:no-verbose`.
 - **Custom Keys**: Any other keys you define for custom translation messages (like greetings, error messages, etc.) do not require a prefix and can be named freely (e.g., `informal_greeting`, `error_file_not_found`).
 - **Built-in Keys**: Keys for built-in functionalities like `help`, `version`, `USAGE`, `OPTIONS`, `EXAMPLES`, `FORMORE`, and the new `NEGATABLE` key are handled by Gunshi's default locales (found in `src/locales`). You can override these by defining them in your resource file (e.g., providing your own translation for `NEGATABLE`).
 
@@ -268,9 +268,9 @@ const command = define({
     return {
       description: 'This is my command.', // No prefix
       examples: '$ my-command --target file.txt', // No prefix
-      'Option:target': 'The target file to process.', // 'Option:' prefix
-      'Option:verbose': 'Enable verbose output.', // 'Option:' prefix
-      'Option:no-verbose': 'Disable verbose logging specifically.', // Optional custom translation for the negatable option
+      'arg:target': 'The target file to process.', // 'arg:' prefix
+      'arg:verbose': 'Enable verbose output.', // 'arg:' prefix
+      'arg:no-verbose': 'Disable verbose logging specifically.', // Optional custom translation for the negatable option
       processing_message: 'Processing target...' // No prefix
     }
   },
@@ -425,8 +425,8 @@ const command = {
     // Show translation information
     console.log('\nTranslation Information:')
     console.log(`Command Description: ${ctx.translate('description')}`)
-    console.log(`Name Option: ${ctx.translate('Option:name')}`)
-    console.log(`Formal Option: ${ctx.translate('Option:formal')}`)
+    console.log(`Name Argument: ${ctx.translate('arg:name')}`)
+    console.log(`Formal Argument: ${ctx.translate('arg:formal')}`)
   }
 }
 
@@ -447,8 +447,8 @@ With locale files:
 ```json
 {
   "description": "Greeting application",
-  "Option:name": "Name to greet",
-  "Option:formal": "Use formal greeting",
+  "arg:name": "Name to greet",
+  "arg:formal": "Use formal greeting",
   "informal_greeting": "Hello",
   "formal_greeting": "Good day"
 }
@@ -459,8 +459,8 @@ With locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "Option:name": "挨拶する相手の名前",
-  "Option:formal": "丁寧な挨拶を使用する",
+  "arg:name": "挨拶する相手の名前",
+  "arg:formal": "丁寧な挨拶を使用する",
   "informal_greeting": "こんにちは",
   "formal_greeting": "はじめまして"
 }

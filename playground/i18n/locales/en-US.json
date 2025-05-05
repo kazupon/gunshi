@@ -1,8 +1,8 @@
 {
   "description": "A greeting application with internationalization support",
   "examples": "# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal",
-  "Option:name": "Name to greet",
-  "Option:formal": "Use formal greeting",
+  "arg:name": "Name to greet",
+  "arg:formal": "Use formal greeting",
   "formal_greeting": "Good day",
   "informal_greeting": "Hello"
 }
