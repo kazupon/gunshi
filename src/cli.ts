@@ -33,7 +33,7 @@ export async function cli<A extends Args = Args>(
     throw new Error(`Command not found: ${name || ''}`)
   }
 
-  const args = resolveArgments(command.args)
+  const args = resolveArguments(command.args)
 
   const { values, positionals, rest, error } = resolveArgs(args, tokens, {
     optionGrouping: true
@@ -83,7 +83,7 @@ export async function cli<A extends Args = Args>(
   await command.run(ctx)
 }
 
-function resolveArgments<A extends Args>(options?: A): A {
+function resolveArguments<A extends Args>(options?: A): A {
   return Object.assign(create<A>(), options, COMMON_OPTIONS)
 }
 
