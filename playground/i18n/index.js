@@ -51,10 +51,10 @@ const command = {
     console.log(`${greeting}, ${name}!`)
 
     // Show translation information
-    console.log('\nTranslation Information:')
-    console.log(`Command Description: ${ctx.translate('description')}`)
-    console.log(`Name Option: ${ctx.translate('name')}`)
-    console.log(`Formal Option: ${ctx.translate('formal')}`)
+    console.log('\ntranslation information:')
+    console.log(`command description: ${ctx.translate('description')}`)
+    console.log(`name argument: ${ctx.translate('name')}`)
+    console.log(`formal option: ${ctx.translate('formal')}`)
   }
 }
 
