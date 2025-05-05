@@ -13,7 +13,7 @@ export const DEFAULT_LOCALE = 'en-US'
 
 export const BUILT_IN_PREFIX = '_'
 
-export const OPTION_PREFIX = 'Option'
+export const OPTION_PREFIX = 'arg'
 
 export const BUILT_IN_KEY_SEPARATOR = ':'
 

@@ -296,11 +296,11 @@ describe('translation', () => {
 
     const jaJPResource = {
       description: 'これはコマンド1です',
-      'Option:foo': 'これは foo オプションです',
-      'Option:bar': 'これは bar オプションです',
-      'Option:baz': 'これは baz オプションです',
-      'Option:qux': 'これは qux オプションです',
-      'Option:no-qux': 'これは qux オプションの否定形です',
+      'arg:foo': 'これは foo オプションです',
+      'arg:bar': 'これは bar オプションです',
+      'arg:baz': 'これは baz オプションです',
+      'arg:qux': 'これは qux オプションです',
+      'arg:no-qux': 'これは qux オプションの否定形です',
       examples: 'これはコマンド1の例です',
       test: 'これはテストです'
     } satisfies CommandResource<typeof args>
@@ -347,12 +347,12 @@ describe('translation', () => {
 
     // description, options, and examples
     expect(ctx.translate('description')).toEqual(jaJPResource.description)
-    expect(ctx.translate(resolveOptionKey<typeof args>('foo'))).toEqual(jaJPResource['Option:foo'])
-    expect(ctx.translate(resolveOptionKey<typeof args>('bar'))).toEqual(jaJPResource['Option:bar'])
-    expect(ctx.translate(resolveOptionKey<typeof args>('baz'))).toEqual(jaJPResource['Option:baz'])
-    expect(ctx.translate(resolveOptionKey<typeof args>('qux'))).toEqual(jaJPResource['Option:qux'])
+    expect(ctx.translate(resolveOptionKey<typeof args>('foo'))).toEqual(jaJPResource['arg:foo'])
+    expect(ctx.translate(resolveOptionKey<typeof args>('bar'))).toEqual(jaJPResource['arg:bar'])
+    expect(ctx.translate(resolveOptionKey<typeof args>('baz'))).toEqual(jaJPResource['arg:baz'])
+    expect(ctx.translate(resolveOptionKey<typeof args>('qux'))).toEqual(jaJPResource['arg:qux'])
     expect(ctx.translate(resolveOptionKey<typeof args>('no-qux'))).toEqual(
-      jaJPResource['Option:no-qux']
+      jaJPResource['arg:no-qux']
     )
     expect(ctx.translate('examples')).toEqual(jaJPResource.examples)
 
@@ -373,7 +373,7 @@ describe('translation adapter', () => {
 
     const jaJPResource = {
       description: 'これはコマンド1です',
-      'Option:foo': 'これは foo オプションです',
+      'arg:foo': 'これは foo オプションです',
       examples: 'これはコマンド1の例です',
       user: 'こんにちは、{$user}'
     } satisfies CommandResource<typeof args>
@@ -412,8 +412,8 @@ describe('translation adapter', () => {
       }
     })
 
-    const mf1 = new MessageFormat('ja-JP', jaJPResource['Option:foo'])
-    expect(ctx.translate('Option:foo')).toEqual(mf1.format())
+    const mf1 = new MessageFormat('ja-JP', jaJPResource['arg:foo'])
+    expect(ctx.translate('arg:foo')).toEqual(mf1.format())
     const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
     expect(ctx.translate('user', { user: 'kazupon' })).toEqual(mf2.format({ user: 'kazupon' }))
   })
@@ -429,7 +429,7 @@ describe('translation adapter', () => {
 
     const jaJPResource = {
       description: 'これはコマンド1です',
-      'Option:foo': 'これは foo オプションです',
+      'arg:foo': 'これは foo オプションです',
       examples: 'これはコマンド1の例です',
       user: 'こんにちは、{user}'
     } satisfies CommandResource<typeof args>
@@ -468,7 +468,7 @@ describe('translation adapter', () => {
       }
     })
 
-    expect(ctx.translate('Option:foo')).toEqual(jaJPResource['Option:foo'])
+    expect(ctx.translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
     expect(ctx.translate('user', { user: 'kazupon' })).toEqual(`こんにちは、kazupon`)
   })
 })
