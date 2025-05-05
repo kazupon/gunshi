@@ -357,6 +357,10 @@ async function generateOptionalArgsUsage<A extends Args>(
   return usages.join('\n')
 }
 
+function getPositionalArgs<A extends Args>(ctx: CommandContext<A>): [string, ArgSchema][] {
+  return Object.entries(ctx.args).filter(([_, schema]) => schema.type === 'positional')
+}
+
 async function generatePositionalArgsUsage<A extends Args>(
   ctx: CommandContext<A>
 ): Promise<string> {
