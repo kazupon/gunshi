@@ -332,7 +332,7 @@ async function generateOptionalArgsUsage<A extends Args>(
 
   const optionSchemaMaxLength = ctx.env.usageOptionType
     ? Math.max(
-        ...Object.entries(optionsPairs).map(([key, _]) => resolveNegatableType(key, ctx).length)
+        ...Object.entries(optionsPairs).map(([key]) => resolveNegatableType(key, ctx).length)
       )
     : 0
 
@@ -365,10 +365,10 @@ async function generatePositionalArgsUsage<A extends Args>(
   ctx: CommandContext<A>
 ): Promise<string> {
   const positionals = getPositionalArgs(ctx)
-  const argsMaxLength = Math.max(...positionals.map(([name, _]) => name.length))
+  const argsMaxLength = Math.max(...positionals.map(([name]) => name.length))
 
   const usages = await Promise.all(
-    positionals.map(([name, _]) => {
+    positionals.map(([name]) => {
       const desc =
         ctx.translate(resolveArgKey(name)) ||
         (ctx.args[name] as ArgSchema & { description?: string }).description ||
@@ -383,8 +383,8 @@ async function generatePositionalArgsUsage<A extends Args>(
 
 function generatePositionalSymbols<A extends Args>(ctx: CommandContext<A>): string {
   return hasPositionalArgs(ctx)
-    ? `${getPositionalArgs(ctx)
-        .map(([name, _], __) => `<${name}>`)
-        .join(' ')}`
+    ? getPositionalArgs(ctx)
+        .map(([name]) => `<${name}>`)
+        .join(' ')
     : ''
 }
