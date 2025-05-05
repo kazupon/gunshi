@@ -47,6 +47,11 @@ const command = {
       short: 'n',
       description: 'Name to greet'
     },
+    // Add a positional argument using 'file' as the key
+    file: {
+      type: 'positional',
+      description: 'Input file to process'
+    },
     greeting: {
       type: 'string',
       short: 'g',
@@ -75,19 +80,19 @@ const command = {
 
   // Command examples
   examples: `# Examples
-$ node index.js --name World
+$ node index.js <input-file.txt> --name World
 
-$ node index.js -n World -g "Hey there" -t 3
+$ node index.js <input-file.txt> -n World -g "Hey there" -t 3
 
 # Boolean short options can be grouped: -V -b is the same as -Vb
-$ node index.js -Vb -n World
+$ node index.js <input-file.txt> -Vb -n World
 
 # Using the negatable option
-$ node index.js --no-verbose -n World
+$ node index.js <input-file.txt> --no-verbose -n World
 
 # Using rest arguments after \`--\` (arguments after \`--\` are not parsed by gunshi)
-$ node index.js -n User -- --foo --bar buz
-`,
+$ node index.js <input-file.txt> -n User -- --foo --bar buz
+`, // Added comma here
 
   // Command execution function
   run: ctx => {
@@ -95,7 +100,9 @@ $ node index.js -n User -- --foo --bar buz
     // - true if -V or --verbose is passed
     // - false if --no-verbose is passed
     // - undefined if neither is passed (or default value if set)
-    const { name = 'World', greeting, times, verbose, banner } = ctx.values // Added banner
+
+    // Access positional argument 'file' via ctx.values.file
+    const { name = 'World', greeting, times, verbose, banner, file } = ctx.values
 
     if (banner) {
       // Added check for banner
@@ -104,8 +111,12 @@ $ node index.js -n User -- --foo --bar buz
     if (verbose) {
       console.log('Running in verbose mode...')
       console.log('Context values:', ctx.values)
-      console.log('Positional arguments:', ctx.positionals) // Show positionals
+      console.log('Input file (from positional via ctx.values.file):', file)
+      console.log('Raw positional array (ctx.positionals):', ctx.positionals) // Still available
     }
+
+    // Process the input file (example placeholder)
+    console.log(`\nProcessing file: ${file}...`)
 
     // Repeat the greeting the specified number of times
     for (let i = 0; i < times; i++) {
@@ -149,7 +160,39 @@ Each option can have the following properties:
   <!-- eslint-enable markdown/no-missing-label-refs -->
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
-- `required`: Set to `true` if the option is required
+- `required`: Set to `true` if the option is required (Note: Positional arguments defined with `type: 'positional'` are implicitly required by the parser).
+
+#### Positional Arguments
+
+To define arguments that are identified by their position rather than a name/flag (like `--name`), set their `type` to `'positional'`. The _key_ you use for the argument in the `args` object serves as its name for accessing the value later.
+
+```js
+const command = {
+  args: {
+    // ... other options
+
+    // 'source' is the key and the name used to access the value
+    source: {
+      type: 'positional',
+      description: 'The source file path'
+    },
+
+    // 'destination' is the key and the name used to access the value
+    destination: {
+      type: 'positional',
+      description: 'The destination file path'
+    }
+    // ... potentially more positional arguments
+  }
+}
+```
+
+- **Implicitly Required**: When you define an argument with `type: 'positional'` in the schema, Gunshi (via `args-tokens`) expects it to be present on the command line. If it's missing, a validation error will occur. They cannot be truly optional like named flags.
+- **Order Matters**: Positional arguments are matched based on the order they appear on the command line and the order they are defined in the `args` object.
+- **Accessing Values**: The resolved value is accessible via `ctx.values`, using the _key_ you defined in the `args` object (e.g., `ctx.values.source`, `ctx.values.destination`).
+- **`ctx.positionals`**: This array still exists and contains the raw string values of positional arguments in the order they were parsed (e.g., `ctx.positionals[0]`, `ctx.positionals[1]`). While available, using `ctx.values.<key>` is generally preferred for clarity and consistency.
+- **Descriptions**: The `description` property is used for generating help/usage messages.
+- **Type Conversion**: `args-tokens` resolves positional arguments as strings. You typically need to perform type conversions or further validation on the values accessed via `ctx.values.<key>` within your `run` function based on your application's needs.
 
 #### Negatable Boolean Options
 
@@ -172,14 +215,19 @@ The `examples` property provides example commands showing how to use the CLI.
 
 The `run` function receives a command context object (`ctx`) with:
 
-- `args`: The command arguments configuration
-- `values`: The resolved option values
-- `positionals`: Positional arguments
-- `rest`: Rest arguments (arguments appearing after `--`)
-- `_`: The raw arguments is passed from `cli` function
-- `name`: The command name
-- `description`: The command description
-- `env`: The command environment
+- `args`: The command arguments configuration (`ArgSchema` object).
+- `values`: An object containing the resolved values for both named options (e.g., `ctx.values.name`) and positional arguments (accessed via their _key_ from the `args` definition, e.g., `ctx.values.file`). Positional values are stored as strings.
+- `positionals`: An array of strings containing the raw values of the arguments identified as positional, in the order they were parsed. Useful if you need the original order, but `ctx.values.<key>` is generally recommended.
+- `rest`: An array of strings containing arguments that appear after the `--` separator.
+- `argv`: The raw argument array passed to the `cli` function.
+- `tokens`: The raw tokens parsed by `args-tokens`.
+- `omitted`: A boolean indicating if the command was run without specifying a subcommand name.
+- `command`: The resolved command definition object itself.
+- `commandOptions`: The resolved command options passed to `cli`.
+- `name`: The name of the _currently executing_ command.
+- `description`: The description of the _currently executing_ command.
+- `env`: The command environment settings (version, logger, renderers, etc.).
+- `log`: Logger function (defaults to `console.log`).
 
 ## CLI Configuration
 
