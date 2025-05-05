@@ -40,6 +40,10 @@ const SHOW = {
       description: 'The log option',
       choices: ['debug', 'info', 'warn', 'error'],
       default: 'info'
+    },
+    positional1: {
+      type: 'positional',
+      description: 'The positional argument 1'
     }
   },
   name: 'show',
@@ -212,7 +216,7 @@ describe('renderUsage', () => {
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
 
-  test('no options', async () => {
+  test('no arguments', async () => {
     const command = {
       name: 'test',
       description: 'A test command',
@@ -240,7 +244,7 @@ describe('renderUsage', () => {
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
 
-  test('no required options', async () => {
+  test('no required on optional arguments', async () => {
     const command = {
       args: {
         foo: {
@@ -263,6 +267,88 @@ describe('renderUsage', () => {
       description: 'A test command',
       run: NOOP
     } as Command<Args>
+    const ctx = await createCommandContext({
+      args: command.args!,
+      values: {},
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [], // dummy, due to test
+      omitted: false,
+      command,
+      commandOptions: {
+        cwd: '/path/to/cmd1',
+        version: '0.0.0',
+        name: 'cmd1'
+      }
+    })
+
+    expect(await renderUsage(ctx)).toMatchSnapshot()
+  })
+
+  test('positional arguments', async () => {
+    const command = {
+      args: {
+        foo: {
+          type: 'positional',
+          description: 'The foo argument'
+        },
+        bar: {
+          type: 'positional',
+          description: 'The bar argument'
+        }
+      },
+      name: 'test',
+      description: 'A test command',
+      run: NOOP
+    } as Command<Args>
+
+    const ctx = await createCommandContext({
+      args: command.args!,
+      values: {},
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [], // dummy, due to test
+      omitted: false,
+      command,
+      commandOptions: {
+        cwd: '/path/to/cmd1',
+        version: '0.0.0',
+        name: 'cmd1'
+      }
+    })
+
+    expect(await renderUsage(ctx)).toMatchSnapshot()
+  })
+
+  test('mixed positionals and optionals', async () => {
+    const command = {
+      args: {
+        foo: {
+          type: 'positional',
+          description: 'The foo argument'
+        },
+        bar: {
+          type: 'string',
+          short: 'b',
+          description: 'The bar option'
+        },
+        baz: {
+          type: 'positional',
+          description: 'The bar argument'
+        },
+        qux: {
+          type: 'enum',
+          description: 'The qux option',
+          choices: ['a', 'b', 'c']
+        }
+      },
+      name: 'test',
+      description: 'A test command',
+      run: NOOP
+    } as Command<Args>
+
     const ctx = await createCommandContext({
       args: command.args!,
       values: {},
@@ -423,8 +509,8 @@ test('renderValidationErrors', async () => {
 
   // eslint-disable-next-line unicorn/error-message
   const error = new AggregateError([
-    new Error(`Option '--dependency' or '-d' is required`),
-    new Error(`Option '--alias' or '-a' is required`)
+    new Error(`Optional argument '--dependency' or '-d' is required`),
+    new Error(`Optional argument '--alias' or '-a' is required`)
   ])
   await expect(renderValidationErrors(ctx, error)).resolves.toMatchSnapshot()
 })

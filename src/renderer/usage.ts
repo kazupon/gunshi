@@ -37,8 +37,13 @@ export async function renderUsage<A extends Args = Args>(
     messages.push(...(await renderCommandsSection(ctx)), '')
   }
 
+  // render positional arguments section
+  if (hasPositionalArgs(ctx)) {
+    messages.push(...(await renderPositionalArgsSection(ctx)), '')
+  }
+
   // render optional arguments section
-  if (hasOptions(ctx)) {
+  if (hasOptionalArgs(ctx)) {
     messages.push(...(await renderOptionalArgsSection(ctx)), '')
   }
 
@@ -49,6 +54,20 @@ export async function renderUsage<A extends Args = Args>(
   }
 
   return messages.join('\n')
+}
+
+/**
+ * Render the positional arguments section
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A rendered arguments section
+ */
+async function renderPositionalArgsSection<A extends Args>(
+  ctx: Readonly<CommandContext<A>>
+): Promise<string[]> {
+  const messages: string[] = []
+  messages.push(`${ctx.translate(resolveBuiltInKey('ARGUMENTS'))}:`)
+  messages.push(await generatePositionalArgsUsage(ctx))
+  return messages
 }
 
 /**
@@ -94,14 +113,14 @@ async function renderUsageSection<A extends Args>(
 ): Promise<string[]> {
   const messages: string[] = [`${ctx.translate(resolveBuiltInKey('USAGE'))}:`]
   if (ctx.omitted) {
-    const defaultCommand = `${resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${resolveSubCommand(ctx)}]` : ''} ${hasOptions(ctx) ? `<${ctx.translate(resolveBuiltInKey('OPTIONS'))}>` : ''} `
+    const defaultCommand = `${resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${resolveSubCommand(ctx)}]` : ''} ${[generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
     messages.push(defaultCommand.padStart(ctx.env.leftMargin + defaultCommand.length))
     if (await hasCommands(ctx)) {
       const commandsUsage = `${resolveEntry(ctx)} <${ctx.translate(resolveBuiltInKey('COMMANDS'))}>`
       messages.push(commandsUsage.padStart(ctx.env.leftMargin + commandsUsage.length))
     }
   } else {
-    const usageStr = `${resolveEntry(ctx)} ${resolveSubCommand(ctx)} ${generateOptionsSymbols(ctx)}`
+    const usageStr = `${resolveEntry(ctx)} ${resolveSubCommand(ctx)} ${[generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
     messages.push(usageStr.padStart(ctx.env.leftMargin + usageStr.length))
   }
   return messages
@@ -188,12 +207,21 @@ async function hasCommands<A extends Args>(ctx: CommandContext<A>): Promise<bool
 }
 
 /**
- * Check if the command has options
+ * Check if the command has optional arguments
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has options
  */
-function hasOptions<A extends Args>(ctx: CommandContext<A>): boolean {
-  return !!(ctx.args && Object.keys(ctx.args).length > 0)
+function hasOptionalArgs<A extends Args>(ctx: CommandContext<A>): boolean {
+  return !!(ctx.args && Object.values(ctx.args).some(arg => arg.type !== 'positional'))
+}
+
+/**
+ * Check if the command has positional arguments
+ * @param ctx A {@link CommandContext | command context}
+ * @returns True if the command has options
+ */
+function hasPositionalArgs<A extends Args>(ctx: CommandContext<A>): boolean {
+  return !!(ctx.args && Object.values(ctx.args).some(arg => arg.type === 'positional'))
 }
 
 /**
@@ -211,7 +239,7 @@ function hasAllDefaultOptions<A extends Args>(ctx: CommandContext<A>): boolean {
  * @returns Options symbols for usage
  */
 function generateOptionsSymbols<A extends Args>(ctx: CommandContext<A>): string {
-  return hasOptions(ctx)
+  return hasOptionalArgs(ctx)
     ? hasAllDefaultOptions(ctx)
       ? `[${ctx.translate(resolveBuiltInKey('OPTIONS'))}]`
       : `<${ctx.translate(resolveBuiltInKey('OPTIONS'))}>`
@@ -233,6 +261,9 @@ function makeShortLongOptionPair(schema: ArgSchema, name: string): string {
  */
 function getOptionalArgsPairs<A extends Args>(ctx: CommandContext<A>): Record<string, string> {
   return Object.entries(ctx.args).reduce((acc, [name, value]) => {
+    if (value.type === 'positional') {
+      return acc
+    }
     let key = makeShortLongOptionPair(value, name)
     if (value.type !== 'boolean') {
       key = value.default ? `${key} [${name}]` : `${key} <${name}>`
@@ -324,4 +355,33 @@ async function generateOptionalArgsUsage<A extends Args>(
   )
 
   return usages.join('\n')
+}
+
+function getPositionalArgs<A extends Args>(ctx: CommandContext<A>): [string, ArgSchema][] {
+  return Object.entries(ctx.args).filter(([_, schema]) => schema.type === 'positional')
+}
+
+async function generatePositionalArgsUsage<A extends Args>(
+  ctx: CommandContext<A>
+): Promise<string> {
+  const positionals = getPositionalArgs(ctx)
+  const argsMaxLength = Math.max(...positionals.map(([name, _]) => name.length))
+
+  const usages = await Promise.all(
+    positionals.map(([name, _]) => {
+      const desc = ctx.translate(resolveArgKey(name))
+      const arg = `${name.padEnd(argsMaxLength + ctx.env.middleMargin)} ${desc}`
+      return `${arg.padStart(ctx.env.leftMargin + arg.length)}`
+    })
+  )
+
+  return usages.join('\n')
+}
+
+function generatePositionalSymbols<A extends Args>(ctx: CommandContext<A>): string {
+  return hasPositionalArgs(ctx)
+    ? `${getPositionalArgs(ctx)
+        .map(([name, _], __) => `<${name}>`)
+        .join(' ')}`
+    : ''
 }

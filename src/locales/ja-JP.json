@@ -3,6 +3,7 @@
   "COMMANDS": "コマンド",
   "SUBCOMMAND": "サブコマンド",
   "USAGE": "使い方",
+  "ARGUMENTS": "引数",
   "OPTIONS": "オプション",
   "EXAMPLES": "例",
   "FORMORE": "詳細は、コマンドと`--help`フラグを実行してください:",

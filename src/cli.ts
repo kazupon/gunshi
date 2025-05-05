@@ -36,7 +36,8 @@ export async function cli<A extends Args = Args>(
   const args = resolveArguments(command.args)
 
   const { values, positionals, rest, error } = resolveArgs(args, tokens, {
-    optionGrouping: true
+    optionGrouping: true,
+    skipPositional: resolvedCommandOptions.subCommands!.size > 0 ? 0 : -1
   })
   const omitted = !subCommand
   const ctx = await createCommandContext({

@@ -1,14 +1,14 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`auto generate usage > inline function > USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -h, --help             Display this help message
   -v, --version          Display this version
  1`] = `
 "USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -h, --help             Display this help message
@@ -18,7 +18,7 @@ OPTIONS:
 
 exports[`auto generate usage > inline function 1`] = `
 "USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -h, --help             Display this help message
@@ -30,7 +30,7 @@ exports[`auto generate usage > locale resource not found 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
 USAGE:
-  gunshi <OPTIONS> 
+  gunshi <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          [string]  The foo option
@@ -46,7 +46,7 @@ EXAMPLES:
 `;
 
 exports[`auto generate usage > loosely entry command > USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          
@@ -54,7 +54,7 @@ OPTIONS:
   -v, --version            Display this version
  1`] = `
 "USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          
@@ -65,7 +65,7 @@ OPTIONS:
 
 exports[`auto generate usage > loosely entry command 1`] = `
 "USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          
@@ -87,7 +87,7 @@ OPTIONS:
 
 exports[`auto generate usage > loosely sub commands > main 1`] = `
 "USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          
@@ -98,7 +98,7 @@ OPTIONS:
 
 exports[`auto generate usage > loosely sub commands 1`] = `
 "USAGE:
-  COMMAND <OPTIONS> 
+  COMMAND <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          
@@ -117,7 +117,7 @@ OPTIONS:
 
 exports[`auto generate usage > strictly entry command > Modern CLI tool (gunshi v0.0.0)
 USAGE:
-  gunshi <OPTIONS> 
+  gunshi <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          [string]  The foo option
@@ -133,7 +133,7 @@ EXAMPLES:
 "Modern CLI tool (gunshi v0.0.0)
 
 USAGE:
-  gunshi <OPTIONS> 
+  gunshi <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          [string]  The foo option
@@ -169,7 +169,7 @@ EXAMPLES:
 exports[`auto generate usage > strictly sub commands > main 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 使い方:
-    gunshi [command1] <オプション> 
+    gunshi [command1] <オプション>
     gunshi <コマンド>
 
 コマンド:
@@ -197,7 +197,7 @@ exports[`auto generate usage > strictly sub commands 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
 使い方:
-    gunshi [command1] <オプション> 
+    gunshi [command1] <オプション>
     gunshi <コマンド>
 
 コマンド:
@@ -248,16 +248,16 @@ Options:
   --help       [boolean]   Display this help message
   --version    [boolean]   Display this version
 
-******************************
-* Option '--bar' is required *
-******************************"
+*****************************************
+* Optional argument '--bar' is required *
+*****************************************"
 `;
 
 exports[`edge cases > 'description' option 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
 USAGE:
-  gunshi <OPTIONS> 
+  gunshi <OPTIONS>
 
 OPTIONS:
   -d, --description <description>          This is a description of description option
@@ -269,7 +269,7 @@ OPTIONS:
 exports[`usageSilent 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 USAGE:
-  gunshi <OPTIONS> 
+  gunshi <OPTIONS>
 
 OPTIONS:
   -f, --foo <foo>          this is foo option

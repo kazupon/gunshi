@@ -3,7 +3,7 @@
 exports[`single 1`] = `
 "This is a generator (generator v1.0.0)
 USAGE:
-  generator <OPTIONS> 
+  generator <OPTIONS>
 
 OPTIONS:
   -c, --catalog             Display the catalog only (default: false)

@@ -676,7 +676,102 @@ test('enum optional argument', async () => {
     run: vi.fn()
   })
   const stdout = log()
-  expect(stdout).toEqual(`Option '--foo' should be chosen from 'enum' ["a", "b", "c"] values`)
+  expect(stdout).toEqual(
+    `Optional argument '--foo' should be chosen from 'enum' ["a", "b", "c"] values`
+  )
+})
+
+describe('positional arguments', async () => {
+  test('basic', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    // success case
+    const args = {
+      foo: {
+        type: 'positional'
+      },
+      bar: {
+        type: 'positional'
+      }
+    } satisfies Args
+    const mockFn1 = vi.fn()
+    await cli(['value1', 'value2'], {
+      args,
+      run: mockFn1
+    })
+    expect(mockFn1.mock.calls[0][0].values).toEqual({ foo: 'value1', bar: 'value2' })
+
+    // failure case
+    await cli(['value1'], {
+      args,
+      run: vi.fn()
+    })
+    const stdout = log()
+    expect(stdout).toEqual(`Positional argument 'bar' is required`)
+  })
+
+  test('sub commands', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const mockFn1 = vi.fn()
+    const mockFn2 = vi.fn()
+
+    const subCommands = new Map()
+    const command1 = define({
+      name: 'command1',
+      args: {
+        foo: {
+          type: 'positional'
+        },
+        option1: {
+          type: 'string',
+          short: 'o'
+        }
+      },
+      run: mockFn1
+    })
+    const command2 = define({
+      name: 'command2',
+      args: {
+        bar: {
+          type: 'positional'
+        },
+        option2: {
+          type: 'number',
+          short: 'o'
+        }
+      },
+      run: mockFn2
+    })
+    subCommands.set(command1.name, command1)
+    subCommands.set(command2.name, command2)
+
+    // success case
+    await cli(
+      ['command1', '-o=option1', 'value1'],
+      {
+        run: vi.fn()
+      },
+      {
+        subCommands
+      }
+    )
+    expect(mockFn1.mock.calls[0][0].values).toEqual({ foo: 'value1', option1: 'option1' })
+
+    // failure case
+    await cli(
+      ['command2', '-o=1'],
+      {
+        run: vi.fn()
+      },
+      {
+        subCommands
+      }
+    )
+    const stdout = log()
+    expect(stdout).toEqual(`Positional argument 'bar' is required`)
+  })
 })
 
 describe('edge cases', () => {
