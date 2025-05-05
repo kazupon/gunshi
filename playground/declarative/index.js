@@ -9,8 +9,8 @@ const command = {
   name: 'greet',
   description: 'A greeting command with declarative configuration',
 
-  // Command options with descriptions
-  options: {
+  // Command arguments with descriptions
+  args: {
     name: {
       type: 'string',
       short: 'n',
@@ -49,7 +49,7 @@ const command = {
     console.log('\nCommand configuration:')
     console.log('Name:', ctx.name)
     console.log('Description:', ctx.description)
-    console.log('Options:', ctx.options)
+    console.log('Args:', ctx.args)
     console.log('Values:', ctx.values)
   }
 }

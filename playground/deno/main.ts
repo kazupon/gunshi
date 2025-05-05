@@ -8,7 +8,7 @@ if (import.meta.main) {
   const createCommand = define({
     name: 'create',
     description: enUS.description,
-    options: {
+    args: {
       name: {
         type: 'string',
         short: 'n',
@@ -45,7 +45,7 @@ if (import.meta.main) {
   const mainCommand = define({
     name: 'main',
     description: 'A CLI application with Deno',
-    options: {
+    args: {
       count: {
         type: 'number',
         short: 'c',

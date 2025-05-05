@@ -8,8 +8,8 @@ const command = {
   name: 'file-manager',
   description: 'A file management utility with automatic usage generation',
 
-  // Define various types of options with descriptions to showcase auto usage generation
-  options: {
+  // Define various types of arguments with descriptions to showcase auto usage generation
+  args: {
     // String option with short alias
     path: {
       type: 'string',

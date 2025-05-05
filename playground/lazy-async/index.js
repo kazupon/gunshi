@@ -11,7 +11,7 @@ console.log('Starting lazy-async playground CLI...')
 const lazyCommandDefinition = {
   name: 'lazy', // Key for subCommands map
   description: 'A command whose runner is loaded lazily',
-  options: {
+  args: {
     delay: {
       type: 'number',
       short: 'd',
@@ -50,7 +50,7 @@ const lazyCommand = lazy(lazyCommandLoader, lazyCommandDefinition)
 const asyncDataDefinition = {
   name: 'data', // Key for subCommands map
   description: 'A command that loads data asynchronously via its loader',
-  options: {
+  args: {
     id: {
       type: 'number',
       short: 'i',

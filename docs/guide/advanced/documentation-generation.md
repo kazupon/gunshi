@@ -14,7 +14,7 @@ import { promises as fs } from 'node:fs'
 const command = {
   name: 'my-command',
   description: 'A sample command',
-  options: {
+  args: {
     input: {
       type: 'string',
       short: 'i',
@@ -68,7 +68,7 @@ import { promises as fs } from 'node:fs'
 const createCommand = {
   name: 'create',
   description: 'Create a new resource',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n',
@@ -84,7 +84,7 @@ const createCommand = {
 const listCommand = {
   name: 'list',
   description: 'List all resources',
-  options: {
+  args: {
     format: {
       type: 'string',
       short: 'f',
@@ -153,7 +153,7 @@ async function main() {
   const command = {
     name: 'data-processor',
     description: 'Process data files',
-    options: {
+    args: {
       input: {
         type: 'string',
         short: 'i',
@@ -354,7 +354,7 @@ function renderManPageUsage(ctx) {
 
   // OPTIONS
   lines.push('## OPTIONS')
-  for (const [name, schema] of Object.entries(ctx.options)) {
+  for (const [name, schema] of Object.entries(ctx.args)) {
     const options = [`\`--${name}\``]
     if (schema.short) {
       options.unshift(`\`-${schema.short}\``)
@@ -389,7 +389,7 @@ async function main() {
   const command = {
     name: 'my-tool',
     description: 'A utility for processing data',
-    options: {
+    args: {
       input: {
         type: 'string',
         short: 'i',

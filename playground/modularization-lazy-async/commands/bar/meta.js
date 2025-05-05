@@ -1,7 +1,7 @@
 export const meta = {
   name: 'bar',
   description: 'This is bar command',
-  options: {
+  args: {
     msg: {
       type: 'string',
       short: 'm',

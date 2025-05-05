@@ -35,7 +35,7 @@ import { cli, lazy } from 'gunshi'
 const helloDefinition = {
   name: 'hello', // This name is used as the key in subCommands Map
   description: 'A command whose runner is loaded lazily',
-  options: {
+  args: {
     name: {
       type: 'string',
       description: 'Name to greet',
@@ -114,7 +114,7 @@ const fullCommandLoader = async () => {
 const lazyFullCommand = lazy(fullCommandLoader, {
   name: 'full',
   description: 'Loads a full command object',
-  options: {
+  args: {
     test: { type: 'boolean' }
   }
 })
@@ -134,7 +134,7 @@ import { cli, lazy } from 'gunshi'
 const asyncJobDefinition = {
   name: 'async-job',
   description: 'Example of a lazy command with an async runner',
-  options: {
+  args: {
     duration: {
       type: 'number',
       short: 'd',
@@ -187,7 +187,7 @@ import type { CommandContext, CommandRunner } from 'gunshi'
 const helloDefinition = define({
   name: 'hello',
   description: 'A type-safe lazy command',
-  options: {
+  args: {
     name: {
       type: 'string',
       description: 'Name to greet',
@@ -197,19 +197,19 @@ const helloDefinition = define({
   // No 'run' needed in definition
 })
 
-type HelloOptions = NonNullable<typeof helloDefinition.options>
+type HelloArgs = NonNullable<typeof helloDefinition.args>
 
 // Define the typed loader function
-// It must return a function matching CommandRunner<typeof helloOptions>
-// or a Command<HelloOptions> containing a 'run' function.
-const helloLoader = async (): Promise<CommandRunner<HelloOptions>> => {
+// It must return a function matching CommandRunner<HelloArgs>
+// or a Command<HelloArgs> containing a 'run' function.
+const helloLoader = async (): Promise<CommandRunner<HelloArgs>> => {
   console.log('Loading typed hello runner...')
   // const { run } = await import('./commands/typedHello.js')
   // return run
 
   // Define typed runner inline
-  const run = (ctx: CommandContext<HelloOptions>) => {
-    // ctx.values is properly typed based on helloOptions
+  const run = (ctx: CommandContext<HelloArgs>) => {
+    // ctx.values is properly typed based on HelloArgs
     console.log(`Hello, ${ctx.values.name}! (Typed)`)
   }
   return run

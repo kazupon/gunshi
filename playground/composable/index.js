@@ -7,7 +7,7 @@ import { cli } from 'gunshi'
 const createCommand = {
   name: 'create',
   description: 'Create a new resource',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n',
@@ -31,7 +31,7 @@ const createCommand = {
 const listCommand = {
   name: 'list',
   description: 'List all resources',
-  options: {
+  args: {
     type: {
       type: 'string',
       short: 't',
@@ -60,7 +60,7 @@ const listCommand = {
 const deleteCommand = {
   name: 'delete',
   description: 'Delete a resource',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n',
@@ -95,8 +95,8 @@ subCommands.set('delete', deleteCommand)
 const mainCommand = {
   name: 'resource-manager',
   description: 'Manage resources with composable sub-commands',
-  // The main command can have its own options
-  options: {
+  // The main command can have its own arguments
+  args: {
     verbose: {
       type: 'boolean',
       short: 'v',

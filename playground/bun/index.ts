@@ -5,7 +5,7 @@ if (import.meta.main) {
   const createCommand = define({
     name: 'create',
     description: 'Create a new resource',
-    options: {
+    args: {
       name: {
         type: 'string',
         short: 'n',
@@ -31,7 +31,7 @@ if (import.meta.main) {
   // Define the main command using define
   const mainCommand = define({
     name: 'main', // This name is internal if subcommands are used
-    options: {
+    args: {
       count: {
         type: 'number',
         short: 'c'

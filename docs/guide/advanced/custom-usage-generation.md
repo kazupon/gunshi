@@ -56,7 +56,7 @@ const customHeaderRenderer = ctx => {
 const command = {
   name: 'app',
   description: 'My application',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n',
@@ -118,10 +118,10 @@ const customUsageRenderer = ctx => {
   lines.push('')
 
   // Add options section with custom formatting
-  if (ctx.options && Object.keys(ctx.options).length > 0) {
+  if (ctx.args && Object.keys(ctx.args).length > 0) {
     lines.push('OPTIONS:')
 
-    for (const [key, option] of Object.entries(ctx.options)) {
+    for (const [key, option] of Object.entries(ctx.args)) {
       const shortFlag = option.short ? `-${option.short}|` : '    '
       const required = option.required ? ' (required)' : ''
       const type = option.type ? ` <${option.type}>` : ''
@@ -240,7 +240,7 @@ const customValidationErrorsRenderer = (ctx, error) => {
 const command = {
   name: 'task-manager',
   description: 'A task management utility',
-  options: {
+  args: {
     action: {
       type: 'string',
       short: 'a',
@@ -291,7 +291,7 @@ import { cli } from 'gunshi'
 const command = {
   name: 'task-manager',
   description: 'A task management utility',
-  options: {
+  args: {
     add: {
       type: 'string',
       short: 'a',
@@ -390,10 +390,10 @@ const coloredUsageRenderer = ctx => {
   lines.push(chalk.white(`  $ ${ctx.env.name} [options]`))
   lines.push('')
 
-  if (ctx.options && Object.keys(ctx.options).length > 0) {
+  if (ctx.args && Object.keys(ctx.args).length > 0) {
     lines.push(chalk.white.bold('OPTIONS:'))
 
-    for (const [key, option] of Object.entries(ctx.options)) {
+    for (const [key, option] of Object.entries(ctx.args)) {
       const shortFlag = option.short ? chalk.green(`-${option.short}, `) : '    '
       const longFlag = chalk.green(`--${key}`)
       const type = chalk.blue(`[${option.type}]`)
@@ -427,7 +427,7 @@ The renderer functions receive a command context object (`ctx`) with the followi
 - `env`: Environment information (name, version, description)
 - `name`: Command name
 - `description`: Command description
-- `options`: Command options
+- `args`: Command arguments
 - `examples`: Command examples
 - `translate`: Translation function
 - `locale`: Current locale
@@ -475,10 +475,10 @@ const customUsageRenderer = ctx => {
   lines.push('')
 
   // Add options section with custom formatting
-  if (ctx.options && Object.keys(ctx.options).length > 0) {
+  if (ctx.args && Object.keys(ctx.args).length > 0) {
     lines.push('OPTIONS:')
 
-    for (const [key, option] of Object.entries(ctx.options)) {
+    for (const [key, option] of Object.entries(ctx.args)) {
       const shortFlag = option.short ? `-${option.short}, ` : '    '
       const longFlag = `--${key}`
       const type = `[${option.type}]`
@@ -533,7 +533,7 @@ const customValidationErrorsRenderer = (ctx, error) => {
 const command = {
   name: 'task-manager',
   description: 'A task management utility with custom usage generation',
-  options: {
+  args: {
     add: {
       type: 'string',
       short: 'a',

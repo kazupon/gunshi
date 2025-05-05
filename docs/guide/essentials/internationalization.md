@@ -20,7 +20,7 @@ import { cli } from 'gunshi'
 // Define a command with i18n support
 const command = {
   name: 'greeter',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n'
@@ -115,7 +115,7 @@ import enUS from './locales/en-US.json' with { type: 'json' }
 
 const command = {
   name: 'greeter',
-  options: {
+  args: {
     name: { type: 'string', short: 'n' },
     formal: { type: 'boolean', short: 'f' }
   },
@@ -179,7 +179,7 @@ Gunshi automatically uses your translations for help messages:
 ```js
 const command = {
   name: 'greeter',
-  options: {
+  args: {
     name: { type: 'string', short: 'n' },
     formal: { type: 'boolean', short: 'f' }
   },
@@ -259,7 +259,7 @@ import { define } from 'gunshi'
 
 const command = define({
   name: 'my-command',
-  options: {
+  args: {
     target: { type: 'string' },
     verbose: { type: 'boolean' }
   },
@@ -321,7 +321,7 @@ import enUSForMain from './locales/main/en-US.json' with { type: 'json' }
 // Define sub-commands
 const createCommand = {
   name: 'create',
-  options: {
+  args: {
     name: { type: 'string', short: 'n' }
   },
 
@@ -382,7 +382,7 @@ import enUS from './locales/en-US.json' with { type: 'json' }
 
 const command = {
   name: 'greeter',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n'

@@ -1,7 +1,7 @@
 export const meta = {
   name: 'foo',
   description: 'This is foo command',
-  options: {
+  args: {
     id: {
       type: 'number',
       short: 'i',

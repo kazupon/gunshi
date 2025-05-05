@@ -40,8 +40,8 @@ const command = {
   name: 'greet',
   description: 'A greeting command with declarative configuration',
 
-  // Command options with descriptions
-  options: {
+  // Command arguments with descriptions
+  args: {
     name: {
       type: 'string',
       short: 'n',
@@ -172,7 +172,7 @@ The `examples` property provides example commands showing how to use the CLI.
 
 The `run` function receives a command context object (`ctx`) with:
 
-- `options`: The command options configuration
+- `args`: The command arguments configuration
 - `values`: The resolved option values
 - `positionals`: Positional arguments
 - `rest`: Rest arguments (arguments appearing after `--`)

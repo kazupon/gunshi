@@ -36,7 +36,7 @@ import { cli } from 'gunshi'
 const createCommand = {
   name: 'create',
   description: 'Create a new resource',
-  options: {
+  args: {
     name: { type: 'string', short: 'n' }
   },
   run: ctx => {
@@ -80,12 +80,12 @@ When working with sub-commands, you can maintain type safety:
 
 ```ts
 import { cli } from 'gunshi'
-import type { ArgOptions, Command } from 'gunshi'
+import type { Args, Command } from 'gunshi'
 
 // Define type-safe sub-commands
-const createCommand: Command<ArgOptions> = {
+const createCommand: Command<Args> = {
   name: 'create',
-  options: {
+  args: {
     name: { type: 'string', short: 'n' }
   },
   run: ctx => {
@@ -93,7 +93,7 @@ const createCommand: Command<ArgOptions> = {
   }
 }
 
-const listCommand: Command<ArgOptions> = {
+const listCommand: Command<Args> = {
   name: 'list',
   run: () => {
     console.log('Listing items...')
@@ -101,12 +101,12 @@ const listCommand: Command<ArgOptions> = {
 }
 
 // Create a Map of sub-commands
-const subCommands = new Map<string, Command<ArgOptions>>()
+const subCommands = new Map<string, Command<Args>>()
 subCommands.set('create', createCommand)
 subCommands.set('list', listCommand)
 
 // Define the main command
-const mainCommand: Command<ArgOptions> = {
+const mainCommand: Command<Args> = {
   name: 'app',
   run: () => {
     console.log('Use a sub-command: create, list')

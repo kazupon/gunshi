@@ -67,7 +67,7 @@ import { cli } from 'gunshi'
 const command = {
   name: 'greeter',
   description: 'A simple greeting CLI',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n',

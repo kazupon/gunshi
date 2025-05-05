@@ -13,8 +13,8 @@ const command = {
   name: 'file-manager',
   description: 'A file management utility',
 
-  // Define options with descriptions
-  options: {
+  // Define arguments with descriptions
+  args: {
     path: {
       type: 'string',
       short: 'p',
@@ -116,7 +116,7 @@ import { cli } from 'gunshi'
 const createCommand = {
   name: 'create',
   description: 'Create a new resource',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n',

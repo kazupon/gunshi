@@ -6,7 +6,7 @@ import { cli, define } from 'gunshi'
 const command = define({
   name: 'type-safe-define',
   description: 'Demonstrates type-safe argument parsing with define',
-  options: {
+  args: {
     // Define string option with short alias
     name: {
       type: 'string',

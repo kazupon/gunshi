@@ -123,7 +123,7 @@ class MyTranslationAdapter {
 // Define your command
 const command = {
   name: 'greeter',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n'
@@ -260,7 +260,7 @@ class MessageFormatTranslation {
 // Define your command
 const command = {
   name: 'greeter',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n'
@@ -394,7 +394,7 @@ class IntlifyTranslation {
 // Define your command
 const command = {
   name: 'greeter',
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n'

@@ -23,7 +23,7 @@ import { cli, define } from 'gunshi'
 // Define a command using the `define` function
 const command = define({
   name: 'greet',
-  options: {
+  args: {
     // Define a string option 'name' with a short alias 'n'
     name: {
       type: 'string',
@@ -44,7 +44,7 @@ const command = define({
       description: 'Enable verbose output'
     }
   },
-  // The 'ctx' parameter is automatically typed based on the options
+  // The 'ctx' parameter is automatically typed based on the args
   run: ctx => {
     // `ctx.values` is fully typed!
     const { name, age, verbose } = ctx.values
@@ -75,7 +75,7 @@ await cli(process.argv.slice(2), command)
 With `define`:
 
 - You don't need to import types like `Command` or `CommandContext`.
-- The `ctx` parameter in the `run` function automatically gets the correct type, derived from the `options` definition.
+- The `ctx` parameter in the `run` function automatically gets the correct type, derived from the `args` definition.
 - Accessing `ctx.values.optionName` provides type safety and autocompletion based on the option's `type` and whether it has a `default`.
   - Options without a `default` (like `name`) are typed as `T | undefined`.
   - Options with a `default` (like `age`) are typed simply as `T`.

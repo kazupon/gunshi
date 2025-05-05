@@ -8,7 +8,7 @@ import enUS from './locales/en-US.json' with { type: 'json' }
 const command = {
   name: 'greeter',
 
-  options: {
+  args: {
     name: {
       type: 'string',
       short: 'n'

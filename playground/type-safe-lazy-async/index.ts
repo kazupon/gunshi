@@ -6,7 +6,7 @@ import type { CommandContext, CommandRunner } from 'gunshi'
 const helloDefinition = define({
   name: 'hello',
   description: 'A type-safe lazy command',
-  options: {
+  args: {
     name: {
       type: 'string',
       description: 'Name to greet',
@@ -16,12 +16,12 @@ const helloDefinition = define({
   // No 'run' needed in definition
 })
 
-type HelloOptions = NonNullable<typeof helloDefinition.options>
+type HelloArgs = NonNullable<typeof helloDefinition.args>
 
 // Define the loader function
-// It must return a function matching CommandRunner<HelloOptionsType>
-// or a Command<HelloOptions> containing a 'run' function.
-const helloLoader = async (): Promise<CommandRunner<HelloOptions>> => {
+// It must return a function matching CommandRunner<HelloArgs>
+// or a Command<HelloArgs> containing a 'run' function.
+const helloLoader = async (): Promise<CommandRunner<HelloArgs>> => {
   console.log('Loading typed hello runner...')
   // Simulate loading delay
   await new Promise(resolve => setTimeout(resolve, 500))
@@ -29,8 +29,8 @@ const helloLoader = async (): Promise<CommandRunner<HelloOptions>> => {
   // return run
 
   // Define typed runner inline
-  const run = (ctx: CommandContext<HelloOptions>) => {
-    // ctx.values is properly typed based on helloOptions
+  const run = (ctx: CommandContext<HelloArgs>) => {
+    // ctx.values is properly typed based on HelloArgs
     console.log(`Hello, ${ctx.values.name}! (Typed)`)
   }
   return run

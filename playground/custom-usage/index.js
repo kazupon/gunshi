@@ -8,7 +8,7 @@ const command = {
   name: 'task-manager',
   description: 'A task management utility with custom usage generation',
 
-  options: {
+  args: {
     add: {
       type: 'string',
       short: 'a',
@@ -99,10 +99,10 @@ const customUsageRenderer = ctx => {
   lines.push('')
 
   // Add options section with custom formatting
-  if (ctx.options && Object.keys(ctx.options).length > 0) {
+  if (ctx.args && Object.keys(ctx.args).length > 0) {
     lines.push('OPTIONS:')
 
-    for (const [key, option] of Object.entries(ctx.options)) {
+    for (const [key, option] of Object.entries(ctx.args)) {
       const shortFlag = option.short ? `-${option.short}, ` : '    '
       const longFlag = `--${key}`
       const type = `[${option.type}]`

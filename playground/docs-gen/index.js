@@ -6,7 +6,7 @@ import path from 'node:path'
 const command = {
   name: 'doc-generator',
   description: 'A documentation generator example',
-  options: {
+  args: {
     output: {
       type: 'string',
       short: 'o',
