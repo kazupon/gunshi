@@ -5,12 +5,14 @@
 
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
-import type { Args } from 'args-tokens'
+import type { Args, ArgValues } from 'args-tokens'
 import type {
   Command,
   Commandable,
   CommandBuiltinArgsKeys,
   CommandBuiltinResourceKeys,
+  CommandContext,
+  CommandExamplesFetcher,
   GenerateNamespacedKey,
   KeyOfArgs,
   RemovedIndex
@@ -70,6 +72,17 @@ export function resolveArgKey<A extends Args = {}, K extends string = KeyOfArgs<
   key: K
 ): GenerateNamespacedKey<K, typeof ARG_PREFIX> {
   return `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+}
+
+export async function resolveExamples<A extends Args = Args, V extends ArgValues<A> = ArgValues<A>>(
+  ctx: Readonly<CommandContext<A, V>>,
+  examples?: string | CommandExamplesFetcher<A>
+): Promise<string> {
+  return typeof examples === 'string'
+    ? examples
+    : typeof examples === 'function'
+      ? await examples(ctx)
+      : ''
 }
 
 export function mapResourceWithBuiltinKey(

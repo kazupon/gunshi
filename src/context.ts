@@ -24,6 +24,7 @@ import {
   log,
   mapResourceWithBuiltinKey,
   resolveArgKey,
+  resolveExamples,
   resolveLazyCommand
 } from './utils.ts'
 
@@ -230,18 +231,17 @@ export async function createCommandContext<
     return res
   }, create<Record<string, string>>())
   defaultCommandResource.description = command.description || ''
-  defaultCommandResource.examples = command.examples || ''
+  defaultCommandResource.examples = await resolveExamples(ctx, command.examples)
   adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
   const originalResource = await loadCommandResource<A, V>(ctx, command)
   if (originalResource) {
     const resource = Object.assign(
       create<Record<string, string>>(),
+      originalResource as Record<string, string>,
       {
-        description: originalResource.description,
-        examples: originalResource.examples
-      } as Record<string, string>,
-      originalResource as Record<string, string>
+        examples: await resolveExamples(ctx, originalResource.examples)
+      } as Record<string, string>
     )
     if (builtInLoadedResources) {
       resource.help = builtInLoadedResources.help

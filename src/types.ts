@@ -329,7 +329,7 @@ export interface Command<A extends Args = Args> {
    * Command examples.
    * examples of how to use the command.
    */
-  examples?: string
+  examples?: string | CommandExamplesFetcher<A>
   /**
    * Command runner. it's the command to be executed
    */
@@ -351,10 +351,19 @@ export type CommandResource<A extends Args = Args> = {
   /**
    * Examples usage.
    */
-  examples: string
+  examples: string | CommandExamplesFetcher<A>
 } & {
   [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<A>>, typeof ARG_PREFIX>]: string
 } & { [key: string]: string } // Infer the arguments usage, Define the user resources
+
+/**
+ * Command examples fetcher.
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A fetched command examples.
+ */
+export type CommandExamplesFetcher<A extends Args = Args, V = ArgValues<A>> = (
+  ctx: Readonly<CommandContext<A, V>>
+) => Promise<string>
 
 /**
  * Command resource fetcher.

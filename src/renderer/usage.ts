@@ -4,7 +4,12 @@
  */
 
 import { COMMON_ARGS } from '../constants.ts'
-import { create, resolveArgKey, resolveBuiltInKey } from '../utils.ts'
+import {
+  resolveExamples as _resolvedExamples,
+  create,
+  resolveArgKey,
+  resolveBuiltInKey
+} from '../utils.ts'
 
 import type { Args, ArgSchema } from 'args-tokens'
 import type { Command, CommandContext } from '../types.ts'
@@ -48,7 +53,7 @@ export async function renderUsage<A extends Args = Args>(
   }
 
   // render examples section
-  const examples = renderExamplesSection(ctx)
+  const examples = await renderExamplesSection(ctx)
   if (examples.length > 0) {
     messages.push(...examples, '')
   }
@@ -89,10 +94,12 @@ async function renderOptionalArgsSection<A extends Args>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered examples section
  */
-function renderExamplesSection<A extends Args>(ctx: Readonly<CommandContext<A>>): string[] {
+async function renderExamplesSection<A extends Args>(
+  ctx: Readonly<CommandContext<A>>
+): Promise<string[]> {
   const messages: string[] = []
 
-  const resolvedExamples = resolveExamples(ctx)
+  const resolvedExamples = await resolveExamples(ctx)
   if (resolvedExamples) {
     const examples = resolvedExamples
       .split('\n')
@@ -187,13 +194,13 @@ function resolveDescription<A extends Args>(ctx: CommandContext<A>): string {
  * @param ctx A {@link CommandContext | command context}
  * @returns resolved command examples, if not resolved, return empty string
  */
-function resolveExamples<A extends Args>(ctx: CommandContext<A>): string {
+async function resolveExamples<A extends Args>(ctx: CommandContext<A>): Promise<string> {
   const ret = ctx.translate('examples')
   if (ret) {
     return ret
   }
   const command = ctx.env.subCommands?.get(ctx.name || '') as Command<A> | undefined
-  return command?.examples ?? ''
+  return await _resolvedExamples(ctx, command?.examples)
 }
 
 /**
