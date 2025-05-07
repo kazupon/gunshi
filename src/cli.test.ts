@@ -17,6 +17,7 @@ describe('execute command', () => {
     const mockFn = vi.fn()
     await cli([], mockFn)
     expect(mockFn).toBeCalled()
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
   })
 
   test('entry command', async () => {
@@ -25,6 +26,7 @@ describe('execute command', () => {
       run: mockFn
     })
     expect(mockFn).toBeCalled()
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
   })
 
   test('entry command with name', async () => {
@@ -34,6 +36,7 @@ describe('execute command', () => {
       run: mockFn
     })
     expect(mockFn).toBeCalled()
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
   })
 
   test('entry command with arguments', async () => {
@@ -49,6 +52,7 @@ describe('execute command', () => {
     })
     expect(mockFn.mock.calls[0][0].values).toEqual({ outDir: 'dist/' })
     expect(mockFn.mock.calls[0][0].positionals).toEqual(['foo', 'bar'])
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
   })
 
   test('entry command without arguments', async () => {
@@ -58,6 +62,7 @@ describe('execute command', () => {
     })
     expect(mockFn.mock.calls[0][0].values).toEqual({})
     expect(mockFn.mock.calls[0][0].positionals).toEqual(['dist/', 'test/'])
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
   })
 
   test('entry strictly command + sub commands', async () => {
@@ -99,12 +104,15 @@ describe('execute command', () => {
     await cli(['command2', '--bar=1', 'position2'], show, options)
 
     expect(mockShow).toBeCalledTimes(2)
+    expect(mockShow.mock.calls[0][0].callMode).toEqual('entry')
     expect(mockCommand1).toBeCalledTimes(1)
     expect(mockCommand1.mock.calls[0][0].values).toEqual({ foo: 'foo' })
     expect(mockCommand1.mock.calls[0][0].positionals).toEqual(['command1', 'position1'])
+    expect(mockCommand1.mock.calls[0][0].callMode).toEqual('subCommand')
     expect(mockCommand2).toBeCalledTimes(1)
     expect(mockCommand2.mock.calls[0][0].values).toEqual({ bar: 1 })
     expect(mockCommand2.mock.calls[0][0].positionals).toEqual(['command2', 'position2'])
+    expect(mockCommand2.mock.calls[0][0].callMode).toEqual('subCommand')
   })
 
   test('entry loose command + sub commands', async () => {

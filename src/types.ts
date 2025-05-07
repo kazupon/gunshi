@@ -222,6 +222,11 @@ export interface CommandOptions<A extends Args = Args> {
 }
 
 /**
+ * Command call mode.
+ */
+export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
+
+/**
  * Command context.
  * Command context is the context of the command execution.
  */
@@ -277,6 +282,11 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
    * Whether the currently executing command has been executed with the sub-command name omitted.
    */
   omitted: boolean
+  /**
+   * Command call mode.
+   * The command call mode is `entry` when the command is executed as an entry command, and `subCommand` when the command is executed as a sub-command.
+   */
+  callMode: CommandCallMode
   /**
    * Output a message.
    * If {@link CommandEnvironment.usageSilent} is true, the message is not output.

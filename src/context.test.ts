@@ -61,6 +61,7 @@ test('basic', async () => {
     argv: ['bar'],
     tokens: [], // dummy, due to test
     omitted: true,
+    callMode: 'entry',
     command,
     commandOptions: {
       cwd: '/path/to/cmd1',
@@ -152,6 +153,7 @@ test('default', async () => {
     tokens: [], // dummy, due to test
     command,
     omitted: false,
+    callMode: 'entry',
     commandOptions: {}
   })
 
@@ -198,6 +200,7 @@ describe('translation', () => {
       tokens: [], // dummy, due to test
       command,
       omitted: false,
+      callMode: 'entry',
       commandOptions: {}
     })
 
@@ -258,6 +261,7 @@ describe('translation', () => {
       tokens: [], // dummy, due to test
       command,
       omitted: false,
+      callMode: 'entry',
       commandOptions: {}
     })
 
@@ -332,6 +336,7 @@ describe('translation', () => {
       tokens: [], // dummy, due to test
       command,
       omitted: false,
+      callMode: 'entry',
       commandOptions: {
         description: 'this is cmd1',
         locale: new Intl.Locale(loadLocale)
@@ -403,6 +408,7 @@ describe('translation adapter', () => {
       tokens: [], // dummy, due to test
       command,
       omitted: false,
+      callMode: 'entry',
       commandOptions: {
         description: 'this is cmd1',
         locale: new Intl.Locale(loadLocale),
@@ -459,6 +465,7 @@ describe('translation adapter', () => {
       tokens: [], // dummy, due to test
       command,
       omitted: false,
+      callMode: 'entry',
       commandOptions: {
         description: 'this is cmd1',
         locale: new Intl.Locale(loadLocale),

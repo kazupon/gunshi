@@ -10,7 +10,13 @@ import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts
 import { create, resolveLazyCommand } from './utils.ts'
 
 import type { Args, ArgToken } from 'args-tokens'
-import type { Command, CommandContext, CommandOptions, CommandRunner } from './types.ts'
+import type {
+  Command,
+  CommandCallMode,
+  CommandContext,
+  CommandOptions,
+  CommandRunner
+} from './types.ts'
 
 /**
  * Run the command.
@@ -28,7 +34,12 @@ export async function cli<A extends Args = Args>(
 
   const subCommand = getSubCommand(tokens)
   const resolvedCommandOptions = resolveCommandOptions(opts, entry)
-  const [name, command] = await resolveCommand(subCommand, entry, resolvedCommandOptions, true)
+  const [name, command, callMode] = await resolveCommand(
+    subCommand,
+    entry,
+    resolvedCommandOptions,
+    true
+  )
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
@@ -48,6 +59,7 @@ export async function cli<A extends Args = Args>(
     argv,
     tokens,
     omitted,
+    callMode,
     command,
     commandOptions: resolvedCommandOptions
   })
@@ -161,27 +173,31 @@ async function resolveCommand<A extends Args>(
   entry: Command<A> | CommandRunner<A>,
   options: CommandOptions<A>,
   needRunResolving: boolean = false
-): Promise<[string | undefined, Command<A> | undefined]> {
+): Promise<[string | undefined, Command<A> | undefined, CommandCallMode]> {
   const omitted = !sub
   if (typeof entry === 'function') {
-    return [undefined, { run: entry }]
+    return [undefined, { run: entry }, 'entry']
   } else {
     if (omitted) {
       return typeof entry === 'object'
-        ? [resolveEntryName(entry), await resolveLazyCommand(entry, '', needRunResolving)]
-        : [undefined, undefined]
+        ? [resolveEntryName(entry), await resolveLazyCommand(entry, '', needRunResolving), 'entry']
+        : [undefined, undefined, 'unexpected']
     } else {
       if (options.subCommands == null || options.subCommands.size === 0) {
-        return [resolveEntryName(entry), await resolveLazyCommand(entry, '', needRunResolving)]
+        return [
+          resolveEntryName(entry),
+          await resolveLazyCommand(entry, '', needRunResolving),
+          'entry'
+        ]
       }
 
       const cmd = options.subCommands?.get(sub)
 
       if (cmd == null) {
-        return [sub, undefined]
+        return [sub, undefined, 'unexpected']
       }
 
-      return [sub, await resolveLazyCommand(cmd, sub, needRunResolving)]
+      return [sub, await resolveLazyCommand(cmd, sub, needRunResolving), 'subCommand']
     }
   }
 }

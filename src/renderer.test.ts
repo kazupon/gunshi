@@ -97,6 +97,7 @@ describe('renderHeader', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -118,6 +119,7 @@ describe('renderHeader', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -138,6 +140,7 @@ describe('renderHeader', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
+      callMode: 'entry',
       command,
       commandOptions: { cwd: '/path/to/cmd1' }
     })
@@ -154,6 +157,7 @@ describe('renderHeader', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: true,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -205,6 +209,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -233,6 +238,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -275,6 +281,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -311,6 +318,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -357,6 +365,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -405,6 +414,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
+      callMode: 'entry',
       command,
       commandOptions: {
         cwd: '/path/to/cmd1',
@@ -454,6 +464,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       omitted: false,
+      callMode: 'entry',
       command,
       commandOptions: {
         usageOptionType: true,
@@ -473,6 +484,7 @@ describe('renderUsage', () => {
       args: SHOW.args!,
       values: {},
       omitted: true,
+      callMode: 'entry',
       positionals: [],
       rest: [],
       argv: [],
@@ -499,6 +511,7 @@ test('renderValidationErrors', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
+    callMode: 'entry',
     command: SHOW,
     commandOptions: {
       cwd: '/path/to/cmd1',

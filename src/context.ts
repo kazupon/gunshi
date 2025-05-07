@@ -32,6 +32,7 @@ import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 import type {
   Command,
   CommandBuiltinKeys,
+  CommandCallMode,
   CommandContext,
   CommandEnvironment,
   CommandOptions,
@@ -73,6 +74,10 @@ interface CommandContextParams<A extends Args, V> {
    */
   omitted: boolean
   /**
+   * Command call mode.
+   */
+  callMode: CommandCallMode
+  /**
    * A target {@link Command | command}
    */
   command: Command<A>
@@ -99,6 +104,7 @@ export async function createCommandContext<
   tokens,
   command,
   commandOptions,
+  callMode = 'entry',
   omitted = false
 }: CommandContextParams<A, V>): Promise<Readonly<CommandContext<A, V>>> {
   /**
@@ -200,6 +206,7 @@ export async function createCommandContext<
       name: command.name,
       description: command.description,
       omitted,
+      callMode,
       locale,
       env,
       args: _args,
