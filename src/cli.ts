@@ -19,13 +19,13 @@ import type {
   LazyCommand
 } from './types.ts'
 
-/**
- * Run the command.
- * @param args Command line arguments
- * @param entry A {@link Command | entry command} or an {@link CommandRunner | inline command runner}
- * @param opts A {@link CommandOptions | command options}
- * @returns A rendered usage or undefined. if you will use {@link CommandOptions.usageSilent} option, it will return rendered usage string.
- */
+//
+// Run the command.
+// @param args Command line arguments
+// @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+// @param opts A {@link CommandOptions | command options}
+// @returns A rendered usage or undefined. if you will use {@link CommandOptions.usageSilent} option, it will return rendered usage string.
+//
 export async function cli<A extends Args = Args>(
   argv: string[],
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
@@ -174,7 +174,11 @@ async function showValidationErrors<A extends Args>(
   ctx.log(await render(ctx, error))
 }
 
-const CANNOT_RESOLVE_COMMAND = [undefined, undefined, 'unexpected']
+const CANNOT_RESOLVE_COMMAND = [undefined, undefined, 'unexpected'] as const satisfies [
+  undefined,
+  undefined,
+  CommandCallMode
+]
 
 async function resolveCommand<A extends Args>(
   sub: string,
@@ -189,7 +193,7 @@ async function resolveCommand<A extends Args>(
   > {
     if (typeof entry === 'function') {
       // eslint-disable-next-line unicorn/prefer-ternary
-      if ('commandName' in entry) {
+      if ('commandName' in entry && entry.commandName) {
         // lazy command
         return [entry.commandName, await resolveLazyCommand(entry, '', needRunResolving), 'entry']
       } else {
@@ -204,23 +208,20 @@ async function resolveCommand<A extends Args>(
         'entry'
       ]
     } else {
-      return CANNOT_RESOLVE_COMMAND as [string | undefined, Command<A> | undefined, CommandCallMode]
+      return CANNOT_RESOLVE_COMMAND
     }
   }
 
-  if (omitted) {
+  if (omitted || options.subCommands?.size === 0) {
     return doResolveCommand()
-  } else {
-    if (options.subCommands == null || options.subCommands.size === 0) {
-      return doResolveCommand()
-    } else {
-      const cmd = options.subCommands?.get(sub)
-      if (cmd == null) {
-        return [sub, undefined, 'unexpected']
-      }
-      return [sub, await resolveLazyCommand(cmd, sub, needRunResolving), 'subCommand']
-    }
   }
+
+  const cmd = options.subCommands?.get(sub)
+  if (cmd == null) {
+    return [sub, undefined, 'unexpected']
+  }
+
+  return [sub, await resolveLazyCommand(cmd, sub, needRunResolving), 'subCommand']
 }
 
 function resolveEntryName<A extends Args>(entry: Command<A>): string {

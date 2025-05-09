@@ -93,22 +93,22 @@ describe('execute command', () => {
       name: 'command1',
       run: mockCommand1
     })
-    await cli(
-      ['lazy'],
-      lazy(() => mockFn, { name: 'lazy' }),
-      { subCommands }
-    )
+    const lazyCommand = lazy(() => mockFn, { name: 'lazy' })
+
+    // check entry command
+    await cli(['lazy'], lazyCommand, { subCommands })
     expect(mockFn).toBeCalled()
     expect(mockFn.mock.calls[0][0].callMode).toEqual('subCommand')
-    await cli(
-      ['command1'],
-      lazy(() => mockFn, { name: 'lazy' }),
-      {
-        subCommands
-      }
-    )
+
+    // check registered sub-command
+    await cli(['command1'], lazyCommand, { subCommands })
     expect(mockCommand1).toBeCalled()
     expect(mockCommand1.mock.calls[0][0].callMode).toEqual('subCommand')
+
+    // check unknown command
+    await expect(async () => {
+      await cli(['unknown'], lazyCommand, { subCommands })
+    }).rejects.toThrowError('Command not found: unknown')
   })
 
   test('entry strictly command + sub commands', async () => {
