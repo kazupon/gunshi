@@ -107,7 +107,7 @@ function resolveCommandOptions<A extends Args>(
 ): CommandOptions<A> {
   const subCommands = new Map(options.subCommands)
   if (options.subCommands) {
-    if (typeof entry === 'function' && 'commandName' in entry) {
+    if (typeof entry === 'function' && 'commandName' in entry && entry.commandName) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       subCommands.set(entry.commandName!, entry as LazyCommand<any>)
     } else if (typeof entry === 'object' && entry.name) {
