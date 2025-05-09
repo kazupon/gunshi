@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
-import { define } from './definition.ts'
+import { define, lazy } from './definition.ts'
 import { renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
@@ -63,6 +63,52 @@ describe('execute command', () => {
     expect(mockFn.mock.calls[0][0].values).toEqual({})
     expect(mockFn.mock.calls[0][0].positionals).toEqual(['dist/', 'test/'])
     expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+  })
+
+  test('entry lazy command name omitted', async () => {
+    const mockFn = vi.fn()
+    await cli(
+      [''],
+      lazy(() => mockFn, { name: 'lazy' })
+    )
+    expect(mockFn).toBeCalled()
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+  })
+
+  test('entry lazy command name as sub-command', async () => {
+    const mockFn = vi.fn()
+    await cli(
+      ['laz'],
+      lazy(() => mockFn, { name: 'lazy' })
+    )
+    expect(mockFn).toBeCalled()
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+  })
+
+  test('entry lazy command on sub-command', async () => {
+    const mockFn = vi.fn()
+    const mockCommand1 = vi.fn()
+    const subCommands = new Map()
+    subCommands.set('command1', {
+      name: 'command1',
+      run: mockCommand1
+    })
+    await cli(
+      ['lazy'],
+      lazy(() => mockFn, { name: 'lazy' }),
+      { subCommands }
+    )
+    expect(mockFn).toBeCalled()
+    expect(mockFn.mock.calls[0][0].callMode).toEqual('subCommand')
+    await cli(
+      ['command1'],
+      lazy(() => mockFn, { name: 'lazy' }),
+      {
+        subCommands
+      }
+    )
+    expect(mockCommand1).toBeCalled()
+    expect(mockCommand1.mock.calls[0][0].callMode).toEqual('subCommand')
   })
 
   test('entry strictly command + sub commands', async () => {
