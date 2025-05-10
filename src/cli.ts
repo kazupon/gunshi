@@ -31,22 +31,16 @@ export async function cli<A extends Args = Args>(
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
   opts: CommandOptions<A> = {}
 ): Promise<string | undefined> {
-  const tokens = parseArgs(argv)
-
-  const subCommand = getSubCommand(tokens)
   const resolvedCommandOptions = resolveCommandOptions(opts, entry)
-  const [name, command, callMode] = await resolveCommand(
-    subCommand,
-    entry,
-    resolvedCommandOptions,
-    true
-  )
+
+  const tokens = parseArgs(argv)
+  const subCommand = getSubCommand(tokens)
+  const [name, command, callMode] = await resolveCommand(subCommand, entry, resolvedCommandOptions)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
 
   const args = resolveArguments(command.args)
-
   const { values, positionals, rest, error } = resolveArgs(args, tokens, {
     optionGrouping: true,
     skipPositional: resolvedCommandOptions.subCommands!.size > 0 ? 0 : -1
@@ -97,8 +91,8 @@ export async function cli<A extends Args = Args>(
   await command.run(ctx)
 }
 
-function resolveArguments<A extends Args>(options?: A): A {
-  return Object.assign(create<A>(), options, COMMON_ARGS)
+function resolveArguments<A extends Args>(args?: A): A {
+  return Object.assign(create<A>(), args, COMMON_ARGS)
 }
 
 function resolveCommandOptions<A extends Args>(
@@ -183,8 +177,7 @@ const CANNOT_RESOLVE_COMMAND = [undefined, undefined, 'unexpected'] as const sat
 async function resolveCommand<A extends Args>(
   sub: string,
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
-  options: CommandOptions<A>,
-  needRunResolving: boolean = false
+  options: CommandOptions<A>
 ): Promise<[string | undefined, Command<A> | undefined, CommandCallMode]> {
   const omitted = !sub
 
@@ -195,18 +188,14 @@ async function resolveCommand<A extends Args>(
       // eslint-disable-next-line unicorn/prefer-ternary
       if ('commandName' in entry && entry.commandName) {
         // lazy command
-        return [entry.commandName, await resolveLazyCommand(entry, '', needRunResolving), 'entry']
+        return [entry.commandName, await resolveLazyCommand(entry, '', true), 'entry']
       } else {
         // inline command (command runner)
         return [undefined, { run: entry as CommandRunner<A> }, 'entry']
       }
     } else if (typeof entry === 'object') {
       // command object
-      return [
-        resolveEntryName(entry),
-        await resolveLazyCommand(entry, '', needRunResolving),
-        'entry'
-      ]
+      return [resolveEntryName(entry), await resolveLazyCommand(entry, '', true), 'entry']
     } else {
       return CANNOT_RESOLVE_COMMAND
     }
@@ -221,7 +210,7 @@ async function resolveCommand<A extends Args>(
     return [sub, undefined, 'unexpected']
   }
 
-  return [sub, await resolveLazyCommand(cmd, sub, needRunResolving), 'subCommand']
+  return [sub, await resolveLazyCommand(cmd, sub, true), 'subCommand']
 }
 
 function resolveEntryName<A extends Args>(entry: Command<A>): string {
