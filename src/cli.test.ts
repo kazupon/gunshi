@@ -6,7 +6,7 @@ import { renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
 import type { Mocked } from 'vitest'
-import type { Command, CommandOptions, CommandRunner, LazyCommand } from './types.ts'
+import type { CliOptions, Command, CommandRunner, LazyCommand } from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -560,7 +560,7 @@ describe('custom generate usage', () => {
         const msg = `* ${await renderValidationErrors(ctx, error)} *`
         return ['*'.repeat(msg.length), msg, '*'.repeat(msg.length)].join('\n')
       }
-    } satisfies CommandOptions<typeof entryOptions>
+    } satisfies CliOptions<typeof entryOptions>
 
     // usage
     await cli(['-h'], entry, options)
@@ -609,7 +609,7 @@ test('usageSilent', async () => {
     description: 'Modern CLI tool',
     version: '0.0.0',
     usageSilent: true
-  } satisfies CommandOptions<typeof entryArgs>
+  } satisfies CliOptions<typeof entryArgs>
 
   // usage with silent
   const usage = await cli(['-h'], entry, options)

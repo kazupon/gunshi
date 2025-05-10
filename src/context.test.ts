@@ -63,7 +63,7 @@ test('basic', async () => {
     omitted: true,
     callMode: 'entry',
     command,
-    commandOptions: {
+    cliOptions: {
       cwd: '/path/to/cmd1',
       description: 'this is command line',
       version: '0.0.0',
@@ -154,7 +154,7 @@ test('default', async () => {
     command,
     omitted: false,
     callMode: 'entry',
-    commandOptions: {}
+    cliOptions: {}
   })
 
   /**
@@ -201,7 +201,7 @@ describe('translation', () => {
       command,
       omitted: false,
       callMode: 'entry',
-      commandOptions: {}
+      cliOptions: {}
     })
 
     // locale en-US
@@ -262,7 +262,7 @@ describe('translation', () => {
       command,
       omitted: false,
       callMode: 'entry',
-      commandOptions: {}
+      cliOptions: {}
     })
 
     // description, options, and examples
@@ -337,7 +337,7 @@ describe('translation', () => {
       command,
       omitted: false,
       callMode: 'entry',
-      commandOptions: {
+      cliOptions: {
         description: 'this is cmd1',
         locale: new Intl.Locale(loadLocale)
       }
@@ -409,7 +409,7 @@ describe('translation adapter', () => {
       command,
       omitted: false,
       callMode: 'entry',
-      commandOptions: {
+      cliOptions: {
         description: 'this is cmd1',
         locale: new Intl.Locale(loadLocale),
         translationAdapterFactory: createTranslationAdapterForMessageFormat2
@@ -466,7 +466,7 @@ describe('translation adapter', () => {
       command,
       omitted: false,
       callMode: 'entry',
-      commandOptions: {
+      cliOptions: {
         description: 'this is cmd1',
         locale: new Intl.Locale(loadLocale),
         translationAdapterFactory: createTranslationAdapterForIntlifyMessageFormat

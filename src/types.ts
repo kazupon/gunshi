@@ -81,58 +81,58 @@ export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
 export interface CommandEnvironment<A extends Args = Args> {
   /**
    * Current working directory.
-   * @see {@link CommandOptions.cwd}
+   * @see {@link CliOptions.cwd}
    */
   cwd: string | undefined
   /**
    * Command name.
-   * @see {@link CommandOptions.name}
+   * @see {@link CliOptions.name}
    */
   name: string | undefined
   /**
    * Command description.
-   * @see {@link CommandOptions.description}
+   * @see {@link CliOptions.description}
    *
    */
   description: string | undefined
   /**
    * Command version.
-   * @see {@link CommandOptions.version}
+   * @see {@link CliOptions.version}
    */
   version: string | undefined
   /**
    * Left margin of the command output.
    * @default 2
-   * @see {@link CommandOptions.leftMargin}
+   * @see {@link CliOptions.leftMargin}
    */
   leftMargin: number
   /**
    * Middle margin of the command output.
    * @default 10
-   * @see {@link CommandOptions.middleMargin}
+   * @see {@link CliOptions.middleMargin}
    */
   middleMargin: number
   /**
    * Whether to display the usage option type.
    * @default false
-   * @see {@link CommandOptions.usageOptionType}
+   * @see {@link CliOptions.usageOptionType}
    */
   usageOptionType: boolean
   /**
    * Whether to display the option value.
    * @default true
-   * @see {@link CommandOptions.usageOptionValue}
+   * @see {@link CliOptions.usageOptionValue}
    */
   usageOptionValue: boolean
   /**
    * Whether to display the command usage.
    * @default false
-   * @see {@link CommandOptions.usageSilent}
+   * @see {@link CliOptions.usageSilent}
    */
   usageSilent: boolean
   /**
    * Sub commands.
-   * @see {@link CommandOptions.subCommands}
+   * @see {@link CliOptions.subCommands}
    */
   subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
@@ -153,9 +153,9 @@ export interface CommandEnvironment<A extends Args = Args> {
 }
 
 /**
- * Command options.
+ * CLI options of `cli` function.
  */
-export interface CommandOptions<A extends Args = Args> {
+export interface CliOptions<A extends Args = Args> {
   /**
    * Current working directory.
    */

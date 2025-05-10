@@ -11,31 +11,31 @@ import { create, resolveLazyCommand } from './utils.ts'
 
 import type { Args, ArgToken } from 'args-tokens'
 import type {
+  CliOptions,
   Command,
   CommandCallMode,
   CommandContext,
-  CommandOptions,
   CommandRunner,
   LazyCommand
 } from './types.ts'
 
-//
-// Run the command.
-// @param args Command line arguments
-// @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
-// @param opts A {@link CommandOptions | command options}
-// @returns A rendered usage or undefined. if you will use {@link CommandOptions.usageSilent} option, it will return rendered usage string.
-//
+/**
+ * Run the command.
+ * @param args Command line arguments
+ * @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options A {@link CliOptions | CLI options}
+ * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
+ */
 export async function cli<A extends Args = Args>(
   argv: string[],
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
-  opts: CommandOptions<A> = {}
+  options: CliOptions<A> = {}
 ): Promise<string | undefined> {
-  const resolvedCommandOptions = resolveCommandOptions(opts, entry)
+  const cliOptions = resolveCliOptions(options, entry)
 
   const tokens = parseArgs(argv)
   const subCommand = getSubCommand(tokens)
-  const [name, command, callMode] = await resolveCommand(subCommand, entry, resolvedCommandOptions)
+  const [name, command, callMode] = await resolveCommand(subCommand, entry, cliOptions)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
@@ -43,7 +43,7 @@ export async function cli<A extends Args = Args>(
   const args = resolveArguments(command.args)
   const { values, positionals, rest, error } = resolveArgs(args, tokens, {
     optionGrouping: true,
-    skipPositional: resolvedCommandOptions.subCommands!.size > 0 ? 0 : -1
+    skipPositional: cliOptions.subCommands!.size > 0 ? 0 : -1
   })
   const omitted = !subCommand
   const ctx = await createCommandContext({
@@ -56,7 +56,7 @@ export async function cli<A extends Args = Args>(
     omitted,
     callMode,
     command,
-    commandOptions: resolvedCommandOptions
+    cliOptions: cliOptions
   })
 
   if (values.version) {
@@ -95,10 +95,10 @@ function resolveArguments<A extends Args>(args?: A): A {
   return Object.assign(create<A>(), args, COMMON_ARGS)
 }
 
-function resolveCommandOptions<A extends Args>(
-  options: CommandOptions<A>,
+function resolveCliOptions<A extends Args>(
+  options: CliOptions<A>,
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>
-): CommandOptions<A> {
+): CliOptions<A> {
   const subCommands = new Map(options.subCommands)
   if (options.subCommands) {
     if (typeof entry === 'function' && 'commandName' in entry && entry.commandName) {
@@ -108,14 +108,9 @@ function resolveCommandOptions<A extends Args>(
       subCommands.set(entry.name, entry)
     }
   }
-  const resolvedOptions = Object.assign(
-    create<CommandOptions<A>>(),
-    COMMAND_OPTIONS_DEFAULT,
-    options,
-    {
-      subCommands
-    }
-  ) as CommandOptions<A>
+  const resolvedOptions = Object.assign(create<CliOptions<A>>(), COMMAND_OPTIONS_DEFAULT, options, {
+    subCommands
+  }) as CliOptions<A>
 
   return resolvedOptions
 }
@@ -177,7 +172,7 @@ const CANNOT_RESOLVE_COMMAND = [undefined, undefined, 'unexpected'] as const sat
 async function resolveCommand<A extends Args>(
   sub: string,
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
-  options: CommandOptions<A>
+  options: CliOptions<A>
 ): Promise<[string | undefined, Command<A> | undefined, CommandCallMode]> {
   const omitted = !sub
 

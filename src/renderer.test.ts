@@ -99,7 +99,7 @@ describe('renderHeader', () => {
       omitted: true,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         description: 'this is command line',
         version: '0.0.0',
@@ -121,7 +121,7 @@ describe('renderHeader', () => {
       omitted: true,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
         name: 'cmd1'
@@ -142,7 +142,7 @@ describe('renderHeader', () => {
       omitted: true,
       callMode: 'entry',
       command,
-      commandOptions: { cwd: '/path/to/cmd1' }
+      cliOptions: { cwd: '/path/to/cmd1' }
     })
 
     expect(await renderHeader(ctx)).toEqual('')
@@ -159,7 +159,7 @@ describe('renderHeader', () => {
       omitted: true,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         name: 'cmd1',
         description: 'this is command line'
@@ -211,7 +211,7 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         name: 'cmd1',
         description: 'this is command line'
@@ -240,7 +240,7 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
         name: 'cmd1'
@@ -283,7 +283,7 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
         name: 'cmd1'
@@ -320,7 +320,7 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
         name: 'cmd1'
@@ -367,7 +367,7 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
         name: 'cmd1'
@@ -416,7 +416,7 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
         name: 'cmd1'
@@ -466,7 +466,7 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
-      commandOptions: {
+      cliOptions: {
         usageOptionType: true,
         leftMargin: 4,
         middleMargin: 12,
@@ -490,7 +490,7 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       command: SHOW,
-      commandOptions: {
+      cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
         name: 'cmd1',
@@ -513,7 +513,7 @@ test('renderValidationErrors', async () => {
     omitted: false,
     callMode: 'entry',
     command: SHOW,
-    commandOptions: {
+    cliOptions: {
       cwd: '/path/to/cmd1',
       version: '0.0.0',
       name: 'cmd1'

@@ -4,7 +4,7 @@
  */
 
 import type { Args } from 'args-tokens'
-import type { CommandOptions } from './types.ts'
+import type { CliOptions } from './types.ts'
 
 /**
  * The default locale string, which format is BCP 47 language tag.
@@ -45,7 +45,7 @@ export const COMMON_ARGS: CommonArgType = {
   }
 }
 
-export const COMMAND_OPTIONS_DEFAULT: CommandOptions<Args> = {
+export const COMMAND_OPTIONS_DEFAULT: CliOptions<Args> = {
   name: undefined,
   description: undefined,
   version: undefined,
