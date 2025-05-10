@@ -140,7 +140,7 @@
     "jsr": "^0.13.4",
     "jsr-exports-lint": "^0.2.0",
     "knip": "^5.53.0",
-    "lint-staged": "^15.5.1",
+    "lint-staged": "^16.0.0",
     "messageformat": "4.0.0-11",
     "mitata": "^1.0.34",
     "pkg-pr-new": "^0.0.43",
