@@ -273,14 +273,14 @@ test('lazy command', async () => {
     },
     run: mockCommand2
   }
-  const command2 = () => {
+  const command2 = lazy(() => {
     return new Promise<Command>(resolve => {
       setTimeout(() => {
         resolve(remoteCommand2)
       }, 5)
     })
-  }
-  subCommands.set(command2.name, command2)
+  }, remoteCommand2)
+  subCommands.set(command2.commandName, command2)
 
   // regularly load command
   const command3 = {
