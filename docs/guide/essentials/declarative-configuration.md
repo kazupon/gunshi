@@ -223,7 +223,7 @@ The `run` function receives a command context object (`ctx`) with:
 - `tokens`: The raw tokens parsed by `args-tokens`.
 - `omitted`: A boolean indicating if the command was run without specifying a subcommand name.
 - `command`: The resolved command definition object itself.
-- `commandOptions`: The resolved command options passed to `cli`.
+- `cliOptions`: The resolved CLI options passed to `cli`.
 - `name`: The name of the _currently executing_ command.
 - `description`: The description of the _currently executing_ command.
 - `env`: The command environment settings (version, logger, renderers, etc.).

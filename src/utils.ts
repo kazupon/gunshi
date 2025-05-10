@@ -15,8 +15,13 @@ import type {
   CommandExamplesFetcher,
   GenerateNamespacedKey,
   KeyOfArgs,
+  LazyCommand,
   RemovedIndex
 } from './types.ts'
+
+export function isLazyCommand<A extends Args = Args>(cmd: unknown): cmd is LazyCommand<A> {
+  return typeof cmd === 'function' && 'commandName' in cmd && !!cmd.commandName
+}
 
 export async function resolveLazyCommand<A extends Args = Args>(
   cmd: Commandable<A>,
@@ -24,7 +29,7 @@ export async function resolveLazyCommand<A extends Args = Args>(
   needRunResolving: boolean = false
 ): Promise<Command<A>> {
   let command: Command<A> | undefined
-  if (typeof cmd === 'function') {
+  if (isLazyCommand<A>(cmd)) {
     command = Object.assign(create<Command<A>>(), {
       name: cmd.commandName,
       description: cmd.description,

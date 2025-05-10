@@ -30,12 +30,12 @@ import {
 
 import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 import type {
+  CliOptions,
   Command,
   CommandBuiltinKeys,
   CommandCallMode,
   CommandContext,
   CommandEnvironment,
-  CommandOptions,
   CommandResource
 } from './types.ts'
 
@@ -84,7 +84,7 @@ interface CommandContextParams<A extends Args, V> {
   /**
    * A command options, which is spicialized from `cli` function
    */
-  commandOptions: CommandOptions<A>
+  cliOptions: CliOptions<A>
 }
 
 /**
@@ -103,7 +103,7 @@ export async function createCommandContext<
   argv,
   tokens,
   command,
-  commandOptions,
+  cliOptions,
   callMode = 'entry',
   omitted = false
 }: CommandContextParams<A, V>): Promise<Readonly<CommandContext<A, V>>> {
@@ -120,17 +120,12 @@ export async function createCommandContext<
    * setup the environment
    */
 
-  const env = Object.assign(
-    create<CommandEnvironment<A>>(),
-    COMMAND_OPTIONS_DEFAULT,
-    commandOptions
-  )
+  const env = Object.assign(create<CommandEnvironment<A>>(), COMMAND_OPTIONS_DEFAULT, cliOptions)
 
-  const locale = resolveLocale(commandOptions.locale)
+  const locale = resolveLocale(cliOptions.locale)
   const localeStr = locale.toString() // NOTE: `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
 
-  const translationAdapterFactory =
-    commandOptions.translationAdapterFactory || createTranslationAdapter
+  const translationAdapterFactory = cliOptions.translationAdapterFactory || createTranslationAdapter
   const adapter = translationAdapterFactory({
     locale: localeStr,
     fallbackLocale: DEFAULT_LOCALE
@@ -191,7 +186,7 @@ export async function createCommandContext<
       return cachedCommands
     }
 
-    const subCommands = [...(commandOptions.subCommands || [])] as [string, Command<A>][]
+    const subCommands = [...(cliOptions.subCommands || [])] as [string, Command<A>][]
     return (cachedCommands = await Promise.all(
       subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
     ))
@@ -215,7 +210,7 @@ export async function createCommandContext<
       rest,
       _: argv,
       tokens,
-      log: commandOptions.usageSilent ? NOOP : log,
+      log: cliOptions.usageSilent ? NOOP : log,
       loadCommands,
       translate
     })
