@@ -53,7 +53,7 @@ await main()
 The `generate` function takes three parameters:
 
 - `command`: The command name to generate documentation for, or `null` for the default command
-- `entry`: The command object or function
+- `entry`: The command object or lazy command function
 - `opts`: Command options (name, version, description, etc.)
 
 ## Generating Documentation for Multiple Commands
