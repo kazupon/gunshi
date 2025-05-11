@@ -85,8 +85,8 @@ importers:
         specifier: ^0.2.8
         version: 0.2.8
       gunshi019:
-        specifier: npm:gunshi@0.22.0
-        version: gunshi@0.22.0
+        specifier: npm:gunshi@0.23.0
+        version: gunshi@0.23.0
       jsr:
         specifier: ^0.13.4
         version: 0.13.4
@@ -165,7 +165,7 @@ importers:
     devDependencies:
       '@types/bun':
         specifier: latest
-        version: 1.2.12
+        version: 1.2.13
 
   playground/composable:
     dependencies:
@@ -1628,8 +1628,8 @@ packages:
   '@tybys/wasm-util@0.9.0':
     resolution: {integrity: sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw==}
 
-  '@types/bun@1.2.12':
-    resolution: {integrity: sha512-lY/GQTXDGsolT/TiH72p1tuyUORuRrdV7VwOTOjDOt8uTBJQOJc5zz3ufwwDl0VBaoxotSk4LdP0hhjLJ6ypIQ==}
+  '@types/bun@1.2.13':
+    resolution: {integrity: sha512-u6vXep/i9VBxoJl3GjZsl/BFIsvML8DfVDO0RYLEwtSZSp981kEO1V5NwRcO1CPJ7AmvpbnDCiMKo3JvbDEjAg==}
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
@@ -2119,8 +2119,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  bun-types@1.2.12:
-    resolution: {integrity: sha512-tvWMx5vPqbRXgE8WUZI94iS1xAYs8bkqESR9cxBB1Wi+urvfTrF1uzuDgBHFAdO0+d2lmsbG3HmeKMvUyj6pWA==}
+  bun-types@1.2.13:
+    resolution: {integrity: sha512-rRjA1T6n7wto4gxhAO/ErZEtOXyEZEmnIHQfl0Dt1QQSB4QV0iP6BZ9/YB5fZaHFQ2dwHFrmPaRQ9GGMX01k9Q==}
 
   byte-size@9.0.1:
     resolution: {integrity: sha512-YLe9x3rabBrcI0cueCdLS2l5ONUKywcRpTs02B8KP9/Cimhj7o3ZccGrPnRvcbyHMbb7W79/3MUJl7iGgTXKEw==}
@@ -2891,8 +2891,8 @@ packages:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
     engines: {node: '>=6.0'}
 
-  gunshi@0.22.0:
-    resolution: {integrity: sha512-xyvAA7PiJMsZyShO001T9j+zuUK45UBELB+WDGz6NoBGmccthgUC3Hm8iW7z2vmRireBiW7DExpMv6Q5llbcrQ==}
+  gunshi@0.23.0:
+    resolution: {integrity: sha512-fI8sGNzMbz/ooAzP8XIp3p9U92xNhBhpAu461VszPGmLFcs6SIC+UdUQ4t7sv+JpOVW0OSnomPS8cPv3alWCEw==}
     engines: {node: '>= 20'}
 
   has-bigints@1.1.0:
@@ -5790,9 +5790,9 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@types/bun@1.2.12':
+  '@types/bun@1.2.13':
     dependencies:
-      bun-types: 1.2.12
+      bun-types: 1.2.13
 
   '@types/debug@4.1.12':
     dependencies:
@@ -6346,7 +6346,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  bun-types@1.2.12:
+  bun-types@1.2.13:
     dependencies:
       '@types/node': 22.15.3
 
@@ -7260,7 +7260,7 @@ snapshots:
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
 
-  gunshi@0.22.0:
+  gunshi@0.23.0:
     dependencies:
       args-tokens: 0.17.1
 
