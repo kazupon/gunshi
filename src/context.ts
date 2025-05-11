@@ -263,7 +263,7 @@ export async function createCommandContext<
   return ctx
 }
 
-function getCommandName<A extends Args>(cmd?: Command<A> | LazyCommand<A>): string {
+function getCommandName<A extends Args>(cmd: Command<A> | LazyCommand<A>): string {
   if (isLazyCommand<A>(cmd)) {
     return cmd.commandName || cmd.name || ANONYMOUS_COMMAND_NAME
   } else if (typeof cmd === 'object') {
