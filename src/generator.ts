@@ -45,7 +45,11 @@ export async function generate<A extends Args = Args>(
     (await cli(
       args,
       entry,
-      Object.assign(create<GenerateOptions<A>>(), options, { usageSilent: true, __proto__: null })
+      {
+        ...create<GenerateOptions<A>>(), // default options
+        ...options,                      // caller-supplied overrides
+        usageSilent: true                // force silent usage
+      }
     )) || ''
   )
 }
