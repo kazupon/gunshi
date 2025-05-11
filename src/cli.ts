@@ -4,7 +4,7 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { COMMAND_OPTIONS_DEFAULT, COMMON_ARGS } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, COMMON_ARGS } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
@@ -242,7 +242,7 @@ async function resolveCommand<A extends Args>(
 }
 
 function resolveEntryName<A extends Args>(entry: Command<A>): string {
-  return entry.name || '(anonymous)'
+  return entry.name || ANONYMOUS_COMMAND_NAME
 }
 
 async function executeCommand<A extends Args = Args>(

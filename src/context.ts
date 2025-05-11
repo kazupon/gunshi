@@ -15,12 +15,19 @@
  * @license MIT
  */
 
-import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE, NOOP } from './constants.ts'
+import {
+  ANONYMOUS_COMMAND_NAME,
+  BUILT_IN_PREFIX,
+  COMMAND_OPTIONS_DEFAULT,
+  DEFAULT_LOCALE,
+  NOOP
+} from './constants.ts'
 import DefaultResource from './locales/en-US.json' with { type: 'json' }
 import { createTranslationAdapter } from './translation.ts'
 import {
   create,
   deepFreeze,
+  isLazyCommand,
   log,
   mapResourceWithBuiltinKey,
   resolveArgKey,
@@ -36,7 +43,8 @@ import type {
   CommandCallMode,
   CommandContext,
   CommandEnvironment,
-  CommandResource
+  CommandResource,
+  LazyCommand
 } from './types.ts'
 
 const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
@@ -78,9 +86,9 @@ interface CommandContextParams<A extends Args, V> {
    */
   callMode: CommandCallMode
   /**
-   * A target {@link Command | command}
+   * A target command
    */
-  command: Command<A>
+  command: Command<A> | LazyCommand<A>
   /**
    * A command options, which is spicialized from `cli` function
    */
@@ -198,7 +206,7 @@ export async function createCommandContext<
 
   const ctx = deepFreeze(
     Object.assign(create<CommandContext<A, V>>(), {
-      name: command.name,
+      name: getCommandName(command),
       description: command.description,
       omitted,
       callMode,
@@ -253,6 +261,16 @@ export async function createCommandContext<
   }
 
   return ctx
+}
+
+function getCommandName<A extends Args>(cmd?: Command<A> | LazyCommand<A>): string {
+  if (isLazyCommand<A>(cmd)) {
+    return cmd.commandName || cmd.name || ANONYMOUS_COMMAND_NAME
+  } else if (typeof cmd === 'object') {
+    return cmd.name || ANONYMOUS_COMMAND_NAME
+  } else {
+    return ANONYMOUS_COMMAND_NAME
+  }
 }
 
 function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {

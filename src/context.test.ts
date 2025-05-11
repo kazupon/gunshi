@@ -5,7 +5,7 @@ import {
   createTranslationAdapterForMessageFormat2,
   hasPrototype
 } from '../test/utils.ts'
-import { DEFAULT_LOCALE } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, DEFAULT_LOCALE } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import DefaultLocale from './locales/en-US.json' with { type: 'json' }
 import jaLocale from './locales/ja-JP.json' with { type: 'json' }
@@ -162,7 +162,7 @@ test('default', async () => {
    */
 
   expect(ctx).toMatchObject({
-    name: undefined,
+    name: ANONYMOUS_COMMAND_NAME,
     description: undefined,
     args: {},
     values: { foo: 'foo', bar: true, baz: 42 },

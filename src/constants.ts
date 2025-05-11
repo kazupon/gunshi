@@ -17,6 +17,8 @@ export const ARG_PREFIX = 'arg'
 
 export const BUILT_IN_KEY_SEPARATOR = ':'
 
+export const ANONYMOUS_COMMAND_NAME = '(anonymous)'
+
 export const NOOP: () => void = () => {}
 
 type CommonArgType = {
