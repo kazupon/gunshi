@@ -85,8 +85,8 @@ importers:
         specifier: ^0.2.8
         version: 0.2.8
       gunshi019:
-        specifier: npm:gunshi@0.23.0
-        version: gunshi@0.23.0
+        specifier: npm:gunshi@0.23.1
+        version: gunshi@0.23.1
       jsr:
         specifier: ^0.13.4
         version: 0.13.4
@@ -2891,8 +2891,8 @@ packages:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
     engines: {node: '>=6.0'}
 
-  gunshi@0.23.0:
-    resolution: {integrity: sha512-fI8sGNzMbz/ooAzP8XIp3p9U92xNhBhpAu461VszPGmLFcs6SIC+UdUQ4t7sv+JpOVW0OSnomPS8cPv3alWCEw==}
+  gunshi@0.23.1:
+    resolution: {integrity: sha512-tl4qKJRgr0w5WkAj8jEew9+K7LK58qrFGdNS1GalSVYcnpauWoi/sCq0Kb1JiQLHXB4j62R0erza0BQyw2yO6w==}
     engines: {node: '>= 20'}
 
   has-bigints@1.1.0:
@@ -7260,7 +7260,7 @@ snapshots:
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
 
-  gunshi@0.23.0:
+  gunshi@0.23.1:
     dependencies:
       args-tokens: 0.17.1
 
