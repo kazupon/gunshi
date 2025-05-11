@@ -42,14 +42,10 @@ export async function generate<A extends Args = Args>(
     args.unshift(command)
   }
   return (
-    (await cli(
-      args,
-      entry,
-      {
-        ...create<GenerateOptions<A>>(), // default options
-        ...options,                      // caller-supplied overrides
-        usageSilent: true                // force silent usage
-      }
-    )) || ''
+    (await cli(args, entry, {
+      ...create<GenerateOptions<A>>(), // default options
+      ...options, // caller-supplied overrides
+      usageSilent: true // force silent usage
+    })) || ''
   )
 }
