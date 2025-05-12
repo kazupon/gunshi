@@ -143,7 +143,7 @@
     "lint-staged": "^16.0.0",
     "messageformat": "4.0.0-11",
     "mitata": "^1.0.34",
-    "pkg-pr-new": "^0.0.43",
+    "pkg-pr-new": "^0.0.44",
     "prettier": "^3.5.3",
     "publint": "^0.3.12",
     "tsdown": "^0.10.2",
