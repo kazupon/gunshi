@@ -100,8 +100,8 @@ importers:
         specifier: ^16.0.0
         version: 16.0.0
       messageformat:
-        specifier: 4.0.0-11
-        version: 4.0.0-11
+        specifier: 4.0.0-12
+        version: 4.0.0-12
       mitata:
         specifier: ^1.0.34
         version: 1.0.34
@@ -3389,8 +3389,8 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
-  messageformat@4.0.0-11:
-    resolution: {integrity: sha512-8OZN4+rgXmsRkkjcVGAZtdp91a4USScLHr5fiQrAgIhQGWEY3Ii+VMCfsrw4sWVAwsbTzPIckOtVRKOiv7WPLg==}
+  messageformat@4.0.0-12:
+    resolution: {integrity: sha512-14gCLxSsgxafX+1YBoB27Ruv73rjU1mkDTyFG7yQvT2XAiTYaGRUhVwk4jYZda+cHDIBRM+nX1mJ8OqW5JEhzw==}
 
   micromark-core-commonmark@2.0.3:
     resolution: {integrity: sha512-RDBrHEMSxVFLg6xvnXmb1Ayr2WzLAWjeSATAoxwKYJV94TeNavgoIdA0a9ytzDSVzBy2YKFK+emCPOEibLeCrg==}
@@ -7821,7 +7821,7 @@ snapshots:
 
   merge2@1.4.1: {}
 
-  messageformat@4.0.0-11: {}
+  messageformat@4.0.0-12: {}
 
   micromark-core-commonmark@2.0.3:
     dependencies:
