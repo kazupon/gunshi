@@ -91,8 +91,8 @@ importers:
         specifier: ^0.13.4
         version: 0.13.4
       jsr-exports-lint:
-        specifier: ^0.2.0
-        version: 0.2.0(tsdown@0.10.2(publint@0.3.12)(typescript@5.8.3))
+        specifier: ^0.4.0
+        version: 0.4.0(tsdown@0.10.2(publint@0.3.12)(typescript@5.8.3))
       knip:
         specifier: ^5.53.0
         version: 5.53.0(@types/node@22.15.3)(typescript@5.8.3)
@@ -3166,8 +3166,8 @@ packages:
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
-  jsr-exports-lint@0.2.0:
-    resolution: {integrity: sha512-U/Bjymvluo55Sgho7kGqt5AADeEhSKzM3O0/ewtKeOPbl6XCgoFjTGCdRLWWXPzD3V9/FGoqZwRFWrEoB/VXnw==}
+  jsr-exports-lint@0.4.0:
+    resolution: {integrity: sha512-x0YWsgHrsOPiHNItEGbO3M342KzKNs+tGSG5KB0bwkC/Qhuz07zJeIi27dR2noBpimbJpaiQy+hKdV71vLPXXA==}
     engines: {node: '>= 20'}
     peerDependencies:
       tsdown: '>=0.9.6'
@@ -7520,7 +7520,7 @@ snapshots:
 
   jsonc-parser@3.3.1: {}
 
-  jsr-exports-lint@0.2.0(tsdown@0.10.2(publint@0.3.12)(typescript@5.8.3)):
+  jsr-exports-lint@0.4.0(tsdown@0.10.2(publint@0.3.12)(typescript@5.8.3)):
     dependencies:
       picocolors: 1.1.1
     optionalDependencies:
