@@ -828,6 +828,23 @@ describe('positional arguments', async () => {
   })
 })
 
+test('multiple option values', async () => {
+  const args = {
+    fruits: {
+      type: 'enum',
+      multiple: true,
+      short: 'f',
+      choices: ['apple', 'banana', 'orange']
+    }
+  } satisfies Args
+  const mockFn1 = vi.fn()
+  await cli(['--fruits', 'banana', '-f=orange', 'foo', 'bar', '-f', 'apple'], {
+    args,
+    run: mockFn1
+  })
+  expect(mockFn1.mock.calls[0][0].values).toEqual({ fruits: ['banana', 'orange', 'apple'] })
+})
+
 describe('edge cases', () => {
   test(`'description' option`, async () => {
     const command = define({
