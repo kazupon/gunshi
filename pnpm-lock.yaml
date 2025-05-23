@@ -88,8 +88,8 @@ importers:
         specifier: ^0.2.8
         version: 0.2.8
       gunshi019:
-        specifier: npm:gunshi@0.23.1
-        version: gunshi@0.23.1
+        specifier: npm:gunshi@0.24.0
+        version: gunshi@0.24.0
       jsr:
         specifier: ^0.13.4
         version: 0.13.4
@@ -2020,10 +2020,6 @@ packages:
   args-tokenizer@0.3.0:
     resolution: {integrity: sha512-xXAd7G2Mll5W8uo37GETpQ2VrE84M181Z7ugHFGQnJZ50M2mbOv0osSZ9VsSgPfJQ+LVG0prSi0th+ELMsno7Q==}
 
-  args-tokens@0.17.1:
-    resolution: {integrity: sha512-kWceoEa1zXbcBvgy+BT1ddTLyB7B51u32EhOK/ZMY324nxmQAm767HD+g+9avBEPVmoDjWIYLvsSCQqtbcph/g==}
-    engines: {node: '>= 20'}
-
   args-tokens@0.18.0:
     resolution: {integrity: sha512-jL9s94QUvUBehrX+ptmkgLzvvDGcC62b6ocAv1TU3JKPBEf3OL7qUZI3r6jAI2KF9f6AOuRqwP3+CZBpZBTblA==}
     engines: {node: '>= 20'}
@@ -2836,8 +2832,8 @@ packages:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
     engines: {node: '>=6.0'}
 
-  gunshi@0.23.1:
-    resolution: {integrity: sha512-tl4qKJRgr0w5WkAj8jEew9+K7LK58qrFGdNS1GalSVYcnpauWoi/sCq0Kb1JiQLHXB4j62R0erza0BQyw2yO6w==}
+  gunshi@0.24.0:
+    resolution: {integrity: sha512-gghYZ1HbTNbId4Uv5GeLtajMPI4DQPQBjjdBzEy7AIvBmQJqnxgKB0CGJXXCcgdKle+JnLH9deqTEz0o17+6sw==}
     engines: {node: '>= 20'}
 
   has-bigints@1.1.0:
@@ -6047,8 +6043,6 @@ snapshots:
 
   args-tokenizer@0.3.0: {}
 
-  args-tokens@0.17.1: {}
-
   args-tokens@0.18.0: {}
 
   array-buffer-byte-length@1.0.2:
@@ -7006,9 +7000,9 @@ snapshots:
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
 
-  gunshi@0.23.1:
+  gunshi@0.24.0:
     dependencies:
-      args-tokens: 0.17.1
+      args-tokens: 0.18.0
 
   has-bigints@1.1.0: {}
 
