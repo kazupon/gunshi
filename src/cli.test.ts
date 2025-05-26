@@ -865,7 +865,7 @@ describe('argument name kebabnize', () => {
     expect(mockFn1.mock.calls[0][0].values).toEqual({ fooBar: 'value1', bazQux: 'value2' })
   })
 
-  test('globaly', async () => {
+  test('globally', async () => {
     const args = {
       fooBar: {
         type: 'string'

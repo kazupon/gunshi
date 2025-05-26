@@ -289,7 +289,7 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
   callMode: CommandCallMode
   /**
    * Whether to convert the camel-case style argument name to kebab-case.
-   * This conext value is set from {@link Command.toKebab} option.
+   * This context value is set from {@link Command.toKebab} option.
    */
   toKebab?: boolean
   /**
