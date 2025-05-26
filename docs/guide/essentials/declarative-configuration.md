@@ -163,6 +163,7 @@ Each option can have the following properties:
 - `required`: Set to `true` if the option is required (Note: Positional arguments defined with `type: 'positional'` are implicitly required by the parser).
 - `multiple`: Set to `true` if the multiple option values are be allowed
 - `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
+- `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
 
 #### Positional Arguments
 
@@ -195,6 +196,74 @@ const command = {
 - **`ctx.positionals`**: This array still exists and contains the raw string values of positional arguments in the order they were parsed (e.g., `ctx.positionals[0]`, `ctx.positionals[1]`). While available, using `ctx.values.<key>` is generally preferred for clarity and consistency.
 - **Descriptions**: The `description` property is used for generating help/usage messages.
 - **Type Conversion**: `args-tokens` resolves positional arguments as strings. You typically need to perform type conversions or further validation on the values accessed via `ctx.values.<key>` within your `run` function based on your application's needs.
+
+#### Custom Type Arguments
+
+Gunshi supports custom argument types with user-defined parsing logic. This allows you to create complex argument types that can parse and validate input in any way you need, and a validation library like `zod`.
+
+To define a custom argument type:
+
+```js
+import { z } from 'zod'
+
+// custom schema with `zod`
+const config = z.object({
+  debug: z.boolean(),
+  mode: z.string()
+})
+
+const command = {
+  name: 'example',
+  description: 'Example command with custom argument types',
+  args: {
+    // CSV parser example
+    tags: {
+      type: 'custom',
+      short: 't',
+      description: 'Comma-separated list of tags',
+      parse: value => value.split(',').map(tag => tag.trim())
+    },
+
+    // JSON parser example with `zod`
+    config: {
+      type: 'custom',
+      short: 'c',
+      description: 'JSON configuration',
+      parse: value => {
+        return config.parse(JSON.parse(value))
+      }
+    },
+
+    // Custom validation example
+    port: {
+      type: 'custom',
+      short: 'p',
+      description: 'Port number (1024-65535)',
+      parse: value => {
+        const port = Number(value)
+        if (Number.isNaN(port) || port < 1024 || port > 65_535) {
+          throw new TypeError(`Invalid port: ${value}. Must be a number between 1024 and 65535`)
+        }
+        return port
+      }
+    }
+  },
+  run: ctx => {
+    // Access the parsed values
+    console.log('Tags:', ctx.values.tags) // Array of strings
+    console.log('Config:', ctx.values.config) // Parsed JSON object
+    console.log('Port:', ctx.values.port) // Validated port number
+  }
+}
+```
+
+Custom type arguments support:
+
+- **Type safety**: The return type of the `parse` function is properly inferred in TypeScript
+- **Validation**: Throw an error from the `parse` function to indicate invalid input
+- **Default values**: Set a `default` property to provide a value when the argument is not specified
+- **Multiple values**: Set `multiple: true` to allow multiple instances of the argument
+- **Short aliases**: Set a `short` property to provide a single-character alias
 
 #### Kebab-Case Argument Names
 

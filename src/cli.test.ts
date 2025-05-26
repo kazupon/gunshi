@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { z } from 'zod/v4-mini'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
@@ -882,6 +883,136 @@ describe('argument name kebabnize', () => {
       run: mockFn1
     })
     expect(mockFn1.mock.calls[0][0].values).toEqual({ fooBar: 'value1' })
+  })
+})
+
+describe('custom type arguments', () => {
+  test('csv parser', async () => {
+    const args = {
+      tags: {
+        type: 'custom',
+        short: 't',
+        description: 'Comma-separated list of tags',
+        parse: (value: string) => value.split(',').map(tag => tag.trim())
+      }
+    } satisfies Args
+
+    const mockFn = vi.fn()
+    await cli(['--tags', 'javascript,typescript,node.js'], {
+      args,
+      run: mockFn
+    })
+    expect(mockFn.mock.calls[0][0].values).toEqual({
+      tags: ['javascript', 'typescript', 'node.js']
+    })
+  })
+
+  test('json parser', async () => {
+    const config = z.object({
+      debug: z.boolean(),
+      port: z.number()
+    })
+    const args = {
+      config: {
+        type: 'custom',
+        short: 'c',
+        description: 'JSON configuration',
+        parse: (value: string) => {
+          return config.parse(JSON.parse(value))
+        }
+      }
+    } satisfies Args
+
+    const mockFn = vi.fn()
+    await cli(['--config', '{"debug":true,"port":3000}'], {
+      args,
+      run: mockFn
+    })
+    expect(mockFn.mock.calls[0][0].values).toEqual({ config: { debug: true, port: 3000 } })
+  })
+
+  test('custom type with default value', async () => {
+    const args = {
+      format: {
+        type: 'custom',
+        short: 'f',
+        description: 'Output format',
+        default: 'json',
+        parse: (value: string) => {
+          if (!['json', 'yaml', 'xml'].includes(value)) {
+            throw new Error(`Invalid format: ${value}. Must be one of: json, yaml, xml`)
+          }
+          return value
+        }
+      }
+    } satisfies Args
+
+    const mockFn = vi.fn()
+    await cli([], {
+      args,
+      run: mockFn
+    })
+    expect(mockFn.mock.calls[0][0].values).toEqual({ format: 'json' })
+  })
+
+  test('custom type with validation error', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const args = {
+      port: {
+        type: 'custom',
+        short: 'p',
+        description: 'Port number (1024-65535)',
+        parse: (value: string) => {
+          const port = Number(value)
+          // eslint-disable-next-line unicorn/numeric-separators-style
+          if (Number.isNaN(port) || port < 1024 || port > 65535) {
+            throw new TypeError(`Invalid port: ${value}. Must be a number between 1024 and 65535`)
+          }
+          return port
+        }
+      }
+    } satisfies Args
+
+    await cli(['--port', '80'], {
+      args,
+      run: vi.fn()
+    })
+
+    const stdout = log()
+    expect(stdout).toContain('Invalid port: 80. Must be a number between 1024 and 65535')
+  })
+
+  test('multiple custom type values', async () => {
+    const args = {
+      points: {
+        type: 'custom',
+        multiple: true,
+        short: 'p',
+        description: 'Points in x,y format',
+        parse: (value: string) => {
+          const [x, y] = value.split(',').map(Number)
+          if (Number.isNaN(x) || Number.isNaN(y)) {
+            throw new TypeError(`Invalid point format: ${value}. Expected format: x,y`)
+          }
+          return { x, y }
+        }
+      }
+    } satisfies Args
+
+    const mockFn = vi.fn()
+    await cli(['--points', '1,2', '--points', '3,4', '-p=5,6'], {
+      args,
+      run: mockFn
+    })
+    expect(mockFn.mock.calls[0][0].values).toEqual({
+      points: [
+        { x: 1, y: 2 },
+        { x: 3, y: 4 },
+        { x: 5, y: 6 }
+      ]
+    })
   })
 })
 

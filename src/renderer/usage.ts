@@ -313,7 +313,10 @@ function resolveDisplayValue<A extends Args>(
 
   const schema = ctx.args[key]
   if (
-    (schema.type === 'boolean' || schema.type === 'number' || schema.type === 'string') &&
+    (schema.type === 'boolean' ||
+      schema.type === 'number' ||
+      schema.type === 'string' ||
+      schema.type === 'custom') &&
     schema.default !== undefined
   ) {
     return `(${generateDefaultDisplayValue(ctx, schema)})`
