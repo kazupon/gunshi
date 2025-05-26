@@ -2,6 +2,7 @@
   "automerge": true,
   "extends": ["config:base", ":preserveSemverRanges"],
   "labels": ["deps"],
+  "ignoreDeps": ["gunshi019"],
   "major": {
     "automerge": false
   }
