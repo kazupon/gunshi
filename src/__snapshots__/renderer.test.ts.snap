@@ -40,6 +40,27 @@ EXAMPLES:
 "
 `;
 
+exports[`renderUsage > kebab-case arguments with toKebab option 1`] = `
+"A test command with kebab-case arguments
+
+USAGE:
+  cmd1 test <OPTIONS>
+
+OPTIONS:
+  -f, --foo-bar <foo-bar>                                  The fooBar option
+  --baz-qux                                                The bazQux option
+  --no-baz-qux                                             Negatable of --baz-qux
+  -c, --camel-case [camel-case]                            The camelCase option (default: 42)
+  -k, --kebab-case-required <kebab-case-required>          The kebabCaseRequired option
+
+EXAMPLES:
+  # Example with kebab-case
+  $ test --foo-bar value --baz-qux --camel-case 42 --kebab-case-required value
+  # Example with negated option
+  $ test --no-baz-qux --foo-bar value --kebab-case-required value
+"
+`;
+
 exports[`renderUsage > mixed positionals and optionals 1`] = `
 "A test command
 
