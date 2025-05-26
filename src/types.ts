@@ -355,7 +355,7 @@ export interface Command<A extends Args = Args> {
   resource?: CommandResourceFetcher<A>
   /**
    * Whether to convert the camel-case style argument name to kebab-case.
-   * If you will set to `treu`, All {@link Command.args} names will be converted to kebab-case.
+   * If you will set to `true`, All {@link Command.args} names will be converted to kebab-case.
    */
   toKebab?: boolean
 }

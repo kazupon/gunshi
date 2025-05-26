@@ -276,13 +276,13 @@ function getOptionalArgsPairs<A extends Args>(ctx: CommandContext<A>): Record<st
     }
     let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
     if (schema.type !== 'boolean') {
-      // Use kebab-case for parameter placeholders too if toKebab is true
+      // Convert parameter placeholders to kebab-case format when toKebab is enabled
       const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
       key = schema.default ? `${key} [${displayName}]` : `${key} <${displayName}>`
     }
     acc[name] = key
     if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {
-      // Use kebab-case for negated options too if toKebab is true
+      // Convert parameter placeholders to kebab-case format when toKebab is enabled
       const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
       acc[`no-${name}`] = `--no-${displayName}`
     }

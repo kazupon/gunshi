@@ -1,5 +1,5 @@
 /**
- * The entry for command deifinition.
+ * The entry for command definition.
  *
  * @example
  * ```js
