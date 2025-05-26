@@ -218,6 +218,7 @@ export async function createCommandContext<
       rest,
       _: argv,
       tokens,
+      toKebab: command.toKebab,
       log: cliOptions.usageSilent ? NOOP : log,
       loadCommands,
       translate

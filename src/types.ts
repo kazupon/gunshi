@@ -288,6 +288,11 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
    */
   callMode: CommandCallMode
   /**
+   * Whether to convert the camel-case style argument name to kebab-case.
+   * This conext value is set from {@link Command.toKebab} option.
+   */
+  toKebab?: boolean
+  /**
    * Output a message.
    * If {@link CommandEnvironment.usageSilent} is true, the message is not output.
    * @param message an output message, @see {@link console.log}
@@ -348,6 +353,11 @@ export interface Command<A extends Args = Args> {
    * Command resource fetcher.
    */
   resource?: CommandResourceFetcher<A>
+  /**
+   * Whether to convert the camel-case style argument name to kebab-case.
+   * If you will set to `treu`, All {@link Command.args} names will be converted to kebab-case.
+   */
+  toKebab?: boolean
 }
 
 /**

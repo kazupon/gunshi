@@ -26,6 +26,7 @@ test('lazy', async () => {
   const test = define({
     name: 'test',
     description: 'A test command',
+    toKebab: true,
     args: {
       foo: {
         type: 'string',
@@ -44,6 +45,7 @@ test('lazy', async () => {
   expect(testLazy.commandName).toBe(test.name)
   expect(testLazy.description).toBe(test.description)
   expect(testLazy.args).toEqual(test.args)
+  expect(testLazy.toKebab).toBe(test.toKebab)
 
   await cli(
     ['test', '--foo', 'bar'],

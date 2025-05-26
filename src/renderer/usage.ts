@@ -254,9 +254,9 @@ function generateOptionsSymbols<A extends Args>(ctx: CommandContext<A>): string 
     : ''
 }
 
-function makeShortLongOptionPair(schema: ArgSchema, name: string): string {
+function makeShortLongOptionPair(schema: ArgSchema, name: string, toKebab?: boolean): string {
   // Convert camelCase to kebab-case for display in help text if toKebab is true
-  const displayName = schema.toKebab ? kebabnize(name) : name
+  const displayName = toKebab || schema.toKebab ? kebabnize(name) : name
   let key = `--${displayName}`
   if (schema.short) {
     key = `-${schema.short}, ${key}`
@@ -274,16 +274,16 @@ function getOptionalArgsPairs<A extends Args>(ctx: CommandContext<A>): Record<st
     if (schema.type === 'positional') {
       return acc
     }
-    let key = makeShortLongOptionPair(schema, name)
+    let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
     if (schema.type !== 'boolean') {
       // Use kebab-case for parameter placeholders too if toKebab is true
-      const displayName = schema.toKebab ? kebabnize(name) : name
+      const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
       key = schema.default ? `${key} [${displayName}]` : `${key} <${displayName}>`
     }
     acc[name] = key
     if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {
       // Use kebab-case for negated options too if toKebab is true
-      const displayName = schema.toKebab ? kebabnize(name) : name
+      const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
       acc[`no-${name}`] = `--no-${displayName}`
     }
     return acc
@@ -356,7 +356,7 @@ async function generateOptionalArgsUsage<A extends Args>(
       if (!rawDesc && key.startsWith('no-')) {
         const name = resolveNegatableKey(key)
         const schema = ctx.args[name]
-        const optionKey = makeShortLongOptionPair(schema, name)
+        const optionKey = makeShortLongOptionPair(schema, name, ctx.toKebab)
         rawDesc = `${ctx.translate(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''

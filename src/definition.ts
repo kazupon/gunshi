@@ -44,6 +44,7 @@ export function lazy<A extends Args = Args>(
     ;(loader as LazyCommand<A>).args = definition.args
     ;(loader as LazyCommand<A>).examples = definition.examples
     ;(loader as LazyCommand<A>).resource = definition.resource
+    ;(loader as LazyCommand<A>).toKebab = definition.toKebab
   }
   return loader
 }

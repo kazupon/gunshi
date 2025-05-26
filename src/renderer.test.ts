@@ -556,6 +556,58 @@ describe('renderUsage', () => {
 
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
+
+  test('kebab-case arguments with Command.toKebab option', async () => {
+    const command = {
+      args: {
+        fooBar: {
+          type: 'string',
+          short: 'f',
+          description: 'The fooBar option'
+        },
+        bazQux: {
+          type: 'boolean',
+          description: 'The bazQux option',
+          toKebab: true
+        },
+        camelCase: {
+          type: 'number',
+          short: 'c',
+          default: 42,
+          description: 'The camelCase option'
+        },
+        kebabCaseRequired: {
+          type: 'string',
+          short: 'k',
+          required: true,
+          description: 'The kebabCaseRequired option'
+        }
+      },
+      name: 'test',
+      description: 'A test command with kebab-case arguments',
+      examples: `# Example with kebab-case\n$ test --foo-bar value --baz-qux --camel-case 42 --kebab-case-required value\n# Example with negated option\n$ test --no-baz-qux --foo-bar value --kebab-case-required value`,
+      toKebab: true,
+      run: NOOP
+    } as Command<Args>
+    const ctx = await createCommandContext({
+      args: command.args!,
+      values: {},
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [], // dummy, due to test
+      omitted: false,
+      callMode: 'entry',
+      command,
+      cliOptions: {
+        cwd: '/path/to/cmd1',
+        name: 'cmd1',
+        description: 'this is command line'
+      }
+    })
+
+    expect(await renderUsage(ctx)).toMatchSnapshot()
+  })
 })
 
 test('renderValidationErrors', async () => {
