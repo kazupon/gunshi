@@ -845,6 +845,46 @@ test('multiple option values', async () => {
   expect(mockFn1.mock.calls[0][0].values).toEqual({ fruits: ['banana', 'orange', 'apple'] })
 })
 
+describe('argument name kebabnize', () => {
+  test('per argument', async () => {
+    const args = {
+      fooBar: {
+        type: 'string',
+        toKebab: true
+      },
+      bazQux: {
+        type: 'string'
+      }
+    } satisfies Args
+
+    const mockFn1 = vi.fn()
+    await cli(['--foo-bar', 'value1', '--bazQux', 'value2'], {
+      args,
+      run: mockFn1
+    })
+    expect(mockFn1.mock.calls[0][0].values).toEqual({ fooBar: 'value1', bazQux: 'value2' })
+  })
+
+  test('globaly', async () => {
+    const args = {
+      fooBar: {
+        type: 'string'
+      },
+      bazQux: {
+        type: 'string'
+      }
+    } satisfies Args
+
+    const mockFn1 = vi.fn()
+    await cli(['--foo-bar', 'value1', '--bazQux', 'value2'], {
+      args,
+      toKebab: true,
+      run: mockFn1
+    })
+    expect(mockFn1.mock.calls[0][0].values).toEqual({ fooBar: 'value1' })
+  })
+})
+
 describe('edge cases', () => {
   test(`'description' option`, async () => {
     const command = define({
