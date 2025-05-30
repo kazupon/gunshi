@@ -16,17 +16,13 @@ catalogs:
 importers:
 
   .:
-    dependencies:
-      args-tokens:
-        specifier: ^0.20.1
-        version: 0.20.1
     devDependencies:
+      '@eslint/compat':
+        specifier: ^1.2.9
+        version: 1.2.9(eslint@9.27.0(jiti@2.4.2))
       '@eslint/markdown':
         specifier: ^6.4.0
         version: 6.4.0
-      '@intlify/core':
-        specifier: next
-        version: 12.0.0-alpha.2
       '@kazupon/eslint-config':
         specifier: ^0.29.0
         version: 0.29.0(9e3658f37b7c77add21678a25c4fd2a3)
@@ -45,9 +41,6 @@ importers:
       bumpp:
         specifier: ^10.1.1
         version: 10.1.1
-      deno:
-        specifier: ^2.3.3
-        version: 2.3.3
       eslint:
         specifier: ^9.27.0
         version: 9.27.0(jiti@2.4.2)
@@ -93,21 +86,12 @@ importers:
       gunshi019:
         specifier: npm:gunshi@0.19.0
         version: gunshi@0.19.0
-      jsr:
-        specifier: ^0.13.4
-        version: 0.13.4
-      jsr-exports-lint:
-        specifier: ^0.4.0
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       knip:
         specifier: ^5.58.0
         version: 5.58.0(@types/node@22.15.21)(typescript@5.8.3)
       lint-staged:
         specifier: ^16.0.0
         version: 16.0.0
-      messageformat:
-        specifier: 4.0.0-12
-        version: 4.0.0-12
       mitata:
         specifier: ^1.0.34
         version: 1.0.34
@@ -117,12 +101,18 @@ importers:
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
-      publint:
-        specifier: ^0.3.12
-        version: 0.3.12
-      tsdown:
-        specifier: ^0.12.3
-        version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+      typescript-eslint:
+        specifier: ^8.32.1
+        version: 8.32.1(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)
+      vitest:
+        specifier: ^3.1.4
+        version: 3.1.4(@types/debug@4.1.12)(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.29.3)(tsx@4.19.3)(yaml@2.8.0)
+
+  packages/docs:
+    devDependencies:
       typedoc:
         specifier: ^0.28.4
         version: 0.28.4(typescript@5.8.3)
@@ -132,24 +122,46 @@ importers:
       typedoc-vitepress-theme:
         specifier: ^1.1.2
         version: 1.1.2(typedoc-plugin-markdown@4.6.3(typedoc@0.28.4(typescript@5.8.3)))
-      typescript-eslint:
-        specifier: ^8.32.1
-        version: 8.32.1(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)
       vitepress:
         specifier: ^1.6.3
         version: 1.6.3(@algolia/client-search@5.23.4)(@types/node@22.15.21)(lightningcss@1.29.3)(postcss@8.5.3)(search-insights@2.17.3)(typescript@5.8.3)
       vitepress-plugin-group-icons:
         specifier: ^1.5.5
-        version: 1.5.5(markdown-it@14.1.0)(vite@6.3.2(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.29.3)(tsx@4.19.3)(yaml@2.8.0))
+        version: 1.5.5(markdown-it@14.1.0)(vite@5.4.18(@types/node@22.15.21)(lightningcss@1.29.3))
       vitepress-plugin-llms:
         specifier: ^1.3.4
         version: 1.3.4
-      vitest:
-        specifier: ^3.1.4
-        version: 3.1.4(@types/debug@4.1.12)(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.29.3)(tsx@4.19.3)(yaml@2.8.0)
       vue:
         specifier: ^3.5.14
         version: 3.5.14(typescript@5.8.3)
+
+  packages/gunshi:
+    dependencies:
+      args-tokens:
+        specifier: ^0.20.1
+        version: 0.20.1
+    devDependencies:
+      '@intlify/core':
+        specifier: next
+        version: 12.0.0-alpha.2
+      deno:
+        specifier: ^2.3.3
+        version: 2.3.3
+      jsr:
+        specifier: ^0.13.4
+        version: 0.13.4
+      jsr-exports-lint:
+        specifier: ^0.4.0
+        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+      messageformat:
+        specifier: 4.0.0-12
+        version: 4.0.0-12
+      publint:
+        specifier: ^0.3.12
+        version: 0.3.12
+      tsdown:
+        specifier: ^0.12.3
+        version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
       zod:
         specifier: 'catalog:'
         version: 3.25.28
@@ -158,13 +170,13 @@ importers:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/bun:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -177,13 +189,13 @@ importers:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/custom-type:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
       zod:
         specifier: 'catalog:'
         version: 3.25.28
@@ -192,69 +204,55 @@ importers:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/declarative:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/docs-gen:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/i18n:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/lazy-async:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/modularization-lazy-async:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/simple:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
+        version: link:../../packages/gunshi
 
   playground/type-safe:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
-    devDependencies:
-      tsx:
-        specifier: ^4.7.1
-        version: 4.19.3
-      typescript:
-        specifier: 'catalog:'
-        version: 5.8.3
+        version: link:../../packages/gunshi
 
   playground/type-safe-lazy-async:
     dependencies:
       gunshi:
         specifier: workspace:*
-        version: link:../..
-    devDependencies:
-      tsx:
-        specifier: ^4.7.1
-        version: 4.19.3
-      typescript:
-        specifier: 'catalog:'
-        version: 5.8.3
+        version: link:../../packages/gunshi
 
 packages:
 
@@ -740,6 +738,15 @@ packages:
   '@eslint-community/regexpp@4.12.1':
     resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
+
+  '@eslint/compat@1.2.9':
+    resolution: {integrity: sha512-gCdSY54n7k+driCadyMNv8JSPzYLeDVM/ikZRtvtROBpRdFSkS8W9A82MqsaY7lZuwL0wiapgD0NT1xT0hyJsA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: ^9.10.0
+    peerDependenciesMeta:
+      eslint:
+        optional: true
 
   '@eslint/config-array@0.20.0':
     resolution: {integrity: sha512-fxlS1kkIjx8+vy2SjuCB94q3htSNrufYTXubwiBFeaQHbH6Ipi43gFJq2zCMt6PHhImH3Xmr0NksKDvchWlpQQ==}
@@ -1928,9 +1935,6 @@ packages:
     resolution: {integrity: sha512-Rf/ISLqokIvcySIYnv3tNWq40PLpNLDLSJwwVWzG6MNtyIhfbcrAxo5ZL9nARJhqjZyWWa40oRb2IDuejeuv6w==}
     peerDependencies:
       vue: 3.5.14
-
-  '@vue/shared@3.5.13':
-    resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
 
   '@vue/shared@3.5.14':
     resolution: {integrity: sha512-oXTwNxVfc9EtP1zzXAlSlgARLXNC84frFYkS0HHz0h3E4WZSP9sywqjqzGCP9Y34M8ipNmd380pVgmMuwELDyQ==}
@@ -3595,9 +3599,6 @@ packages:
   package-manager-detector@0.2.11:
     resolution: {integrity: sha512-BEnLolu+yuz22S56CU1SUKq3XC3PkwD5wv4ikR4MfGvnRVcmzXR9DwSlW2fEamyTPyXHomBJRzgapeuBvRNzJQ==}
 
-  package-manager-detector@1.2.0:
-    resolution: {integrity: sha512-PutJepsOtsqVfUsxCzgTTpyXmiAgvKptIgY4th5eq5UXXFhj5PxfQ9hnGkypMeovpAvVshFRItoFHYO18TCOqA==}
-
   package-manager-detector@1.3.0:
     resolution: {integrity: sha512-ZsEbbZORsyHuO00lY1kV3/t72yp6Ysay6Pd17ZAlNGuGwmWDLCJxFpRs0IzfXfj1o4icJOkUEioexFHzyPurSQ==}
 
@@ -4935,6 +4936,10 @@ snapshots:
 
   '@eslint-community/regexpp@4.12.1': {}
 
+  '@eslint/compat@1.2.9(eslint@9.27.0(jiti@2.4.2))':
+    optionalDependencies:
+      eslint: 9.27.0(jiti@2.4.2)
+
   '@eslint/config-array@0.20.0':
     dependencies:
       '@eslint/object-schema': 2.1.6
@@ -5989,8 +5994,6 @@ snapshots:
       '@vue/compiler-ssr': 3.5.14
       '@vue/shared': 3.5.14
       vue: 3.5.14(typescript@5.8.3)
-
-  '@vue/shared@3.5.13': {}
 
   '@vue/shared@3.5.14': {}
 
@@ -8007,8 +8010,6 @@ snapshots:
     dependencies:
       quansync: 0.2.10
 
-  package-manager-detector@1.2.0: {}
-
   package-manager-detector@1.3.0: {}
 
   parent-module@1.0.1:
@@ -8089,7 +8090,7 @@ snapshots:
   publint@0.3.12:
     dependencies:
       '@publint/pack': 0.1.2
-      package-manager-detector: 1.2.0
+      package-manager-detector: 1.3.0
       picocolors: 1.1.1
       sade: 1.8.1
 
@@ -8625,7 +8626,7 @@ snapshots:
       rolldown-plugin-dts: 0.13.4(oxc-resolver@9.0.2)(rolldown@1.0.0-beta.9-commit.d91dfb5)(typescript@5.8.3)
       semver: 7.7.2
       tinyexec: 1.0.1
-      tinyglobby: 0.2.13
+      tinyglobby: 0.2.14
       unconfig: 7.3.2
     optionalDependencies:
       publint: 0.3.12
@@ -8665,9 +8666,10 @@ snapshots:
   tsx@4.19.3:
     dependencies:
       esbuild: 0.25.2
-      get-tsconfig: 4.10.0
+      get-tsconfig: 4.10.1
     optionalDependencies:
       fsevents: 2.3.3
+    optional: true
 
   type-check@0.4.0:
     dependencies:
@@ -8725,7 +8727,7 @@ snapshots:
       markdown-it: 14.1.0
       minimatch: 9.0.5
       typescript: 5.8.3
-      yaml: 2.7.1
+      yaml: 2.8.0
 
   typescript-eslint@8.32.1(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3):
     dependencies:
@@ -8934,13 +8936,13 @@ snapshots:
       tsx: 4.19.3
       yaml: 2.8.0
 
-  vitepress-plugin-group-icons@1.5.5(markdown-it@14.1.0)(vite@6.3.2(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.29.3)(tsx@4.19.3)(yaml@2.8.0)):
+  vitepress-plugin-group-icons@1.5.5(markdown-it@14.1.0)(vite@5.4.18(@types/node@22.15.21)(lightningcss@1.29.3)):
     dependencies:
       '@iconify-json/logos': 1.2.4
       '@iconify-json/vscode-icons': 1.2.19
       '@iconify/utils': 2.3.0
       markdown-it: 14.1.0
-      vite: 6.3.2(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.29.3)(tsx@4.19.3)(yaml@2.8.0)
+      vite: 5.4.18(@types/node@22.15.21)(lightningcss@1.29.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -8972,7 +8974,7 @@ snapshots:
       '@types/markdown-it': 14.1.2
       '@vitejs/plugin-vue': 5.2.3(vite@5.4.18(@types/node@22.15.21)(lightningcss@1.29.3))(vue@3.5.14(typescript@5.8.3))
       '@vue/devtools-api': 7.7.5
-      '@vue/shared': 3.5.13
+      '@vue/shared': 3.5.14
       '@vueuse/core': 12.8.2(typescript@5.8.3)
       '@vueuse/integrations': 12.8.2(focus-trap@7.6.4)(typescript@5.8.3)
       focus-trap: 7.6.4

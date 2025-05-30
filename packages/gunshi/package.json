@@ -1,0 +1,100 @@
+{
+  "name": "gunshi",
+  "description": "Modern javascript command-line library",
+  "version": "0.25.0",
+  "author": {
+    "name": "kazuya kawaguchi",
+    "email": "kawakazu80@gmail.com"
+  },
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/kazupon",
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazupon/gunshi.git",
+    "directory": "packages/gunshi"
+  },
+  "keywords": [
+    "command",
+    "option",
+    "cli",
+    "argument",
+    "args",
+    "argv"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">= 20"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "lib"
+  ],
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./definition": {
+      "types": "./lib/definition.d.ts",
+      "import": "./lib/definition.js",
+      "require": "./lib/definition.js",
+      "default": "./lib/definition.js"
+    },
+    "./context": {
+      "types": "./lib/context.d.ts",
+      "import": "./lib/context.js",
+      "require": "./lib/context.js",
+      "default": "./lib/context.js"
+    },
+    "./renderer": {
+      "types": "./lib/renderer.d.ts",
+      "import": "./lib/renderer.js",
+      "require": "./lib/renderer.js",
+      "default": "./lib/renderer.js"
+    },
+    "./generator": {
+      "types": "./lib/generator.d.ts",
+      "import": "./lib/generator.js",
+      "require": "./lib/generator.js",
+      "default": "./lib/generator.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/*",
+        "./*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint:jsr": "jsr publish --dry-run --allow-dirty",
+    "prepack": "pnpm build",
+    "typecheck:deno": "deno check --all ./src"
+  },
+  "dependencies": {
+    "args-tokens": "^0.20.1"
+  },
+  "devDependencies": {
+    "@intlify/core": "next",
+    "deno": "^2.3.3",
+    "jsr": "^0.13.4",
+    "jsr-exports-lint": "^0.4.0",
+    "messageformat": "4.0.0-12",
+    "publint": "^0.3.12",
+    "tsdown": "^0.12.3",
+    "zod": "catalog:"
+  }
+}

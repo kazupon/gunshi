@@ -7,13 +7,13 @@ export default {
    * ref: https://typedoc.org/documents/Options.html
    */
   entryPoints: [
-    './src/index.ts',
-    './src/definition.ts',
-    './src/context.ts',
-    './src/generator.ts',
-    './src/renderer.ts'
+    '../gunshi/src/index.ts',
+    '../gunshi/src/definition.ts',
+    '../gunshi/src/context.ts',
+    '../gunshi/src/generator.ts',
+    '../gunshi/src/renderer.ts'
   ],
-  out: 'docs/api',
+  out: 'src/api',
   plugin: ['typedoc-plugin-markdown', 'typedoc-vitepress-theme'],
   readme: 'none',
   groupOrder: ['Variables', 'Functions', 'Class'],
@@ -36,5 +36,5 @@ export default {
    * typedoc-vitepress-theme options
    * ref: https://typedoc-plugin-markdown.org/plugins/vitepress/options
    */
-  docsRoot: './docs'
+  docsRoot: './src'
 }

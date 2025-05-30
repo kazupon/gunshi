@@ -1,7 +1,7 @@
 {
-  "name": "gunshi",
-  "description": "Modern javascript command-line library",
-  "version": "0.25.0",
+  "name": "gunshi-monorepo",
+  "description": "Monorepo for gunshi - Modern javascript command-line library",
+  "private": true,
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
@@ -15,114 +15,48 @@
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git"
   },
-  "keywords": [
-    "command",
-    "option",
-    "cli",
-    "argument",
-    "args",
-    "argv"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
   "packageManager": "pnpm@10.11.0",
   "engines": {
     "node": ">= 20"
   },
   "type": "module",
-  "sideEffects": false,
-  "files": [
-    "lib"
-  ],
-  "module": "lib/index.js",
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js",
-      "require": "./lib/index.js",
-      "default": "./lib/index.js"
-    },
-    "./definition": {
-      "types": "./lib/definition.d.ts",
-      "import": "./lib/definition.js",
-      "require": "./lib/definition.js",
-      "default": "./lib/definition.js"
-    },
-    "./context": {
-      "types": "./lib/context.d.ts",
-      "import": "./lib/context.js",
-      "require": "./lib/context.js",
-      "default": "./lib/context.js"
-    },
-    "./renderer": {
-      "types": "./lib/renderer.d.ts",
-      "import": "./lib/renderer.js",
-      "require": "./lib/renderer.js",
-      "default": "./lib/renderer.js"
-    },
-    "./generator": {
-      "types": "./lib/generator.d.ts",
-      "import": "./lib/generator.js",
-      "require": "./lib/generator.js",
-      "default": "./lib/generator.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "types": "lib/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./lib/*",
-        "./*"
-      ]
-    }
-  },
   "scripts": {
     "bench:mitata": "node --expose-gc bench/mitata.js",
     "bench:vitest": "vitest bench --run",
-    "build": "tsdown",
+    "build": "pnpm -r build",
+    "build:docs": "pnpm -F @gunshi/docs build",
+    "build:gunshi": "pnpm -F gunshi build",
     "changelog": "gh-changelogen --repo=kazupon/gunshi",
     "clean": "git clean -df",
     "dev": "pnpx @eslint/config-inspector --config eslint.config.ts",
     "dev:eslint": "pnpx @eslint/config-inspector --config eslint.config.ts",
-    "dev:typedoc": "typedoc --watch --preserveWatchOutput",
-    "docs:build": "pnpm run docs:build:typedoc && pnpm docs:build:vitepress",
-    "docs:build:typedoc": "typedoc --excludeInternal",
-    "docs:build:vitepress": "vitepress build docs",
-    "docs:dev": "pnpm run docs:build:typedoc && pnpm docs:dev:vitepress",
-    "docs:dev:vitepress": "vitepress dev docs",
-    "docs:preview": "vitepress preview docs",
+    "dev:typedoc": "pnpm -F @gunshi/docs dev",
     "fix": "pnpm run --stream --color \"/^fix:/\"",
     "fix:eslint": "eslint . --fix",
     "fix:knip": "knip --fix --no-exit-code",
     "fix:prettier": "prettier . --write",
     "lint": "pnpm run --stream --color \"/^lint:/\"",
     "lint:eslint": "eslint .",
-    "lint:jsr": "jsr publish --dry-run --allow-dirty",
+    "lint:jsr": "pnpm -r --if-present lint:jsr",
     "lint:knip": "knip",
     "lint:prettier": "prettier . --check",
-    "prepack": "pnpm build",
     "prepare": "git config --local core.hooksPath .githooks",
-    "release": "bumpp --commit \"release: v%s\" --all --push --tag",
+    "preview:docs": "pnpm -F @gunshi/docs preview",
+    "release": "bumpp package.json packages/**/package.json --commit \"release: v\" --all --push --tag",
     "test": "vitest --typecheck run",
     "typecheck": "pnpm run --stream --color \"/^typecheck:/\"",
-    "typecheck:deno": "deno check --all ./src",
-    "typecheck:tsc": "tsgo --noEmit"
-  },
-  "dependencies": {
-    "args-tokens": "^0.20.1"
+    "typecheck:deno": "pnpm -r --if-present typecheck:deno",
+    "typecheck:tsc": "tsgo --noEmit --diagnostics"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.9",
     "@eslint/markdown": "^6.4.0",
-    "@intlify/core": "next",
     "@kazupon/eslint-config": "^0.29.0",
     "@kazupon/prettier-config": "^0.1.1",
     "@types/node": "^22.15.21",
     "@typescript/native-preview": "7.0.0-dev.20250530.1",
     "@vitest/eslint-plugin": "^1.2.1",
     "bumpp": "^10.1.1",
-    "deno": "^2.3.3",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-import-resolver-typescript": "^4.4.1",
@@ -138,26 +72,14 @@
     "eslint-plugin-yml": "^1.18.0",
     "gh-changelogen": "^0.2.8",
     "gunshi019": "npm:gunshi@0.19.0",
-    "jsr": "^0.13.4",
-    "jsr-exports-lint": "^0.4.0",
     "knip": "^5.58.0",
     "lint-staged": "^16.0.0",
-    "messageformat": "4.0.0-12",
     "mitata": "^1.0.34",
     "pkg-pr-new": "^0.0.51",
     "prettier": "^3.5.3",
-    "publint": "^0.3.12",
-    "tsdown": "^0.12.3",
-    "typedoc": "^0.28.4",
-    "typedoc-plugin-markdown": "^4.6.3",
-    "typedoc-vitepress-theme": "^1.1.2",
+    "typescript": "catalog:",
     "typescript-eslint": "^8.32.1",
-    "vitepress": "^1.6.3",
-    "vitepress-plugin-group-icons": "^1.5.5",
-    "vitepress-plugin-llms": "^1.3.4",
-    "vitest": "^3.1.4",
-    "vue": "^3.5.14",
-    "zod": "catalog:"
+    "vitest": "^3.1.4"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

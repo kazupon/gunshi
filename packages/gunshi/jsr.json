@@ -16,13 +16,7 @@
       "CHANGELOG.md",
       "LICENSE"
     ],
-    "exclude": [
-      "src/**/*.test.ts",
-      "src/**/*.test-d.ts",
-      "docs/.vitepress/config.ts",
-      "**/__snapshots__/**",
-      "**/dist/**"
-    ]
+    "exclude": ["src/**/*.test.ts", "src/**/*.test-d.ts", "**/__snapshots__/**", "**/dist/**"]
   },
   "exports": {
     ".": "./src/index.ts",

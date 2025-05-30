@@ -1,3 +1,4 @@
+import { includeIgnoreFile } from '@eslint/compat'
 import {
   comments,
   defineConfig,
@@ -16,8 +17,11 @@ import {
   yaml
 } from '@kazupon/eslint-config'
 import { globalIgnores } from 'eslint/config'
+import { fileURLToPath, URL } from 'node:url'
 
 import type { Linter } from 'eslint'
+
+const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url))
 
 const config: ReturnType<typeof defineConfig> = defineConfig(
   javascript(),
@@ -27,10 +31,10 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
       ignores: [
         './bench/**',
         './playground/**',
-        './docs/**',
-        './test/**',
-        './src/**.test.ts',
-        './src/**.test-d.ts'
+        './packages/docs/**',
+        './**/test/**',
+        './**/src/**.test.ts',
+        './**/src/**.test-d.ts'
       ]
     }
   }),
@@ -83,17 +87,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   }),
   vitest(),
   prettier(),
-  globalIgnores([
-    '.vscode',
-    'docs/.vitepress/cache',
-    'docs/.vitepress/config.ts',
-    'docs/api',
-    '**/dist/**',
-    'lib',
-    'tsconfig.json',
-    'pnpm-lock.yaml',
-    'playground/**'
-  ]) as Linter.Config
+  includeIgnoreFile(gitignorePath),
+  globalIgnores(['.vscode', 'tsconfig.json', 'pnpm-lock.yaml', 'playground/**']) as Linter.Config
 )
 
 export default config

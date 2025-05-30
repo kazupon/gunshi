@@ -6,6 +6,6 @@
     "playground/type-safe-lazy-async/index.ts",
     "playground/bun/index.ts",
     "playground/deno/main.ts",
-    "docs/.vitepress/config.ts"
+    "packages/docs/src/.vitepress/config.ts"
   ]
 }

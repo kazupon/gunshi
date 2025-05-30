@@ -3,14 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -p .",
-    "start": "tsx index.ts"
+    "start": "node index.ts"
   },
   "dependencies": {
     "gunshi": "workspace:*"
   },
-  "devDependencies": {
-    "tsx": "^4.7.1",
-    "typescript": "catalog:"
+  "engines": {
+    "node": ">= 24"
   }
 }

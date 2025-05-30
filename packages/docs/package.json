@@ -1,0 +1,34 @@
+{
+  "name": "@gunshi/docs",
+  "description": "Documentation for gunshi",
+  "private": true,
+  "version": "0.25.0",
+  "author": {
+    "name": "kazuya kawaguchi",
+    "email": "kawakazu80@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazupon/gunshi.git",
+    "directory": "packages/docs"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run build:typedoc && pnpm run build:vitepress",
+    "build:typedoc": "typedoc --excludeInternal",
+    "build:vitepress": "vitepress build src",
+    "dev": "pnpm run build:typedoc && pnpm run dev:vitepress",
+    "dev:vitepress": "vitepress dev src",
+    "preview": "vitepress preview src"
+  },
+  "devDependencies": {
+    "typedoc": "^0.28.4",
+    "typedoc-plugin-markdown": "^4.6.3",
+    "typedoc-vitepress-theme": "^1.1.2",
+    "vitepress": "^1.6.3",
+    "vitepress-plugin-group-icons": "^1.5.5",
+    "vitepress-plugin-llms": "^1.3.4",
+    "vue": "^3.5.14"
+  }
+}

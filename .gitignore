@@ -5,9 +5,9 @@ node_modules
 .clinerules
 lib
 dist
-docs/.vitepress/dist
-docs/.vitepress/cache
-docs/api
+packages/docs/src/.vitepress/dist
+packages/docs/src/.vitepress/cache
+packages/docs/src/api
 generated-docs
 *.log
 *.swp

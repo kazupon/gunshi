@@ -1,6 +1,6 @@
 import { generate as generate019 } from 'gunshi019/generator'
 import { bench } from 'vitest'
-import { generate } from '../lib/generator.js'
+import { generate } from '../packages/gunshi/lib/generator.js'
 import subCommands from './commands.js'
 
 const options = {
