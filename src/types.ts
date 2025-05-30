@@ -297,6 +297,7 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
    * If {@link CommandEnvironment.usageSilent} is true, the message is not output.
    * @param message an output message, @see {@link console.log}
    * @param optionalParams an optional parameters, @see {@link console.log}
+   * @internal
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any
   /**

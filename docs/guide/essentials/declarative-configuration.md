@@ -365,7 +365,6 @@ The `run` function receives a command context object (`ctx`) with:
 - `name`: The name of the _currently executing_ command.
 - `description`: The description of the _currently executing_ command.
 - `env`: The command environment settings (version, logger, renderers, etc.).
-- `log`: Logger function (defaults to `console.log`).
 
 ## CLI Configuration
 
