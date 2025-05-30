@@ -21,7 +21,7 @@ for PKG in packages/* ; do
     fi
     pushd $PKG
     if [[ $PKG == packages/gunshi ]]; then
-      cp ../../assets ./assets
+      cp -r ../../assets ./assets
       cp ../../README.md ./README.md
       cp ../../CHANGELOG.md ./CHANGELOG.md
       cp ../../LICENSE ./LICENSE
