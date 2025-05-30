@@ -16,7 +16,7 @@ fi
 # Release packages
 for PKG in packages/* ; do
   if [[ -d $PKG ]]; then
-    if [[ $PKG == packages/docs]]; then
+    if [[ $PKG == packages/docs ]]; then
       continue
     fi
     pushd $PKG
