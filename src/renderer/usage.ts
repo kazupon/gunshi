@@ -3,11 +3,11 @@
  * @license MIT
  */
 
+import { kebabnize } from 'args-tokens/utils'
 import { COMMON_ARGS } from '../constants.ts'
 import {
   resolveExamples as _resolvedExamples,
   create,
-  kebabnize,
   resolveArgKey,
   resolveBuiltInKey
 } from '../utils.ts'

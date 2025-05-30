@@ -73,16 +73,6 @@ export function resolveBuiltInKey<
   return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
-/**
- * Convert a camelCase string to kebab-case
- * @param str The string to convert
- * @returns The kebab-case version of the string
- */
-export function kebabnize(str: string): string {
-  // eslint-disable-next-line unicorn/prefer-string-replace-all
-  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-}
-
 export function resolveArgKey<A extends Args = {}, K extends string = KeyOfArgs<RemovedIndex<A>>>(
   key: K
 ): GenerateNamespacedKey<K, typeof ARG_PREFIX> {
