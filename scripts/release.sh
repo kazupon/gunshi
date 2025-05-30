@@ -20,6 +20,12 @@ for PKG in packages/* ; do
       continue
     fi
     pushd $PKG
+    if [[ $PKG == packages/gunshi ]]; then
+      cp ../../assets ./assets
+      cp ../../README.md ./README.md
+      cp ../../CHANGELOG.md ./CHANGELOG.md
+      cp ../../LICENSE ./LICENSE
+    fi
     TAG="latest"
     echo "⚡ Publishing $PKG with tag $TAG"
     pnpm publish --access public --no-git-checks --tag $TAG
