@@ -7,7 +7,7 @@ import type { Args, ArgToken, ArgValues } from 'args-tokens'
 
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
-type Awaitable<T> = T | Promise<T>
+export type Awaitable<T> = T | Promise<T>
 
 type RemoveIndexSignature<T> = {
   [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]

@@ -4,8 +4,10 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, COMMON_ARGS } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT } from './constants.ts'
 import { createCommandContext } from './context.ts'
+import { PluginContext } from './plugin.ts'
+import builtins from './plugins/builtins.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
@@ -33,6 +35,11 @@ export async function cli<A extends Args = Args>(
 ): Promise<string | undefined> {
   const cliOptions = resolveCliOptions(options, entry)
 
+  const pluginContext = new PluginContext()
+  for (const plugin of [builtins]) {
+    await plugin()(pluginContext)
+  }
+
   const tokens = parseArgs(argv)
   const subCommand = getSubCommand(tokens)
   const {
@@ -44,14 +51,14 @@ export async function cli<A extends Args = Args>(
     throw new Error(`Command not found: ${name || ''}`)
   }
 
-  const args = resolveArguments(getCommandArgs(command))
+  const args = resolveArguments(pluginContext, getCommandArgs(command))
   const { values, positionals, rest, error } = resolveArgs(args, tokens, {
     shortGrouping: true,
     toKebab: command.toKebab,
     skipPositional: cliOptions.subCommands!.size > 0 ? 0 : -1
   })
   const omitted = !subCommand
-  const ctx = await createCommandContext({
+  const commandContext = await createCommandContext({
     args,
     values,
     positionals,
@@ -65,19 +72,19 @@ export async function cli<A extends Args = Args>(
   })
 
   if (values.version) {
-    showVersion(ctx)
+    showVersion(commandContext)
     return
   }
 
   const usageBuffer: string[] = []
 
-  const header = await showHeader(ctx)
+  const header = await showHeader(commandContext)
   if (header) {
     usageBuffer.push(header)
   }
 
   if (values.help) {
-    const usage = await showUsage(ctx)
+    const usage = await showUsage(commandContext)
     if (usage) {
       usageBuffer.push(usage)
     }
@@ -85,11 +92,11 @@ export async function cli<A extends Args = Args>(
   }
 
   if (error) {
-    await showValidationErrors(ctx, error)
+    await showValidationErrors(commandContext, error)
     return
   }
 
-  await executeCommand(command, ctx, name || '')
+  await executeCommand(command, commandContext, name || '')
 }
 
 function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {
@@ -102,8 +109,8 @@ function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {
   }
 }
 
-function resolveArguments<A extends Args>(args?: A): A {
-  return Object.assign(create<A>(), args, COMMON_ARGS)
+function resolveArguments<A extends Args>(pluginContext: PluginContext, args?: A): A {
+  return Object.assign(create<A>(), args, Object.fromEntries(pluginContext.globalOptions))
 }
 
 function resolveCliOptions<A extends Args>(
