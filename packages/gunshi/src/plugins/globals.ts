@@ -8,7 +8,7 @@ import { COMMON_ARGS } from '../constants.ts'
 import type { PluginContext } from '../plugin.ts'
 
 /**
- * Built-in globa options plugin for Gunshi.
+ * Built-in global options plugin for Gunshi.
  */
 export default function globals(ctx: PluginContext) {
   for (const [name, schema] of Object.entries(COMMON_ARGS)) {
