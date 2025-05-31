@@ -42,7 +42,7 @@ export class PluginContext {
   }
 
   addGlobalOption(name: string, schema: ArgSchema): void {
-    if (!name || typeof name !== 'string') {
+    if (!name) {
       throw new Error('Option name must be a non-empty string')
     }
     if (this.#globalOptions.has(name)) {
