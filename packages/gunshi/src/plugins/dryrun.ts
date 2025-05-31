@@ -3,13 +3,11 @@
  * @license MIT
  */
 
-import type { Plugin } from '../plugin.ts'
+import type { PluginContext } from '../plugin.ts'
 
 /**
  * `dry-run` option plugin for Gunshi.
  */
-export default function dryRun(): Plugin {
-  return _ctx => {
-    // TODO: Implement dry-run plugin logic
-  }
+export default function dryRun(_ctx: PluginContext) {
+  // TODO: Implement dry-run plugin logic
 }

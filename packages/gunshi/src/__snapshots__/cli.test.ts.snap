@@ -33,9 +33,9 @@ USAGE:
   gunshi <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          [string]  The foo option
   -h, --help               [boolean] Display this help message
   -v, --version            [boolean] Display this version
+  -f, --foo <foo>          [string]  The foo option
 
 EXAMPLES:
   # Example 1
@@ -49,17 +49,17 @@ exports[`auto generate usage > loosely entry command > USAGE:
   COMMAND <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          
   -h, --help               Display this help message
   -v, --version            Display this version
+  -f, --foo <foo>          
  1`] = `
 "USAGE:
   COMMAND <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          
   -h, --help               Display this help message
   -v, --version            Display this version
+  -f, --foo <foo>          
 "
 `;
 
@@ -68,9 +68,9 @@ exports[`auto generate usage > loosely entry command 1`] = `
   COMMAND <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          
   -h, --help               Display this help message
   -v, --version            Display this version
+  -f, --foo <foo>          
 "
 `;
 
@@ -79,9 +79,9 @@ exports[`auto generate usage > loosely sub commands > command2 1`] = `
   COMMAND command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]           (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
+  -b, --bar [bar]           (default: 42)
 "
 `;
 
@@ -90,9 +90,9 @@ exports[`auto generate usage > loosely sub commands > main 1`] = `
   COMMAND <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          
   -h, --help               Display this help message
   -v, --version            Display this version
+  -f, --foo <foo>          
 "
 `;
 
@@ -101,17 +101,17 @@ exports[`auto generate usage > loosely sub commands 1`] = `
   COMMAND <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          
   -h, --help               Display this help message
   -v, --version            Display this version
+  -f, --foo <foo>          
 
 USAGE:
   COMMAND command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]           (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
+  -b, --bar [bar]           (default: 42)
 "
 `;
 
@@ -120,9 +120,9 @@ USAGE:
   gunshi <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          [string]  The foo option
   -h, --help               [boolean] Display this help message
   -v, --version            [boolean] Display this version
+  -f, --foo <foo>          [string]  The foo option
 
 EXAMPLES:
   # Example 1
@@ -136,9 +136,9 @@ USAGE:
   gunshi <OPTIONS>
 
 OPTIONS:
-  -f, --foo <foo>          [string]  The foo option
   -h, --help               [boolean] Display this help message
   -v, --version            [boolean] Display this version
+  -f, --foo <foo>          [string]  The foo option
 
 EXAMPLES:
   # Example 1
@@ -154,9 +154,9 @@ USAGE:
   gunshi command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]          The bar option (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
+  -b, --bar [bar]          The bar option (default: 42)
 
 EXAMPLES:
   # Example 1
@@ -181,9 +181,9 @@ exports[`auto generate usage > strictly sub commands > main 1`] = `
     gunshi command1 --help
 
 オプション:
-    -f, --foo <foo>               The foo option
     -h, --help                    Display this help message
     -v, --version                 Display this version
+    -f, --foo <foo>               The foo option
 
 例:
     # Example 1
@@ -209,9 +209,9 @@ exports[`auto generate usage > strictly sub commands 1`] = `
     gunshi command1 --help
 
 オプション:
-    -f, --foo <foo>               The foo option
     -h, --help                    Display this help message
     -v, --version                 Display this version
+    -f, --foo <foo>               The foo option
 
 例:
     # Example 1
@@ -225,9 +225,9 @@ USAGE:
   gunshi command2 <OPTIONS>
 
 OPTIONS:
-  -b, --bar [bar]          The bar option (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
+  -b, --bar [bar]          The bar option (default: 42)
 
 EXAMPLES:
   # Example 1
@@ -242,11 +242,11 @@ exports[`custom generate usage > basic 1`] = `
   gunshi [options]
 
 Options:
+  --help       [boolean]   Display this help message
+  --version    [boolean]   Display this version
   --foo        [string]    this is foo option
   --bar        [boolean]   this is bar option
   --baz        [number]    this is baz option
-  --help       [boolean]   Display this help message
-  --version    [boolean]   Display this version
 
 *****************************************
 * Optional argument '--bar' is required *
@@ -260,9 +260,9 @@ USAGE:
   gunshi <OPTIONS>
 
 OPTIONS:
-  -d, --description <description>          This is a description of description option
   -h, --help                               Display this help message
   -v, --version                            Display this version
+  -d, --description <description>          This is a description of description option
 "
 `;
 
@@ -272,10 +272,10 @@ USAGE:
   gunshi <OPTIONS>
 
 OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
   -f, --foo <foo>          this is foo option
   --bar                    this is bar option
   -b, --baz [baz]          this is baz option (default: 42)
-  -h, --help               Display this help message
-  -v, --version            Display this version
 "
 `;

@@ -7,7 +7,7 @@ import { parseArgs, resolveArgs } from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { PluginContext } from './plugin.ts'
-import builtins from './plugins/builtins.ts'
+import { plugins } from './plugins/index.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
@@ -36,9 +36,7 @@ export async function cli<A extends Args = Args>(
   const cliOptions = resolveCliOptions(options, entry)
 
   const pluginContext = new PluginContext()
-  for (const plugin of [builtins]) {
-    await plugin()(pluginContext)
-  }
+  await applyPlugins(pluginContext)
 
   const tokens = parseArgs(argv)
   const subCommand = getSubCommand(tokens)
@@ -97,6 +95,17 @@ export async function cli<A extends Args = Args>(
   }
 
   await executeCommand(command, commandContext, name || '')
+}
+
+async function applyPlugins(pluginContext: PluginContext): Promise<void> {
+  try {
+    // TODO(kazupon): add more user plugins loading logic
+    for (const plugin of plugins) {
+      await plugin(pluginContext)
+    }
+  } catch (error: unknown) {
+    console.error('Error loading plugin:', (error as Error).message)
+  }
 }
 
 function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {

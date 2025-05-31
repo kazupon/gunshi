@@ -6,11 +6,11 @@ USAGE:
   generator <OPTIONS>
 
 OPTIONS:
+  -h, --help                Display this help message
+  -v, --version             Display this version
   -c, --catalog             Display the catalog only (default: false)
   -d, --dependency          Display the catalogable dependencies only
   --no-dependency           Negatable of -d, --dependency
-  -h, --help                Display this help message
-  -v, --version             Display this version
 
 EXAMPLES:
   # Show the catalog and catalogable dependencies:
@@ -26,11 +26,11 @@ USAGE:
   generator show <OPTIONS>
 
 OPTIONS:
+  -h, --help                Display this help message
+  -v, --version             Display this version
   -c, --catalog             Display the catalog only (default: false)
   -d, --dependency          Display the catalogable dependencies only
   --no-dependency           Negatable of -d, --dependency
-  -h, --help                Display this help message
-  -v, --version             Display this version
 
 EXAMPLES:
   # Show the catalog and catalogable dependencies:
