@@ -26,6 +26,7 @@ export default {
     '**/src/**.test-d.ts',
     'bench/**',
     // TODO(kazupon): Remove these, after will be finished
+    'packages/gunshi/src/plugin.ts',
     'packages/gunshi/src/plugins/dryrun.ts',
     'packages/gunshi/src/plugins/completion.ts'
   ],
