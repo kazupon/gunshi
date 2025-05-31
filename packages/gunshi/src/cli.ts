@@ -110,7 +110,11 @@ function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {
 }
 
 function resolveArguments<A extends Args>(pluginContext: PluginContext, args?: A): A {
-  return Object.assign(create<A>(), args, Object.fromEntries(pluginContext.globalOptions))
+  return Object.assign(
+    create<A>(),
+    Object.fromEntries(pluginContext.globalOptions),
+    args
+  )
 }
 
 function resolveCliOptions<A extends Args>(
