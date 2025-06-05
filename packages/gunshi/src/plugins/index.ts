@@ -6,5 +6,6 @@
 import completion from './completion.ts'
 import dryRun from './dryrun.ts'
 import globals from './globals.ts'
+import type { Plugin } from '../plugin.ts'
 
-export const plugins = [globals, completion, dryRun]
+export const plugins: Plugin[] = [globals, completion, dryRun]

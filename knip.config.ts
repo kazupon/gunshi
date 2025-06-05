@@ -21,14 +21,6 @@ export default {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts']
     }
   },
-  ignore: [
-    'playground/deno/main.ts',
-    '**/src/**.test-d.ts',
-    'bench/**',
-    // TODO(kazupon): Remove these, after will be finished
-    'packages/gunshi/src/plugin.ts',
-    'packages/gunshi/src/plugins/dryrun.ts',
-    'packages/gunshi/src/plugins/completion.ts'
-  ],
+  ignore: ['playground/deno/main.ts', '**/src/**.test-d.ts', 'bench/**'],
   ignoreDependencies: ['lint-staged', 'deno', 'gunshi019', 'mitata']
 } satisfies KnipConfig
