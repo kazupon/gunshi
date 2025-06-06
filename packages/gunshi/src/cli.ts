@@ -6,9 +6,9 @@
 import { parseArgs, resolveArgs } from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT } from './constants.ts'
 import { createCommandContext } from './context.ts'
+import { RendererDecorators } from './decorators.ts'
 import { PluginContext } from './plugin.ts'
 import { plugins } from './plugins/index.ts'
-import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
 import type { Args, ArgToken } from 'args-tokens'
@@ -35,7 +35,8 @@ export async function cli<A extends Args = Args>(
 ): Promise<string | undefined> {
   const cliOptions = resolveCliOptions(options, entry)
 
-  const pluginContext = new PluginContext()
+  const decorators = new RendererDecorators()
+  const pluginContext = new PluginContext(decorators)
   await applyPlugins(pluginContext)
 
   const tokens = parseArgs(argv)
@@ -76,13 +77,13 @@ export async function cli<A extends Args = Args>(
 
   const usageBuffer: string[] = []
 
-  const header = await showHeader(commandContext)
+  const header = await showHeader(commandContext, decorators)
   if (header) {
     usageBuffer.push(header)
   }
 
   if (values.help) {
-    const usage = await showUsage(commandContext)
+    const usage = await showUsage(commandContext, decorators)
     if (usage) {
       usageBuffer.push(usage)
     }
@@ -90,7 +91,7 @@ export async function cli<A extends Args = Args>(
   }
 
   if (error) {
-    await showValidationErrors(commandContext, error)
+    await showValidationErrors(commandContext, error, decorators)
     return
   }
 
@@ -152,11 +153,15 @@ function getSubCommand(tokens: ArgToken[]): string {
     : ''
 }
 
-async function showUsage<A extends Args>(ctx: CommandContext<A>): Promise<string | undefined> {
+async function showUsage<A extends Args>(
+  ctx: CommandContext<A>,
+  decorators: RendererDecorators
+): Promise<string | undefined> {
   if (ctx.env.renderUsage === null) {
     return
   }
-  const usage = await (ctx.env.renderUsage || renderUsage)(ctx)
+  const renderer = ctx.env.renderUsage || decorators.getUsageRenderer()
+  const usage = await renderer(ctx)
   if (usage) {
     ctx.log(usage)
     return usage
@@ -167,11 +172,15 @@ function showVersion<A extends Args>(ctx: CommandContext<A>): void {
   ctx.log(ctx.env.version)
 }
 
-async function showHeader<A extends Args>(ctx: CommandContext<A>): Promise<string | undefined> {
+async function showHeader<A extends Args>(
+  ctx: CommandContext<A>,
+  decorators: RendererDecorators
+): Promise<string | undefined> {
   if (ctx.env.renderHeader === null) {
     return
   }
-  const header = await (ctx.env.renderHeader || renderHeader)(ctx)
+  const renderer = ctx.env.renderHeader || decorators.getHeaderRenderer()
+  const header = await renderer(ctx)
   if (header) {
     ctx.log(header)
     ctx.log()
@@ -181,13 +190,14 @@ async function showHeader<A extends Args>(ctx: CommandContext<A>): Promise<strin
 
 async function showValidationErrors<A extends Args>(
   ctx: CommandContext<A>,
-  error: AggregateError
+  error: AggregateError,
+  decorators: RendererDecorators
 ): Promise<void> {
   if (ctx.env.renderValidationErrors === null) {
     return
   }
-  const render = ctx.env.renderValidationErrors || renderValidationErrors
-  ctx.log(await render(ctx, error))
+  const renderer = ctx.env.renderValidationErrors || decorators.getValidationErrorsRenderer()
+  ctx.log(await renderer(ctx, error))
 }
 
 type ResolveCommandContext<A extends Args = Args> = {

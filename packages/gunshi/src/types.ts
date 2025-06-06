@@ -480,3 +480,29 @@ export type LazyCommand<A extends Args = Args> = {
  * Define a command type.
  */
 export type Commandable<A extends Args> = Command<A> | LazyCommand<A>
+
+/**
+ * Renderer decorator type.
+ * A function that wraps a base renderer to add or modify its behavior.
+ * @param baseRenderer The base renderer function to decorate
+ * @param ctx The command context
+ * @returns The decorated result
+ */
+export type RendererDecorator<T> = (
+  baseRenderer: (ctx: CommandContext) => Promise<T>,
+  ctx: CommandContext
+) => Promise<T>
+
+/**
+ * Validation errors renderer decorator type.
+ * A function that wraps a validation errors renderer to add or modify its behavior.
+ * @param baseRenderer The base validation errors renderer function to decorate
+ * @param ctx The command context
+ * @param error The aggregate error containing validation errors
+ * @returns The decorated result
+ */
+export type ValidationErrorsDecorator = (
+  baseRenderer: (ctx: CommandContext, error: AggregateError) => Promise<string>,
+  ctx: CommandContext,
+  error: AggregateError
+) => Promise<string>

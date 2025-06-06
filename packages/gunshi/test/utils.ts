@@ -10,7 +10,11 @@ import { vi } from 'vitest'
 import { DefaultTranslation } from '../src/translation.ts'
 
 import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core'
-import type { TranslationAdapter, TranslationAdapterFactoryOptions } from '../src/types.ts'
+import type {
+  CommandContext,
+  TranslationAdapter,
+  TranslationAdapterFactoryOptions
+} from '../src/types.ts'
 
 export function defineMockLog(utils: typeof import('../src/utils.ts')) {
   const logs: unknown[] = []
@@ -131,5 +135,40 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
 
     const ret = translate(this.#context, key, values)
     return typeof ret === 'number' && ret === NOT_REOSLVED ? undefined : (ret as string)
+  }
+}
+
+export function createMockCommandContext(): CommandContext {
+  return {
+    name: 'test-command',
+    description: 'Test command',
+    locale: new Intl.Locale('en-US'),
+    env: {
+      cwd: undefined,
+      name: 'test-app',
+      description: 'Test application',
+      version: '1.0.0',
+      leftMargin: 2,
+      middleMargin: 10,
+      usageOptionType: false,
+      usageOptionValue: true,
+      usageSilent: false,
+      subCommands: undefined,
+      renderUsage: undefined,
+      renderHeader: undefined,
+      renderValidationErrors: undefined
+    },
+    args: {},
+    values: {},
+    positionals: [],
+    rest: [],
+    _: [],
+    tokens: [],
+    omitted: false,
+    callMode: 'entry',
+    log: vi.fn(),
+    loadCommands: vi.fn().mockResolvedValue([]),
+    // eslint-disable-next-line unicorn/prefer-native-coercion-functions, @typescript-eslint/no-explicit-any
+    translate: ((key: any) => String(key)) as CommandContext['translate']
   }
 }

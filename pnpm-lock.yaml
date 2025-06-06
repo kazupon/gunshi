@@ -236,6 +236,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/gunshi
 
+  playground/renderer-plugin:
+    dependencies:
+      gunshi:
+        specifier: workspace:*
+        version: link:../../packages/gunshi
+
   playground/simple:
     dependencies:
       gunshi:

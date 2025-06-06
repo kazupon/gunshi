@@ -14,7 +14,8 @@
  */
 
 import type { ArgSchema } from 'args-tokens'
-import type { Awaitable } from './types.ts'
+import type { RendererDecorators } from './decorators.ts'
+import type { Awaitable, RendererDecorator, ValidationErrorsDecorator } from './types.ts'
 
 /**
  * Gunshi plugin, which is a function that receives a PluginContext.
@@ -28,19 +29,25 @@ export type Plugin = (ctx: PluginContext) => Awaitable<void>
  */
 export class PluginContext {
   #globalOptions: Map<string, ArgSchema> = new Map()
+  #decorators: RendererDecorators
 
-  constructor() {
-    // TODO:
+  constructor(decorators: RendererDecorators) {
+    this.#decorators = decorators
   }
 
   /**
-   * Get the global options.
+   * Get the global options
    * @returns A map of global options.
    */
   get globalOptions(): Map<string, ArgSchema> {
     return new Map(this.#globalOptions)
   }
 
+  /**
+   * Add a global option.
+   * @param name An option name
+   * @param schema An {@link ArgSchema} for the option
+   */
   addGlobalOption(name: string, schema: ArgSchema): void {
     if (!name) {
       throw new Error('Option name must be a non-empty string')
@@ -51,5 +58,27 @@ export class PluginContext {
     this.#globalOptions.set(name, schema)
   }
 
-  // TODO: Implement more hooks for plugin context
+  /**
+   * Decorate the header renderer.
+   * @param decorator - A decorator function that wraps the base header renderer.
+   */
+  decorateHeaderRenderer(decorator: RendererDecorator<string>): void {
+    this.#decorators.addHeaderDecorator(decorator)
+  }
+
+  /**
+   * Decorate the usage renderer.
+   * @param decorator - A decorator function that wraps the base usage renderer.
+   */
+  decorateUsageRenderer(decorator: RendererDecorator<string>): void {
+    this.#decorators.addUsageDecorator(decorator)
+  }
+
+  /**
+   * Decorate the validation errors renderer.
+   * @param decorator - A decorator function that wraps the base validation errors renderer.
+   */
+  decorateValidationErrorsRenderer(decorator: ValidationErrorsDecorator): void {
+    this.#decorators.addValidationErrorsDecorator(decorator)
+  }
 }

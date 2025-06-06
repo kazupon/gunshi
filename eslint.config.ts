@@ -33,8 +33,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
         './playground/**',
         './packages/docs/**',
         './**/test/**',
-        './**/src/**.test.ts',
-        './**/src/**.test-d.ts'
+        './**/src/**/*.test.ts',
+        './**/src/**/*.test-d.ts'
       ]
     }
   }),
