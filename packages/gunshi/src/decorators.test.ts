@@ -1,13 +1,6 @@
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { createMockCommandContext } from '../test/utils.ts'
 import { RendererDecorators } from './decorators.ts'
-
-// Mock the default renderers
-vi.mock('./renderer.ts', () => ({
-  renderHeader: vi.fn().mockResolvedValue('Default Header'),
-  renderUsage: vi.fn().mockResolvedValue('Default Usage'),
-  renderValidationErrors: vi.fn().mockResolvedValue('Default Validation Errors')
-}))
 
 describe('RendererDecorators', () => {
   test('Return default header renderer when no decorators', async () => {
@@ -17,7 +10,7 @@ describe('RendererDecorators', () => {
 
     const result = await renderer(ctx)
 
-    expect(result).toBe('Default Header')
+    expect(result).toBe('')
   })
 
   test('Return default usage renderer when no decorators', async () => {
@@ -27,7 +20,7 @@ describe('RendererDecorators', () => {
 
     const result = await renderer(ctx)
 
-    expect(result).toBe('Default Usage')
+    expect(result).toBe('')
   })
 
   test('Return default validation errors renderer when no decorators', async () => {
@@ -38,7 +31,7 @@ describe('RendererDecorators', () => {
 
     const result = await renderer(ctx, error)
 
-    expect(result).toBe('Default Validation Errors')
+    expect(result).toBe('')
   })
 
   test('Apply single header decorator', async () => {
@@ -53,7 +46,7 @@ describe('RendererDecorators', () => {
     const renderer = decorators.getHeaderRenderer()
     const result = await renderer(ctx)
 
-    expect(result).toBe('[DECORATED] Default Header')
+    expect(result).toBe('[DECORATED] ')
   })
 
   test('Apply multiple decorators in correct order', async () => {
@@ -74,7 +67,7 @@ describe('RendererDecorators', () => {
     const result = await renderer(ctx)
 
     // B is applied last, so it wraps A
-    expect(result).toBe('[B] [A] Default Header [B]')
+    expect(result).toBe('[B] [A]  [B]')
   })
 
   test('Handle async decorators correctly', async () => {
@@ -91,7 +84,7 @@ describe('RendererDecorators', () => {
     const renderer = decorators.getUsageRenderer()
     const result = await renderer(ctx)
 
-    expect(result).toBe('[ASYNC] Default Usage [ASYNC]')
+    expect(result).toBe('[ASYNC]  [ASYNC]')
   })
 
   test('Pass context correctly through decorators', async () => {
@@ -107,7 +100,7 @@ describe('RendererDecorators', () => {
     const renderer = decorators.getHeaderRenderer()
     const result = await renderer(ctx)
 
-    expect(result).toBe('[special-command] Default Header [special-command]')
+    expect(result).toBe('[special-command]  [special-command]')
   })
 
   test('Handle validation errors decorator with error parameter', async () => {
@@ -126,7 +119,7 @@ describe('RendererDecorators', () => {
     const renderer = decorators.getValidationErrorsRenderer()
     const result = await renderer(ctx, error)
 
-    expect(result).toBe('[2 errors] Default Validation Errors [2 errors]')
+    expect(result).toBe('[2 errors]  [2 errors]')
   })
 
   test('Handle decorator that throws error', async () => {
@@ -151,10 +144,8 @@ describe('RendererDecorators', () => {
     const usageRenderer = decorators.getUsageRenderer()
     const validationRenderer = decorators.getValidationErrorsRenderer()
 
-    expect(await headerRenderer(ctx)).toBe('Default Header')
-    expect(await usageRenderer(ctx)).toBe('Default Usage')
-    expect(await validationRenderer(ctx, new AggregateError([], 'validation errors'))).toBe(
-      'Default Validation Errors'
-    )
+    expect(await headerRenderer(ctx)).toBe('')
+    expect(await usageRenderer(ctx)).toBe('')
+    expect(await validationRenderer(ctx, new AggregateError([], 'validation errors'))).toBe('')
   })
 })

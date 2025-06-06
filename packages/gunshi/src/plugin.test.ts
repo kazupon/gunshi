@@ -1,14 +1,7 @@
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { createMockCommandContext } from '../test/utils.ts'
 import { RendererDecorators } from './decorators.ts'
 import { PluginContext } from './plugin.ts'
-
-// Mock the default renderers
-vi.mock('./renderer.ts', () => ({
-  renderHeader: vi.fn().mockResolvedValue('Default Header'),
-  renderUsage: vi.fn().mockResolvedValue('Default Usage'),
-  renderValidationErrors: vi.fn().mockResolvedValue('Default Validation Errors')
-}))
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -54,7 +47,7 @@ describe('PluginContext#decorateHeaderRenderer', () => {
     const mockCtx = createMockCommandContext()
     const result = await renderer(mockCtx)
 
-    expect(result).toBe('[DECORATED] Default Header')
+    expect(result).toBe('[DECORATED] ')
   })
 })
 
@@ -72,7 +65,7 @@ describe('PluginContext#decorateUsageRenderer', () => {
     const mockCtx = createMockCommandContext()
     const result = await renderer(mockCtx)
 
-    expect(result).toBe('[USAGE] Default Usage')
+    expect(result).toBe('[USAGE] ')
   })
 })
 
@@ -91,6 +84,6 @@ describe('PluginContext#decorateValidationErrorsRenderer', () => {
     const error = new AggregateError([new Error('Test')], 'Validation failed')
     const result = await renderer(mockCtx, error)
 
-    expect(result).toBe('[ERROR] Default Validation Errors')
+    expect(result).toBe('[ERROR] ')
   })
 })

@@ -3,9 +3,11 @@
  * @license MIT
  */
 
-import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
-
 import type { CommandContext, RendererDecorator, ValidationErrorsDecorator } from './types.ts'
+
+// Default empty renderers for performance optimization
+const EMPTY_RENDERER = async () => ''
+const EMPTY_VALIDATION_RENDERER = async () => ''
 
 /**
  * Internal class for managing renderer decorators.
@@ -29,22 +31,24 @@ export class RendererDecorators {
   }
 
   getHeaderRenderer(): (ctx: CommandContext) => Promise<string> {
-    return this.#buildRenderer(this.#headerDecorators, renderHeader)
+    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
   }
 
   getUsageRenderer(): (ctx: CommandContext) => Promise<string> {
-    return this.#buildRenderer(this.#usageDecorators, renderUsage)
+    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
   }
 
   getValidationErrorsRenderer(): (ctx: CommandContext, error: AggregateError) => Promise<string> {
     if (this.#validationDecorators.length === 0) {
-      return renderValidationErrors
+      return EMPTY_VALIDATION_RENDERER
     }
 
-    let renderer = renderValidationErrors
+    let renderer: (ctx: CommandContext, error: AggregateError) => Promise<string> =
+      EMPTY_VALIDATION_RENDERER
     for (const decorator of this.#validationDecorators) {
       const previousRenderer = renderer
-      renderer = (ctx, error) => decorator(previousRenderer, ctx, error)
+      renderer = (ctx: CommandContext, error: AggregateError) =>
+        decorator(previousRenderer, ctx, error)
     }
     return renderer
   }
