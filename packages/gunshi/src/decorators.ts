@@ -5,9 +5,7 @@
 
 import type { CommandContext, RendererDecorator, ValidationErrorsDecorator } from './types.ts'
 
-// Default empty renderers for performance optimization
 const EMPTY_RENDERER = async () => ''
-const EMPTY_VALIDATION_RENDERER = async () => ''
 
 /**
  * Internal class for managing renderer decorators.
@@ -40,11 +38,10 @@ export class RendererDecorators {
 
   getValidationErrorsRenderer(): (ctx: CommandContext, error: AggregateError) => Promise<string> {
     if (this.#validationDecorators.length === 0) {
-      return EMPTY_VALIDATION_RENDERER
+      return EMPTY_RENDERER
     }
 
-    let renderer: (ctx: CommandContext, error: AggregateError) => Promise<string> =
-      EMPTY_VALIDATION_RENDERER
+    let renderer: (ctx: CommandContext, error: AggregateError) => Promise<string> = EMPTY_RENDERER
     for (const decorator of this.#validationDecorators) {
       const previousRenderer = renderer
       renderer = (ctx: CommandContext, error: AggregateError) =>
