@@ -157,6 +157,7 @@ async function showUsage<A extends Args>(
   ctx: CommandContext<A>,
   decorators: RendererDecorators
 ): Promise<string | undefined> {
+  // TODO(kazupon): deprecate cliOptions.renderUsage
   if (ctx.env.renderUsage === null) {
     return
   }
@@ -176,6 +177,7 @@ async function showHeader<A extends Args>(
   ctx: CommandContext<A>,
   decorators: RendererDecorators
 ): Promise<string | undefined> {
+  // TODO(kazupon): deprecate cliOptions.renderHeader
   if (ctx.env.renderHeader === null) {
     return
   }
@@ -193,6 +195,7 @@ async function showValidationErrors<A extends Args>(
   error: AggregateError,
   decorators: RendererDecorators
 ): Promise<void> {
+  // TODO(kazupon): deprecate cliOptions.renderValidationErrors
   if (ctx.env.renderValidationErrors === null) {
     return
   }
