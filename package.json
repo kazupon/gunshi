@@ -51,7 +51,7 @@
   "devDependencies": {
     "@eslint/compat": "^1.2.9",
     "@eslint/markdown": "^6.4.0",
-    "@kazupon/eslint-config": "^0.30.0",
+    "@kazupon/eslint-config": "^0.31.0",
     "@kazupon/prettier-config": "^0.1.1",
     "@types/node": "^22.15.29",
     "@typescript/native-preview": "7.0.0-dev.20250607.1",
