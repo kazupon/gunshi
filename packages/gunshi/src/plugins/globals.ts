@@ -14,4 +14,42 @@ export default function globals(ctx: PluginContext) {
   for (const [name, schema] of Object.entries(COMMON_ARGS)) {
     ctx.addGlobalOption(name, schema)
   }
+
+  // Apply help and version decorators
+  ctx.decorateCommand(baseRunner => async ctx => {
+    if (ctx.values.version) {
+      const version = ctx.env.version || 'unknown'
+      if (!ctx.env.usageSilent) {
+        ctx.log(version)
+      }
+      return version
+    }
+
+    const outBuf: string[] = []
+
+    let header: string | undefined
+    if (ctx.env.renderHeader !== null && ctx.env.renderHeader !== undefined) {
+      header = await ctx.env.renderHeader(ctx)
+      if (header) {
+        ctx.log(header)
+        ctx.log() // Empty line after header
+        outBuf.push(header)
+      }
+    }
+
+    if (ctx.values.help) {
+      if (ctx.env.renderUsage !== null && ctx.env.renderUsage !== undefined) {
+        const usage = await ctx.env.renderUsage(ctx)
+        if (usage) {
+          ctx.log(usage)
+          outBuf.push(usage)
+          return outBuf.join('\n')
+        }
+      }
+      return
+    }
+
+    // Normal command execution
+    return baseRunner(ctx)
+  })
 }

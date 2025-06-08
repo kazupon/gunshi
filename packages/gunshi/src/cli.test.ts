@@ -1016,6 +1016,65 @@ describe('custom type arguments', () => {
   })
 })
 
+describe('command decorators', () => {
+  test('command decorators in reverse order', async () => {
+    const mockFn = vi.fn()
+    const command = {
+      name: 'test',
+      run: mockFn
+    }
+
+    await cli(['test'], command)
+
+    expect(mockFn).toHaveBeenCalled()
+  })
+
+  test('return string from command runner', async () => {
+    const command = {
+      name: 'test',
+      run: () => {
+        return 'Command output'
+      }
+    }
+
+    const result = await cli(['test'], command)
+
+    expect(result).toBe('Command output')
+  })
+
+  test('return string from decorator', async () => {
+    const command = {
+      name: 'test',
+      run: () => {
+        return 'Command output'
+      }
+    }
+
+    const result = await cli(['--version'], command, {
+      usageSilent: true,
+      version: '1.2.3'
+    })
+
+    expect(result).toBe('1.2.3')
+  })
+
+  test('not call command runner', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const mockFn = vi.fn()
+    const command = {
+      name: 'test',
+      run: mockFn
+    }
+
+    await cli(['--help'], command)
+
+    expect(mockFn).not.toHaveBeenCalled()
+    expect(log()).toMatchSnapshot()
+  })
+})
+
 describe('edge cases', () => {
   test(`'description' option`, async () => {
     const command = define({

@@ -39,6 +39,17 @@ export async function cli<A extends Args = Args>(
   const pluginContext = new PluginContext(decorators)
   await applyPlugins(pluginContext)
 
+  // Set default renderers if not provided via cli options
+  if (cliOptions.renderHeader === undefined) {
+    cliOptions.renderHeader = decorators.getHeaderRenderer()
+  }
+  if (cliOptions.renderUsage === undefined) {
+    cliOptions.renderUsage = decorators.getUsageRenderer()
+  }
+  if (cliOptions.renderValidationErrors === undefined) {
+    cliOptions.renderValidationErrors = decorators.getValidationErrorsRenderer()
+  }
+
   const tokens = parseArgs(argv)
   const subCommand = getSubCommand(tokens)
   const {
@@ -70,32 +81,15 @@ export async function cli<A extends Args = Args>(
     cliOptions: cliOptions
   })
 
-  if (values.version) {
-    showVersion(commandContext)
-    return
-  }
+  // Skip validation if help or version is requested
+  const skipValidation = values.help || values.version
 
-  const usageBuffer: string[] = []
-
-  const header = await showHeader(commandContext, decorators)
-  if (header) {
-    usageBuffer.push(header)
-  }
-
-  if (values.help) {
-    const usage = await showUsage(commandContext, decorators)
-    if (usage) {
-      usageBuffer.push(usage)
-    }
-    return usageBuffer.join('\n')
-  }
-
-  if (error) {
+  if (!skipValidation && error) {
     await showValidationErrors(commandContext, error, decorators)
     return
   }
 
-  await executeCommand(command, commandContext, name || '')
+  return await executeCommand(command, commandContext, name || '', pluginContext)
 }
 
 async function applyPlugins(pluginContext: PluginContext): Promise<void> {
@@ -151,43 +145,6 @@ function getSubCommand(tokens: ArgToken[]): string {
     firstToken.value
     ? firstToken.value
     : ''
-}
-
-async function showUsage<A extends Args>(
-  ctx: CommandContext<A>,
-  decorators: RendererDecorators
-): Promise<string | undefined> {
-  // TODO(kazupon): deprecate cliOptions.renderUsage
-  if (ctx.env.renderUsage === null) {
-    return
-  }
-  const renderer = ctx.env.renderUsage || decorators.getUsageRenderer()
-  const usage = await renderer(ctx)
-  if (usage) {
-    ctx.log(usage)
-    return usage
-  }
-}
-
-function showVersion<A extends Args>(ctx: CommandContext<A>): void {
-  ctx.log(ctx.env.version)
-}
-
-async function showHeader<A extends Args>(
-  ctx: CommandContext<A>,
-  decorators: RendererDecorators
-): Promise<string | undefined> {
-  // TODO(kazupon): deprecate cliOptions.renderHeader
-  if (ctx.env.renderHeader === null) {
-    return
-  }
-  const renderer = ctx.env.renderHeader || decorators.getHeaderRenderer()
-  const header = await renderer(ctx)
-  if (header) {
-    ctx.log(header)
-    ctx.log()
-    return header
-  }
 }
 
 async function showValidationErrors<A extends Args>(
@@ -278,11 +235,22 @@ function resolveEntryName<A extends Args>(entry: Command<A>): string {
 async function executeCommand<A extends Args = Args>(
   cmd: Command<A> | LazyCommand<A>,
   ctx: CommandContext<A>,
-  name: string
-): Promise<void> {
+  name: string,
+  pluginContext: PluginContext
+): Promise<string | undefined> {
   const resolved = isLazyCommand<A>(cmd) ? await resolveLazyCommand<A>(cmd, name, true) : cmd
-  if (resolved.run == null) {
-    throw new Error(`'run' not found on Command \`${name}\``)
-  }
-  await resolved.run(ctx)
+  const baseRunner = resolved.run || (() => {})
+
+  // Apply plugin decorators
+  const decorators = pluginContext.commandDecorators
+  const decoratedRunner = decorators.reduceRight(
+    (runner, decorator) => decorator(runner),
+    baseRunner
+  )
+
+  // Execute and return result
+  const result = await decoratedRunner(ctx)
+
+  // Return string if one was returned
+  return typeof result === 'string' ? result : undefined
 }

@@ -454,10 +454,21 @@ export interface TranslationAdapter<MessageResource = string> {
 /**
  * Command runner.
  * @param ctx A {@link CommandContext | command context}
+ * @returns void or string (for CLI output)
  */
 export type CommandRunner<A extends Args = Args> = (
   ctx: Readonly<CommandContext<A>>
-) => Awaitable<void>
+) => Awaitable<void | string>
+
+/**
+ * Command decorator.
+ * A function that wraps a command runner to add or modify its behavior.
+ * @param baseRunner The base command runner to decorate
+ * @returns The decorated command runner
+ */
+export type CommandDecorator<A extends Args = Args> = (
+  baseRunner: CommandRunner<A>
+) => CommandRunner<A>
 
 export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | CommandRunner<A>>
 

@@ -3,6 +3,8 @@ import { createMockCommandContext } from '../test/utils.ts'
 import { RendererDecorators } from './decorators.ts'
 import { PluginContext } from './plugin.ts'
 
+import type { CommandDecorator } from './types.ts'
+
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
     const decorators = new RendererDecorators()
@@ -85,5 +87,47 @@ describe('PluginContext#decorateValidationErrorsRenderer', () => {
     const result = await renderer(mockCtx, error)
 
     expect(result).toBe('[ERROR] ')
+  })
+})
+
+describe('commandDecorators', () => {
+  const identityDecorator: CommandDecorator = baseRunner => baseRunner
+
+  test('should add command decorator', () => {
+    const decorators = new RendererDecorators()
+    const ctx = new PluginContext(decorators)
+
+    ctx.decorateCommand(identityDecorator)
+
+    expect(ctx.commandDecorators).toHaveLength(1)
+    expect(ctx.commandDecorators[0]).toBe(identityDecorator)
+  })
+
+  test('should add multiple command decorators', () => {
+    const decorators = new RendererDecorators()
+    const ctx = new PluginContext(decorators)
+
+    const decorator1 = identityDecorator
+    const decorator2 = identityDecorator
+
+    ctx.decorateCommand(decorator1)
+    ctx.decorateCommand(decorator2)
+
+    expect(ctx.commandDecorators).toHaveLength(2)
+    expect(ctx.commandDecorators[0]).toBe(decorator1)
+    expect(ctx.commandDecorators[1]).toBe(decorator2)
+  })
+
+  test('should return a copy of decorators array', () => {
+    const decorators = new RendererDecorators()
+    const ctx = new PluginContext(decorators)
+
+    ctx.decorateCommand(identityDecorator)
+
+    const decorators1 = ctx.commandDecorators
+    const decorators2 = ctx.commandDecorators
+
+    expect(decorators1).not.toBe(decorators2)
+    expect(decorators1).toEqual(decorators2)
   })
 })

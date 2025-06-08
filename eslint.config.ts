@@ -48,6 +48,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   regexp(),
   unicorn({
     rules: {
+      'unicorn/prefer-string-replace-all': 'off',
+      'unicorn/consistent-function-scoping': 'off',
       'unicorn/no-array-push-push': 'off',
       'unicorn/no-array-reduce': 'off',
       'unicorn/prevent-abbreviations': 'off',
@@ -88,7 +90,13 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   vitest(),
   prettier(),
   includeIgnoreFile(gitignorePath),
-  globalIgnores(['.vscode', 'tsconfig.json', 'pnpm-lock.yaml', 'playground/**']) as Linter.Config
+  globalIgnores([
+    '.vscode',
+    'tsconfig.json',
+    'pnpm-lock.yaml',
+    'playground/**',
+    'design/**'
+  ]) as Linter.Config
 )
 
 export default config

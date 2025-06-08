@@ -237,6 +237,16 @@ EXAMPLES:
 "
 `;
 
+exports[`command decorators > not call command runner 1`] = `
+"USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
 exports[`custom generate usage > basic 1`] = `
 "Usage:
   gunshi [options]

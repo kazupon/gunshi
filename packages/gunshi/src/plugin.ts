@@ -15,7 +15,12 @@
 
 import type { ArgSchema } from 'args-tokens'
 import type { RendererDecorators } from './decorators.ts'
-import type { Awaitable, RendererDecorator, ValidationErrorsDecorator } from './types.ts'
+import type {
+  Awaitable,
+  CommandDecorator,
+  RendererDecorator,
+  ValidationErrorsDecorator
+} from './types.ts'
 
 /**
  * Gunshi plugin, which is a function that receives a PluginContext.
@@ -30,6 +35,7 @@ export type Plugin = (ctx: PluginContext) => Awaitable<void>
 export class PluginContext {
   #globalOptions: Map<string, ArgSchema> = new Map()
   #decorators: RendererDecorators
+  #commandDecorators: CommandDecorator[] = []
 
   constructor(decorators: RendererDecorators) {
     this.#decorators = decorators
@@ -80,5 +86,22 @@ export class PluginContext {
    */
   decorateValidationErrorsRenderer(decorator: ValidationErrorsDecorator): void {
     this.#decorators.addValidationErrorsDecorator(decorator)
+  }
+
+  /**
+   * Get the command decorators
+   * @returns The command decorators
+   */
+  get commandDecorators(): readonly CommandDecorator[] {
+    return [...this.#commandDecorators]
+  }
+
+  /**
+   * Decorate the command execution.
+   * Decorators are applied in reverse order (last registered is executed first).
+   * @param decorator - A decorator function that wraps the command runner
+   */
+  decorateCommand(decorator: CommandDecorator): void {
+    this.#commandDecorators.push(decorator)
   }
 }
