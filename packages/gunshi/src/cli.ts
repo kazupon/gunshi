@@ -6,7 +6,7 @@
 import { parseArgs, resolveArgs } from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT } from './constants.ts'
 import { createCommandContext } from './context.ts'
-import { RendererDecorators } from './decorators.ts'
+import { Decorators } from './decorators.ts'
 import { PluginContext } from './plugin.ts'
 import { plugins } from './plugins/index.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
@@ -17,6 +17,7 @@ import type {
   Command,
   CommandCallMode,
   CommandContext,
+  CommandDecorator,
   CommandRunner,
   LazyCommand
 } from './types.ts'
@@ -35,7 +36,7 @@ export async function cli<A extends Args = Args>(
 ): Promise<string | undefined> {
   const cliOptions = resolveCliOptions(options, entry)
 
-  const decorators = new RendererDecorators()
+  const decorators = new Decorators()
   const pluginContext = new PluginContext(decorators)
   await applyPlugins(pluginContext)
 
@@ -89,7 +90,7 @@ export async function cli<A extends Args = Args>(
     return
   }
 
-  return await executeCommand(command, commandContext, name || '', pluginContext)
+  return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
 
 async function applyPlugins(pluginContext: PluginContext): Promise<void> {
@@ -150,7 +151,7 @@ function getSubCommand(tokens: ArgToken[]): string {
 async function showValidationErrors<A extends Args>(
   ctx: CommandContext<A>,
   error: AggregateError,
-  decorators: RendererDecorators
+  decorators: Decorators
 ): Promise<void> {
   // TODO(kazupon): deprecate cliOptions.renderValidationErrors
   if (ctx.env.renderValidationErrors === null) {
@@ -236,13 +237,12 @@ async function executeCommand<A extends Args = Args>(
   cmd: Command<A> | LazyCommand<A>,
   ctx: CommandContext<A>,
   name: string,
-  pluginContext: PluginContext
+  decorators: readonly CommandDecorator[]
 ): Promise<string | undefined> {
   const resolved = isLazyCommand<A>(cmd) ? await resolveLazyCommand<A>(cmd, name, true) : cmd
   const baseRunner = resolved.run || (() => {})
 
-  // Apply plugin decorators
-  const decorators = pluginContext.commandDecorators
+  // apply plugin decorators
   const decoratedRunner = decorators.reduceRight(
     (runner, decorator) => decorator(runner),
     baseRunner

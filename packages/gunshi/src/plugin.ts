@@ -13,8 +13,9 @@
  * @license MIT
  */
 
+import { Decorators } from './decorators.ts'
+
 import type { ArgSchema } from 'args-tokens'
-import type { RendererDecorators } from './decorators.ts'
 import type {
   Awaitable,
   CommandDecorator,
@@ -34,10 +35,9 @@ export type Plugin = (ctx: PluginContext) => Awaitable<void>
  */
 export class PluginContext {
   #globalOptions: Map<string, ArgSchema> = new Map()
-  #decorators: RendererDecorators
-  #commandDecorators: CommandDecorator[] = []
+  #decorators: Decorators
 
-  constructor(decorators: RendererDecorators) {
+  constructor(decorators: Decorators) {
     this.#decorators = decorators
   }
 
@@ -89,19 +89,11 @@ export class PluginContext {
   }
 
   /**
-   * Get the command decorators
-   * @returns The command decorators
-   */
-  get commandDecorators(): readonly CommandDecorator[] {
-    return [...this.#commandDecorators]
-  }
-
-  /**
    * Decorate the command execution.
    * Decorators are applied in reverse order (last registered is executed first).
    * @param decorator - A decorator function that wraps the command runner
    */
   decorateCommand(decorator: CommandDecorator): void {
-    this.#commandDecorators.push(decorator)
+    this.#decorators.addCommandDecorator(decorator)
   }
 }

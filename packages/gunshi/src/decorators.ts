@@ -3,7 +3,12 @@
  * @license MIT
  */
 
-import type { CommandContext, RendererDecorator, ValidationErrorsDecorator } from './types.ts'
+import type {
+  CommandContext,
+  CommandDecorator,
+  RendererDecorator,
+  ValidationErrorsDecorator
+} from './types.ts'
 
 const EMPTY_RENDERER = async () => ''
 
@@ -11,10 +16,11 @@ const EMPTY_RENDERER = async () => ''
  * Internal class for managing renderer decorators.
  * This class is not exposed to plugin authors.
  */
-export class RendererDecorators {
+export class Decorators {
   #headerDecorators: RendererDecorator<string>[] = []
   #usageDecorators: RendererDecorator<string>[] = []
   #validationDecorators: ValidationErrorsDecorator[] = []
+  #commandDecorators: CommandDecorator[] = []
 
   addHeaderDecorator(decorator: RendererDecorator<string>): void {
     this.#headerDecorators.push(decorator)
@@ -26,6 +32,14 @@ export class RendererDecorators {
 
   addValidationErrorsDecorator(decorator: ValidationErrorsDecorator): void {
     this.#validationDecorators.push(decorator)
+  }
+
+  addCommandDecorator(decorator: CommandDecorator): void {
+    this.#commandDecorators.push(decorator)
+  }
+
+  get commandDecorators(): readonly CommandDecorator[] {
+    return [...this.#commandDecorators]
   }
 
   getHeaderRenderer(): (ctx: CommandContext) => Promise<string> {
