@@ -15,7 +15,7 @@ export default function globals(ctx: PluginContext) {
     ctx.addGlobalOption(name, schema)
   }
 
-  // Apply help and version decorators
+  // apply help and version decorators
   ctx.decorateCommand(baseRunner => async ctx => {
     if (ctx.values.version) {
       const version = ctx.env.version || 'unknown'
@@ -32,7 +32,7 @@ export default function globals(ctx: PluginContext) {
       header = await ctx.env.renderHeader(ctx)
       if (header) {
         ctx.log(header)
-        ctx.log() // Empty line after header
+        ctx.log() // empty line after header
         outBuf.push(header)
       }
     }
@@ -49,7 +49,7 @@ export default function globals(ctx: PluginContext) {
       return
     }
 
-    // Normal command execution
+    // normal command execution
     return baseRunner(ctx)
   })
 }
