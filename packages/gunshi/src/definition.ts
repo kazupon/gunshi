@@ -15,25 +15,15 @@
  */
 
 import type { Args } from 'args-tokens'
-import type { ContextExtension } from './plugin.ts'
-import type { Awaitable, Command, CommandContext, CommandLoader, LazyCommand } from './types.ts'
+import type {
+  Command,
+  CommandLoader,
+  ContextExtension,
+  ExtendedCommand,
+  LazyCommand
+} from './types.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
-
-/**
- * Extended command type with extension support
- */
-export interface ExtendedCommand<
-  A extends Args = Args,
-  E extends Record<string, ContextExtension> = {}
-> extends Omit<Command<A>, 'run'> {
-  _extensions?: E
-  run?: (
-    ctx: CommandContext<A> & {
-      ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
-    }
-  ) => Awaitable<void | string>
-}
 
 /**
  * Define a {@link Command | command} with type inference

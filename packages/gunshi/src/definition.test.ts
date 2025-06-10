@@ -4,8 +4,7 @@ import { define, lazy } from './definition.ts'
 import { plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
-import type { ExtendedCommand } from './definition.ts'
-import type { ContextExtension } from './plugin.ts'
+import type { ContextExtension, ExtendedCommand } from './types.ts'
 
 // eslint-disable-next-line vitest/expect-expect
 test('define', async () => {

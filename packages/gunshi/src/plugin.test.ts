@@ -1,7 +1,10 @@
 import { describe, expect, test, vi } from 'vitest'
 import { createMockCommandContext } from '../test/utils.ts'
 import { Decorators } from './decorators.ts'
-import { PluginContext, plugin, type ContextExtension, type Plugin } from './plugin.ts'
+import { PluginContext, plugin } from './plugin.ts'
+
+import type { Plugin } from './plugin.ts'
+import type { ContextExtension } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {

@@ -16,22 +16,14 @@
 import { Decorators } from './decorators.ts'
 
 import type { ArgSchema } from 'args-tokens'
-import type { CommandContextCore } from './context.ts'
 import type {
   Awaitable,
+  CommandContextCore,
   CommandDecorator,
+  ContextExtension,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
-
-/**
- * Context extension type definition
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ContextExtension<T = any> {
-  readonly key: symbol
-  readonly factory: (core: CommandContextCore) => T
-}
 
 /**
  * Plugin definition options

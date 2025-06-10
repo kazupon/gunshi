@@ -323,6 +323,22 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
 }
 
 /**
+ * CommandContextCore type (base type without extensions)
+ */
+export type CommandContextCore<A extends Args = Args, V = ArgValues<A>> = Readonly<
+  CommandContext<A, V>
+>
+
+/**
+ * Context extension type definition
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ContextExtension<T = any> {
+  readonly key: symbol
+  readonly factory: (core: CommandContextCore) => T
+}
+
+/**
  * Command interface.
  */
 export interface Command<A extends Args = Args> {
@@ -360,6 +376,41 @@ export interface Command<A extends Args = Args> {
    */
   toKebab?: boolean
 }
+
+/**
+ * Extended command type with extension support
+ */
+export interface ExtendedCommand<
+  A extends Args = Args,
+  E extends Record<string, ContextExtension> = {}
+> extends Omit<Command<A>, 'run'> {
+  _extensions?: E
+  run?: (
+    ctx: CommandContext<A> & {
+      ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+    }
+  ) => Awaitable<void | string>
+}
+
+/**
+ * Lazy command interface.
+ * Lazy command that's not loaded until it is executed.
+ */
+export type LazyCommand<A extends Args = Args> = {
+  /**
+   * Command load function
+   */
+  (): Awaitable<Command<A> | CommandRunner<A>>
+  /**
+   * Command name
+   */
+  commandName?: string
+} & Omit<Command<A>, 'run' | 'name'>
+
+/**
+ * Define a command type.
+ */
+export type Commandable<A extends Args> = Command<A> | LazyCommand<A>
 
 /**
  * Command resource.
@@ -471,26 +522,6 @@ export type CommandDecorator<A extends Args = Args> = (
 ) => CommandRunner<A>
 
 export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | CommandRunner<A>>
-
-/**
- * Lazy command interface.
- * Lazy command that's not loaded until it is executed.
- */
-export type LazyCommand<A extends Args = Args> = {
-  /**
-   * Command load function
-   */
-  (): Awaitable<Command<A> | CommandRunner<A>>
-  /**
-   * Command name
-   */
-  commandName?: string
-} & Omit<Command<A>, 'run' | 'name'>
-
-/**
- * Define a command type.
- */
-export type Commandable<A extends Args> = Command<A> | LazyCommand<A>
 
 /**
  * Renderer decorator type.

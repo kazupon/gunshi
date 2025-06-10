@@ -22,7 +22,5 @@ export { plugin } from './plugin.ts'
 export { DefaultTranslation } from './translation.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
-export type { CommandContextCore } from './context.ts'
-export type { ExtendedCommand } from './definition.ts'
-export type { ContextExtension, Plugin, PluginOptions } from './plugin.ts'
+export type { Plugin, PluginOptions } from './plugin.ts'
 export type * from './types.ts'

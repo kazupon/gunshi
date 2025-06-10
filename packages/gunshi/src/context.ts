@@ -36,27 +36,21 @@ import {
 } from './utils.ts'
 
 import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
-import type { ExtendedCommand } from './definition.ts'
-import type { ContextExtension } from './plugin.ts'
 import type {
   CliOptions,
   Command,
   CommandBuiltinKeys,
   CommandCallMode,
   CommandContext,
+  CommandContextCore,
   CommandEnvironment,
   CommandResource,
+  ContextExtension,
+  ExtendedCommand,
   LazyCommand
 } from './types.ts'
 
 const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
-
-/**
- * CommandContextCore type (base type without extensions)
- */
-export type CommandContextCore<A extends Args = Args, V = ArgValues<A>> = Readonly<
-  CommandContext<A, V>
->
 
 /**
  * Parameters of {@link createCommandContext}

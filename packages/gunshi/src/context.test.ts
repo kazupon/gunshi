@@ -12,10 +12,15 @@ import jaLocale from './locales/ja-JP.json' with { type: 'json' }
 import { resolveArgKey, resolveBuiltInKey } from './utils.ts'
 
 import type { Args } from 'args-tokens'
-import type { CommandContextCore } from './context.ts'
-import type { ExtendedCommand } from './definition.ts'
-import type { ContextExtension } from './plugin.ts'
-import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
+import type {
+  Command,
+  CommandContextCore,
+  CommandResource,
+  CommandResourceFetcher,
+  ContextExtension,
+  ExtendedCommand,
+  LazyCommand
+} from './types.ts'
 
 test('basic', async () => {
   const args = {
@@ -77,6 +82,7 @@ test('basic', async () => {
       renderHeader: null,
       renderUsage: mockRenderUsage,
       renderValidationErrors: mockRenderValidationErrors,
+      // @ts-ignore -- TODO(kazupon): resolve type
       subCommands
     }
   })
