@@ -46,15 +46,11 @@ export class Decorators {
   getHeaderRenderer<A extends Args = Args>(): (
     ctx: Readonly<CommandContext<A>>
   ) => Promise<string> {
-    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER) as (
-      ctx: Readonly<CommandContext<A>>
-    ) => Promise<string>
+    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
   }
 
   getUsageRenderer<A extends Args = Args>(): (ctx: Readonly<CommandContext<A>>) => Promise<string> {
-    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER) as (
-      ctx: Readonly<CommandContext<A>>
-    ) => Promise<string>
+    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
   }
 
   getValidationErrorsRenderer<A extends Args = Args>(): (
@@ -62,25 +58,23 @@ export class Decorators {
     error: AggregateError
   ) => Promise<string> {
     if (this.#validationDecorators.length === 0) {
-      return EMPTY_RENDERER as (
-        ctx: Readonly<CommandContext<A>>,
-        error: AggregateError
-      ) => Promise<string>
+      return EMPTY_RENDERER
     }
 
-    let renderer: (ctx: CommandContext, error: AggregateError) => Promise<string> = EMPTY_RENDERER
+    let renderer: (ctx: Readonly<CommandContext>, error: AggregateError) => Promise<string> =
+      EMPTY_RENDERER
     for (const decorator of this.#validationDecorators) {
       const previousRenderer = renderer
       renderer = (ctx: CommandContext, error: AggregateError) =>
         decorator(previousRenderer, ctx, error)
     }
-    return renderer as (ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string>
+    return renderer
   }
 
   #buildRenderer<T>(
     decorators: RendererDecorator<T>[],
-    defaultRenderer: (ctx: CommandContext) => Promise<T>
-  ): (ctx: CommandContext) => Promise<T> {
+    defaultRenderer: (ctx: Readonly<CommandContext>) => Promise<T>
+  ): (ctx: Readonly<CommandContext>) => Promise<T> {
     if (decorators.length === 0) {
       return defaultRenderer
     }
