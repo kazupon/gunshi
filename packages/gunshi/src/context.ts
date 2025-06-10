@@ -55,7 +55,11 @@ const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 /**
  * Parameters of {@link createCommandContext}
  */
-interface CommandContextParams<A extends Args, V> {
+interface CommandContextParams<
+  A extends Args,
+  V,
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A> // eslint-disable-line @typescript-eslint/no-explicit-any
+> {
   /**
    * An arguments of target command
    */
@@ -91,7 +95,7 @@ interface CommandContextParams<A extends Args, V> {
   /**
    * A target command
    */
-  command: Command<A> | LazyCommand<A> | ExtendedCommand<A, any> // eslint-disable-line @typescript-eslint/no-explicit-any
+  command: C
   /**
    * A command options, which is spicialized from `cli` function
    */
@@ -105,7 +109,8 @@ interface CommandContextParams<A extends Args, V> {
  */
 export async function createCommandContext<
   A extends Args = Args,
-  V extends ArgValues<A> = ArgValues<A>
+  V extends ArgValues<A> = ArgValues<A>,
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A> // eslint-disable-line @typescript-eslint/no-explicit-any
 >({
   args,
   values,
@@ -117,7 +122,11 @@ export async function createCommandContext<
   cliOptions,
   callMode = 'entry',
   omitted = false
-}: CommandContextParams<A, V>): Promise<Readonly<CommandContext<A, V>>> {
+}: CommandContextParams<A, V, C>): Promise<
+  C extends ExtendedCommand<A, infer E>
+    ? Readonly<CommandContext<A, V> & { ext: { [K in keyof E]: ReturnType<E[K]['factory']> } }>
+    : Readonly<CommandContext<A, V>>
+> {
   /**
    * normailize the options schema and values, to avoid prototype pollution
    */
@@ -291,7 +300,9 @@ export async function createCommandContext<
     adapter.setResource(localeStr, resource)
   }
 
-  return ctx
+  return ctx as C extends ExtendedCommand<A, infer E>
+    ? Readonly<CommandContext<A, V> & { ext: { [K in keyof E]: ReturnType<E[K]['factory']> } }>
+    : Readonly<CommandContext<A, V>>
 }
 
 function getCommandName<A extends Args>(

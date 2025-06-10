@@ -546,31 +546,15 @@ describe('createCommandContext with extensions', () => {
     })
 
     // check that extensions are applied
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext).toBeDefined()
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.auth).toBeDefined()
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.auth.user).toEqual({ id: 1, name: 'Test User' })
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.auth.isAuthenticated).toBe(true)
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.auth.getCommandName()).toBe('test-cmd')
+    expect(ctx.ext).toBeDefined()
+    expect(ctx.ext.auth).toBeDefined()
+    expect(ctx.ext.auth.user).toEqual({ id: 1, name: 'Test User' })
+    expect(ctx.ext.auth.isAuthenticated).toBe(true)
+    expect(ctx.ext.auth.getCommandName()).toBe('test-cmd')
 
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.db).toBeDefined()
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.db.connected).toBe(true)
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(typeof (ctx as any).ext.db.query).toBe('function')
+    expect(ctx.ext.db).toBeDefined()
+    expect(ctx.ext.db.connected).toBe(true)
+    expect(typeof ctx.ext.db.query).toBe('function')
 
     // check that factories were called with core context
     expect(authExtension.factory).toHaveBeenCalledWith(
@@ -603,7 +587,7 @@ describe('createCommandContext with extensions', () => {
       }
     }
 
-    const command: ExtendedCommand = {
+    const command: ExtendedCommand<Args, typeof extensions> = {
       name: 'multi-ext',
       _extensions: extensions,
       run: async _ctx => 'done'
@@ -622,18 +606,10 @@ describe('createCommandContext with extensions', () => {
       cliOptions: {}
     })
 
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext).toBeDefined()
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.ext1.value1).toBe('test1')
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.ext2.value2).toBe('test2')
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((ctx as any).ext.ext3.value3).toBe('test3')
+    expect(ctx.ext).toBeDefined()
+    expect(ctx.ext.ext1.value1).toBe('test1')
+    expect(ctx.ext.ext2.value2).toBe('test2')
+    expect(ctx.ext.ext3.value3).toBe('test3')
   })
 
   test('extension factory execution order', async () => {
@@ -663,9 +639,15 @@ describe('createCommandContext with extensions', () => {
       }
     }
 
-    const command: ExtendedCommand = {
+    const extensions: Record<string, CommandContextExtension> = {
+      ext1,
+      ext2,
+      ext3
+    }
+
+    const command: ExtendedCommand<Args, typeof extensions> = {
       name: 'order-test',
-      _extensions: { ext1, ext2, ext3 },
+      _extensions: extensions,
       run: async _ctx => 'done'
     }
 
@@ -719,13 +701,20 @@ describe('createCommandContext with extensions', () => {
   test('extension can access all context properties', async () => {
     let capturedCore: CommandContextCore | null = null
 
-    const testExtension: CommandContextExtension = {
+    type TestExtension = {
+      getName: () => string
+      getValues: () => Record<string, unknown>
+      getPositionals: () => string[]
+      translate: (key: string) => string
+    }
+
+    const testExtension: CommandContextExtension<TestExtension> = {
       key: Symbol('test'),
       factory: core => {
         capturedCore = core
         return {
-          // Return methods that use the core context
-          getName: () => core.name,
+          // return methods that use the core context
+          getName: () => core.name!,
           getValues: () => core.values,
           getPositionals: () => core.positionals,
           translate: (key: string) => core.translate(key)
