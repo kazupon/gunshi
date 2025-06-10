@@ -12,6 +12,9 @@ import jaLocale from './locales/ja-JP.json' with { type: 'json' }
 import { resolveArgKey, resolveBuiltInKey } from './utils.ts'
 
 import type { Args } from 'args-tokens'
+import type { CommandContextCore } from './context.ts'
+import type { ExtendedCommand } from './definition.ts'
+import type { ContextExtension } from './plugin.ts'
 import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
 
 test('basic', async () => {
@@ -475,5 +478,310 @@ describe('translation adapter', () => {
 
     expect(ctx.translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
     expect(ctx.translate('user', { user: 'kazupon' })).toEqual(`こんにちは、kazupon`)
+  })
+})
+
+describe('createCommandContext with extensions', () => {
+  test('applies extensions to context', async () => {
+    const authExtension: ContextExtension = {
+      key: Symbol('auth'),
+      factory: vi.fn((_core: CommandContextCore) => ({
+        user: { id: 1, name: 'Test User' },
+        isAuthenticated: true,
+        getCommandName: () => _core.name
+      }))
+    }
+
+    const dbExtension: ContextExtension = {
+      key: Symbol('db'),
+      factory: vi.fn((_core: CommandContextCore) => ({
+        query: async (sql: string) => ({ rows: [], sql }),
+        connected: true
+      }))
+    }
+
+    const args = { token: { type: 'string' as const } }
+    const command: ExtendedCommand<typeof args> = {
+      name: 'test-cmd',
+      args,
+      _extensions: {
+        auth: authExtension,
+        db: dbExtension
+      },
+      // TODO(kazupon): resolve type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      run: async (ctx: any) => {
+        // Access extensions
+        return `${ctx.ext.auth.user.name} - ${ctx.ext.db.connected}`
+      }
+    }
+
+    const ctx = await createCommandContext({
+      args,
+      values: { token: 'test-token' },
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [],
+      command,
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: {}
+    })
+
+    // check that extensions are applied
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext).toBeDefined()
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.auth).toBeDefined()
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.auth.user).toEqual({ id: 1, name: 'Test User' })
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.auth.isAuthenticated).toBe(true)
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.auth.getCommandName()).toBe('test-cmd')
+
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.db).toBeDefined()
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.db.connected).toBe(true)
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(typeof (ctx as any).ext.db.query).toBe('function')
+
+    // check that factories were called with core context
+    expect(authExtension.factory).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'test-cmd',
+        values: { token: 'test-token' }
+      })
+    )
+    expect(dbExtension.factory).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'test-cmd',
+        values: { token: 'test-token' }
+      })
+    )
+  })
+
+  test('multiple extensions', async () => {
+    const extensions: Record<string, ContextExtension> = {
+      ext1: {
+        key: Symbol('ext1'),
+        factory: () => ({ value1: 'test1' })
+      },
+      ext2: {
+        key: Symbol('ext2'),
+        factory: () => ({ value2: 'test2' })
+      },
+      ext3: {
+        key: Symbol('ext3'),
+        factory: () => ({ value3: 'test3' })
+      }
+    }
+
+    const command: ExtendedCommand = {
+      name: 'multi-ext',
+      _extensions: extensions,
+      run: async _ctx => 'done'
+    }
+
+    const ctx = await createCommandContext({
+      args: {},
+      values: {},
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [],
+      command,
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: {}
+    })
+
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext).toBeDefined()
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.ext1.value1).toBe('test1')
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.ext2.value2).toBe('test2')
+    // TODO(kazupon): resolve type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((ctx as any).ext.ext3.value3).toBe('test3')
+  })
+
+  test('extension factory execution order', async () => {
+    const executionOrder: string[] = []
+
+    const ext1: ContextExtension = {
+      key: Symbol('ext1'),
+      factory: _core => {
+        executionOrder.push('ext1')
+        return { order: 1 }
+      }
+    }
+
+    const ext2: ContextExtension = {
+      key: Symbol('ext2'),
+      factory: _core => {
+        executionOrder.push('ext2')
+        return { order: 2 }
+      }
+    }
+
+    const ext3: ContextExtension = {
+      key: Symbol('ext3'),
+      factory: _core => {
+        executionOrder.push('ext3')
+        return { order: 3 }
+      }
+    }
+
+    const command: ExtendedCommand = {
+      name: 'order-test',
+      _extensions: { ext1, ext2, ext3 },
+      run: async _ctx => 'done'
+    }
+
+    await createCommandContext({
+      args: {},
+      values: {},
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [],
+      command,
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: {}
+    })
+
+    // Extensions should be processed in the order they appear in the object
+    expect(executionOrder).toEqual(['ext1', 'ext2', 'ext3'])
+  })
+
+  test('without extensions - backward compatibility', async () => {
+    const args = { name: { type: 'string' as const } }
+    const command: Command<typeof args> = {
+      name: 'simple',
+      args,
+      run: async ctx => `Hello, ${ctx.values.name}!`
+    }
+
+    const ctx = await createCommandContext({
+      args,
+      values: { name: 'World' },
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [],
+      command,
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: {}
+    })
+
+    // should not have ext property
+    expect((ctx as any).ext).toBeUndefined() // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    // all standard properties should work
+    expect(ctx.name).toBe('simple')
+    expect(ctx.values.name).toBe('World')
+    expect(ctx.args).toEqual(args)
+  })
+
+  test('extension can access all context properties', async () => {
+    let capturedCore: CommandContextCore | null = null
+
+    const testExtension: ContextExtension = {
+      key: Symbol('test'),
+      factory: core => {
+        capturedCore = core
+        return {
+          // Return methods that use the core context
+          getName: () => core.name,
+          getValues: () => core.values,
+          getPositionals: () => core.positionals,
+          translate: (key: string) => core.translate(key)
+        }
+      }
+    }
+
+    const args = { opt: { type: 'string' as const } }
+    const command: ExtendedCommand<typeof args> = {
+      name: 'context-test',
+      description: 'Test command',
+      args,
+      _extensions: { test: testExtension },
+      run: async _ctx => 'done'
+    }
+
+    await createCommandContext({
+      args,
+      values: { opt: 'value' },
+      positionals: ['pos1', 'pos2'],
+      rest: ['rest1'],
+      argv: ['test', 'pos1', 'pos2', '--opt', 'value', '--', 'rest1'],
+      tokens: [],
+      command,
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: { name: 'test-cli' }
+    })
+
+    // Verify the captured core has all expected properties
+    expect(capturedCore).not.toBeNull()
+    expect(capturedCore!.name).toBe('context-test')
+    expect(capturedCore!.values).toEqual({ opt: 'value' })
+    expect(capturedCore!.positionals).toEqual(['pos1', 'pos2'])
+    expect(capturedCore!.rest).toEqual(['rest1'])
+    expect(capturedCore!._).toEqual(['test', 'pos1', 'pos2', '--opt', 'value', '--', 'rest1'])
+    expect(capturedCore!.callMode).toBe('entry')
+    expect(typeof capturedCore!.log).toBe('function')
+    expect(typeof capturedCore!.translate).toBe('function')
+  })
+})
+
+describe('CommandContextCore type', () => {
+  test('is readonly version of CommandContext', async () => {
+    const args = { flag: { type: 'boolean' as const } }
+    const command: Command<typeof args> = {
+      name: 'readonly-test',
+      args,
+      run: async _ctx => 'done'
+    }
+
+    const ctx = await createCommandContext({
+      args,
+      values: { flag: true },
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [],
+      command,
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: {}
+    })
+
+    // CommandContextCore should be a readonly version
+    const core: CommandContextCore<typeof args> = ctx
+
+    // all properties should be accessible
+    expect(core.name).toBe('readonly-test')
+    expect(core.values.flag).toBe(true)
+    expect(core.args).toEqual(args)
+    expect(typeof core.log).toBe('function')
+    expect(typeof core.translate).toBe('function')
   })
 })

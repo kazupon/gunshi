@@ -15,17 +15,52 @@
  */
 
 import type { Args } from 'args-tokens'
-import type { Command, CommandLoader, LazyCommand } from './types.ts'
+import type { ContextExtension } from './plugin.ts'
+import type { Awaitable, Command, CommandContext, CommandLoader, LazyCommand } from './types.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
+
+/**
+ * Extended command type with extension support
+ */
+export interface ExtendedCommand<
+  A extends Args = Args,
+  E extends Record<string, ContextExtension> = {}
+> extends Omit<Command<A>, 'run'> {
+  _extensions?: E
+  run?: (
+    ctx: CommandContext<A> & {
+      ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+    }
+  ) => Awaitable<void | string>
+}
 
 /**
  * Define a {@link Command | command} with type inference
  * @param definition A {@link Command | command} definition
  * @returns A {@link Command | command} definition with type inference
  */
-export function define<A extends Args = Args>(definition: Command<A>): Command<A> {
-  return definition
+export function define<A extends Args = Args>(definition: Command<A>): Command<A>
+
+/**
+ * Define an {@link ExtendedCommand | extended command} with type inference and extension support
+ * @param definition An {@link ExtendedCommand | extended command} definition with extensions
+ * @returns An {@link ExtendedCommand | extended command} definition with type inference
+ */
+export function define<A extends Args = Args, E extends Record<string, ContextExtension> = {}>(
+  definition: ExtendedCommand<A, E> & {
+    extensions?: E
+  }
+): ExtendedCommand<A, E>
+
+export function define<A extends Args = Args, E extends Record<string, ContextExtension> = {}>(
+  definition: Command<A> | (ExtendedCommand<A, E> & { extensions?: E })
+): Command<A> | ExtendedCommand<A, E> {
+  if ('extensions' in definition && definition.extensions) {
+    const { extensions, ...rest } = definition
+    return { ...rest, _extensions: extensions } as ExtendedCommand<A, E>
+  }
+  return definition as Command<A>
 }
 
 /**
@@ -37,14 +72,41 @@ export function define<A extends Args = Args>(definition: Command<A>): Command<A
 export function lazy<A extends Args = Args>(
   loader: CommandLoader<A>,
   definition?: Command<A>
-): LazyCommand<A> {
+): LazyCommand<A>
+
+/**
+ * Define a {@link LazyCommand | lazy command} with extension support
+ * @param loader A {@link CommandLoader | command loader}
+ * @param definition An {@link ExtendedCommand | extended command} definition with extensions
+ * @returns A {@link LazyCommand | lazy command} loader with extension support
+ */
+export function lazy<A extends Args = Args, E extends Record<string, ContextExtension> = {}>(
+  loader: CommandLoader<A>,
+  definition?: ExtendedCommand<A, E> & { extensions?: E }
+): LazyCommand<A> & { _extensions?: E }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function lazy<A extends Args = Args>(loader: CommandLoader<A>, definition?: any): any {
+  const lazyCommand = loader as LazyCommand<A>
+
   if (definition != null) {
-    ;(loader as LazyCommand<A>).commandName = definition.name
-    ;(loader as LazyCommand<A>).description = definition.description
-    ;(loader as LazyCommand<A>).args = definition.args
-    ;(loader as LazyCommand<A>).examples = definition.examples
-    ;(loader as LazyCommand<A>).resource = definition.resource
-    ;(loader as LazyCommand<A>).toKebab = definition.toKebab
+    // copy existing properties
+    lazyCommand.commandName = definition.name
+    lazyCommand.description = definition.description
+    lazyCommand.args = definition.args
+    lazyCommand.examples = definition.examples
+    lazyCommand.resource = definition.resource
+    lazyCommand.toKebab = definition.toKebab
+
+    // handle extensions
+    if (definition.extensions) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(lazyCommand as any)._extensions = definition.extensions
+    } else if (definition._extensions) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(lazyCommand as any)._extensions = definition._extensions
+    }
   }
-  return loader
+
+  return lazyCommand
 }

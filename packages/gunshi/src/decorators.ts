@@ -3,6 +3,7 @@
  * @license MIT
  */
 
+import type { Args } from 'args-tokens'
 import type {
   CommandContext,
   CommandDecorator,
@@ -42,17 +43,29 @@ export class Decorators {
     return [...this.#commandDecorators]
   }
 
-  getHeaderRenderer(): (ctx: CommandContext) => Promise<string> {
-    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
+  getHeaderRenderer<A extends Args = Args>(): (
+    ctx: Readonly<CommandContext<A>>
+  ) => Promise<string> {
+    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER) as (
+      ctx: Readonly<CommandContext<A>>
+    ) => Promise<string>
   }
 
-  getUsageRenderer(): (ctx: CommandContext) => Promise<string> {
-    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
+  getUsageRenderer<A extends Args = Args>(): (ctx: Readonly<CommandContext<A>>) => Promise<string> {
+    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER) as (
+      ctx: Readonly<CommandContext<A>>
+    ) => Promise<string>
   }
 
-  getValidationErrorsRenderer(): (ctx: CommandContext, error: AggregateError) => Promise<string> {
+  getValidationErrorsRenderer<A extends Args = Args>(): (
+    ctx: Readonly<CommandContext<A>>,
+    error: AggregateError
+  ) => Promise<string> {
     if (this.#validationDecorators.length === 0) {
-      return EMPTY_RENDERER
+      return EMPTY_RENDERER as (
+        ctx: Readonly<CommandContext<A>>,
+        error: AggregateError
+      ) => Promise<string>
     }
 
     let renderer: (ctx: CommandContext, error: AggregateError) => Promise<string> = EMPTY_RENDERER
@@ -61,7 +74,7 @@ export class Decorators {
       renderer = (ctx: CommandContext, error: AggregateError) =>
         decorator(previousRenderer, ctx, error)
     }
-    return renderer
+    return renderer as (ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string>
   }
 
   #buildRenderer<T>(

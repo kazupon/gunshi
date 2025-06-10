@@ -16,6 +16,7 @@
 import { Decorators } from './decorators.ts'
 
 import type { ArgSchema } from 'args-tokens'
+import type { CommandContextCore } from './context.ts'
 import type {
   Awaitable,
   CommandDecorator,
@@ -24,11 +25,33 @@ import type {
 } from './types.ts'
 
 /**
+ * Context extension type definition
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ContextExtension<T = any> {
+  readonly key: symbol
+  readonly factory: (core: CommandContextCore) => T
+}
+
+/**
+ * Plugin definition options
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface PluginOptions<T = any> {
+  name: string
+  setup: (ctx: PluginContext) => Awaitable<void>
+  extension?: (core: CommandContextCore) => T
+}
+
+/**
  * Gunshi plugin, which is a function that receives a PluginContext.
  * @param ctx - A {@link PluginContext}.
  * @returns An {@link Awaitable} that resolves when the plugin is loaded.
  */
-export type Plugin = (ctx: PluginContext) => Awaitable<void>
+export type Plugin = ((ctx: PluginContext) => Awaitable<void>) & {
+  name?: string
+  extension?: ContextExtension<any> // eslint-disable-line @typescript-eslint/no-explicit-any
+}
 
 /**
  * Gunshi plugin context.
@@ -96,4 +119,39 @@ export class PluginContext {
   decorateCommand(decorator: CommandDecorator): void {
     this.#decorators.addCommandDecorator(decorator)
   }
+}
+
+/**
+ * Create a plugin with optional extension capabilities
+ * @param options - Plugin configuration options
+ * @returns A plugin function with optional name and extension properties
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function plugin<T = any>(options: PluginOptions<T>): Plugin {
+  const { name, setup, extension } = options
+
+  // create a wrapper function with properties
+  const pluginFn = async (ctx: PluginContext) => await setup(ctx)
+
+  // use Object.defineProperty to add properties to the function
+  Object.defineProperty(pluginFn, 'name', {
+    value: name,
+    writable: false,
+    enumerable: true,
+    configurable: true
+  })
+
+  if (extension) {
+    Object.defineProperty(pluginFn, 'extension', {
+      value: {
+        key: Symbol(name),
+        factory: extension
+      },
+      writable: false,
+      enumerable: true,
+      configurable: true
+    })
+  }
+
+  return pluginFn as Plugin
 }

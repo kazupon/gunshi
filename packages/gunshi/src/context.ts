@@ -36,6 +36,8 @@ import {
 } from './utils.ts'
 
 import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
+import type { ExtendedCommand } from './definition.ts'
+import type { ContextExtension } from './plugin.ts'
 import type {
   CliOptions,
   Command,
@@ -48,6 +50,13 @@ import type {
 } from './types.ts'
 
 const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
+
+/**
+ * CommandContextCore type (base type without extensions)
+ */
+export type CommandContextCore<A extends Args = Args, V = ArgValues<A>> = Readonly<
+  CommandContext<A, V>
+>
 
 /**
  * Parameters of {@link createCommandContext}
@@ -88,7 +97,7 @@ interface CommandContextParams<A extends Args, V> {
   /**
    * A target command
    */
-  command: Command<A> | LazyCommand<A>
+  command: Command<A> | LazyCommand<A> | ExtendedCommand<A, any> // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
    * A command options, which is spicialized from `cli` function
    */
@@ -201,36 +210,63 @@ export async function createCommandContext<
   }
 
   /**
-   * create the context
+   * create the command context
    */
 
-  const ctx = deepFreeze(
-    Object.assign(create<CommandContext<A, V>>(), {
-      name: getCommandName(command),
-      description: command.description,
-      omitted,
-      callMode,
-      locale,
-      env,
-      args: _args,
-      values,
-      positionals,
-      rest,
-      _: argv,
-      tokens,
-      toKebab: command.toKebab,
-      log: cliOptions.usageSilent ? NOOP : log,
-      loadCommands,
-      translate
+  const core = Object.assign(create<CommandContext<A, V>>(), {
+    name: getCommandName(command),
+    description: command.description,
+    omitted,
+    callMode,
+    locale,
+    env,
+    args: _args,
+    values,
+    positionals,
+    rest,
+    _: argv,
+    tokens,
+    toKebab: command.toKebab,
+    log: cliOptions.usageSilent ? NOOP : log,
+    loadCommands,
+    translate
+  })
+
+  /**
+   * extend the command context with extensions
+   */
+
+  // TODO(kazupon): remove `any` type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let ctx: any
+
+  // if command requires extensions
+  if ('_extensions' in command && command._extensions) {
+    const ext = {} as any // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    // apply each extension
+    for (const [key, extension] of Object.entries(command._extensions)) {
+      ext[key] = (extension as ContextExtension).factory(core as CommandContextCore<A, V>)
+    }
+
+    // create extended context with extensions
+    // TODO(kazupon): remove `any` type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const extendedCtx = Object.assign(create<any>(), core, {
+      ext: Object.freeze(ext)
     })
-  )
+
+    ctx = deepFreeze(extendedCtx)
+  } else {
+    // without extensions (backward compatibility)
+    ctx = deepFreeze(core)
+  }
 
   /**
    * load the command resources
    */
 
-  // Extract option descriptions from command options
-  // const loadedOptionsResources = Object.entries(command.options || create<Options>()).map(
+  // extract option descriptions from command options
   const loadedOptionsResources = Object.entries(args).map(([key, arg]) => {
     // get description from option if available
     const description = arg.description || ''
@@ -264,7 +300,10 @@ export async function createCommandContext<
   return ctx
 }
 
-function getCommandName<A extends Args>(cmd: Command<A> | LazyCommand<A>): string {
+function getCommandName<A extends Args>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cmd: Command<A> | LazyCommand<A> | ExtendedCommand<A, any>
+): string {
   if (isLazyCommand<A>(cmd)) {
     return cmd.commandName || cmd.name || ANONYMOUS_COMMAND_NAME
   } else if (typeof cmd === 'object') {
@@ -284,7 +323,8 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
 
 async function loadCommandResource<A extends Args, V extends ArgValues<A>>(
   ctx: CommandContext<A, V>,
-  command: Command<A>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  command: Command<A> | ExtendedCommand<A, any> | LazyCommand<A>
 ): Promise<CommandResource<A> | undefined> {
   let resource: CommandResource<A> | undefined
   try {
