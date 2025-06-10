@@ -102,6 +102,16 @@ interface CommandContextParams<
   cliOptions: CliOptions<A>
 }
 
+type InferExtentableCommand<
+  A extends Args,
+  V extends ArgValues<A> = ArgValues<A>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>
+> =
+  C extends ExtendedCommand<A, infer E>
+    ? Readonly<CommandContext<A, V> & { ext: { [K in keyof E]: ReturnType<E[K]['factory']> } }>
+    : Readonly<CommandContext<A, V>>
+
 /**
  * Create a {@link CommandContext | command context}
  * @param param A {@link CommandContextParams | parameters} to create a {@link CommandContext | command context}
@@ -122,11 +132,7 @@ export async function createCommandContext<
   cliOptions,
   callMode = 'entry',
   omitted = false
-}: CommandContextParams<A, V, C>): Promise<
-  C extends ExtendedCommand<A, infer E>
-    ? Readonly<CommandContext<A, V> & { ext: { [K in keyof E]: ReturnType<E[K]['factory']> } }>
-    : Readonly<CommandContext<A, V>>
-> {
+}: CommandContextParams<A, V, C>): Promise<InferExtentableCommand<A, V, C>> {
   /**
    * normailize the options schema and values, to avoid prototype pollution
    */
@@ -300,9 +306,7 @@ export async function createCommandContext<
     adapter.setResource(localeStr, resource)
   }
 
-  return ctx as C extends ExtendedCommand<A, infer E>
-    ? Readonly<CommandContext<A, V> & { ext: { [K in keyof E]: ReturnType<E[K]['factory']> } }>
-    : Readonly<CommandContext<A, V>>
+  return ctx as InferExtentableCommand<A, V, C>
 }
 
 function getCommandName<A extends Args>(
