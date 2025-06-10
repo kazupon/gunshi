@@ -382,7 +382,7 @@ export interface Command<A extends Args = Args> {
  */
 export interface ExtendedCommand<
   A extends Args = Args,
-  E extends Record<string, ContextExtension> = {}
+  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
 > extends Omit<Command<A>, 'run'> {
   _extensions?: E
   run?: (

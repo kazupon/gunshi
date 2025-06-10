@@ -37,13 +37,19 @@ export function define<A extends Args = Args>(definition: Command<A>): Command<A
  * @param definition An {@link ExtendedCommand | extended command} definition with extensions
  * @returns An {@link ExtendedCommand | extended command} definition with type inference
  */
-export function define<A extends Args = Args, E extends Record<string, ContextExtension> = {}>(
+export function define<
+  A extends Args = Args,
+  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
+>(
   definition: ExtendedCommand<A, E> & {
     extensions?: E
   }
 ): ExtendedCommand<A, E>
 
-export function define<A extends Args = Args, E extends Record<string, ContextExtension> = {}>(
+export function define<
+  A extends Args = Args,
+  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
+>(
   definition: Command<A> | (ExtendedCommand<A, E> & { extensions?: E })
 ): Command<A> | ExtendedCommand<A, E> {
   if ('extensions' in definition && definition.extensions) {
@@ -70,7 +76,10 @@ export function lazy<A extends Args = Args>(
  * @param definition An {@link ExtendedCommand | extended command} definition with extensions
  * @returns A {@link LazyCommand | lazy command} loader with extension support
  */
-export function lazy<A extends Args = Args, E extends Record<string, ContextExtension> = {}>(
+export function lazy<
+  A extends Args = Args,
+  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
+>(
   loader: CommandLoader<A>,
   definition?: ExtendedCommand<A, E> & { extensions?: E }
 ): LazyCommand<A> & { _extensions?: E }
