@@ -17,8 +17,8 @@
 import type { Args } from 'args-tokens'
 import type {
   Command,
+  CommandContextExtension,
   CommandLoader,
-  ContextExtension,
   ExtendedCommand,
   LazyCommand
 } from './types.ts'
@@ -39,7 +39,7 @@ export function define<A extends Args = Args>(definition: Command<A>): Command<A
  */
 export function define<
   A extends Args = Args,
-  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 >(
   definition: ExtendedCommand<A, E> & {
     extensions?: E
@@ -48,7 +48,7 @@ export function define<
 
 export function define<
   A extends Args = Args,
-  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 >(
   definition: Command<A> | (ExtendedCommand<A, E> & { extensions?: E })
 ): Command<A> | ExtendedCommand<A, E> {
@@ -78,7 +78,7 @@ export function lazy<A extends Args = Args>(
  */
 export function lazy<
   A extends Args = Args,
-  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 >(
   loader: CommandLoader<A>,
   definition?: ExtendedCommand<A, E> & { extensions?: E }

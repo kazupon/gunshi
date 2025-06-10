@@ -19,8 +19,8 @@ import type { ArgSchema } from 'args-tokens'
 import type {
   Awaitable,
   CommandContextCore,
+  CommandContextExtension,
   CommandDecorator,
-  ContextExtension,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
@@ -42,7 +42,7 @@ export interface PluginOptions<T = any> {
  */
 export type Plugin = ((ctx: PluginContext) => Awaitable<void>) & {
   name?: string
-  extension?: ContextExtension<any> // eslint-disable-line @typescript-eslint/no-explicit-any
+  extension?: CommandContextExtension<any> // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /**

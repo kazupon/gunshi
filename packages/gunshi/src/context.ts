@@ -43,9 +43,9 @@ import type {
   CommandCallMode,
   CommandContext,
   CommandContextCore,
+  CommandContextExtension,
   CommandEnvironment,
   CommandResource,
-  ContextExtension,
   ExtendedCommand,
   LazyCommand
 } from './types.ts'
@@ -240,7 +240,7 @@ export async function createCommandContext<
 
     // apply each extension
     for (const [key, extension] of Object.entries(command._extensions)) {
-      ext[key] = (extension as ContextExtension).factory(core as CommandContextCore<A, V>)
+      ext[key] = (extension as CommandContextExtension).factory(core as CommandContextCore<A, V>)
     }
 
     // create extended context with extensions

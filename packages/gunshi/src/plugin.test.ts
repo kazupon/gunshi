@@ -4,7 +4,7 @@ import { Decorators } from './decorators.ts'
 import { PluginContext, plugin } from './plugin.ts'
 
 import type { Plugin } from './plugin.ts'
-import type { ContextExtension } from './types.ts'
+import type { CommandContextExtension } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -214,14 +214,14 @@ describe('Plugin type with optional properties', () => {
   })
 })
 
-describe('ContextExtension type', () => {
+describe('CommandContextExtension type', () => {
   test('extension key is unique symbol', () => {
-    const extension1: ContextExtension = {
+    const extension1: CommandContextExtension = {
       key: Symbol('test1'),
       factory: () => ({ value: 1 })
     }
 
-    const extension2: ContextExtension = {
+    const extension2: CommandContextExtension = {
       key: Symbol('test2'),
       factory: () => ({ value: 2 })
     }
@@ -230,7 +230,7 @@ describe('ContextExtension type', () => {
   })
 
   test('extension factory can return complex objects', () => {
-    const dbExtension: ContextExtension<{
+    const dbExtension: CommandContextExtension<{
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       query: (sql: string) => Promise<any>
       transaction: (fn: () => Promise<void>) => Promise<void>

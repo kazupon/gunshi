@@ -4,7 +4,7 @@ import { define, lazy } from './definition.ts'
 import { plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
-import type { ContextExtension, ExtendedCommand } from './types.ts'
+import type { CommandContextExtension, ExtendedCommand } from './types.ts'
 
 // eslint-disable-next-line vitest/expect-expect
 test('define', async () => {
@@ -69,7 +69,7 @@ describe('define with extensions', () => {
       isAuthenticated: boolean
     }
 
-    const authExtension: ContextExtension<Auth> = {
+    const authExtension: CommandContextExtension<Auth> = {
       key: Symbol('auth'),
       factory: _core => ({
         user: { id: 1, name: 'Test' },
@@ -81,7 +81,7 @@ describe('define with extensions', () => {
       query: (sql: string) => Promise<{ rows: string[] }>
     }
 
-    const dbExtension: ContextExtension<Database> = {
+    const dbExtension: CommandContextExtension<Database> = {
       key: Symbol('db'),
       factory: _core => ({
         query: async (_sql: string) => ({ rows: [] })
@@ -219,7 +219,7 @@ describe('lazy with extensions', () => {
       authenticated: boolean
     }
 
-    const authExtension: ContextExtension<Auth> = {
+    const authExtension: CommandContextExtension<Auth> = {
       key: Symbol('auth'),
       factory: _core => ({ authenticated: true })
     }
@@ -275,7 +275,7 @@ describe('lazy with extensions', () => {
       return async () => 'done'
     })
 
-    // const extensionFromDefinition: ContextExtension = {
+    // const extensionFromDefinition: CommandContextExtension = {
     //   key: Symbol('fromDef'),
     //   factory: () => ({ fromDef: true })
     // }
@@ -335,12 +335,12 @@ describe('lazy with extensions', () => {
 
 describe('ExtendedCommand type', () => {
   test('type safety with multiple extensions', () => {
-    const ext1: ContextExtension<{ value1: string }> = {
+    const ext1: CommandContextExtension<{ value1: string }> = {
       key: Symbol('ext1'),
       factory: () => ({ value1: 'test1' })
     }
 
-    const ext2: ContextExtension<{ value2: number }> = {
+    const ext2: CommandContextExtension<{ value2: number }> = {
       key: Symbol('ext2'),
       factory: () => ({ value2: 42 })
     }

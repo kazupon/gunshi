@@ -15,9 +15,9 @@ import type { Args } from 'args-tokens'
 import type {
   Command,
   CommandContextCore,
+  CommandContextExtension,
   CommandResource,
   CommandResourceFetcher,
-  ContextExtension,
   ExtendedCommand,
   LazyCommand
 } from './types.ts'
@@ -489,16 +489,25 @@ describe('translation adapter', () => {
 
 describe('createCommandContext with extensions', () => {
   test('applies extensions to context', async () => {
-    const authExtension: ContextExtension = {
+    type AuthExtension = {
+      user: { id: number; name: string }
+      isAuthenticated: boolean
+      getCommandName: () => string
+    }
+    const authExtension: CommandContextExtension<AuthExtension> = {
       key: Symbol('auth'),
       factory: vi.fn((_core: CommandContextCore) => ({
         user: { id: 1, name: 'Test User' },
         isAuthenticated: true,
-        getCommandName: () => _core.name
+        getCommandName: () => _core.name!
       }))
     }
 
-    const dbExtension: ContextExtension = {
+    type DbExtension = {
+      query: (sql: string) => Promise<{ rows: string[]; sql: string }>
+      connected: boolean
+    }
+    const dbExtension: CommandContextExtension<DbExtension> = {
       key: Symbol('db'),
       factory: vi.fn((_core: CommandContextCore) => ({
         query: async (sql: string) => ({ rows: [], sql }),
@@ -507,17 +516,18 @@ describe('createCommandContext with extensions', () => {
     }
 
     const args = { token: { type: 'string' as const } }
-    const command: ExtendedCommand<typeof args> = {
+    const command: ExtendedCommand<
+      typeof args,
+      { auth: CommandContextExtension<AuthExtension>; db: CommandContextExtension<DbExtension> }
+    > = {
       name: 'test-cmd',
       args,
       _extensions: {
         auth: authExtension,
         db: dbExtension
       },
-      // TODO(kazupon): resolve type
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      run: async (ctx: any) => {
-        // Access extensions
+      run: async ctx => {
+        // access extensions
         return `${ctx.ext.auth.user.name} - ${ctx.ext.db.connected}`
       }
     }
@@ -578,7 +588,7 @@ describe('createCommandContext with extensions', () => {
   })
 
   test('multiple extensions', async () => {
-    const extensions: Record<string, ContextExtension> = {
+    const extensions: Record<string, CommandContextExtension> = {
       ext1: {
         key: Symbol('ext1'),
         factory: () => ({ value1: 'test1' })
@@ -629,7 +639,7 @@ describe('createCommandContext with extensions', () => {
   test('extension factory execution order', async () => {
     const executionOrder: string[] = []
 
-    const ext1: ContextExtension = {
+    const ext1: CommandContextExtension = {
       key: Symbol('ext1'),
       factory: _core => {
         executionOrder.push('ext1')
@@ -637,7 +647,7 @@ describe('createCommandContext with extensions', () => {
       }
     }
 
-    const ext2: ContextExtension = {
+    const ext2: CommandContextExtension = {
       key: Symbol('ext2'),
       factory: _core => {
         executionOrder.push('ext2')
@@ -645,7 +655,7 @@ describe('createCommandContext with extensions', () => {
       }
     }
 
-    const ext3: ContextExtension = {
+    const ext3: CommandContextExtension = {
       key: Symbol('ext3'),
       factory: _core => {
         executionOrder.push('ext3')
@@ -709,7 +719,7 @@ describe('createCommandContext with extensions', () => {
   test('extension can access all context properties', async () => {
     let capturedCore: CommandContextCore | null = null
 
-    const testExtension: ContextExtension = {
+    const testExtension: CommandContextExtension = {
       key: Symbol('test'),
       factory: core => {
         capturedCore = core

@@ -330,10 +330,10 @@ export type CommandContextCore<A extends Args = Args, V = ArgValues<A>> = Readon
 >
 
 /**
- * Context extension type definition
+ * Command context extension
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ContextExtension<T = any> {
+export interface CommandContextExtension<T = any> {
   readonly key: symbol
   readonly factory: (core: CommandContextCore) => T
 }
@@ -382,7 +382,7 @@ export interface Command<A extends Args = Args> {
  */
 export interface ExtendedCommand<
   A extends Args = Args,
-  E extends Record<string, ContextExtension> = Record<string, ContextExtension>
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > extends Omit<Command<A>, 'run'> {
   _extensions?: E
   run?: (
