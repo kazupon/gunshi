@@ -16,7 +16,9 @@
 
 import type { Args } from 'args-tokens'
 import type {
+  Awaitable,
   Command,
+  CommandContext,
   CommandContextExtension,
   CommandLoader,
   ExtendedCommand,
@@ -30,7 +32,9 @@ export type { Args, ArgSchema, ArgValues } from 'args-tokens'
  * @param definition A {@link Command | command} definition
  * @returns A {@link Command | command} definition with type inference
  */
-export function define<A extends Args = Args>(definition: Command<A>): Command<A>
+export function define<A extends Args = Args>(
+  definition: Command<A>
+): Command<A> & { _extensions?: never; extensions?: never }
 
 /**
  * Define an {@link ExtendedCommand | extended command} with type inference and extension support
@@ -41,23 +45,52 @@ export function define<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 >(
-  definition: ExtendedCommand<A, E> & {
-    extensions?: E
+  definition: Omit<Command<A>, 'run'> & {
+    extensions: E
+    run?: (
+      ctx: Readonly<
+        CommandContext<A> & {
+          ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+        }
+      >
+    ) => Awaitable<void | string>
   }
-): ExtendedCommand<A, E>
+): ExtendedCommand<A, E> & { _extensions: E }
 
 export function define<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 >(
-  definition: Command<A> | (ExtendedCommand<A, E> & { extensions?: E })
-): Command<A> | ExtendedCommand<A, E> {
+  definition:
+    | Command<A>
+    | (Omit<Command<A>, 'run'> & {
+        extensions: E
+        run?: (
+          ctx: Readonly<
+            CommandContext<A> & {
+              ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+            }
+          >
+        ) => Awaitable<void | string>
+      })
+):
+  | (Command<A> & { _extensions?: never; extensions?: never })
+  | (ExtendedCommand<A, E> & { _extensions: E }) {
   if ('extensions' in definition && definition.extensions) {
-    const { extensions, ...rest } = definition
-    return { ...rest, _extensions: extensions } as ExtendedCommand<A, E>
+    const { extensions, run, ...rest } = definition
+    return { ...rest, run, _extensions: extensions } as ExtendedCommand<A, E> & { _extensions: E }
   }
-  return definition as Command<A>
+  return definition as Command<A> & { _extensions?: never; extensions?: never }
 }
+
+/**
+ * Define a {@link LazyCommand | lazy command} without definition
+ * @param loader A {@link CommandLoader | command loader}
+ * @returns A {@link LazyCommand | lazy command} loader
+ */
+export function lazy<A extends Args = Args>(
+  loader: CommandLoader<A>
+): LazyCommand<A> & { _extensions?: never }
 
 /**
  * Define a {@link LazyCommand | lazy command} with command loader, which is attached with command definition as usage metadata.
@@ -67,11 +100,11 @@ export function define<
  */
 export function lazy<A extends Args = Args>(
   loader: CommandLoader<A>,
-  definition?: Command<A>
-): LazyCommand<A>
+  definition: Omit<Command<A>, 'run'>
+): LazyCommand<A> & { _extensions?: never }
 
 /**
- * Define a {@link LazyCommand | lazy command} with extension support
+ * Define a {@link LazyCommand | lazy command} with extension support (extensions property)
  * @param loader A {@link CommandLoader | command loader}
  * @param definition An {@link ExtendedCommand | extended command} definition with extensions
  * @returns A {@link LazyCommand | lazy command} loader with extension support
@@ -81,12 +114,31 @@ export function lazy<
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 >(
   loader: CommandLoader<A>,
-  definition?: ExtendedCommand<A, E> & { extensions?: E }
-): LazyCommand<A> & { _extensions?: E }
+  definition: Omit<Command<A>, 'run'> & { extensions: E }
+): LazyCommand<A> & { _extensions: E }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function lazy<A extends Args = Args>(loader: CommandLoader<A>, definition?: any): any {
-  const lazyCommand = loader as LazyCommand<A>
+/**
+ * Define a {@link LazyCommand | lazy command} with extension support (_extensions property)
+ * @param loader A {@link CommandLoader | command loader}
+ * @param definition An {@link ExtendedCommand | extended command} definition with _extensions
+ * @returns A {@link LazyCommand | lazy command} loader with extension support
+ */
+export function lazy<
+  A extends Args = Args,
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
+>(
+  loader: CommandLoader<A>,
+  definition: Omit<Command<A>, 'run'> & { _extensions: E }
+): LazyCommand<A> & { _extensions: E }
+
+export function lazy<
+  A extends Args = Args,
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
+>(
+  loader: CommandLoader<A>,
+  definition?: Omit<Command<A>, 'run'> & ({ extensions?: E } | { _extensions?: E })
+): LazyCommand<A> & { _extensions?: E | never } {
+  const lazyCommand = loader as LazyCommand<A> & { _extensions?: E | never }
 
   if (definition != null) {
     // copy existing properties
@@ -98,12 +150,10 @@ export function lazy<A extends Args = Args>(loader: CommandLoader<A>, definition
     lazyCommand.toKebab = definition.toKebab
 
     // handle extensions
-    if (definition.extensions) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(lazyCommand as any)._extensions = definition.extensions
-    } else if (definition._extensions) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(lazyCommand as any)._extensions = definition._extensions
+    if ('extensions' in definition && definition.extensions) {
+      lazyCommand._extensions = definition.extensions
+    } else if ('_extensions' in definition && definition._extensions) {
+      lazyCommand._extensions = definition._extensions
     }
   }
 

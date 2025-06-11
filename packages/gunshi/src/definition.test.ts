@@ -98,19 +98,15 @@ describe('define with extensions', () => {
         auth: authExtension,
         db: dbExtension
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      run: async (ctx: any) => {
-        // type checking - ctx.ext should be available
-        // TODO(kazupon): resolve type
+      run: async ctx => {
+        // @ts-expect-error -- TODO(kazupon): resolve type
         return `Deploying as ${ctx.ext.auth.user.name}`
       }
     })
 
     // check that extensions are converted to _extensions
     expect(command._extensions).toBeDefined()
-    // TODO(kazupon): resolve type
     expect(command._extensions!.auth).toBe(authExtension)
-    // TODO(kazupon): resolve type
     expect(command._extensions!.db).toBe(dbExtension)
   })
 
@@ -127,12 +123,8 @@ describe('define with extensions', () => {
     })
 
     // should not have _extensions property
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((command as any)._extensions).toBeUndefined()
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((command as any).extensions).toBeUndefined()
+    expect(command._extensions).toBeUndefined()
+    expect(command.extensions).toBeUndefined()
 
     // all standard properties should be preserved
     expect(command.name).toBe('hello')
@@ -158,18 +150,16 @@ describe('define with extensions', () => {
       })
     })
 
-    // @ts-expect-error -- TODO: resolve type
+    // @ts-expect-error -- TODO(kazupon): resolve type
     const command = define({
       name: 'profile',
       extensions: {
         auth: authPlugin.extension
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      run: async (ctx: any) => {
-        // TypeScript should infer ctx.ext.auth correctly
-        // TODO(kazupon): resolve type
+      run: async ctx => {
+        // @ts-expect-error -- TODO(kazupon): resolve type
         const userName: string = ctx.ext.auth.user.name
-        // TODO(kazupon): resolve type
+        // @ts-expect-error -- TODO(kazupon): resolve type
         await ctx.ext.auth.logout()
         return `User: ${userName}`
       }
@@ -234,7 +224,6 @@ describe('lazy with extensions', () => {
 
     // check that extensions are preserved
     expect(lazyCmd._extensions).toBeDefined()
-    // TODO(kazupon): resolve type
     expect(lazyCmd._extensions!.auth).toBe(authExtension)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((lazyCmd as any).extensions).toBeUndefined()
@@ -275,12 +264,7 @@ describe('lazy with extensions', () => {
       return async () => 'done'
     })
 
-    // const extensionFromDefinition: CommandContextExtension = {
-    //   key: Symbol('fromDef'),
-    //   factory: () => ({ fromDef: true })
-    // }
-
-    // Simulate a command that already has _extensions
+    // simulate a command that already has _extensions
     const definitionWithExtensions = {
       name: 'test',
       _extensions: {
@@ -288,17 +272,13 @@ describe('lazy with extensions', () => {
       }
     }
 
-    // TODO: resolve type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lazyCmd = lazy(loader, definitionWithExtensions as any)
 
-    // Should preserve _extensions from definition
-    // TODO: resolve type
+    // should preserve _extensions from definition
+    expect(lazyCmd._extensions).toBeDefined()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((lazyCmd as any)._extensions).toBeDefined()
-    // TODO: resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((lazyCmd as any)._extensions.existing).toBeDefined()
+    expect((lazyCmd._extensions as any).existing).toBeDefined()
   })
 
   test('backward compatibility - lazy command without extensions', () => {
@@ -326,7 +306,6 @@ describe('lazy with extensions', () => {
 
     const lazyCmd = lazy(loader)
 
-    // TODO(kazupon): resolve type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((lazyCmd as any)._extensions).toBeUndefined()
     expect(typeof lazyCmd).toBe('function')
@@ -357,9 +336,7 @@ describe('ExtendedCommand type', () => {
     }
 
     expect(command._extensions).toBeDefined()
-    // TODO(kazupon): resolve type
     expect(command._extensions!.ext1).toBe(ext1)
-    // TODO(kazupon): resolve type
     expect(command._extensions!.ext2).toBe(ext2)
   })
 })

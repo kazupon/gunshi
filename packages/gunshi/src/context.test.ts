@@ -664,7 +664,7 @@ describe('createCommandContext with extensions', () => {
       cliOptions: {}
     })
 
-    // Extensions should be processed in the order they appear in the object
+    // extensions should be processed in the order they appear in the object
     expect(executionOrder).toEqual(['ext1', 'ext2', 'ext3'])
   })
 
@@ -744,7 +744,6 @@ describe('createCommandContext with extensions', () => {
       cliOptions: { name: 'test-cli' }
     })
 
-    // Verify the captured core has all expected properties
     expect(capturedCore).not.toBeNull()
     expect(capturedCore!.name).toBe('context-test')
     expect(capturedCore!.values).toEqual({ opt: 'value' })
@@ -779,10 +778,8 @@ describe('CommandContextCore type', () => {
       cliOptions: {}
     })
 
-    // CommandContextCore should be a readonly version
     const core: CommandContextCore<typeof args> = ctx
 
-    // all properties should be accessible
     expect(core.name).toBe('readonly-test')
     expect(core.values.flag).toBe(true)
     expect(core.args).toEqual(args)

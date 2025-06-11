@@ -384,11 +384,14 @@ export interface ExtendedCommand<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > extends Omit<Command<A>, 'run'> {
+  // @internal
   _extensions?: E
   run?: (
-    ctx: CommandContext<A> & {
-      ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
-    }
+    ctx: Readonly<
+      CommandContext<A> & {
+        ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+      }
+    >
   ) => Awaitable<void | string>
 }
 
