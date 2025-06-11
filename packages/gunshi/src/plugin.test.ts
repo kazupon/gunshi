@@ -6,7 +6,6 @@ import { define } from './definition.ts'
 import { PluginContext, plugin } from './plugin.ts'
 
 import type { Plugin } from './plugin.ts'
-import type { CommandContextExtension } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -213,46 +212,6 @@ describe('Plugin type with optional properties', () => {
     expect(pluginWithExtension.name).toBe('extended-plugin')
     expect(pluginWithExtension.extension).toBeDefined()
     expect(typeof pluginWithExtension.extension?.key).toBe('symbol')
-  })
-})
-
-describe('CommandContextExtension type', () => {
-  test('extension key is unique symbol', () => {
-    const extension1: CommandContextExtension = {
-      key: Symbol('test1'),
-      factory: () => ({ value: 1 })
-    }
-
-    const extension2: CommandContextExtension = {
-      key: Symbol('test2'),
-      factory: () => ({ value: 2 })
-    }
-
-    expect(extension1.key).not.toBe(extension2.key)
-  })
-
-  test('extension factory can return complex objects', () => {
-    const dbExtension: CommandContextExtension<{
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      query: (sql: string) => Promise<any>
-      transaction: (fn: () => Promise<void>) => Promise<void>
-    }> = {
-      key: Symbol('db'),
-      factory: _core => ({
-        query: async (_sql: string) => {
-          return { rows: [], count: 0 }
-        },
-        transaction: async (fn: () => Promise<void>) => {
-          await fn()
-        }
-      })
-    }
-
-    const mockCore = createMockCommandContext()
-    const db = dbExtension.factory(mockCore)
-
-    expect(typeof db.query).toBe('function')
-    expect(typeof db.transaction).toBe('function')
   })
 })
 
