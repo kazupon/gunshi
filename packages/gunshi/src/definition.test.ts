@@ -99,15 +99,14 @@ describe('define with extensions', () => {
         db: dbExtension
       },
       run: async ctx => {
-        // @ts-expect-error -- TODO(kazupon): resolve type
         return `Deploying as ${ctx.ext.auth.user.name}`
       }
     })
 
     // check that extensions are converted to _extensions
     expect(command._extensions).toBeDefined()
-    expect(command._extensions!.auth).toBe(authExtension)
-    expect(command._extensions!.db).toBe(dbExtension)
+    expect(command._extensions.auth).toBe(authExtension)
+    expect(command._extensions.db).toBe(dbExtension)
   })
 
   test('backward compatibility - command without extensions', () => {
@@ -123,8 +122,8 @@ describe('define with extensions', () => {
     })
 
     // should not have _extensions property
-    expect(command._extensions).toBeUndefined()
-    expect(command.extensions).toBeUndefined()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((command as any)._extensions).toBeUndefined()
 
     // all standard properties should be preserved
     expect(command.name).toBe('hello')
@@ -134,8 +133,6 @@ describe('define with extensions', () => {
   })
 
   test('type inference - ext property is typed correctly', () => {
-    // this test mainly ensures TypeScript compilation works correctly
-
     type Auth = {
       user: { id: number; name: string }
       logout: () => Promise<void>
@@ -156,17 +153,13 @@ describe('define with extensions', () => {
         auth: authPlugin.extension
       },
       run: async ctx => {
-        // @ts-expect-error -- TODO(kazupon): resolve type
         const userName: string = ctx.ext.auth.user.name
-        // @ts-expect-error -- TODO(kazupon): resolve type
         await ctx.ext.auth.logout()
         return `User: ${userName}`
       }
     })
 
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((command as any)._extensions.auth).toBeDefined()
+    expect(command._extensions.auth).toBeDefined()
   })
 
   test('preserves all command properties', () => {
@@ -223,9 +216,7 @@ describe('lazy with extensions', () => {
 
     // check that extensions are preserved
     expect(lazyCmd._extensions).toBeDefined()
-    expect(lazyCmd._extensions!.auth).toBe(authExtension)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((lazyCmd as any).extensions).toBeUndefined()
+    expect(lazyCmd._extensions.auth).toBe(authExtension)
 
     // check that other properties are preserved
     expect(lazyCmd.commandName).toBe('lazy-deploy')

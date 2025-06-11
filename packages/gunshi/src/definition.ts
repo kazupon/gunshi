@@ -20,67 +20,60 @@ import type {
   Command,
   CommandContext,
   CommandContextExtension,
+  CommandExamplesFetcher,
   CommandLoader,
+  CommandResourceFetcher,
+  CommandRunner,
   ExtendedCommand,
   LazyCommand
 } from './types.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 
-/**
- * Define a {@link Command | command} with type inference
- * @param definition A {@link Command | command} definition
- * @returns A {@link Command | command} definition with type inference
- */
+// Overload for command without extensions
 export function define<A extends Args = Args>(
-  definition: Command<A>
-): Command<A> & { _extensions?: never; extensions?: never }
+  definition: {
+    name?: string
+    description?: string
+    args?: A
+    examples?: string | CommandExamplesFetcher<A>
+    resource?: CommandResourceFetcher<A>
+    toKebab?: boolean
+    run?: CommandRunner<A>
+  } & { extensions?: never }
+): Command<A>
 
-/**
- * Define an {@link ExtendedCommand | extended command} with type inference and extension support
- * @param definition An {@link ExtendedCommand | extended command} definition with extensions
- * @returns An {@link ExtendedCommand | extended command} definition with type inference
- */
+// Overload for command with extensions
 export function define<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
->(
-  definition: Omit<Command<A>, 'run'> & {
-    extensions: E
-    run?: (
-      ctx: Readonly<
-        CommandContext<A> & {
-          ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
-        }
-      >
-    ) => Awaitable<void | string>
-  }
-): ExtendedCommand<A, E> & { _extensions: E }
+>(definition: {
+  name?: string
+  description?: string
+  args?: A
+  examples?: string | CommandExamplesFetcher<A>
+  resource?: CommandResourceFetcher<A>
+  toKebab?: boolean
+  extensions: E
+  run?: (
+    ctx: Readonly<
+      CommandContext<A> & {
+        ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+      }
+    >
+  ) => Awaitable<void | string>
+}): ExtendedCommand<A, E>
 
-export function define<
-  A extends Args = Args,
-  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
->(
-  definition:
-    | Command<A>
-    | (Omit<Command<A>, 'run'> & {
-        extensions: E
-        run?: (
-          ctx: Readonly<
-            CommandContext<A> & {
-              ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
-            }
-          >
-        ) => Awaitable<void | string>
-      })
-):
-  | (Command<A> & { _extensions?: never; extensions?: never })
-  | (ExtendedCommand<A, E> & { _extensions: E }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function define(definition: any): any {
   if ('extensions' in definition && definition.extensions) {
-    const { extensions, run, ...rest } = definition
-    return { ...rest, run, _extensions: extensions } as ExtendedCommand<A, E> & { _extensions: E }
+    const { extensions, ...rest } = definition
+    return {
+      ...rest,
+      _extensions: extensions
+    }
   }
-  return definition as Command<A> & { _extensions?: never; extensions?: never }
+  return definition
 }
 
 /**

@@ -385,7 +385,7 @@ export interface ExtendedCommand<
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > extends Omit<Command<A>, 'run'> {
   // @internal
-  _extensions?: E
+  _extensions: E
   run?: (
     ctx: Readonly<
       CommandContext<A> & {

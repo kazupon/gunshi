@@ -247,11 +247,8 @@ describe('Plugin Extensions Integration', () => {
         test: testPlugin.extension
       },
       async run(ctx) {
-        // @ts-expect-error -- TODO(kazupon): resolve type
         const value = ctx.ext.test.getValue()
-        // @ts-expect-error -- TODO(kazupon): resolve type
         const doubled = ctx.ext.test.doubled(ctx.values.num!)
-        // @ts-expect-error -- TODO(kazupon): resolve type
         const asyncResult = await ctx.ext.test.asyncOp()
 
         return `${value}:${doubled}:${asyncResult}`
@@ -266,7 +263,6 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      // @ts-expect-error -- TODO(kazupon): resolve type
       command: testCommand,
       omitted: false,
       callMode: 'entry',
@@ -274,9 +270,7 @@ describe('Plugin Extensions Integration', () => {
     })
 
     // execute command
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await testCommand.run!(ctx as any)
+    const result = await testCommand.run!(ctx)
     expect(result).toBe('custom:10:async-result')
   })
 
@@ -318,14 +312,10 @@ describe('Plugin Extensions Integration', () => {
         logger: loggerPlugin.extension
       },
       run(ctx) {
-        // @ts-expect-error -- TODO(kazupon): resolve type
         ctx.ext.logger.log(`User ${ctx.ext.auth.getUser()} executed command`)
-        // @ts-expect-error -- TODO(kazupon): resolve type
         if (ctx.ext.auth.isAdmin()) {
-          // @ts-expect-error -- TODO(kazupon): resolve type
           ctx.ext.logger.log('Admin access granted')
         }
-        // @ts-expect-error -- TODO(kazupon): resolve type
         return ctx.ext.logger.getLogs().join('; ')
       }
     })
@@ -338,7 +328,6 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      // @ts-expect-error -- TODO(kazupon): resolve type
       command: multiCommand,
       omitted: false,
       callMode: 'entry',
@@ -408,7 +397,6 @@ describe('Plugin Extensions Integration', () => {
         ctx: contextPlugin.extension
       },
       run(ctx) {
-        // @ts-expect-error -- TODO(kazupon): resolve type
         return String(ctx.ext.ctx.captured)
       }
     })
@@ -420,16 +408,13 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      // @ts-expect-error -- TODO(kazupon): resolve type
       command: contextCommand,
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
     })
 
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await contextCommand.run!(ctx as any)
+    await contextCommand.run!(ctx)
 
     expect(capturedContext).toHaveBeenCalledWith({
       name: 'ctx-test',
