@@ -155,6 +155,15 @@ describe('plugin function', () => {
       name: 'auth-plugin',
       setup: async ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
+        ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
+          const user = cmdCtx.ext.auth.user
+          console.log(`User: ${user.name} (${user.id})`)
+          return await baseRenderer(cmdCtx)
+        })
+        ctx.decorateCommand(baseRunner => async ctx => {
+          const result = await baseRunner(ctx)
+          return `[AUTH] ${result}`
+        })
       },
       extension: extensionFactory
     })
