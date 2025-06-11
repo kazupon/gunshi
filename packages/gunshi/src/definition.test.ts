@@ -150,7 +150,6 @@ describe('define with extensions', () => {
       })
     })
 
-    // @ts-expect-error -- TODO(kazupon): resolve type
     const command = define({
       name: 'profile',
       extensions: {

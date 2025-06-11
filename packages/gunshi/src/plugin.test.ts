@@ -112,10 +112,10 @@ describe('plugin function', () => {
     // check plugin properties
     expect(testPlugin.name).toBe('test-plugin')
     expect(testPlugin.extension).toBeDefined()
-    expect(testPlugin.extension?.key).toBeDefined()
-    expect(typeof testPlugin.extension?.key).toBe('symbol')
-    expect(testPlugin.extension?.key.description).toBe('test-plugin')
-    expect(testPlugin.extension?.factory).toBe(extensionFactory)
+    expect(testPlugin.extension.key).toBeDefined()
+    expect(typeof testPlugin.extension.key).toBe('symbol')
+    expect(testPlugin.extension.key.description).toBe('test-plugin')
+    expect(testPlugin.extension.factory).toBe(extensionFactory)
 
     // check that setup function is callable
     const decorators = new Decorators()
@@ -244,13 +244,14 @@ describe('Plugin Extensions Integration', () => {
         num: { type: 'number', default: 5 }
       },
       extensions: {
-        test: testPlugin.extension!
+        test: testPlugin.extension
       },
-      // TODO: resolve type
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      async run(ctx: any) {
+      async run(ctx) {
+        // @ts-expect-error -- TODO(kazupon): resolve type
         const value = ctx.ext.test.getValue()
+        // @ts-expect-error -- TODO(kazupon): resolve type
         const doubled = ctx.ext.test.doubled(ctx.values.num!)
+        // @ts-expect-error -- TODO(kazupon): resolve type
         const asyncResult = await ctx.ext.test.asyncOp()
 
         return `${value}:${doubled}:${asyncResult}`
@@ -265,7 +266,7 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      // @ts-expect-error // TODO(kazupon): resolve type
+      // @ts-expect-error -- TODO(kazupon): resolve type
       command: testCommand,
       omitted: false,
       callMode: 'entry',
@@ -313,16 +314,18 @@ describe('Plugin Extensions Integration', () => {
     const multiCommand = define({
       name: 'multi',
       extensions: {
-        auth: authPlugin.extension!,
-        logger: loggerPlugin.extension!
+        auth: authPlugin.extension,
+        logger: loggerPlugin.extension
       },
-      // TODO(kazupon): resolve type
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      run(ctx: any) {
+      run(ctx) {
+        // @ts-expect-error -- TODO(kazupon): resolve type
         ctx.ext.logger.log(`User ${ctx.ext.auth.getUser()} executed command`)
+        // @ts-expect-error -- TODO(kazupon): resolve type
         if (ctx.ext.auth.isAdmin()) {
+          // @ts-expect-error -- TODO(kazupon): resolve type
           ctx.ext.logger.log('Admin access granted')
         }
+        // @ts-expect-error -- TODO(kazupon): resolve type
         return ctx.ext.logger.getLogs().join('; ')
       }
     })
@@ -335,7 +338,7 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      // @ts-expect-error // TODO(kazupon): resolve type
+      // @ts-expect-error -- TODO(kazupon): resolve type
       command: multiCommand,
       omitted: false,
       callMode: 'entry',
@@ -349,21 +352,19 @@ describe('Plugin Extensions Integration', () => {
   })
 
   test('commands without extensions work normally', async () => {
-    // Regular command without extensions
+    // regular command without extensions
     const regularCommand = define({
       name: 'regular',
       args: {
         msg: { type: 'string', default: 'hello' },
         upper: { type: 'boolean', default: false }
       },
-      // TODO(kazupon): resolve type
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      run(ctx: any) {
+      run(ctx) {
         return ctx.values.upper ? ctx.values.msg!.toUpperCase() : ctx.values.msg!
       }
     })
 
-    // Create command context directly
+    // create command context directly
     const ctx = await createCommandContext({
       args: {
         msg: { type: 'string', default: 'hello' },
@@ -404,11 +405,10 @@ describe('Plugin Extensions Integration', () => {
     const contextCommand = define({
       name: 'ctx-test',
       extensions: {
-        ctx: contextPlugin.extension!
+        ctx: contextPlugin.extension
       },
-      // TODO(kazupon): resolve type
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      run(ctx: any) {
+      run(ctx) {
+        // @ts-expect-error -- TODO(kazupon): resolve type
         return String(ctx.ext.ctx.captured)
       }
     })
@@ -420,7 +420,7 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      // @ts-expect-error // TODO(kazupon): resolve type
+      // @ts-expect-error -- TODO(kazupon): resolve type
       command: contextCommand,
       omitted: false,
       callMode: 'entry',

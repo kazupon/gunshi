@@ -114,36 +114,64 @@ export class PluginContext {
 }
 
 /**
- * Create a plugin with optional extension capabilities
- * @param options - Plugin configuration options
- * @returns A plugin function with optional name and extension properties
+ * Plugin return type with extension
  */
+interface PluginWithExtension<T> extends Plugin {
+  name: string
+  extension: CommandContextExtension<T>
+}
+
+/**
+ * Plugin return type without extension
+ */
+interface PluginWithoutExtension extends Plugin {
+  name: string
+}
+
+/**
+ * Create a plugin with extension capabilities
+ */
+export function plugin<T>(options: {
+  name: string
+  setup: (ctx: PluginContext) => Awaitable<void>
+  extension: (core: CommandContextCore) => T
+}): PluginWithExtension<T>
+
+/**
+ * Create a plugin without extension
+ */
+export function plugin(options: {
+  name: string
+  setup: (ctx: PluginContext) => Awaitable<void>
+}): PluginWithoutExtension
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function plugin<T = any>(options: PluginOptions<T>): Plugin {
+export function plugin<T = any>(options: PluginOptions<T>) {
   const { name, setup, extension } = options
 
   // create a wrapper function with properties
   const pluginFn = async (ctx: PluginContext) => await setup(ctx)
 
-  // use Object.defineProperty to add properties to the function
-  Object.defineProperty(pluginFn, 'name', {
-    value: name,
-    writable: false,
-    enumerable: true,
-    configurable: true
-  })
-
-  if (extension) {
-    Object.defineProperty(pluginFn, 'extension', {
-      value: {
-        key: Symbol(name),
-        factory: extension
-      },
+  // define the properties
+  const result = Object.defineProperties(pluginFn, {
+    name: {
+      value: name,
       writable: false,
       enumerable: true,
       configurable: true
+    },
+    ...(extension && {
+      extension: {
+        value: {
+          key: Symbol(name),
+          factory: extension
+        },
+        writable: false,
+        enumerable: true,
+        configurable: true
+      }
     })
-  }
+  })
 
-  return pluginFn as Plugin
+  return result as any // eslint-disable-line @typescript-eslint/no-explicit-any
 }
