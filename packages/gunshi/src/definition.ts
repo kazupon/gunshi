@@ -19,6 +19,7 @@ import type {
   Awaitable,
   Command,
   CommandContext,
+  CommandContextExt,
   CommandContextExtension,
   CommandExamplesFetcher,
   CommandLoader,
@@ -55,13 +56,7 @@ export function define<
   resource?: CommandResourceFetcher<A>
   toKebab?: boolean
   extensions: E
-  run?: (
-    ctx: Readonly<
-      CommandContext<A> & {
-        ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
-      }
-    >
-  ) => Awaitable<void | string>
+  run?: (ctx: Readonly<CommandContext<A> & CommandContextExt<E>>) => Awaitable<void | string>
 }): ExtendedCommand<A, E>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

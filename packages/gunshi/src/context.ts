@@ -43,6 +43,7 @@ import type {
   CommandCallMode,
   CommandContext,
   CommandContextCore,
+  CommandContextExt,
   CommandContextExtension,
   CommandEnvironment,
   CommandResource,
@@ -109,7 +110,7 @@ type InferExtentableCommand<
   C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>
 > =
   C extends ExtendedCommand<A, infer E>
-    ? Readonly<CommandContext<A, V> & { ext: { [K in keyof E]: ReturnType<E[K]['factory']> } }>
+    ? Readonly<CommandContext<A, V> & CommandContextExt<E>>
     : Readonly<CommandContext<A, V>>
 
 /**

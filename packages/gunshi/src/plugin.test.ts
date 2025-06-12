@@ -156,6 +156,7 @@ describe('plugin function', () => {
       setup: async ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
+          // @ts-expect-error -- TODO(kazupon): fix type
           const user = cmdCtx.ext.auth.user
           console.log(`User: ${user.name} (${user.id})`)
           return await baseRenderer(cmdCtx)

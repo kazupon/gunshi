@@ -386,13 +386,16 @@ export interface ExtendedCommand<
 > extends Omit<Command<A>, 'run'> {
   // @internal
   _extensions: E
-  run?: (
-    ctx: Readonly<
-      CommandContext<A> & {
-        ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
-      }
-    >
-  ) => Awaitable<void | string>
+  run?: (ctx: Readonly<CommandContext<A> & CommandContextExt<E>>) => Awaitable<void | string>
+}
+
+/**
+ * Command context extension type.
+ * This type is used to extend the command context with additional properties.
+ * @internal
+ */
+export type CommandContextExt<E extends Record<string, CommandContextExtension>> = {
+  ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
 }
 
 /**
