@@ -5,7 +5,7 @@
 
 import type { Args } from 'args-tokens'
 import type {
-  CommandContext,
+  CommandContextWithPossibleExt,
   CommandDecorator,
   RendererDecorator,
   ValidationErrorsDecorator
@@ -43,27 +43,29 @@ export class Decorators<A extends Args = Args> {
     return [...this.#commandDecorators]
   }
 
-  getHeaderRenderer(): (ctx: Readonly<CommandContext<A>>) => Promise<string> {
+  getHeaderRenderer(): (ctx: CommandContextWithPossibleExt<A>) => Promise<string> {
     return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
   }
 
-  getUsageRenderer(): (ctx: Readonly<CommandContext<A>>) => Promise<string> {
+  getUsageRenderer(): (ctx: CommandContextWithPossibleExt<A>) => Promise<string> {
     return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
   }
 
   getValidationErrorsRenderer(): (
-    ctx: Readonly<CommandContext<A>>,
+    ctx: CommandContextWithPossibleExt<A>,
     error: AggregateError
   ) => Promise<string> {
     if (this.#validationDecorators.length === 0) {
       return EMPTY_RENDERER
     }
 
-    let renderer: (ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string> =
-      EMPTY_RENDERER
+    let renderer: (
+      ctx: CommandContextWithPossibleExt<A>,
+      error: AggregateError
+    ) => Promise<string> = EMPTY_RENDERER
     for (const decorator of this.#validationDecorators) {
       const previousRenderer = renderer
-      renderer = (ctx: Readonly<CommandContext<A>>, error: AggregateError) =>
+      renderer = (ctx: CommandContextWithPossibleExt<A>, error: AggregateError) =>
         decorator(previousRenderer, ctx, error)
     }
     return renderer
@@ -71,8 +73,8 @@ export class Decorators<A extends Args = Args> {
 
   #buildRenderer<T, A extends Args = Args>(
     decorators: RendererDecorator<T, A>[],
-    defaultRenderer: (ctx: Readonly<CommandContext<A>>) => Promise<T>
-  ): (ctx: Readonly<CommandContext<A>>) => Promise<T> {
+    defaultRenderer: (ctx: CommandContextWithPossibleExt<A>) => Promise<T>
+  ): (ctx: CommandContextWithPossibleExt<A>) => Promise<T> {
     if (decorators.length === 0) {
       return defaultRenderer
     }

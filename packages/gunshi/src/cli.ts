@@ -16,7 +16,7 @@ import type {
   CliOptions,
   Command,
   CommandCallMode,
-  CommandContext,
+  CommandContextWithPossibleExt,
   CommandDecorator,
   CommandRunner,
   LazyCommand
@@ -155,7 +155,7 @@ function getSubCommand(tokens: ArgToken[]): string {
 }
 
 async function showValidationErrors<A extends Args>(
-  ctx: CommandContext<A>,
+  ctx: CommandContextWithPossibleExt<A>,
   error: AggregateError,
   decorators: Decorators<A>
 ): Promise<void> {
@@ -241,7 +241,7 @@ function resolveEntryName<A extends Args>(entry: Command<A>): string {
 
 async function executeCommand<A extends Args = Args>(
   cmd: Command<A> | LazyCommand<A>,
-  ctx: CommandContext<A>,
+  ctx: CommandContextWithPossibleExt<A>,
   name: string,
   decorators: readonly CommandDecorator<A>[]
 ): Promise<string | undefined> {

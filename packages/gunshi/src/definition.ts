@@ -31,7 +31,10 @@ import type {
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 
-// Overload for command without extensions
+/**
+ * Define a {@link Command | command}
+ * @param definition A {@link Command | command} definition
+ */
 export function define<A extends Args = Args>(
   definition: {
     name?: string
@@ -44,7 +47,10 @@ export function define<A extends Args = Args>(
   } & { extensions?: never }
 ): Command<A>
 
-// Overload for command with extensions
+/**
+ * Define an {@link ExtendedCommand | extended command} with extensions
+ * @param definition An {@link ExtendedCommand | extended command} definition with extensions
+ */
 export function define<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
@@ -60,15 +66,18 @@ export function define<
 }): ExtendedCommand<A, E>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function define(definition: any): any {
+export function define<A extends Args = Args>(definition: any): any {
   if ('extensions' in definition && definition.extensions) {
-    const { extensions, ...rest } = definition
+    const { extensions, run, ...rest } = definition
     return {
       ...rest,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      run: run as any, // the run function type is correctly enforced by the overloads
       _extensions: extensions
-    }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as ExtendedCommand<A, any>
   }
-  return definition
+  return definition as Command<A>
 }
 
 /**

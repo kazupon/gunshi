@@ -138,16 +138,16 @@ export interface CommandEnvironment<A extends Args = Args> {
   /**
    * Render function the command usage.
    */
-  renderUsage: ((ctx: CommandContext<A>) => Promise<string>) | null | undefined
+  renderUsage: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null | undefined
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader: ((ctx: CommandContext<A>) => Promise<string>) | null | undefined
+  renderHeader: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null | undefined
   /**
    * Render function the validation errors.
    */
   renderValidationErrors:
-    | ((ctx: CommandContext<A>, error: AggregateError) => Promise<string>)
+    | ((ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>)
     | null
     | undefined
 }
@@ -204,16 +204,16 @@ export interface CliOptions<A extends Args = Args> {
   /**
    * Render function the command usage.
    */
-  renderUsage?: ((ctx: Readonly<CommandContext<A>>) => Promise<string>) | null
+  renderUsage?: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader?: ((ctx: Readonly<CommandContext<A>>) => Promise<string>) | null
+  renderHeader?: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null
   /**
    * Render function the validation errors.
    */
   renderValidationErrors?:
-    | ((ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string>)
+    | ((ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>)
     | null
   /**
    * Translation adapter factory.
@@ -326,6 +326,22 @@ export interface CommandContext<A extends Args = Args> {
  * CommandContextCore type (base type without extensions)
  */
 export type CommandContextCore<A extends Args = Args> = Readonly<CommandContext<A>>
+
+/**
+ * CommandContext with possible extensions
+ * This type represents a command context that may have extensions
+ */
+export type CommandContextWithPossibleExt<A extends Args = Args> = Readonly<CommandContext<A>> & {
+  ext?: Record<string, unknown>
+}
+
+/**
+ * CommandContext with specific extensions
+ */
+export type CommandContextWithExt<
+  A extends Args = Args,
+  E extends Record<string, unknown> = Record<string, never>
+> = Readonly<CommandContext<A>> & (keyof E extends never ? {} : { ext: E })
 
 /**
  * Command context extension
@@ -522,8 +538,8 @@ export type CommandRunner<A extends Args = Args> = (
  * @returns The decorated command runner
  */
 export type CommandDecorator<A extends Args = Args> = (
-  baseRunner: CommandRunner<A>
-) => CommandRunner<A>
+  baseRunner: (ctx: CommandContextWithPossibleExt<A>) => Awaitable<void | string>
+) => (ctx: CommandContextWithPossibleExt<A>) => Awaitable<void | string>
 
 export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | CommandRunner<A>>
 
@@ -535,8 +551,8 @@ export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | 
  * @returns The decorated result
  */
 export type RendererDecorator<T, A extends Args = Args> = (
-  baseRenderer: (ctx: Readonly<CommandContext<A>>) => Promise<T>,
-  ctx: Readonly<CommandContext<A>>
+  baseRenderer: (ctx: CommandContextWithPossibleExt<A>) => Promise<T>,
+  ctx: CommandContextWithPossibleExt<A>
 ) => Promise<T>
 
 /**
@@ -548,7 +564,7 @@ export type RendererDecorator<T, A extends Args = Args> = (
  * @returns The decorated result
  */
 export type ValidationErrorsDecorator<A extends Args = Args> = (
-  baseRenderer: (ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string>,
-  ctx: Readonly<CommandContext<A>>,
+  baseRenderer: (ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>,
+  ctx: CommandContextWithPossibleExt<A>,
   error: AggregateError
 ) => Promise<string>
