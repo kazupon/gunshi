@@ -230,7 +230,7 @@ export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
  * Command context.
  * Command context is the context of the command execution.
  */
-export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
+export interface CommandContext<A extends Args = Args> {
   /**
    * Command name, that is the command that is executed.
    * The command name is same {@link CommandEnvironment.name}.
@@ -259,7 +259,7 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
    * Command values, that is the values of the command that is executed.
    * Resolve values with `resolveArgs` from command arguments and {@link Command.args}.
    */
-  values: V
+  values: ArgValues<A>
   /**
    * Command positionals arguments, that is the positionals of the command that is executed.
    * Resolve positionals with `resolveArgs` from command arguments.
@@ -325,9 +325,7 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
 /**
  * CommandContextCore type (base type without extensions)
  */
-export type CommandContextCore<A extends Args = Args, V = ArgValues<A>> = Readonly<
-  CommandContext<A, V>
->
+export type CommandContextCore<A extends Args = Args> = Readonly<CommandContext<A>>
 
 /**
  * Command context extension
@@ -439,8 +437,8 @@ export type CommandResource<A extends Args = Args> = {
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched command examples.
  */
-export type CommandExamplesFetcher<A extends Args = Args, V = ArgValues<A>> = (
-  ctx: Readonly<CommandContext<A, V>>
+export type CommandExamplesFetcher<A extends Args = Args> = (
+  ctx: Readonly<CommandContext<A>>
 ) => Promise<string>
 
 /**
@@ -448,8 +446,8 @@ export type CommandExamplesFetcher<A extends Args = Args, V = ArgValues<A>> = (
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched {@link CommandResource | command resource}.
  */
-export type CommandResourceFetcher<A extends Args = Args, V = ArgValues<A>> = (
-  ctx: Readonly<CommandContext<A, V>>
+export type CommandResourceFetcher<A extends Args = Args> = (
+  ctx: Readonly<CommandContext<A>>
 ) => Promise<CommandResource<A>>
 
 /**
@@ -536,9 +534,9 @@ export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | 
  * @param ctx The command context
  * @returns The decorated result
  */
-export type RendererDecorator<T> = (
-  baseRenderer: (ctx: CommandContext) => Promise<T>,
-  ctx: CommandContext
+export type RendererDecorator<T, A extends Args = Args> = (
+  baseRenderer: (ctx: Readonly<CommandContext<A>>) => Promise<T>,
+  ctx: Readonly<CommandContext<A>>
 ) => Promise<T>
 
 /**
@@ -549,8 +547,8 @@ export type RendererDecorator<T> = (
  * @param error The aggregate error containing validation errors
  * @returns The decorated result
  */
-export type ValidationErrorsDecorator = (
-  baseRenderer: (ctx: CommandContext, error: AggregateError) => Promise<string>,
-  ctx: CommandContext,
+export type ValidationErrorsDecorator<A extends Args = Args> = (
+  baseRenderer: (ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string>,
+  ctx: Readonly<CommandContext<A>>,
   error: AggregateError
 ) => Promise<string>

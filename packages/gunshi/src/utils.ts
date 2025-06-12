@@ -5,7 +5,7 @@
 
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
-import type { Args, ArgValues } from 'args-tokens'
+import type { Args } from 'args-tokens'
 import type {
   Command,
   Commandable,
@@ -79,8 +79,8 @@ export function resolveArgKey<A extends Args = {}, K extends string = KeyOfArgs<
   return `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
-export async function resolveExamples<A extends Args = Args, V extends ArgValues<A> = ArgValues<A>>(
-  ctx: Readonly<CommandContext<A, V>>,
+export async function resolveExamples<A extends Args = Args>(
+  ctx: Readonly<CommandContext<A>>,
   examples?: string | CommandExamplesFetcher<A>
 ): Promise<string> {
   return typeof examples === 'string'

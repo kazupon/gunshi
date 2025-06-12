@@ -17,43 +17,41 @@ const EMPTY_RENDERER = async () => ''
  * Internal class for managing renderer decorators.
  * This class is not exposed to plugin authors.
  */
-export class Decorators {
-  #headerDecorators: RendererDecorator<string>[] = []
-  #usageDecorators: RendererDecorator<string>[] = []
-  #validationDecorators: ValidationErrorsDecorator[] = []
-  #commandDecorators: CommandDecorator[] = []
+export class Decorators<A extends Args = Args> {
+  #headerDecorators: RendererDecorator<string, A>[] = []
+  #usageDecorators: RendererDecorator<string, A>[] = []
+  #validationDecorators: ValidationErrorsDecorator<A>[] = []
+  #commandDecorators: CommandDecorator<A>[] = []
 
-  addHeaderDecorator(decorator: RendererDecorator<string>): void {
+  addHeaderDecorator(decorator: RendererDecorator<string, A>): void {
     this.#headerDecorators.push(decorator)
   }
 
-  addUsageDecorator(decorator: RendererDecorator<string>): void {
+  addUsageDecorator(decorator: RendererDecorator<string, A>): void {
     this.#usageDecorators.push(decorator)
   }
 
-  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator): void {
+  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<A>): void {
     this.#validationDecorators.push(decorator)
   }
 
-  addCommandDecorator(decorator: CommandDecorator): void {
+  addCommandDecorator(decorator: CommandDecorator<A>): void {
     this.#commandDecorators.push(decorator)
   }
 
-  get commandDecorators(): readonly CommandDecorator[] {
+  get commandDecorators(): readonly CommandDecorator<A>[] {
     return [...this.#commandDecorators]
   }
 
-  getHeaderRenderer<A extends Args = Args>(): (
-    ctx: Readonly<CommandContext<A>>
-  ) => Promise<string> {
+  getHeaderRenderer(): (ctx: Readonly<CommandContext<A>>) => Promise<string> {
     return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
   }
 
-  getUsageRenderer<A extends Args = Args>(): (ctx: Readonly<CommandContext<A>>) => Promise<string> {
+  getUsageRenderer(): (ctx: Readonly<CommandContext<A>>) => Promise<string> {
     return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
   }
 
-  getValidationErrorsRenderer<A extends Args = Args>(): (
+  getValidationErrorsRenderer(): (
     ctx: Readonly<CommandContext<A>>,
     error: AggregateError
   ) => Promise<string> {
@@ -61,20 +59,20 @@ export class Decorators {
       return EMPTY_RENDERER
     }
 
-    let renderer: (ctx: Readonly<CommandContext>, error: AggregateError) => Promise<string> =
+    let renderer: (ctx: Readonly<CommandContext<A>>, error: AggregateError) => Promise<string> =
       EMPTY_RENDERER
     for (const decorator of this.#validationDecorators) {
       const previousRenderer = renderer
-      renderer = (ctx: CommandContext, error: AggregateError) =>
+      renderer = (ctx: Readonly<CommandContext<A>>, error: AggregateError) =>
         decorator(previousRenderer, ctx, error)
     }
     return renderer
   }
 
-  #buildRenderer<T>(
-    decorators: RendererDecorator<T>[],
-    defaultRenderer: (ctx: Readonly<CommandContext>) => Promise<T>
-  ): (ctx: Readonly<CommandContext>) => Promise<T> {
+  #buildRenderer<T, A extends Args = Args>(
+    decorators: RendererDecorator<T, A>[],
+    defaultRenderer: (ctx: Readonly<CommandContext<A>>) => Promise<T>
+  ): (ctx: Readonly<CommandContext<A>>) => Promise<T> {
     if (decorators.length === 0) {
       return defaultRenderer
     }

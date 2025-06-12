@@ -15,7 +15,7 @@
 
 import { Decorators } from './decorators.ts'
 
-import type { ArgSchema } from 'args-tokens'
+import type { Args, ArgSchema } from 'args-tokens'
 import type {
   Awaitable,
   CommandContextCore,
@@ -26,33 +26,13 @@ import type {
 } from './types.ts'
 
 /**
- * Plugin definition options
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface PluginOptions<T = any> {
-  name: string
-  setup: (ctx: PluginContext) => Awaitable<void>
-  extension?: (core: CommandContextCore) => T
-}
-
-/**
- * Gunshi plugin, which is a function that receives a PluginContext.
- * @param ctx - A {@link PluginContext}.
- * @returns An {@link Awaitable} that resolves when the plugin is loaded.
- */
-export type Plugin = ((ctx: PluginContext) => Awaitable<void>) & {
-  name?: string
-  extension?: CommandContextExtension<any> // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-/**
  * Gunshi plugin context.
  */
-export class PluginContext {
+export class PluginContext<A extends Args = Args> {
   #globalOptions: Map<string, ArgSchema> = new Map()
-  #decorators: Decorators
+  #decorators: Decorators<A>
 
-  constructor(decorators: Decorators) {
+  constructor(decorators: Decorators<A>) {
     this.#decorators = decorators
   }
 
@@ -83,7 +63,7 @@ export class PluginContext {
    * Decorate the header renderer.
    * @param decorator - A decorator function that wraps the base header renderer.
    */
-  decorateHeaderRenderer(decorator: RendererDecorator<string>): void {
+  decorateHeaderRenderer(decorator: RendererDecorator<string, A>): void {
     this.#decorators.addHeaderDecorator(decorator)
   }
 
@@ -91,7 +71,7 @@ export class PluginContext {
    * Decorate the usage renderer.
    * @param decorator - A decorator function that wraps the base usage renderer.
    */
-  decorateUsageRenderer(decorator: RendererDecorator<string>): void {
+  decorateUsageRenderer(decorator: RendererDecorator<string, A>): void {
     this.#decorators.addUsageDecorator(decorator)
   }
 
@@ -99,7 +79,7 @@ export class PluginContext {
    * Decorate the validation errors renderer.
    * @param decorator - A decorator function that wraps the base validation errors renderer.
    */
-  decorateValidationErrorsRenderer(decorator: ValidationErrorsDecorator): void {
+  decorateValidationErrorsRenderer(decorator: ValidationErrorsDecorator<A>): void {
     this.#decorators.addValidationErrorsDecorator(decorator)
   }
 
@@ -108,9 +88,29 @@ export class PluginContext {
    * Decorators are applied in reverse order (last registered is executed first).
    * @param decorator - A decorator function that wraps the command runner
    */
-  decorateCommand(decorator: CommandDecorator): void {
+  decorateCommand(decorator: CommandDecorator<A>): void {
     this.#decorators.addCommandDecorator(decorator)
   }
+}
+
+/**
+ * Plugin definition options
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface PluginOptions<T = any> {
+  name: string
+  setup: (ctx: PluginContext) => Awaitable<void>
+  extension?: (core: CommandContextCore) => T
+}
+
+/**
+ * Gunshi plugin, which is a function that receives a PluginContext.
+ * @param ctx - A {@link PluginContext}.
+ * @returns An {@link Awaitable} that resolves when the plugin is loaded.
+ */
+export type Plugin = ((ctx: PluginContext) => Awaitable<void>) & {
+  name?: string
+  extension?: CommandContextExtension<any> // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /**

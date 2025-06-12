@@ -105,13 +105,12 @@ interface CommandContextParams<
 
 type InferExtentableCommand<
   A extends Args,
-  V extends ArgValues<A> = ArgValues<A>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>
 > =
   C extends ExtendedCommand<A, infer E>
-    ? Readonly<CommandContext<A, V> & CommandContextExt<E>>
-    : Readonly<CommandContext<A, V>>
+    ? Readonly<CommandContext<A> & CommandContextExt<E>>
+    : Readonly<CommandContext<A>>
 
 /**
  * Create a {@link CommandContext | command context}
@@ -133,7 +132,7 @@ export async function createCommandContext<
   cliOptions,
   callMode = 'entry',
   omitted = false
-}: CommandContextParams<A, V, C>): Promise<InferExtentableCommand<A, V, C>> {
+}: CommandContextParams<A, V, C>): Promise<InferExtentableCommand<A, C>> {
   /**
    * normailize the options schema and values, to avoid prototype pollution
    */
@@ -223,7 +222,7 @@ export async function createCommandContext<
    * create the command context
    */
 
-  const core = Object.assign(create<CommandContext<A, V>>(), {
+  const core = Object.assign(create<CommandContext<A>>(), {
     name: getCommandName(command),
     description: command.description,
     omitted,
@@ -246,21 +245,19 @@ export async function createCommandContext<
    * extend the command context with extensions
    */
 
-  // TODO(kazupon): remove `any` type
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ctx: any
 
   // if command requires extensions
   if ('_extensions' in command && command._extensions) {
-    const ext = {} as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // apply each extension
     for (const [key, extension] of Object.entries(command._extensions)) {
-      ext[key] = (extension as CommandContextExtension).factory(core as CommandContextCore<A, V>)
+      ext[key] = (extension as CommandContextExtension).factory(core as CommandContextCore<Args>)
     }
 
     // create extended context with extensions
-    // TODO(kazupon): remove `any` type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const extendedCtx = Object.assign(create<any>(), core, {
       ext: Object.freeze(ext)
@@ -291,7 +288,7 @@ export async function createCommandContext<
   defaultCommandResource.examples = await resolveExamples(ctx, command.examples)
   adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-  const originalResource = await loadCommandResource<A, V>(ctx, command)
+  const originalResource = await loadCommandResource<A>(ctx, command)
   if (originalResource) {
     const resource = Object.assign(
       create<Record<string, string>>(),
@@ -307,7 +304,7 @@ export async function createCommandContext<
     adapter.setResource(localeStr, resource)
   }
 
-  return ctx as InferExtentableCommand<A, V, C>
+  return ctx as InferExtentableCommand<A, C>
 }
 
 function getCommandName<A extends Args>(
@@ -331,8 +328,8 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadCommandResource<A extends Args, V extends ArgValues<A>>(
-  ctx: CommandContext<A, V>,
+async function loadCommandResource<A extends Args>(
+  ctx: CommandContext<A>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   command: Command<A> | ExtendedCommand<A, any> | LazyCommand<A>
 ): Promise<CommandResource<A> | undefined> {
