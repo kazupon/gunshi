@@ -171,7 +171,14 @@ describe('define with extensions', () => {
         value: { type: 'number' }
       },
       examples: 'complex --flag\ncomplex --value 42',
-      // resource: async () => ({ key: 'complex.desc' }),
+      resource: async () => {
+        return {
+          description: 'Complex command resource',
+          examples: 'complex --flag\ncomplex --value 42',
+          'arg:flag': 'A boolean flag for the complex command',
+          'arg:value': 'A numeric value for the complex command'
+        }
+      },
       toKebab: false,
       extensions: {
         test: { key: Symbol('test'), factory: () => ({ test: true }) }
@@ -183,7 +190,7 @@ describe('define with extensions', () => {
     expect(command.description).toBe('Complex command')
     expect(command.args).toBeDefined()
     expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
-    // expect(command.resource).toBeDefined()
+    expect(command.resource).toBeDefined()
     expect(command.toKebab).toBe(false)
     expect(command._extensions).toBeDefined()
   })
@@ -233,7 +240,13 @@ describe('lazy with extensions', () => {
       description: 'Test lazy command',
       args: { opt: { type: 'string' as const } },
       examples: 'lazy-test --opt value',
-      // resource: async () => ({ key: 'lazy.test' }),
+      resource: () => {
+        return {
+          description: 'This is a lazy command',
+          examples: 'lazy-test',
+          'arg:opt': 'An optional string argument for the lazy command'
+        }
+      },
       toKebab: true,
       extensions: {
         ext1: { key: Symbol('ext1'), factory: () => ({ ext1: true }) }
@@ -244,7 +257,7 @@ describe('lazy with extensions', () => {
     expect(lazyCmd.description).toBe('Test lazy command')
     expect(lazyCmd.args).toEqual({ opt: { type: 'string' } })
     expect(lazyCmd.examples).toEqual('lazy-test --opt value')
-    // expect(lazyCmd.resource).toBeDefined()
+    expect(lazyCmd.resource).toBeDefined()
     expect(lazyCmd.toKebab).toBe(true)
     expect(lazyCmd._extensions).toBeDefined()
   })

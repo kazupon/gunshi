@@ -227,7 +227,7 @@ describe('Plugin type with optional properties', () => {
 
 describe('Plugin Extensions Integration', () => {
   test('plugin with extension provides functionality to commands', async () => {
-    // Create a plugin with extension
+    // create a plugin with extension
     const testPlugin = plugin({
       name: 'test',
       setup(ctx) {
@@ -265,7 +265,7 @@ describe('Plugin Extensions Integration', () => {
       }
     })
 
-    // Create command context directly
+    // create command context directly
     const ctx = await createCommandContext({
       args: { num: { type: 'number', default: 5 } },
       values: { 'test-opt': 'custom', num: 5 },
@@ -285,7 +285,7 @@ describe('Plugin Extensions Integration', () => {
   })
 
   test('multiple plugins with extensions work together', async () => {
-    // Auth plugin
+    // auth plugin
     const authPlugin = plugin({
       name: 'auth',
       setup(ctx) {
@@ -299,7 +299,7 @@ describe('Plugin Extensions Integration', () => {
       }
     })
 
-    // Logger plugin
+    // logger plugin
     const loggerPlugin = plugin({
       name: 'logger',
       setup(ctx) {
@@ -314,7 +314,7 @@ describe('Plugin Extensions Integration', () => {
       }
     })
 
-    // Command using both extensions
+    // command using both extensions
     const multiCommand = define({
       name: 'multi',
       extensions: {
@@ -330,7 +330,7 @@ describe('Plugin Extensions Integration', () => {
       }
     })
 
-    // Create command context directly
+    // create command context directly
     const ctx = await createCommandContext({
       args: {},
       values: { user: 'admin', 'log-level': 'debug' },

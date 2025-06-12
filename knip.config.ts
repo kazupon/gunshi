@@ -6,7 +6,7 @@ export default {
     // '.': {
     //   entry: ['scripts/*.ts'],
     //   project: '**/*.ts'
-    // },
+    // }
     'packages/gunshi': {
       entry: ['src/constants.ts']
     },

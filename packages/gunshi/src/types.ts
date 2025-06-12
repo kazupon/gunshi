@@ -439,7 +439,7 @@ export type CommandResource<A extends Args = Args> = {
  */
 export type CommandExamplesFetcher<A extends Args = Args> = (
   ctx: Readonly<CommandContext<A>>
-) => Promise<string>
+) => Awaitable<string>
 
 /**
  * Command resource fetcher.
@@ -448,7 +448,7 @@ export type CommandExamplesFetcher<A extends Args = Args> = (
  */
 export type CommandResourceFetcher<A extends Args = Args> = (
   ctx: Readonly<CommandContext<A>>
-) => Promise<CommandResource<A>>
+) => Awaitable<CommandResource<A>>
 
 /**
  * Translation adapter factory.
