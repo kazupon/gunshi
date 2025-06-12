@@ -97,6 +97,12 @@ async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Pr
   try {
     // TODO(kazupon): add more user plugins loading logic
     for (const plugin of plugins) {
+      /**
+       * NOTE(kazupon):
+       * strictly `Args` are not required for plugin installation.
+       * because the strictly `Args` required by each plugin are unknown,
+       * and the plugin side can not know what the user will specify.
+       */
       await plugin(pluginContext as unknown as PluginContext<Args>)
     }
   } catch (error: unknown) {
@@ -248,9 +254,9 @@ async function executeCommand<A extends Args = Args>(
     baseRunner
   )
 
-  // Execute and return result
+  // execute and return result
   const result = await decoratedRunner(ctx)
 
-  // Return string if one was returned
+  // return string if one was returned
   return typeof result === 'string' ? result : undefined
 }
