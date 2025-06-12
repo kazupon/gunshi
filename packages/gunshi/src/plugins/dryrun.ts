@@ -9,5 +9,5 @@ import type { PluginContext } from '../plugin.ts'
  * `dry-run` option plugin for Gunshi.
  */
 export default function dryRun(_ctx: PluginContext) {
-  // TODO: Implement dry-run plugin logic
+  // TODO(kazupon): Implement dry-run plugin logic
 }

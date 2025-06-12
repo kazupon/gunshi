@@ -9,5 +9,5 @@ import type { PluginContext } from '../plugin.ts'
  * completion plugin for Gunshi.
  */
 export default function completion(_ctx: PluginContext) {
-  // TODO: Implement completion plugin logic
+  // TODO(kazupon): Implement completion plugin logic
 }

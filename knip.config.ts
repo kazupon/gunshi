@@ -2,10 +2,11 @@ import type { KnipConfig } from 'knip'
 
 export default {
   workspaces: {
-    '.': {
-      entry: ['scripts/*.ts'],
-      project: '**/*.ts'
-    },
+    // NOTE(kazupon): currently, root does not have lintable files.
+    // '.': {
+    //   entry: ['scripts/*.ts'],
+    //   project: '**/*.ts'
+    // },
     'packages/gunshi': {
       entry: ['src/constants.ts']
     },

@@ -149,7 +149,7 @@ export async function createCommandContext<
   const env = Object.assign(create<CommandEnvironment<A>>(), COMMAND_OPTIONS_DEFAULT, cliOptions)
 
   const locale = resolveLocale(cliOptions.locale)
-  const localeStr = locale.toString() // NOTE: `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
+  const localeStr = locale.toString() // NOTE(kazupon): `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
 
   const translationAdapterFactory = cliOptions.translationAdapterFactory || createTranslationAdapter
   const adapter = translationAdapterFactory({
@@ -189,13 +189,13 @@ export async function createCommandContext<
   ): string {
     const strKey = key as string
     if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
-      // NOTE:
+      // NOTE(kazupon):
       // if the key is one of the `COMMAND_BUILTIN_RESOURCE_KEYS` and the key is not found in the locale resources,
       // then return the key itself.
       const resource = localeResources.get(localeStr) || localeResources.get(DEFAULT_LOCALE)!
       return resource[strKey as CommandBuiltinKeys] || strKey
     } else {
-      // NOTE:
+      // NOTE(kazupon):
       // for otherwise, if the key is not found in the command resources, then return an empty string.
       // because should not render the key in usage.
       return adapter.translate(locale.toString(), strKey, values) || ''
@@ -335,7 +335,7 @@ async function loadCommandResource<A extends Args>(
 ): Promise<CommandResource<A> | undefined> {
   let resource: CommandResource<A> | undefined
   try {
-    // TODO: should check the resource which is a dictionary object
+    // TODO(kazupon): should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)
   } catch {}
   return resource
