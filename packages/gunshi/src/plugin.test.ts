@@ -344,9 +344,7 @@ describe('Plugin Extensions Integration', () => {
       cliOptions: {}
     })
 
-    // TODO(kazupon): resolve type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await multiCommand.run!(ctx as any)
+    const result = await multiCommand.run!(ctx)
     expect(result).toBe('[debug] User admin executed command; [debug] Admin access granted')
   })
 
