@@ -73,8 +73,10 @@ export class PluginContext<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   decorateHeaderRenderer<L extends Record<string, any> = {}>(
     decorator: (
-      baseRenderer: (ctx: CommandContextWithExt<A, E & L>) => Promise<string>,
-      ctx: CommandContextWithExt<A, E & L>
+      baseRenderer: (
+        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
+      ) => Promise<string>,
+      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
     ) => Promise<string>
   ): void {
     this.#decorators.addHeaderDecorator(decorator as RendererDecorator<string, A>)
@@ -87,8 +89,10 @@ export class PluginContext<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   decorateUsageRenderer<L extends Record<string, any> = {}>(
     decorator: (
-      baseRenderer: (ctx: CommandContextWithExt<A, E & L>) => Promise<string>,
-      ctx: CommandContextWithExt<A, E & L>
+      baseRenderer: (
+        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
+      ) => Promise<string>,
+      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
     ) => Promise<string>
   ): void {
     this.#decorators.addUsageDecorator(decorator as RendererDecorator<string, A>)
@@ -102,10 +106,10 @@ export class PluginContext<
   decorateValidationErrorsRenderer<L extends Record<string, any> = {}>(
     decorator: (
       baseRenderer: (
-        ctx: CommandContextWithExt<A, E & L>,
+        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>,
         error: AggregateError
       ) => Promise<string>,
-      ctx: CommandContextWithExt<A, E & L>,
+      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>,
       error: AggregateError
     ) => Promise<string>
   ): void {
@@ -120,8 +124,12 @@ export class PluginContext<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   decorateCommand<L extends Record<string, any> = {}>(
     decorator: (
-      baseRunner: (ctx: CommandContextWithExt<A, E & L>) => Awaitable<void | string>
-    ) => (ctx: CommandContextWithExt<A, E & L>) => Awaitable<void | string>
+      baseRunner: (
+        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
+      ) => Awaitable<void | string>
+    ) => (
+      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
+    ) => Awaitable<void | string>
   ): void {
     this.#decorators.addCommandDecorator(decorator as CommandDecorator<A>)
   }
@@ -169,19 +177,18 @@ interface PluginWithoutExtension extends Plugin {
  * @param options - {@link PluginOptions | plugin options}
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function plugin<T = any, E extends Record<string, any> = Record<string, any>>(options: {
+export function plugin<T extends Record<string, any> = any>(options: {
   name: string
-  setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
+  setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
   extension: (core: CommandContextCore) => T
 }): PluginWithExtension<T>
 
 /**
  * Create a plugin without extension
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function plugin<E extends Record<string, any> = Record<string, never>>(options: {
+export function plugin(options: {
   name: string
-  setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
+  setup: (ctx: PluginContext<Args, Record<string, never>>) => Awaitable<void>
 }): PluginWithoutExtension
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

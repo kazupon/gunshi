@@ -7,6 +7,7 @@ import { PluginContext, plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
 import type { Plugin } from './plugin.ts'
+import type { CommandContextCore } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -112,12 +113,12 @@ test('PluginContext#decorateCommand', async () => {
 
 describe('plugin function', () => {
   test('basic - creates plugin with extension', async () => {
-    const extensionFactory = vi.fn(_core => ({
-      getValue: () => 'test-value',
+    const extensionFactory = vi.fn((_core: CommandContextCore) => ({
+      getValue: () => 'test-value' as const,
       isEnabled: true
     }))
 
-    const setupFn = vi.fn(async (ctx: PluginContext) => {
+    const setupFn = vi.fn(async (ctx: PluginContext<Args, ReturnType<typeof extensionFactory>>) => {
       ctx.addGlobalOption('test', { type: 'string' })
     })
 
@@ -162,7 +163,7 @@ describe('plugin function', () => {
     expect(setupFn).toHaveBeenCalledWith(ctx)
   })
 
-  test('extension factory receives correct context', async () => {
+  test('receives correct context via extension', async () => {
     const mockCore = createMockCommandContext()
     const extensionFactory = vi.fn(core => ({
       user: { id: 1, name: 'Test User' },
@@ -174,11 +175,13 @@ describe('plugin function', () => {
       setup: async ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
-          const user = cmdCtx.ext.auth.user
+          const user = cmdCtx.ext.user
+          expectTypeOf(cmdCtx.ext).toEqualTypeOf<ReturnType<typeof extensionFactory>>()
           console.log(`User: ${user.name} (${user.id})`)
           return await baseRenderer(cmdCtx)
         })
         ctx.decorateCommand(baseRunner => async ctx => {
+          expectTypeOf(ctx.ext).toEqualTypeOf<ReturnType<typeof extensionFactory>>()
           const result = await baseRunner(ctx)
           return `[AUTH] ${result}`
         })
@@ -193,6 +196,24 @@ describe('plugin function', () => {
     expect(extensionFactory).toHaveBeenCalledWith(mockCore)
     expect(result.user).toEqual({ id: 1, name: 'Test User' })
     expect(typeof result.getToken).toBe('function')
+  })
+
+  test('not receives correct context via extension', async () => {
+    const testPlugin = plugin({
+      name: 'auth-plugin',
+      setup: async ctx => {
+        ctx.addGlobalOption('token', { type: 'string' })
+        ctx.decorateUsageRenderer(async (baseRenderer, cmdCtx) => {
+          expectTypeOf(cmdCtx.ext.user).toEqualTypeOf<never>()
+          return await baseRenderer(cmdCtx)
+        })
+        ctx.decorateValidationErrorsRenderer(async (baseRenderer, cmdCtx, error) => {
+          expectTypeOf(cmdCtx.ext.user).toEqualTypeOf<never>()
+          return await baseRenderer(cmdCtx, error)
+        })
+      }
+    })
+    expect(testPlugin.extension).toBeUndefined()
   })
 })
 
