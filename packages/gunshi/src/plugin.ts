@@ -138,7 +138,9 @@ export class PluginContext<
 /**
  * Plugin extension for CommandContext
  */
-export type PluginExtension<T> = (core: CommandContextCore) => T
+export type PluginExtension<T = Record<string, never>, A extends Args = Args> = (
+  core: CommandContextCore<A>
+) => T
 
 /**
  * Plugin definition options
@@ -148,7 +150,7 @@ export interface PluginOptions<T extends Record<string, any> = Record<string, ne
   name: string
 
   setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
-  extension?: PluginExtension<T>
+  extension?: PluginExtension<T, Args>
 }
 
 /**
@@ -185,7 +187,7 @@ interface PluginWithoutExtension extends Plugin {
 export function plugin<T extends Record<string, any> = any>(options: {
   name: string
   setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
-  extension: PluginExtension<T>
+  extension: PluginExtension<T, Args>
 }): PluginWithExtension<T>
 
 /**
