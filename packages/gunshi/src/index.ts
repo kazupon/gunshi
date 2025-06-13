@@ -22,5 +22,5 @@ export { plugin } from './plugin.ts'
 export { DefaultTranslation } from './translation.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
-export type { Plugin, PluginOptions } from './plugin.ts'
+export type { Plugin, PluginExtension, PluginOptions } from './plugin.ts'
 export type * from './types.ts'

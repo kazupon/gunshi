@@ -49,6 +49,12 @@
       "require": "./lib/definition.js",
       "default": "./lib/definition.js"
     },
+    "./plugin": {
+      "types": "./lib/plugin.d.ts",
+      "import": "./lib/plugin.js",
+      "require": "./lib/plugin.js",
+      "default": "./lib/plugin.js"
+    },
     "./context": {
       "types": "./lib/context.d.ts",
       "import": "./lib/context.js",

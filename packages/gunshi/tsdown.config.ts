@@ -27,6 +27,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
     './src/index.ts',
     './src/definition.ts',
     './src/context.ts',
+    './src/plugin.ts',
     './src/renderer.ts',
     './src/generator.ts'
   ],

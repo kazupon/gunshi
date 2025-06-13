@@ -3,9 +3,10 @@
  *
  * @example
  * ```js
+ * import { plugin } from 'gunshi/plugin'
  * ```
  *
- * @module default
+ * @module
  */
 
 /**
@@ -28,8 +29,7 @@ import type {
 
 /**
  * Gunshi plugin context.
- * @typeParam A - The args type
- * @typeParam E - The expected extension shape for contexts in decorators
+ * @internal
  */
 export class PluginContext<
   A extends Args = Args,
@@ -136,6 +136,11 @@ export class PluginContext<
 }
 
 /**
+ * Plugin extension for CommandContext
+ */
+export type PluginExtension<T> = (core: CommandContextCore) => T
+
+/**
  * Plugin definition options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -143,7 +148,7 @@ export interface PluginOptions<T extends Record<string, any> = Record<string, ne
   name: string
 
   setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
-  extension?: (core: CommandContextCore) => T
+  extension?: PluginExtension<T>
 }
 
 /**
@@ -180,7 +185,7 @@ interface PluginWithoutExtension extends Plugin {
 export function plugin<T extends Record<string, any> = any>(options: {
   name: string
   setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
-  extension: (core: CommandContextCore) => T
+  extension: PluginExtension<T>
 }): PluginWithExtension<T>
 
 /**

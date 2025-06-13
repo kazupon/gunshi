@@ -22,6 +22,7 @@
     ".": "./src/index.ts",
     "./renderer": "./src/renderer.ts",
     "./definition": "./src/definition.ts",
+    "./plugin": "./src/plugin.ts",
     "./context": "./src/context.ts",
     "./generator": "./src/generator.ts"
   }
