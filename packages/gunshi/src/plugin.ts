@@ -167,7 +167,7 @@ export type Plugin<T = any> = ((ctx: PluginContext) => Awaitable<void>) & {
 /**
  * Plugin return type with extension
  */
-interface PluginWithExtension<T> extends Plugin {
+export interface PluginWithExtension<T> extends Plugin {
   name: string
   extension: CommandContextExtension<T>
 }
@@ -175,7 +175,7 @@ interface PluginWithExtension<T> extends Plugin {
 /**
  * Plugin return type without extension
  */
-interface PluginWithoutExtension extends Plugin {
+export interface PluginWithoutExtension extends Plugin {
   name: string
 }
 

@@ -3,11 +3,14 @@
  * @license MIT
  */
 
-import type { PluginContext } from '../plugin.ts'
+import { plugin } from '../plugin.ts'
 
 /**
  * completion plugin for Gunshi.
  */
-export default function completion(_ctx: PluginContext) {
-  // TODO(kazupon): Implement completion plugin logic
-}
+export default plugin({
+  name: 'completion',
+  setup: _ctx => {
+    // TODO(kazupon): Implement dry-run plugin logic
+  }
+})

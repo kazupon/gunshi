@@ -12,6 +12,7 @@ import { plugins } from './plugins/index.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
 import type { Args, ArgToken } from 'args-tokens'
+import type { Plugin } from './plugin.ts'
 import type {
   CliOptions,
   Command,
@@ -19,6 +20,7 @@ import type {
   CommandContext,
   CommandDecorator,
   CommandRunner,
+  ExtendedCommand,
   LazyCommand
 } from './types.ts'
 
@@ -38,7 +40,7 @@ export async function cli<A extends Args = Args>(
 
   const decorators = new Decorators<A>()
   const pluginContext = new PluginContext<A>(decorators)
-  await applyPlugins(pluginContext)
+  const plugins = await applyPlugins(pluginContext)
 
   // Set default renderers if not provided via cli options
   if (cliOptions.renderHeader === undefined) {
@@ -57,7 +59,7 @@ export async function cli<A extends Args = Args>(
     commandName: name,
     command,
     callMode
-  } = await resolveCommand(subCommand, entry, cliOptions)
+  } = await resolveCommand(subCommand, plugins, entry, cliOptions)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
@@ -93,7 +95,7 @@ export async function cli<A extends Args = Args>(
   return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
 
-async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Promise<void> {
+async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Promise<Plugin[]> {
   try {
     // TODO(kazupon): add more user plugins loading logic
     for (const plugin of plugins) {
@@ -108,6 +110,8 @@ async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Pr
   } catch (error: unknown) {
     console.error('Error loading plugin:', (error as Error).message)
   }
+
+  return plugins
 }
 
 function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {
@@ -169,6 +173,8 @@ async function showValidationErrors<A extends Args>(
 
 type ResolveCommandContext<A extends Args = Args> = {
   commandName?: string | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  c?: ExtendedCommand<A, any>
   command?: Command<A> | LazyCommand<A> | undefined
   callMode: CommandCallMode
 }
@@ -179,6 +185,8 @@ const CANNOT_RESOLVE_COMMAND = {
 
 async function resolveCommand<A extends Args>(
   sub: string,
+  // TODO(kazupon): should apply to command plugin.extensions!
+  _plugins: Plugin[],
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
   options: CliOptions<A>
 ): Promise<ResolveCommandContext<A>> {
