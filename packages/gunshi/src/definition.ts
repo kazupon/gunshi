@@ -21,10 +21,7 @@ import type {
   CommandContext,
   CommandContextExt,
   CommandContextExtension,
-  CommandExamplesFetcher,
   CommandLoader,
-  CommandResourceFetcher,
-  CommandRunner,
   ExtendedCommand,
   LazyCommand
 } from './types.ts'
@@ -36,15 +33,7 @@ export type { Args, ArgSchema, ArgValues } from 'args-tokens'
  * @param definition A {@link Command | command} definition
  */
 export function define<A extends Args = Args>(
-  definition: {
-    name?: string
-    description?: string
-    args?: A
-    examples?: string | CommandExamplesFetcher<A>
-    resource?: CommandResourceFetcher<A>
-    toKebab?: boolean
-    run?: CommandRunner<A>
-  } & { extensions?: never }
+  definition: Command<A> & { extensions?: never }
 ): Command<A>
 
 /**
@@ -54,30 +43,24 @@ export function define<A extends Args = Args>(
 export function define<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
->(definition: {
-  name?: string
-  description?: string
-  args?: A
-  examples?: string | CommandExamplesFetcher<A>
-  resource?: CommandResourceFetcher<A>
-  toKebab?: boolean
-  extensions: E
-  run?: (ctx: Readonly<CommandContext<A> & CommandContextExt<E>>) => Awaitable<void | string>
-}): ExtendedCommand<A, E>
+>(
+  definition: Omit<Command<A>, 'run'> & {
+    extensions: E
+    run?: (ctx: Readonly<CommandContext<A> & CommandContextExt<E>>) => Awaitable<void | string>
+  }
+): ExtendedCommand<A, E>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function define<A extends Args = Args>(definition: any): any {
+export function define(definition: any): any {
   if ('extensions' in definition && definition.extensions) {
     const { extensions, run, ...rest } = definition
     return {
       ...rest,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      run: run as any, // the run function type is correctly enforced by the overloads
+      run,
       _extensions: extensions
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as ExtendedCommand<A, any>
+    }
   }
-  return definition as Command<A>
+  return definition
 }
 
 /**
@@ -128,6 +111,12 @@ export function lazy<
   definition: Omit<Command<A>, 'run'> & { _extensions: E }
 ): LazyCommand<A> & { _extensions: E }
 
+/**
+ * Define a {@link LazyCommand | lazy command} with or without definition.
+ * @param loader A {@link CommandLoader | command loader} function that returns a command definition
+ * @param definition An optional {@link Command | command} definition that can include extensions
+ * @returns A {@link LazyCommand | lazy command} that can be executed later
+ */
 export function lazy<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>

@@ -1,10 +1,11 @@
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { createMockCommandContext } from '../test/utils.ts'
 import { createCommandContext } from './context.ts'
 import { Decorators } from './decorators.ts'
 import { define } from './definition.ts'
 import { PluginContext, plugin } from './plugin.ts'
 
+import type { Args } from 'args-tokens'
 import type { Plugin } from './plugin.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
@@ -37,59 +38,76 @@ describe('PluginContext#addGlobalOpttion', () => {
   })
 })
 
-describe('PluginContext#decorateHeaderRenderer', () => {
-  test('basic', async () => {
-    const decorators = new Decorators()
-    const ctx = new PluginContext(decorators)
+type Auth = { token: string; login: () => string }
+type Logger = { log: (msg: string) => void; level: string }
 
-    ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
-      const result = await baseRenderer(cmdCtx)
-      return `[DECORATED] ${result}`
-    })
+test('PluginContext#decorateHeaderRenderer', async () => {
+  const decorators = new Decorators()
+  const ctx = new PluginContext<Args, Auth>(decorators)
 
-    const renderer = decorators.getHeaderRenderer()
-    const mockCtx = createMockCommandContext()
-    const result = await renderer(mockCtx)
-
-    expect(result).toBe('[DECORATED] ')
+  ctx.decorateHeaderRenderer<Logger>(async (baseRenderer, cmdCtx) => {
+    const result = await baseRenderer(cmdCtx)
+    expectTypeOf(cmdCtx.ext).toEqualTypeOf<Auth & Logger>()
+    return `[DECORATED] ${result}`
   })
+
+  const renderer = decorators.getHeaderRenderer()
+  const mockCtx = createMockCommandContext()
+  const result = await renderer(mockCtx)
+
+  expect(result).toBe('[DECORATED] ')
 })
 
-describe('PluginContext#decorateUsageRenderer', () => {
-  test('basic', async () => {
-    const decorators = new Decorators()
-    const ctx = new PluginContext(decorators)
+test('PluginContext#decorateUsageRenderer', async () => {
+  const decorators = new Decorators()
+  const ctx = new PluginContext<Args, Auth>(decorators)
 
-    ctx.decorateUsageRenderer(async (baseRenderer, cmdCtx) => {
-      const result = await baseRenderer(cmdCtx)
-      return `[USAGE] ${result}`
-    })
-
-    const renderer = decorators.getUsageRenderer()
-    const mockCtx = createMockCommandContext()
-    const result = await renderer(mockCtx)
-
-    expect(result).toBe('[USAGE] ')
+  ctx.decorateUsageRenderer<Logger>(async (baseRenderer, cmdCtx) => {
+    const result = await baseRenderer(cmdCtx)
+    expectTypeOf(cmdCtx.ext).toEqualTypeOf<Auth & Logger>()
+    return `[USAGE] ${result}`
   })
+
+  const renderer = decorators.getUsageRenderer()
+  const mockCtx = createMockCommandContext()
+  const result = await renderer(mockCtx)
+
+  expect(result).toBe('[USAGE] ')
 })
 
-describe('PluginContext#decorateValidationErrorsRenderer', () => {
-  test('basic', async () => {
-    const decorators = new Decorators()
-    const ctx = new PluginContext(decorators)
+test('PluginContext#decorateValidationErrorsRenderer', async () => {
+  const decorators = new Decorators()
+  const ctx = new PluginContext<Args, Auth>(decorators)
 
-    ctx.decorateValidationErrorsRenderer(async (baseRenderer, cmdCtx, error) => {
-      const result = await baseRenderer(cmdCtx, error)
-      return `[ERROR] ${result}`
-    })
-
-    const renderer = decorators.getValidationErrorsRenderer()
-    const mockCtx = createMockCommandContext()
-    const error = new AggregateError([new Error('Test')], 'Validation failed')
-    const result = await renderer(mockCtx, error)
-
-    expect(result).toBe('[ERROR] ')
+  ctx.decorateValidationErrorsRenderer<Logger>(async (baseRenderer, cmdCtx, error) => {
+    const result = await baseRenderer(cmdCtx, error)
+    expectTypeOf(cmdCtx.ext).toEqualTypeOf<Auth & Logger>()
+    return `[ERROR] ${result}`
   })
+
+  const renderer = decorators.getValidationErrorsRenderer()
+  const mockCtx = createMockCommandContext()
+  const error = new AggregateError([new Error('Test')], 'Validation failed')
+  const result = await renderer(mockCtx, error)
+
+  expect(result).toBe('[ERROR] ')
+})
+
+test('PluginContext#decorateCommand', async () => {
+  const decorators = new Decorators()
+  const ctx = new PluginContext<Args, Auth>(decorators)
+
+  ctx.decorateCommand<Logger>(baseRunner => async ctx => {
+    const result = await baseRunner(ctx)
+    expectTypeOf(ctx.ext).toEqualTypeOf<Auth & Logger>()
+    return `[USAGE] ${result}`
+  })
+
+  const runner = decorators.commandDecorators[0]
+  const mockCtx = createMockCommandContext()
+  const result = await runner(_ctx => '[TEST]')(mockCtx)
+
+  expect(result).toBe('[USAGE] [TEST]')
 })
 
 describe('plugin function', () => {

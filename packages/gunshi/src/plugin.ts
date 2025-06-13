@@ -70,10 +70,11 @@ export class PluginContext<
    * Decorate the header renderer.
    * @param decorator - A decorator function that wraps the base header renderer.
    */
-  decorateHeaderRenderer(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  decorateHeaderRenderer<L extends Record<string, any> = {}>(
     decorator: (
-      baseRenderer: (ctx: CommandContextWithExt<A, E>) => Promise<string>,
-      ctx: CommandContextWithExt<A, E>
+      baseRenderer: (ctx: CommandContextWithExt<A, E & L>) => Promise<string>,
+      ctx: CommandContextWithExt<A, E & L>
     ) => Promise<string>
   ): void {
     this.#decorators.addHeaderDecorator(decorator as RendererDecorator<string, A>)
@@ -83,10 +84,11 @@ export class PluginContext<
    * Decorate the usage renderer.
    * @param decorator - A decorator function that wraps the base usage renderer.
    */
-  decorateUsageRenderer(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  decorateUsageRenderer<L extends Record<string, any> = {}>(
     decorator: (
-      baseRenderer: (ctx: CommandContextWithExt<A, E>) => Promise<string>,
-      ctx: CommandContextWithExt<A, E>
+      baseRenderer: (ctx: CommandContextWithExt<A, E & L>) => Promise<string>,
+      ctx: CommandContextWithExt<A, E & L>
     ) => Promise<string>
   ): void {
     this.#decorators.addUsageDecorator(decorator as RendererDecorator<string, A>)
@@ -96,10 +98,14 @@ export class PluginContext<
    * Decorate the validation errors renderer.
    * @param decorator - A decorator function that wraps the base validation errors renderer.
    */
-  decorateValidationErrorsRenderer(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  decorateValidationErrorsRenderer<L extends Record<string, any> = {}>(
     decorator: (
-      baseRenderer: (ctx: CommandContextWithExt<A, E>, error: AggregateError) => Promise<string>,
-      ctx: CommandContextWithExt<A, E>,
+      baseRenderer: (
+        ctx: CommandContextWithExt<A, E & L>,
+        error: AggregateError
+      ) => Promise<string>,
+      ctx: CommandContextWithExt<A, E & L>,
       error: AggregateError
     ) => Promise<string>
   ): void {
@@ -111,10 +117,11 @@ export class PluginContext<
    * Decorators are applied in reverse order (last registered is executed first).
    * @param decorator - A decorator function that wraps the command runner
    */
-  decorateCommand(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  decorateCommand<L extends Record<string, any> = {}>(
     decorator: (
-      baseRunner: (ctx: CommandContextWithExt<A, E>) => Awaitable<void | string>
-    ) => (ctx: CommandContextWithExt<A, E>) => Awaitable<void | string>
+      baseRunner: (ctx: CommandContextWithExt<A, E & L>) => Awaitable<void | string>
+    ) => (ctx: CommandContextWithExt<A, E & L>) => Awaitable<void | string>
   ): void {
     this.#decorators.addCommandDecorator(decorator as CommandDecorator<A>)
   }
@@ -126,8 +133,8 @@ export class PluginContext<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface PluginOptions<T = any> {
   name: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setup: (ctx: PluginContext<Args, Record<string, any>>) => Awaitable<void>
+
+  setup: (ctx: PluginContext) => Awaitable<void>
   extension?: (core: CommandContextCore) => T
 }
 
@@ -136,9 +143,10 @@ export interface PluginOptions<T = any> {
  * @param ctx - A {@link PluginContext}.
  * @returns An {@link Awaitable} that resolves when the plugin is loaded.
  */
-export type Plugin = ((ctx: PluginContext) => Awaitable<void>) & {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Plugin<T = any> = ((ctx: PluginContext) => Awaitable<void>) & {
   name?: string
-  extension?: CommandContextExtension<any> // eslint-disable-line @typescript-eslint/no-explicit-any
+  extension?: CommandContextExtension<T>
 }
 
 /**
@@ -158,8 +166,7 @@ interface PluginWithoutExtension extends Plugin {
 
 /**
  * Create a plugin with extension capabilities
- * @typeParam T - The type of the plugin's own extension
- * @typeParam E - The expected shape of ext in decorated contexts
+ * @param options - {@link PluginOptions | plugin options}
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function plugin<T = any, E extends Record<string, any> = Record<string, any>>(options: {
@@ -170,7 +177,6 @@ export function plugin<T = any, E extends Record<string, any> = Record<string, a
 
 /**
  * Create a plugin without extension
- * @typeParam E - The expected shape of ext in decorated contexts
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function plugin<E extends Record<string, any> = Record<string, never>>(options: {
@@ -179,18 +185,15 @@ export function plugin<E extends Record<string, any> = Record<string, never>>(op
 }): PluginWithoutExtension
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function plugin<T = any, E extends Record<string, any> = Record<string, any>>(
-  options: PluginOptions<T> & { setup: (ctx: PluginContext<Args, E>) => Awaitable<void> }
-) {
+export function plugin<T = any>(options: PluginOptions<T>): any {
   const { name, setup, extension } = options
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pluginFn = async (ctx: PluginContext<Args, any>) =>
-    await setup(ctx as PluginContext<Args, E>)
+  const pluginFn = async (ctx: PluginContext<Args, any>) => await setup(ctx)
 
   // define the properties
-  const result = Object.defineProperties(pluginFn, {
+  return Object.defineProperties(pluginFn, {
     name: {
       value: name,
       writable: false,
@@ -209,6 +212,4 @@ export function plugin<T = any, E extends Record<string, any> = Record<string, a
       }
     })
   })
-
-  return result as any // eslint-disable-line @typescript-eslint/no-explicit-any
 }
