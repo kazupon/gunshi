@@ -139,10 +139,10 @@ export class PluginContext<
  * Plugin definition options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface PluginOptions<T = any> {
+export interface PluginOptions<T extends Record<string, any> = Record<string, never>> {
   name: string
 
-  setup: (ctx: PluginContext) => Awaitable<void>
+  setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
   extension?: (core: CommandContextCore) => T
 }
 
@@ -192,7 +192,10 @@ export function plugin(options: {
 }): PluginWithoutExtension
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function plugin<T = any>(options: PluginOptions<T>): any {
+export function plugin<T extends Record<string, any> = Record<string, never>>(
+  options: PluginOptions<T>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any {
   const { name, setup, extension } = options
 
   // create a wrapper function with properties
