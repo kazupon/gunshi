@@ -187,27 +187,12 @@ export interface PluginWithoutExtension<E extends Record<string, unknown> = {}> 
  * Create a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
  */
-
 export function plugin<E extends Record<string, unknown> = {}>(options: {
   name: string
   setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
   extension: PluginExtension<E, Args>
 }): PluginWithExtension<E>
 
-// export function plugin<
-//   E extends Record<string, unknown> = {},
-//   Options extends PluginOptions<E> = PluginOptions<E>,
-//   ExtendContext extends Record<string, unknown> = Options['extension'] extends PluginExtension
-//   ? { [K in keyof ReturnType<Options['extension']>]: ReturnType<Options['extension']>[K] }
-//   : { [K in keyof E]: E[K] },
-//   Extension = Options['extension'] extends PluginExtension
-//   ? { extension: CommandContextExtension<ExtendContext> }
-//   : { extension?: never }
-// >(options: Options): PluginFunction<ExtendContext> & Pick<PluginOptions, 'name'> & Extension
-
-/**
- * create a plugin without extension
- */
 export function plugin(options: {
   name: string
   setup: (ctx: PluginContext<Args>) => Awaitable<void>
