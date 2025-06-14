@@ -5,7 +5,7 @@
 
 import type { Args } from 'args-tokens'
 import type {
-  CommandContextWithPossibleExt,
+  CommandContext,
   CommandDecorator,
   RendererDecorator,
   ValidationErrorsDecorator
@@ -17,64 +17,72 @@ const EMPTY_RENDERER = async () => ''
  * Internal class for managing renderer decorators.
  * This class is not exposed to plugin authors.
  */
-export class Decorators<A extends Args = Args> {
-  #headerDecorators: RendererDecorator<string, A>[] = []
-  #usageDecorators: RendererDecorator<string, A>[] = []
-  #validationDecorators: ValidationErrorsDecorator<A>[] = []
-  #commandDecorators: CommandDecorator<A>[] = []
+export class Decorators<A extends Args = Args, E extends Record<string, unknown> = {}> {
+  #headerDecorators: RendererDecorator<string, A, E>[] = []
+  #usageDecorators: RendererDecorator<string, A, E>[] = []
+  #validationDecorators: ValidationErrorsDecorator<A, E>[] = []
+  #commandDecorators: CommandDecorator<A, E>[] = []
 
-  addHeaderDecorator(decorator: RendererDecorator<string, A>): void {
+  addHeaderDecorator(decorator: RendererDecorator<string, A, E>): void {
     this.#headerDecorators.push(decorator)
   }
 
-  addUsageDecorator(decorator: RendererDecorator<string, A>): void {
+  addUsageDecorator(decorator: RendererDecorator<string, A, E>): void {
     this.#usageDecorators.push(decorator)
   }
 
-  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<A>): void {
+  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<A, E>): void {
     this.#validationDecorators.push(decorator)
   }
 
-  addCommandDecorator(decorator: CommandDecorator<A>): void {
+  addCommandDecorator(decorator: CommandDecorator<A, E>): void {
     this.#commandDecorators.push(decorator)
   }
 
-  get commandDecorators(): readonly CommandDecorator<A>[] {
+  get commandDecorators(): readonly CommandDecorator<A, E>[] {
     return [...this.#commandDecorators]
   }
 
-  getHeaderRenderer(): (ctx: CommandContextWithPossibleExt<A>) => Promise<string> {
-    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
+  getHeaderRenderer<
+    L extends Record<string, unknown> = {},
+    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+  >(): (ctx: Readonly<CommandContext<A, C>>) => Promise<string> {
+    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER) as unknown as (
+      ctx: Readonly<CommandContext<A, C>>
+    ) => Promise<string>
   }
 
-  getUsageRenderer(): (ctx: CommandContextWithPossibleExt<A>) => Promise<string> {
-    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
+  getUsageRenderer<
+    L extends Record<string, unknown> = {},
+    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+  >(): (ctx: Readonly<CommandContext<A, C>>) => Promise<string> {
+    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER) as unknown as (
+      ctx: Readonly<CommandContext<A, C>>
+    ) => Promise<string>
   }
 
-  getValidationErrorsRenderer(): (
-    ctx: CommandContextWithPossibleExt<A>,
-    error: AggregateError
-  ) => Promise<string> {
+  getValidationErrorsRenderer<
+    L extends Record<string, unknown> = {},
+    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+  >(): (ctx: Readonly<CommandContext<A, C>>, error: AggregateError) => Promise<string> {
     if (this.#validationDecorators.length === 0) {
       return EMPTY_RENDERER
     }
 
-    let renderer: (
-      ctx: CommandContextWithPossibleExt<A>,
-      error: AggregateError
-    ) => Promise<string> = EMPTY_RENDERER
+    let renderer: (ctx: Readonly<CommandContext<A, C>>, error: AggregateError) => Promise<string> =
+      EMPTY_RENDERER
     for (const decorator of this.#validationDecorators) {
       const previousRenderer = renderer
-      renderer = (ctx: CommandContextWithPossibleExt<A>, error: AggregateError) =>
-        decorator(previousRenderer, ctx, error)
+      renderer = (ctx: Readonly<CommandContext<A, C>>, error: AggregateError) =>
+        (decorator as unknown as ValidationErrorsDecorator<A, C>)(previousRenderer, ctx, error)
     }
     return renderer
   }
 
-  #buildRenderer<T, A extends Args = Args>(
-    decorators: RendererDecorator<T, A>[],
-    defaultRenderer: (ctx: CommandContextWithPossibleExt<A>) => Promise<T>
-  ): (ctx: CommandContextWithPossibleExt<A>) => Promise<T> {
+  #buildRenderer<T, A extends Args = Args, E extends Record<string, unknown> = {}>(
+    decorators: RendererDecorator<T, A, E>[],
+    defaultRenderer: (ctx: Readonly<CommandContext<A, E>>) => Promise<T>
+  ): (ctx: Readonly<CommandContext<A, E>>) => Promise<T> {
     if (decorators.length === 0) {
       return defaultRenderer
     }

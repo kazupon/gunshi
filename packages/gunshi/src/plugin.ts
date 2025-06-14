@@ -19,27 +19,25 @@ import { Decorators } from './decorators.ts'
 import type { Args, ArgSchema } from 'args-tokens'
 import type {
   Awaitable,
+  CommandContext,
   CommandContextCore,
   CommandContextExtension,
-  CommandContextWithExt,
   CommandDecorator,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
 
+export { GlobalsCommandContext } from './plugins/globals.ts'
+
 /**
  * Gunshi plugin context.
  * @internal
  */
-export class PluginContext<
-  A extends Args = Args,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  E extends Record<string, any> = Record<string, never>
-> {
+export class PluginContext<A extends Args = Args, E extends Record<string, unknown> = {}> {
   #globalOptions: Map<string, ArgSchema> = new Map()
-  #decorators: Decorators<A>
+  #decorators: Decorators<A, E>
 
-  constructor(decorators: Decorators<A>) {
+  constructor(decorators: Decorators<A, E>) {
     this.#decorators = decorators
   }
 
@@ -70,50 +68,51 @@ export class PluginContext<
    * Decorate the header renderer.
    * @param decorator - A decorator function that wraps the base header renderer.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  decorateHeaderRenderer<L extends Record<string, any> = {}>(
+  decorateHeaderRenderer<
+    L extends Record<string, unknown> = {},
+    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+  >(
     decorator: (
-      baseRenderer: (
-        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
-      ) => Promise<string>,
-      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
+      baseRenderer: (ctx: Readonly<CommandContext<A, C>>) => Promise<string>,
+      ctx: Readonly<CommandContext<A, C>>
     ) => Promise<string>
   ): void {
-    this.#decorators.addHeaderDecorator(decorator as RendererDecorator<string, A>)
+    this.#decorators.addHeaderDecorator(decorator as unknown as RendererDecorator<string, A, E>)
   }
 
   /**
    * Decorate the usage renderer.
    * @param decorator - A decorator function that wraps the base usage renderer.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  decorateUsageRenderer<L extends Record<string, any> = {}>(
+  decorateUsageRenderer<
+    L extends Record<string, unknown> = {},
+    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+  >(
     decorator: (
-      baseRenderer: (
-        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
-      ) => Promise<string>,
-      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
+      baseRenderer: (ctx: Readonly<CommandContext<A, C>>) => Promise<string>,
+      ctx: Readonly<CommandContext<A, C>>
     ) => Promise<string>
   ): void {
-    this.#decorators.addUsageDecorator(decorator as RendererDecorator<string, A>)
+    this.#decorators.addUsageDecorator(decorator as unknown as RendererDecorator<string, A, E>)
   }
 
   /**
    * Decorate the validation errors renderer.
    * @param decorator - A decorator function that wraps the base validation errors renderer.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  decorateValidationErrorsRenderer<L extends Record<string, any> = {}>(
+  decorateValidationErrorsRenderer<
+    L extends Record<string, unknown> = {},
+    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+  >(
     decorator: (
-      baseRenderer: (
-        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>,
-        error: AggregateError
-      ) => Promise<string>,
-      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>,
+      baseRenderer: (ctx: Readonly<CommandContext<A, C>>, error: AggregateError) => Promise<string>,
+      ctx: Readonly<CommandContext<A, C>>,
       error: AggregateError
     ) => Promise<string>
   ): void {
-    this.#decorators.addValidationErrorsDecorator(decorator as ValidationErrorsDecorator<A>)
+    this.#decorators.addValidationErrorsDecorator(
+      decorator as unknown as ValidationErrorsDecorator<A, E>
+    )
   }
 
   /**
@@ -121,35 +120,39 @@ export class PluginContext<
    * Decorators are applied in reverse order (last registered is executed first).
    * @param decorator - A decorator function that wraps the command runner
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  decorateCommand<L extends Record<string, any> = {}>(
+  decorateCommand<
+    L extends Record<string, unknown> = {},
+    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+  >(
     decorator: (
-      baseRunner: (
-        ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
-      ) => Awaitable<void | string>
-    ) => (
-      ctx: CommandContextWithExt<A, keyof E extends never ? L : E & L>
-    ) => Awaitable<void | string>
+      baseRunner: (ctx: Readonly<CommandContext<A, C>>) => Awaitable<void | string>
+    ) => (ctx: Readonly<CommandContext<A, C>>) => Awaitable<void | string>
   ): void {
-    this.#decorators.addCommandDecorator(decorator as CommandDecorator<A>)
+    this.#decorators.addCommandDecorator(decorator as unknown as CommandDecorator<A, E>)
   }
 }
 
 /**
+ *  Plugin function type
+ */
+export type PluginFunction<E extends Record<string, unknown> = {}> = (
+  ctx: PluginContext<Args, E>
+) => Awaitable<void>
+
+/**
  * Plugin extension for CommandContext
  */
-export type PluginExtension<T = Record<string, never>, A extends Args = Args> = (
+export type PluginExtension<T = Record<string, unknown>, A extends Args = Args> = (
   core: CommandContextCore<A>
 ) => T
 
 /**
  * Plugin definition options
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface PluginOptions<T extends Record<string, any> = Record<string, never>> {
+export interface PluginOptions<T extends Record<string, unknown> = {}> {
   name: string
 
-  setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
+  setup: PluginFunction<T>
   extension?: PluginExtension<T, Args>
 }
 
@@ -158,24 +161,25 @@ export interface PluginOptions<T extends Record<string, any> = Record<string, ne
  * @param ctx - A {@link PluginContext}.
  * @returns An {@link Awaitable} that resolves when the plugin is loaded.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Plugin<T = any> = ((ctx: PluginContext) => Awaitable<void>) & {
+export type Plugin<E extends Record<string, unknown> = {}> = PluginFunction<E> & {
   name?: string
-  extension?: CommandContextExtension<T>
+  extension?: CommandContextExtension<E>
 }
 
 /**
  * Plugin return type with extension
+ * @internal
  */
-export interface PluginWithExtension<T> extends Plugin {
+export interface PluginWithExtension<E extends Record<string, unknown> = {}> extends Plugin<E> {
   name: string
-  extension: CommandContextExtension<T>
+  extension: CommandContextExtension<E>
 }
 
 /**
  * Plugin return type without extension
+ * @internal
  */
-export interface PluginWithoutExtension extends Plugin {
+export interface PluginWithoutExtension<E extends Record<string, unknown> = {}> extends Plugin<E> {
   name: string
 }
 
@@ -183,31 +187,40 @@ export interface PluginWithoutExtension extends Plugin {
  * Create a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function plugin<T extends Record<string, any> = any>(options: {
+
+export function plugin<E extends Record<string, unknown> = {}>(options: {
   name: string
-  setup: (ctx: PluginContext<Args, T>) => Awaitable<void>
-  extension: PluginExtension<T, Args>
-}): PluginWithExtension<T>
+  setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
+  extension: PluginExtension<E, Args>
+}): PluginWithExtension<E>
+
+// export function plugin<
+//   E extends Record<string, unknown> = {},
+//   Options extends PluginOptions<E> = PluginOptions<E>,
+//   ExtendContext extends Record<string, unknown> = Options['extension'] extends PluginExtension
+//   ? { [K in keyof ReturnType<Options['extension']>]: ReturnType<Options['extension']>[K] }
+//   : { [K in keyof E]: E[K] },
+//   Extension = Options['extension'] extends PluginExtension
+//   ? { extension: CommandContextExtension<ExtendContext> }
+//   : { extension?: never }
+// >(options: Options): PluginFunction<ExtendContext> & Pick<PluginOptions, 'name'> & Extension
 
 /**
- * Create a plugin without extension
+ * create a plugin without extension
  */
 export function plugin(options: {
   name: string
-  setup: (ctx: PluginContext<Args, Record<string, never>>) => Awaitable<void>
+  setup: (ctx: PluginContext<Args>) => Awaitable<void>
 }): PluginWithoutExtension
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function plugin<T extends Record<string, any> = Record<string, never>>(
-  options: PluginOptions<T>
+export function plugin(
+  options: PluginOptions
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   const { name, setup, extension } = options
 
   // create a wrapper function with properties
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pluginFn = async (ctx: PluginContext<Args, any>) => await setup(ctx)
+  const pluginFn = async (ctx: PluginContext) => await setup(ctx)
 
   // define the properties
   return Object.defineProperties(pluginFn, {

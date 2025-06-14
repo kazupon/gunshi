@@ -78,7 +78,7 @@ export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
 /**
  * Command environment.
  */
-export interface CommandEnvironment<A extends Args = Args> {
+export interface CommandEnvironment<A extends Args = Args, E extends Record<string, unknown> = {}> {
   /**
    * Current working directory.
    * @see {@link CliOptions.cwd}
@@ -138,16 +138,16 @@ export interface CommandEnvironment<A extends Args = Args> {
   /**
    * Render function the command usage.
    */
-  renderUsage: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null | undefined
+  renderUsage: ((ctx: Readonly<CommandContext<A, E>>) => Promise<string>) | null | undefined
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null | undefined
+  renderHeader: ((ctx: Readonly<CommandContext<A, E>>) => Promise<string>) | null | undefined
   /**
    * Render function the validation errors.
    */
   renderValidationErrors:
-    | ((ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>)
+    | ((ctx: Readonly<CommandContext<A, E>>, error: AggregateError) => Promise<string>)
     | null
     | undefined
 }
@@ -155,7 +155,7 @@ export interface CommandEnvironment<A extends Args = Args> {
 /**
  * CLI options of `cli` function.
  */
-export interface CliOptions<A extends Args = Args> {
+export interface CliOptions<A extends Args = Args, E extends Record<string, unknown> = {}> {
   /**
    * Current working directory.
    */
@@ -204,16 +204,16 @@ export interface CliOptions<A extends Args = Args> {
   /**
    * Render function the command usage.
    */
-  renderUsage?: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null
+  renderUsage?: ((ctx: Readonly<CommandContext<A, E>>) => Promise<string>) | null
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader?: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null
+  renderHeader?: ((ctx: Readonly<CommandContext<A, E>>) => Promise<string>) | null
   /**
    * Render function the validation errors.
    */
   renderValidationErrors?:
-    | ((ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>)
+    | ((ctx: Readonly<CommandContext<A, E>>, error: AggregateError) => Promise<string>)
     | null
   /**
    * Translation adapter factory.
@@ -230,7 +230,7 @@ export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
  * Command context.
  * Command context is the context of the command execution.
  */
-export interface CommandContext<A extends Args = Args> {
+export interface CommandContext<A extends Args = Args, E extends Record<string, unknown> = {}> {
   /**
    * Command name, that is the command that is executed.
    * The command name is same {@link CommandEnvironment.name}.
@@ -249,7 +249,7 @@ export interface CommandContext<A extends Args = Args> {
    * Command environment, that is the environment of the command that is executed.
    * The command environment is same {@link CommandEnvironment}.
    */
-  env: Readonly<CommandEnvironment<A>>
+  env: Readonly<CommandEnvironment<A, E>>
   /**
    * Command arguments, that is the arguments of the command that is executed.
    * The command arguments is same {@link Command.args}.
@@ -305,7 +305,7 @@ export interface CommandContext<A extends Args = Args> {
    * The loaded commands are cached and returned when called again.
    * @returns loaded commands.
    */
-  loadCommands: () => Promise<Command<A>[]>
+  loadCommands: () => Promise<Command<A, E>[]>
   /**
    * Translate function.
    * @param key the key to be translated
@@ -320,6 +320,10 @@ export interface CommandContext<A extends Args = Args> {
     key: K,
     values?: Record<string, unknown>
   ) => string
+  /**
+   *  Command context extensions.
+   */
+  extensions: keyof E extends never ? undefined : E
 }
 
 /**
@@ -328,34 +332,17 @@ export interface CommandContext<A extends Args = Args> {
 export type CommandContextCore<A extends Args = Args> = Readonly<CommandContext<A>>
 
 /**
- * CommandContext with possible extensions
- * This type represents a command context that may have extensions
- */
-export type CommandContextWithPossibleExt<A extends Args = Args> = Readonly<CommandContext<A>> & {
-  ext?: Record<string, unknown>
-}
-
-/**
- * CommandContext with specific extensions
- */
-export type CommandContextWithExt<
-  A extends Args = Args,
-  E extends Record<string, unknown> = Record<string, never>
-> = Readonly<CommandContext<A>> & (keyof E extends never ? {} : { ext: E })
-
-/**
  * Command context extension
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface CommandContextExtension<T = any> {
+export interface CommandContextExtension<E extends Record<string, unknown> = {}> {
   readonly key: symbol
-  readonly factory: (core: CommandContextCore) => T
+  readonly factory: (core: CommandContextCore) => E
 }
 
 /**
  * Command interface.
  */
-export interface Command<A extends Args = Args> {
+export interface Command<A extends Args = Args, E extends Record<string, unknown> = {}> {
   /**
    * Command name.
    * It's used to find command line arguments to execute from sub commands, and it's recommended to specify.
@@ -379,7 +366,7 @@ export interface Command<A extends Args = Args> {
   /**
    * Command runner. it's the command to be executed
    */
-  run?: CommandRunner<A>
+  run?: CommandRunner<A, E>
   /**
    * Command resource fetcher.
    */
@@ -398,44 +385,46 @@ export interface ExtendedCommand<
   A extends Args = Args,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > extends Omit<Command<A>, 'run'> {
-  // @internal
-  _extensions: E
-  run?: (ctx: Readonly<CommandContext<A> & CommandContextExt<E>>) => Awaitable<void | string>
+  extensions: E
+  run?: (
+    ctx: Readonly<CommandContext<A, ExtractCommandContextExtension<E>>>
+  ) => Awaitable<void | string>
 }
 
 /**
- * Command context extension type.
- * This type is used to extend the command context with additional properties.
+ * Extract command context extension
  * @internal
  */
-export type CommandContextExt<E extends Record<string, CommandContextExtension>> = {
-  ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+export type ExtractCommandContextExtension<E extends Record<string, CommandContextExtension>> = {
+  [K in keyof E]: ReturnType<E[K]['factory']>
 }
 
 /**
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
  */
-export type LazyCommand<A extends Args = Args> = {
+export type LazyCommand<A extends Args = Args, E extends Record<string, unknown> = {}> = {
   /**
    * Command load function
    */
-  (): Awaitable<Command<A> | CommandRunner<A>>
+  (): Awaitable<Command<A, E> | CommandRunner<A, E>>
   /**
    * Command name
    */
   commandName?: string
-} & Omit<Command<A>, 'run' | 'name'>
+} & Omit<Command<A, E>, 'run' | 'name'>
 
 /**
  * Define a command type.
  */
-export type Commandable<A extends Args> = Command<A> | LazyCommand<A>
+export type Commandable<A extends Args = Args, E extends Record<string, unknown> = {}> =
+  | Command<A, E>
+  | LazyCommand<A, E>
 
 /**
  * Command resource.
  */
-export type CommandResource<A extends Args = Args> = {
+export type CommandResource<A extends Args = Args, E extends Record<string, unknown> = {}> = {
   /**
    * Command description.
    */
@@ -443,7 +432,7 @@ export type CommandResource<A extends Args = Args> = {
   /**
    * Examples usage.
    */
-  examples: string | CommandExamplesFetcher<A>
+  examples: string | CommandExamplesFetcher<A, E>
 } & {
   [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<A>>, typeof ARG_PREFIX>]: string
 } & { [key: string]: string } // Infer the arguments usage, Define the user resources
@@ -453,18 +442,20 @@ export type CommandResource<A extends Args = Args> = {
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched command examples.
  */
-export type CommandExamplesFetcher<A extends Args = Args> = (
-  ctx: Readonly<CommandContext<A>>
-) => Awaitable<string>
+export type CommandExamplesFetcher<
+  A extends Args = Args,
+  E extends Record<string, unknown> = {}
+> = (ctx: Readonly<CommandContext<A, E>>) => Awaitable<string>
 
 /**
  * Command resource fetcher.
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched {@link CommandResource | command resource}.
  */
-export type CommandResourceFetcher<A extends Args = Args> = (
-  ctx: Readonly<CommandContext<A>>
-) => Awaitable<CommandResource<A>>
+export type CommandResourceFetcher<
+  A extends Args = Args,
+  E extends Record<string, unknown> = {}
+> = (ctx: Readonly<CommandContext<A, E>>) => Awaitable<CommandResource<A, E>>
 
 /**
  * Translation adapter factory.
@@ -527,9 +518,20 @@ export interface TranslationAdapter<MessageResource = string> {
  * @param ctx A {@link CommandContext | command context}
  * @returns void or string (for CLI output)
  */
-export type CommandRunner<A extends Args = Args> = (
-  ctx: Readonly<CommandContext<A>>
+export type CommandRunner<A extends Args = Args, E extends Record<string, unknown> = {}> = (
+  ctx: Readonly<CommandContext<A, E>>
 ) => Awaitable<void | string>
+
+/**
+ * Command loader.
+ * A function that returns a command or command runner.
+ * This is used to lazily load commands.
+ * @returns A command or command runner
+ */
+export type CommandLoader<
+  A extends Args = Args,
+  E extends Record<string, unknown> = {}
+> = () => Awaitable<Command<A, E> | CommandRunner<A, E>>
 
 /**
  * Command decorator.
@@ -537,11 +539,9 @@ export type CommandRunner<A extends Args = Args> = (
  * @param baseRunner The base command runner to decorate
  * @returns The decorated command runner
  */
-export type CommandDecorator<A extends Args = Args> = (
-  baseRunner: (ctx: CommandContextWithPossibleExt<A>) => Awaitable<void | string>
-) => (ctx: CommandContextWithPossibleExt<A>) => Awaitable<void | string>
-
-export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | CommandRunner<A>>
+export type CommandDecorator<A extends Args = Args, E extends Record<string, unknown> = {}> = (
+  baseRunner: (ctx: Readonly<CommandContext<A, E>>) => Awaitable<void | string>
+) => (ctx: Readonly<CommandContext<A, E>>) => Awaitable<void | string>
 
 /**
  * Renderer decorator type.
@@ -550,9 +550,9 @@ export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | 
  * @param ctx The command context
  * @returns The decorated result
  */
-export type RendererDecorator<T, A extends Args = Args> = (
-  baseRenderer: (ctx: CommandContextWithPossibleExt<A>) => Promise<T>,
-  ctx: CommandContextWithPossibleExt<A>
+export type RendererDecorator<T, A extends Args = Args, E extends Record<string, unknown> = {}> = (
+  baseRenderer: (ctx: Readonly<CommandContext<A, E>>) => Promise<T>,
+  ctx: Readonly<CommandContext<A, E>>
 ) => Promise<T>
 
 /**
@@ -563,8 +563,11 @@ export type RendererDecorator<T, A extends Args = Args> = (
  * @param error The aggregate error containing validation errors
  * @returns The decorated result
  */
-export type ValidationErrorsDecorator<A extends Args = Args> = (
-  baseRenderer: (ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>,
-  ctx: CommandContextWithPossibleExt<A>,
+export type ValidationErrorsDecorator<
+  A extends Args = Args,
+  E extends Record<string, unknown> = {}
+> = (
+  baseRenderer: (ctx: Readonly<CommandContext<A, E>>, error: AggregateError) => Promise<string>,
+  ctx: Readonly<CommandContext<A, E>>,
   error: AggregateError
 ) => Promise<string>

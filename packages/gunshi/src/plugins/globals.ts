@@ -6,13 +6,13 @@
 import { COMMON_ARGS } from '../constants.ts'
 import { plugin } from '../plugin.ts'
 
-import type { PluginContext, PluginExtension } from '../plugin.ts'
+import type { PluginContext } from '../plugin.ts'
 import type { Awaitable, CommandContextCore } from '../types.ts'
 
 /**
  * Extended command context which provides utilities via global options plugin.
  */
-interface GlobalsCommandContext {
+export interface GlobalsCommandContext {
   /**
    * Show the version of the application. if `--version` option is specified, it will print the version to the console.
    * @returns The version of the application, or `unknown` if the version is not specified.
@@ -33,7 +33,7 @@ interface GlobalsCommandContext {
 /**
  * Extension for the global options plugin.
  */
-const extension: PluginExtension<GlobalsCommandContext> = (ctx: CommandContextCore) => ({
+const extension = (ctx: CommandContextCore) => ({
   showVersion: () => {
     const version = ctx.env.version || 'unknown'
     if (!ctx.env.usageSilent) {
@@ -67,10 +67,11 @@ const extension: PluginExtension<GlobalsCommandContext> = (ctx: CommandContextCo
 /**
  * Built-in global options plugin for Gunshi.
  */
+// @ts-ignore -- FIXME(kazupon): this is a plugin definition, not a function
 const _definition = plugin({
   name: 'globals',
   extension,
-  setup: ctx => {
+  setup(ctx) {
     for (const [name, schema] of Object.entries(COMMON_ARGS)) {
       ctx.addGlobalOption(name, schema)
     }
@@ -80,7 +81,7 @@ const _definition = plugin({
       console.log('globals decorator', ctx)
       const {
         values,
-        ext: { showVersion, showHeader, showUsage }
+        extensions: { showVersion, showHeader, showUsage }
       } = ctx
 
       if (values.version) {

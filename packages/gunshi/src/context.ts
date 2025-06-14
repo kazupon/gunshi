@@ -42,12 +42,11 @@ import type {
   CommandBuiltinKeys,
   CommandCallMode,
   CommandContext,
-  CommandContextCore,
-  CommandContextExt,
   CommandContextExtension,
   CommandEnvironment,
   CommandResource,
   ExtendedCommand,
+  ExtractCommandContextExtension,
   LazyCommand
 } from './types.ts'
 
@@ -59,7 +58,7 @@ const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 interface CommandContextParams<
   A extends Args,
   V,
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A> // eslint-disable-line @typescript-eslint/no-explicit-any
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A> = Command<A>
 > {
   /**
    * An arguments of target command
@@ -105,11 +104,10 @@ interface CommandContextParams<
 
 type InferExtentableCommand<
   A extends Args,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A> = Command<A>
 > =
   C extends ExtendedCommand<A, infer E>
-    ? Readonly<CommandContext<A> & CommandContextExt<E>>
+    ? Readonly<CommandContext<A, ExtractCommandContextExtension<E>>>
     : Readonly<CommandContext<A>>
 
 /**
@@ -249,20 +247,17 @@ export async function createCommandContext<
   let ctx: any
 
   // if command requires extensions
-  if ('_extensions' in command && command._extensions) {
-    const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+  if ('extensions' in command && command.extensions) {
+    const extensions = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // apply each extension
-    for (const [key, extension] of Object.entries(command._extensions)) {
-      ext[key] = (extension as CommandContextExtension).factory(core as CommandContextCore<Args>)
+    for (const [key, extension] of Object.entries(command.extensions)) {
+      extensions[key] = (extension as CommandContextExtension).factory(core)
     }
 
     // create extended context with extensions
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const extendedCtx = Object.assign(create<any>(), core, {
-      ext: Object.freeze(ext)
-    })
-
+    const extendedCtx = Object.assign(create<any>(), core, { extensions })
     ctx = deepFreeze(extendedCtx)
   } else {
     // without extensions (backward compatibility)

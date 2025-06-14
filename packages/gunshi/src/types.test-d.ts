@@ -1,9 +1,12 @@
 import { expectTypeOf, test } from 'vitest'
-import { cli } from './cli.ts'
-import { define } from './definition.ts'
 
 import type { Args } from 'args-tokens'
-import type { KeyOfArgs } from './types.ts'
+import type {
+  CommandContext,
+  CommandRunner,
+  ExtractCommandContextExtension,
+  KeyOfArgs
+} from './types.ts'
 
 test('KeyOfArgOptions', () => {
   const _args = {
@@ -21,20 +24,59 @@ test('KeyOfArgOptions', () => {
   expectTypeOf<KeyOfArgs<typeof _args>>().toEqualTypeOf<'foo' | 'bar' | 'baz' | 'no-baz'>()
 })
 
-test('specified read only value as enum option default', async () => {
-  const choices = ['a', 'b'] as const
+type A = {
+  foo: {
+    type: 'string'
+  }
+}
+type E = {
+  ext1: {
+    foo: number
+  }
+  ext2: {
+    bar: string
+  }
+}
 
-  const command = define({
-    args: {
-      foo: {
-        type: 'enum',
-        choices
-      }
+test('CommandContext', () => {
+  // Args type argument
+  type T1 = CommandContext<A>
+  expectTypeOf<T1['extensions']>().toEqualTypeOf<undefined>()
+  // Args and Extend type argument
+  type T2 = CommandContext<A, E>
+  expectTypeOf<T2['extensions']>().toEqualTypeOf<E>()
+})
+
+test('CommandRunner', () => {
+  // Args type argument
+  type C1 = Parameters<CommandRunner<A>>[0]
+  expectTypeOf<C1['extensions']>().toEqualTypeOf<undefined>()
+
+  // Args and Extend type argument
+  type C2 = Parameters<CommandRunner<A, E>>[0]
+  expectTypeOf<C2['extensions']>().toEqualTypeOf<E>()
+})
+
+test('ExtractCommandContextExtension', () => {
+  const _extensions = {
+    ext1: {
+      key: Symbol('ext1'),
+      factory: () => ({ value1: 'test1' })
     },
-    run: ctx => {
-      expectTypeOf(ctx.values.foo).toEqualTypeOf<'a' | 'b' | undefined>()
+    ext2: {
+      key: Symbol('ext2'),
+      factory: () => ({ value2: 'test2' })
+    },
+    ext3: {
+      key: Symbol('ext3'),
+      factory: () => ({ value3: 'test3' })
     }
-  })
+  }
 
-  await cli(['--foo', 'a'], command)
+  type T1 = ExtractCommandContextExtension<typeof _extensions>
+  expectTypeOf<T1>().toEqualTypeOf<{
+    ext1: { value1: string }
+    ext2: { value2: string }
+    ext3: { value3: string }
+  }>()
 })
