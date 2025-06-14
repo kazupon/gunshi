@@ -1,10 +1,9 @@
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
-import { plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
-import type { CommandContextExtension, ExtendedCommand } from './types.ts'
+import type { CommandContextExtension, CommandRunner, ExtendedCommand } from './types.ts'
 
 // eslint-disable-next-line vitest/expect-expect
 test('define', async () => {
@@ -62,54 +61,36 @@ test('lazy', async () => {
   expect(mock).toHaveBeenCalled()
 })
 
-describe('define with extensions', () => {
-  test('basic - command with extensions', () => {
-    type Auth = {
-      user: { id: number; name: string }
-      isAuthenticated: boolean
+describe('define with type parameters', () => {
+  test('basic - command with type parameter extension', () => {
+    type ExtendedContext = {
+      auth: {
+        user: { id: number; name: string }
+        isAuthenticated: boolean
+      }
+      db: {
+        query: (sql: string) => Promise<{ rows: string[] }>
+      }
     }
 
-    const authExtension: CommandContextExtension<Auth> = {
-      key: Symbol('auth'),
-      factory: _core => ({
-        user: { id: 1, name: 'Test' },
-        isAuthenticated: true
-      })
-    }
-
-    type Database = {
-      query: (sql: string) => Promise<{ rows: string[] }>
-    }
-
-    const dbExtension: CommandContextExtension<Database> = {
-      key: Symbol('db'),
-      factory: _core => ({
-        query: async (_sql: string) => ({ rows: [] })
-      })
-    }
-
-    const command = define({
+    const command = define<{ env: { type: 'string'; required: true } }, ExtendedContext>({
       name: 'deploy',
       description: 'Deploy application',
       args: {
         env: { type: 'string', required: true }
       },
-      extensions: {
-        auth: authExtension,
-        db: dbExtension
-      },
       run: async ctx => {
-        return `Deploying as ${ctx.ext.auth.user.name}`
+        return `Deploying as ${ctx.extensions.auth.user.name}`
       }
     })
 
-    // check that extensions are converted to _extensions
-    expect(command._extensions).toBeDefined()
-    expect(command._extensions.auth).toBe(authExtension)
-    expect(command._extensions.db).toBe(dbExtension)
+    // check that command is created properly
+    expect(command.name).toBe('deploy')
+    expect(command.description).toBe('Deploy application')
+    expect(command.args).toEqual({ env: { type: 'string', required: true } })
   })
 
-  test('backward compatibility - command without extensions', () => {
+  test('backward compatibility - command without type parameter', () => {
     const command = define({
       name: 'hello',
       description: 'Say hello',
@@ -117,13 +98,10 @@ describe('define with extensions', () => {
         name: { type: 'string' }
       },
       run: async ctx => {
+        expectTypeOf(ctx.extensions).toEqualTypeOf<undefined>()
         return `Hello, ${ctx.values.name || 'World'}!`
       }
     })
-
-    // should not have _extensions property
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((command as any)._extensions).toBeUndefined()
 
     // all standard properties should be preserved
     expect(command.name).toBe('hello')
@@ -132,34 +110,24 @@ describe('define with extensions', () => {
     expect(typeof command.run).toBe('function')
   })
 
-  test('type inference - ext property is typed correctly', () => {
-    type Auth = {
-      user: { id: number; name: string }
-      logout: () => Promise<void>
+  test('type inference - extension is typed correctly', () => {
+    type AuthExt = {
+      auth: {
+        user: { id: number; name: string }
+        logout: () => Promise<void>
+      }
     }
 
-    const authPlugin = plugin<Auth>({
-      name: 'auth',
-      setup: async _ctx => {},
-      extension: _core => ({
-        user: { id: 1, name: 'Test' },
-        logout: async () => {}
-      })
-    })
-
-    const command = define({
+    const command = define<Args, AuthExt>({
       name: 'profile',
-      extensions: {
-        auth: authPlugin.extension
-      },
       run: async ctx => {
-        const userName: string = ctx.ext.auth.user.name
-        await ctx.ext.auth.logout()
+        const userName: string = ctx.extensions.auth.user.name
+        await ctx.extensions.auth.logout()
         return `User: ${userName}`
       }
     })
 
-    expect(command._extensions.auth).toBeDefined()
+    expect(command.name).toBe('profile')
   })
 
   test('preserves all command properties', () => {
@@ -180,9 +148,6 @@ describe('define with extensions', () => {
         }
       },
       toKebab: false,
-      extensions: {
-        test: { key: Symbol('test'), factory: () => ({ test: true }) }
-      },
       run: async _ctx => 'done'
     })
 
@@ -192,40 +157,30 @@ describe('define with extensions', () => {
     expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
     expect(command.resource).toBeDefined()
     expect(command.toKebab).toBe(false)
-    expect(command._extensions).toBeDefined()
   })
 })
 
-describe('lazy with extensions', () => {
-  test('basic - lazy command with extensions', () => {
+describe('lazy with type parameters', () => {
+  test('basic - lazy command with type parameter', () => {
+    type AuthExt = {
+      auth: {
+        authenticated: boolean
+      }
+    }
     const loader = vi.fn(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const runner = async (_ctx: any) => 'deployed'
+      const runner: CommandRunner<Args, AuthExt> = async ctx => {
+        expectTypeOf(ctx.extensions.auth.authenticated).toEqualTypeOf<boolean>()
+        return 'deployed'
+      }
       return runner
     })
 
-    type Auth = {
-      authenticated: boolean
-    }
-
-    const authExtension: CommandContextExtension<Auth> = {
-      key: Symbol('auth'),
-      factory: _core => ({ authenticated: true })
-    }
-
-    const lazyCmd = lazy(loader, {
+    const lazyCmd = lazy<Args, AuthExt>(loader, {
       name: 'lazy-deploy',
-      description: 'Lazy deploy command',
-      extensions: {
-        auth: authExtension
-      }
+      description: 'Lazy deploy command'
     })
 
-    // check that extensions are preserved
-    expect(lazyCmd._extensions).toBeDefined()
-    expect(lazyCmd._extensions.auth).toBe(authExtension)
-
-    // check that other properties are preserved
+    // check that properties are preserved
     expect(lazyCmd.commandName).toBe('lazy-deploy')
     expect(lazyCmd.description).toBe('Lazy deploy command')
   })
@@ -247,10 +202,7 @@ describe('lazy with extensions', () => {
           'arg:opt': 'An optional string argument for the lazy command'
         }
       },
-      toKebab: true,
-      extensions: {
-        ext1: { key: Symbol('ext1'), factory: () => ({ ext1: true }) }
-      }
+      toKebab: true
     })
 
     expect(lazyCmd.commandName).toBe('lazy-test')
@@ -259,32 +211,28 @@ describe('lazy with extensions', () => {
     expect(lazyCmd.examples).toEqual('lazy-test --opt value')
     expect(lazyCmd.resource).toBeDefined()
     expect(lazyCmd.toKebab).toBe(true)
-    expect(lazyCmd._extensions).toBeDefined()
   })
 
-  test('handles _extensions from loaded command', () => {
+  test('handles type parameters from loaded command', () => {
     const loader = vi.fn(async () => {
-      return async () => 'done'
+      type TestExt = {
+        existing: { existing: boolean }
+      }
+      const runner: CommandRunner<Args, TestExt> = async () => {
+        return 'done'
+      }
+      return runner
     })
 
-    // simulate a command that already has _extensions
-    const definitionWithExtensions = {
-      name: 'test',
-      _extensions: {
-        existing: { key: Symbol('existing'), factory: () => ({ existing: true }) }
-      }
-    }
+    const lazyCmd = lazy(loader, {
+      name: 'test'
+    })
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const lazyCmd = lazy(loader, definitionWithExtensions as any)
-
-    // should preserve _extensions from definition
-    expect(lazyCmd._extensions).toBeDefined()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((lazyCmd._extensions as any).existing).toBeDefined()
+    // should work without errors
+    expect(lazyCmd.commandName).toBe('test')
   })
 
-  test('backward compatibility - lazy command without extensions', () => {
+  test('backward compatibility - lazy command without type parameter', () => {
     const loader = vi.fn(async () => ({
       name: 'simple',
       run: async () => 'done'
@@ -295,8 +243,6 @@ describe('lazy with extensions', () => {
       description: 'Simple lazy command'
     })
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((lazyCmd as any)._extensions).toBeUndefined()
     expect(lazyCmd.commandName).toBe('simple')
     expect(lazyCmd.description).toBe('Simple lazy command')
   })
@@ -309,8 +255,6 @@ describe('lazy with extensions', () => {
 
     const lazyCmd = lazy(loader)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((lazyCmd as any)._extensions).toBeUndefined()
     expect(typeof lazyCmd).toBe('function')
   })
 })
@@ -329,17 +273,17 @@ describe('ExtendedCommand type', () => {
 
     const command: ExtendedCommand<Args, { ext1: typeof ext1; ext2: typeof ext2 }> = {
       name: 'multi-ext',
-      _extensions: { ext1, ext2 },
+      extensions: { ext1, ext2 },
       run: async ctx => {
-        // typeScript should properly type ctx.ext
-        const v1: string = ctx.ext.ext1.value1
-        const v2: number = ctx.ext.ext2.value2
+        // properly type ctx.extensions
+        const v1: string = ctx.extensions.ext1.value1
+        const v2: number = ctx.extensions.ext2.value2
         return `${v1} - ${v2}`
       }
     }
 
-    expect(command._extensions).toBeDefined()
-    expect(command._extensions!.ext1).toBe(ext1)
-    expect(command._extensions!.ext2).toBe(ext2)
+    expect(command.extensions).toBeDefined()
+    expect(command.extensions.ext1).toBe(ext1)
+    expect(command.extensions.ext2).toBe(ext2)
   })
 })
