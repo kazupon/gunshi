@@ -27,7 +27,7 @@ import type {
   ValidationErrorsDecorator
 } from './types.ts'
 
-export { GlobalsCommandContext } from './plugins/globals.ts'
+export type { GlobalsCommandContext } from './plugins/globals.ts'
 
 /**
  * Gunshi plugin context.
