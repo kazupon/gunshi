@@ -15,7 +15,7 @@
  */
 
 import type { Args } from 'args-tokens'
-import type { Command, CommandLoader, LazyCommand } from './types.ts'
+import type { Command, CommandLoader, ExtendContext, LazyCommand } from './types.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 
@@ -23,7 +23,7 @@ export type { Args, ArgSchema, ArgValues } from 'args-tokens'
  * Define a {@link Command | command}
  * @param definition A {@link Command | command} definition
  */
-export function define<A extends Args = Args, E extends Record<string, unknown> = {}>(
+export function define<A extends Args = Args, E extends ExtendContext = {}>(
   definition: Command<A, E>
 ): Command<A, E> {
   return definition
@@ -34,7 +34,7 @@ export function define<A extends Args = Args, E extends Record<string, unknown> 
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
-export function lazy<A extends Args = Args, E extends Record<string, unknown> = {}>(
+export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
   loader: CommandLoader<A, E>
 ): LazyCommand<A, E>
 
@@ -44,7 +44,7 @@ export function lazy<A extends Args = Args, E extends Record<string, unknown> = 
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<A extends Args = Args, E extends Record<string, unknown> = {}>(
+export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
   loader: CommandLoader<A, E>,
   definition: Command<A, E>
 ): LazyCommand<A, E>
@@ -55,7 +55,7 @@ export function lazy<A extends Args = Args, E extends Record<string, unknown> = 
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<A extends Args = Args, E extends Record<string, unknown> = {}>(
+export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
   loader: CommandLoader<A, E>,
   definition?: Command<A, E>
 ): LazyCommand<A, E> {

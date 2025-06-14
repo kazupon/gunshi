@@ -23,6 +23,7 @@ import type {
   CommandContextCore,
   CommandContextExtension,
   CommandDecorator,
+  ExtendContext,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
@@ -33,7 +34,7 @@ export type { GlobalsCommandContext } from './plugins/globals.ts'
  * Gunshi plugin context.
  * @internal
  */
-export class PluginContext<A extends Args = Args, E extends Record<string, unknown> = {}> {
+export class PluginContext<A extends Args = Args, E extends ExtendContext = {}> {
   #globalOptions: Map<string, ArgSchema> = new Map()
   #decorators: Decorators<A, E>
 
@@ -135,7 +136,7 @@ export class PluginContext<A extends Args = Args, E extends Record<string, unkno
 /**
  *  Plugin function type
  */
-export type PluginFunction<E extends Record<string, unknown> = {}> = (
+export type PluginFunction<E extends ExtendContext = {}> = (
   ctx: PluginContext<Args, E>
 ) => Awaitable<void>
 
@@ -161,7 +162,7 @@ export interface PluginOptions<T extends Record<string, unknown> = {}> {
  * @param ctx - A {@link PluginContext}.
  * @returns An {@link Awaitable} that resolves when the plugin is loaded.
  */
-export type Plugin<E extends Record<string, unknown> = {}> = PluginFunction<E> & {
+export type Plugin<E extends ExtendContext = {}> = PluginFunction<E> & {
   name?: string
   extension?: CommandContextExtension<E>
 }
@@ -170,7 +171,7 @@ export type Plugin<E extends Record<string, unknown> = {}> = PluginFunction<E> &
  * Plugin return type with extension
  * @internal
  */
-export interface PluginWithExtension<E extends Record<string, unknown> = {}> extends Plugin<E> {
+export interface PluginWithExtension<E extends ExtendContext = {}> extends Plugin<E> {
   name: string
   extension: CommandContextExtension<E>
 }
@@ -179,7 +180,7 @@ export interface PluginWithExtension<E extends Record<string, unknown> = {}> ext
  * Plugin return type without extension
  * @internal
  */
-export interface PluginWithoutExtension<E extends Record<string, unknown> = {}> extends Plugin<E> {
+export interface PluginWithoutExtension<E extends ExtendContext = {}> extends Plugin<E> {
   name: string
 }
 
@@ -187,7 +188,7 @@ export interface PluginWithoutExtension<E extends Record<string, unknown> = {}> 
  * Create a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
  */
-export function plugin<E extends Record<string, unknown> = {}>(options: {
+export function plugin<E extends ExtendContext = {}>(options: {
   name: string
   setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
   extension: PluginExtension<E, Args>

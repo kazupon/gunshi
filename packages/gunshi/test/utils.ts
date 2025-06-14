@@ -15,6 +15,7 @@ import type { Args } from 'args-tokens'
 import type {
   CommandContext,
   CommandContextExtension,
+  ExtendContext,
   TranslationAdapter,
   TranslationAdapterFactoryOptions
 } from '../src/types.ts'
@@ -141,7 +142,7 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
   }
 }
 
-export function createMockCommandContext<E extends Record<string, unknown> = {}>(
+export function createMockCommandContext<E extends ExtendContext = {}>(
   extensions?: Record<string, CommandContextExtension>
 ): CommandContext<Args, E> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

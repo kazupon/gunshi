@@ -7,6 +7,7 @@ import type { Args } from 'args-tokens'
 import type {
   CommandContext,
   CommandDecorator,
+  ExtendContext,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
@@ -17,7 +18,7 @@ const EMPTY_RENDERER = async () => ''
  * Internal class for managing renderer decorators.
  * This class is not exposed to plugin authors.
  */
-export class Decorators<A extends Args = Args, E extends Record<string, unknown> = {}> {
+export class Decorators<A extends Args = Args, E extends ExtendContext = {}> {
   #headerDecorators: RendererDecorator<string, A, E>[] = []
   #usageDecorators: RendererDecorator<string, A, E>[] = []
   #validationDecorators: ValidationErrorsDecorator<A, E>[] = []
@@ -79,7 +80,7 @@ export class Decorators<A extends Args = Args, E extends Record<string, unknown>
     return renderer
   }
 
-  #buildRenderer<T, A extends Args = Args, E extends Record<string, unknown> = {}>(
+  #buildRenderer<T, A extends Args = Args, E extends ExtendContext = {}>(
     decorators: RendererDecorator<T, A, E>[],
     defaultRenderer: (ctx: Readonly<CommandContext<A, E>>) => Promise<T>
   ): (ctx: Readonly<CommandContext<A, E>>) => Promise<T> {
