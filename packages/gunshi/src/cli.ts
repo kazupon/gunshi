@@ -18,6 +18,7 @@ import type {
   Command,
   CommandCallMode,
   CommandContext,
+  CommandContextExtension,
   CommandDecorator,
   CommandRunner,
   LazyCommand
@@ -37,8 +38,7 @@ export async function cli<A extends Args = Args>(
 ): Promise<string | undefined> {
   const decorators = new Decorators<A>()
   const pluginContext = new PluginContext<A>(decorators)
-  // const plugins = await applyPlugins(pluginContext)
-  await applyPlugins(pluginContext)
+  const plugins = await applyPlugins(pluginContext)
 
   const cliOptions = normalizeCliOptions(options, entry, decorators)
 
@@ -71,6 +71,7 @@ export async function cli<A extends Args = Args>(
     omitted,
     callMode,
     command,
+    extensions: getPluginExtensions(plugins),
     cliOptions: cliOptions
   })
 
@@ -246,17 +247,33 @@ function resolveEntryName<A extends Args>(entry: Command<A>): string {
   return entry.name || ANONYMOUS_COMMAND_NAME
 }
 
+function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextExtension> {
+  const extensions = create<Record<string, CommandContextExtension>>()
+  const pluginExtensions = plugins
+    .map(plugin => plugin.extension)
+    .filter(Boolean) as CommandContextExtension[]
+  for (const extension of pluginExtensions) {
+    const key = extension.key.description
+    if (key) {
+      if (extensions[key]) {
+        console.warn(
+          `Plugin "${key}" is already installed. ignore it for command context extending.`
+        )
+      } else {
+        extensions[key] = extension
+      }
+    }
+  }
+  return extensions
+}
+
 async function executeCommand<A extends Args = Args>(
   cmd: Command<A> | LazyCommand<A>,
   ctx: Readonly<CommandContext<A>>,
   name: string,
   decorators: readonly CommandDecorator<A>[]
 ): Promise<string | undefined> {
-  // const extensions = plugins
-  //   .map(plugin => plugin.extension)
-  //   .filter(Boolean) as CommandContextExtension<A>[]
   const resolved = isLazyCommand<A>(cmd) ? await resolveLazyCommand<A>(cmd, name, true) : cmd
-  // const extended = applyPlugnExtensions(resolved, extensions)
   const baseRunner = resolved.run || NOOP
 
   // apply plugin decorators
