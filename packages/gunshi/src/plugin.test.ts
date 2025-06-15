@@ -7,7 +7,7 @@ import { PluginContext, plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
 import type { Plugin } from './plugin.ts'
-import type { CommandContextCore } from './types.ts'
+import type { Command, CommandContextCore } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -43,51 +43,51 @@ type Auth = { token: string; login: () => string }
 type Logger = { log: (msg: string) => void; level: string }
 
 test('PluginContext#decorateHeaderRenderer', async () => {
-  const decorators = new Decorators()
+  const decorators = new Decorators<Args, Auth>()
   const ctx = new PluginContext<Args, Auth>(decorators)
 
   ctx.decorateHeaderRenderer<Logger>(async (baseRenderer, cmdCtx) => {
     const result = await baseRenderer(cmdCtx)
-    expectTypeOf(cmdCtx.ext).toEqualTypeOf<Auth & Logger>()
+    expectTypeOf(cmdCtx.extensions).toEqualTypeOf<Auth & Logger>()
     return `[DECORATED] ${result}`
   })
 
   const renderer = decorators.getHeaderRenderer()
-  const mockCtx = createMockCommandContext()
+  const mockCtx = createMockCommandContext<Auth>()
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[DECORATED] ')
 })
 
 test('PluginContext#decorateUsageRenderer', async () => {
-  const decorators = new Decorators()
+  const decorators = new Decorators<Args, Auth>()
   const ctx = new PluginContext<Args, Auth>(decorators)
 
   ctx.decorateUsageRenderer<Logger>(async (baseRenderer, cmdCtx) => {
     const result = await baseRenderer(cmdCtx)
-    expectTypeOf(cmdCtx.ext).toEqualTypeOf<Auth & Logger>()
+    expectTypeOf(cmdCtx.extensions).toEqualTypeOf<Auth & Logger>()
     return `[USAGE] ${result}`
   })
 
-  const renderer = decorators.getUsageRenderer()
-  const mockCtx = createMockCommandContext()
+  const renderer = decorators.getUsageRenderer<Logger>()
+  const mockCtx = createMockCommandContext<Auth & Logger>()
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[USAGE] ')
 })
 
 test('PluginContext#decorateValidationErrorsRenderer', async () => {
-  const decorators = new Decorators()
+  const decorators = new Decorators<Args, Auth>()
   const ctx = new PluginContext<Args, Auth>(decorators)
 
   ctx.decorateValidationErrorsRenderer<Logger>(async (baseRenderer, cmdCtx, error) => {
     const result = await baseRenderer(cmdCtx, error)
-    expectTypeOf(cmdCtx.ext).toEqualTypeOf<Auth & Logger>()
+    expectTypeOf(cmdCtx.extensions).toEqualTypeOf<Auth & Logger>()
     return `[ERROR] ${result}`
   })
 
   const renderer = decorators.getValidationErrorsRenderer()
-  const mockCtx = createMockCommandContext()
+  const mockCtx = createMockCommandContext<Auth>()
   const error = new AggregateError([new Error('Test')], 'Validation failed')
   const result = await renderer(mockCtx, error)
 
@@ -95,17 +95,17 @@ test('PluginContext#decorateValidationErrorsRenderer', async () => {
 })
 
 test('PluginContext#decorateCommand', async () => {
-  const decorators = new Decorators()
+  const decorators = new Decorators<Args, Auth>()
   const ctx = new PluginContext<Args, Auth>(decorators)
 
   ctx.decorateCommand<Logger>(baseRunner => async ctx => {
     const result = await baseRunner(ctx)
-    expectTypeOf(ctx.ext).toEqualTypeOf<Auth & Logger>()
+    expectTypeOf(ctx.extensions).toEqualTypeOf<Auth & Logger>()
     return `[USAGE] ${result}`
   })
 
   const runner = decorators.commandDecorators[0]
-  const mockCtx = createMockCommandContext()
+  const mockCtx = createMockCommandContext<Auth>()
   const result = await runner(_ctx => '[TEST]')(mockCtx)
 
   expect(result).toBe('[USAGE] [TEST]')
@@ -118,27 +118,30 @@ describe('plugin function', () => {
       isEnabled: true
     }))
 
-    const setupFn = vi.fn(async (ctx: PluginContext<Args, ReturnType<typeof extensionFactory>>) => {
-      ctx.addGlobalOption('test', { type: 'string' })
-    })
+    const setupFn = vi.fn(
+      async (ctx: PluginContext<Args, { test: ReturnType<typeof extensionFactory> }>) => {
+        ctx.addGlobalOption('test', { type: 'string' })
+      }
+    )
 
     const testPlugin = plugin({
-      name: 'test-plugin',
+      name: 'test',
       setup: setupFn,
       extension: extensionFactory
     })
 
     // check plugin properties
-    expect(testPlugin.name).toBe('test-plugin')
+    expect(testPlugin.name).toBe('test')
     expect(testPlugin.extension).toBeDefined()
     expect(testPlugin.extension.key).toBeDefined()
     expect(typeof testPlugin.extension.key).toBe('symbol')
-    expect(testPlugin.extension.key.description).toBe('test-plugin')
+    expect(testPlugin.extension.key.description).toBe('test')
     expect(testPlugin.extension.factory).toBe(extensionFactory)
 
     // check that setup function is callable
-    const decorators = new Decorators()
-    const ctx = new PluginContext(decorators)
+    type Extension = ReturnType<typeof testPlugin.extension.factory>
+    const decorators = new Decorators<Args, Extension>()
+    const ctx = new PluginContext<Args, Extension>(decorators)
     await testPlugin(ctx)
     expect(setupFn).toHaveBeenCalledWith(ctx)
   })
@@ -167,30 +170,34 @@ describe('plugin function', () => {
     const mockCore = createMockCommandContext()
     const extensionFactory = vi.fn(core => ({
       user: { id: 1, name: 'Test User' },
-      getToken: () => core.values.token
+      getToken: () => core.values.token as string
     }))
 
     const testPlugin = plugin({
-      name: 'auth-plugin',
-      setup: async ctx => {
+      name: 'auth',
+      extension: extensionFactory,
+      async setup(ctx) {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
-          const user = cmdCtx.ext.user
-          expectTypeOf(cmdCtx.ext).toEqualTypeOf<ReturnType<typeof extensionFactory>>()
+          const user = cmdCtx.extensions.auth.user
+          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{
+            auth: ReturnType<typeof extensionFactory>
+          }>()
           console.log(`User: ${user.name} (${user.id})`)
           return await baseRenderer(cmdCtx)
         })
         ctx.decorateCommand(baseRunner => async ctx => {
-          expectTypeOf(ctx.ext).toEqualTypeOf<ReturnType<typeof extensionFactory>>()
+          expectTypeOf(ctx.extensions).toEqualTypeOf<{
+            auth: ReturnType<typeof extensionFactory>
+          }>()
           const result = await baseRunner(ctx)
           return `[AUTH] ${result}`
         })
-      },
-      extension: extensionFactory
+      }
     })
 
     // test extension factory
-    const extension = testPlugin.extension!
+    const extension = testPlugin.extension
     const result = extension.factory(mockCore)
 
     expect(extensionFactory).toHaveBeenCalledWith(mockCore)
@@ -200,15 +207,15 @@ describe('plugin function', () => {
 
   test('not receives correct context via extension', async () => {
     const testPlugin = plugin({
-      name: 'auth-plugin',
+      name: 'auth',
       setup: async ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateUsageRenderer(async (baseRenderer, cmdCtx) => {
-          expectTypeOf(cmdCtx.ext.user).toEqualTypeOf<never>()
+          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<undefined>()
           return await baseRenderer(cmdCtx)
         })
         ctx.decorateValidationErrorsRenderer(async (baseRenderer, cmdCtx, error) => {
-          expectTypeOf(cmdCtx.ext.user).toEqualTypeOf<never>()
+          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<undefined>()
           return await baseRenderer(cmdCtx, error)
         })
       }
@@ -232,7 +239,8 @@ describe('Plugin type with optional properties', () => {
   })
 
   test('plugin with name and extension properties', async () => {
-    const pluginFn = async (ctx: PluginContext) => {
+    type Extension = { extended: boolean }
+    const pluginFn = async (ctx: PluginContext<Args, Extension>) => {
       ctx.addGlobalOption('extended', { type: 'string' })
     }
 
@@ -255,11 +263,12 @@ describe('Plugin type with optional properties', () => {
       configurable: true
     })
 
-    const pluginWithExtension = pluginFn as Plugin
+    const pluginWithExtension = pluginFn as Plugin<Extension>
 
     expect(pluginWithExtension.name).toBe('extended-plugin')
     expect(pluginWithExtension.extension).toBeDefined()
     expect(typeof pluginWithExtension.extension?.key).toBe('symbol')
+    expect(typeof pluginWithExtension.extension?.factory).toBe('function')
   })
 })
 
@@ -274,9 +283,15 @@ describe('Plugin Extensions Integration', () => {
           default: 'default-value'
         })
       },
-      extension(core) {
+      extension: (
+        core: CommandContextCore
+      ): {
+        getValue: () => string
+        doubled: (n: number) => number
+        asyncOp: () => Promise<string>
+      } => {
         return {
-          getValue: () => core.values['test-opt'] || 'default-value',
+          getValue: () => (core.values['test-opt'] as string) || 'default-value',
           doubled: (n: number) => n * 2,
           async asyncOp() {
             return 'async-result'
@@ -285,33 +300,35 @@ describe('Plugin Extensions Integration', () => {
       }
     })
 
-    // Create a command that uses the extension
-    const testCommand = define({
-      name: 'test-cmd',
-      args: {
-        num: { type: 'number', default: 5 }
-      },
-      extensions: {
-        test: testPlugin.extension
-      },
-      async run(ctx) {
-        const value = ctx.ext.test.getValue()
-        const doubled = ctx.ext.test.doubled(ctx.values.num!)
-        const asyncResult = await ctx.ext.test.asyncOp()
+    const args = {
+      num: { type: 'number', default: 5 },
+      'test-opt': { type: 'string', default: 'custom' }
+    } satisfies Args
 
+    type TestExtension = ReturnType<typeof testPlugin.extension.factory>
+
+    // create a command that uses the extension
+    const testCommand = define<typeof args, { test: TestExtension }>({
+      name: 'test-cmd',
+      args,
+      async run(ctx) {
+        const value = ctx.extensions.test.getValue()
+        const doubled = ctx.extensions.test.doubled(ctx.values.num!)
+        const asyncResult = await ctx.extensions.test.asyncOp()
         return `${value}:${doubled}:${asyncResult}`
       }
     })
 
     // create command context directly
     const ctx = await createCommandContext({
-      args: { num: { type: 'number', default: 5 } },
+      args,
       values: { 'test-opt': 'custom', num: 5 },
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: testCommand,
+      command: testCommand as Command<typeof args>,
+      extensions: { test: testPlugin.extension },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -324,59 +341,59 @@ describe('Plugin Extensions Integration', () => {
 
   test('multiple plugins with extensions work together', async () => {
     // auth plugin
+    const authExtension = vi.fn((core: CommandContextCore) => ({
+      getUser: () => core.values.user || 'guest',
+      isAdmin: () => core.values.user === 'admin'
+    }))
     const authPlugin = plugin({
       name: 'auth',
       setup(ctx) {
         ctx.addGlobalOption('user', { type: 'string', default: 'guest' })
       },
-      extension(core) {
-        return {
-          getUser: () => core.values.user || 'guest',
-          isAdmin: () => core.values.user === 'admin'
-        }
-      }
+      extension: authExtension
     })
 
     // logger plugin
+    const logs = [] as string[]
+    const loggerExtension = vi.fn((core: CommandContextCore) => ({
+      log: (msg: string) => logs.push(`[${core.values['log-level'] || 'info'}] ${msg}`),
+      getLogs: (): string[] => logs
+    }))
     const loggerPlugin = plugin({
       name: 'logger',
       setup(ctx) {
         ctx.addGlobalOption('log-level', { type: 'string', default: 'info' })
       },
-      extension(core) {
-        const logs: string[] = []
-        return {
-          log: (msg: string) => logs.push(`[${core.values['log-level'] || 'info'}] ${msg}`),
-          getLogs: () => logs
-        }
-      }
+      extension: loggerExtension
     })
 
+    type ExtendContext = {
+      auth: ReturnType<typeof authPlugin.extension.factory>
+      logger: ReturnType<typeof loggerPlugin.extension.factory>
+    }
+
     // command using both extensions
-    const multiCommand = define({
+    const multiCommand = define<Args, ExtendContext>({
       name: 'multi',
-      extensions: {
-        auth: authPlugin.extension,
-        logger: loggerPlugin.extension
-      },
       run(ctx) {
-        ctx.ext.logger.log(`User ${ctx.ext.auth.getUser()} executed command`)
-        if (ctx.ext.auth.isAdmin()) {
-          ctx.ext.logger.log('Admin access granted')
+        ctx.extensions.logger.log(`User ${ctx.extensions.auth.getUser()} executed command`)
+        if (ctx.extensions.auth.isAdmin()) {
+          ctx.extensions.logger.log('Admin access granted')
         }
-        return ctx.ext.logger.getLogs().join('; ')
+        return ctx.extensions.logger.getLogs().join('; ')
       }
     })
 
     // create command context directly
     const ctx = await createCommandContext({
-      args: {},
+      args: {} as Args,
       values: { user: 'admin', 'log-level': 'debug' },
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: multiCommand,
+      command: multiCommand as Command<Args>,
+      extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -425,7 +442,7 @@ describe('Plugin Extensions Integration', () => {
 
     const contextPlugin = plugin({
       name: 'context',
-      setup() {},
+      setup: () => {},
       extension(core) {
         capturedContext({
           name: core.name,
@@ -437,24 +454,27 @@ describe('Plugin Extensions Integration', () => {
       }
     })
 
-    const contextCommand = define({
+    const contextCommand = define<
+      Args,
+      { ctx: ReturnType<typeof contextPlugin.extension.factory> }
+    >({
       name: 'ctx-test',
-      extensions: {
-        ctx: contextPlugin.extension
-      },
       run(ctx) {
-        return String(ctx.ext.ctx.captured)
+        return String(ctx.extensions.ctx.captured)
       }
     })
 
     const ctx = await createCommandContext({
-      args: {},
+      args: {} as Args,
       values: {},
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: contextCommand,
+      command: contextCommand as Command<Args>,
+      extensions: {
+        ctx: contextPlugin.extension
+      },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}

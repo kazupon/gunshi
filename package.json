@@ -46,7 +46,7 @@
     "test": "vitest --typecheck run",
     "typecheck": "pnpm run --stream --color \"/^typecheck:/\"",
     "typecheck:deno": "pnpm -r --if-present typecheck:deno",
-    "typecheck:tsc": "tsgo --noEmit --diagnostics"
+    "typecheck:tsc": "tsc --noEmit --diagnostics"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.9",

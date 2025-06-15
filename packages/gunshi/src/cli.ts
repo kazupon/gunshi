@@ -4,7 +4,7 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { Decorators } from './decorators.ts'
 import { PluginContext } from './plugin.ts'
@@ -12,11 +12,13 @@ import { plugins } from './plugins/index.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
 import type { Args, ArgToken } from 'args-tokens'
+import type { Plugin } from './plugin.ts'
 import type {
   CliOptions,
   Command,
   CommandCallMode,
   CommandContext,
+  CommandContextExtension,
   CommandDecorator,
   CommandRunner,
   LazyCommand
@@ -34,25 +36,15 @@ export async function cli<A extends Args = Args>(
   entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
   options: CliOptions<A> = {}
 ): Promise<string | undefined> {
-  const cliOptions = resolveCliOptions(options, entry)
-
   const decorators = new Decorators<A>()
   const pluginContext = new PluginContext<A>(decorators)
-  await applyPlugins(pluginContext)
+  const plugins = await applyPlugins(pluginContext)
 
-  // Set default renderers if not provided via cli options
-  if (cliOptions.renderHeader === undefined) {
-    cliOptions.renderHeader = decorators.getHeaderRenderer()
-  }
-  if (cliOptions.renderUsage === undefined) {
-    cliOptions.renderUsage = decorators.getUsageRenderer()
-  }
-  if (cliOptions.renderValidationErrors === undefined) {
-    cliOptions.renderValidationErrors = decorators.getValidationErrorsRenderer()
-  }
+  const cliOptions = normalizeCliOptions(options, entry, decorators)
 
   const tokens = parseArgs(argv)
   const subCommand = getSubCommand(tokens)
+
   const {
     commandName: name,
     command,
@@ -79,6 +71,7 @@ export async function cli<A extends Args = Args>(
     omitted,
     callMode,
     command,
+    extensions: getPluginExtensions(plugins),
     cliOptions: cliOptions
   })
 
@@ -93,7 +86,7 @@ export async function cli<A extends Args = Args>(
   return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
 
-async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Promise<void> {
+async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Promise<Plugin[]> {
   try {
     // TODO(kazupon): add more user plugins loading logic
     for (const plugin of plugins) {
@@ -108,6 +101,8 @@ async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Pr
   } catch (error: unknown) {
     console.error('Error loading plugin:', (error as Error).message)
   }
+
+  return plugins
 }
 
 function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {
@@ -124,9 +119,10 @@ function resolveArguments<A extends Args>(pluginContext: PluginContext<A>, args?
   return Object.assign(create<A>(), Object.fromEntries(pluginContext.globalOptions), args)
 }
 
-function resolveCliOptions<A extends Args>(
+function normalizeCliOptions<A extends Args>(
   options: CliOptions<A>,
-  entry: Command<A> | CommandRunner<A> | LazyCommand<A>
+  entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
+  decorators: Decorators<A>
 ): CliOptions<A> {
   const subCommands = new Map(options.subCommands)
   if (options.subCommands) {
@@ -137,9 +133,21 @@ function resolveCliOptions<A extends Args>(
       subCommands.set(entry.name, entry)
     }
   }
+
   const resolvedOptions = Object.assign(create<CliOptions<A>>(), COMMAND_OPTIONS_DEFAULT, options, {
     subCommands
   }) as CliOptions<A>
+
+  // set default renderers if not provided via cli options
+  if (resolvedOptions.renderHeader === undefined) {
+    resolvedOptions.renderHeader = decorators.getHeaderRenderer()
+  }
+  if (resolvedOptions.renderUsage === undefined) {
+    resolvedOptions.renderUsage = decorators.getUsageRenderer()
+  }
+  if (resolvedOptions.renderValidationErrors === undefined) {
+    resolvedOptions.renderValidationErrors = decorators.getValidationErrorsRenderer()
+  }
 
   return resolvedOptions
 }
@@ -239,14 +247,34 @@ function resolveEntryName<A extends Args>(entry: Command<A>): string {
   return entry.name || ANONYMOUS_COMMAND_NAME
 }
 
+function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextExtension> {
+  const extensions = create<Record<string, CommandContextExtension>>()
+  const pluginExtensions = plugins
+    .map(plugin => plugin.extension)
+    .filter(Boolean) as CommandContextExtension[]
+  for (const extension of pluginExtensions) {
+    const key = extension.key.description
+    if (key) {
+      if (extensions[key]) {
+        console.warn(
+          `Plugin "${key}" is already installed. ignore it for command context extending.`
+        )
+      } else {
+        extensions[key] = extension
+      }
+    }
+  }
+  return extensions
+}
+
 async function executeCommand<A extends Args = Args>(
   cmd: Command<A> | LazyCommand<A>,
-  ctx: CommandContext<A>,
+  ctx: Readonly<CommandContext<A>>,
   name: string,
   decorators: readonly CommandDecorator<A>[]
 ): Promise<string | undefined> {
   const resolved = isLazyCommand<A>(cmd) ? await resolveLazyCommand<A>(cmd, name, true) : cmd
-  const baseRunner = resolved.run || (() => {})
+  const baseRunner = resolved.run || NOOP
 
   // apply plugin decorators
   const decoratedRunner = decorators.reduceRight(
@@ -255,7 +283,7 @@ async function executeCommand<A extends Args = Args>(
   )
 
   // execute and return result
-  const result = await decoratedRunner(ctx)
+  const result = await decoratedRunner(ctx as Parameters<typeof baseRunner>[0])
 
   // return string if one was returned
   return typeof result === 'string' ? result : undefined
