@@ -36,7 +36,6 @@ import {
 } from './utils.ts'
 
 import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
-import type { PluginWithExtension } from './plugin.ts'
 import type {
   CliOptions,
   Command,
@@ -53,26 +52,12 @@ import type {
 const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 
 /**
- * Extract extensions from plugins
+ * Extract extension return types from extensions record
  * @internal
  */
-export type ExtractPluginsExtensions<P extends readonly PluginWithExtension[]> =
-  P extends readonly []
-    ? {}
-    : P extends readonly [infer First, ...infer Rest]
-      ? First extends PluginWithExtension
-        ? First extends { name: infer N; extension: { factory: infer F } }
-          ? N extends string
-            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              F extends (...args: any) => infer R
-              ? Rest extends readonly PluginWithExtension[]
-                ? { [K in N]: R } & ExtractPluginsExtensions<Rest>
-                : { [K in N]: R }
-              : ExtractPluginsExtensions<Rest extends readonly PluginWithExtension[] ? Rest : []>
-            : ExtractPluginsExtensions<Rest extends readonly PluginWithExtension[] ? Rest : []>
-          : ExtractPluginsExtensions<Rest extends readonly PluginWithExtension[] ? Rest : []>
-        : ExtractPluginsExtensions<Rest extends readonly PluginWithExtension[] ? Rest : []>
-      : {}
+export type ExtractExtensions<E extends Record<string, CommandContextExtension>> = {
+  [K in keyof E]: E[K] extends CommandContextExtension<infer T> ? T : never
+}
 
 /**
  * Parameters of {@link createCommandContext}
@@ -80,7 +65,8 @@ export type ExtractPluginsExtensions<P extends readonly PluginWithExtension[]> =
 interface CommandContextParams<
   A extends Args,
   V extends ArgValues<A>,
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A> = Command<A>
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A> = Command<A>,
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > {
   /**
    * An arguments of target command
@@ -121,7 +107,7 @@ interface CommandContextParams<
   /**
    * Plugin extensions to apply as the command context extension.
    */
-  extensions: Record<string, CommandContextExtension>
+  extensions?: E
   /**
    * A command options, which is spicialized from `cli` function
    */
@@ -137,7 +123,7 @@ export async function createCommandContext<
   A extends Args = Args,
   V extends ArgValues<A> = ArgValues<A>,
   C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>, // eslint-disable-line @typescript-eslint/no-explicit-any
-  P extends readonly PluginWithExtension[] = readonly PluginWithExtension[]
+  E extends Record<string, CommandContextExtension> = {}
 >({
   args,
   values,
@@ -146,14 +132,14 @@ export async function createCommandContext<
   argv,
   tokens,
   command,
-  extensions,
+  extensions = {} as E,
   cliOptions,
   callMode = 'entry',
   omitted = false
-}: CommandContextParams<A, V, C>): Promise<
-  P extends readonly []
+}: CommandContextParams<A, V, C, E>): Promise<
+  {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<A>>
-    : Readonly<CommandContext<A, ExtractPluginsExtensions<P>>>
+    : Readonly<CommandContext<A, ExtractExtensions<E>>>
 > {
   /**
    * normailize the options schema and values, to avoid prototype pollution
@@ -320,9 +306,9 @@ export async function createCommandContext<
     adapter.setResource(localeStr, resource)
   }
 
-  return ctx as P extends readonly []
+  return ctx as {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<A>>
-    : Readonly<CommandContext<A, ExtractPluginsExtensions<P>>>
+    : Readonly<CommandContext<A, ExtractExtensions<E>>>
 }
 
 function getCommandName<A extends Args>(

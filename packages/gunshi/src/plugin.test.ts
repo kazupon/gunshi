@@ -7,7 +7,7 @@ import { PluginContext, plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
 import type { Plugin } from './plugin.ts'
-import type { CommandContextCore, ExtendedCommand } from './types.ts'
+import type { CommandContextCore } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -326,10 +326,8 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command: { ...testCommand, extensions: { test: testPlugin.extension } } as ExtendedCommand<
-        typeof args,
-        { test: typeof testPlugin.extension }
-      >,
+      command: testCommand,
+      extensions: { test: testPlugin.extension },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -393,16 +391,8 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command: {
-        ...multiCommand,
-        extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension }
-      } as ExtendedCommand<
-        Args,
-        {
-          auth: typeof authPlugin.extension
-          logger: typeof loggerPlugin.extension
-        }
-      >,
+      command: multiCommand,
+      extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -480,10 +470,10 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command: {
-        ...contextCommand,
-        extensions: { ctx: contextPlugin.extension }
-      } as ExtendedCommand<Args, { ctx: typeof contextPlugin.extension }>,
+      command: contextCommand,
+      extensions: {
+        ctx: contextPlugin.extension
+      },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}

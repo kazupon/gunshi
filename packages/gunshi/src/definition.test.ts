@@ -3,7 +3,7 @@ import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
 
 import type { Args } from 'args-tokens'
-import type { CommandContextExtension, CommandRunner, ExtendedCommand } from './types.ts'
+import type { CommandRunner } from './types.ts'
 
 // eslint-disable-next-line vitest/expect-expect
 test('define', async () => {
@@ -256,34 +256,5 @@ describe('lazy with type parameters', () => {
     const lazyCmd = lazy(loader)
 
     expect(typeof lazyCmd).toBe('function')
-  })
-})
-
-describe('ExtendedCommand type', () => {
-  test('type safety with multiple extensions', () => {
-    const ext1: CommandContextExtension<{ value1: string }> = {
-      key: Symbol('ext1'),
-      factory: () => ({ value1: 'test1' })
-    }
-
-    const ext2: CommandContextExtension<{ value2: number }> = {
-      key: Symbol('ext2'),
-      factory: () => ({ value2: 42 })
-    }
-
-    const command: ExtendedCommand<Args, { ext1: typeof ext1; ext2: typeof ext2 }> = {
-      name: 'multi-ext',
-      extensions: { ext1, ext2 },
-      run: async ctx => {
-        // properly type ctx.extensions
-        const v1: string = ctx.extensions.ext1.value1
-        const v2: number = ctx.extensions.ext2.value2
-        return `${v1} - ${v2}`
-      }
-    }
-
-    expect(command.extensions).toBeDefined()
-    expect(command.extensions.ext1).toBe(ext1)
-    expect(command.extensions.ext2).toBe(ext2)
   })
 })

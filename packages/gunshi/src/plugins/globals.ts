@@ -78,7 +78,6 @@ const _definition = plugin({
 
     // apply help and version decorators
     ctx.decorateCommand(baseRunner => async ctx => {
-      console.log('globals decorator', ctx)
       const {
         values,
         extensions: {
