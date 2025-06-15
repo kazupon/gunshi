@@ -118,22 +118,24 @@ describe('plugin function', () => {
       isEnabled: true
     }))
 
-    const setupFn = vi.fn(async (ctx: PluginContext<Args, ReturnType<typeof extensionFactory>>) => {
-      ctx.addGlobalOption('test', { type: 'string' })
-    })
+    const setupFn = vi.fn(
+      async (ctx: PluginContext<Args, { test: ReturnType<typeof extensionFactory> }>) => {
+        ctx.addGlobalOption('test', { type: 'string' })
+      }
+    )
 
     const testPlugin = plugin({
-      name: 'test-plugin',
+      name: 'test',
       setup: setupFn,
       extension: extensionFactory
     })
 
     // check plugin properties
-    expect(testPlugin.name).toBe('test-plugin')
+    expect(testPlugin.name).toBe('test')
     expect(testPlugin.extension).toBeDefined()
     expect(testPlugin.extension.key).toBeDefined()
     expect(typeof testPlugin.extension.key).toBe('symbol')
-    expect(testPlugin.extension.key.description).toBe('test-plugin')
+    expect(testPlugin.extension.key.description).toBe('test')
     expect(testPlugin.extension.factory).toBe(extensionFactory)
 
     // check that setup function is callable
@@ -172,18 +174,22 @@ describe('plugin function', () => {
     }))
 
     const testPlugin = plugin({
-      name: 'auth-plugin',
+      name: 'auth',
       extension: extensionFactory,
       async setup(ctx) {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
-          const user = cmdCtx.extensions.user
-          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<ReturnType<typeof extensionFactory>>()
+          const user = cmdCtx.extensions.auth.user
+          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{
+            auth: ReturnType<typeof extensionFactory>
+          }>()
           console.log(`User: ${user.name} (${user.id})`)
           return await baseRenderer(cmdCtx)
         })
         ctx.decorateCommand(baseRunner => async ctx => {
-          expectTypeOf(ctx.extensions).toEqualTypeOf<ReturnType<typeof extensionFactory>>()
+          expectTypeOf(ctx.extensions).toEqualTypeOf<{
+            auth: ReturnType<typeof extensionFactory>
+          }>()
           const result = await baseRunner(ctx)
           return `[AUTH] ${result}`
         })
@@ -201,7 +207,7 @@ describe('plugin function', () => {
 
   test('not receives correct context via extension', async () => {
     const testPlugin = plugin({
-      name: 'auth-plugin',
+      name: 'auth',
       setup: async ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateUsageRenderer(async (baseRenderer, cmdCtx) => {

@@ -188,25 +188,29 @@ export interface PluginWithoutExtension<E extends ExtendContext = {}> extends Pl
  * Create a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
  */
-export function plugin<E extends ExtendContext = {}>(options: {
-  name: string
-  setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
+export function plugin<N extends string, E extends ExtendContext = {}>(options: {
+  name: N
+  setup: (ctx: PluginContext<Args, { [K in N]: E }>) => Awaitable<void>
   extension: PluginExtension<E, Args>
 }): PluginWithExtension<E>
 
 export function plugin(options: {
   name: string
-  setup: (ctx: PluginContext<Args>) => Awaitable<void>
-}): PluginWithoutExtension
+  setup: (ctx: PluginContext<Args, {}>) => Awaitable<void>
+}): PluginWithoutExtension<{}>
 
-export function plugin(
-  options: PluginOptions
+export function plugin<N extends string, E extends ExtendContext = {}>(
+  options: {
+    name: N
+    setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
+    extension?: PluginExtension<E, Args>
+  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   const { name, setup, extension } = options
 
   // create a wrapper function with properties
-  const pluginFn = async (ctx: PluginContext) => await setup(ctx)
+  const pluginFn = async (ctx: PluginContext<Args, E>) => await setup(ctx)
 
   // define the properties
   return Object.defineProperties(pluginFn, {

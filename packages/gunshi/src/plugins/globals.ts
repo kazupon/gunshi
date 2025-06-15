@@ -67,7 +67,7 @@ const extension = (ctx: CommandContextCore) => ({
 /**
  * Built-in global options plugin for Gunshi.
  */
-// @ts-ignore -- FIXME(kazupon): this is a plugin definition, not a function
+// @ts-ignore -- TODO(kazupon): after plugin refactor, remove this
 const _definition = plugin({
   name: 'globals',
   extension,
@@ -81,7 +81,9 @@ const _definition = plugin({
       console.log('globals decorator', ctx)
       const {
         values,
-        extensions: { showVersion, showHeader, showUsage }
+        extensions: {
+          globals: { showVersion, showHeader, showUsage }
+        }
       } = ctx
 
       if (values.version) {
