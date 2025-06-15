@@ -523,15 +523,12 @@ describe('plugin extensions', () => {
     }
 
     const args = { token: { type: 'string' as const } }
-    const command: Command<
-      typeof args
-      // { auth: CommandContextExtension<AuthExtension>; db: CommandContextExtension<DbExtension> }
-    > = {
+    const command: Command<typeof args, { auth: AuthExtension; db: DbExtension }> = {
       name: 'test-cmd',
       args,
-      run: async _ctx => {
+      run: async ctx => {
         // access extensions
-        // return `${ctx.extensions.auth.user.name} - ${ctx.extensions.db.connected}`
+        return `${ctx.extensions.auth.user.name} - ${ctx.extensions.db.connected}`
       }
     }
 
@@ -542,7 +539,7 @@ describe('plugin extensions', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command,
+      command: command as Command<typeof args>,
       extensions: {
         auth: authExtension,
         db: dbExtension
