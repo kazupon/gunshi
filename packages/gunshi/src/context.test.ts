@@ -19,7 +19,6 @@ import type {
   CommandContextExtension,
   CommandResource,
   CommandResourceFetcher,
-  ExtendedCommand,
   LazyCommand
 } from './types.ts'
 
@@ -72,6 +71,7 @@ test('basic', async () => {
     omitted: true,
     callMode: 'entry',
     command,
+    extensions: {},
     cliOptions: {
       cwd: '/path/to/cmd1',
       description: 'this is command line',
@@ -162,6 +162,7 @@ test('default', async () => {
     argv: ['bar'],
     tokens: [], // dummy, due to test
     command,
+    extensions: {},
     omitted: false,
     callMode: 'entry',
     cliOptions: {}
@@ -209,6 +210,7 @@ describe('translation', () => {
       argv: ['bar'],
       tokens: [], // dummy, due to test
       command,
+      extensions: {},
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -270,6 +272,7 @@ describe('translation', () => {
       argv: ['bar'],
       tokens: [], // dummy, due to test
       command,
+      extensions: {},
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -345,6 +348,7 @@ describe('translation', () => {
       argv: ['bar'],
       tokens: [], // dummy, due to test
       command,
+      extensions: {},
       omitted: false,
       callMode: 'entry',
       cliOptions: {
@@ -417,6 +421,7 @@ describe('translation adapter', () => {
       argv: ['bar'],
       tokens: [], // dummy, due to test
       command,
+      extensions: {},
       omitted: false,
       callMode: 'entry',
       cliOptions: {
@@ -474,6 +479,7 @@ describe('translation adapter', () => {
       argv: ['bar'],
       tokens: [], // dummy, due to test
       command,
+      extensions: {},
       omitted: false,
       callMode: 'entry',
       cliOptions: {
@@ -488,7 +494,7 @@ describe('translation adapter', () => {
   })
 })
 
-describe('createCommandContext with extensions', () => {
+describe('plugin extensions', () => {
   test('applies extensions to context', async () => {
     type AuthExtension = {
       user: { id: number; name: string }
@@ -517,19 +523,15 @@ describe('createCommandContext with extensions', () => {
     }
 
     const args = { token: { type: 'string' as const } }
-    const command: ExtendedCommand<
-      typeof args,
-      { auth: CommandContextExtension<AuthExtension>; db: CommandContextExtension<DbExtension> }
+    const command: Command<
+      typeof args
+      // { auth: CommandContextExtension<AuthExtension>; db: CommandContextExtension<DbExtension> }
     > = {
       name: 'test-cmd',
       args,
-      extensions: {
-        auth: authExtension,
-        db: dbExtension
-      },
-      run: async ctx => {
+      run: async _ctx => {
         // access extensions
-        return `${ctx.extensions.auth.user.name} - ${ctx.extensions.db.connected}`
+        // return `${ctx.extensions.auth.user.name} - ${ctx.extensions.db.connected}`
       }
     }
 
@@ -541,6 +543,10 @@ describe('createCommandContext with extensions', () => {
       argv: [],
       tokens: [],
       command,
+      extensions: {
+        auth: authExtension,
+        db: dbExtension
+      },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -572,7 +578,7 @@ describe('createCommandContext with extensions', () => {
     )
   })
 
-  test('multiple extensions', async () => {
+  test('multiple plugin extensions', async () => {
     const extensions = {
       ext1: {
         key: Symbol('ext1'),
@@ -588,9 +594,8 @@ describe('createCommandContext with extensions', () => {
       }
     }
 
-    const command: ExtendedCommand<Args, typeof extensions> = {
+    const command: Command<Args> = {
       name: 'multi-ext',
-      extensions,
       run: async _ctx => 'done'
     }
 
@@ -602,6 +607,7 @@ describe('createCommandContext with extensions', () => {
       argv: [],
       tokens: [],
       command,
+      extensions,
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -640,15 +646,8 @@ describe('createCommandContext with extensions', () => {
       }
     }
 
-    const extensions: Record<string, CommandContextExtension> = {
-      ext1,
-      ext2,
-      ext3
-    }
-
-    const command: ExtendedCommand<Args, typeof extensions> = {
+    const command: Command<Args> = {
       name: 'order-test',
-      extensions: extensions,
       run: async _ctx => 'done'
     }
 
@@ -660,6 +659,11 @@ describe('createCommandContext with extensions', () => {
       argv: [],
       tokens: [],
       command,
+      extensions: {
+        ext1,
+        ext2,
+        ext3
+      },
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -685,6 +689,7 @@ describe('createCommandContext with extensions', () => {
       argv: [],
       tokens: [],
       command,
+      extensions: {},
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
@@ -724,11 +729,10 @@ describe('createCommandContext with extensions', () => {
     }
 
     const args = { opt: { type: 'string' as const } }
-    const command: ExtendedCommand<typeof args> = {
+    const command: Command<typeof args> = {
       name: 'context-test',
       description: 'Test command',
       args,
-      extensions: { test: testExtension },
       run: async _ctx => 'done'
     }
 
@@ -740,6 +744,9 @@ describe('createCommandContext with extensions', () => {
       argv: ['test', 'pos1', 'pos2', '--opt', 'value', '--', 'rest1'],
       tokens: [],
       command,
+      extensions: {
+        test: testExtension
+      },
       omitted: false,
       callMode: 'entry',
       cliOptions: { name: 'test-cli' }
@@ -774,6 +781,7 @@ describe('CommandContextCore type', () => {
       argv: [],
       tokens: [],
       command,
+      extensions: {},
       omitted: false,
       callMode: 'entry',
       cliOptions: {}
