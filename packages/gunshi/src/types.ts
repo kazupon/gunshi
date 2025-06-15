@@ -384,19 +384,6 @@ export interface Command<A extends Args = Args, E extends ExtendContext = {}> {
 }
 
 /**
- * Extended command type with extension support
- */
-export interface ExtendedCommand<
-  A extends Args = Args,
-  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
-> extends Omit<Command<A>, 'run'> {
-  extensions: E
-  run?: (
-    ctx: Readonly<CommandContext<A, ExtractCommandContextExtension<E>>>
-  ) => Awaitable<void | string>
-}
-
-/**
  * Extract command context extension
  * @internal
  */

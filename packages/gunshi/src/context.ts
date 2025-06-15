@@ -42,10 +42,10 @@ import type {
   CommandBuiltinKeys,
   CommandCallMode,
   CommandContext,
+  CommandContextCore,
   CommandContextExtension,
   CommandEnvironment,
   CommandResource,
-  ExtendedCommand,
   LazyCommand
 } from './types.ts'
 
@@ -65,7 +65,7 @@ export type ExtractExtensions<E extends Record<string, CommandContextExtension>>
 interface CommandContextParams<
   A extends Args,
   V extends ArgValues<A>,
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A> = Command<A>,
+  C extends Command<A> | LazyCommand<A> = Command<A>,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > {
   /**
@@ -122,7 +122,7 @@ interface CommandContextParams<
 export async function createCommandContext<
   A extends Args = Args,
   V extends ArgValues<A> = ArgValues<A>,
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>, // eslint-disable-line @typescript-eslint/no-explicit-any
+  C extends Command<A> | LazyCommand<A> = Command<A>,
   E extends Record<string, CommandContextExtension> = {}
 >({
   args,
@@ -259,7 +259,7 @@ export async function createCommandContext<
   if (Object.keys(extensions).length > 0) {
     const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
     for (const [key, extension] of Object.entries(extensions)) {
-      ext[key] = extension.factory(core)
+      ext[key] = extension.factory(core as unknown as CommandContextCore)
     }
 
     // create extended context with extensions
@@ -311,10 +311,7 @@ export async function createCommandContext<
     : Readonly<CommandContext<A, ExtractExtensions<E>>>
 }
 
-function getCommandName<A extends Args>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cmd: Command<A> | LazyCommand<A> | ExtendedCommand<A, any>
-): string {
+function getCommandName<A extends Args>(cmd: Command<A> | LazyCommand<A>): string {
   if (isLazyCommand<A>(cmd)) {
     return cmd.commandName || cmd.name || ANONYMOUS_COMMAND_NAME
   } else if (typeof cmd === 'object') {
@@ -334,8 +331,7 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
 
 async function loadCommandResource<A extends Args>(
   ctx: CommandContext<A>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  command: Command<A> | ExtendedCommand<A, any> | LazyCommand<A>
+  command: Command<A> | LazyCommand<A>
 ): Promise<CommandResource<A> | undefined> {
   let resource: CommandResource<A> | undefined
   try {

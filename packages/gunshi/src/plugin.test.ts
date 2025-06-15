@@ -7,7 +7,7 @@ import { PluginContext, plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
 import type { Plugin } from './plugin.ts'
-import type { CommandContextCore } from './types.ts'
+import type { Command, CommandContextCore } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -301,7 +301,8 @@ describe('Plugin Extensions Integration', () => {
     })
 
     const args = {
-      num: { type: 'number', default: 5 }
+      num: { type: 'number', default: 5 },
+      'test-opt': { type: 'string', default: 'custom' }
     } satisfies Args
 
     type TestExtension = ReturnType<typeof testPlugin.extension.factory>
@@ -320,13 +321,13 @@ describe('Plugin Extensions Integration', () => {
 
     // create command context directly
     const ctx = await createCommandContext({
-      args: { num: { type: 'number', default: 5 } },
+      args,
       values: { 'test-opt': 'custom', num: 5 },
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: testCommand,
+      command: testCommand as Command<typeof args>,
       extensions: { test: testPlugin.extension },
       omitted: false,
       callMode: 'entry',
@@ -385,13 +386,13 @@ describe('Plugin Extensions Integration', () => {
 
     // create command context directly
     const ctx = await createCommandContext({
-      args: {},
+      args: {} as Args,
       values: { user: 'admin', 'log-level': 'debug' },
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: multiCommand,
+      command: multiCommand as Command<Args>,
       extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension },
       omitted: false,
       callMode: 'entry',
@@ -464,13 +465,13 @@ describe('Plugin Extensions Integration', () => {
     })
 
     const ctx = await createCommandContext({
-      args: {},
+      args: {} as Args,
       values: {},
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: contextCommand,
+      command: contextCommand as Command<Args>,
       extensions: {
         ctx: contextPlugin.extension
       },

@@ -529,9 +529,9 @@ describe('plugin extensions', () => {
     > = {
       name: 'test-cmd',
       args,
-      run: async ctx => {
+      run: async _ctx => {
         // access extensions
-        return `${ctx.extensions.auth.user.name} - ${ctx.extensions.db.connected}`
+        // return `${ctx.extensions.auth.user.name} - ${ctx.extensions.db.connected}`
       }
     }
 
