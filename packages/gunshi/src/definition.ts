@@ -14,10 +14,12 @@
  * @license MIT
  */
 
+import type { Args } from 'args-tokens'
 import type {
   Command,
   CommandLoader,
   DefaultGunshiParams,
+  ExtendContext,
   GunshiParams,
   LazyCommand
 } from './types.ts'
@@ -28,6 +30,21 @@ export type { Args, ArgSchema, ArgValues } from 'args-tokens'
  * Define a {@link Command | command}
  * @param definition A {@link Command | command} definition
  */
+// Overload for args with explicit type (improved type inference for ArgValues)
+export function define<A extends Args>(
+  definition: Command<GunshiParams<{ args: A; extensions: {} }>> & { args: A }
+): Command<GunshiParams<{ args: A; extensions: {} }>>
+
+// Overload for extensions only
+export function define<E extends ExtendContext>(
+  definition: Command<GunshiParams<{ args: Args; extensions: E }>>
+): Command<GunshiParams<{ args: Args; extensions: E }>>
+
+// Generic overload (default)
+export function define<G extends GunshiParams = DefaultGunshiParams>(
+  definition: Command<G>
+): Command<G>
+
 export function define<G extends GunshiParams = DefaultGunshiParams>(
   definition: Command<G>
 ): Command<G> {

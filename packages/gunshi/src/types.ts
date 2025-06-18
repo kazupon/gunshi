@@ -10,8 +10,13 @@ import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants
 export type Awaitable<T> = T | Promise<T>
 
 /**
+ * Extend command context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
+ */
+export type ExtendContext = Record<string, unknown>
+
+/**
  * Gunshi unified parameter type.
- * This type combines both argument definitions and context extensions.
+ * This type combines both argument definitions and command context extensions.
  */
 export interface GunshiParams<
   P extends {
@@ -102,11 +107,6 @@ export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
   KeyOfArgs<RemovedIndex<A>>,
   typeof ARG_PREFIX
 >
-
-/**
- * Extend context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
- */
-export type ExtendContext = Record<string, unknown>
 
 /**
  * Command environment.
@@ -373,7 +373,9 @@ export type CommandContextCore<G extends GunshiParams<any> = DefaultGunshiParams
 /**
  * Command context extension
  */
-export interface CommandContextExtension<E extends ExtendContext = {}> {
+export interface CommandContextExtension<
+  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
+> {
   readonly key: symbol
   readonly factory: (core: CommandContextCore) => E
 }

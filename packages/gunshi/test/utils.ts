@@ -181,12 +181,15 @@ export function createMockCommandContext<E extends ExtendContext = {}>(
   }
 
   if (extensions) {
-    const extensions = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const extensionsObj = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
     for (const [key, extension] of Object.entries(extensions)) {
-      extensions[key] = (extension as CommandContextExtension).factory(ctx)
+      extensionsObj[key] = (extension as CommandContextExtension).factory(ctx)
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ctx = Object.assign(create<any>(), ctx, { extensions })
+    ctx = Object.assign(create<any>(), ctx, { extensions: extensionsObj })
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ctx = Object.assign(create<any>(), ctx, { extensions: {} })
   }
 
   return ctx as CommandContext<GunshiParams<{ args: Args; extensions: E }>>

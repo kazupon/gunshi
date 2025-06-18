@@ -416,7 +416,7 @@ describe('Plugin Extensions Integration', () => {
         upper: { type: 'boolean', default: false }
       },
       run(ctx) {
-        return ctx.values.upper ? ctx.values.msg!.toUpperCase() : ctx.values.msg!
+        return ctx.values.upper ? ctx.values.msg.toUpperCase() : ctx.values.msg
       }
     })
 
