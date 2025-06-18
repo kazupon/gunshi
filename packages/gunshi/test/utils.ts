@@ -21,6 +21,8 @@ import type {
   TranslationAdapterFactoryOptions
 } from '../src/types.ts'
 
+type NoExt = Record<never, never>
+
 export function defineMockLog(utils: typeof import('../src/utils.ts')) {
   const logs: unknown[] = []
   vi.spyOn(utils, 'log').mockImplementation((...args: unknown[]) => {
@@ -143,7 +145,7 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
   }
 }
 
-export function createMockCommandContext<E extends ExtendContext = {}>(
+export function createMockCommandContext<E extends ExtendContext = NoExt>(
   extensions?: Record<string, CommandContextExtension>
 ): CommandContext<GunshiParams<{ args: Args; extensions: E }>> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
