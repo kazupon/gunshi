@@ -13,24 +13,28 @@ import type {
   CommandBuiltinResourceKeys,
   CommandContext,
   CommandExamplesFetcher,
+  DefaultGunshiParams,
   GenerateNamespacedKey,
+  GunshiParams,
   KeyOfArgs,
   LazyCommand,
   RemovedIndex
 } from './types.ts'
 
-export function isLazyCommand<A extends Args = Args>(cmd: unknown): cmd is LazyCommand<A> {
+export function isLazyCommand<G extends GunshiParams = DefaultGunshiParams>(
+  cmd: unknown
+): cmd is LazyCommand<G> {
   return typeof cmd === 'function' && 'commandName' in cmd && !!cmd.commandName
 }
 
-export async function resolveLazyCommand<A extends Args = Args>(
-  cmd: Commandable<A>,
+export async function resolveLazyCommand<G extends GunshiParams = DefaultGunshiParams>(
+  cmd: Commandable<G>,
   name?: string | undefined,
   needRunResolving: boolean = false
-): Promise<Command<A>> {
-  let command: Command<A> | undefined
-  if (isLazyCommand<A>(cmd)) {
-    command = Object.assign(create<Command<A>>(), {
+): Promise<Command<G>> {
+  let command: Command<G> | undefined
+  if (isLazyCommand<G>(cmd)) {
+    command = Object.assign(create<Command<G>>(), {
       name: cmd.commandName,
       description: cmd.description,
       args: cmd.args,
@@ -57,7 +61,7 @@ export async function resolveLazyCommand<A extends Args = Args>(
       }
     }
   } else {
-    command = Object.assign(create<Command<A>>(), cmd)
+    command = Object.assign(create<Command<G>>(), cmd)
   }
 
   if (command.name == null && name) {
@@ -79,9 +83,9 @@ export function resolveArgKey<A extends Args = {}, K extends string = KeyOfArgs<
   return `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
-export async function resolveExamples<A extends Args = Args>(
-  ctx: Readonly<CommandContext<A>>,
-  examples?: string | CommandExamplesFetcher<A>
+export async function resolveExamples<G extends GunshiParams = DefaultGunshiParams>(
+  ctx: Readonly<CommandContext<G>>,
+  examples?: string | CommandExamplesFetcher<G>
 ): Promise<string> {
   return typeof examples === 'string'
     ? examples

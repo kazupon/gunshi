@@ -1,4 +1,4 @@
-import type { Command } from '../../src/types.ts'
+import type { Command, GunshiParams } from '../../src/types.ts'
 
 const args = {
   catalog: {
@@ -22,7 +22,7 @@ const args = {
   }
 } as const
 
-const command: Command<typeof args> = {
+const command: Command<GunshiParams<{ args: typeof args }>> = {
   name: 'register',
   description: 'Register the dependency to the catalog',
   args,

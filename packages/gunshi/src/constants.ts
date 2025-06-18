@@ -3,8 +3,7 @@
  * @license MIT
  */
 
-import type { Args } from 'args-tokens'
-import type { CliOptions } from './types.ts'
+import type { CliOptions, DefaultGunshiParams } from './types.ts'
 
 /**
  * The default locale string, which format is BCP 47 language tag.
@@ -47,7 +46,7 @@ export const COMMON_ARGS: CommonArgType = {
   }
 }
 
-export const COMMAND_OPTIONS_DEFAULT: CliOptions<Args> = {
+export const COMMAND_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   name: undefined,
   description: undefined,
   version: undefined,

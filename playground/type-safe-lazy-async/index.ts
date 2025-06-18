@@ -1,6 +1,6 @@
 import { cli, define, lazy } from 'gunshi'
 
-import type { CommandContext, CommandRunner } from 'gunshi'
+import type { CommandContext, CommandRunner, GunshiParams } from 'gunshi'
 
 // Define the command definition with define function
 const helloDefinition = define({
@@ -21,7 +21,7 @@ type HelloArgs = NonNullable<typeof helloDefinition.args>
 // Define the loader function
 // It must return a function matching CommandRunner<HelloArgs>
 // or a Command<HelloArgs> containing a 'run' function.
-const helloLoader = async (): Promise<CommandRunner<HelloArgs>> => {
+const helloLoader = async (): Promise<CommandRunner<GunshiParams<{ args: HelloArgs }>>> => {
   console.log('Loading typed hello runner...')
   // Simulate loading delay
   await new Promise(resolve => setTimeout(resolve, 500))
@@ -29,7 +29,7 @@ const helloLoader = async (): Promise<CommandRunner<HelloArgs>> => {
   // return run
 
   // Define typed runner inline
-  const run = (ctx: CommandContext<HelloArgs>) => {
+  const run = (ctx: CommandContext<GunshiParams<{ args: HelloArgs }>>) => {
     // ctx.values is properly typed based on HelloArgs
     console.log(`Hello, ${ctx.values.name}! (Typed)`)
   }

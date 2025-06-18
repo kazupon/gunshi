@@ -6,10 +6,11 @@
 import { COMMON_ARGS } from '../constants.ts'
 import { plugin } from '../plugin.ts'
 
-import type { Awaitable, CommandContextCore } from '../types.ts'
+import type { Awaitable, CommandContextCore, DefaultGunshiParams } from '../types.ts'
 
 /**
  * Extended command context which provides utilities via global options plugin.
+ * These utilities are available via `CommnandContext.extensions.globals`.
  */
 export interface GlobalsCommandContext {
   /**
@@ -32,7 +33,7 @@ export interface GlobalsCommandContext {
 /**
  * Extension for the global options plugin.
  */
-const extension = (ctx: CommandContextCore) => ({
+const extension = (ctx: CommandContextCore<DefaultGunshiParams>) => ({
   showVersion: () => {
     const version = ctx.env.version || 'unknown'
     if (!ctx.env.usageSilent) {
@@ -75,12 +76,12 @@ export default plugin({
 
     // apply help and version decorators
     ctx.decorateCommand(baseRunner => async ctx => {
-      const {
-        values,
-        extensions: {
-          globals: { showVersion, showHeader, showUsage }
-        }
-      } = ctx
+      const { values } = ctx
+      const globals = (ctx.extensions as unknown as { globals: GlobalsCommandContext })?.globals
+      if (!globals) {
+        return baseRunner(ctx)
+      }
+      const { showVersion, showHeader, showUsage } = globals
 
       if (values.version) {
         return showVersion()

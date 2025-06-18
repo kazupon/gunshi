@@ -19,6 +19,8 @@ import type {
   CommandContextExtension,
   CommandResource,
   CommandResourceFetcher,
+  DefaultGunshiParams,
+  GunshiParams,
   LazyCommand
 } from './types.ts'
 
@@ -53,9 +55,12 @@ test('basic', async () => {
     args,
     examples: 'examples',
     run: vi.fn()
-  } satisfies Command<typeof args>
+  } satisfies Command<GunshiParams<{ args: typeof args }>>
 
-  const subCommands = new Map<string, Command<Args> | LazyCommand<Args>>()
+  const subCommands = new Map<
+    string,
+    Command<GunshiParams<Args>> | LazyCommand<GunshiParams<Args>>
+  >()
   subCommands.set('cmd2', { name: 'cmd2', run: vi.fn() })
 
   const mockRenderUsage = vi.fn()
@@ -262,7 +267,7 @@ describe('translation', () => {
       description: 'this is cmd1',
       examples: 'this is an cmd1 example',
       run: vi.fn()
-    } satisfies Command<Args>
+    } satisfies Command<GunshiParams<Args>>
 
     const ctx = await createCommandContext({
       args,
@@ -320,17 +325,19 @@ describe('translation', () => {
       'arg:no-qux': 'これは qux オプションの否定形です',
       examples: 'これはコマンド1の例です',
       test: 'これはテストです'
-    } satisfies CommandResource<typeof args>
+    } satisfies CommandResource<GunshiParams<{ args: typeof args }>>
 
     const loadLocale = 'ja-JP'
 
-    using mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
-      if (ctx.locale.toString() === loadLocale) {
-        return Promise.resolve(jaJPResource)
-      } else {
-        throw new Error('not found')
-      }
-    })
+    using mockResource = vi
+      .fn<CommandResourceFetcher<GunshiParams<{ args: typeof args }>>>()
+      .mockImplementation(ctx => {
+        if (ctx.locale.toString() === loadLocale) {
+          return Promise.resolve(jaJPResource)
+        } else {
+          throw new Error('not found')
+        }
+      })
 
     const command = {
       name: 'cmd1',
@@ -338,9 +345,9 @@ describe('translation', () => {
       examples: 'this is an cmd1 example',
       run: vi.fn(),
       resource: mockResource
-    } satisfies Command<typeof args>
+    } satisfies Command<GunshiParams<{ args: typeof args }>>
 
-    const ctx = await createCommandContext({
+    const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
       values: { foo: 'foo', bar: true, baz: 42 },
       positionals: ['bar'],
@@ -393,17 +400,19 @@ describe('translation adapter', () => {
       'arg:foo': 'これは foo オプションです',
       examples: 'これはコマンド1の例です',
       user: 'こんにちは、{$user}'
-    } satisfies CommandResource<typeof args>
+    } satisfies CommandResource<GunshiParams<{ args: typeof args }>>
 
     const loadLocale = 'ja-JP'
 
-    using mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
-      if (ctx.locale.toString() === loadLocale) {
-        return Promise.resolve(jaJPResource)
-      } else {
-        throw new Error('not found')
-      }
-    })
+    using mockResource = vi
+      .fn<CommandResourceFetcher<GunshiParams<{ args: typeof args }>>>()
+      .mockImplementation(ctx => {
+        if (ctx.locale.toString() === loadLocale) {
+          return Promise.resolve(jaJPResource)
+        } else {
+          throw new Error('not found')
+        }
+      })
 
     const command = {
       name: 'cmd1',
@@ -411,11 +420,11 @@ describe('translation adapter', () => {
       examples: 'this is an cmd1 example',
       run: vi.fn(),
       resource: mockResource
-    } satisfies Command<typeof args>
+    } satisfies Command<GunshiParams<{ args: typeof args }>>
 
-    const ctx = await createCommandContext({
+    const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
-      values: { foo: 'foo', bar: true, baz: 42 },
+      values: { foo: 'foo' },
       positionals: ['bar'],
       rest: [],
       argv: ['bar'],
@@ -451,17 +460,19 @@ describe('translation adapter', () => {
       'arg:foo': 'これは foo オプションです',
       examples: 'これはコマンド1の例です',
       user: 'こんにちは、{user}'
-    } satisfies CommandResource<typeof args>
+    } satisfies CommandResource<GunshiParams<{ args: typeof args }>>
 
     const loadLocale = 'ja-JP'
 
-    using mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
-      if (ctx.locale.toString() === loadLocale) {
-        return Promise.resolve(jaJPResource)
-      } else {
-        throw new Error('not found')
-      }
-    })
+    using mockResource = vi
+      .fn<CommandResourceFetcher<GunshiParams<{ args: typeof args }>>>()
+      .mockImplementation(ctx => {
+        if (ctx.locale.toString() === loadLocale) {
+          return Promise.resolve(jaJPResource)
+        } else {
+          throw new Error('not found')
+        }
+      })
 
     const command = {
       name: 'cmd1',
@@ -469,11 +480,11 @@ describe('translation adapter', () => {
       examples: 'this is an cmd1 example',
       run: vi.fn(),
       resource: mockResource
-    } satisfies Command<typeof args>
+    } satisfies Command<GunshiParams<{ args: typeof args }>>
 
-    const ctx = await createCommandContext({
+    const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
-      values: { foo: 'foo', bar: true, baz: 42 },
+      values: { foo: 'foo' },
       positionals: ['bar'],
       rest: [],
       argv: ['bar'],
@@ -523,7 +534,9 @@ describe('plugin extensions', () => {
     }
 
     const args = { token: { type: 'string' as const } }
-    const command: Command<typeof args, { auth: AuthExtension; db: DbExtension }> = {
+    const command: Command<
+      GunshiParams<{ args: typeof args; extensions: { auth: AuthExtension; db: DbExtension } }>
+    > = {
       name: 'test-cmd',
       args,
       run: async ctx => {
@@ -532,14 +545,16 @@ describe('plugin extensions', () => {
       }
     }
 
-    const ctx = await createCommandContext({
+    const ctx = await createCommandContext<
+      GunshiParams<{ args: typeof args; extensions: { auth: AuthExtension; db: DbExtension } }>
+    >({
       args,
       values: { token: 'test-token' },
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: command as Command<typeof args>,
+      command,
       extensions: {
         auth: authExtension,
         db: dbExtension
@@ -591,7 +606,7 @@ describe('plugin extensions', () => {
       }
     }
 
-    const command: Command<Args> = {
+    const command: Command<DefaultGunshiParams> = {
       name: 'multi-ext',
       run: async _ctx => 'done'
     }
@@ -643,7 +658,7 @@ describe('plugin extensions', () => {
       }
     }
 
-    const command: Command<Args> = {
+    const command: Command<DefaultGunshiParams> = {
       name: 'order-test',
       run: async _ctx => 'done'
     }
@@ -672,13 +687,13 @@ describe('plugin extensions', () => {
 
   test('without extensions - backward compatibility', async () => {
     const args = { name: { type: 'string' as const } }
-    const command: Command<typeof args> = {
+    const command: Command<GunshiParams<{ args: typeof args }>> = {
       name: 'simple',
       args,
       run: async ctx => `Hello, ${ctx.values.name}!`
     }
 
-    const ctx = await createCommandContext({
+    const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
       values: { name: 'World' },
       positionals: [],
@@ -726,14 +741,18 @@ describe('plugin extensions', () => {
     }
 
     const args = { opt: { type: 'string' as const } }
-    const command: Command<typeof args> = {
+    const command: Command<
+      GunshiParams<{ args: typeof args; extensions: { test: TestExtension } }>
+    > = {
       name: 'context-test',
       description: 'Test command',
       args,
       run: async _ctx => 'done'
     }
 
-    await createCommandContext({
+    await createCommandContext<
+      GunshiParams<{ args: typeof args; extensions: { test: TestExtension } }>
+    >({
       args,
       values: { opt: 'value' },
       positionals: ['pos1', 'pos2'],
@@ -764,13 +783,13 @@ describe('plugin extensions', () => {
 describe('CommandContextCore type', () => {
   test('is readonly version of CommandContext', async () => {
     const args = { flag: { type: 'boolean' as const } }
-    const command: Command<typeof args> = {
+    const command: Command<GunshiParams<{ args: typeof args }>> = {
       name: 'readonly-test',
       args,
       run: async _ctx => 'done'
     }
 
-    const ctx = await createCommandContext({
+    const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
       values: { flag: true },
       positionals: [],
@@ -784,7 +803,7 @@ describe('CommandContextCore type', () => {
       cliOptions: {}
     })
 
-    const core: CommandContextCore<typeof args> = ctx
+    const core: CommandContextCore<GunshiParams<{ args: typeof args }>> = ctx
 
     expect(core.name).toBe('readonly-test')
     expect(core.values.flag).toBe(true)

@@ -7,7 +7,7 @@ import { renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
 import type { Mocked } from 'vitest'
-import type { CliOptions, Command, CommandRunner, LazyCommand } from './types.ts'
+import type { CliOptions, Command, CommandRunner, GunshiParams, LazyCommand } from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -381,7 +381,7 @@ describe('auto generate usage', () => {
     const entry = {
       args: entryArgs,
       run: vi.fn()
-    } satisfies Command<typeof entryArgs>
+    } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
 
     const command2Args = {
       bar: {
@@ -393,7 +393,7 @@ describe('auto generate usage', () => {
     const command2 = {
       args: command2Args,
       run: vi.fn()
-    } satisfies Command<typeof command2Args>
+    } satisfies Command<GunshiParams<{ args: typeof command2Args }>>
 
     const subCommands = new Map()
     subCommands.set('command2', command2)
@@ -421,7 +421,7 @@ describe('auto generate usage', () => {
       name: 'command1',
       examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
       run: vi.fn()
-    } satisfies Command<typeof entryArgs>
+    } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
 
     const command2Args = {
       bar: {
@@ -439,7 +439,7 @@ describe('auto generate usage', () => {
       run: ctx => {
         console.log(ctx.values)
       }
-    } satisfies Command<typeof command2Args>
+    } satisfies Command<GunshiParams<{ args: typeof command2Args }>>
 
     const subCommands = new Map()
     subCommands.set('command2', command2)
@@ -528,7 +528,7 @@ describe('custom generate usage', () => {
       args: entryOptions,
       name: 'command1',
       run: vi.fn()
-    } satisfies Command<typeof entryOptions>
+    } satisfies Command<GunshiParams<{ args: typeof entryOptions }>>
 
     const options = {
       name: 'gunshi',
@@ -561,7 +561,7 @@ describe('custom generate usage', () => {
         const msg = `* ${await renderValidationErrors(ctx, error)} *`
         return ['*'.repeat(msg.length), msg, '*'.repeat(msg.length)].join('\n')
       }
-    } satisfies CliOptions<typeof entryOptions>
+    } as CliOptions<GunshiParams>
 
     // usage
     await cli(['-h'], entry, options)
@@ -603,14 +603,14 @@ test('usageSilent', async () => {
     args: entryArgs,
     name: 'command1',
     run: vi.fn()
-  } satisfies Command<typeof entryArgs>
+  } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
 
   const options = {
     name: 'gunshi',
     description: 'Modern CLI tool',
     version: '0.0.0',
     usageSilent: true
-  } satisfies CliOptions<typeof entryArgs>
+  } satisfies CliOptions<GunshiParams<{ args: typeof entryArgs }>>
 
   // usage with silent
   const usage = await cli(['-h'], entry, options)

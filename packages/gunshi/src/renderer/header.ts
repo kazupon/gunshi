@@ -3,16 +3,15 @@
  * @license MIT
  */
 
-import type { Args } from 'args-tokens'
-import type { CommandContext } from '../types.ts'
+import type { CommandContext, DefaultGunshiParams, GunshiParams } from '../types.ts'
 
 /**
  * Render the header.
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered header.
  */
-export function renderHeader<A extends Args = Args>(
-  ctx: Readonly<CommandContext<A>>
+export function renderHeader<G extends GunshiParams = DefaultGunshiParams>(
+  ctx: Readonly<CommandContext<G>>
 ): Promise<string> {
   const title = ctx.env.description || ctx.env.name || ''
   return Promise.resolve(

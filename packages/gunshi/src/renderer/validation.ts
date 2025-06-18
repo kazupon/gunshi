@@ -3,8 +3,7 @@
  * @license MIT
  */
 
-import type { Args } from 'args-tokens'
-import type { CommandContext } from '../types.ts'
+import type { CommandContext, DefaultGunshiParams, GunshiParams } from '../types.ts'
 
 /**
  * Render the validation errors.
@@ -12,8 +11,8 @@ import type { CommandContext } from '../types.ts'
  * @param error An {@link AggregateError} of option in `args-token` validation
  * @returns A rendered validation error.
  */
-export function renderValidationErrors<A extends Args = Args>(
-  _ctx: CommandContext<A>,
+export function renderValidationErrors<G extends GunshiParams = DefaultGunshiParams>(
+  _ctx: CommandContext<G>,
   error: AggregateError
 ): Promise<string> {
   const messages = [] as string[]

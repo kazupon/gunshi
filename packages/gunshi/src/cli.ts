@@ -11,7 +11,7 @@ import { PluginContext } from './plugin.ts'
 import { plugins } from './plugins/index.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
-import type { Args, ArgToken } from 'args-tokens'
+import type { ArgToken } from 'args-tokens'
 import type { Plugin } from './plugin.ts'
 import type {
   CliOptions,
@@ -21,6 +21,8 @@ import type {
   CommandContextExtension,
   CommandDecorator,
   CommandRunner,
+  DefaultGunshiParams,
+  GunshiParams,
   LazyCommand
 } from './types.ts'
 
@@ -31,13 +33,13 @@ import type {
  * @param options A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
  */
-export async function cli<A extends Args = Args>(
+export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   argv: string[],
-  entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
-  options: CliOptions<A> = {}
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  options: CliOptions<G> = {}
 ): Promise<string | undefined> {
-  const decorators = new Decorators<A>()
-  const pluginContext = new PluginContext<A>(decorators)
+  const decorators = new Decorators<G>()
+  const pluginContext = new PluginContext<G>(decorators)
   const plugins = await applyPlugins(pluginContext)
 
   const cliOptions = normalizeCliOptions(options, entry, decorators)
@@ -86,7 +88,9 @@ export async function cli<A extends Args = Args>(
   return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
 
-async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Promise<Plugin[]> {
+async function applyPlugins<G extends GunshiParams>(
+  pluginContext: PluginContext<G>
+): Promise<Plugin[]> {
   try {
     // TODO(kazupon): add more user plugins loading logic
     for (const plugin of plugins) {
@@ -96,7 +100,7 @@ async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Pr
        * because the strictly `Args` required by each plugin are unknown,
        * and the plugin side can not know what the user will specify.
        */
-      await plugin(pluginContext as unknown as PluginContext<Args>)
+      await plugin(pluginContext as unknown as PluginContext<DefaultGunshiParams>)
     }
   } catch (error: unknown) {
     console.error('Error loading plugin:', (error as Error).message)
@@ -105,25 +109,28 @@ async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Pr
   return plugins
 }
 
-function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {
-  if (isLazyCommand<A>(cmd)) {
-    return cmd.args || create<A>()
+function getCommandArgs<G extends GunshiParams>(cmd?: Command<G> | LazyCommand<G>): G['args'] {
+  if (isLazyCommand<G>(cmd)) {
+    return cmd.args || create<G['args']>()
   } else if (typeof cmd === 'object') {
-    return cmd.args || create<A>()
+    return cmd.args || create<G['args']>()
   } else {
-    return create<A>()
+    return create<G['args']>()
   }
 }
 
-function resolveArguments<A extends Args>(pluginContext: PluginContext<A>, args?: A): A {
-  return Object.assign(create<A>(), Object.fromEntries(pluginContext.globalOptions), args)
+function resolveArguments<G extends GunshiParams>(
+  pluginContext: PluginContext<G>,
+  args?: G['args']
+): G['args'] {
+  return Object.assign(create<G['args']>(), Object.fromEntries(pluginContext.globalOptions), args)
 }
 
-function normalizeCliOptions<A extends Args>(
-  options: CliOptions<A>,
-  entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
-  decorators: Decorators<A>
-): CliOptions<A> {
+function normalizeCliOptions<G extends GunshiParams>(
+  options: CliOptions<G>,
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  decorators: Decorators<G>
+): CliOptions<G> {
   const subCommands = new Map(options.subCommands)
   if (options.subCommands) {
     if (isLazyCommand(entry)) {
@@ -134,9 +141,9 @@ function normalizeCliOptions<A extends Args>(
     }
   }
 
-  const resolvedOptions = Object.assign(create<CliOptions<A>>(), COMMAND_OPTIONS_DEFAULT, options, {
+  const resolvedOptions = Object.assign(create<CliOptions<G>>(), COMMAND_OPTIONS_DEFAULT, options, {
     subCommands
-  }) as CliOptions<A>
+  }) as CliOptions<G>
 
   // set default renderers if not provided via cli options
   if (resolvedOptions.renderHeader === undefined) {
@@ -162,10 +169,10 @@ function getSubCommand(tokens: ArgToken[]): string {
     : ''
 }
 
-async function showValidationErrors<A extends Args>(
-  ctx: CommandContext<A>,
+async function showValidationErrors<G extends GunshiParams>(
+  ctx: CommandContext<G>,
   error: AggregateError,
-  decorators: Decorators<A>
+  decorators: Decorators<G>
 ): Promise<void> {
   // TODO(kazupon): deprecate cliOptions.renderValidationErrors
   if (ctx.env.renderValidationErrors === null) {
@@ -175,9 +182,9 @@ async function showValidationErrors<A extends Args>(
   ctx.log(await renderer(ctx, error))
 }
 
-type ResolveCommandContext<A extends Args = Args> = {
+type ResolveCommandContext<G extends GunshiParams = DefaultGunshiParams> = {
   commandName?: string | undefined
-  command?: Command<A> | LazyCommand<A> | undefined
+  command?: Command<G> | LazyCommand<G> | undefined
   callMode: CommandCallMode
 }
 
@@ -185,14 +192,14 @@ const CANNOT_RESOLVE_COMMAND = {
   callMode: 'unexpected'
 } as const satisfies ResolveCommandContext
 
-async function resolveCommand<A extends Args>(
+async function resolveCommand<G extends GunshiParams>(
   sub: string,
-  entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
-  options: CliOptions<A>
-): Promise<ResolveCommandContext<A>> {
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  options: CliOptions<G>
+): Promise<ResolveCommandContext<G>> {
   const omitted = !sub
 
-  async function doResolveCommand(): Promise<ResolveCommandContext<A>> {
+  async function doResolveCommand(): Promise<ResolveCommandContext<G>> {
     if (typeof entry === 'function') {
       // eslint-disable-next-line unicorn/prefer-ternary
       if ('commandName' in entry && entry.commandName) {
@@ -201,7 +208,7 @@ async function resolveCommand<A extends Args>(
       } else {
         // inline command (command runner)
         return {
-          command: { run: entry as CommandRunner<A> } as Command<A>,
+          command: { run: entry as CommandRunner<G> } as Command<G>,
           callMode: 'entry'
         }
       }
@@ -230,7 +237,7 @@ async function resolveCommand<A extends Args>(
   }
 
   // resolve command name, if command has not name on subCommand
-  if (isLazyCommand<A>(cmd) && cmd.commandName == null) {
+  if (isLazyCommand<G>(cmd) && cmd.commandName == null) {
     cmd.commandName = sub
   } else if (typeof cmd === 'object' && cmd.name == null) {
     cmd.name = sub
@@ -243,7 +250,7 @@ async function resolveCommand<A extends Args>(
   }
 }
 
-function resolveEntryName<A extends Args>(entry: Command<A>): string {
+function resolveEntryName<G extends GunshiParams>(entry: Command<G>): string {
   return entry.name || ANONYMOUS_COMMAND_NAME
 }
 
@@ -267,13 +274,13 @@ function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextEx
   return extensions
 }
 
-async function executeCommand<A extends Args = Args>(
-  cmd: Command<A> | LazyCommand<A>,
-  ctx: Readonly<CommandContext<A>>,
+async function executeCommand<G extends GunshiParams = DefaultGunshiParams>(
+  cmd: Command<G> | LazyCommand<G>,
+  ctx: Readonly<CommandContext<G>>,
   name: string,
-  decorators: readonly CommandDecorator<A>[]
+  decorators: Readonly<CommandDecorator<G>[]>
 ): Promise<string | undefined> {
-  const resolved = isLazyCommand<A>(cmd) ? await resolveLazyCommand<A>(cmd, name, true) : cmd
+  const resolved = isLazyCommand<G>(cmd) ? await resolveLazyCommand<G>(cmd, name, true) : cmd
   const baseRunner = resolved.run || NOOP
 
   // apply plugin decorators

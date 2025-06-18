@@ -16,14 +16,16 @@
 
 import { Decorators } from './decorators.ts'
 
-import type { Args, ArgSchema } from 'args-tokens'
+import type { ArgSchema } from 'args-tokens'
 import type {
   Awaitable,
   CommandContext,
   CommandContextCore,
   CommandContextExtension,
   CommandDecorator,
+  DefaultGunshiParams,
   ExtendContext,
+  GunshiParams,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
@@ -34,11 +36,11 @@ export type { GlobalsCommandContext } from './plugins/globals.ts'
  * Gunshi plugin context.
  * @internal
  */
-export class PluginContext<A extends Args = Args, E extends ExtendContext = {}> {
+export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
   #globalOptions: Map<string, ArgSchema> = new Map()
-  #decorators: Decorators<A, E>
+  #decorators: Decorators<G>
 
-  constructor(decorators: Decorators<A, E>) {
+  constructor(decorators: Decorators<G>) {
     this.#decorators = decorators
   }
 
@@ -71,14 +73,18 @@ export class PluginContext<A extends Args = Args, E extends ExtendContext = {}> 
    */
   decorateHeaderRenderer<
     L extends Record<string, unknown> = {},
-    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+    C extends Record<string, unknown> = keyof G['extensions'] extends never
+      ? L
+      : G['extensions'] & L
   >(
     decorator: (
-      baseRenderer: (ctx: Readonly<CommandContext<A, C>>) => Promise<string>,
-      ctx: Readonly<CommandContext<A, C>>
+      baseRenderer: (
+        ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>
+      ) => Promise<string>,
+      ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>
     ) => Promise<string>
   ): void {
-    this.#decorators.addHeaderDecorator(decorator as unknown as RendererDecorator<string, A, E>)
+    this.#decorators.addHeaderDecorator(decorator as unknown as RendererDecorator<string, G>)
   }
 
   /**
@@ -87,14 +93,18 @@ export class PluginContext<A extends Args = Args, E extends ExtendContext = {}> 
    */
   decorateUsageRenderer<
     L extends Record<string, unknown> = {},
-    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+    C extends Record<string, unknown> = keyof G['extensions'] extends never
+      ? L
+      : G['extensions'] & L
   >(
     decorator: (
-      baseRenderer: (ctx: Readonly<CommandContext<A, C>>) => Promise<string>,
-      ctx: Readonly<CommandContext<A, C>>
+      baseRenderer: (
+        ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>
+      ) => Promise<string>,
+      ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>
     ) => Promise<string>
   ): void {
-    this.#decorators.addUsageDecorator(decorator as unknown as RendererDecorator<string, A, E>)
+    this.#decorators.addUsageDecorator(decorator as unknown as RendererDecorator<string, G>)
   }
 
   /**
@@ -103,16 +113,21 @@ export class PluginContext<A extends Args = Args, E extends ExtendContext = {}> 
    */
   decorateValidationErrorsRenderer<
     L extends Record<string, unknown> = {},
-    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+    C extends Record<string, unknown> = keyof G['extensions'] extends never
+      ? L
+      : G['extensions'] & L
   >(
     decorator: (
-      baseRenderer: (ctx: Readonly<CommandContext<A, C>>, error: AggregateError) => Promise<string>,
-      ctx: Readonly<CommandContext<A, C>>,
+      baseRenderer: (
+        ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>,
+        error: AggregateError
+      ) => Promise<string>,
+      ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>,
       error: AggregateError
     ) => Promise<string>
   ): void {
     this.#decorators.addValidationErrorsDecorator(
-      decorator as unknown as ValidationErrorsDecorator<A, E>
+      decorator as unknown as ValidationErrorsDecorator<G>
     )
   }
 
@@ -123,29 +138,34 @@ export class PluginContext<A extends Args = Args, E extends ExtendContext = {}> 
    */
   decorateCommand<
     L extends Record<string, unknown> = {},
-    C extends Record<string, unknown> = keyof E extends never ? L : E & L
+    C extends Record<string, unknown> = keyof G['extensions'] extends never
+      ? L
+      : G['extensions'] & L
   >(
     decorator: (
-      baseRunner: (ctx: Readonly<CommandContext<A, C>>) => Awaitable<void | string>
-    ) => (ctx: Readonly<CommandContext<A, C>>) => Awaitable<void | string>
+      baseRunner: (
+        ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>
+      ) => Awaitable<void | string>
+    ) => (
+      ctx: Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: C }>>>
+    ) => Awaitable<void | string>
   ): void {
-    this.#decorators.addCommandDecorator(decorator as unknown as CommandDecorator<A, E>)
+    this.#decorators.addCommandDecorator(decorator as unknown as CommandDecorator<G>)
   }
 }
 
 /**
  *  Plugin function type
  */
-export type PluginFunction<E extends ExtendContext = {}> = (
-  ctx: PluginContext<Args, E>
-) => Awaitable<void>
+export type PluginFunction = (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
 
 /**
  * Plugin extension for CommandContext
  */
-export type PluginExtension<T = Record<string, unknown>, A extends Args = Args> = (
-  core: CommandContextCore<A>
-) => T
+export type PluginExtension<
+  T = Record<string, unknown>,
+  G extends GunshiParams = DefaultGunshiParams
+> = (core: CommandContextCore<G>) => T
 
 /**
  * Plugin definition options
@@ -153,8 +173,8 @@ export type PluginExtension<T = Record<string, unknown>, A extends Args = Args> 
 export interface PluginOptions<T extends Record<string, unknown> = {}> {
   name: string
 
-  setup: PluginFunction<T>
-  extension?: PluginExtension<T, Args>
+  setup: PluginFunction
+  extension?: PluginExtension<T, DefaultGunshiParams>
 }
 
 /**
@@ -162,7 +182,7 @@ export interface PluginOptions<T extends Record<string, unknown> = {}> {
  * @param ctx - A {@link PluginContext}.
  * @returns An {@link Awaitable} that resolves when the plugin is loaded.
  */
-export type Plugin<E extends ExtendContext = {}> = PluginFunction<E> & {
+export type Plugin<E extends ExtendContext = {}> = PluginFunction & {
   name?: string
   extension?: CommandContextExtension<E>
 }
@@ -190,27 +210,27 @@ export interface PluginWithoutExtension<E extends ExtendContext = {}> extends Pl
  */
 export function plugin<N extends string, E extends ExtendContext = {}>(options: {
   name: N
-  setup: (ctx: PluginContext<Args, { [K in N]: E }>) => Awaitable<void>
-  extension: PluginExtension<E, Args>
+  setup: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
+  extension: PluginExtension<E, DefaultGunshiParams>
 }): PluginWithExtension<E>
 
 export function plugin(options: {
   name: string
-  setup: (ctx: PluginContext<Args, {}>) => Awaitable<void>
+  setup: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
 }): PluginWithoutExtension<{}>
 
 export function plugin<N extends string, E extends ExtendContext = {}>(
   options: {
     name: N
-    setup: (ctx: PluginContext<Args, E>) => Awaitable<void>
-    extension?: PluginExtension<E, Args>
+    setup: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
+    extension?: PluginExtension<E, DefaultGunshiParams>
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
   const { name, setup, extension } = options
 
   // create a wrapper function with properties
-  const pluginFn = async (ctx: PluginContext<Args, E>) => await setup(ctx)
+  const pluginFn = async (ctx: PluginContext<DefaultGunshiParams>) => await setup(ctx)
 
   // define the properties
   return Object.defineProperties(pluginFn, {

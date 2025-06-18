@@ -12,8 +12,8 @@ import {
   resolveBuiltInKey
 } from '../utils.ts'
 
-import type { Args, ArgSchema } from 'args-tokens'
-import type { Command, CommandContext } from '../types.ts'
+import type { ArgSchema } from 'args-tokens'
+import type { Command, CommandContext, DefaultGunshiParams, GunshiParams } from '../types.ts'
 
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
 
@@ -22,8 +22,8 @@ const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered usage.
  */
-export async function renderUsage<A extends Args = Args>(
-  ctx: Readonly<CommandContext<A>>
+export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
+  ctx: Readonly<CommandContext<G>>
 ): Promise<string> {
   const messages: string[] = []
 
@@ -67,8 +67,8 @@ export async function renderUsage<A extends Args = Args>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered arguments section
  */
-async function renderPositionalArgsSection<A extends Args>(
-  ctx: Readonly<CommandContext<A>>
+async function renderPositionalArgsSection<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>
 ): Promise<string[]> {
   const messages: string[] = []
   messages.push(`${ctx.translate(resolveBuiltInKey('ARGUMENTS'))}:`)
@@ -81,8 +81,8 @@ async function renderPositionalArgsSection<A extends Args>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered options section
  */
-async function renderOptionalArgsSection<A extends Args>(
-  ctx: Readonly<CommandContext<A>>
+async function renderOptionalArgsSection<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>
 ): Promise<string[]> {
   const messages: string[] = []
   messages.push(`${ctx.translate(resolveBuiltInKey('OPTIONS'))}:`)
@@ -95,8 +95,8 @@ async function renderOptionalArgsSection<A extends Args>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered examples section
  */
-async function renderExamplesSection<A extends Args>(
-  ctx: Readonly<CommandContext<A>>
+async function renderExamplesSection<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>
 ): Promise<string[]> {
   const messages: string[] = []
 
@@ -116,8 +116,8 @@ async function renderExamplesSection<A extends Args>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered usage section
  */
-async function renderUsageSection<A extends Args>(
-  ctx: Readonly<CommandContext<A>>
+async function renderUsageSection<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>
 ): Promise<string[]> {
   const messages: string[] = [`${ctx.translate(resolveBuiltInKey('USAGE'))}:`]
   if (ctx.omitted) {
@@ -139,8 +139,8 @@ async function renderUsageSection<A extends Args>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered commands section
  */
-async function renderCommandsSection<A extends Args>(
-  ctx: Readonly<CommandContext<A>>
+async function renderCommandsSection<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>
 ): Promise<string[]> {
   const messages: string[] = [`${ctx.translate(resolveBuiltInKey('COMMANDS'))}:`]
   const loadedCommands = await ctx.loadCommands()
@@ -168,7 +168,7 @@ async function renderCommandsSection<A extends Args>(
  * @param ctx A {@link CommandContext | command context}
  * @returns The entry command name
  */
-function resolveEntry<A extends Args>(ctx: CommandContext<A>): string {
+function resolveEntry<G extends GunshiParams>(ctx: CommandContext<G>): string {
   return ctx.env.name || ctx.translate(resolveBuiltInKey('COMMAND'))
 }
 
@@ -177,7 +177,7 @@ function resolveEntry<A extends Args>(ctx: CommandContext<A>): string {
  * @param ctx A {@link CommandContext | command context}
  * @returns The sub command name
  */
-function resolveSubCommand<A extends Args>(ctx: Readonly<CommandContext<A>>): string {
+function resolveSubCommand<G extends GunshiParams>(ctx: Readonly<CommandContext<G>>): string {
   return ctx.name || ctx.translate(resolveBuiltInKey('SUBCOMMAND'))
 }
 
@@ -186,7 +186,7 @@ function resolveSubCommand<A extends Args>(ctx: Readonly<CommandContext<A>>): st
  * @param ctx A {@link CommandContext | command context}
  * @returns resolved command description
  */
-function resolveDescription<A extends Args>(ctx: CommandContext<A>): string {
+function resolveDescription<G extends GunshiParams>(ctx: CommandContext<G>): string {
   return ctx.translate('description') || ctx.description || ''
 }
 
@@ -195,12 +195,12 @@ function resolveDescription<A extends Args>(ctx: CommandContext<A>): string {
  * @param ctx A {@link CommandContext | command context}
  * @returns resolved command examples, if not resolved, return empty string
  */
-async function resolveExamples<A extends Args>(ctx: CommandContext<A>): Promise<string> {
+async function resolveExamples<G extends GunshiParams>(ctx: CommandContext<G>): Promise<string> {
   const ret = ctx.translate('examples')
   if (ret) {
     return ret
   }
-  const command = ctx.env.subCommands?.get(ctx.name || '') as Command<A> | undefined
+  const command = ctx.env.subCommands?.get(ctx.name || '') as Command<G> | undefined
   return await _resolvedExamples(ctx, command?.examples)
 }
 
@@ -209,7 +209,7 @@ async function resolveExamples<A extends Args>(ctx: CommandContext<A>): Promise<
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has sub commands
  */
-async function hasCommands<A extends Args>(ctx: CommandContext<A>): Promise<boolean> {
+async function hasCommands<G extends GunshiParams>(ctx: CommandContext<G>): Promise<boolean> {
   const loadedCommands = await ctx.loadCommands()
   return loadedCommands.length > 1
 }
@@ -219,7 +219,7 @@ async function hasCommands<A extends Args>(ctx: CommandContext<A>): Promise<bool
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has options
  */
-function hasOptionalArgs<A extends Args>(ctx: CommandContext<A>): boolean {
+function hasOptionalArgs<G extends GunshiParams>(ctx: CommandContext<G>): boolean {
   return !!(ctx.args && Object.values(ctx.args).some(arg => arg.type !== 'positional'))
 }
 
@@ -228,7 +228,7 @@ function hasOptionalArgs<A extends Args>(ctx: CommandContext<A>): boolean {
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has options
  */
-function hasPositionalArgs<A extends Args>(ctx: CommandContext<A>): boolean {
+function hasPositionalArgs<G extends GunshiParams>(ctx: CommandContext<G>): boolean {
   return !!(ctx.args && Object.values(ctx.args).some(arg => arg.type === 'positional'))
 }
 
@@ -237,7 +237,7 @@ function hasPositionalArgs<A extends Args>(ctx: CommandContext<A>): boolean {
  * @param ctx A {@link CommandContext | command context}
  * @returns True if all options have default values
  */
-function hasAllDefaultOptions<A extends Args>(ctx: CommandContext<A>): boolean {
+function hasAllDefaultOptions<G extends GunshiParams>(ctx: CommandContext<G>): boolean {
   return !!(ctx.args && Object.values(ctx.args).every(arg => arg.default))
 }
 
@@ -246,7 +246,7 @@ function hasAllDefaultOptions<A extends Args>(ctx: CommandContext<A>): boolean {
  * @param ctx A {@link CommandContext | command context}
  * @returns Options symbols for usage
  */
-function generateOptionsSymbols<A extends Args>(ctx: CommandContext<A>): string {
+function generateOptionsSymbols<G extends GunshiParams>(ctx: CommandContext<G>): string {
   return hasOptionalArgs(ctx)
     ? hasAllDefaultOptions(ctx)
       ? `[${ctx.translate(resolveBuiltInKey('OPTIONS'))}]`
@@ -269,7 +269,9 @@ function makeShortLongOptionPair(schema: ArgSchema, name: string, toKebab?: bool
  * @param ctx A {@link CommandContext | command context}
  * @returns Options pairs for usage
  */
-function getOptionalArgsPairs<A extends Args>(ctx: CommandContext<A>): Record<string, string> {
+function getOptionalArgsPairs<G extends GunshiParams>(
+  ctx: CommandContext<G>
+): Record<string, string> {
   return Object.entries(ctx.args).reduce((acc, [name, schema]) => {
     if (schema.type === 'positional') {
       return acc
@@ -292,19 +294,22 @@ function getOptionalArgsPairs<A extends Args>(ctx: CommandContext<A>): Record<st
 
 const resolveNegatableKey = (key: string): string => key.split('no-')[1]
 
-function resolveNegatableType<A extends Args>(key: string, ctx: Readonly<CommandContext<A>>) {
+function resolveNegatableType<G extends GunshiParams>(
+  key: string,
+  ctx: Readonly<CommandContext<G>>
+) {
   return ctx.args[key.startsWith('no-') ? resolveNegatableKey(key) : key].type
 }
 
-function generateDefaultDisplayValue<A extends Args>(
-  ctx: Readonly<CommandContext<A>>,
+function generateDefaultDisplayValue<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>,
   schema: ArgSchema
 ): string {
   return `${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
 }
 
-function resolveDisplayValue<A extends Args>(
-  ctx: Readonly<CommandContext<A>>,
+function resolveDisplayValue<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>,
   key: string
 ): string {
   if (COMMON_ARGS_KEYS.includes(key)) {
@@ -339,8 +344,8 @@ function resolveDisplayValue<A extends Args>(
  * @param optionsPairs Options pairs for usage
  * @returns Generated options usage
  */
-async function generateOptionalArgsUsage<A extends Args>(
-  ctx: CommandContext<A>,
+async function generateOptionalArgsUsage<G extends GunshiParams>(
+  ctx: CommandContext<G>,
   optionsPairs: Record<string, string>
 ): Promise<string> {
   const optionsMaxLength = Math.max(
@@ -374,12 +379,12 @@ async function generateOptionalArgsUsage<A extends Args>(
   return usages.join('\n')
 }
 
-function getPositionalArgs<A extends Args>(ctx: CommandContext<A>): [string, ArgSchema][] {
+function getPositionalArgs<G extends GunshiParams>(ctx: CommandContext<G>): [string, ArgSchema][] {
   return Object.entries(ctx.args).filter(([_, schema]) => schema.type === 'positional')
 }
 
-async function generatePositionalArgsUsage<A extends Args>(
-  ctx: CommandContext<A>
+async function generatePositionalArgsUsage<G extends GunshiParams>(
+  ctx: CommandContext<G>
 ): Promise<string> {
   const positionals = getPositionalArgs(ctx)
   const argsMaxLength = Math.max(...positionals.map(([name]) => name.length))
@@ -398,7 +403,7 @@ async function generatePositionalArgsUsage<A extends Args>(
   return usages.join('\n')
 }
 
-function generatePositionalSymbols<A extends Args>(ctx: CommandContext<A>): string {
+function generatePositionalSymbols<G extends GunshiParams>(ctx: CommandContext<G>): string {
   return hasPositionalArgs(ctx)
     ? getPositionalArgs(ctx)
         .map(([name]) => `<${name}>`)

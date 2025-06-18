@@ -16,6 +16,7 @@ import type {
   CommandContext,
   CommandContextExtension,
   ExtendContext,
+  GunshiParams,
   TranslationAdapter,
   TranslationAdapterFactoryOptions
 } from '../src/types.ts'
@@ -144,7 +145,7 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
 
 export function createMockCommandContext<E extends ExtendContext = {}>(
   extensions?: Record<string, CommandContextExtension>
-): CommandContext<Args, E> {
+): CommandContext<GunshiParams<{ args: Args; extensions: E }>> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ctx: any = {
     name: 'mock-command',
@@ -188,5 +189,5 @@ export function createMockCommandContext<E extends ExtendContext = {}>(
     ctx = Object.assign(create<any>(), ctx, { extensions })
   }
 
-  return ctx as CommandContext<Args, E>
+  return ctx as CommandContext<GunshiParams<{ args: Args; extensions: E }>>
 }

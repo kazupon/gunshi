@@ -17,13 +17,18 @@
 import { cli } from './cli.ts'
 import { create } from './utils.ts'
 
-import type { Args } from 'args-tokens'
-import type { CliOptions, Command, LazyCommand } from './types.ts'
+import type {
+  CliOptions,
+  Command,
+  DefaultGunshiParams,
+  GunshiParams,
+  LazyCommand
+} from './types.ts'
 
 /**
  * generate options of `generate` function.
  */
-export type GenerateOptions<A extends Args = Args> = CliOptions<A>
+export type GenerateOptions<G extends GunshiParams = DefaultGunshiParams> = CliOptions<G>
 
 /**
  * Generate the command usage.
@@ -32,10 +37,11 @@ export type GenerateOptions<A extends Args = Args> = CliOptions<A>
  * @param options - A {@link CliOptions | cli options}
  * @returns A rendered usage.
  */
-export async function generate<A extends Args = Args>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function generate<G extends GunshiParams<any> = DefaultGunshiParams>(
   command: string | null,
-  entry: Command<A> | LazyCommand<A>,
-  options: GenerateOptions<A> = {}
+  entry: Command<G> | LazyCommand<G>,
+  options: GenerateOptions<G> = {}
 ): Promise<string> {
   const args = ['-h']
   if (command != null) {
@@ -43,7 +49,7 @@ export async function generate<A extends Args = Args>(
   }
   return (
     (await cli(args, entry, {
-      ...create<GenerateOptions<A>>(), // default options
+      ...create<GenerateOptions<G>>(), // default options
       ...options, // caller-supplied overrides
       usageSilent: true // force silent usage
     })) || ''

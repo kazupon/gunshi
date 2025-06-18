@@ -3,7 +3,7 @@ import { createCommandContext } from './context.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
-import type { Command, LazyCommand } from './types.ts'
+import type { Command, GunshiParams, LazyCommand } from './types.ts'
 
 const NOOP = async () => {}
 
@@ -50,7 +50,7 @@ const SHOW = {
   description: 'A show command',
   examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
   run: NOOP
-} as Command<Args>
+} as Command<GunshiParams<{ args: Args }>>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const COMMANDS = new Map<string, Command<any> | LazyCommand<any>>()
@@ -87,7 +87,7 @@ describe('renderHeader', () => {
     name: 'test',
     description: 'A test command',
     run: NOOP
-  } as Command<Args>
+  } as Command<GunshiParams<{ args: Args }>>
 
   test('basic', async () => {
     const ctx = await createCommandContext({
@@ -201,7 +201,7 @@ describe('renderUsage', () => {
       description: 'A test command',
       examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
     const ctx = await createCommandContext({
       args: command.args!,
       values: {},
@@ -230,7 +230,7 @@ describe('renderUsage', () => {
       run: async () => {
         // something here
       }
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
     const ctx = await createCommandContext({
       args: {},
       values: {},
@@ -273,7 +273,7 @@ describe('renderUsage', () => {
       name: 'test',
       description: 'A test command',
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
     const ctx = await createCommandContext({
       args: command.args!,
       values: {},
@@ -309,7 +309,7 @@ describe('renderUsage', () => {
       name: 'test',
       description: 'A test command',
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
 
     const ctx = await createCommandContext({
       args: command.args!,
@@ -356,7 +356,7 @@ describe('renderUsage', () => {
       name: 'test',
       description: 'A test command',
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
 
     const ctx = await createCommandContext({
       args: command.args!,
@@ -406,7 +406,7 @@ describe('renderUsage', () => {
       name: 'test',
       description: 'A test command',
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
     const ctx = await createCommandContext({
       args: command.args!,
       values: {},
@@ -456,7 +456,7 @@ describe('renderUsage', () => {
       description: 'A test command',
       examples: `# Example 1\n$ test --foo bar --bar --baz 42 --qux quux\n# Example 2\n$ test -f bar -b 42 -q quux`,
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
     const ctx = await createCommandContext({
       args: command.args!,
       values: {},
@@ -536,7 +536,7 @@ describe('renderUsage', () => {
       description: 'A test command with kebab-case arguments',
       examples: `# Example with kebab-case\n$ test --foo-bar value --baz-qux --camel-case 42 --kebab-case-required value\n# Example with negated option\n$ test --no-baz-qux --foo-bar value --kebab-case-required value`,
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
     const ctx = await createCommandContext({
       args: command.args!,
       values: {},
@@ -588,7 +588,7 @@ describe('renderUsage', () => {
       examples: `# Example with kebab-case\n$ test --foo-bar value --baz-qux --camel-case 42 --kebab-case-required value\n# Example with negated option\n$ test --no-baz-qux --foo-bar value --kebab-case-required value`,
       toKebab: true,
       run: NOOP
-    } as Command<Args>
+    } as Command<GunshiParams<{ args: Args }>>
     const ctx = await createCommandContext({
       args: command.args!,
       values: {},

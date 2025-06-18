@@ -14,8 +14,13 @@
  * @license MIT
  */
 
-import type { Args } from 'args-tokens'
-import type { Command, CommandLoader, ExtendContext, LazyCommand } from './types.ts'
+import type {
+  Command,
+  CommandLoader,
+  DefaultGunshiParams,
+  GunshiParams,
+  LazyCommand
+} from './types.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 
@@ -23,9 +28,9 @@ export type { Args, ArgSchema, ArgValues } from 'args-tokens'
  * Define a {@link Command | command}
  * @param definition A {@link Command | command} definition
  */
-export function define<A extends Args = Args, E extends ExtendContext = {}>(
-  definition: Command<A, E>
-): Command<A, E> {
+export function define<G extends GunshiParams = DefaultGunshiParams>(
+  definition: Command<G>
+): Command<G> {
   return definition
 }
 
@@ -34,9 +39,9 @@ export function define<A extends Args = Args, E extends ExtendContext = {}>(
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
-export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
-  loader: CommandLoader<A, E>
-): LazyCommand<A, E>
+export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+  loader: CommandLoader<G>
+): LazyCommand<G>
 
 /**
  * Define a {@link LazyCommand | lazy command} with definition.
@@ -44,10 +49,10 @@ export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
-  loader: CommandLoader<A, E>,
-  definition: Command<A, E>
-): LazyCommand<A, E>
+export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+  loader: CommandLoader<G>,
+  definition: Command<G>
+): LazyCommand<G>
 
 /**
  * Define a {@link LazyCommand | lazy command} with or without definition.
@@ -55,11 +60,11 @@ export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<A extends Args = Args, E extends ExtendContext = {}>(
-  loader: CommandLoader<A, E>,
-  definition?: Command<A, E>
-): LazyCommand<A, E> {
-  const lazyCommand = loader as LazyCommand<A, E>
+export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+  loader: CommandLoader<G>,
+  definition?: Command<G>
+): LazyCommand<G> {
+  const lazyCommand = loader as LazyCommand<G>
 
   if (definition != null) {
     // copy existing properties

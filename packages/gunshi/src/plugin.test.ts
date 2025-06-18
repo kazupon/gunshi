@@ -7,7 +7,7 @@ import { PluginContext, plugin } from './plugin.ts'
 
 import type { Args } from 'args-tokens'
 import type { Plugin } from './plugin.ts'
-import type { Command, CommandContextCore } from './types.ts'
+import type { Command, CommandContextCore, GunshiParams } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
@@ -43,8 +43,8 @@ type Auth = { token: string; login: () => string }
 type Logger = { log: (msg: string) => void; level: string }
 
 test('PluginContext#decorateHeaderRenderer', async () => {
-  const decorators = new Decorators<Args, Auth>()
-  const ctx = new PluginContext<Args, Auth>(decorators)
+  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateHeaderRenderer<Logger>(async (baseRenderer, cmdCtx) => {
     const result = await baseRenderer(cmdCtx)
@@ -53,15 +53,16 @@ test('PluginContext#decorateHeaderRenderer', async () => {
   })
 
   const renderer = decorators.getHeaderRenderer()
-  const mockCtx = createMockCommandContext<Auth>()
+  const mockCtx =
+    createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[DECORATED] ')
 })
 
 test('PluginContext#decorateUsageRenderer', async () => {
-  const decorators = new Decorators<Args, Auth>()
-  const ctx = new PluginContext<Args, Auth>(decorators)
+  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateUsageRenderer<Logger>(async (baseRenderer, cmdCtx) => {
     const result = await baseRenderer(cmdCtx)
@@ -69,16 +70,16 @@ test('PluginContext#decorateUsageRenderer', async () => {
     return `[USAGE] ${result}`
   })
 
-  const renderer = decorators.getUsageRenderer<Logger>()
-  const mockCtx = createMockCommandContext<Auth & Logger>()
+  const renderer = decorators.getUsageRenderer()
+  const mockCtx = createMockCommandContext<Auth>()
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[USAGE] ')
 })
 
 test('PluginContext#decorateValidationErrorsRenderer', async () => {
-  const decorators = new Decorators<Args, Auth>()
-  const ctx = new PluginContext<Args, Auth>(decorators)
+  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateValidationErrorsRenderer<Logger>(async (baseRenderer, cmdCtx, error) => {
     const result = await baseRenderer(cmdCtx, error)
@@ -87,7 +88,8 @@ test('PluginContext#decorateValidationErrorsRenderer', async () => {
   })
 
   const renderer = decorators.getValidationErrorsRenderer()
-  const mockCtx = createMockCommandContext<Auth>()
+  const mockCtx =
+    createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
   const error = new AggregateError([new Error('Test')], 'Validation failed')
   const result = await renderer(mockCtx, error)
 
@@ -95,8 +97,8 @@ test('PluginContext#decorateValidationErrorsRenderer', async () => {
 })
 
 test('PluginContext#decorateCommand', async () => {
-  const decorators = new Decorators<Args, Auth>()
-  const ctx = new PluginContext<Args, Auth>(decorators)
+  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateCommand<Logger>(baseRunner => async ctx => {
     const result = await baseRunner(ctx)
@@ -105,7 +107,8 @@ test('PluginContext#decorateCommand', async () => {
   })
 
   const runner = decorators.commandDecorators[0]
-  const mockCtx = createMockCommandContext<Auth>()
+  const mockCtx =
+    createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
   const result = await runner(_ctx => '[TEST]')(mockCtx)
 
   expect(result).toBe('[USAGE] [TEST]')
@@ -113,16 +116,14 @@ test('PluginContext#decorateCommand', async () => {
 
 describe('plugin function', () => {
   test('basic - creates plugin with extension', async () => {
-    const extensionFactory = vi.fn((_core: CommandContextCore) => ({
+    const extensionFactory = vi.fn((_core: CommandContextCore<GunshiParams>) => ({
       getValue: () => 'test-value' as const,
       isEnabled: true
     }))
 
-    const setupFn = vi.fn(
-      async (ctx: PluginContext<Args, { test: ReturnType<typeof extensionFactory> }>) => {
-        ctx.addGlobalOption('test', { type: 'string' })
-      }
-    )
+    const setupFn = vi.fn(async (ctx: PluginContext) => {
+      ctx.addGlobalOption('test', { type: 'string' })
+    })
 
     const testPlugin = plugin({
       name: 'test',
@@ -139,9 +140,8 @@ describe('plugin function', () => {
     expect(testPlugin.extension.factory).toBe(extensionFactory)
 
     // check that setup function is callable
-    type Extension = ReturnType<typeof testPlugin.extension.factory>
-    const decorators = new Decorators<Args, Extension>()
-    const ctx = new PluginContext<Args, Extension>(decorators)
+    const decorators = new Decorators()
+    const ctx = new PluginContext(decorators)
     await testPlugin(ctx)
     expect(setupFn).toHaveBeenCalledWith(ctx)
   })
@@ -240,7 +240,7 @@ describe('Plugin type with optional properties', () => {
 
   test('plugin with name and extension properties', async () => {
     type Extension = { extended: boolean }
-    const pluginFn = async (ctx: PluginContext<Args, Extension>) => {
+    const pluginFn = async (ctx: PluginContext) => {
       ctx.addGlobalOption('extended', { type: 'string' })
     }
 
@@ -284,7 +284,7 @@ describe('Plugin Extensions Integration', () => {
         })
       },
       extension: (
-        core: CommandContextCore
+        core: CommandContextCore<GunshiParams>
       ): {
         getValue: () => string
         doubled: (n: number) => number
@@ -308,7 +308,9 @@ describe('Plugin Extensions Integration', () => {
     type TestExtension = ReturnType<typeof testPlugin.extension.factory>
 
     // create a command that uses the extension
-    const testCommand = define<typeof args, { test: TestExtension }>({
+    const testCommand = define<
+      GunshiParams<{ args: typeof args; extensions: { test: TestExtension } }>
+    >({
       name: 'test-cmd',
       args,
       async run(ctx) {
@@ -320,14 +322,16 @@ describe('Plugin Extensions Integration', () => {
     })
 
     // create command context directly
-    const ctx = await createCommandContext({
+    const ctx = await createCommandContext<
+      GunshiParams<{ args: typeof args; extensions: { test: TestExtension } }>
+    >({
       args,
       values: { 'test-opt': 'custom', num: 5 },
       positionals: [],
       rest: [],
       argv: [],
       tokens: [],
-      command: testCommand as Command<typeof args>,
+      command: testCommand,
       extensions: { test: testPlugin.extension },
       omitted: false,
       callMode: 'entry',
@@ -341,7 +345,7 @@ describe('Plugin Extensions Integration', () => {
 
   test('multiple plugins with extensions work together', async () => {
     // auth plugin
-    const authExtension = vi.fn((core: CommandContextCore) => ({
+    const authExtension = vi.fn((core: CommandContextCore<GunshiParams>) => ({
       getUser: () => core.values.user || 'guest',
       isAdmin: () => core.values.user === 'admin'
     }))
@@ -355,7 +359,7 @@ describe('Plugin Extensions Integration', () => {
 
     // logger plugin
     const logs = [] as string[]
-    const loggerExtension = vi.fn((core: CommandContextCore) => ({
+    const loggerExtension = vi.fn((core: CommandContextCore<GunshiParams>) => ({
       log: (msg: string) => logs.push(`[${core.values['log-level'] || 'info'}] ${msg}`),
       getLogs: (): string[] => logs
     }))
@@ -373,7 +377,7 @@ describe('Plugin Extensions Integration', () => {
     }
 
     // command using both extensions
-    const multiCommand = define<Args, ExtendContext>({
+    const multiCommand = define<GunshiParams<{ args: Args; extensions: ExtendContext }>>({
       name: 'multi',
       run(ctx) {
         ctx.extensions.logger.log(`User ${ctx.extensions.auth.getUser()} executed command`)
@@ -392,7 +396,7 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command: multiCommand as Command<Args>,
+      command: multiCommand as Command<GunshiParams<{ args: Args }>>,
       extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension },
       omitted: false,
       callMode: 'entry',
@@ -455,8 +459,10 @@ describe('Plugin Extensions Integration', () => {
     })
 
     const contextCommand = define<
-      Args,
-      { ctx: ReturnType<typeof contextPlugin.extension.factory> }
+      GunshiParams<{
+        args: Args
+        extensions: { ctx: ReturnType<typeof contextPlugin.extension.factory> }
+      }>
     >({
       name: 'ctx-test',
       run(ctx) {
@@ -471,7 +477,7 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command: contextCommand as Command<Args>,
+      command: contextCommand as Command<GunshiParams<Args>>,
       extensions: {
         ctx: contextPlugin.extension
       },

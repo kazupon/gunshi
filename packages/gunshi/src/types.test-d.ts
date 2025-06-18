@@ -5,6 +5,7 @@ import type {
   CommandContext,
   CommandRunner,
   ExtractCommandContextExtension,
+  GunshiParams,
   KeyOfArgs
 } from './types.ts'
 
@@ -40,20 +41,20 @@ type E = {
 
 test('CommandContext', () => {
   // Args type argument
-  type T1 = CommandContext<A>
+  type T1 = CommandContext<GunshiParams<{ args: A }>>
   expectTypeOf<T1['extensions']>().toEqualTypeOf<undefined>()
   // Args and Extend type argument
-  type T2 = CommandContext<A, E>
+  type T2 = CommandContext<GunshiParams<{ args: A; extensions: E }>>
   expectTypeOf<T2['extensions']>().toEqualTypeOf<E>()
 })
 
 test('CommandRunner', () => {
   // Args type argument
-  type C1 = Parameters<CommandRunner<A>>[0]
+  type C1 = Parameters<CommandRunner<GunshiParams<{ args: A }>>>[0]
   expectTypeOf<C1['extensions']>().toEqualTypeOf<undefined>()
 
   // Args and Extend type argument
-  type C2 = Parameters<CommandRunner<A, E>>[0]
+  type C2 = Parameters<CommandRunner<GunshiParams<{ args: A; extensions: E }>>>[0]
   expectTypeOf<C2['extensions']>().toEqualTypeOf<E>()
 })
 
