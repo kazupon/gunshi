@@ -76,12 +76,12 @@ export default plugin({
 
     // apply help and version decorators
     ctx.decorateCommand(baseRunner => async ctx => {
-      const { values } = ctx
-      const globals = (ctx.extensions as unknown as { globals: GlobalsCommandContext })?.globals
-      if (!globals) {
-        return baseRunner(ctx)
-      }
-      const { showVersion, showHeader, showUsage } = globals
+      const {
+        values,
+        extensions: {
+          globals: { showVersion, showHeader, showUsage }
+        }
+      } = ctx
 
       if (values.version) {
         return showVersion()
