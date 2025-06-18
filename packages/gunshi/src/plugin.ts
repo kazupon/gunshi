@@ -154,7 +154,9 @@ export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
 /**
  *  Plugin function type
  */
-export type PluginFunction = (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
+export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
+  ctx: PluginContext<G>
+) => Awaitable<void>
 
 /**
  * Plugin extension for CommandContext
@@ -167,11 +169,14 @@ export type PluginExtension<
 /**
  * Plugin definition options
  */
-export interface PluginOptions<T extends Record<string, unknown> = {}> {
+export interface PluginOptions<
+  T extends Record<string, unknown> = Record<never, never>,
+  G extends GunshiParams = DefaultGunshiParams
+> {
   name: string
 
-  setup: PluginFunction
-  extension?: PluginExtension<T, DefaultGunshiParams>
+  setup: PluginFunction<G>
+  extension?: PluginExtension<T, G>
 }
 
 /**
