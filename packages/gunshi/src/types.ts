@@ -337,12 +337,6 @@ export interface CommandContext<G extends GunshiParams<any> = DefaultGunshiParam
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
-   * Load sub-commands.
-   * The loaded commands are cached and returned when called again.
-   * @returns loaded commands.
-   */
-  loadCommands: () => Promise<Command<G>[]>
-  /**
    * Translate function.
    * @param key the key to be translated
    * @param values the values to be formatted

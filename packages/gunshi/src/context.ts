@@ -31,8 +31,7 @@ import {
   log,
   mapResourceWithBuiltinKey,
   resolveArgKey,
-  resolveExamples,
-  resolveLazyCommand
+  resolveExamples
 } from './utils.ts'
 
 import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
@@ -214,22 +213,6 @@ export async function createCommandContext<
   }
 
   /**
-   * load the sub commands
-   */
-
-  let cachedCommands: Command<G>[] | undefined
-  async function loadCommands(): Promise<Command<G>[]> {
-    if (cachedCommands) {
-      return cachedCommands
-    }
-
-    const subCommands = [...(cliOptions.subCommands || [])] as [string, Command<G>][]
-    return (cachedCommands = await Promise.all(
-      subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
-    ))
-  }
-
-  /**
    * create the command context
    */
 
@@ -248,7 +231,6 @@ export async function createCommandContext<
     tokens,
     toKebab: command.toKebab,
     log: cliOptions.usageSilent ? NOOP : log,
-    loadCommands,
     translate
   })
 
@@ -256,23 +238,19 @@ export async function createCommandContext<
    * extend the command context with extensions
    */
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let ctx: any
-
   if (Object.keys(extensions).length > 0) {
-    const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const ext = create<Record<string, ReturnType<CommandContextExtension['factory']>>>(null)
+    Object.defineProperty(core, 'extensions', {
+      value: ext,
+      writable: false,
+      enumerable: true,
+      configurable: true
+    })
     for (const [key, extension] of Object.entries(extensions)) {
-      ext[key] = extension.factory(core as unknown as CommandContextCore)
+      ext[key] = extension.factory(core as CommandContextCore)
     }
-
-    // create extended context with extensions
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const extendedCtx = Object.assign(create<any>(), core, { extensions: ext })
-    ctx = deepFreeze(extendedCtx)
-  } else {
-    // without extensions (backward compatibility)
-    ctx = deepFreeze(core)
   }
+  const ctx = deepFreeze(core)
 
   /**
    * load the command resources

@@ -12,7 +12,8 @@ import {
   resolveBuiltInKey
 } from '../utils.ts'
 
-import type { ArgSchema } from 'args-tokens'
+import type { ArgSchema, Args } from 'args-tokens'
+import type { LoaderCommandContext } from '../plugins/loader.ts'
 import type { Command, CommandContext, DefaultGunshiParams, GunshiParams } from '../types.ts'
 
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
@@ -139,11 +140,11 @@ async function renderUsageSection<G extends GunshiParams>(
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered commands section
  */
-async function renderCommandsSection<G extends GunshiParams>(
-  ctx: Readonly<CommandContext<G>>
-): Promise<string[]> {
+async function renderCommandsSection<
+  G extends GunshiParams<{ args: Args; extensions: { loader: LoaderCommandContext } }>
+>(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
   const messages: string[] = [`${ctx.translate(resolveBuiltInKey('COMMANDS'))}:`]
-  const loadedCommands = await ctx.loadCommands()
+  const loadedCommands = (await ctx.extensions?.loader.loadCommands<G>()) || []
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
   const commandsStr = await Promise.all(
     loadedCommands.map(cmd => {
@@ -209,8 +210,10 @@ async function resolveExamples<G extends GunshiParams>(ctx: CommandContext<G>): 
  * @param ctx A {@link CommandContext | command context}
  * @returns True if the command has sub commands
  */
-async function hasCommands<G extends GunshiParams>(ctx: CommandContext<G>): Promise<boolean> {
-  const loadedCommands = await ctx.loadCommands()
+async function hasCommands<
+  G extends GunshiParams<{ args: Args; extensions: { loader: LoaderCommandContext } }>
+>(ctx: CommandContext<G>): Promise<boolean> {
+  const loadedCommands = (await ctx.extensions?.loader.loadCommands<G>()) || []
   return loadedCommands.length > 1
 }
 

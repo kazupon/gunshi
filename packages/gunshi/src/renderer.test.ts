@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from './context.ts'
+import loaderPlugin from './plugins/loader.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
@@ -491,6 +492,9 @@ describe('renderUsage', () => {
       argv: [],
       tokens: [], // dummy, due to test
       command: SHOW,
+      extensions: {
+        loader: loaderPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
