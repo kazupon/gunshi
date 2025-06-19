@@ -175,7 +175,7 @@ export interface PluginOptions<
 > {
   name: string
 
-  setup: PluginFunction<G>
+  setup?: PluginFunction<G>
   extension?: PluginExtension<T, G>
 }
 
@@ -221,7 +221,7 @@ export function plugin<
   F extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
 >(options: {
   name: N
-  setup: (
+  setup?: (
     ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<F> } }>>
   ) => Awaitable<void>
   extension: F
@@ -229,7 +229,7 @@ export function plugin<
 
 export function plugin(options: {
   name: string
-  setup: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
+  setup?: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
 export function plugin<
@@ -238,7 +238,7 @@ export function plugin<
 >(
   options: {
     name: N
-    setup: (
+    setup?: (
       ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
     ) => Awaitable<void>
     extension?: PluginExtension<E, DefaultGunshiParams>
@@ -249,7 +249,11 @@ export function plugin<
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pluginFn = async (ctx: PluginContext<any>) => await setup(ctx)
+  const pluginFn = async (ctx: PluginContext<any>) => {
+    if (setup) {
+      await setup(ctx)
+    }
+  }
 
   // define the properties
   return Object.defineProperties(pluginFn, {

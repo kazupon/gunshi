@@ -9,8 +9,6 @@ import { plugin } from '../plugin.ts'
  * completion plugin for Gunshi.
  */
 export default plugin({
-  name: 'completion',
-  setup: _ctx => {
-    // TODO(kazupon): Implement dry-run plugin logic
-  }
+  name: 'completion'
+  // TODO(kazupon): Implement completion plugin logic
 })

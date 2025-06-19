@@ -47,8 +47,5 @@ const extension = (ctx: CommandContextCore<DefaultGunshiParams>) => {
  */
 export default plugin({
   name: 'loader',
-  extension,
-  setup: _ctx => {
-    // TODO(kazupon): omit setup logic
-  }
+  extension
 })
