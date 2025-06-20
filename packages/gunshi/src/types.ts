@@ -354,6 +354,11 @@ export interface CommandContext<G extends GunshiParams<any> = DefaultGunshiParam
    *  Command context extensions.
    */
   extensions: keyof G['extensions'] extends never ? undefined : G['extensions']
+  /**
+   * Validation error from argument parsing.
+   * This will be set if argument validation fails during CLI execution.
+   */
+  validationError?: AggregateError
 }
 
 /**

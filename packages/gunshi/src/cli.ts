@@ -74,16 +74,9 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
     callMode,
     command,
     extensions: getPluginExtensions(plugins),
+    validationError: error,
     cliOptions: cliOptions
   })
-
-  // Skip validation if help or version is requested
-  const skipValidation = values.help || values.version
-
-  if (!skipValidation && error) {
-    await showValidationErrors(commandContext, error, decorators)
-    return
-  }
 
   return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
@@ -167,19 +160,6 @@ function getSubCommand(tokens: ArgToken[]): string {
     firstToken.value
     ? firstToken.value
     : ''
-}
-
-async function showValidationErrors<G extends GunshiParams>(
-  ctx: CommandContext<G>,
-  error: AggregateError,
-  decorators: Decorators<G>
-): Promise<void> {
-  // TODO(kazupon): deprecate cliOptions.renderValidationErrors
-  if (ctx.env.renderValidationErrors === null) {
-    return
-  }
-  const renderer = ctx.env.renderValidationErrors || decorators.getValidationErrorsRenderer()
-  ctx.log(await renderer(ctx, error))
 }
 
 type ResolveCommandContext<G extends GunshiParams = DefaultGunshiParams> = {

@@ -113,6 +113,10 @@ interface CommandContextParams<
    * A command options, which is spicialized from `cli` function
    */
   cliOptions: CliOptions<G>
+  /**
+   * Validation error from argument parsing.
+   */
+  validationError?: AggregateError
 }
 
 /**
@@ -137,7 +141,8 @@ export async function createCommandContext<
   extensions = {} as E,
   cliOptions,
   callMode = 'entry',
-  omitted = false
+  omitted = false,
+  validationError
 }: CommandContextParams<G, V, C, E>): Promise<
   {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<G>>
@@ -231,7 +236,8 @@ export async function createCommandContext<
     tokens,
     toKebab: command.toKebab,
     log: cliOptions.usageSilent ? NOOP : log,
-    translate
+    translate,
+    validationError
   })
 
   /**

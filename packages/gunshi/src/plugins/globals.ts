@@ -28,6 +28,12 @@ export interface GlobalsCommandContext {
    * @returns The usage of the application, or `undefined` if the `renderUsage` is not specified.
    */
   showUsage: () => Awaitable<string | undefined>
+  /**
+   * Show validation errors. This is called when argument validation fails.
+   * @param error The aggregate error containing validation failures
+   * @returns The rendered error message, or `undefined` if `renderValidationErrors` is null
+   */
+  showValidationErrors: (error: AggregateError) => Awaitable<string | undefined>
 }
 
 /**
@@ -60,6 +66,16 @@ const extension = (ctx: CommandContextCore<DefaultGunshiParams>) => ({
         return usage
       }
     }
+  },
+  showValidationErrors: async (error: AggregateError) => {
+    if (ctx.env.renderValidationErrors === null) {
+      return
+    }
+    if (ctx.env.renderValidationErrors !== undefined) {
+      const message = await ctx.env.renderValidationErrors(ctx, error)
+      ctx.log(message)
+      return message
+    }
   }
 })
 
@@ -78,8 +94,9 @@ export default plugin({
     ctx.decorateCommand(baseRunner => async ctx => {
       const {
         values,
+        validationError,
         extensions: {
-          globals: { showVersion, showHeader, showUsage }
+          globals: { showVersion, showHeader, showUsage, showValidationErrors }
         }
       } = ctx
 
@@ -100,6 +117,11 @@ export default plugin({
           return buf.join('\n')
         }
         return
+      }
+
+      // check for validation errors before executing command
+      if (validationError) {
+        return await showValidationErrors(validationError)
       }
 
       // normal command execution
