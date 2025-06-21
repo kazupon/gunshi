@@ -50,9 +50,12 @@ class MessageFormat2Translation extends DefaultTranslation {
     (values: Record<string, unknown>, onError: (err: Error) => void) => string | undefined
   >
 
+  #options: TranslationAdapterFactoryOptions
+
   constructor(options: TranslationAdapterFactoryOptions) {
     super(options)
     this.#messageFormatCaches = new Map()
+    this.#options = options
   }
 
   override translate(
@@ -60,9 +63,16 @@ class MessageFormat2Translation extends DefaultTranslation {
     key: string,
     values: Record<string, unknown>
   ): string | undefined {
-    const message = super.translate(locale, key, values)
-    if (message == null) {
-      return message
+    // Get the raw message without interpolation
+    let message = this.getMessage(locale, key)
+
+    // Fall back to the fallback locale if needed
+    if (message === undefined && locale !== this.#options.fallbackLocale) {
+      message = this.getMessage(this.#options.fallbackLocale, key)
+    }
+
+    if (message === undefined) {
+      return
     }
 
     const cacheKey = `${locale}:${key}:${message}`

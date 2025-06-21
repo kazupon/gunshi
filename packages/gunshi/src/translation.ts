@@ -58,7 +58,7 @@ export class DefaultTranslation implements TranslationAdapter {
       return
     }
 
-    return message.replaceAll(/\{\{(\w+)\}\}/g, (_: string | RegExp, name: string): string => {
+    return message.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
       return values[name] == null ? '' : values[name].toString()
     })
   }
