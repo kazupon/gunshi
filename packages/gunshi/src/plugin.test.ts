@@ -573,20 +573,22 @@ describe('resolveDependencies', () => {
   test('throw error for missing required dependency', () => {
     const pluginB = plugin({ name: 'b', dependencies: ['a'] })
 
-    expect(() => resolveDependencies([pluginB])).toThrow('Missing required dependency: a')
+    expect(() => resolveDependencies([pluginB])).toThrow('Missing required dependency: `a` on `b`')
   })
 
   test('throw error for circular dependency', () => {
     const pluginA = plugin({ name: 'a', dependencies: ['b'] })
     const pluginB = plugin({ name: 'b', dependencies: ['a'] })
 
-    expect(() => resolveDependencies([pluginA, pluginB])).toThrow('Circular dependency detected: a')
+    expect(() => resolveDependencies([pluginA, pluginB])).toThrow(
+      'Circular dependency detected: `a`'
+    )
   })
 
   test('throw error for self-dependency', () => {
     const pluginA = plugin({ name: 'a', dependencies: ['a'] })
 
-    expect(() => resolveDependencies([pluginA])).toThrow('Circular dependency detected: a')
+    expect(() => resolveDependencies([pluginA])).toThrow('Circular dependency detected: `a`')
   })
 
   test('handle plugins without names', () => {
@@ -620,7 +622,7 @@ describe('resolveDependencies', () => {
     const result = resolveDependencies([pluginA, pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['a', 'b'])
-    expect(mockWarn).toHaveBeenCalledWith('Duplicate plugin name detected: a')
+    expect(mockWarn).toHaveBeenCalledWith('Duplicate plugin name detected: `a`')
   })
 
   test('resolve dependencies with version field (for future use)', () => {

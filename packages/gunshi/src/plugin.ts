@@ -318,7 +318,7 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
   for (const plugin of plugins) {
     if (plugin.name) {
       if (pluginMap.has(plugin.name)) {
-        console.warn(`Duplicate plugin name detected: ${plugin.name}`)
+        console.warn(`Duplicate plugin name detected: \`${plugin.name}\``)
       }
       pluginMap.set(plugin.name, plugin)
     }
@@ -332,7 +332,7 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
       return
     }
     if (visiting.has(plugin.name)) {
-      throw new Error(`Circular dependency detected: ${plugin.name}`)
+      throw new Error(`Circular dependency detected: \`${plugin.name}\``)
     }
 
     visiting.add(plugin.name)
@@ -345,7 +345,7 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
 
       const depPlugin = pluginMap.get(depName)
       if (!depPlugin && !isOptional) {
-        throw new Error(`Missing required dependency: ${depName}`)
+        throw new Error(`Missing required dependency: \`${depName}\` on \`${plugin.name}\``)
       }
       if (depPlugin) {
         visit(depPlugin)
