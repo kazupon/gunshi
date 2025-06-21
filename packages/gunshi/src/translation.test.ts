@@ -8,10 +8,10 @@ test('DefaultTranslation', () => {
   })
 
   translation.setResource('ja-JP', {
-    hello: 'こんにちは、{{name}}さん！'
+    hello: 'こんにちは、{$name}さん！'
   })
   translation.setResource('en-US', {
-    hello: 'Hello, {{last}} {{first}}!'
+    hello: 'Hello, {$last} {$first}!'
   })
 
   expect(translation.translate('ja-JP', 'hello', { name: '太郎' })).toEqual(

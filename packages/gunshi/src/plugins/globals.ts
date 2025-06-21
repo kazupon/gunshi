@@ -37,55 +37,52 @@ export interface GlobalsCommandContext {
 }
 
 /**
- * Extension for the global options plugin.
- */
-const extension = (ctx: CommandContextCore<DefaultGunshiParams>) => ({
-  showVersion: () => {
-    const version = ctx.env.version || 'unknown'
-    if (!ctx.env.usageSilent) {
-      ctx.log(version)
-    }
-    return version
-  },
-  showHeader: async () => {
-    let header: string | undefined
-    if (ctx.env.renderHeader !== null && ctx.env.renderHeader !== undefined) {
-      header = await ctx.env.renderHeader(ctx)
-      if (header) {
-        ctx.log(header)
-        ctx.log() // empty line after header
-      }
-    }
-    return header
-  },
-  showUsage: async () => {
-    if (ctx.env.renderUsage !== null && ctx.env.renderUsage !== undefined) {
-      const usage = await ctx.env.renderUsage(ctx)
-      if (usage) {
-        ctx.log(usage)
-        return usage
-      }
-    }
-  },
-  showValidationErrors: async (error: AggregateError) => {
-    if (ctx.env.renderValidationErrors === null) {
-      return
-    }
-    if (ctx.env.renderValidationErrors !== undefined) {
-      const message = await ctx.env.renderValidationErrors(ctx, error)
-      ctx.log(message)
-      return message
-    }
-  }
-})
-
-/**
  * Built-in global options plugin for Gunshi.
  */
 export default function globals() {
   return plugin({
     name: 'globals',
-    extension,
+
+    extension: (ctx: CommandContextCore<DefaultGunshiParams>) => ({
+      showVersion: () => {
+        const version = ctx.env.version || 'unknown'
+        if (!ctx.env.usageSilent) {
+          ctx.log(version)
+        }
+        return version
+      },
+      showHeader: async () => {
+        let header: string | undefined
+        if (ctx.env.renderHeader !== null && ctx.env.renderHeader !== undefined) {
+          header = await ctx.env.renderHeader(ctx)
+          if (header) {
+            ctx.log(header)
+            ctx.log() // empty line after header
+          }
+        }
+        return header
+      },
+      showUsage: async () => {
+        if (ctx.env.renderUsage !== null && ctx.env.renderUsage !== undefined) {
+          const usage = await ctx.env.renderUsage(ctx)
+          if (usage) {
+            ctx.log(usage)
+            return usage
+          }
+        }
+      },
+      showValidationErrors: async (error: AggregateError) => {
+        if (ctx.env.renderValidationErrors === null) {
+          return
+        }
+        if (ctx.env.renderValidationErrors !== undefined) {
+          const message = await ctx.env.renderValidationErrors(ctx, error)
+          ctx.log(message)
+          return message
+        }
+      }
+    }),
+
     setup(ctx) {
       for (const [name, schema] of Object.entries(COMMON_ARGS)) {
         ctx.addGlobalOption(name, schema)

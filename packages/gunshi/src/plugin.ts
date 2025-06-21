@@ -19,6 +19,7 @@ import { Decorators } from './decorators.ts'
 import type { Args, ArgSchema } from 'args-tokens'
 import type {
   Awaitable,
+  Command,
   CommandContext,
   CommandContextCore,
   CommandContextExtension,
@@ -179,7 +180,7 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 export type PluginExtension<
   T = Record<string, unknown>,
   G extends GunshiParams = DefaultGunshiParams
-> = (core: CommandContextCore<G>) => T
+> = (ctx: CommandContextCore<G>, cmd: Command<G>) => T
 
 /**
  * Plugin definition options
@@ -266,17 +267,14 @@ export function plugin(options: {
 export function plugin<
   N extends string,
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
->(
-  options: {
-    name: N
-    dependencies?: (PluginDependency | string)[]
-    setup?: (
-      ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
-    ) => Awaitable<void>
-    extension?: PluginExtension<E, DefaultGunshiParams>
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any {
+>(options: {
+  name: N
+  dependencies?: (PluginDependency | string)[]
+  setup?: (
+    ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
+  ) => Awaitable<void>
+  extension?: PluginExtension<E, DefaultGunshiParams>
+}): PluginWithExtension<E> | PluginWithoutExtension<DefaultGunshiParams['extensions']> {
   const { name, setup, extension, dependencies } = options
 
   // create a wrapper function with properties

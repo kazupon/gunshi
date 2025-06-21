@@ -580,13 +580,15 @@ describe('plugin extensions', () => {
       expect.objectContaining({
         name: 'test-cmd',
         values: { token: 'test-token' }
-      })
+      }),
+      command
     )
     expect(dbExtension.factory).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'test-cmd',
         values: { token: 'test-token' }
-      })
+      }),
+      command
     )
   })
 
@@ -828,7 +830,7 @@ describe('CommandContextExtension type', () => {
     expect(extension1.key).not.toBe(extension2.key)
   })
 
-  test('extension factory can return complex objects', () => {
+  test('extension factory can return complex objects', async () => {
     const dbExtension: CommandContextExtension<{
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       query: (sql: string) => Promise<any>
@@ -845,8 +847,8 @@ describe('CommandContextExtension type', () => {
       })
     }
 
-    const mockCore = createMockCommandContext()
-    const db = dbExtension.factory(mockCore)
+    const mockCore = await createMockCommandContext()
+    const db = await dbExtension.factory(mockCore, {} as Command)
 
     expect(typeof db.query).toBe('function')
     expect(typeof db.transaction).toBe('function')

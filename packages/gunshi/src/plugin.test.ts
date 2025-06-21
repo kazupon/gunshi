@@ -54,7 +54,7 @@ test('PluginContext#decorateHeaderRenderer', async () => {
 
   const renderer = decorators.getHeaderRenderer()
   const mockCtx =
-    createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
+    await createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[DECORATED] ')
@@ -71,7 +71,7 @@ test('PluginContext#decorateUsageRenderer', async () => {
   })
 
   const renderer = decorators.getUsageRenderer()
-  const mockCtx = createMockCommandContext<Auth>()
+  const mockCtx = await createMockCommandContext<Auth>()
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[USAGE] ')
@@ -89,7 +89,7 @@ test('PluginContext#decorateValidationErrorsRenderer', async () => {
 
   const renderer = decorators.getValidationErrorsRenderer()
   const mockCtx =
-    createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
+    await createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
   const error = new AggregateError([new Error('Test')], 'Validation failed')
   const result = await renderer(mockCtx, error)
 
@@ -108,7 +108,7 @@ test('PluginContext#decorateCommand', async () => {
 
   const runner = decorators.commandDecorators[0]
   const mockCtx =
-    createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
+    await createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
   const result = await runner(_ctx => '[TEST]')(mockCtx)
 
   expect(result).toBe('[USAGE] [TEST]')
@@ -167,7 +167,7 @@ describe('plugin function', () => {
   })
 
   test('receives correct context via extension', async () => {
-    const mockCore = createMockCommandContext()
+    const mockCore = await createMockCommandContext()
     const extensionFactory = vi.fn(core => ({
       user: { id: 1, name: 'Test User' },
       getToken: () => core.values.token as string
@@ -198,9 +198,10 @@ describe('plugin function', () => {
 
     // test extension factory
     const extension = testPlugin.extension
-    const result = extension.factory(mockCore)
+    const command = {} as Command
+    const result = await extension.factory(mockCore, command)
 
-    expect(extensionFactory).toHaveBeenCalledWith(mockCore)
+    expect(extensionFactory).toHaveBeenCalledWith(mockCore, command)
     expect(result.user).toEqual({ id: 1, name: 'Test User' })
     expect(typeof result.getToken).toBe('function')
   })
@@ -305,7 +306,7 @@ describe('Plugin Extensions Integration', () => {
       'test-opt': { type: 'string', default: 'custom' }
     } satisfies Args
 
-    type TestExtension = ReturnType<typeof testPlugin.extension.factory>
+    type TestExtension = Awaited<ReturnType<typeof testPlugin.extension.factory>>
 
     // create a command that uses the extension
     const testCommand = define<
@@ -372,8 +373,8 @@ describe('Plugin Extensions Integration', () => {
     })
 
     type ExtendContext = {
-      auth: ReturnType<typeof authPlugin.extension.factory>
-      logger: ReturnType<typeof loggerPlugin.extension.factory>
+      auth: Awaited<ReturnType<typeof authPlugin.extension.factory>>
+      logger: Awaited<ReturnType<typeof loggerPlugin.extension.factory>>
     }
 
     // command using both extensions
@@ -461,7 +462,7 @@ describe('Plugin Extensions Integration', () => {
     const contextCommand = define<
       GunshiParams<{
         args: Args
-        extensions: { ctx: ReturnType<typeof contextPlugin.extension.factory> }
+        extensions: { ctx: Awaited<ReturnType<typeof contextPlugin.extension.factory>> }
       }>
     >({
       name: 'ctx-test',
@@ -477,7 +478,7 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command: contextCommand as Command<GunshiParams<Args>>,
+      command: contextCommand,
       extensions: {
         ctx: contextPlugin.extension
       },

@@ -8,7 +8,12 @@ import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constan
 import { createCommandContext } from './context.ts'
 import { Decorators } from './decorators.ts'
 import { PluginContext, resolveDependencies } from './plugin.ts'
-import { plugins } from './plugins/index.ts'
+import completion from './plugins/completion.ts'
+import dryRun from './plugins/dryrun.ts'
+import globals from './plugins/globals.ts'
+import i18n from './plugins/i18n.ts'
+import loader from './plugins/loader.ts'
+import renderer from './plugins/renderer.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
 import type { ArgToken } from 'args-tokens'
@@ -40,7 +45,16 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 ): Promise<string | undefined> {
   const decorators = new Decorators<G>()
   const pluginContext = new PluginContext<G>(decorators)
-  const plugins = await applyPlugins(pluginContext)
+
+  const builtInPlugins: Plugin[] = [
+    loader(),
+    globals(),
+    i18n({ locale: options.locale, translationAdapterFactory: options.translationAdapterFactory }),
+    renderer(),
+    completion(),
+    dryRun()
+  ]
+  const plugins = await applyPlugins(pluginContext, builtInPlugins)
 
   const cliOptions = normalizeCliOptions(options, entry, decorators)
 
@@ -82,7 +96,8 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 }
 
 async function applyPlugins<G extends GunshiParams>(
-  pluginContext: PluginContext<G>
+  pluginContext: PluginContext<G>,
+  plugins: Plugin[]
 ): Promise<Plugin[]> {
   const sortedPlugins = resolveDependencies(plugins)
   try {

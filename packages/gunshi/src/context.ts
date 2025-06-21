@@ -253,7 +253,7 @@ export async function createCommandContext<
       configurable: true
     })
     for (const [key, extension] of Object.entries(extensions)) {
-      ext[key] = extension.factory(core as CommandContextCore)
+      ext[key] = await extension.factory(core as CommandContextCore, command as Command)
     }
   }
   const ctx = deepFreeze(core)

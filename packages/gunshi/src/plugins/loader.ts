@@ -22,32 +22,30 @@ export interface LoaderCommandContext {
 }
 
 /**
- * Extension for the command loader plugin.
- */
-const extension = (ctx: CommandContextCore<DefaultGunshiParams>) => {
-  let cachedCommands: Command<DefaultGunshiParams>[] | undefined
-  return {
-    loadCommands: async <G extends GunshiParams = DefaultGunshiParams>(): Promise<Command<G>[]> => {
-      if (cachedCommands) {
-        return cachedCommands as Command<G>[]
-      }
-
-      const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
-      cachedCommands = (await Promise.all(
-        subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
-      )) as Command<DefaultGunshiParams>[]
-
-      return cachedCommands as Command<G>[]
-    }
-  }
-}
-
-/**
- * command loader plugin for Gunshi.
+ * Command loader plugin for Gunshi.
  */
 export default function loader() {
   return plugin({
     name: 'loader',
-    extension
+
+    extension: (ctx: CommandContextCore<DefaultGunshiParams>) => {
+      let cachedCommands: Command<DefaultGunshiParams>[] | undefined
+      return {
+        loadCommands: async <G extends GunshiParams = DefaultGunshiParams>(): Promise<
+          Command<G>[]
+        > => {
+          if (cachedCommands) {
+            return cachedCommands as Command<G>[]
+          }
+
+          const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
+          cachedCommands = (await Promise.all(
+            subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
+          )) as Command<DefaultGunshiParams>[]
+
+          return cachedCommands as Command<G>[]
+        }
+      }
+    }
   })
 }
