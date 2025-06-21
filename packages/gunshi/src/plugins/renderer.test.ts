@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { createCommandContext } from './context.ts'
-import i18n from './plugins/i18n.ts'
-import loader from './plugins/loader.ts'
-import renderer from './plugins/renderer.ts'
-import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
+import { createCommandContext } from '../context.ts'
+import { renderHeader, renderUsage, renderValidationErrors } from '../renderer.ts'
+import i18n from './i18n.ts'
+import loader from './loader.ts'
+import renderer from './renderer.ts'
 
 import type { Args } from 'args-tokens'
-import type { Command, GunshiParams, LazyCommand } from './types.ts'
+import type { Command, GunshiParams, LazyCommand } from '../types.ts'
 
 const NOOP = async () => {}
 const loaderPlugin = loader()
