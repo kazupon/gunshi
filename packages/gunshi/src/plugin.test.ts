@@ -613,12 +613,14 @@ describe('resolveDependencies', () => {
   })
 
   test('handle duplicate plugins in the list', () => {
+    const mockWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const pluginA = plugin({ name: 'a' })
     const pluginB = plugin({ name: 'b', dependencies: ['a'] })
 
     const result = resolveDependencies([pluginA, pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['a', 'b'])
+    expect(mockWarn).toHaveBeenCalledWith('Duplicate plugin name detected: a')
   })
 
   test('resolve dependencies with version field (for future use)', () => {

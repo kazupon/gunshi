@@ -317,6 +317,9 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
   // build a map for quick lookup
   for (const plugin of plugins) {
     if (plugin.name) {
+      if (pluginMap.has(plugin.name)) {
+        console.warn(`Duplicate plugin name detected: ${plugin.name}`)
+      }
       pluginMap.set(plugin.name, plugin)
     }
   }
