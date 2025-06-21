@@ -14,6 +14,7 @@ import { renderValidationErrors } from '../renderer/validation.ts'
 export default function renderer() {
   return plugin({
     name: 'default-renderer',
+    dependencies: ['loader'],
     setup: ctx => {
       ctx.decorateHeaderRenderer(async (_baseRenderer, cmdCtx) => await renderHeader(cmdCtx))
       ctx.decorateUsageRenderer(async (_baseRenderer, cmdCtx) => await renderUsage(cmdCtx))
