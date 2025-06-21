@@ -33,6 +33,21 @@ import type {
 export type { GlobalsCommandContext } from './plugins/globals.ts'
 
 /**
+ * Plugin dependency definition
+ */
+export interface PluginDependency {
+  /**
+   * Dependency plugin name
+   */
+  name: string
+  /**
+   * Optional dependency flag.
+   * If true, the plugin will not throw an error if the dependency is not found.
+   */
+  optional?: boolean
+}
+
+/**
  * Gunshi plugin context.
  * @internal
  */
@@ -174,9 +189,21 @@ export interface PluginOptions<
   T extends Record<string, unknown> = Record<never, never>,
   G extends GunshiParams = DefaultGunshiParams
 > {
+  /**
+   * Plugin name
+   */
   name: string
-
+  /**
+   * Plugin dependencies
+   */
+  dependencies?: (PluginDependency | string)[]
+  /**
+   * Plugin setup function
+   */
   setup?: PluginFunction<G>
+  /**
+   * Plugin extension
+   */
   extension?: PluginExtension<T, G>
 }
 
@@ -188,6 +215,7 @@ export interface PluginOptions<
 export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> =
   PluginFunction & {
     name?: string
+    dependencies?: (PluginDependency | string)[]
     extension?: CommandContextExtension<E>
   }
 
@@ -199,6 +227,7 @@ export interface PluginWithExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > extends Plugin<E> {
   name: string
+  dependencies?: (PluginDependency | string)[]
   extension: CommandContextExtension<E>
 }
 
@@ -210,6 +239,7 @@ export interface PluginWithoutExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > extends Plugin<E> {
   name: string
+  dependencies?: (PluginDependency | string)[]
 }
 
 /**
@@ -221,6 +251,7 @@ export function plugin<
   F extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
 >(options: {
   name: N
+  dependencies?: (PluginDependency | string)[]
   setup?: (
     ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<F> } }>>
   ) => Awaitable<void>
@@ -229,6 +260,7 @@ export function plugin<
 
 export function plugin(options: {
   name: string
+  dependencies?: (PluginDependency | string)[]
   setup?: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
@@ -238,6 +270,7 @@ export function plugin<
 >(
   options: {
     name: N
+    dependencies?: (PluginDependency | string)[]
     setup?: (
       ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
     ) => Awaitable<void>
@@ -245,7 +278,7 @@ export function plugin<
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any {
-  const { name, setup, extension } = options
+  const { name, setup, extension, dependencies } = options
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -263,6 +296,14 @@ export function plugin<
       enumerable: true,
       configurable: true
     },
+    ...(dependencies && {
+      dependencies: {
+        value: dependencies,
+        writable: false,
+        enumerable: true,
+        configurable: true
+      }
+    }),
     ...(extension && {
       extension: {
         value: {
@@ -275,4 +316,69 @@ export function plugin<
       }
     })
   })
+}
+
+/**
+ * Resolve plugin dependencies using topological sort
+ * @param plugins - Array of plugins to resolve
+ * @returns Array of plugins sorted by dependencies
+ * @throws Error if circular dependency is detected or required dependency is missing
+ */
+export function resolveDependencies<E extends GunshiParams['extensions']>(
+  plugins: Plugin<E>[]
+): Plugin<E>[] {
+  const sorted: Plugin<E>[] = []
+  const visited = new Set<string>()
+  const visiting = new Set<string>()
+  const pluginMap = new Map<string, Plugin<E>>()
+
+  // build a map for quick lookup
+  for (const plugin of plugins) {
+    if (plugin.name) {
+      if (pluginMap.has(plugin.name)) {
+        console.warn(`Duplicate plugin name detected: \`${plugin.name}\``)
+      }
+      pluginMap.set(plugin.name, plugin)
+    }
+  }
+
+  function visit(plugin: Plugin<E>) {
+    if (!plugin.name) {
+      return
+    }
+    if (visited.has(plugin.name)) {
+      return
+    }
+    if (visiting.has(plugin.name)) {
+      throw new Error(`Circular dependency detected: \`${plugin.name}\``)
+    }
+
+    visiting.add(plugin.name)
+
+    // process dependencies first
+    const deps = plugin.dependencies || []
+    for (const dep of deps) {
+      const depName = typeof dep === 'string' ? dep : dep.name
+      const isOptional = typeof dep === 'string' ? false : dep.optional || false
+
+      const depPlugin = pluginMap.get(depName)
+      if (!depPlugin && !isOptional) {
+        throw new Error(`Missing required dependency: \`${depName}\` on \`${plugin.name}\``)
+      }
+      if (depPlugin) {
+        visit(depPlugin)
+      }
+    }
+
+    visiting.delete(plugin.name)
+    visited.add(plugin.name)
+    sorted.push(plugin)
+  }
+
+  // visit all plugins
+  for (const plugin of plugins) {
+    visit(plugin)
+  }
+
+  return sorted
 }

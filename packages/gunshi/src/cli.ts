@@ -7,7 +7,7 @@ import { parseArgs, resolveArgs } from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { Decorators } from './decorators.ts'
-import { PluginContext } from './plugin.ts'
+import { PluginContext, resolveDependencies } from './plugin.ts'
 import { plugins } from './plugins/index.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
@@ -84,9 +84,10 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 async function applyPlugins<G extends GunshiParams>(
   pluginContext: PluginContext<G>
 ): Promise<Plugin[]> {
+  const sortedPlugins = resolveDependencies(plugins)
   try {
     // TODO(kazupon): add more user plugins loading logic
-    for (const plugin of plugins) {
+    for (const plugin of sortedPlugins) {
       /**
        * NOTE(kazupon):
        * strictly `Args` are not required for plugin installation.
@@ -99,7 +100,7 @@ async function applyPlugins<G extends GunshiParams>(
     console.error('Error loading plugin:', (error as Error).message)
   }
 
-  return plugins
+  return sortedPlugins
 }
 
 function getCommandArgs<G extends GunshiParams>(cmd?: Command<G> | LazyCommand<G>): G['args'] {
