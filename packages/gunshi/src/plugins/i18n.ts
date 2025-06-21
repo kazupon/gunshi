@@ -80,7 +80,9 @@ interface I18nPluginOptions {
 export default function i18n(options: I18nPluginOptions = {}) {
   return plugin({
     name: 'i18n',
+
     dependencies: [{ name: 'globals', optional: true }],
+
     extension: async (ctx: CommandContextCore, cmd: Command) => {
       // extract locale configuration from options
       const locale = resolveLocale(options.locale)
