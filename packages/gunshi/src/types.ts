@@ -376,7 +376,7 @@ export interface CommandContextExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > {
   readonly key: symbol
-  readonly factory: (core: CommandContextCore) => E
+  readonly factory: (ctx: CommandContextCore, cmd: Command) => Awaitable<E>
 }
 
 /**

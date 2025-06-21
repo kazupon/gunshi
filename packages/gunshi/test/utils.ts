@@ -13,8 +13,10 @@ import { create } from '../src/utils.ts'
 import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core'
 import type { Args } from 'args-tokens'
 import type {
+  Command,
   CommandContext,
   CommandContextExtension,
+  DefaultGunshiParams,
   ExtendContext,
   GunshiParams,
   TranslationAdapter,
@@ -145,9 +147,14 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
   }
 }
 
-export function createMockCommandContext<E extends ExtendContext = NoExt>(
-  extensions?: Record<string, CommandContextExtension>
-): CommandContext<GunshiParams<{ args: Args; extensions: E }>> {
+type CreateMockCommandContext<G extends GunshiParams = DefaultGunshiParams> = {
+  extensions?: Record<string, CommandContextExtension<G['extensions']>>
+  command?: Command<G>
+}
+
+export async function createMockCommandContext<E extends ExtendContext = NoExt>(
+  options: CreateMockCommandContext<DefaultGunshiParams> = {}
+): Promise<CommandContext<GunshiParams<{ args: Args; extensions: E }>>> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ctx: any = {
     name: 'mock-command',
@@ -182,10 +189,13 @@ export function createMockCommandContext<E extends ExtendContext = NoExt>(
     translate: ((key: any) => String(key)) as CommandContext['translate']
   }
 
-  if (extensions) {
+  if (options.extensions) {
     const extensionsObj = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
-    for (const [key, extension] of Object.entries(extensions)) {
-      extensionsObj[key] = (extension as CommandContextExtension).factory(ctx)
+    for (const [key, extension] of Object.entries(options.extensions)) {
+      extensionsObj[key] = await (extension as CommandContextExtension).factory(
+        ctx,
+        options.command as Command
+      )
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ctx = Object.assign(create<any>(), ctx, { extensions: extensionsObj })

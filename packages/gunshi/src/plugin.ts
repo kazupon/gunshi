@@ -19,6 +19,7 @@ import { Decorators } from './decorators.ts'
 import type { Args, ArgSchema } from 'args-tokens'
 import type {
   Awaitable,
+  Command,
   CommandContext,
   CommandContextCore,
   CommandContextExtension,
@@ -164,7 +165,7 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 export type PluginExtension<
   T = Record<string, unknown>,
   G extends GunshiParams = DefaultGunshiParams
-> = (core: CommandContextCore<G>) => T
+> = (ctx: CommandContextCore<G>, cmd: Command<G>) => T
 
 /**
  * Plugin definition options
