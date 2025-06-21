@@ -13,7 +13,6 @@
  * @license MIT
  */
 
-import { DEFAULT_LOCALE } from '../constants.ts'
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
 import { plugin } from '../plugin.ts'
 import { createTranslationAdapter } from '../translation.ts'
@@ -33,9 +32,15 @@ import type {
 } from '../types.ts'
 
 /**
- * i18n extension interface for CommandContext
+ * The default locale string, which format is BCP 47 language tag.
  */
-interface I18nCommandContext {
+const DEFAULT_LOCALE = 'en-US'
+
+/**
+ * Extended command context which provides utilities via i18n plugin.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Command locale
    */
@@ -48,7 +53,7 @@ interface I18nCommandContext {
    */
   translate: <
     T extends string = CommandBuiltinKeys,
-    O = CommandArgKeys<DefaultGunshiParams['args']>,
+    O = CommandArgKeys<G['args']>,
     K = CommandBuiltinKeys | O | T
   >(
     key: K,
@@ -75,6 +80,7 @@ interface I18nPluginOptions {
 export default function i18n(options: I18nPluginOptions = {}) {
   return plugin({
     name: 'i18n',
+    dependencies: [{ name: 'globals', optional: true }],
     extension: async (ctx: CommandContextCore, cmd: Command) => {
       // extract locale configuration from options
       const locale = resolveLocale(options.locale)
@@ -172,7 +178,7 @@ async function loadLocaleResources(
   let targetResource: Record<string, string> | undefined
   try {
     targetResource = (
-      (await import(`./locales/${targetLocale}.json`, {
+      (await import(`../locales/${targetLocale}.json`, {
         with: { type: 'json' }
       })) as { default: Record<string, string> }
     ).default

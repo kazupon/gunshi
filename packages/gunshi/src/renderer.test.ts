@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from './context.ts'
+import i18n from './plugins/i18n.ts'
 import loader from './plugins/loader.ts'
+import renderer from './plugins/renderer.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
@@ -8,6 +10,8 @@ import type { Command, GunshiParams, LazyCommand } from './types.ts'
 
 const NOOP = async () => {}
 const loaderPlugin = loader()
+const i18nPlugin = i18n()
+const rendererPlugin = renderer()
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -214,6 +218,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         name: 'cmd1',
@@ -243,6 +252,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
@@ -286,6 +300,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
@@ -323,6 +342,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
@@ -370,6 +394,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
@@ -419,6 +448,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         version: '0.0.0',
@@ -469,6 +503,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         usageOptionType: true,
         leftMargin: 4,
@@ -494,7 +533,9 @@ describe('renderUsage', () => {
       tokens: [], // dummy, due to test
       command: SHOW,
       extensions: {
-        loader: loaderPlugin.extension
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
       },
       cliOptions: {
         cwd: '/path/to/cmd1',
@@ -552,6 +593,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         name: 'cmd1',
@@ -604,6 +650,11 @@ describe('renderUsage', () => {
       omitted: false,
       callMode: 'entry',
       command,
+      extensions: {
+        i18n: i18nPlugin.extension,
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
       cliOptions: {
         cwd: '/path/to/cmd1',
         name: 'cmd1',
