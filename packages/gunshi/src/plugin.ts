@@ -35,9 +35,15 @@ export type { GlobalsCommandContext } from './plugins/globals.ts'
  * Plugin dependency definition
  */
 export interface PluginDependency {
+  /**
+   * Dependency plugin name
+   */
   name: string
+  /**
+   * Optional dependency flag.
+   * If true, the plugin will not throw an error if the dependency is not found.
+   */
   optional?: boolean
-  version?: string
 }
 
 /**
@@ -182,10 +188,21 @@ export interface PluginOptions<
   T extends Record<string, unknown> = Record<never, never>,
   G extends GunshiParams = DefaultGunshiParams
 > {
+  /**
+   * Plugin name
+   */
   name: string
+  /**
+   * Plugin dependencies
+   */
   dependencies?: (PluginDependency | string)[]
-
+  /**
+   * Plugin setup function
+   */
   setup?: PluginFunction<G>
+  /**
+   * Plugin extension
+   */
   extension?: PluginExtension<T, G>
 }
 

@@ -625,18 +625,6 @@ describe('resolveDependencies', () => {
     expect(mockWarn).toHaveBeenCalledWith('Duplicate plugin name detected: `a`')
   })
 
-  test('resolve dependencies with version field (for future use)', () => {
-    const pluginA = plugin({ name: 'a' })
-    const pluginB = plugin({
-      name: 'b',
-      dependencies: [{ name: 'a', version: '1.0.0' }]
-    })
-
-    const result = resolveDependencies([pluginB, pluginA])
-
-    expect(result.map(p => p.name)).toEqual(['a', 'b'])
-  })
-
   test('handle empty plugin array', () => {
     const result = resolveDependencies([])
 
