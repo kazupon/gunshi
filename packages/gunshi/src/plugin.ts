@@ -233,7 +233,7 @@ export function plugin<
   F extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
 >(options: {
   name: N
-  dependencies?: PluginDependency[] | string[]
+  dependencies?: (PluginDependency | string)[]
   setup?: (
     ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<F> } }>>
   ) => Awaitable<void>
@@ -242,7 +242,7 @@ export function plugin<
 
 export function plugin(options: {
   name: string
-  dependencies?: PluginDependency[] | string[]
+  dependencies?: (PluginDependency | string)[]
   setup?: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
@@ -252,7 +252,7 @@ export function plugin<
 >(
   options: {
     name: N
-    dependencies?: PluginDependency[] | string[]
+    dependencies?: (PluginDependency | string)[]
     setup?: (
       ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
     ) => Awaitable<void>

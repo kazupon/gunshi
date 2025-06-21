@@ -604,11 +604,7 @@ describe('resolveDependencies', () => {
     const pluginB = plugin({ name: 'b' })
     const pluginC = plugin({
       name: 'c',
-      dependencies: [
-        { name: 'a' },
-        { name: 'b', optional: false },
-        { name: 'missing', optional: true }
-      ]
+      dependencies: ['a', { name: 'b', optional: false }, { name: 'missing', optional: true }]
     })
 
     const result = resolveDependencies([pluginC, pluginB, pluginA])
