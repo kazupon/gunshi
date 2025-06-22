@@ -193,9 +193,7 @@ export async function createMockCommandContext<E extends ExtendContext = NoExt>(
     tokens: [],
     omitted: false,
     callMode: 'entry',
-    log: vi.fn(),
-    // eslint-disable-next-line unicorn/prefer-native-coercion-functions, @typescript-eslint/no-explicit-any
-    translate: ((key: any) => String(key)) as CommandContext['translate']
+    log: vi.fn()
   }
 
   if (options.extensions) {

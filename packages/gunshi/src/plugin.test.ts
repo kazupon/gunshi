@@ -451,9 +451,7 @@ describe('Plugin Extensions Integration', () => {
       extension(core) {
         capturedContext({
           name: core.name,
-          locale: core.locale.toString(),
-          hasValues: !!core.values,
-          hasTranslate: typeof core.translate === 'function'
+          hasValues: !!core.values
         })
         return { captured: true }
       }
@@ -491,9 +489,7 @@ describe('Plugin Extensions Integration', () => {
 
     expect(capturedContext).toHaveBeenCalledWith({
       name: 'ctx-test',
-      locale: 'en-US',
-      hasValues: true,
-      hasTranslate: true
+      hasValues: true
     })
   })
 })

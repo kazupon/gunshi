@@ -143,6 +143,8 @@ export default function i18n(options: I18nPluginOptions = {}) {
       defaultCommandResource.examples = await resolveExamples(ctx, cmd.examples)
       adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
+      // console.log('load command resource', locale.toString())
+      // FiXME(kazupon): should be removed, if built-in plugin is self-hosted
       const originalResource = await loadCommandResource<DefaultGunshiParams>(ctx, cmd)
       if (originalResource) {
         const resource = Object.assign(

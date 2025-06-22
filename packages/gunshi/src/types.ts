@@ -278,10 +278,6 @@ export interface CommandContext<G extends GunshiParams<any> = DefaultGunshiParam
    */
   description: string | undefined
   /**
-   * Command locale, that is the locale of the command that is executed.
-   */
-  locale: Intl.Locale
-  /**
    * Command environment, that is the environment of the command that is executed.
    * The command environment is same {@link CommandEnvironment}.
    */
@@ -336,20 +332,6 @@ export interface CommandContext<G extends GunshiParams<any> = DefaultGunshiParam
    * @internal
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any
-  /**
-   * Translate function.
-   * @param key the key to be translated
-   * @param values the values to be formatted
-   * @returns A translated string.
-   */
-  translate: <
-    T extends string = CommandBuiltinKeys,
-    O = CommandArgKeys<G['args']>,
-    K = CommandBuiltinKeys | O | T
-  >(
-    key: K,
-    values?: Record<string, unknown>
-  ) => string
   /**
    *  Command context extensions.
    */

@@ -1,9 +1,22 @@
+import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { createMockCommandContext } from '../../test/utils.ts'
+import {
+  createMockCommandContext,
+  createTranslationAdapterForIntlifyMessageFormat,
+  createTranslationAdapterForMessageFormat2
+} from '../../test/utils.ts'
+import { createCommandContext } from '../context.ts'
 import { resolveBuiltInKey } from '../utils.ts'
 import i18n from './i18n.ts'
 
-import type { Command, TranslationAdapter } from '../types.ts'
+import type { Args } from 'args-tokens'
+import type {
+  Command,
+  CommandResource,
+  CommandResourceFetcher,
+  GunshiParams,
+  TranslationAdapter
+} from '../types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -116,4 +129,160 @@ test('handle missing translations gracefully', async () => {
 
   // Test non-existent key
   expect(extension.translate('non-existent-key')).toBe('')
+})
+
+describe('translation adapter', () => {
+  test('Intl.MessageFormat (MF2)', async () => {
+    const args = {
+      foo: {
+        type: 'string',
+        short: 'f',
+        description: 'this is foo option'
+      }
+    } satisfies Args
+
+    const jaJPResource = {
+      description: 'これはコマンド1です',
+      'arg:foo': 'これは foo オプションです',
+      examples: 'これはコマンド1の例です',
+      user: 'こんにちは、{$user}'
+    } satisfies CommandResource<GunshiParams<{ args: typeof args }>>
+
+    const loadLocale = 'ja-JP'
+
+    const plugin = i18n({
+      translationAdapterFactory: createTranslationAdapterForMessageFormat2,
+      locale: loadLocale
+    })
+    using mockResource = vi
+      .fn<
+        CommandResourceFetcher<
+          GunshiParams<{
+            args: typeof args
+            extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+          }>
+        >
+      >()
+      .mockImplementation(ctx => {
+        if (ctx.extensions.i18n.locale.toString() === loadLocale) {
+          return Promise.resolve(jaJPResource)
+        } else {
+          throw new Error('not found')
+        }
+      })
+
+    const command = {
+      name: 'cmd1',
+      args,
+      examples: 'this is an cmd1 example',
+      run: vi.fn(),
+      resource: mockResource
+    } satisfies Command<GunshiParams<{ args: typeof args }>>
+
+    const ctx = await createCommandContext<
+      GunshiParams<{
+        args: typeof args
+        extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+      }>
+    >({
+      args,
+      values: { foo: 'foo' },
+      positionals: ['bar'],
+      rest: [],
+      argv: ['bar'],
+      tokens: [], // dummy, due to test
+      command,
+      extensions: {
+        i18n: plugin.extension
+      },
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: {
+        description: 'this is cmd1'
+      }
+    })
+
+    const mf1 = new MessageFormat('ja-JP', jaJPResource['arg:foo'])
+    expect(ctx.extensions.i18n.translate('arg:foo')).toEqual(mf1.format())
+    const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
+    expect(ctx.extensions.i18n.translate('user', { user: 'kazupon' })).toEqual(
+      mf2.format({ user: 'kazupon' })
+    )
+  })
+
+  test('Intlify Message Format', async () => {
+    const args = {
+      foo: {
+        type: 'string',
+        short: 'f',
+        description: 'this is foo option'
+      }
+    } satisfies Args
+
+    const jaJPResource = {
+      description: 'これはコマンド1です',
+      'arg:foo': 'これは foo オプションです',
+      examples: 'これはコマンド1の例です',
+      user: 'こんにちは、{user}'
+    } satisfies CommandResource<GunshiParams<{ args: typeof args }>>
+
+    const loadLocale = 'ja-JP'
+
+    const plugin = i18n({
+      translationAdapterFactory: createTranslationAdapterForIntlifyMessageFormat,
+      locale: loadLocale
+    })
+    using mockResource = vi
+      .fn<
+        CommandResourceFetcher<
+          GunshiParams<{
+            args: typeof args
+            extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+          }>
+        >
+      >()
+      .mockImplementation(ctx => {
+        if (ctx.extensions.i18n.locale.toString() === loadLocale) {
+          return Promise.resolve(jaJPResource)
+        } else {
+          throw new Error('not found')
+        }
+      })
+
+    const command = {
+      name: 'cmd1',
+      args,
+      examples: 'this is an cmd1 example',
+      run: vi.fn(),
+      resource: mockResource
+    } satisfies Command<GunshiParams<{ args: typeof args }>>
+
+    const ctx = await createCommandContext<
+      GunshiParams<{
+        args: typeof args
+        extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+      }>
+    >({
+      args,
+      values: { foo: 'foo' },
+      positionals: ['bar'],
+      rest: [],
+      argv: ['bar'],
+      tokens: [], // dummy, due to test
+      command,
+      extensions: {
+        i18n: plugin.extension
+      },
+      omitted: false,
+      callMode: 'entry',
+      cliOptions: {
+        description: 'this is cmd1'
+      }
+    })
+
+    expect(ctx.extensions.i18n.translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
+    expect(ctx.extensions.i18n.translate('user', { user: 'kazupon' })).toEqual(
+      `こんにちは、kazupon`
+    )
+  })
 })

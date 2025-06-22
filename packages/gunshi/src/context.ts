@@ -15,42 +15,22 @@
  * @license MIT
  */
 
-import {
-  ANONYMOUS_COMMAND_NAME,
-  BUILT_IN_PREFIX,
-  COMMAND_OPTIONS_DEFAULT,
-  DEFAULT_LOCALE,
-  NOOP
-} from './constants.ts'
-import DefaultResource from './locales/en-US.json' with { type: 'json' }
-import { createTranslationAdapter } from './translation.ts'
-import {
-  create,
-  deepFreeze,
-  isLazyCommand,
-  log,
-  mapResourceWithBuiltinKey,
-  resolveArgKey,
-  resolveExamples
-} from './utils.ts'
+import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
+import { create, deepFreeze, isLazyCommand, log } from './utils.ts'
 
 import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 import type {
   CliOptions,
   Command,
-  CommandBuiltinKeys,
   CommandCallMode,
   CommandContext,
   CommandContextCore,
   CommandContextExtension,
   CommandEnvironment,
-  CommandResource,
   DefaultGunshiParams,
   GunshiParams,
   LazyCommand
 } from './types.ts'
-
-const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 
 /**
  * Extract extension return types from extensions record
@@ -163,60 +143,6 @@ export async function createCommandContext<
 
   const env = Object.assign(create<CommandEnvironment<G>>(), COMMAND_OPTIONS_DEFAULT, cliOptions)
 
-  const locale = resolveLocale(cliOptions.locale)
-  const localeStr = locale.toString() // NOTE(kazupon): `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
-
-  const translationAdapterFactory = cliOptions.translationAdapterFactory || createTranslationAdapter
-  const adapter = translationAdapterFactory({
-    locale: localeStr,
-    fallbackLocale: DEFAULT_LOCALE
-  })
-
-  // store built-in locale resources in the environment
-  const localeResources: Map<string, Record<string, string>> = new Map()
-
-  let builtInLoadedResources: Record<string, string> | undefined
-
-  /**
-   * load the built-in locale resources
-   */
-
-  localeResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
-  if (DEFAULT_LOCALE !== localeStr) {
-    try {
-      builtInLoadedResources = (
-        (await import(`./locales/${localeStr}.json`, {
-          with: { type: 'json' }
-        })) as { default: Record<string, string> }
-      ).default
-      localeResources.set(localeStr, mapResourceWithBuiltinKey(builtInLoadedResources))
-    } catch {}
-  }
-
-  /**
-   * define the translation function, which is used to {@link CommandContext.translate}.
-   *
-   */
-
-  function translate<
-    T extends string = CommandBuiltinKeys,
-    K = CommandBuiltinKeys | keyof G['args'] | T
-  >(key: K, values: Record<string, unknown> = create<Record<string, unknown>>()): string {
-    const strKey = key as string
-    if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
-      // NOTE(kazupon):
-      // if the key is one of the `COMMAND_BUILTIN_RESOURCE_KEYS` and the key is not found in the locale resources,
-      // then return the key itself.
-      const resource = localeResources.get(localeStr) || localeResources.get(DEFAULT_LOCALE)!
-      return resource[strKey as CommandBuiltinKeys] || strKey
-    } else {
-      // NOTE(kazupon):
-      // for otherwise, if the key is not found in the command resources, then return an empty string.
-      // because should not render the key in usage.
-      return adapter.translate(locale.toString(), strKey, values) || ''
-    }
-  }
-
   /**
    * create the command context
    */
@@ -226,7 +152,6 @@ export async function createCommandContext<
     description: command.description,
     omitted,
     callMode,
-    locale,
     env,
     args: _args,
     values,
@@ -236,7 +161,6 @@ export async function createCommandContext<
     tokens,
     toKebab: command.toKebab,
     log: cliOptions.usageSilent ? NOOP : log,
-    translate,
     validationError
   })
 
@@ -258,41 +182,6 @@ export async function createCommandContext<
   }
   const ctx = deepFreeze(core)
 
-  /**
-   * load the command resources
-   */
-
-  // extract option descriptions from command options
-  const loadedOptionsResources = Object.entries(args).map(([key, arg]) => {
-    // get description from option if available
-    const description = arg.description || ''
-    return [key, description] as [string, string]
-  })
-
-  const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
-    res[resolveArgKey(key)] = value
-    return res
-  }, create<Record<string, string>>())
-  defaultCommandResource.description = command.description || ''
-  defaultCommandResource.examples = await resolveExamples(ctx, command.examples)
-  adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
-
-  const originalResource = await loadCommandResource<G>(ctx, command)
-  if (originalResource) {
-    const resource = Object.assign(
-      create<Record<string, string>>(),
-      originalResource as Record<string, string>,
-      {
-        examples: await resolveExamples(ctx, originalResource.examples)
-      } as Record<string, string>
-    )
-    if (builtInLoadedResources) {
-      resource.help = builtInLoadedResources.help
-      resource.version = builtInLoadedResources.version
-    }
-    adapter.setResource(localeStr, resource)
-  }
-
   return ctx as {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<G>>
     : Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: ExtractExtensions<E> }>>>
@@ -306,24 +195,4 @@ function getCommandName<G extends GunshiParams>(cmd: Command<G> | LazyCommand<G>
   } else {
     return ANONYMOUS_COMMAND_NAME
   }
-}
-
-function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
-  return locale instanceof Intl.Locale
-    ? locale
-    : typeof locale === 'string'
-      ? new Intl.Locale(locale)
-      : new Intl.Locale(DEFAULT_LOCALE)
-}
-
-async function loadCommandResource<G extends GunshiParams>(
-  ctx: CommandContext<G>,
-  command: Command<G> | LazyCommand<G>
-): Promise<CommandResource<G> | undefined> {
-  let resource: CommandResource<G> | undefined
-  try {
-    // TODO(kazupon): should check the resource which is a dictionary object
-    resource = await command.resource?.(ctx)
-  } catch {}
-  return resource
 }
