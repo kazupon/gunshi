@@ -359,6 +359,7 @@ export interface CommandContextExtension<
 > {
   readonly key: symbol
   readonly factory: (ctx: CommandContextCore, cmd: Command) => Awaitable<E>
+  readonly onFactory?: (ctx: Readonly<CommandContext>, cmd: Readonly<Command>) => Awaitable<void>
 }
 
 /**

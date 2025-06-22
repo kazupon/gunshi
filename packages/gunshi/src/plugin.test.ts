@@ -128,7 +128,10 @@ describe('plugin function', () => {
     const testPlugin = plugin({
       name: 'test',
       setup: setupFn,
-      extension: extensionFactory
+      extension: extensionFactory,
+      onExtension: ctx => {
+        expectTypeOf(ctx.extensions.test).toEqualTypeOf<ReturnType<typeof extensionFactory>>()
+      }
     })
 
     // check plugin properties
@@ -444,17 +447,20 @@ describe('Plugin Extensions Integration', () => {
 
   test('extension can access all context properties', async () => {
     const capturedContext = vi.fn()
+    const onExtension = vi.fn()
 
     const contextPlugin = plugin({
       name: 'context',
       setup: () => {},
-      extension(core) {
+      extension(core: CommandContextCore) {
+        expect(core.extensions).toBeDefined()
         capturedContext({
           name: core.name,
           hasValues: !!core.values
         })
         return { captured: true }
-      }
+      },
+      onExtension
     })
 
     const contextCommand = define<
@@ -491,6 +497,7 @@ describe('Plugin Extensions Integration', () => {
       name: 'ctx-test',
       hasValues: true
     })
+    expect(onExtension).toHaveBeenCalledWith(ctx, contextCommand)
   })
 })
 
