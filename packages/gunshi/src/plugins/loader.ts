@@ -22,7 +22,7 @@ export interface LoaderCommandContext {
 }
 
 /**
- * Command loader plugin for Gunshi.
+ * command loader plugin
  */
 export default function loader() {
   return plugin({

@@ -43,7 +43,7 @@ describe('translate built-in keys', () => {
     expect(extension.translate(resolveBuiltInKey('CHOICES'))).toEqual('choices')
     expect(extension.translate(resolveBuiltInKey('DEFAULT'))).toEqual('default')
     expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
-      'For more info, run any command with the `--help` flag:'
+      'For more info, run any command with the `--help` flag'
     )
     expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('Negatable of')
     expect(extension.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
@@ -65,7 +65,7 @@ describe('translate built-in keys', () => {
     expect(extension.translate(resolveBuiltInKey('CHOICES'))).toEqual('選択肢')
     expect(extension.translate(resolveBuiltInKey('DEFAULT'))).toEqual('デフォルト')
     expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
-      '詳細は、コマンドと`--help`フラグを実行してください:'
+      '詳細は、コマンドと`--help`フラグを実行してください'
     )
     expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('否定可能な')
     expect(extension.translate(resolveBuiltInKey('help'))).toEqual('このヘルプメッセージを表示')

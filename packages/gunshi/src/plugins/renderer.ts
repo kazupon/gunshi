@@ -3,6 +3,12 @@
  * @license MIT
  */
 
+import {
+  ARG_NEGATABLE_PREFIX,
+  ARG_PREFIX_AND_KEY_SEPARATOR,
+  BUILD_IN_PREFIX_ADN_KEY_SEPARATOR
+} from '../constants.ts'
+import DefaultResource from '../locales/en-US.json' with { type: 'json' }
 import { plugin } from '../plugin.ts'
 import { renderHeader } from '../renderer/header.ts'
 import { renderUsage } from '../renderer/usage.ts'
@@ -32,7 +38,7 @@ export interface DefaultRendererCommandContext<G extends GunshiParams<any> = Def
 }
 
 /**
- * Default renderer plugin for Gunshi.
+ * Default renderer plugin
  */
 export default function renderer() {
   return plugin({
@@ -56,7 +62,27 @@ export default function renderer() {
         O = CommandArgKeys<DefaultGunshiParams['args']>,
         K = CommandBuiltinKeys | O | T
       >(key: K, values: Record<string, unknown> = create<Record<string, unknown>>()): string {
-        return i18n ? i18n.translate(key, values) : (key as string)
+        if (i18n) {
+          return i18n.translate(key, values)
+        } else {
+          if ((key as string).startsWith(BUILD_IN_PREFIX_ADN_KEY_SEPARATOR)) {
+            const resKey = (key as string).slice(BUILD_IN_PREFIX_ADN_KEY_SEPARATOR.length)
+            return DefaultResource[resKey as keyof typeof DefaultResource] || (key as string)
+          } else if ((key as string).startsWith(ARG_PREFIX_AND_KEY_SEPARATOR)) {
+            let argKey = (key as string).slice(ARG_PREFIX_AND_KEY_SEPARATOR.length)
+            let negatable = false
+            if (argKey.startsWith(ARG_NEGATABLE_PREFIX)) {
+              argKey = argKey.slice(ARG_NEGATABLE_PREFIX.length)
+              negatable = true
+            }
+            const schema = ctx.args[argKey as keyof typeof ctx.args]
+            return negatable && schema.type === 'boolean' && schema.negatable
+              ? `${DefaultResource['NEGATABLE']} --${argKey}`
+              : schema.description || ''
+          } else {
+            return key as string
+          }
+        }
       }
 
       return {

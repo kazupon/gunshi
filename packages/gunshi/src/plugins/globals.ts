@@ -37,7 +37,7 @@ export interface GlobalsCommandContext {
 }
 
 /**
- * Built-in global options plugin for Gunshi.
+ * Built-in global options plugin
  */
 export default function globals() {
   return plugin({

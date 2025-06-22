@@ -6,7 +6,7 @@
 import { plugin } from '../plugin.ts'
 
 /**
- * completion plugin for Gunshi.
+ * completion plugin
  */
 export default function completion(_options = {}) {
   return plugin({

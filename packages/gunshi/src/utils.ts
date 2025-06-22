@@ -3,7 +3,11 @@
  * @license MIT
  */
 
-import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
+import {
+  ARG_PREFIX,
+  ARG_PREFIX_AND_KEY_SEPARATOR,
+  BUILD_IN_PREFIX_ADN_KEY_SEPARATOR
+} from './constants.ts'
 
 import type { Args } from 'args-tokens'
 import type {
@@ -74,13 +78,13 @@ export async function resolveLazyCommand<G extends GunshiParams = DefaultGunshiP
 export function resolveBuiltInKey<
   K extends string = CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
 >(key: K): GenerateNamespacedKey<K> {
-  return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+  return `${BUILD_IN_PREFIX_ADN_KEY_SEPARATOR}${key}`
 }
 
 export function resolveArgKey<A extends Args = {}, K extends string = KeyOfArgs<RemovedIndex<A>>>(
   key: K
 ): GenerateNamespacedKey<K, typeof ARG_PREFIX> {
-  return `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+  return `${ARG_PREFIX_AND_KEY_SEPARATOR}${key}`
 }
 
 export async function resolveExamples<G extends GunshiParams = DefaultGunshiParams>(

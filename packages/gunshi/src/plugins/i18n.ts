@@ -77,6 +77,9 @@ interface I18nPluginOptions {
   translationAdapterFactory?: TranslationAdapterFactory
 }
 
+/**
+ * i18n plugin
+ */
 export default function i18n(options: I18nPluginOptions = {}) {
   return plugin({
     name: 'i18n',
@@ -97,16 +100,16 @@ export default function i18n(options: I18nPluginOptions = {}) {
       })
 
       // store built-in locale resources
-      const localeResources: Map<string, Record<string, string>> = new Map()
+      const localeBuiltinResources: Map<string, Record<string, string>> = new Map()
 
       let builtInLoadedResources: Record<string, string> | undefined
 
       // load default built-in resources
-      localeResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
+      localeBuiltinResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
 
       // load locale-specific resources asynchronously if needed
       if (DEFAULT_LOCALE !== localeStr) {
-        builtInLoadedResources = await loadLocaleResources(localeResources, localeStr)
+        builtInLoadedResources = await loadBuiltInLocaleResources(localeBuiltinResources, localeStr)
       }
 
       // define translate function
@@ -118,7 +121,8 @@ export default function i18n(options: I18nPluginOptions = {}) {
         const strKey = key as string
         if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
           // handle built-in keys
-          const resource = localeResources.get(localeStr) || localeResources.get(DEFAULT_LOCALE)!
+          const resource =
+            localeBuiltinResources.get(localeStr) || localeBuiltinResources.get(DEFAULT_LOCALE)!
           return resource[strKey as CommandBuiltinKeys] || strKey
         } else {
           // handle command-specific keys
@@ -127,11 +131,9 @@ export default function i18n(options: I18nPluginOptions = {}) {
       }
 
       // extract option descriptions from command options
-      const loadedOptionsResources = Object.entries(ctx.args).map(([key, arg]) => {
-        // get description from option if available
-        const description = arg.description || ''
-        return [key, description] as [string, string]
-      })
+      const loadedOptionsResources = Object.entries(ctx.args).map(
+        ([key, schema]) => [key, schema.description || ''] as [string, string]
+      )
 
       const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
         res[resolveArgKey(key)] = value
@@ -173,7 +175,7 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadLocaleResources(
+async function loadBuiltInLocaleResources(
   localeResources: Map<string, Record<string, string>>,
   targetLocale: string
 ): Promise<Record<string, string> | undefined> {

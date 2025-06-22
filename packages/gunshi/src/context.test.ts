@@ -232,7 +232,7 @@ describe('translation', () => {
     expect(ctx.translate(resolveBuiltInKey('EXAMPLES'))).toEqual('EXAMPLES')
     expect(ctx.translate(resolveBuiltInKey('USAGE'))).toEqual('USAGE')
     expect(ctx.translate(resolveBuiltInKey('FORMORE'))).toEqual(
-      'For more info, run any command with the `--help` flag:'
+      'For more info, run any command with the `--help` flag'
     )
 
     // description, options, and examples

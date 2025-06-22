@@ -6,7 +6,7 @@
 import { plugin } from '../plugin.ts'
 
 /**
- * dry-run plugin for Gunshi.
+ * dry-run plugin
  */
 export default function dryRun(_options = {}) {
   return plugin({

@@ -4,7 +4,7 @@
  */
 
 import { kebabnize } from 'args-tokens/utils'
-import { COMMON_ARGS } from '../constants.ts'
+import { ARG_NEGATABLE_PREFIX, COMMON_ARGS } from '../constants.ts'
 import {
   resolveExamples as _resolvedExamples,
   create,
@@ -161,7 +161,11 @@ async function renderCommandsSection<
       return `${command.padStart(ctx.env.leftMargin + command.length)} `
     })
   )
-  messages.push(...commandsStr, '', ctx.extensions!.renderer.text(resolveBuiltInKey('FORMORE')))
+  messages.push(
+    ...commandsStr,
+    '',
+    `${ctx.extensions!.renderer.text(resolveBuiltInKey('FORMORE'))}:`
+  )
   messages.push(
     ...loadedCommands.map(cmd => {
       const commandHelp = `${ctx.env.name} ${cmd.name} --help`
@@ -312,19 +316,19 @@ function getOptionalArgsPairs<G extends GunshiParams>(
     if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {
       // Convert parameter placeholders to kebab-case format when toKebab is enabled
       const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
-      acc[`no-${name}`] = `--no-${displayName}`
+      acc[`${ARG_NEGATABLE_PREFIX}${name}`] = `--${ARG_NEGATABLE_PREFIX}${displayName}`
     }
     return acc
   }, create<Record<string, string>>())
 }
 
-const resolveNegatableKey = (key: string): string => key.split('no-')[1]
+const resolveNegatableKey = (key: string): string => key.split(ARG_NEGATABLE_PREFIX)[1]
 
 function resolveNegatableType<G extends GunshiParams>(
   key: string,
   ctx: Readonly<CommandContext<G>>
 ) {
-  return ctx.args[key.startsWith('no-') ? resolveNegatableKey(key) : key].type
+  return ctx.args[key.startsWith(ARG_NEGATABLE_PREFIX) ? resolveNegatableKey(key) : key].type
 }
 
 function generateDefaultDisplayValue<
@@ -384,14 +388,14 @@ async function generateOptionalArgsUsage<
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(([key, value]) => {
       let rawDesc = ctx.extensions!.renderer.text(resolveArgKey(key))
-      if (!rawDesc && key.startsWith('no-')) {
+      if (!rawDesc && key.startsWith(ARG_NEGATABLE_PREFIX)) {
         const name = resolveNegatableKey(key)
         const schema = ctx.args[name]
         const optionKey = makeShortLongOptionPair(schema, name, ctx.toKebab)
         rawDesc = `${ctx.extensions!.renderer.text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
-      const valueDesc = key.startsWith('no-') ? '' : resolveDisplayValue(ctx, key)
+      const valueDesc = key.startsWith(ARG_NEGATABLE_PREFIX) ? '' : resolveDisplayValue(ctx, key)
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
       const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`

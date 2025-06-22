@@ -26,6 +26,7 @@ const SHOW = {
     },
     bar: {
       type: 'boolean',
+      negatable: true,
       description: 'The bar option'
     },
     baz: {
@@ -659,6 +660,32 @@ describe('renderUsage', () => {
         cwd: '/path/to/cmd1',
         name: 'cmd1',
         description: 'this is command line'
+      }
+    })
+
+    expect(await renderUsage(ctx)).toMatchSnapshot()
+  })
+
+  test('not install i18n plugin', async () => {
+    const ctx = await createCommandContext({
+      args: SHOW.args!,
+      values: {},
+      omitted: true,
+      callMode: 'entry',
+      positionals: [],
+      rest: [],
+      argv: [],
+      tokens: [], // dummy, due to test
+      command: SHOW,
+      extensions: {
+        loader: loaderPlugin.extension,
+        renderer: rendererPlugin.extension
+      },
+      cliOptions: {
+        cwd: '/path/to/cmd1',
+        version: '0.0.0',
+        name: 'cmd1',
+        subCommands: COMMANDS
       }
     })
 
