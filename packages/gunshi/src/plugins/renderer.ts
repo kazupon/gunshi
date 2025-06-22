@@ -6,7 +6,7 @@
 import {
   ARG_NEGATABLE_PREFIX,
   ARG_PREFIX_AND_KEY_SEPARATOR,
-  BUILD_IN_PREFIX_ADN_KEY_SEPARATOR
+  BUILD_IN_PREFIX_AND_KEY_SEPARATOR
 } from '../constants.ts'
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
 import { plugin } from '../plugin.ts'
@@ -65,8 +65,8 @@ export default function renderer() {
         if (i18n) {
           return i18n.translate(key, values)
         } else {
-          if ((key as string).startsWith(BUILD_IN_PREFIX_ADN_KEY_SEPARATOR)) {
-            const resKey = (key as string).slice(BUILD_IN_PREFIX_ADN_KEY_SEPARATOR.length)
+          if ((key as string).startsWith(BUILD_IN_PREFIX_AND_KEY_SEPARATOR)) {
+            const resKey = (key as string).slice(BUILD_IN_PREFIX_AND_KEY_SEPARATOR.length)
             return DefaultResource[resKey as keyof typeof DefaultResource] || (key as string)
           } else if ((key as string).startsWith(ARG_PREFIX_AND_KEY_SEPARATOR)) {
             let argKey = (key as string).slice(ARG_PREFIX_AND_KEY_SEPARATOR.length)

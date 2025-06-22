@@ -6,7 +6,7 @@
 import {
   ARG_PREFIX,
   ARG_PREFIX_AND_KEY_SEPARATOR,
-  BUILD_IN_PREFIX_ADN_KEY_SEPARATOR
+  BUILD_IN_PREFIX_AND_KEY_SEPARATOR
 } from './constants.ts'
 
 import type { Args } from 'args-tokens'
@@ -78,7 +78,7 @@ export async function resolveLazyCommand<G extends GunshiParams = DefaultGunshiP
 export function resolveBuiltInKey<
   K extends string = CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
 >(key: K): GenerateNamespacedKey<K> {
-  return `${BUILD_IN_PREFIX_ADN_KEY_SEPARATOR}${key}`
+  return `${BUILD_IN_PREFIX_AND_KEY_SEPARATOR}${key}`
 }
 
 export function resolveArgKey<A extends Args = {}, K extends string = KeyOfArgs<RemovedIndex<A>>>(
