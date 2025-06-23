@@ -89,7 +89,7 @@ export type CommandBuiltinResourceKeys =
 
 /**
  * Command i18n built-in keys.
- * The command i18n built-in keys are used to {@link CommandContext.translate | translate} function.
+ * The command i18n built-in keys are used by the i18n plugin for translation.
  * @internal
  */
 export type CommandBuiltinKeys =
@@ -100,7 +100,7 @@ export type CommandBuiltinKeys =
 
 /**
  * Command i18n option keys.
- * The command i18n option keys are used to {@link CommandContext.translate | translate} function.
+ * The command i18n option keys are used by the i18n plugin for translation.
  * @internal
  */
 export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
