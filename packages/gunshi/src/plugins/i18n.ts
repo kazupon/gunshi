@@ -23,7 +23,6 @@ import type {
   CommandArgKeys,
   CommandBuiltinKeys,
   CommandContext,
-  CommandContextCore,
   CommandResource,
   DefaultGunshiParams,
   GunshiParams,
@@ -98,12 +97,15 @@ export default function i18n(options: I18nPluginOptions = {}) {
   // load default built-in resources
   let builtInLoadedResources: Record<string, string> | undefined
 
+  /**
+   * define i18n plugin
+   */
   return plugin({
     name: 'i18n',
 
     dependencies: [{ name: 'globals', optional: true }],
 
-    extension: async (_ctx: CommandContextCore, _cmd: Command) => {
+    extension: async () => {
       // load default built-in resources
       localeBuiltinResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
 
