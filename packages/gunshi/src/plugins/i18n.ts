@@ -81,29 +81,29 @@ interface I18nPluginOptions {
  * i18n plugin
  */
 export default function i18n(options: I18nPluginOptions = {}) {
+  // extract locale configuration from options
+  const locale = resolveLocale(options.locale)
+  const localeStr = locale.toString()
+
+  // create translation adapter
+  const translationAdapterFactory = options.translationAdapterFactory || createTranslationAdapter
+  const adapter = translationAdapterFactory({
+    locale: localeStr,
+    fallbackLocale: DEFAULT_LOCALE
+  })
+
+  // store built-in locale resources
+  const localeBuiltinResources: Map<string, Record<string, string>> = new Map()
+
+  // load default built-in resources
+  let builtInLoadedResources: Record<string, string> | undefined
+
   return plugin({
     name: 'i18n',
 
     dependencies: [{ name: 'globals', optional: true }],
 
-    extension: async (ctx: CommandContextCore, cmd: Command) => {
-      // extract locale configuration from options
-      const locale = resolveLocale(options.locale)
-      const localeStr = locale.toString()
-
-      // create translation adapter
-      const translationAdapterFactory =
-        options.translationAdapterFactory || createTranslationAdapter
-      const adapter = translationAdapterFactory({
-        locale: localeStr,
-        fallbackLocale: DEFAULT_LOCALE
-      })
-
-      // store built-in locale resources
-      const localeBuiltinResources: Map<string, Record<string, string>> = new Map()
-
-      let builtInLoadedResources: Record<string, string> | undefined
-
+    extension: async (_ctx: CommandContextCore, _cmd: Command) => {
       // load default built-in resources
       localeBuiltinResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
 
@@ -130,6 +130,17 @@ export default function i18n(options: I18nPluginOptions = {}) {
         }
       }
 
+      return {
+        locale,
+        translate
+      } as I18nCommandContext
+    },
+
+    onExtension: async (ctx, cmd) => {
+      /**
+       * load command resources, after the command context is extended
+       */
+
       // extract option descriptions from command options
       const loadedOptionsResources = Object.entries(ctx.args).map(
         ([key, schema]) => [key, schema.description || ''] as [string, string]
@@ -143,9 +154,7 @@ export default function i18n(options: I18nPluginOptions = {}) {
       defaultCommandResource.examples = await resolveExamples(ctx, cmd.examples)
       adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-      // console.log('load command resource', locale.toString())
-      // FiXME(kazupon): should be removed, if built-in plugin is self-hosted
-      const originalResource = await loadCommandResource<DefaultGunshiParams>(ctx, cmd)
+      const originalResource = await loadCommandResource(ctx, cmd)
       if (originalResource) {
         const resource = Object.assign(
           create<Record<string, string>>(),
@@ -160,11 +169,6 @@ export default function i18n(options: I18nPluginOptions = {}) {
         }
         adapter.setResource(localeStr, resource)
       }
-
-      return {
-        locale,
-        translate
-      } as I18nCommandContext
     }
   })
 }
