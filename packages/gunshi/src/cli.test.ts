@@ -1161,9 +1161,9 @@ test('plugins option', async () => {
     return plugin({
       name: 'logger',
       setup: ctx => {
-        ctx.decorateCommand(bauseRuuner => ctx => {
+        ctx.decorateCommand(baseRunner => ctx => {
           console.log(`before command: ${ctx.name}`)
-          const ret = bauseRuuner(ctx)
+          const ret = baseRunner(ctx)
           if (typeof ret === 'string') {
             console.log(`command output: ${ret}`)
           }
