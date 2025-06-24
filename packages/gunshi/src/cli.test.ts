@@ -1154,20 +1154,20 @@ describe('command decorators', () => {
 })
 
 test('plugins option', async () => {
-  const utils = await import('./utils.ts')
-  const log = defineMockLog(utils)
+  const msgs: string[] = []
+  vi.spyOn(console, 'log').mockImplementation(msg => msgs.push(msg))
 
   function logger() {
     return plugin({
       name: 'logger',
       setup: ctx => {
         ctx.decorateCommand(bauseRuuner => ctx => {
-          ctx.log(`before command: ${ctx.name}`)
+          console.log(`before command: ${ctx.name}`)
           const ret = bauseRuuner(ctx)
           if (typeof ret === 'string') {
-            ctx.log(`command output: ${ret}`)
+            console.log(`command output: ${ret}`)
           }
-          ctx.log(`after command: ${ctx.name}`)
+          console.log(`after command: ${ctx.name}`)
           return ret
         })
       }
@@ -1185,10 +1185,11 @@ test('plugins option', async () => {
     plugins: [logger()]
   })
 
-  const stdout = log()
-  expect(stdout).toEqual(
-    ['before command: test', 'command output: executed test', 'after command: test'].join('\n')
-  )
+  expect(msgs).toEqual([
+    'before command: test',
+    'command output: executed test',
+    'after command: test'
+  ])
 })
 
 describe('edge cases', () => {
