@@ -66,7 +66,8 @@ export const COMMAND_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   renderHeader: undefined,
   renderUsage: undefined,
   renderValidationErrors: undefined,
-  translationAdapterFactory: undefined
+  translationAdapterFactory: undefined,
+  plugins: undefined
 }
 
 export const COMMAND_BUILTIN_RESOURCE_KEYS = [

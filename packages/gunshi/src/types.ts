@@ -3,9 +3,10 @@
  * @license MIT
  */
 
-import type { Args, ArgToken, ArgValues } from 'args-tokens'
-
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
+import { Plugin } from './plugin.ts'
+
+import type { Args, ArgToken, ArgValues } from 'args-tokens'
 
 export type Awaitable<T> = T | Promise<T>
 
@@ -254,6 +255,10 @@ export interface CliOptions<G extends GunshiParams<any> = DefaultGunshiParams> {
    * Translation adapter factory.
    */
   translationAdapterFactory?: TranslationAdapterFactory
+  /**
+   * User plugins.
+   */
+  plugins?: Plugin[]
 }
 
 /**

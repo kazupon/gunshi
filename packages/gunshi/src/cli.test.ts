@@ -3,6 +3,7 @@ import { z } from 'zod/v4-mini'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
+import { plugin } from './plugin.ts'
 import { renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
@@ -1150,6 +1151,44 @@ describe('command decorators', () => {
     expect(mockFn).not.toHaveBeenCalled()
     expect(log()).toMatchSnapshot()
   })
+})
+
+test('plugins option', async () => {
+  const utils = await import('./utils.ts')
+  const log = defineMockLog(utils)
+
+  function logger() {
+    return plugin({
+      name: 'logger',
+      setup: ctx => {
+        ctx.decorateCommand(bauseRuuner => ctx => {
+          ctx.log(`before command: ${ctx.name}`)
+          const ret = bauseRuuner(ctx)
+          if (typeof ret === 'string') {
+            ctx.log(`command output: ${ret}`)
+          }
+          ctx.log(`after command: ${ctx.name}`)
+          return ret
+        })
+      }
+    })
+  }
+
+  const command = {
+    name: 'test',
+    run: ctx => {
+      return `executed ${ctx.name}`
+    }
+  } satisfies Command<GunshiParams>
+
+  await cli([], command, {
+    plugins: [logger()]
+  })
+
+  const stdout = log()
+  expect(stdout).toEqual(
+    ['before command: test', 'command output: executed test', 'after command: test'].join('\n')
+  )
 })
 
 describe('edge cases', () => {

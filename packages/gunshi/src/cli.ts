@@ -54,7 +54,7 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
     completion(),
     dryRun()
   ]
-  const plugins = await applyPlugins(pluginContext, builtInPlugins)
+  const plugins = await applyPlugins(pluginContext, [...builtInPlugins, ...(options.plugins || [])])
 
   const cliOptions = normalizeCliOptions(options, entry, decorators)
 
