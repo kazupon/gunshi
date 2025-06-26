@@ -19,6 +19,8 @@ import { COMMON_ARGS } from '../../shared/constants.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
 
+export type { GlobalsCommandContext } from './extension.ts'
+
 /**
  * Built-in global options plugin
  */
