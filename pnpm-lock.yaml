@@ -212,6 +212,9 @@ importers:
         specifier: workspace:*
         version: link:../gunshi
     devDependencies:
+      '@intlify/core':
+        specifier: next
+        version: 12.0.0-alpha.2
       deno:
         specifier: 'catalog:'
         version: 2.3.3
@@ -221,6 +224,9 @@ importers:
       jsr-exports-lint:
         specifier: 'catalog:'
         version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+      messageformat:
+        specifier: 4.0.0-12
+        version: 4.0.0-12
       publint:
         specifier: 'catalog:'
         version: 0.3.12

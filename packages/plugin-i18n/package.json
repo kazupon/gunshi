@@ -66,6 +66,7 @@
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
+    "messageformat": "4.0.0-12",
     "publint": "catalog:",
     "tsdown": "catalog:"
   }
