@@ -1,6 +1,6 @@
 {
-  "name": "gunshi",
-  "description": "Modern javascript command-line library",
+  "name": "@gunshi/plugin-global",
+  "description": "global options plugin for gunshi",
   "version": "0.26.3",
   "author": {
     "name": "kazuya kawaguchi",
@@ -14,15 +14,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git",
-    "directory": "packages/gunshi"
+    "directory": "packages/plugin-global"
   },
   "keywords": [
-    "command",
-    "option",
-    "cli",
-    "argument",
-    "args",
-    "argv"
+    "gunshi",
+    "plugin",
+    "cli"
   ],
   "publishConfig": {
     "access": "public"
@@ -43,36 +40,6 @@
       "require": "./lib/index.js",
       "default": "./lib/index.js"
     },
-    "./definition": {
-      "types": "./lib/definition.d.ts",
-      "import": "./lib/definition.js",
-      "require": "./lib/definition.js",
-      "default": "./lib/definition.js"
-    },
-    "./plugin": {
-      "types": "./lib/plugin.d.ts",
-      "import": "./lib/plugin.js",
-      "require": "./lib/plugin.js",
-      "default": "./lib/plugin.js"
-    },
-    "./context": {
-      "types": "./lib/context.d.ts",
-      "import": "./lib/context.js",
-      "require": "./lib/context.js",
-      "default": "./lib/context.js"
-    },
-    "./renderer": {
-      "types": "./lib/renderer.d.ts",
-      "import": "./lib/renderer.js",
-      "require": "./lib/renderer.js",
-      "default": "./lib/renderer.js"
-    },
-    "./generator": {
-      "types": "./lib/generator.d.ts",
-      "import": "./lib/generator.js",
-      "require": "./lib/generator.js",
-      "default": "./lib/generator.js"
-    },
     "./package.json": "./package.json"
   },
   "types": "lib/index.d.ts",
@@ -91,16 +58,13 @@
     "typecheck:deno": "deno check ./src"
   },
   "dependencies": {
-    "args-tokens": "^0.20.1"
+    "gunshi": "workspace:*"
   },
   "devDependencies": {
-    "@intlify/core": "next",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
-    "messageformat": "4.0.0-12",
     "publint": "catalog:",
-    "tsdown": "catalog:",
-    "zod": "catalog:"
+    "tsdown": "catalog:"
   }
 }

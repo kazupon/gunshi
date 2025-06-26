@@ -6,6 +6,21 @@ settings:
 
 catalogs:
   default:
+    deno:
+      specifier: ^2.3.3
+      version: 2.3.3
+    jsr:
+      specifier: ^0.13.4
+      version: 0.13.4
+    jsr-exports-lint:
+      specifier: ^0.4.0
+      version: 0.4.0
+    publint:
+      specifier: ^0.3.12
+      version: 0.3.12
+    tsdown:
+      specifier: ^0.12.3
+      version: 0.12.3
     typescript:
       specifier: ^5.8.3
       version: 5.8.3
@@ -148,26 +163,92 @@ importers:
         specifier: next
         version: 12.0.0-alpha.2
       deno:
-        specifier: ^2.3.3
+        specifier: 'catalog:'
         version: 2.3.3
       jsr:
-        specifier: ^0.13.4
+        specifier: 'catalog:'
         version: 0.13.4
       jsr-exports-lint:
-        specifier: ^0.4.0
+        specifier: 'catalog:'
         version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       messageformat:
         specifier: 4.0.0-12
         version: 4.0.0-12
       publint:
-        specifier: ^0.3.12
+        specifier: 'catalog:'
         version: 0.3.12
       tsdown:
-        specifier: ^0.12.3
+        specifier: 'catalog:'
         version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
       zod:
         specifier: 'catalog:'
         version: 3.25.51
+
+  packages/plugin-global:
+    dependencies:
+      gunshi:
+        specifier: workspace:*
+        version: link:../gunshi
+    devDependencies:
+      deno:
+        specifier: 'catalog:'
+        version: 2.3.3
+      jsr:
+        specifier: 'catalog:'
+        version: 0.13.4
+      jsr-exports-lint:
+        specifier: 'catalog:'
+        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.12
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
+
+  packages/plugin-i18n:
+    dependencies:
+      gunshi:
+        specifier: workspace:*
+        version: link:../gunshi
+    devDependencies:
+      deno:
+        specifier: 'catalog:'
+        version: 2.3.3
+      jsr:
+        specifier: 'catalog:'
+        version: 0.13.4
+      jsr-exports-lint:
+        specifier: 'catalog:'
+        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.12
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
+
+  packages/plugin-renderer:
+    dependencies:
+      gunshi:
+        specifier: workspace:*
+        version: link:../gunshi
+    devDependencies:
+      deno:
+        specifier: 'catalog:'
+        version: 2.3.3
+      jsr:
+        specifier: 'catalog:'
+        version: 0.13.4
+      jsr-exports-lint:
+        specifier: 'catalog:'
+        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.12
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
 
   playground/auto-usage:
     dependencies:
@@ -4672,9 +4753,6 @@ packages:
     peerDependencies:
       zod: ^3.18.0
 
-  zod@3.25.49:
-    resolution: {integrity: sha512-JMMPMy9ZBk3XFEdbM3iL1brx4NUSejd6xr3ELrrGEfGb355gjhiAWtG3K5o+AViV/3ZfkIrCzXsZn6SbLwTR8Q==}
-
   zod@3.25.51:
     resolution: {integrity: sha512-TQSnBldh+XSGL+opiSIq0575wvDPqu09AqWe1F7JhUMKY+M91/aGlK4MhpVNO7MgYfHcVCB1ffwAUTJzllKJqg==}
 
@@ -5615,7 +5693,7 @@ snapshots:
 
   '@rolldown/binding-wasm32-wasi@1.0.0-beta.9-commit.d91dfb5':
     dependencies:
-      '@napi-rs/wasm-runtime': 0.2.9
+      '@napi-rs/wasm-runtime': 0.2.10
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.0.0-beta.9-commit.d91dfb5':
@@ -7199,8 +7277,8 @@ snapshots:
     dependencies:
       ohmyfetch: 0.4.21
       semver: 7.7.1
-      zod: 3.25.49
-      zodiarg: 0.2.1(zod@3.25.49)
+      zod: 3.25.51
+      zodiarg: 0.2.1(zod@3.25.51)
 
   giget@2.0.0:
     dependencies:
@@ -7562,8 +7640,8 @@ snapshots:
       smol-toml: 1.3.4
       strip-json-comments: 5.0.2
       typescript: 5.8.3
-      zod: 3.25.49
-      zod-validation-error: 3.4.0(zod@3.25.49)
+      zod: 3.25.51
+      zod-validation-error: 3.4.0(zod@3.25.51)
 
   kolorist@1.8.0: {}
 
@@ -9451,16 +9529,14 @@ snapshots:
     dependencies:
       zod: 3.25.51
 
-  zod-validation-error@3.4.0(zod@3.25.49):
+  zod-validation-error@3.4.0(zod@3.25.51):
     dependencies:
-      zod: 3.25.49
-
-  zod@3.25.49: {}
+      zod: 3.25.51
 
   zod@3.25.51: {}
 
-  zodiarg@0.2.1(zod@3.25.49):
+  zodiarg@0.2.1(zod@3.25.51):
     dependencies:
-      zod: 3.25.49
+      zod: 3.25.51
 
   zwitch@2.0.4: {}

@@ -4,3 +4,8 @@ packages:
 catalog:
   typescript: ^5.8.3
   zod: ^3.25.51
+  deno: ^2.3.3
+  jsr: ^0.13.4
+  jsr-exports-lint: ^0.4.0
+  publint: ^0.3.12
+  tsdown: ^0.12.3
