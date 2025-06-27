@@ -48,7 +48,7 @@ import type {
   LazyCommand
 } from 'gunshi'
 import type { PluginWithExtension } from 'gunshi/plugin'
-import type { CommandArgKeys, CommandBuiltinKeys } from '../../shared/types.ts'
+import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '../../shared/types.ts'
 import type { TranslationAdapterFactory } from './types.ts'
 
 export type * from './types.ts'
@@ -100,7 +100,7 @@ export interface I18nPluginOptions {
   /**
    * Built-in localizable resources
    */
-  resources?: Record<string, Record<keyof typeof DefaultResource, string>>
+  resources?: Record<string, Record<BuiltinResourceKeys, string>>
 }
 
 /**
@@ -115,7 +115,7 @@ export default function i18n(
 
   const resources =
     options.resources ||
-    (Object.create(null) as Record<string, Record<keyof typeof DefaultResource, string>>)
+    (Object.create(null) as Record<string, Record<BuiltinResourceKeys, string>>)
 
   // create translation adapter
   const translationAdapterFactory = options.translationAdapterFactory || createTranslationAdapter
@@ -127,7 +127,7 @@ export default function i18n(
   // store built-in locale resources
   const localeBuiltinResources: Map<string, Record<string, string>> = new Map()
 
-  // load default built-in resources
+  // loaded built-in resource
   let builtInLoadedResources: Record<string, string> | undefined
 
   return plugin({
@@ -157,7 +157,7 @@ export default function i18n(
       // define getResource function
       function getResource(
         locale: string | Intl.Locale
-      ): Record<keyof typeof DefaultResource, string> | undefined {
+      ): Record<BuiltinResourceKeys, string> | undefined {
         const targetLocale = toLocale(locale)
         const targetLocaleStr = targetLocale.toString()
         return localeBuiltinResources.get(targetLocaleStr)
@@ -166,7 +166,7 @@ export default function i18n(
       // define setResource function
       function setResource(
         locale: string | Intl.Locale,
-        resource: Record<keyof typeof DefaultResource, string>
+        resource: Record<BuiltinResourceKeys, string>
       ): void {
         const targetLocale = toLocale(locale)
         const targetLocaleStr = targetLocale.toString()
@@ -184,7 +184,7 @@ export default function i18n(
         setResource(locale, resource)
       }
 
-      // load locale-specific resources asynchronously if needed
+      // keep built-in locale resources for later use
       builtInLoadedResources = getResource(locale)
 
       return {

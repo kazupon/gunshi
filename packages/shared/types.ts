@@ -48,12 +48,16 @@ export type CommandBuiltinResourceKeys =
   (typeof import('./constants.ts'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
 
 /**
+ * i18n built-in resource keys.
+ */
+export type BuiltinResourceKeys = CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
+
+/**
  * Command i18n built-in keys.
  * The command i18n built-in keys are used by the i18n plugin for translation.
  */
 export type CommandBuiltinKeys =
-  | GenerateNamespacedKey<CommandBuiltinArgsKeys>
-  | GenerateNamespacedKey<CommandBuiltinResourceKeys>
+  | GenerateNamespacedKey<BuiltinResourceKeys>
   | 'description'
   | 'examples'
 
