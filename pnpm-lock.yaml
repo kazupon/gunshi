@@ -208,6 +208,9 @@ importers:
 
   packages/plugin-i18n:
     dependencies:
+      '@gunshi/plugin-global':
+        specifier: workspace:*
+        version: link:../plugin-global
       gunshi:
         specifier: workspace:*
         version: link:../gunshi

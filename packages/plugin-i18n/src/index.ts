@@ -35,8 +35,8 @@
 
 import { plugin } from 'gunshi/plugin'
 import { BUILT_IN_PREFIX } from '../../shared/constants.ts'
+import DefaultResource from '../../shared/resource.ts'
 import { resolveArgKey, resolveBuiltInKey, resolveExamples } from '../../shared/utils.ts' // for type checking
-import DefaultResource from './locales/en-US.json' with { type: 'json' }
 import { createTranslationAdapter } from './translation.ts'
 
 import type {
@@ -188,6 +188,7 @@ export default function i18n(
           } as Record<string, string>
         )
         if (builtInLoadedResources) {
+          // NOTE(kazupon): setup resource for global opsions
           resource.help = builtInLoadedResources.help
           resource.version = builtInLoadedResources.version
         }

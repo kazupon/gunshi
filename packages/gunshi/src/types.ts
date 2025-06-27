@@ -4,9 +4,9 @@
  */
 
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
-import { Plugin } from './plugin.ts'
 
 import type { Args, ArgToken, ArgValues } from 'args-tokens'
+import type { Plugin } from './plugin.ts'
 
 export type Awaitable<T> = T | Promise<T>
 

@@ -62,6 +62,14 @@
   "dependencies": {
     "gunshi": "workspace:*"
   },
+  "peerDependencies": {
+    "@gunshi/plugin-global": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@gunshi/plugin-global": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "deno": "catalog:",
     "jsr": "catalog:",

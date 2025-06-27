@@ -60,8 +60,15 @@
     "typecheck:deno": "deno check ./src"
   },
   "dependencies": {
-    "@gunshi/plugin-i18n": "workspace:*",
     "gunshi": "workspace:*"
+  },
+  "peerDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@gunshi/plugin-i18n": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "deno": "catalog:",

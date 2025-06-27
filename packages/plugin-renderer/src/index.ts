@@ -36,7 +36,7 @@ import {
   ARG_PREFIX_AND_KEY_SEPARATOR,
   BUILD_IN_PREFIX_AND_KEY_SEPARATOR
 } from '../../shared/constants.ts'
-import DefaultResource from '../../shared/en-US.json' with { type: 'json' }
+import DefaultResource from '../../shared/resource.ts'
 import { renderHeader } from './header.ts'
 import { renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'

@@ -47,7 +47,6 @@ export interface PluginDependency {
 
 /**
  * Gunshi plugin context.
- * @internal
  */
 export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
   #globalOptions: Map<string, ArgSchema> = new Map()
