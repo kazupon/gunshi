@@ -7,7 +7,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
   clean: true,
   publint: true,
   dts: true,
-  external: ['gunshi', 'gunshi/plugin'],
+  external: ['gunshi', 'gunshi/plugin', 'gunshi/utils'],
   hooks: {
     'build:done': lintJsrExports()
   }

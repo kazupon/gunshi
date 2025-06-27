@@ -60,6 +60,7 @@
     "typecheck:deno": "deno check ./src"
   },
   "dependencies": {
+    "@gunshi/plugin-i18n": "workspace:*",
     "gunshi": "workspace:*"
   },
   "devDependencies": {

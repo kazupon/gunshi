@@ -6,8 +6,8 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../../gunshi/test/utils.ts'
+import { resolveBuiltInKey } from '../../shared/utils.ts'
 import i18n from './index.ts'
-import { resolveBuiltInKey } from './utils.ts'
 
 import type { Args, Command, CommandResource, CommandResourceFetcher, GunshiParams } from 'gunshi'
 import type { TranslationAdapter } from './types.ts'

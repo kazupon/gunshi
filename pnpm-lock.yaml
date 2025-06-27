@@ -212,9 +212,6 @@ importers:
         specifier: workspace:*
         version: link:../gunshi
     devDependencies:
-      '@intlify/core':
-        specifier: next
-        version: 12.0.0-alpha.2
       deno:
         specifier: 'catalog:'
         version: 2.3.3
@@ -236,6 +233,9 @@ importers:
 
   packages/plugin-renderer:
     dependencies:
+      '@gunshi/plugin-i18n':
+        specifier: workspace:*
+        version: link:../plugin-i18n
       gunshi:
         specifier: workspace:*
         version: link:../gunshi

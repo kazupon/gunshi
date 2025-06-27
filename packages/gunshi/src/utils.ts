@@ -21,6 +21,8 @@ import type {
   RemovedIndex
 } from './types.ts'
 
+export { kebabnize } from 'args-tokens/utils'
+
 export function isLazyCommand<G extends GunshiParams = DefaultGunshiParams>(
   cmd: unknown
 ): cmd is LazyCommand<G> {

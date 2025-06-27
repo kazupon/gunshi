@@ -73,6 +73,12 @@
       "require": "./lib/generator.js",
       "default": "./lib/generator.js"
     },
+    "./utils": {
+      "types": "./lib/utils.d.ts",
+      "import": "./lib/utils.js",
+      "require": "./lib/utils.js",
+      "default": "./lib/utils.js"
+    },
     "./package.json": "./package.json"
   },
   "types": "lib/index.d.ts",

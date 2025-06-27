@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from '../../shared/constants.ts'
+import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
 import type {
   Args,

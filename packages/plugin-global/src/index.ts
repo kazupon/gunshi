@@ -4,6 +4,21 @@
  * @example
  * ```js
  * import global from '@gunshi/plugin-global'
+ * import { cli } from 'gunshi'
+ *
+ * const entry = (ctx) => {
+ *   // ...
+ * }
+ *
+ * await cli(process.argv.slice(2), entry, {
+ *   // ...
+ *
+ *   plugins: [
+ *     global()
+ *   ],
+ *
+ *   // ...
+ * })
  * ```
  *
  * @module
@@ -19,12 +34,15 @@ import { COMMON_ARGS } from '../../shared/constants.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
 
+import type { PluginWithExtension } from 'gunshi/plugin'
+import type { GlobalsCommandContext } from './extension.ts'
+
 export type { GlobalsCommandContext } from './extension.ts'
 
 /**
  * Built-in global options plugin
  */
-export default function globals(): ReturnType<typeof plugin> {
+export default function globals(): PluginWithExtension<GlobalsCommandContext> {
   return plugin({
     name: 'globals',
 

@@ -6,10 +6,15 @@
  * import i18n from '@gunshi/plugin-i18n'
  * import { cli } from 'gunshi'
  *
+ * const entry = (ctx) => {
+ *   // ...
+ * }
+ *
+ *
  * await cli(process.argv.slice(2), entry, {
  *   // ...
  *
- *   pulgins: [
+ *   plugins: [
  *     i18n({
  *       locale: 'ja-JP', // specify the locale you want to use
  *       translationAdapterFactory: createTranslationAdapter, // optional, use default adapter
@@ -30,9 +35,9 @@
 
 import { plugin } from 'gunshi/plugin'
 import { BUILT_IN_PREFIX } from '../../shared/constants.ts'
+import { resolveArgKey, resolveBuiltInKey, resolveExamples } from '../../shared/utils.ts' // for type checking
 import DefaultResource from './locales/en-US.json' with { type: 'json' }
 import { createTranslationAdapter } from './translation.ts'
-import { resolveArgKey, resolveBuiltInKey, resolveExamples } from './utils.ts'
 
 import type {
   Command,
@@ -43,7 +48,8 @@ import type {
   LazyCommand
 } from 'gunshi'
 import type { PluginWithExtension } from 'gunshi/plugin'
-import type { CommandArgKeys, CommandBuiltinKeys, TranslationAdapterFactory } from './types.ts'
+import type { CommandArgKeys, CommandBuiltinKeys } from '../../shared/types.ts'
+import type { TranslationAdapterFactory } from './types.ts'
 
 export type * from './types.ts'
 
