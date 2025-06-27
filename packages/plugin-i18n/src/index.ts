@@ -66,7 +66,7 @@ export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiP
   /**
    * Command locale
    */
-  locale: Intl.Locale
+  locale: string | Intl.Locale
   /**
    * Translate a message
    * @param key Translation key
@@ -97,6 +97,10 @@ export interface I18nPluginOptions {
    * Translation adapter factory
    */
   translationAdapterFactory?: TranslationAdapterFactory
+  /**
+   * Built-in localizable resources
+   */
+  resources?: Record<string, Record<keyof typeof DefaultResource, string>>
 }
 
 /**
@@ -106,8 +110,12 @@ export default function i18n(
   options: I18nPluginOptions = {}
 ): PluginWithExtension<Promise<I18nCommandContext<DefaultGunshiParams>>> {
   // extract locale configuration from options
-  const locale = resolveLocale(options.locale)
+  const locale = toLocale(options.locale)
   const localeStr = locale.toString()
+
+  const resources =
+    options.resources ||
+    (Object.create(null) as Record<string, Record<keyof typeof DefaultResource, string>>)
 
   // create translation adapter
   const translationAdapterFactory = options.translationAdapterFactory || createTranslationAdapter
@@ -128,14 +136,6 @@ export default function i18n(
     dependencies: [{ name: 'globals', optional: true }],
 
     extension: async () => {
-      // load default built-in resources
-      localeBuiltinResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
-
-      // load locale-specific resources asynchronously if needed
-      if (DEFAULT_LOCALE !== localeStr) {
-        builtInLoadedResources = await loadBuiltInLocaleResources(localeBuiltinResources, localeStr)
-      }
-
       // define translate function
       function translate<
         T extends string = CommandBuiltinKeys,
@@ -153,6 +153,39 @@ export default function i18n(
           return adapter.translate(localeStr, strKey, values) || ''
         }
       }
+
+      // define getResource function
+      function getResource(
+        locale: string | Intl.Locale
+      ): Record<keyof typeof DefaultResource, string> | undefined {
+        const targetLocale = toLocale(locale)
+        const targetLocaleStr = targetLocale.toString()
+        return localeBuiltinResources.get(targetLocaleStr)
+      }
+
+      // define setResource function
+      function setResource(
+        locale: string | Intl.Locale,
+        resource: Record<keyof typeof DefaultResource, string>
+      ): void {
+        const targetLocale = toLocale(locale)
+        const targetLocaleStr = targetLocale.toString()
+        if (localeBuiltinResources.has(targetLocaleStr)) {
+          return
+        }
+        localeBuiltinResources.set(targetLocale.toString(), mapResourceWithBuiltinKey(resource))
+      }
+
+      // set default locale resources
+      setResource(DEFAULT_LOCALE, DefaultResource)
+
+      // install built-in locale resources
+      for (const [locale, resource] of Object.entries(resources)) {
+        setResource(locale, resource)
+      }
+
+      // load locale-specific resources asynchronously if needed
+      builtInLoadedResources = getResource(locale)
 
       return {
         locale,
@@ -198,30 +231,12 @@ export default function i18n(
   })
 }
 
-function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
+function toLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
   return locale instanceof Intl.Locale
     ? locale
     : typeof locale === 'string'
       ? new Intl.Locale(locale)
       : new Intl.Locale(DEFAULT_LOCALE)
-}
-
-async function loadBuiltInLocaleResources(
-  localeResources: Map<string, Record<string, string>>,
-  targetLocale: string
-): Promise<Record<string, string> | undefined> {
-  let targetResource: Record<string, string> | undefined
-  try {
-    targetResource = (
-      (await import(`./locales/${targetLocale}.json`, {
-        with: { type: 'json' }
-      })) as { default: Record<string, string> }
-    ).default
-    localeResources.set(targetLocale, mapResourceWithBuiltinKey(targetResource))
-  } catch {
-    // target locale might not exist, fallback to default
-  }
-  return targetResource
 }
 
 async function loadCommandResource<G extends GunshiParams>(

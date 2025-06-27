@@ -58,7 +58,8 @@ describe('translate built-in keys', () => {
   })
 
   test('custom locale: ja-JP', async () => {
-    const plugin = i18n({ locale: 'ja-JP' })
+    const jaJPResource = await import('./locales/ja-JP.json', { with: { type: 'json' } })
+    const plugin = i18n({ locale: 'ja-JP', resources: { 'ja-JP': jaJPResource } })
     const ctx = await createMockCommandContext()
     const extension = await plugin.extension.factory(ctx, {} as Command)
 
