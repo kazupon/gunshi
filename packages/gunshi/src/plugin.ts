@@ -144,7 +144,15 @@ export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
 export function createPluginContext<G extends GunshiParams = DefaultGunshiParams>(
   decorators: Decorators<G>
 ): PluginContext<G> {
+  /**
+   * private states
+   */
+
   const globalOptions = new Map<string, ArgSchema>()
+
+  /**
+   * public interfaces
+   */
 
   return Object.freeze({
     get globalOptions(): Map<string, ArgSchema> {
@@ -232,7 +240,7 @@ export function createPluginContext<G extends GunshiParams = DefaultGunshiParams
  *  Plugin function type
  */
 export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
-  ctx: PluginContext<G>
+  ctx: Readonly<PluginContext<G>>
 ) => Awaitable<void>
 
 /**
@@ -326,7 +334,9 @@ export function plugin<
   name: N
   dependencies?: (PluginDependency | string)[]
   setup?: (
-    ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<P> } }>>
+    ctx: Readonly<
+      PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<P> } }>>
+    >
   ) => Awaitable<void>
   extension: P
   onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in N]: ReturnType<P> } }>
@@ -335,7 +345,7 @@ export function plugin<
 export function plugin(options: {
   name: string
   dependencies?: (PluginDependency | string)[]
-  setup?: (ctx: PluginContext<DefaultGunshiParams>) => Awaitable<void>
+  setup?: (ctx: Readonly<PluginContext<DefaultGunshiParams>>) => Awaitable<void>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
 export function plugin<
@@ -345,7 +355,7 @@ export function plugin<
   name: N
   dependencies?: (PluginDependency | string)[]
   setup?: (
-    ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
+    ctx: Readonly<PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>>
   ) => Awaitable<void>
   extension?: PluginExtension<E, DefaultGunshiParams>
   onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in N]?: E } }>
@@ -354,7 +364,7 @@ export function plugin<
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pluginFn = async (ctx: PluginContext<any>) => {
+  const pluginFn = async (ctx: Readonly<PluginContext<any>>) => {
     if (setup) {
       await setup(ctx)
     }
