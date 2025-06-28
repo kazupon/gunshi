@@ -1,0 +1,15 @@
+{
+  "$id": "https://jsr.io/schema/config-file.v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "name": "@gunshi/plugin-global",
+  "description": "utilities for gunshi plugin",
+  "version": "0.26.3",
+  "license": "MIT",
+  "publish": {
+    "include": ["src/**/*.ts", "package.json", "jsr.json", "README.md", "CHANGELOG.md", "LICENSE"],
+    "exclude": ["src/**/*.test.ts", "src/**/*.test-d.ts", "**/__snapshots__/**", "**/dist/**"]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

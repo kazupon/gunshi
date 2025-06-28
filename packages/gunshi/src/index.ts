@@ -18,9 +18,18 @@ export { parseArgs, resolveArgs } from 'args-tokens'
 export * from './cli.ts'
 export { DEFAULT_LOCALE } from './constants.ts'
 export { define, lazy } from './definition.ts'
-export { plugin, createPluginContext } from './plugin.ts'
+export { plugin } from './plugin/core.ts'
 export { DefaultTranslation } from './translation.ts'
 
 export type { Args, ArgSchema, ArgValues } from 'args-tokens'
-export type { Plugin, PluginContext, PluginExtension, PluginOptions } from './plugin.ts'
+export type { PluginContext } from './plugin/context.ts'
+export type {
+  OnPluginExtension,
+  Plugin,
+  PluginDependency,
+  PluginExtension,
+  PluginFunction,
+  PluginWithExtension,
+  PluginWithoutExtension
+} from './plugin/core.ts'
 export type * from './types.ts'

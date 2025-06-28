@@ -7,7 +7,8 @@ import { parseArgs, resolveArgs } from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { createDecorators } from './decorators.ts'
-import { createPluginContext, resolveDependencies } from './plugin.ts'
+import { createPluginContext } from './plugin/context.ts'
+import { resolveDependencies } from './plugin/dependency.ts'
 import completion from './plugins/completion.ts'
 import dryRun from './plugins/dryrun.ts'
 import globals from './plugins/globals.ts'
@@ -17,7 +18,8 @@ import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
 import type { ArgToken } from 'args-tokens'
 import type { Decorators } from './decorators.ts'
-import type { Plugin, PluginContext } from './plugin.ts'
+import type { PluginContext } from './plugin/context.ts'
+import type { Plugin } from './plugin/core.ts'
 import type {
   CliOptions,
   Command,

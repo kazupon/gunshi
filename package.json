@@ -26,6 +26,7 @@
     "build": "pnpm -r build",
     "build:docs": "pnpm -F @gunshi/docs build",
     "build:gunshi": "pnpm -F gunshi build",
+    "build:plugin": "pnpm -F @gunshi/plugin build",
     "build:plugin:global": "pnpm -F @gunshi/plugin-global build",
     "build:plugin:i18n": "pnpm -F @gunshi/plugin-i18n build",
     "build:plugin:renderer": "pnpm -F @gunshi/plugin-renderer build",

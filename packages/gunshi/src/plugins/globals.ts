@@ -4,7 +4,7 @@
  */
 
 import { COMMON_ARGS } from '../constants.ts'
-import { plugin } from '../plugin.ts'
+import { plugin } from '../plugin/core.ts'
 import decorator from './globals/decorator.ts'
 import extension from './globals/extension.ts'
 

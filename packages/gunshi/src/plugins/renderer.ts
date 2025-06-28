@@ -9,7 +9,7 @@ import {
   BUILD_IN_PREFIX_AND_KEY_SEPARATOR
 } from '../constants.ts'
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
-import { plugin } from '../plugin.ts'
+import { plugin } from '../plugin/core.ts'
 import { create, resolveLazyCommand } from '../utils.ts'
 import { renderHeader } from './renderer/header.ts'
 import { renderUsage } from './renderer/usage.ts'

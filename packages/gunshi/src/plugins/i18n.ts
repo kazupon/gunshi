@@ -14,7 +14,7 @@
  */
 
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
-import { plugin } from '../plugin.ts'
+import { plugin } from '../plugin/core.ts'
 import { createTranslationAdapter } from '../translation.ts'
 import { create, mapResourceWithBuiltinKey, resolveArgKey, resolveExamples } from '../utils.ts'
 

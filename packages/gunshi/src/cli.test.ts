@@ -3,7 +3,7 @@ import { z } from 'zod/v4-mini'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
-import { plugin } from './plugin.ts'
+import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'

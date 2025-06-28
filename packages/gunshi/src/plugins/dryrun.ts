@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { plugin } from '../plugin.ts'
+import { plugin } from '../plugin/core.ts'
 
 /**
  * dry-run plugin
