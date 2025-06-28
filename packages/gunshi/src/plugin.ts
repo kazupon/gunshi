@@ -14,9 +14,8 @@
  * @license MIT
  */
 
-import { Decorators } from './decorators.ts'
-
 import type { Args, ArgSchema } from 'args-tokens'
+import type { Decorators } from './decorators.ts'
 import type {
   Awaitable,
   Command,

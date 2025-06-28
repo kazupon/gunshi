@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { createMockCommandContext } from '../test/utils.ts'
 import { createCommandContext } from './context.ts'
-import { Decorators } from './decorators.ts'
+import { createDecorators } from './decorators.ts'
 import { define } from './definition.ts'
 import { PluginContext, plugin, resolveDependencies } from './plugin.ts'
 
@@ -11,7 +11,7 @@ import type { Command, CommandContextCore, GunshiParams } from './types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
   test('basic', () => {
-    const decorators = new Decorators()
+    const decorators = createDecorators()
     const ctx = new PluginContext(decorators)
     ctx.addGlobalOption('foo', { type: 'string', description: 'foo option' })
 
@@ -23,7 +23,7 @@ describe('PluginContext#addGlobalOpttion', () => {
   })
 
   test('name empty', () => {
-    const decorators = new Decorators()
+    const decorators = createDecorators()
     const ctx = new PluginContext(decorators)
 
     expect(() => ctx.addGlobalOption('', { type: 'string' })).toThrow(
@@ -32,7 +32,7 @@ describe('PluginContext#addGlobalOpttion', () => {
   })
 
   test('duplicate name', () => {
-    const decorators = new Decorators()
+    const decorators = createDecorators()
     const ctx = new PluginContext(decorators)
     ctx.addGlobalOption('foo', { type: 'string', description: 'foo option' })
 
@@ -46,7 +46,7 @@ type Auth = { token: string; login: () => string }
 type Logger = { log: (msg: string) => void; level: string }
 
 test('PluginContext#decorateHeaderRenderer', async () => {
-  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const decorators = createDecorators<GunshiParams<{ args: Args; extensions: Auth }>>()
   const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateHeaderRenderer<Logger>(async (baseRenderer, cmdCtx) => {
@@ -65,7 +65,7 @@ test('PluginContext#decorateHeaderRenderer', async () => {
 })
 
 test('PluginContext#decorateUsageRenderer', async () => {
-  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const decorators = createDecorators<GunshiParams<{ args: Args; extensions: Auth }>>()
   const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateUsageRenderer<Logger>(async (baseRenderer, cmdCtx) => {
@@ -84,7 +84,7 @@ test('PluginContext#decorateUsageRenderer', async () => {
 })
 
 test('PluginContext#decorateValidationErrorsRenderer', async () => {
-  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const decorators = createDecorators<GunshiParams<{ args: Args; extensions: Auth }>>()
   const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateValidationErrorsRenderer<Logger>(async (baseRenderer, cmdCtx, error) => {
@@ -105,7 +105,7 @@ test('PluginContext#decorateValidationErrorsRenderer', async () => {
 })
 
 test('PluginContext#decorateCommand', async () => {
-  const decorators = new Decorators<GunshiParams<{ args: Args; extensions: Auth }>>()
+  const decorators = createDecorators<GunshiParams<{ args: Args; extensions: Auth }>>()
   const ctx = new PluginContext<GunshiParams<{ args: Args; extensions: Auth }>>(decorators)
 
   ctx.decorateCommand<Logger>(baseRunner => async ctx => {
@@ -153,7 +153,7 @@ describe('plugin function', () => {
     expect(testPlugin.extension.factory).toBe(extensionFactory)
 
     // check that setup function is callable
-    const decorators = new Decorators()
+    const decorators = createDecorators()
     const ctx = new PluginContext(decorators)
     await testPlugin(ctx)
     expect(setupFn).toHaveBeenCalledWith(ctx)
@@ -173,7 +173,7 @@ describe('plugin function', () => {
     expect(simplePlugin.extension).toBeUndefined()
 
     // check that setup function is callable
-    const decorators = new Decorators()
+    const decorators = createDecorators()
     const ctx = new PluginContext(decorators)
     await simplePlugin(ctx)
     expect(setupFn).toHaveBeenCalledWith(ctx)
@@ -249,7 +249,7 @@ describe('Plugin type with optional properties', () => {
       ctx.addGlobalOption('simple', { type: 'string' })
     }
 
-    const decorators = new Decorators()
+    const decorators = createDecorators()
     const ctx = new PluginContext(decorators)
 
     // should work without name or extension
