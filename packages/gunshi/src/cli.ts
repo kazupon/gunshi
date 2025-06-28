@@ -7,7 +7,7 @@ import { parseArgs, resolveArgs } from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { createDecorators } from './decorators.ts'
-import { PluginContext, resolveDependencies } from './plugin.ts'
+import { createPluginContext, resolveDependencies } from './plugin.ts'
 import completion from './plugins/completion.ts'
 import dryRun from './plugins/dryrun.ts'
 import globals from './plugins/globals.ts'
@@ -17,7 +17,7 @@ import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
 import type { ArgToken } from 'args-tokens'
 import type { Decorators } from './decorators.ts'
-import type { Plugin } from './plugin.ts'
+import type { Plugin, PluginContext } from './plugin.ts'
 import type {
   CliOptions,
   Command,
@@ -44,7 +44,7 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   options: CliOptions<G> = {}
 ): Promise<string | undefined> {
   const decorators = createDecorators<G>()
-  const pluginContext = new PluginContext<G>(decorators)
+  const pluginContext = createPluginContext<G>(decorators)
 
   const builtInPlugins: Plugin[] = [
     globals(),

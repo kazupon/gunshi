@@ -45,38 +45,21 @@ export interface PluginDependency {
 }
 
 /**
- * Gunshi plugin context.
+ * Gunshi plugin context interface.
  */
-export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
-  #globalOptions: Map<string, ArgSchema> = new Map()
-  #decorators: Decorators<G>
-
-  constructor(decorators: Decorators<G>) {
-    this.#decorators = decorators
-  }
-
+export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
   /**
    * Get the global options
    * @returns A map of global options.
    */
-  get globalOptions(): Map<string, ArgSchema> {
-    return new Map(this.#globalOptions)
-  }
+  readonly globalOptions: Map<string, ArgSchema>
 
   /**
    * Add a global option.
    * @param name An option name
    * @param schema An {@link ArgSchema} for the option
    */
-  addGlobalOption(name: string, schema: ArgSchema): void {
-    if (!name) {
-      throw new Error('Option name must be a non-empty string')
-    }
-    if (this.#globalOptions.has(name)) {
-      throw new Error(`Global option '${name}' is already registered`)
-    }
-    this.#globalOptions.set(name, schema)
-  }
+  addGlobalOption(name: string, schema: ArgSchema): void
 
   /**
    * Decorate the header renderer.
@@ -93,9 +76,7 @@ export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
         CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
       >
     ) => Promise<string>
-  ): void {
-    this.#decorators.addHeaderDecorator(decorator as unknown as RendererDecorator<string, G>)
-  }
+  ): void
 
   /**
    * Decorate the usage renderer.
@@ -112,9 +93,7 @@ export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
         CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
       >
     ) => Promise<string>
-  ): void {
-    this.#decorators.addUsageDecorator(decorator as unknown as RendererDecorator<string, G>)
-  }
+  ): void
 
   /**
    * Decorate the validation errors renderer.
@@ -135,11 +114,7 @@ export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
       >,
       error: AggregateError
     ) => Promise<string>
-  ): void {
-    this.#decorators.addValidationErrorsDecorator(
-      decorator as unknown as ValidationErrorsDecorator<G>
-    )
-  }
+  ): void
 
   /**
    * Decorate the command execution.
@@ -158,9 +133,99 @@ export class PluginContext<G extends GunshiParams = DefaultGunshiParams> {
         CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
       >
     ) => Awaitable<void | string>
-  ): void {
-    this.#decorators.addCommandDecorator(decorator as unknown as CommandDecorator<G>)
-  }
+  ): void
+}
+
+/**
+ * Factory function for creating a plugin context.
+ * @param decorators - A {@link Decorators} instance.
+ * @returns A new {@link PluginContext} instance.
+ */
+export function createPluginContext<G extends GunshiParams = DefaultGunshiParams>(
+  decorators: Decorators<G>
+): PluginContext<G> {
+  const globalOptions = new Map<string, ArgSchema>()
+
+  return Object.freeze({
+    get globalOptions(): Map<string, ArgSchema> {
+      return new Map(globalOptions)
+    },
+
+    addGlobalOption(name: string, schema: ArgSchema): void {
+      if (!name) {
+        throw new Error('Option name must be a non-empty string')
+      }
+      if (globalOptions.has(name)) {
+        throw new Error(`Global option '${name}' is already registered`)
+      }
+      globalOptions.set(name, schema)
+    },
+
+    decorateHeaderRenderer<L extends Record<string, unknown> = DefaultGunshiParams['extensions']>(
+      decorator: (
+        baseRenderer: (
+          ctx: Readonly<
+            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          >
+        ) => Promise<string>,
+        ctx: Readonly<
+          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+        >
+      ) => Promise<string>
+    ): void {
+      decorators.addHeaderDecorator(decorator as unknown as RendererDecorator<string, G>)
+    },
+
+    decorateUsageRenderer<L extends Record<string, unknown> = DefaultGunshiParams['extensions']>(
+      decorator: (
+        baseRenderer: (
+          ctx: Readonly<
+            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          >
+        ) => Promise<string>,
+        ctx: Readonly<
+          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+        >
+      ) => Promise<string>
+    ): void {
+      decorators.addUsageDecorator(decorator as unknown as RendererDecorator<string, G>)
+    },
+
+    decorateValidationErrorsRenderer<
+      L extends Record<string, unknown> = DefaultGunshiParams['extensions']
+    >(
+      decorator: (
+        baseRenderer: (
+          ctx: Readonly<
+            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          >,
+          error: AggregateError
+        ) => Promise<string>,
+        ctx: Readonly<
+          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+        >,
+        error: AggregateError
+      ) => Promise<string>
+    ): void {
+      decorators.addValidationErrorsDecorator(decorator as unknown as ValidationErrorsDecorator<G>)
+    },
+
+    decorateCommand<L extends Record<string, unknown> = DefaultGunshiParams['extensions']>(
+      decorator: (
+        baseRunner: (
+          ctx: Readonly<
+            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          >
+        ) => Awaitable<void | string>
+      ) => (
+        ctx: Readonly<
+          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+        >
+      ) => Awaitable<void | string>
+    ): void {
+      decorators.addCommandDecorator(decorator as unknown as CommandDecorator<G>)
+    }
+  })
 }
 
 /**
