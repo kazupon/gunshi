@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@types/node':
+      specifier: ^22.15.29
+      version: 22.15.29
     deno:
       specifier: ^2.3.3
       version: 2.3.3
@@ -45,7 +48,7 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       '@types/node':
-        specifier: ^22.15.29
+        specifier: 'catalog:'
         version: 22.15.29
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20250629.1
@@ -286,6 +289,9 @@ importers:
         specifier: workspace:*
         version: link:../plugin-global
     devDependencies:
+      '@gunshi/resources':
+        specifier: workspace:*
+        version: link:../resources
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
@@ -339,7 +345,7 @@ importers:
   packages/resources:
     devDependencies:
       '@types/node':
-        specifier: ^22.15.29
+        specifier: 'catalog:'
         version: 22.15.29
       deno:
         specifier: 'catalog:'
