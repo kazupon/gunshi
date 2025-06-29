@@ -60,6 +60,7 @@
     "typecheck:deno": "deno check ./src"
   },
   "dependencies": {
+    "@gunshi/plugin": "workspace:*",
     "gunshi": "workspace:*"
   },
   "peerDependencies": {

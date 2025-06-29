@@ -1,8 +1,8 @@
-import { createCommandContext } from 'gunshi/context'
 import { expect, test } from 'vitest'
+import { createCommandContext } from '../../gunshi/src/context.ts'
 import { renderHeader } from './header.ts'
 
-import type { Args, Command, GunshiParams } from 'gunshi'
+import type { Args, Command, GunshiParams } from '@gunshi/plugin'
 
 const NOOP = async () => {}
 

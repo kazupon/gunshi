@@ -1,18 +1,48 @@
 import i18n from '@gunshi/plugin-i18n'
-import { createCommandContext } from 'gunshi/context'
 import { afterEach, expect, test, vi } from 'vitest'
+import { createCommandContext } from '../../gunshi/src/context.ts'
 import renderer from './index.ts'
 import { renderUsage } from './usage.ts'
 
-import type { Args, Command, GunshiParams, LazyCommand } from 'gunshi'
-
-const NOOP = async () => {}
-const i18nPlugin = i18n()
-const rendererPlugin = renderer()
+import type { Args, Command, DefaultGunshiParams, GunshiParams, LazyCommand } from '@gunshi/plugin'
+import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+import type { UsageRendererCommandContext } from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
 })
+
+/**
+ * type aliases for renderUsage
+ */
+
+type WithI18nAndRenderer = GunshiParams<{
+  args: Args
+  extensions: {
+    i18n: I18nCommandContext<DefaultGunshiParams> | Promise<I18nCommandContext<DefaultGunshiParams>>
+    renderer: UsageRendererCommandContext<DefaultGunshiParams>
+  }
+}>
+
+type WithRendererOnly = GunshiParams<{
+  args: Args
+  extensions: {
+    renderer: UsageRendererCommandContext<DefaultGunshiParams>
+  }
+}>
+
+/**
+ * setup the plugins
+ */
+
+const i18nPlugin = i18n()
+const rendererPlugin = renderer()
+
+/**
+ * mocks for tests
+ */
+
+const NOOP = async () => {}
 
 const SHOW = {
   args: {
@@ -86,6 +116,10 @@ COMMANDS.set('command2', () =>
   })
 )
 
+/**
+ * tests for renderUsage
+ */
+
 test('basic', async () => {
   const command = {
     args: {
@@ -137,7 +171,7 @@ test('basic', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('no arguments', async () => {
@@ -170,7 +204,7 @@ test('no arguments', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('no required on optional arguments', async () => {
@@ -217,7 +251,7 @@ test('no required on optional arguments', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('positional arguments', async () => {
@@ -258,7 +292,7 @@ test('positional arguments', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('mixed positionals and optionals', async () => {
@@ -309,7 +343,7 @@ test('mixed positionals and optionals', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('no examples', async () => {
@@ -362,7 +396,7 @@ test('no examples', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('enable usageOptionType', async () => {
@@ -419,7 +453,7 @@ test('enable usageOptionType', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('sub commands', async () => {
@@ -445,7 +479,7 @@ test('sub commands', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('kebab-case arguments with toKebab option', async () => {
@@ -504,7 +538,7 @@ test('kebab-case arguments with toKebab option', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('kebab-case arguments with Command.toKebab option', async () => {
@@ -560,7 +594,7 @@ test('kebab-case arguments with Command.toKebab option', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
 test('not install i18n plugin', async () => {
@@ -585,5 +619,5 @@ test('not install i18n plugin', async () => {
     }
   })
 
-  expect(await renderUsage(ctx)).toMatchSnapshot()
+  expect(await renderUsage<WithRendererOnly>(ctx)).toMatchSnapshot()
 })

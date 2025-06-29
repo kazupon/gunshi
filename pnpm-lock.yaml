@@ -207,9 +207,9 @@ importers:
 
   packages/plugin-global:
     dependencies:
-      gunshi:
+      '@gunshi/plugin':
         specifier: workspace:*
-        version: link:../gunshi
+        version: link:../plugin
     devDependencies:
       deno:
         specifier: 'catalog:'
@@ -229,12 +229,12 @@ importers:
 
   packages/plugin-i18n:
     dependencies:
+      '@gunshi/plugin':
+        specifier: workspace:*
+        version: link:../plugin
       '@gunshi/plugin-global':
         specifier: workspace:*
         version: link:../plugin-global
-      gunshi:
-        specifier: workspace:*
-        version: link:../gunshi
     devDependencies:
       deno:
         specifier: 'catalog:'
@@ -257,6 +257,9 @@ importers:
 
   packages/plugin-renderer:
     dependencies:
+      '@gunshi/plugin':
+        specifier: workspace:*
+        version: link:../plugin
       '@gunshi/plugin-i18n':
         specifier: workspace:*
         version: link:../plugin-i18n

@@ -29,12 +29,12 @@
  * @license MIT
  */
 
-import { plugin } from 'gunshi/plugin'
+import { plugin } from '@gunshi/plugin'
 import { COMMON_ARGS } from '../../shared/constants.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
 
-import type { PluginWithExtension } from 'gunshi/plugin'
+import type { PluginWithExtension } from '@gunshi/plugin'
 import type { GlobalsCommandContext } from './extension.ts'
 
 export type { GlobalsCommandContext } from './extension.ts'

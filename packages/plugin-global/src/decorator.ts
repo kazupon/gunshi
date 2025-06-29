@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { CommandDecorator, DefaultGunshiParams } from 'gunshi'
+import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
 import type { GlobalsCommandContext } from './extension.ts'
 
 /**

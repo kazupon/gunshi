@@ -18,7 +18,7 @@ import type {
   CommandContext,
   DefaultGunshiParams,
   GunshiParams
-} from 'gunshi'
+} from '@gunshi/plugin'
 import type { UsageRendererCommandContext } from './types.ts'
 
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)

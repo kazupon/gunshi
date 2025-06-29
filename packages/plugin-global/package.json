@@ -58,7 +58,7 @@
     "typecheck:deno": "deno check ./src"
   },
   "dependencies": {
-    "gunshi": "workspace:*"
+    "@gunshi/plugin": "workspace:*"
   },
   "devDependencies": {
     "deno": "catalog:",

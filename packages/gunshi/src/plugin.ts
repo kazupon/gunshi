@@ -33,10 +33,12 @@ export type {
   PluginDependency,
   PluginExtension,
   PluginFunction,
+  PluginOptions,
   PluginWithExtension,
   PluginWithoutExtension
 } from './plugin/core.ts'
 export type {
+  Awaitable,
   Command,
   CommandContext,
   CommandContextCore,

@@ -3,8 +3,8 @@
  * @license MIT
  */
 
+import type { Command, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
-import type { Command, DefaultGunshiParams, GunshiParams } from 'gunshi'
 
 /**
  * Extended command context which provides utilities via usage renderer plugin.

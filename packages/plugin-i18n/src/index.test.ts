@@ -1,6 +1,6 @@
-import { createCommandContext } from 'gunshi/context'
 import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { createCommandContext } from '../../gunshi/src/context.ts'
 import {
   createMockCommandContext,
   createTranslationAdapterForIntlifyMessageFormat,
@@ -9,7 +9,13 @@ import {
 import { resolveBuiltInKey } from '../../shared/utils.ts'
 import i18n from './index.ts'
 
-import type { Args, Command, CommandResource, CommandResourceFetcher, GunshiParams } from 'gunshi'
+import type {
+  Args,
+  Command,
+  CommandResource,
+  CommandResourceFetcher,
+  GunshiParams
+} from '@gunshi/plugin'
 import type { TranslationAdapter } from './types.ts'
 
 afterEach(() => {

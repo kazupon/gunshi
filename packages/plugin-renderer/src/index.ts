@@ -60,6 +60,14 @@ export { renderValidationErrors } from './validation.ts'
 
 export type { UsageRendererCommandContext } from './types.ts'
 
+// type for the command context with renderer extension
+type RendererCommandContext = GunshiParams<{
+  args: Args
+  extensions: {
+    renderer: UsageRendererCommandContext<DefaultGunshiParams>
+  }
+}>
+
 /**
  * usage renderer plugin
  */
@@ -132,10 +140,15 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
     },
 
     setup: ctx => {
-      ctx.decorateHeaderRenderer(async (_baseRenderer, cmdCtx) => await renderHeader(cmdCtx))
-      ctx.decorateUsageRenderer(async (_baseRenderer, cmdCtx) => await renderUsage(cmdCtx))
+      ctx.decorateHeaderRenderer(
+        async (_baseRenderer, cmdCtx) => await renderHeader<RendererCommandContext>(cmdCtx)
+      )
+      ctx.decorateUsageRenderer(
+        async (_baseRenderer, cmdCtx) => await renderUsage<RendererCommandContext>(cmdCtx)
+      )
       ctx.decorateValidationErrorsRenderer(
-        async (_baseRenderer, cmdCtx, error) => await renderValidationErrors(cmdCtx, error)
+        async (_baseRenderer, cmdCtx, error) =>
+          await renderValidationErrors<RendererCommandContext>(cmdCtx, error)
       )
     }
   })

@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { Awaitable, CommandContextCore, DefaultGunshiParams } from 'gunshi'
+import type { Awaitable, CommandContextCore, DefaultGunshiParams } from '@gunshi/plugin'
 
 /**
  * Extended command context which provides utilities via global options plugin.

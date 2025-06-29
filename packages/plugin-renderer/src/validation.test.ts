@@ -1,5 +1,5 @@
-import { createCommandContext } from 'gunshi/context'
 import { expect, test } from 'vitest'
+import { createCommandContext } from '../../gunshi/src/context.ts'
 import { renderValidationErrors } from './validation.ts'
 
 test('basic', async () => {

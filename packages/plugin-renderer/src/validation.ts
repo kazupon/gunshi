@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { CommandContext, DefaultGunshiParams, GunshiParams } from 'gunshi'
+import type { CommandContext, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
 
 /**
  * Render the validation errors.

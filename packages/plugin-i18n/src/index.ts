@@ -33,7 +33,7 @@
  * @license MIT
  */
 
-import { plugin } from 'gunshi/plugin'
+import { plugin } from '@gunshi/plugin'
 import { BUILT_IN_PREFIX } from '../../shared/constants.ts'
 import DefaultResource from '../../shared/resource.ts'
 import { resolveArgKey, resolveBuiltInKey, resolveExamples } from '../../shared/utils.ts' // for type checking
@@ -45,9 +45,9 @@ import type {
   CommandResource,
   DefaultGunshiParams,
   GunshiParams,
-  LazyCommand
-} from 'gunshi'
-import type { PluginWithExtension } from 'gunshi/plugin'
+  LazyCommand,
+  PluginWithExtension
+} from '@gunshi/plugin'
 import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '../../shared/types.ts'
 import type { TranslationAdapterFactory } from './types.ts'
 
@@ -217,7 +217,7 @@ export default function i18n(
           Object.create(null),
           originalResource as Record<string, string>,
           {
-            examples: await resolveExamples(ctx, originalResource.examples)
+            examples: await resolveExamples<typeof ctx>(ctx, originalResource.examples)
           } as Record<string, string>
         )
         if (builtInLoadedResources) {
