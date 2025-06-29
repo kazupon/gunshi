@@ -29,7 +29,7 @@
  * @license MIT
  */
 
-import { plugin } from 'gunshi/plugin'
+import { plugin } from '@gunshi/plugin'
 import { resolveLazyCommand } from 'gunshi/utils'
 import {
   ARG_NEGATABLE_PREFIX,
@@ -41,16 +41,16 @@ import { renderHeader } from './header.ts'
 import { renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'
 
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 import type {
   Args,
   Command,
   CommandContext,
   CommandContextCore,
   DefaultGunshiParams,
-  GunshiParams
-} from 'gunshi'
-import type { PluginWithExtension } from 'gunshi/plugin'
+  GunshiParams,
+  PluginWithExtension
+} from '@gunshi/plugin'
+import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 import type { CommandArgKeys, CommandBuiltinKeys } from '../../shared/types.ts'
 import type { UsageRendererCommandContext } from './types.ts'
 
