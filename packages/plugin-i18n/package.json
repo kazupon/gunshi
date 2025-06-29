@@ -73,6 +73,7 @@
   "devDependencies": {
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
+    "@intlify/core": "next",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",

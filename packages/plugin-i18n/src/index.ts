@@ -55,6 +55,8 @@ import type {
 import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
 import type { TranslationAdapterFactory } from './types.ts'
 
+export * from './translation.ts'
+
 export type * from './types.ts'
 
 /**

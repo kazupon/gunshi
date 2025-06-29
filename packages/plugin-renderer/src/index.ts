@@ -35,6 +35,7 @@ import {
   ARG_PREFIX_AND_KEY_SEPARATOR,
   BUILD_IN_PREFIX_AND_KEY_SEPARATOR,
   DefaultResource,
+  resolveExamples,
   resolveLazyCommand
 } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
@@ -77,7 +78,7 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
 
     dependencies: [{ name: 'i18n', optional: true }],
 
-    extension: (ctx: CommandContextCore): UsageRendererCommandContext => {
+    extension: (ctx: CommandContextCore, cmd: Command): UsageRendererCommandContext => {
       // TODO(kazupon): This is a workaround for the type system.
       const {
         extensions: { i18n }
@@ -105,11 +106,11 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
         return cachedCommands as unknown as Command<G>[]
       }
 
-      function text<
+      async function text<
         T extends string = CommandBuiltinKeys,
         O = CommandArgKeys<DefaultGunshiParams['args']>,
         K = CommandBuiltinKeys | O | T
-      >(key: K, values: Record<string, unknown> = Object.create(null)): string {
+      >(key: K, values: Record<string, unknown> = Object.create(null)): Promise<string> {
         if (i18n) {
           return i18n.translate(key, values)
         } else {
@@ -129,7 +130,13 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
               : schema.description || ''
           } else {
             // if the key is a built-in key 'description' and 'examples', return empty string, because the these keys are resolved by the renderer itself.
-            return key === 'description' || key === 'examples' ? '' : (key as string)
+            if (key === 'description') {
+              return ''
+            } else if (key === 'examples') {
+              return await resolveExamples(ctx, cmd.examples)
+            } else {
+              return key as string
+            }
           }
         }
       }

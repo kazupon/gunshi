@@ -149,8 +149,8 @@ ARGUMENTS:
 
 OPTIONS:
   -f, --foo <foo>          The foo option
-  --bar                    The bar option
-  --no-bar                 Negatable of --bar
+  -B, --bar                The bar option
+  --no-bar                 Negatable of -B, --bar
   -b, --baz [baz]          The baz option (default: 42)
   -q, --qux <qux>          The qux option
   -l, --log [log]          The log option (default: info, choices: debug | info | warn | error)
@@ -195,8 +195,8 @@ ARGUMENTS:
 
 OPTIONS:
   -f, --foo <foo>          The foo option
-  --bar                    The bar option
-  --no-bar                 Negatable of --bar
+  -B, --bar                The bar option
+  --no-bar                 Negatable of -B, --bar
   -b, --baz [baz]          The baz option (default: 42)
   -q, --qux <qux>          The qux option
   -l, --log [log]          The log option (default: info, choices: debug | info | warn | error)

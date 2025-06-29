@@ -100,11 +100,10 @@
     "args-tokens": "^0.20.1"
   },
   "devDependencies": {
-    "@intlify/core": "next",
+    "@gunshi/resources": "workspace:*",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
-    "messageformat": "4.0.0-12",
     "publint": "catalog:",
     "tsdown": "catalog:",
     "zod": "catalog:"

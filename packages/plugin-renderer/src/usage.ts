@@ -36,7 +36,7 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
 
   // render description section (sub command executed only)
   if (!ctx.omitted) {
-    const description = resolveDescription(ctx)
+    const description = await resolveDescription(ctx)
     if (description) {
       messages.push(description, '')
     }
@@ -78,7 +78,7 @@ async function renderPositionalArgsSection<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
   const messages: string[] = []
-  messages.push(`${ctx.extensions!.renderer.text(resolveBuiltInKey('ARGUMENTS'))}:`)
+  messages.push(`${await ctx.extensions!.renderer.text(resolveBuiltInKey('ARGUMENTS'))}:`)
   messages.push(await generatePositionalArgsUsage(ctx))
   return messages
 }
@@ -92,7 +92,7 @@ async function renderOptionalArgsSection<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
   const messages: string[] = []
-  messages.push(`${ctx.extensions!.renderer.text(resolveBuiltInKey('OPTIONS'))}:`)
+  messages.push(`${await ctx.extensions!.renderer.text(resolveBuiltInKey('OPTIONS'))}:`)
   messages.push(await generateOptionalArgsUsage(ctx, getOptionalArgsPairs(ctx)))
   return messages
 }
@@ -112,7 +112,10 @@ async function renderExamplesSection<
     const examples = resolvedExamples
       .split('\n')
       .map((example: string) => example.padStart(ctx.env.leftMargin + example.length))
-    messages.push(`${ctx.extensions!.renderer.text(resolveBuiltInKey('EXAMPLES'))}:`, ...examples)
+    messages.push(
+      `${await ctx.extensions!.renderer.text(resolveBuiltInKey('EXAMPLES'))}:`,
+      ...examples
+    )
   }
 
   return messages
@@ -126,16 +129,16 @@ async function renderExamplesSection<
 async function renderUsageSection<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
-  const messages: string[] = [`${ctx.extensions!.renderer.text(resolveBuiltInKey('USAGE'))}:`]
+  const messages: string[] = [`${await ctx.extensions!.renderer.text(resolveBuiltInKey('USAGE'))}:`]
   if (ctx.omitted) {
-    const defaultCommand = `${resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${resolveSubCommand(ctx)}]` : ''} ${[generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
+    const defaultCommand = `${await resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${await resolveSubCommand(ctx)}]` : ''} ${[await generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
     messages.push(defaultCommand.padStart(ctx.env.leftMargin + defaultCommand.length))
     if (await hasCommands(ctx)) {
-      const commandsUsage = `${resolveEntry(ctx)} <${ctx.extensions!.renderer.text(resolveBuiltInKey('COMMANDS'))}>`
+      const commandsUsage = `${await resolveEntry(ctx)} <${await ctx.extensions!.renderer.text(resolveBuiltInKey('COMMANDS'))}>`
       messages.push(commandsUsage.padStart(ctx.env.leftMargin + commandsUsage.length))
     }
   } else {
-    const usageStr = `${resolveEntry(ctx)} ${resolveSubCommand(ctx)} ${[generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
+    const usageStr = `${await resolveEntry(ctx)} ${await resolveSubCommand(ctx)} ${[await generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
     messages.push(usageStr.padStart(ctx.env.leftMargin + usageStr.length))
   }
   return messages
@@ -154,7 +157,9 @@ async function renderCommandsSection<
     }
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
-  const messages: string[] = [`${ctx.extensions!.renderer.text(resolveBuiltInKey('COMMANDS'))}:`]
+  const messages: string[] = [
+    `${await ctx.extensions!.renderer.text(resolveBuiltInKey('COMMANDS'))}:`
+  ]
   const loadedCommands = (await ctx.extensions?.renderer.loadCommands<G>()) || []
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
   const commandsStr = await Promise.all(
@@ -168,7 +173,7 @@ async function renderCommandsSection<
   messages.push(
     ...commandsStr,
     '',
-    `${ctx.extensions!.renderer.text(resolveBuiltInKey('FORMORE'))}:`
+    `${await ctx.extensions!.renderer.text(resolveBuiltInKey('FORMORE'))}:`
   )
   messages.push(
     ...loadedCommands.map(cmd => {
@@ -184,10 +189,10 @@ async function renderCommandsSection<
  * @param ctx A {@link CommandContext | command context}
  * @returns The entry command name
  */
-function resolveEntry<
+async function resolveEntry<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
->(ctx: CommandContext<G>): string {
-  return ctx.env.name || ctx.extensions!.renderer.text(resolveBuiltInKey('COMMAND'))
+>(ctx: CommandContext<G>): Promise<string> {
+  return ctx.env.name || (await ctx.extensions!.renderer.text(resolveBuiltInKey('COMMAND')))
 }
 
 /**
@@ -195,10 +200,10 @@ function resolveEntry<
  * @param ctx A {@link CommandContext | command context}
  * @returns The sub command name
  */
-function resolveSubCommand<
+async function resolveSubCommand<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
->(ctx: Readonly<CommandContext<G>>): string {
-  return ctx.name || ctx.extensions!.renderer.text(resolveBuiltInKey('SUBCOMMAND'))
+>(ctx: Readonly<CommandContext<G>>): Promise<string> {
+  return ctx.name || (await ctx.extensions!.renderer.text(resolveBuiltInKey('SUBCOMMAND')))
 }
 
 /**
@@ -206,10 +211,10 @@ function resolveSubCommand<
  * @param ctx A {@link CommandContext | command context}
  * @returns resolved command description
  */
-function resolveDescription<
+async function resolveDescription<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
->(ctx: CommandContext<G>): string {
-  return ctx.extensions!.renderer.text('description') || ctx.description || ''
+>(ctx: CommandContext<G>): Promise<string> {
+  return (await ctx.extensions!.renderer.text('description')) || ctx.description || ''
 }
 
 /**
@@ -220,7 +225,7 @@ function resolveDescription<
 async function resolveExamples<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
 >(ctx: CommandContext<G>): Promise<string> {
-  const ret = ctx.extensions!.renderer.text('examples')
+  const ret = await ctx.extensions!.renderer.text('examples')
   if (ret) {
     return ret
   }
@@ -277,13 +282,13 @@ function hasAllDefaultOptions<G extends GunshiParams>(ctx: CommandContext<G>): b
  * @param ctx A {@link CommandContext | command context}
  * @returns Options symbols for usage
  */
-function generateOptionsSymbols<
+async function generateOptionsSymbols<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
->(ctx: CommandContext<G>): string {
+>(ctx: CommandContext<G>): Promise<string> {
   return hasOptionalArgs(ctx)
     ? hasAllDefaultOptions(ctx)
-      ? `[${ctx.extensions!.renderer.text(resolveBuiltInKey('OPTIONS'))}]`
-      : `<${ctx.extensions!.renderer.text(resolveBuiltInKey('OPTIONS'))}>`
+      ? `[${await ctx.extensions!.renderer.text(resolveBuiltInKey('OPTIONS'))}]`
+      : `<${await ctx.extensions!.renderer.text(resolveBuiltInKey('OPTIONS'))}>`
     : ''
 }
 
@@ -338,15 +343,15 @@ function resolveNegatableType<G extends GunshiParams>(
   return ctx.args[key.startsWith(ARG_NEGATABLE_PREFIX) ? resolveNegatableKey(key) : key].type
 }
 
-function generateDefaultDisplayValue<
+async function generateDefaultDisplayValue<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
->(ctx: Readonly<CommandContext<G>>, schema: ArgSchema): string {
-  return `${ctx.extensions!.renderer.text(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
+>(ctx: Readonly<CommandContext<G>>, schema: ArgSchema): Promise<string> {
+  return `${await ctx.extensions!.renderer.text(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
 }
 
-function resolveDisplayValue<
+async function resolveDisplayValue<
   G extends GunshiParams<{ args: Args; extensions: { renderer: UsageRendererCommandContext } }>
->(ctx: Readonly<CommandContext<G>>, key: string): string {
+>(ctx: Readonly<CommandContext<G>>, key: string): Promise<string> {
   if (COMMON_ARGS_KEYS.includes(key)) {
     return ''
   }
@@ -359,14 +364,14 @@ function resolveDisplayValue<
       schema.type === 'custom') &&
     schema.default !== undefined
   ) {
-    return `(${generateDefaultDisplayValue(ctx, schema)})`
+    return `(${await generateDefaultDisplayValue(ctx, schema)})`
   }
   if (schema.type === 'enum') {
     const _default =
       schema.default !== undefined // eslint-disable-line unicorn/no-negated-condition
-        ? generateDefaultDisplayValue(ctx, schema)
+        ? await generateDefaultDisplayValue(ctx, schema)
         : ''
-    const choices = `${ctx.extensions!.renderer.text(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
+    const choices = `${await ctx.extensions!.renderer.text(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
     return `(${_default ? `${_default}, ${choices}` : choices})`
   }
 
@@ -393,16 +398,18 @@ async function generateOptionalArgsUsage<
     : 0
 
   const usages = await Promise.all(
-    Object.entries(optionsPairs).map(([key, value]) => {
-      let rawDesc = ctx.extensions!.renderer.text(resolveArgKey(key))
+    Object.entries(optionsPairs).map(async ([key, value]) => {
+      let rawDesc = await ctx.extensions!.renderer.text(resolveArgKey(key))
       if (!rawDesc && key.startsWith(ARG_NEGATABLE_PREFIX)) {
         const name = resolveNegatableKey(key)
         const schema = ctx.args[name]
         const optionKey = makeShortLongOptionPair(schema, name, ctx.toKebab)
-        rawDesc = `${ctx.extensions!.renderer.text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
+        rawDesc = `${await ctx.extensions!.renderer.text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
-      const valueDesc = key.startsWith(ARG_NEGATABLE_PREFIX) ? '' : resolveDisplayValue(ctx, key)
+      const valueDesc = key.startsWith(ARG_NEGATABLE_PREFIX)
+        ? ''
+        : await resolveDisplayValue(ctx, key)
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
       const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
@@ -424,9 +431,9 @@ async function generatePositionalArgsUsage<
   const argsMaxLength = Math.max(...positionals.map(([name]) => name.length))
 
   const usages = await Promise.all(
-    positionals.map(([name]) => {
+    positionals.map(async ([name]) => {
       const desc =
-        ctx.extensions!.renderer.text(resolveArgKey(name)) ||
+        (await ctx.extensions!.renderer.text(resolveArgKey(name))) ||
         (ctx.args[name] as ArgSchema & { description?: string }).description ||
         ''
       const arg = `${name.padEnd(argsMaxLength + ctx.env.middleMargin)} ${desc}`

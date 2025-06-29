@@ -65,11 +65,6 @@
   "peerDependencies": {
     "@gunshi/plugin-i18n": "workspace:*"
   },
-  "peerDependenciesMeta": {
-    "@gunshi/plugin-i18n": {
-      "optional": true
-    }
-  },
   "devDependencies": {
     "@gunshi/shared": "workspace:*",
     "deno": "catalog:",

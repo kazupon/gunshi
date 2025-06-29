@@ -4,7 +4,7 @@
  */
 
 import type { Command, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+import type { CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
 
 /**
  * Extended command context which provides utilities via usage renderer plugin.
@@ -14,7 +14,14 @@ export interface UsageRendererCommandContext<G extends GunshiParams<any> = Defau
   /**
    * Render the text message
    */
-  text: I18nCommandContext<G>['translate']
+  text: <
+    T extends string = CommandBuiltinKeys,
+    O = CommandArgKeys<G['args']>,
+    K = CommandBuiltinKeys | O | T
+  >(
+    key: K,
+    values?: Record<string, unknown>
+  ) => Promise<string>
   /**
    * Load commands
    * @returns A list of commands loaded from the command loader plugin.

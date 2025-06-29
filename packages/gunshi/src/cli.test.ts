@@ -1,5 +1,7 @@
+import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { z } from 'zod/v4-mini'
+import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
@@ -467,8 +469,13 @@ describe('auto generate usage', () => {
       description: 'Modern CLI tool',
       version: '0.0.0',
       leftMargin: 4,
-      locale: 'ja-JP',
-      middleMargin: 15
+      middleMargin: 15,
+      plugins: [
+        i18n({
+          locale: 'ja-JP',
+          resources: { 'ja-JP': jsJPResource }
+        })
+      ]
     })
     expect(mainUsageRendered).toMatchSnapshot('main')
 
@@ -507,8 +514,12 @@ describe('auto generate usage', () => {
         name: 'gunshi',
         description: 'Modern CLI tool',
         version: '0.0.0',
-        locale: 'fr-FR',
-        usageOptionType: true
+        usageOptionType: true,
+        plugins: [
+          i18n({
+            locale: 'fr-FR'
+          })
+        ]
       }
     )
 

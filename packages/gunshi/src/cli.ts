@@ -5,12 +5,10 @@
 
 import { parseArgs, resolveArgs } from 'args-tokens'
 import globals from '../../plugin-global/src/index.ts'
-import i18n from '../../plugin-i18n/src/index.ts'
 import renderer from '../../plugin-renderer/src/index.ts'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { createDecorators } from './decorators.ts'
-import jaJPResource from './locales/ja-JP.json' with { type: 'json' }
 import { createPluginContext } from './plugin/context.ts'
 import { resolveDependencies } from './plugin/dependency.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
@@ -46,17 +44,7 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   const decorators = createDecorators<G>()
   const pluginContext = createPluginContext<G>(decorators)
 
-  const builtInPlugins: Plugin[] = [
-    globals(),
-    i18n({
-      locale: options.locale,
-      translationAdapterFactory: options.translationAdapterFactory,
-      resources: {
-        'ja-JP': jaJPResource
-      }
-    }),
-    renderer()
-  ]
+  const builtInPlugins: Plugin[] = [globals(), renderer()]
   const plugins = await applyPlugins(pluginContext, [...builtInPlugins, ...(options.plugins || [])])
 
   const cliOptions = normalizeCliOptions(options, entry, decorators)

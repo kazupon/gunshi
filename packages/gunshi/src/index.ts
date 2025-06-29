@@ -15,10 +15,10 @@
  */
 
 export { parseArgs, resolveArgs } from 'args-tokens'
+export { DefaultTranslation } from '../../plugin-i18n/src/index.ts' // TODO(kazupon): remove this import after the next major release
 export * from './cli.ts'
 export { define, lazy } from './definition.ts'
 export { plugin } from './plugin/core.ts'
-export { DefaultTranslation } from './translation.ts'
 
 export type { PluginContext } from './plugin/context.ts'
 export type {
