@@ -14,8 +14,8 @@
  * @license MIT
  */
 
-import type { Args } from 'args-tokens'
 import type {
+  Args,
   Command,
   CommandLoader,
   DefaultGunshiParams,
@@ -24,7 +24,7 @@ import type {
   LazyCommand
 } from './types.ts'
 
-export type { Args, ArgSchema, ArgValues } from 'args-tokens'
+export type { Args, ArgSchema, ArgValues } from './types.ts'
 
 /**
  * Define a {@link Command | command}

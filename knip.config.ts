@@ -15,5 +15,5 @@ export default {
     }
   },
   ignore: ['playground/deno/main.ts', '**/src/**.test-d.ts', 'bench/**'],
-  ignoreDependencies: ['lint-staged', 'deno', 'gunshi019', 'mitata', '@typescript/native-preview']
+  ignoreDependencies: ['lint-staged', 'deno', 'mitata']
 } satisfies KnipConfig

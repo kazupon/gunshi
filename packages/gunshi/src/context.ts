@@ -18,8 +18,11 @@
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { create, deepFreeze, isLazyCommand, log } from './utils.ts'
 
-import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 import type {
+  Args,
+  ArgSchema,
+  ArgToken,
+  ArgValues,
   CliOptions,
   Command,
   CommandCallMode,

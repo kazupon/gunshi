@@ -29,7 +29,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
     './src/context.ts',
     './src/plugin.ts',
     './src/renderer.ts',
-    './src/generator.ts'
+    './src/generator.ts',
+    './src/utils.ts'
   ],
   outDir: 'lib',
   clean: true,

@@ -1,0 +1,80 @@
+{
+  "name": "@gunshi/resources",
+  "description": "built-in resources for gunshi",
+  "version": "0.26.3",
+  "author": {
+    "name": "kazuya kawaguchi",
+    "email": "kawakazu80@gmail.com"
+  },
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/kazupon",
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazupon/gunshi.git",
+    "directory": "packages/resources"
+  },
+  "keywords": [
+    "gunshi",
+    "l10n",
+    "localization",
+    "cli"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">= 20"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "lib",
+    "locales"
+  ],
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./en-US": {
+      "import": "./locales/en-US.json",
+      "require": "./locales/en-US.json",
+      "default": "./locales/en-US.json"
+    },
+    "./ja-JP": {
+      "import": "./locales/ja-JP.json",
+      "require": "./locales/ja-JP.json",
+      "default": "./locales/ja-JP.json"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/*",
+        "./*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint:jsr": "jsr publish --dry-run --allow-dirty",
+    "prepack": "pnpm build",
+    "typecheck:deno": "deno check ./src"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "deno": "catalog:",
+    "jsr": "catalog:",
+    "jsr-exports-lint": "catalog:",
+    "publint": "catalog:",
+    "tsdown": "catalog:"
+  }
+}

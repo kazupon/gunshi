@@ -15,62 +15,42 @@ import type {
 const EMPTY_RENDERER = async () => ''
 
 /**
- * Internal class for managing renderer decorators.
- * This class is not exposed to plugin authors.
+ * Interface for managing renderer and command decorators.
+ * This interface defines the contract for decorator management in plugins.
  */
-export class Decorators<G extends GunshiParams = DefaultGunshiParams> {
-  #headerDecorators: RendererDecorator<string, G>[] = []
-  #usageDecorators: RendererDecorator<string, G>[] = []
-  #validationDecorators: ValidationErrorsDecorator<G>[] = []
-  #commandDecorators: CommandDecorator<G>[] = []
-
-  addHeaderDecorator(decorator: RendererDecorator<string, G>): void {
-    this.#headerDecorators.push(decorator)
-  }
-
-  addUsageDecorator(decorator: RendererDecorator<string, G>): void {
-    this.#usageDecorators.push(decorator)
-  }
-
-  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<G>): void {
-    this.#validationDecorators.push(decorator)
-  }
-
-  addCommandDecorator(decorator: CommandDecorator<G>): void {
-    this.#commandDecorators.push(decorator)
-  }
-
-  get commandDecorators(): readonly CommandDecorator<G>[] {
-    return [...this.#commandDecorators]
-  }
-
-  getHeaderRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string> {
-    return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
-  }
-
-  getUsageRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string> {
-    return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
-  }
-
+export interface Decorators<G extends GunshiParams = DefaultGunshiParams> {
+  addHeaderDecorator(decorator: RendererDecorator<string, G>): void
+  addUsageDecorator(decorator: RendererDecorator<string, G>): void
+  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<G>): void
+  addCommandDecorator(decorator: CommandDecorator<G>): void
+  readonly commandDecorators: readonly CommandDecorator<G>[]
+  getHeaderRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string>
+  getUsageRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string>
   getValidationErrorsRenderer(): (
     ctx: Readonly<CommandContext<G>>,
     error: AggregateError
-  ) => Promise<string> {
-    if (this.#validationDecorators.length === 0) {
-      return EMPTY_RENDERER
-    }
+  ) => Promise<string>
+}
 
-    let renderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string> =
-      EMPTY_RENDERER
-    for (const decorator of this.#validationDecorators) {
-      const previousRenderer = renderer
-      renderer = (ctx: Readonly<CommandContext<G>>, error: AggregateError) =>
-        decorator(previousRenderer, ctx, error)
-    }
-    return renderer
-  }
+/**
+ * Factory function for creating a decorators manager.
+ * @returns A new decorators manager instance
+ */
+export function createDecorators<G extends GunshiParams = DefaultGunshiParams>(): Decorators<G> {
+  /**
+   * private states
+   */
 
-  #buildRenderer<T, G extends GunshiParams = DefaultGunshiParams>(
+  const headerDecorators: RendererDecorator<string, G>[] = []
+  const usageDecorators: RendererDecorator<string, G>[] = []
+  const validationDecorators: ValidationErrorsDecorator<G>[] = []
+  const commandDecorators: CommandDecorator<G>[] = []
+
+  /**
+   * helper function for building renderers
+   */
+
+  function buildRenderer<T>(
     decorators: RendererDecorator<T, G>[],
     defaultRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>
   ): (ctx: Readonly<CommandContext<G>>) => Promise<T> {
@@ -85,4 +65,56 @@ export class Decorators<G extends GunshiParams = DefaultGunshiParams> {
     }
     return renderer
   }
+
+  /**
+   * public interfaces
+   */
+
+  return Object.freeze({
+    addHeaderDecorator(decorator: RendererDecorator<string, G>): void {
+      headerDecorators.push(decorator)
+    },
+
+    addUsageDecorator(decorator: RendererDecorator<string, G>): void {
+      usageDecorators.push(decorator)
+    },
+
+    addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<G>): void {
+      validationDecorators.push(decorator)
+    },
+
+    addCommandDecorator(decorator: CommandDecorator<G>): void {
+      commandDecorators.push(decorator)
+    },
+
+    get commandDecorators(): readonly CommandDecorator<G>[] {
+      return [...commandDecorators]
+    },
+
+    getHeaderRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string> {
+      return buildRenderer(headerDecorators, EMPTY_RENDERER)
+    },
+
+    getUsageRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string> {
+      return buildRenderer(usageDecorators, EMPTY_RENDERER)
+    },
+
+    getValidationErrorsRenderer(): (
+      ctx: Readonly<CommandContext<G>>,
+      error: AggregateError
+    ) => Promise<string> {
+      if (validationDecorators.length === 0) {
+        return EMPTY_RENDERER
+      }
+
+      let renderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string> =
+        EMPTY_RENDERER
+      for (const decorator of validationDecorators) {
+        const previousRenderer = renderer
+        renderer = (ctx: Readonly<CommandContext<G>>, error: AggregateError) =>
+          decorator(previousRenderer, ctx, error)
+      }
+      return renderer
+    }
+  })
 }

@@ -4,20 +4,19 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
+import globals from '../../plugin-global/src/index.ts'
+import renderer from '../../plugin-renderer/src/index.ts'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { createCommandContext } from './context.ts'
-import { Decorators } from './decorators.ts'
-import { PluginContext, resolveDependencies } from './plugin.ts'
-import completion from './plugins/completion.ts'
-import dryRun from './plugins/dryrun.ts'
-import globals from './plugins/globals.ts'
-import i18n from './plugins/i18n.ts'
-import renderer from './plugins/renderer.ts'
+import { createDecorators } from './decorators.ts'
+import { createPluginContext } from './plugin/context.ts'
+import { resolveDependencies } from './plugin/dependency.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
-import type { ArgToken } from 'args-tokens'
-import type { Plugin } from './plugin.ts'
+import type { Decorators } from './decorators.ts'
+import type { Plugin, PluginContext } from './plugin.ts'
 import type {
+  ArgToken,
   CliOptions,
   Command,
   CommandCallMode,
@@ -42,16 +41,10 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: CliOptions<G> = {}
 ): Promise<string | undefined> {
-  const decorators = new Decorators<G>()
-  const pluginContext = new PluginContext<G>(decorators)
+  const decorators = createDecorators<G>()
+  const pluginContext = createPluginContext<G>(decorators)
 
-  const builtInPlugins: Plugin[] = [
-    globals(),
-    i18n({ locale: options.locale, translationAdapterFactory: options.translationAdapterFactory }),
-    renderer(),
-    completion(),
-    dryRun()
-  ]
+  const builtInPlugins: Plugin[] = [globals(), renderer()]
   const plugins = await applyPlugins(pluginContext, [...builtInPlugins, ...(options.plugins || [])])
 
   const cliOptions = normalizeCliOptions(options, entry, decorators)
