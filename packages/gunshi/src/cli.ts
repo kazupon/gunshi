@@ -4,22 +4,20 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
+import globals from '../../plugin-global/src/index.ts'
+import i18n from '../../plugin-i18n/src/index.ts'
+import renderer from '../../plugin-renderer/src/index.ts'
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { createDecorators } from './decorators.ts'
+import jaJPResource from './locales/ja-JP.json' with { type: 'json' }
 import { createPluginContext } from './plugin/context.ts'
 import { resolveDependencies } from './plugin/dependency.ts'
-import completion from './plugins/completion.ts'
-import dryRun from './plugins/dryrun.ts'
-import globals from './plugins/globals.ts'
-import i18n from './plugins/i18n.ts'
-import renderer from './plugins/renderer.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
 import type { ArgToken } from 'args-tokens'
 import type { Decorators } from './decorators.ts'
-import type { PluginContext } from './plugin/context.ts'
-import type { Plugin } from './plugin/core.ts'
+import type { Plugin, PluginContext } from './plugin.ts'
 import type {
   CliOptions,
   Command,
@@ -50,10 +48,14 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 
   const builtInPlugins: Plugin[] = [
     globals(),
-    i18n({ locale: options.locale, translationAdapterFactory: options.translationAdapterFactory }),
-    renderer(),
-    completion(),
-    dryRun()
+    i18n({
+      locale: options.locale,
+      translationAdapterFactory: options.translationAdapterFactory,
+      resources: {
+        'ja-JP': jaJPResource
+      }
+    }),
+    renderer()
   ]
   const plugins = await applyPlugins(pluginContext, [...builtInPlugins, ...(options.plugins || [])])
 
