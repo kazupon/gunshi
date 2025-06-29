@@ -54,6 +54,7 @@ const SHOW = {
     bar: {
       type: 'boolean',
       negatable: true,
+      short: 'B',
       description: 'The bar option'
     },
     baz: {

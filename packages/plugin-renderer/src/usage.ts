@@ -287,7 +287,11 @@ function generateOptionsSymbols<
     : ''
 }
 
-function makeShortLongOptionPair(schema: ArgSchema, name: string, toKebab?: boolean): string {
+export function makeShortLongOptionPair(
+  schema: ArgSchema,
+  name: string,
+  toKebab?: boolean
+): string {
   // Convert camelCase to kebab-case for display in help text if toKebab is true
   const displayName = toKebab || schema.toKebab ? kebabnize(name) : name
   let key = `--${displayName}`

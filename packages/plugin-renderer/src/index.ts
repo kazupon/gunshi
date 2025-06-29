@@ -38,7 +38,7 @@ import {
   resolveLazyCommand
 } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
-import { renderUsage } from './usage.ts'
+import { makeShortLongOptionPair, renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'
 
 import type {
@@ -125,7 +125,7 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
             }
             const schema = ctx.args[argKey as keyof typeof ctx.args]
             return negatable && schema.type === 'boolean' && schema.negatable
-              ? `${DefaultResource['NEGATABLE']} --${argKey}`
+              ? `${DefaultResource['NEGATABLE']} ${makeShortLongOptionPair(schema, argKey, ctx.toKebab)}`
               : schema.description || ''
           } else {
             // if the key is a built-in key 'description' and 'examples', return empty string, because the these keys are resolved by the renderer itself.
