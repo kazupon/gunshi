@@ -183,7 +183,7 @@ export default function i18n(
       }
 
       // set default locale resources
-      setResource(DEFAULT_LOCALE, DefaultResource)
+      setResource(DEFAULT_LOCALE, DefaultResource as Record<BuiltinResourceKeys, string>)
 
       // install built-in locale resources
       for (const [locale, resource] of Object.entries(resources)) {
