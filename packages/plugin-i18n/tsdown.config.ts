@@ -6,7 +6,12 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
   outDir: 'lib',
   clean: true,
   publint: true,
-  dts: true,
+  // dts: true,
+  // NOTE(kazupon): We need to avoid for `deno check` to resolve `args-tokens` as a dependency.
+  dts: {
+    resolve: ['args-tokens']
+  },
+  noExternal: ['@gunshi/shared'],
   external: ['@gunshi/plugin'],
   hooks: {
     'build:done': lintJsrExports()

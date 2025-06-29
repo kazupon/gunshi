@@ -18,7 +18,13 @@
       "CHANGELOG.md",
       "LICENSE"
     ],
-    "exclude": ["src/**/*.test.ts", "src/**/*.test-d.ts", "**/__snapshots__/**", "**/dist/**"]
+    "exclude": [
+      "src/**/*.test.ts",
+      "src/**/*.test-d.ts",
+      "**/__snapshots__/**",
+      "**/lib/**",
+      "**/dist/**"
+    ]
   },
   "exports": {
     ".": "./src/index.ts",

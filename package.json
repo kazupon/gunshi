@@ -85,6 +85,7 @@
     "prettier": "^3.6.0",
     "typescript": "catalog:",
     "typescript-eslint": "^8.33.1",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.1"
   },
   "pnpm": {

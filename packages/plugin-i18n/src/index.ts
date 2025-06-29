@@ -34,9 +34,13 @@
  */
 
 import { plugin } from '@gunshi/plugin'
-import { BUILT_IN_PREFIX } from '../../shared/constants.ts'
-import DefaultResource from '../../shared/resource.ts'
-import { resolveArgKey, resolveBuiltInKey, resolveExamples } from '../../shared/utils.ts' // for type checking
+import {
+  BUILT_IN_PREFIX,
+  DefaultResource,
+  resolveArgKey,
+  resolveBuiltInKey,
+  resolveExamples
+} from '@gunshi/shared'
 import { createTranslationAdapter } from './translation.ts'
 
 import type {
@@ -48,7 +52,7 @@ import type {
   LazyCommand,
   PluginWithExtension
 } from '@gunshi/plugin'
-import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '../../shared/types.ts'
+import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
 import type { TranslationAdapterFactory } from './types.ts'
 
 export type * from './types.ts'

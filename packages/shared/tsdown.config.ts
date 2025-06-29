@@ -6,6 +6,9 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
   outDir: 'lib',
   clean: true,
   publint: true,
+  dts: {
+    resolve: ['args-tokens', 'args-tokens/utils']
+  },
   noExternal: ['gunshi/utils'],
   hooks: {
     'build:done': lintJsrExports()

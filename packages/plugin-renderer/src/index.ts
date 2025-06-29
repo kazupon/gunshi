@@ -30,13 +30,13 @@
  */
 
 import { plugin } from '@gunshi/plugin'
-import { resolveLazyCommand } from '@gunshi/shared'
 import {
   ARG_NEGATABLE_PREFIX,
   ARG_PREFIX_AND_KEY_SEPARATOR,
-  BUILD_IN_PREFIX_AND_KEY_SEPARATOR
-} from '../../shared/constants.ts'
-import DefaultResource from '../../shared/resource.ts'
+  BUILD_IN_PREFIX_AND_KEY_SEPARATOR,
+  DefaultResource,
+  resolveLazyCommand
+} from '@gunshi/shared'
 import { renderHeader } from './header.ts'
 import { renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'
@@ -51,7 +51,7 @@ import type {
   PluginWithExtension
 } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
-import type { CommandArgKeys, CommandBuiltinKeys } from '../../shared/types.ts'
+import type { CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
 import type { UsageRendererCommandContext } from './types.ts'
 
 export { renderHeader } from './header.ts'

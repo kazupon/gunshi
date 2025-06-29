@@ -2,8 +2,7 @@ import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
 
-import type { Args } from 'args-tokens'
-import type { CommandRunner, GunshiParams } from './types.ts'
+import type { Args, CommandRunner, GunshiParams } from './types.ts'
 
 test('define', async () => {
   const command = define({

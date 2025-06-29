@@ -25,7 +25,6 @@
 
 export { plugin } from './plugin/core.ts'
 
-export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 export type { PluginContext } from './plugin/context.ts'
 export type {
   OnPluginExtension,
@@ -38,6 +37,10 @@ export type {
   PluginWithoutExtension
 } from './plugin/core.ts'
 export type {
+  Args,
+  ArgSchema,
+  ArgToken,
+  ArgValues,
   Awaitable,
   Command,
   CommandContext,

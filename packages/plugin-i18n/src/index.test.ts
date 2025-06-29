@@ -1,3 +1,4 @@
+import { resolveBuiltInKey } from '@gunshi/shared'
 import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
@@ -6,7 +7,6 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../../gunshi/test/utils.ts'
-import { resolveBuiltInKey } from '../../shared/utils.ts'
 import i18n from './index.ts'
 
 import type {

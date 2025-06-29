@@ -32,8 +32,14 @@
     "paths": {
       "gunshi": ["./packages/gunshi/src/index.ts"],
       "gunshi/plugin": ["./packages/gunshi/src/plugin.ts"],
+      "gunshi/definition": ["./packages/gunshi/src/definition.ts"],
       "gunshi/context": ["./packages/gunshi/src/context.ts"],
-      "gunshi/utils": ["./packages/gunshi/src/utils.ts"]
+      "gunshi/utils": ["./packages/gunshi/src/utils.ts"],
+      "@gunshi/plugin": ["./packages/plugin/src/index.ts"],
+      "@gunshi/shared": ["./packages/shared/src/index.ts"],
+      "@gunshi/plugin-renderer": ["./packages/plugin-renderer/src/index.ts"],
+      "@gunshi/plugin-i18n": ["./packages/plugin-i18n/src/index.ts"],
+      "@gunshi/plugin-global": ["./packages/plugin-global/src/index.ts"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

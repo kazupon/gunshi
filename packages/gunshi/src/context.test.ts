@@ -3,8 +3,8 @@ import { createMockCommandContext, hasPrototype } from '../test/utils.ts'
 import { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 import { createCommandContext } from './context.ts'
 
-import type { Args } from 'args-tokens'
 import type {
+  Args,
   Command,
   CommandContextCore,
   CommandContextExtension,

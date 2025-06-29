@@ -15,10 +15,6 @@ export const ARG_PREFIX_AND_KEY_SEPARATOR: string = `${ARG_PREFIX}${BUILT_IN_KEY
 
 export const ARG_NEGATABLE_PREFIX = 'no-'
 
-// export const ANONYMOUS_COMMAND_NAME = '(anonymous)'
-
-// export const NOOP: () => void = () => {}
-
 type CommonArgType = {
   readonly help: {
     readonly type: 'boolean'

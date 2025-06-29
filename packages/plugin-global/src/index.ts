@@ -30,7 +30,7 @@
  */
 
 import { plugin } from '@gunshi/plugin'
-import { COMMON_ARGS } from '../../shared/constants.ts'
+import { COMMON_ARGS } from '@gunshi/shared'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
 

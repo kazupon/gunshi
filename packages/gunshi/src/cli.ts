@@ -15,10 +15,10 @@ import { createPluginContext } from './plugin/context.ts'
 import { resolveDependencies } from './plugin/dependency.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
-import type { ArgToken } from 'args-tokens'
 import type { Decorators } from './decorators.ts'
 import type { Plugin, PluginContext } from './plugin.ts'
 import type {
+  ArgToken,
   CliOptions,
   Command,
   CommandCallMode,

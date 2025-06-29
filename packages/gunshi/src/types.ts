@@ -8,6 +8,8 @@ import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants
 import type { Args, ArgToken, ArgValues } from 'args-tokens'
 import type { Plugin } from './plugin/core.ts'
 
+export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
+
 export type Awaitable<T> = T | Promise<T>
 
 /**

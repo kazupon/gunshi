@@ -20,7 +20,6 @@ export { define, lazy } from './definition.ts'
 export { plugin } from './plugin/core.ts'
 export { DefaultTranslation } from './translation.ts'
 
-export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 export type { PluginContext } from './plugin/context.ts'
 export type {
   OnPluginExtension,

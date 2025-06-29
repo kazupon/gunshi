@@ -3,13 +3,14 @@
  * @license MIT
  */
 
-import { kebabnize } from '@gunshi/shared'
-import { ARG_NEGATABLE_PREFIX, COMMON_ARGS } from '../../shared/constants.ts'
 import {
+  ARG_NEGATABLE_PREFIX,
+  COMMON_ARGS,
   resolveExamples as _resolvedExamples,
+  kebabnize,
   resolveArgKey,
   resolveBuiltInKey
-} from '../../shared/utils.ts'
+} from '@gunshi/shared'
 
 import type {
   ArgSchema,
