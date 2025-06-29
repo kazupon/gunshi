@@ -94,7 +94,7 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
         Command<G>[]
       > {
         if (cachedCommands) {
-          return cachedCommands as Command<G>[]
+          return cachedCommands as unknown as Command<G>[]
         }
 
         const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
