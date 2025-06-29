@@ -40,7 +40,7 @@ import type { GlobalsCommandContext } from './extension.ts'
 export type { GlobalsCommandContext } from './extension.ts'
 
 /**
- * Built-in global options plugin
+ * global options plugin
  */
 export default function globals(): PluginWithExtension<GlobalsCommandContext> {
   return plugin({
