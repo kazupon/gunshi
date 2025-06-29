@@ -76,40 +76,6 @@ export type GenerateNamespacedKey<
 > = `${Prefixed}${typeof BUILT_IN_KEY_SEPARATOR}${Key}`
 
 /**
- * Command i18n built-in arguments keys.
- * @internal
- */
-export type CommandBuiltinArgsKeys = keyof (typeof import('./constants.ts'))['COMMON_ARGS']
-
-/**
- * Command i18n built-in resource keys.
- * @internal
- */
-export type CommandBuiltinResourceKeys =
-  (typeof import('./constants.ts'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
-
-/**
- * Command i18n built-in keys.
- * The command i18n built-in keys are used by the i18n plugin for translation.
- * @internal
- */
-export type CommandBuiltinKeys =
-  | GenerateNamespacedKey<CommandBuiltinArgsKeys>
-  | GenerateNamespacedKey<CommandBuiltinResourceKeys>
-  | 'description'
-  | 'examples'
-
-/**
- * Command i18n option keys.
- * The command i18n option keys are used by the i18n plugin for translation.
- * @internal
- */
-export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
-  KeyOfArgs<RemovedIndex<A>>,
-  typeof ARG_PREFIX
->
-
-/**
  * Command environment.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

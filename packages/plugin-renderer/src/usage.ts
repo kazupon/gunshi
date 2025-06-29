@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { kebabnize } from 'gunshi/utils'
+import { kebabnize } from '@gunshi/shared'
 import { ARG_NEGATABLE_PREFIX, COMMON_ARGS } from '../../shared/constants.ts'
 import {
   resolveExamples as _resolvedExamples,

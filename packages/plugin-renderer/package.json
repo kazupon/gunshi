@@ -60,8 +60,7 @@
     "typecheck:deno": "deno check ./src"
   },
   "dependencies": {
-    "@gunshi/plugin": "workspace:*",
-    "gunshi": "workspace:*"
+    "@gunshi/plugin": "workspace:*"
   },
   "peerDependencies": {
     "@gunshi/plugin-i18n": "workspace:*"
@@ -72,6 +71,7 @@
     }
   },
   "devDependencies": {
+    "@gunshi/shared": "workspace:*",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",

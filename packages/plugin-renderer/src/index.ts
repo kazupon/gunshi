@@ -30,7 +30,7 @@
  */
 
 import { plugin } from '@gunshi/plugin'
-import { resolveLazyCommand } from 'gunshi/utils'
+import { resolveLazyCommand } from '@gunshi/shared'
 import {
   ARG_NEGATABLE_PREFIX,
   ARG_PREFIX_AND_KEY_SEPARATOR,

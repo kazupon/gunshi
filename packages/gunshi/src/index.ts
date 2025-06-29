@@ -16,7 +16,6 @@
 
 export { parseArgs, resolveArgs } from 'args-tokens'
 export * from './cli.ts'
-export { DEFAULT_LOCALE } from './constants.ts'
 export { define, lazy } from './definition.ts'
 export { plugin } from './plugin/core.ts'
 export { DefaultTranslation } from './translation.ts'
