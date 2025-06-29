@@ -100,7 +100,7 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
         const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
         cachedCommands = (await Promise.all(
           subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
-        )) as Command<DefaultGunshiParams>[]
+        )) as unknown as Command<DefaultGunshiParams>[]
 
         return cachedCommands as unknown as Command<G>[]
       }
@@ -128,7 +128,8 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
               ? `${DefaultResource['NEGATABLE']} --${argKey}`
               : schema.description || ''
           } else {
-            return key as string
+            // if the key is a built-in key 'decription' and 'examples', return empty string, because the these keys are resolved by the renderer itself.
+            return key === 'description' || key === 'examples' ? '' : (key as string)
           }
         }
       }

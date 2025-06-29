@@ -139,19 +139,10 @@ OPTIONS:
 `;
 
 exports[`not install i18n plugin 1`] = `
-"USAGE:
-  cmd1 [show] <OPTIONS> <positional1>
-  cmd1 <COMMANDS>
+"A show command
 
-COMMANDS:
-  show              A show command  
-  command1          this is command1  
-  command2            
-
-For more info, run any command with the \`--help\` flag:
-  cmd1 show --help
-  cmd1 command1 --help
-  cmd1 command2 --help
+USAGE:
+  cmd1 show <OPTIONS> <positional1>
 
 ARGUMENTS:
   positional1           The positional argument 1
@@ -165,7 +156,10 @@ OPTIONS:
   -l, --log [log]          The log option (default: info, choices: debug | info | warn | error)
 
 EXAMPLES:
-  examples
+  # Example 1
+  $ test --foo bar --bar --baz 42 --qux quux
+  # Example 2
+  $ test -f bar -b 42 -q quux
 "
 `;
 

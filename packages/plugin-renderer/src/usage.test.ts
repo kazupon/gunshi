@@ -601,8 +601,8 @@ test('not install i18n plugin', async () => {
   const ctx = await createCommandContext({
     args: SHOW.args!,
     values: {},
-    omitted: true,
-    callMode: 'entry',
+    omitted: false,
+    callMode: 'subCommand',
     positionals: [],
     rest: [],
     argv: [],
