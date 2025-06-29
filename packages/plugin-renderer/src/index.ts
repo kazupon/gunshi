@@ -128,7 +128,7 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
               ? `${DefaultResource['NEGATABLE']} --${argKey}`
               : schema.description || ''
           } else {
-            // if the key is a built-in key 'decription' and 'examples', return empty string, because the these keys are resolved by the renderer itself.
+            // if the key is a built-in key 'description' and 'examples', return empty string, because the these keys are resolved by the renderer itself.
             return key === 'description' || key === 'examples' ? '' : (key as string)
           }
         }
