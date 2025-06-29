@@ -1,0 +1,71 @@
+{
+  "name": "@gunshi/plugin-dryrun",
+  "description": "dryrun option plugin for gunshi",
+  "version": "0.26.3",
+  "author": {
+    "name": "kazuya kawaguchi",
+    "email": "kawakazu80@gmail.com"
+  },
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/kazupon",
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazupon/gunshi.git",
+    "directory": "packages/plugin-completion"
+  },
+  "keywords": [
+    "gunshi",
+    "completion",
+    "plugin",
+    "cli"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">= 20"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "lib"
+  ],
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/*",
+        "./*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint:jsr": "jsr publish --dry-run --allow-dirty",
+    "prepack": "pnpm build",
+    "typecheck:deno": "deno check ./src"
+  },
+  "dependencies": {
+    "@gunshi/plugin": "workspace:*"
+  },
+  "devDependencies": {
+    "deno": "catalog:",
+    "jsr": "catalog:",
+    "jsr-exports-lint": "catalog:",
+    "publint": "catalog:",
+    "tsdown": "catalog:"
+  }
+}
