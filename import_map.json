@@ -7,6 +7,9 @@
     "gunshi/utils": "./packages/gunshi/src/utils.ts",
     "@gunshi/plugin": "./packages/plugin/src/index.ts",
     "@gunshi/shared": "./packages/shared/src/index.ts",
+    "@gunshi/resources": "./packages/resources/src/index.ts",
+    "@gunshi/resources/en-US": "./packages/resources/locales/en-US.json",
+    "@gunshi/resources/ja-JP": "./packages/resources/locales/ja-JP.json",
     "@gunshi/plugin-renderer": "./packages/plugin-renderer/src/index.ts",
     "@gunshi/plugin-i18n": "./packages/plugin-i18n/src/index.ts",
     "@gunshi/plugin-global": "./packages/plugin-global/src/index.ts"

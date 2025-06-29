@@ -64,7 +64,7 @@ describe('translate built-in keys', () => {
   })
 
   test('custom locale: ja-JP', async () => {
-    const jaJPResource = await import('./locales/ja-JP.json', { with: { type: 'json' } }).then(
+    const jaJPResource = await import('@gunshi/resources/ja-JP', { with: { type: 'json' } }).then(
       m => m.default || m
     )
     const plugin = i18n({ locale: 'ja-JP', resources: { 'ja-JP': jaJPResource } })

@@ -1,16 +1,22 @@
 import viteTsconfigPaths from 'vite-tsconfig-paths'
-import { defineConfig } from 'vitest/config'
+import { defaultExclude, defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [viteTsconfigPaths()],
   test: {
     globals: true,
-    include: ['./packages/gunshi/src/**/*.test.ts', './packages/plugin-**/src/**/*.test.ts'],
+    exclude: [...defaultExclude, './packages/docs/src/**/*.test.ts'],
     typecheck: {
       tsconfig: './tsconfig.ci.json'
     },
     coverage: {
-      include: ['packages/gunshi/src/**/*.ts', 'packages/plugin-**/src/**/*.ts']
+      include: [
+        'packages/gunshi/src/**/*.ts',
+        'packages/plugin/src/**/*.ts',
+        'packages/shared/src/**/*.ts',
+        'packages/resources/src/**/*.ts',
+        'packages/plugin-**/src/**/*.ts'
+      ]
     }
   }
 })

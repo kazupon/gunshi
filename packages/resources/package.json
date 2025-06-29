@@ -1,6 +1,6 @@
 {
-  "name": "@gunshi/plugin-renderer",
-  "description": "usage renderer plugin for gunshi",
+  "name": "@gunshi/resources",
+  "description": "built-in resources for gunshi",
   "version": "0.26.3",
   "author": {
     "name": "kazuya kawaguchi",
@@ -14,13 +14,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git",
-    "directory": "packages/plugin-renderer"
+    "directory": "packages/resources"
   },
   "keywords": [
     "gunshi",
-    "usage",
-    "renderer",
-    "plugin",
+    "l10n",
+    "localization",
     "cli"
   ],
   "publishConfig": {
@@ -32,7 +31,8 @@
   "type": "module",
   "sideEffects": false,
   "files": [
-    "lib"
+    "lib",
+    "locales"
   ],
   "module": "lib/index.js",
   "exports": {
@@ -41,6 +41,16 @@
       "import": "./lib/index.js",
       "require": "./lib/index.js",
       "default": "./lib/index.js"
+    },
+    "./en-US": {
+      "import": "./locales/en-US.json",
+      "require": "./locales/en-US.json",
+      "default": "./locales/en-US.json"
+    },
+    "./ja-JP": {
+      "import": "./locales/ja-JP.json",
+      "require": "./locales/ja-JP.json",
+      "default": "./locales/ja-JP.json"
     },
     "./package.json": "./package.json"
   },
@@ -57,22 +67,12 @@
     "build": "tsdown",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
-    "typecheck:deno": "deno check --import-map=../../import_map.json ./src"
-  },
-  "dependencies": {
-    "@gunshi/plugin": "workspace:*"
-  },
-  "peerDependencies": {
-    "@gunshi/plugin-i18n": "workspace:*"
-  },
-  "peerDependenciesMeta": {
-    "@gunshi/plugin-i18n": {
-      "optional": true
-    }
+    "typecheck:deno": "deno check ./src"
   },
   "devDependencies": {
-    "@gunshi/shared": "workspace:*",
+    "@types/node": "catalog:",
     "deno": "catalog:",
+    "gunshi": "workspace:*",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
