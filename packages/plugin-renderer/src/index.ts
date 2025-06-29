@@ -102,7 +102,7 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
           subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
         )) as Command<DefaultGunshiParams>[]
 
-        return cachedCommands as Command<G>[]
+        return cachedCommands as unknown as Command<G>[]
       }
 
       function text<
