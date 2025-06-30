@@ -22,46 +22,46 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
 
   // build a map for quick lookup
   for (const plugin of plugins) {
-    if (plugin.name) {
-      if (pluginMap.has(plugin.name)) {
-        console.warn(`Duplicate plugin name detected: \`${plugin.name}\``)
+    if (plugin.id) {
+      if (pluginMap.has(plugin.id)) {
+        console.warn(`Duplicate plugin id detected: \`${plugin.id}\``)
       }
-      pluginMap.set(plugin.name, plugin)
+      pluginMap.set(plugin.id, plugin)
     }
   }
 
   function visit(plugin: Plugin<E>) {
-    if (!plugin.name) {
+    if (!plugin.id) {
       return
     }
-    if (visited.has(plugin.name)) {
+    if (visited.has(plugin.id)) {
       return
     }
-    if (visiting.has(plugin.name)) {
+    if (visiting.has(plugin.id)) {
       throw new Error(
-        `Circular dependency detected: \`${[...visiting].join(` -> `) + ' -> ' + plugin.name}\``
+        `Circular dependency detected: \`${[...visiting].join(` -> `) + ' -> ' + plugin.id}\``
       )
     }
 
-    visiting.add(plugin.name)
+    visiting.add(plugin.id)
 
     // process dependencies first
     const deps = plugin.dependencies || []
     for (const dep of deps) {
-      const depName = typeof dep === 'string' ? dep : dep.name
+      const depId = typeof dep === 'string' ? dep : dep.id
       const isOptional = typeof dep === 'string' ? false : dep.optional || false
 
-      const depPlugin = pluginMap.get(depName)
+      const depPlugin = pluginMap.get(depId)
       if (!depPlugin && !isOptional) {
-        throw new Error(`Missing required dependency: \`${depName}\` on \`${plugin.name}\``)
+        throw new Error(`Missing required dependency: \`${depId}\` on \`${plugin.id}\``)
       }
       if (depPlugin) {
         visit(depPlugin)
       }
     }
 
-    visiting.delete(plugin.name)
-    visited.add(plugin.name)
+    visiting.delete(plugin.id)
+    visited.add(plugin.id)
     sorted.push(plugin)
   }
 

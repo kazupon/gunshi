@@ -138,6 +138,7 @@ describe('plugin function', () => {
     })
 
     const testPlugin = plugin({
+      id: 'test',
       name: 'test',
       setup: setupFn,
       extension: extensionFactory,
@@ -147,6 +148,7 @@ describe('plugin function', () => {
     })
 
     // check plugin properties
+    expect(testPlugin.id).toBe('test')
     expect(testPlugin.name).toBe('test')
     expect(testPlugin.extension).toBeDefined()
     expect(testPlugin.extension.key).toBeDefined()
@@ -167,10 +169,12 @@ describe('plugin function', () => {
     })
 
     const simplePlugin = plugin({
+      id: 'simple-plugin',
       name: 'simple-plugin',
       setup: setupFn
     })
 
+    expect(simplePlugin.id).toBe('simple-plugin')
     expect(simplePlugin.name).toBe('simple-plugin')
     expect(simplePlugin.extension).toBeUndefined()
 
@@ -189,6 +193,7 @@ describe('plugin function', () => {
     }))
 
     const testPlugin = plugin({
+      id: 'auth',
       name: 'auth',
       extension: extensionFactory,
       async setup(ctx) {
@@ -226,6 +231,7 @@ describe('plugin function', () => {
 
   test('not receives correct context via extension', async () => {
     const testPlugin = plugin({
+      id: 'auth',
       name: 'auth',
       setup: async ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
@@ -247,9 +253,12 @@ describe('plugin function', () => {
 
 describe('Plugin type with optional properties', () => {
   test('backward compatibility - simple function plugin', async () => {
-    const simplePlugin: Plugin = async ctx => {
-      ctx.addGlobalOption('simple', { type: 'string' })
-    }
+    const simplePlugin = Object.assign(
+      async (ctx: PluginContext) => {
+        ctx.addGlobalOption('simple', { type: 'string' })
+      },
+      { id: 'simple' }
+    ) as Plugin
 
     const decorators = createDecorators()
     const ctx = createPluginContext(decorators)
@@ -265,6 +274,12 @@ describe('Plugin type with optional properties', () => {
       ctx.addGlobalOption('extended', { type: 'string' })
     }
     // use Object.defineProperty to add properties
+    Object.defineProperty(pluginFn, 'id', {
+      value: 'extended-plugin',
+      writable: false,
+      enumerable: true,
+      configurable: true
+    })
     Object.defineProperty(pluginFn, 'name', {
       value: 'extended-plugin',
       writable: false,
@@ -284,6 +299,7 @@ describe('Plugin type with optional properties', () => {
 
     const pluginWithExtension = pluginFn as Plugin<Extension>
 
+    expect(pluginWithExtension.id).toBe('extended-plugin')
     expect(pluginWithExtension.name).toBe('extended-plugin')
     expect(pluginWithExtension.extension).toBeDefined()
     expect(typeof pluginWithExtension.extension?.key).toBe('symbol')
@@ -295,6 +311,7 @@ describe('Plugin Extensions Integration', () => {
   test('plugin with extension provides functionality to commands', async () => {
     // create a plugin with extension
     const testPlugin = plugin({
+      id: 'test',
       name: 'test',
       setup(ctx) {
         ctx.addGlobalOption('test-opt', {
@@ -369,6 +386,7 @@ describe('Plugin Extensions Integration', () => {
       isAdmin: () => core.values.user === 'admin'
     }))
     const authPlugin = plugin({
+      id: 'auth',
       name: 'auth',
       setup(ctx) {
         ctx.addGlobalOption('user', { type: 'string', default: 'guest' })
@@ -383,6 +401,7 @@ describe('Plugin Extensions Integration', () => {
       getLogs: (): string[] => logs
     }))
     const loggerPlugin = plugin({
+      id: 'logger',
       name: 'logger',
       setup(ctx) {
         ctx.addGlobalOption('log-level', { type: 'string', default: 'info' })
@@ -465,6 +484,7 @@ describe('Plugin Extensions Integration', () => {
     const onExtension = vi.fn()
 
     const contextPlugin = plugin({
+      id: 'context',
       name: 'context',
       setup: () => {},
       extension(core: CommandContextCore) {

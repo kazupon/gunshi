@@ -237,18 +237,15 @@ function resolveEntryName<G extends GunshiParams>(entry: Command<G>): string {
 
 function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextExtension> {
   const extensions = create<Record<string, CommandContextExtension>>()
-  const pluginExtensions = plugins
-    .map(plugin => plugin.extension)
-    .filter(Boolean) as CommandContextExtension[]
-  for (const extension of pluginExtensions) {
-    const key = extension.key.description
-    if (key) {
+  for (const plugin of plugins) {
+    if (plugin.extension) {
+      const key = plugin.id
       if (extensions[key]) {
         console.warn(
           `Plugin "${key}" is already installed. ignore it for command context extending.`
         )
       } else {
-        extensions[key] = extension
+        extensions[key] = plugin.extension
       }
     }
   }

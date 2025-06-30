@@ -6,80 +6,83 @@ import type { Plugin } from './core.ts'
 
 describe('resolveDependencies', () => {
   test('return plugins in correct order with no dependencies', () => {
-    const pluginA = plugin({ name: 'a' })
-    const pluginB = plugin({ name: 'b' })
-    const pluginC = plugin({ name: 'c' })
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const pluginB = plugin({ id: 'b', name: 'b' })
+    const pluginC = plugin({ id: 'c', name: 'c' })
     const result = resolveDependencies([pluginA, pluginB, pluginC])
 
     expect(result).toEqual([pluginA, pluginB, pluginC])
   })
 
   test('resolve simple dependencies', () => {
-    const pluginA = plugin({ name: 'a' })
-    const pluginB = plugin({ name: 'b', dependencies: ['a'] })
-    const pluginC = plugin({ name: 'c', dependencies: ['b'] })
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const pluginB = plugin({ id: 'b', name: 'b', dependencies: ['a'] })
+    const pluginC = plugin({ id: 'c', name: 'c', dependencies: ['b'] })
     const result = resolveDependencies([pluginC, pluginB, pluginA])
 
-    expect(result.map(p => p.name)).toEqual(['a', 'b', 'c'])
+    expect(result.map(p => p.id)).toEqual(['a', 'b', 'c'])
   })
 
   test('resolve complex dependencies', () => {
-    const pluginA = plugin({ name: 'a' })
-    const pluginB = plugin({ name: 'b', dependencies: ['a'] })
-    const pluginC = plugin({ name: 'c', dependencies: ['a'] })
-    const pluginD = plugin({ name: 'd', dependencies: ['b', 'c'] })
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const pluginB = plugin({ id: 'b', name: 'b', dependencies: ['a'] })
+    const pluginC = plugin({ id: 'c', name: 'c', dependencies: ['a'] })
+    const pluginD = plugin({ id: 'd', name: 'd', dependencies: ['b', 'c'] })
     const result = resolveDependencies([pluginD, pluginC, pluginB, pluginA])
-    const names = result.map(p => p.name)
+    const ids = result.map(p => p.id)
 
-    expect(names[0]).toBe('a')
-    expect(names.indexOf('b')).toBeGreaterThan(names.indexOf('a'))
-    expect(names.indexOf('c')).toBeGreaterThan(names.indexOf('a'))
-    expect(names.indexOf('d')).toBeGreaterThan(names.indexOf('b'))
-    expect(names.indexOf('d')).toBeGreaterThan(names.indexOf('c'))
+    expect(ids[0]).toBe('a')
+    expect(ids.indexOf('b')).toBeGreaterThan(ids.indexOf('a'))
+    expect(ids.indexOf('c')).toBeGreaterThan(ids.indexOf('a'))
+    expect(ids.indexOf('d')).toBeGreaterThan(ids.indexOf('b'))
+    expect(ids.indexOf('d')).toBeGreaterThan(ids.indexOf('c'))
   })
 
   test('handle plugins with PluginDependency objects', () => {
-    const pluginA = plugin({ name: 'a' })
+    const pluginA = plugin({ id: 'a', name: 'a' })
     const pluginB = plugin({
+      id: 'b',
       name: 'b',
-      dependencies: [{ name: 'a', optional: false }]
+      dependencies: [{ id: 'a', optional: false }]
     })
     const result = resolveDependencies([pluginB, pluginA])
 
-    expect(result.map(p => p.name)).toEqual(['a', 'b'])
+    expect(result.map(p => p.id)).toEqual(['a', 'b'])
   })
 
   test('handle optional dependencies when plugin is missing', () => {
-    const pluginA = plugin({ name: 'a' })
+    const pluginA = plugin({ id: 'a', name: 'a' })
     const pluginB = plugin({
+      id: 'b',
       name: 'b',
-      dependencies: [{ name: 'missing', optional: true }]
+      dependencies: [{ id: 'missing', optional: true }]
     })
     const result = resolveDependencies([pluginB, pluginA])
 
-    expect(result.map(p => p.name)).toEqual(['b', 'a'])
+    expect(result.map(p => p.id)).toEqual(['b', 'a'])
   })
 
   test('handle optional dependencies when plugin exists', () => {
-    const pluginA = plugin({ name: 'a' })
+    const pluginA = plugin({ id: 'a', name: 'a' })
     const pluginB = plugin({
+      id: 'b',
       name: 'b',
-      dependencies: [{ name: 'a', optional: true }]
+      dependencies: [{ id: 'a', optional: true }]
     })
     const result = resolveDependencies([pluginB, pluginA])
 
-    expect(result.map(p => p.name)).toEqual(['a', 'b'])
+    expect(result.map(p => p.id)).toEqual(['a', 'b'])
   })
 
   test('throw error for missing required dependency', () => {
-    const pluginB = plugin({ name: 'b', dependencies: ['a'] })
+    const pluginB = plugin({ id: 'b', name: 'b', dependencies: ['a'] })
 
     expect(() => resolveDependencies([pluginB])).toThrow('Missing required dependency: `a` on `b`')
   })
 
   test('throw error for circular dependency', () => {
-    const pluginA = plugin({ name: 'a', dependencies: ['b'] })
-    const pluginB = plugin({ name: 'b', dependencies: ['a'] })
+    const pluginA = plugin({ id: 'a', name: 'a', dependencies: ['b'] })
+    const pluginB = plugin({ id: 'b', name: 'b', dependencies: ['a'] })
 
     expect(() => resolveDependencies([pluginA, pluginB])).toThrow(
       'Circular dependency detected: `a -> b -> a`'
@@ -87,40 +90,41 @@ describe('resolveDependencies', () => {
   })
 
   test('throw error for self-dependency', () => {
-    const pluginA = plugin({ name: 'a', dependencies: ['a'] })
+    const pluginA = plugin({ id: 'a', name: 'a', dependencies: ['a'] })
 
     expect(() => resolveDependencies([pluginA])).toThrow('Circular dependency detected: `a -> a`')
   })
 
-  test('handle plugins without names', () => {
-    const pluginA = plugin({ name: 'a' })
-    const pluginB = {} as Plugin
-    const pluginC = plugin({ name: 'c', dependencies: ['a'] })
+  test('handle plugins without ids', () => {
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const pluginB = { id: '', name: '' } as Plugin
+    const pluginC = plugin({ id: 'c', name: 'c', dependencies: ['a'] })
     const result = resolveDependencies([pluginB, pluginC, pluginA])
 
-    expect(result.filter(p => p.name).map(p => p.name)).toEqual(['a', 'c'])
+    expect(result.filter(p => p.id).map(p => p.id)).toEqual(['a', 'c'])
   })
 
   test('handle PluginDependency objects array', () => {
-    const pluginA = plugin({ name: 'a' })
-    const pluginB = plugin({ name: 'b' })
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const pluginB = plugin({ id: 'b', name: 'b' })
     const pluginC = plugin({
+      id: 'c',
       name: 'c',
-      dependencies: ['a', { name: 'b', optional: false }, { name: 'missing', optional: true }]
+      dependencies: ['a', { id: 'b', optional: false }, { id: 'missing', optional: true }]
     })
     const result = resolveDependencies([pluginC, pluginB, pluginA])
 
-    expect(result.map(p => p.name)).toEqual(['a', 'b', 'c'])
+    expect(result.map(p => p.id)).toEqual(['a', 'b', 'c'])
   })
 
   test('handle duplicate plugins in the list', () => {
     const mockWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    const pluginA = plugin({ name: 'a' })
-    const pluginB = plugin({ name: 'b', dependencies: ['a'] })
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const pluginB = plugin({ id: 'b', name: 'b', dependencies: ['a'] })
     const result = resolveDependencies([pluginA, pluginB, pluginA])
 
-    expect(result.map(p => p.name)).toEqual(['a', 'b'])
-    expect(mockWarn).toHaveBeenCalledWith('Duplicate plugin name detected: `a`')
+    expect(result.map(p => p.id)).toEqual(['a', 'b'])
+    expect(mockWarn).toHaveBeenCalledWith('Duplicate plugin id detected: `a`')
   })
 
   test('handle empty plugin array', () => {
@@ -130,9 +134,9 @@ describe('resolveDependencies', () => {
   })
 
   test('resolve complex circular dependency correctly', () => {
-    const pluginA = plugin({ name: 'a', dependencies: ['c'] })
-    const pluginB = plugin({ name: 'b', dependencies: ['a'] })
-    const pluginC = plugin({ name: 'c', dependencies: ['b'] })
+    const pluginA = plugin({ id: 'a', name: 'a', dependencies: ['c'] })
+    const pluginB = plugin({ id: 'b', name: 'b', dependencies: ['a'] })
+    const pluginC = plugin({ id: 'c', name: 'c', dependencies: ['b'] })
 
     expect(() => resolveDependencies([pluginA, pluginB, pluginC])).toThrow(
       'Circular dependency detected: `a -> c -> b -> a'

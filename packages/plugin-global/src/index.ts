@@ -44,7 +44,8 @@ export type { GlobalsCommandContext } from './extension.ts'
  */
 export default function globals(): PluginWithExtension<GlobalsCommandContext> {
   return plugin({
-    name: 'g:globals',
+    id: 'g:globals',
+    name: 'global options',
 
     // install global options plugin extension
     extension,

@@ -1170,6 +1170,7 @@ test('plugins option', async () => {
 
   function logger() {
     return plugin({
+      id: 'logger',
       name: 'logger',
       setup: ctx => {
         ctx.decorateCommand(baseRunner => ctx => {

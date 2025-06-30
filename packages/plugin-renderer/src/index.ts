@@ -74,9 +74,10 @@ type RendererCommandContext = GunshiParams<{
  */
 export default function renderer(): PluginWithExtension<UsageRendererCommandContext> {
   return plugin({
-    name: 'g:renderer',
+    id: 'g:renderer',
+    name: 'usage renderer',
 
-    dependencies: [{ name: 'g:i18n', optional: true }],
+    dependencies: [{ id: 'g:i18n', optional: true }],
 
     extension: (ctx: CommandContextCore, cmd: Command): UsageRendererCommandContext => {
       // TODO(kazupon): This is a workaround for the type system.

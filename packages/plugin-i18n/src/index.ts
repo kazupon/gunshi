@@ -132,9 +132,10 @@ export default function i18n(
   let builtInLoadedResources: Record<string, string> | undefined
 
   return plugin({
-    name: 'g:i18n',
+    id: 'g:i18n',
+    name: 'i18n',
 
-    dependencies: [{ name: 'g:globals', optional: true }],
+    dependencies: [{ id: 'g:globals', optional: true }],
 
     extension: async () => {
       // define translate function

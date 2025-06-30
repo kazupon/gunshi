@@ -20,9 +20,9 @@ import type { PluginContext } from './context.ts'
  */
 export interface PluginDependency {
   /**
-   * Dependency plugin name
+   * Dependency plugin id
    */
-  name: string
+  id: string
   /**
    * Optional dependency flag.
    * If true, the plugin will not throw an error if the dependency is not found.
@@ -61,9 +61,13 @@ export interface PluginOptions<
   G extends GunshiParams = DefaultGunshiParams
 > {
   /**
+   * Plugin unique identifier
+   */
+  id: string
+  /**
    * Plugin name
    */
-  name: string
+  name?: string
   /**
    * Plugin dependencies
    */
@@ -89,6 +93,7 @@ export interface PluginOptions<
  */
 export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> =
   PluginFunction & {
+    id: string
     name?: string
     dependencies?: (PluginDependency | string)[]
     extension?: CommandContextExtension<E>
@@ -101,6 +106,7 @@ export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['e
 export interface PluginWithExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > extends Plugin<E> {
+  id: string
   name: string
   dependencies?: (PluginDependency | string)[]
   extension: CommandContextExtension<E>
@@ -113,6 +119,7 @@ export interface PluginWithExtension<
 export interface PluginWithoutExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > extends Plugin<E> {
+  id: string
   name: string
   dependencies?: (PluginDependency | string)[]
 }
@@ -122,39 +129,42 @@ export interface PluginWithoutExtension<
  * @param options - {@link PluginOptions | plugin options}
  */
 export function plugin<
-  N extends string,
+  I extends string,
   P extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
 >(options: {
-  name: N
+  id: I
+  name?: string
   dependencies?: (PluginDependency | string)[]
   setup?: (
     ctx: Readonly<
-      PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<P> } }>>
+      PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]: ReturnType<P> } }>>
     >
   ) => Awaitable<void>
   extension: P
-  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in N]: ReturnType<P> } }>
+  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]: ReturnType<P> } }>
 }): PluginWithExtension<ReturnType<P>>
 
 export function plugin(options: {
-  name: string
+  id: string
+  name?: string
   dependencies?: (PluginDependency | string)[]
   setup?: (ctx: Readonly<PluginContext<DefaultGunshiParams>>) => Awaitable<void>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
 export function plugin<
-  N extends string,
+  I extends string,
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 >(options: {
-  name: N
+  id: I
+  name?: string
   dependencies?: (PluginDependency | string)[]
   setup?: (
-    ctx: Readonly<PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>>
+    ctx: Readonly<PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]?: E } }>>>
   ) => Awaitable<void>
   extension?: PluginExtension<E, DefaultGunshiParams>
-  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in N]?: E } }>
+  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]?: E } }>
 }): PluginWithExtension<E> | PluginWithoutExtension<DefaultGunshiParams['extensions']> {
-  const { name, setup, extension, onExtension, dependencies } = options
+  const { id, name, setup, extension, onExtension, dependencies } = options
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -166,12 +176,20 @@ export function plugin<
 
   // define the properties
   return Object.defineProperties(pluginFn, {
-    name: {
-      value: name,
+    id: {
+      value: id,
       writable: false,
       enumerable: true,
       configurable: true
     },
+    ...(name && {
+      name: {
+        value: name,
+        writable: false,
+        enumerable: true,
+        configurable: true
+      }
+    }),
     ...(dependencies && {
       dependencies: {
         value: dependencies,
@@ -183,7 +201,7 @@ export function plugin<
     ...(extension && {
       extension: {
         value: {
-          key: Symbol(name),
+          key: Symbol(id),
           factory: extension,
           onFactory: onExtension
         },
@@ -192,5 +210,5 @@ export function plugin<
         configurable: true
       }
     })
-  })
+  }) as PluginWithExtension<E> | PluginWithoutExtension<DefaultGunshiParams['extensions']>
 }

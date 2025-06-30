@@ -14,7 +14,8 @@ export interface CompletionCommandContext {}
  */
 export default function completion(): PluginWithoutExtension<CompletionCommandContext> {
   return plugin({
-    name: 'g:completion',
+    id: 'g:completion',
+    name: 'completion',
 
     setup(_ctx) {
       // TODO(kazupon): implement completion plugin logic
