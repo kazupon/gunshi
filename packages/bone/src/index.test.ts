@@ -34,12 +34,12 @@ const meta = {
 }
 
 describe('@gunshi/bone', async () => {
-  test('conbination with @gunshi/definition', async () => {
+  test('combination with @gunshi/definition', async () => {
     const result = await cli(['--say', '`hello world`'], entry, { ...meta })
     expect(result).toEqual('You said: `hello world`')
   })
 
-  test('conbination with gunshi plugins', async () => {
+  test('combination with gunshi plugins', async () => {
     const logs: string[] = []
     vi.spyOn(console, 'log').mockImplementation((msg: string) => logs.push(msg))
 
@@ -50,7 +50,7 @@ describe('@gunshi/bone', async () => {
     expect(logs.join('\n')).toMatchSnapshot()
   })
 
-  test('conbination with gunshi plugins and extension', async () => {
+  test('combination with gunshi plugins and extension', async () => {
     const logs: string[] = []
     vi.spyOn(console, 'log').mockImplementation((msg: string) => logs.push(msg))
 

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`@gunshi/bone > conbination with gunshi plugins 1`] = `
+exports[`@gunshi/bone > combination with gunshi plugins 1`] = `
 "app-bone is a @gunshi/bone example (app-bone v1.0.0)
 
 USAGE:
@@ -13,7 +13,7 @@ OPTIONS:
 "
 `;
 
-exports[`@gunshi/bone > conbination with gunshi plugins and extension 1`] = `
+exports[`@gunshi/bone > combination with gunshi plugins and extension 1`] = `
 "app-bone is a @gunshi/bone example (app-bone v1.0.0)
 
 1.0.0"
