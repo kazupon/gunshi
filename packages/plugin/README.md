@@ -31,7 +31,11 @@ deno add jsr:@gunshi/plugin
 bun add @gunshi/plugin
 ```
 
-TODO(kazupon): more explanation
+## 🚀 Usage
+
+```js
+// TODO(kazupon): prepare the example
+```
 
 ## ©️ License
 

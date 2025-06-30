@@ -38,6 +38,7 @@
       "gunshi/utils": ["./packages/gunshi/src/utils.ts"],
       "@gunshi/plugin": ["./packages/plugin/src/index.ts"],
       "@gunshi/bone": ["./packages/bone/src/index.ts"],
+      "@gunshi/definition": ["./packages/definition/src/index.ts"],
       "@gunshi/shared": ["./packages/shared/src/index.ts"],
       "@gunshi/resources": ["./packages/resources/src/index.ts"],
       "@gunshi/resources/en-US": ["./packages/resources/locales/en-US.json"],

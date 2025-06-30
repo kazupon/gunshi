@@ -1,5 +1,10 @@
 /**
- * The entry for command definition.
+ * The entry for gunshi command definition.
+ *
+ * This entry point exports the following APIs and types:
+ * - `define`: A function to define a command.
+ * - `lazy`: A function to lazily load a command.
+ * - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
  *
  * @example
  * ```js
