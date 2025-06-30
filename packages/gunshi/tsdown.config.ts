@@ -4,6 +4,7 @@ import { defineConfig } from 'tsdown'
 const config: ReturnType<typeof defineConfig> = defineConfig({
   entry: [
     './src/index.ts',
+    './src/bone.ts',
     './src/definition.ts',
     './src/context.ts',
     './src/plugin.ts',

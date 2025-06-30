@@ -43,6 +43,12 @@
       "require": "./lib/index.js",
       "default": "./lib/index.js"
     },
+    "./bone": {
+      "types": "./lib/bone.d.ts",
+      "import": "./lib/bone.js",
+      "require": "./lib/bone.js",
+      "default": "./lib/bone.js"
+    },
     "./definition": {
       "types": "./lib/definition.d.ts",
       "import": "./lib/definition.js",

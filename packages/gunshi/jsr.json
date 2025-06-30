@@ -27,6 +27,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./bone": "./src/bone.ts",
     "./renderer": "./src/renderer.ts",
     "./definition": "./src/definition.ts",
     "./plugin": "./src/plugin.ts",
