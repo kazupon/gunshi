@@ -16,8 +16,8 @@ catalogs:
       specifier: ^0.13.4
       version: 0.13.4
     jsr-exports-lint:
-      specifier: ^0.4.0
-      version: 0.4.0
+      specifier: ^0.4.1
+      version: 0.4.1
     publint:
       specifier: ^0.3.12
       version: 0.3.12
@@ -176,7 +176,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -200,7 +200,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -222,7 +222,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -244,7 +244,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -269,7 +269,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -303,7 +303,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       messageformat:
         specifier: 4.0.0-12
         version: 4.0.0-12
@@ -334,7 +334,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -355,7 +355,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -379,7 +379,7 @@ importers:
         version: 0.13.4
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -3444,8 +3444,8 @@ packages:
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
-  jsr-exports-lint@0.4.0:
-    resolution: {integrity: sha512-x0YWsgHrsOPiHNItEGbO3M342KzKNs+tGSG5KB0bwkC/Qhuz07zJeIi27dR2noBpimbJpaiQy+hKdV71vLPXXA==}
+  jsr-exports-lint@0.4.1:
+    resolution: {integrity: sha512-ViJFOrJJ19JfB7TBNUjsAsyKTY4YE3ffJZYShV7VVPfZmjfU2gtyNIcQ3DK6BNQ9EmECRRax0Zfm4F4lsRcA7w==}
     engines: {node: '>= 20'}
     peerDependencies:
       tsdown: '>=0.9.6'
@@ -7767,7 +7767,7 @@ snapshots:
 
   jsonc-parser@3.3.1: {}
 
-  jsr-exports-lint@0.4.0(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)):
+  jsr-exports-lint@0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)):
     dependencies:
       picocolors: 1.1.1
     optionalDependencies:
