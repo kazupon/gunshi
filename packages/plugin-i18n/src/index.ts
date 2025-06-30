@@ -34,13 +34,7 @@
  */
 
 import { plugin } from '@gunshi/plugin'
-import {
-  BUILT_IN_PREFIX,
-  DefaultResource,
-  resolveArgKey,
-  resolveBuiltInKey,
-  resolveExamples
-} from '@gunshi/shared'
+import { BUILT_IN_PREFIX, DefaultResource, resolveArgKey, resolveBuiltInKey } from '@gunshi/shared'
 import { createTranslationAdapter } from './translation.ts'
 
 import type {
@@ -66,6 +60,7 @@ const DEFAULT_LOCALE = 'en-US'
 
 /**
  * Extended command context which provides utilities via i18n plugin.
+ * These utilities are available via `CommandContext.extensions['g:i18n']`.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
@@ -137,9 +132,9 @@ export default function i18n(
   let builtInLoadedResources: Record<string, string> | undefined
 
   return plugin({
-    name: 'i18n',
+    name: 'g:i18n',
 
-    dependencies: [{ name: 'globals', optional: true }],
+    dependencies: [{ name: 'g:globals', optional: true }],
 
     extension: async () => {
       // define translate function
@@ -214,16 +209,26 @@ export default function i18n(
         return res
       }, Object.create(null))
       defaultCommandResource.description = cmd.description || ''
-      defaultCommandResource.examples = await resolveExamples<typeof ctx>(ctx, cmd.examples)
+      defaultCommandResource.examples =
+        typeof cmd.examples === 'string'
+          ? cmd.examples
+          : typeof cmd.examples === 'function'
+            ? await cmd.examples(ctx)
+            : ''
       adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-      const originalResource = await loadCommandResource<typeof ctx>(ctx, cmd)
+      const originalResource = await loadCommandResource(ctx, cmd)
       if (originalResource) {
         const resource = Object.assign(
           Object.create(null),
           originalResource as Record<string, string>,
           {
-            examples: await resolveExamples<typeof ctx>(ctx, originalResource.examples)
+            examples:
+              typeof originalResource.examples === 'string'
+                ? originalResource.examples
+                : typeof originalResource.examples === 'function'
+                  ? await originalResource.examples(ctx)
+                  : ''
           } as Record<string, string>
         )
         if (builtInLoadedResources) {
@@ -245,7 +250,7 @@ function toLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadCommandResource<G extends GunshiParams>(
+async function loadCommandResource<G extends GunshiParams = DefaultGunshiParams>(
   ctx: CommandContext<G>,
   command: Command<G> | LazyCommand<G>
 ): Promise<CommandResource<G> | undefined> {

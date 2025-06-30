@@ -19,15 +19,17 @@ afterEach(() => {
 type WithI18nAndRenderer = GunshiParams<{
   args: Args
   extensions: {
-    i18n: I18nCommandContext<DefaultGunshiParams> | Promise<I18nCommandContext<DefaultGunshiParams>>
-    renderer: UsageRendererCommandContext<DefaultGunshiParams>
+    'g:i18n':
+      | I18nCommandContext<DefaultGunshiParams>
+      | Promise<I18nCommandContext<DefaultGunshiParams>>
+    'g:renderer': UsageRendererCommandContext<DefaultGunshiParams>
   }
 }>
 
 type WithRendererOnly = GunshiParams<{
   args: Args
   extensions: {
-    renderer: UsageRendererCommandContext<DefaultGunshiParams>
+    'g:renderer': UsageRendererCommandContext<DefaultGunshiParams>
   }
 }>
 
@@ -162,8 +164,8 @@ test('basic', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -195,8 +197,8 @@ test('no arguments', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -242,8 +244,8 @@ test('no required on optional arguments', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -283,8 +285,8 @@ test('positional arguments', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -334,8 +336,8 @@ test('mixed positionals and optionals', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -387,8 +389,8 @@ test('no examples', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -441,8 +443,8 @@ test('enable usageOptionType', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       usageOptionType: true,
@@ -469,8 +471,8 @@ test('sub commands', async () => {
     tokens: [], // dummy, due to test
     command: SHOW,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -529,8 +531,8 @@ test('kebab-case arguments with toKebab option', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -585,8 +587,8 @@ test('kebab-case arguments with Command.toKebab option', async () => {
     callMode: 'entry',
     command,
     extensions: {
-      i18n: i18nPlugin.extension,
-      renderer: rendererPlugin.extension
+      'g:i18n': i18nPlugin.extension,
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -610,7 +612,7 @@ test('not install i18n plugin', async () => {
     tokens: [], // dummy, due to test
     command: SHOW,
     extensions: {
-      renderer: rendererPlugin.extension
+      'g:renderer': rendererPlugin.extension
     },
     cliOptions: {
       cwd: '/path/to/cmd1',

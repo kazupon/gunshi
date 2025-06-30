@@ -162,12 +162,12 @@ describe('translation adapter', () => {
         CommandResourceFetcher<
           GunshiParams<{
             args: typeof args
-            extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+            extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
           }>
         >
       >()
       .mockImplementation(ctx => {
-        if (ctx.extensions.i18n.locale.toString() === loadLocale) {
+        if (ctx.extensions['g:i18n'].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
@@ -185,7 +185,7 @@ describe('translation adapter', () => {
     const ctx = await createCommandContext<
       GunshiParams<{
         args: typeof args
-        extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+        extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
       }>
     >({
       args,
@@ -196,7 +196,7 @@ describe('translation adapter', () => {
       tokens: [], // dummy, due to test
       command,
       extensions: {
-        i18n: plugin.extension
+        'g:i18n': plugin.extension
       },
       omitted: false,
       callMode: 'entry',
@@ -206,9 +206,9 @@ describe('translation adapter', () => {
     })
 
     const mf1 = new MessageFormat('ja-JP', jaJPResource['arg:foo'])
-    expect(ctx.extensions.i18n.translate('arg:foo')).toEqual(mf1.format())
+    expect(ctx.extensions['g:i18n'].translate('arg:foo')).toEqual(mf1.format())
     const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
-    expect(ctx.extensions.i18n.translate('user', { user: 'kazupon' })).toEqual(
+    expect(ctx.extensions['g:i18n'].translate('user', { user: 'kazupon' })).toEqual(
       mf2.format({ user: 'kazupon' })
     )
   })
@@ -240,12 +240,12 @@ describe('translation adapter', () => {
         CommandResourceFetcher<
           GunshiParams<{
             args: typeof args
-            extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+            extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
           }>
         >
       >()
       .mockImplementation(ctx => {
-        if (ctx.extensions.i18n.locale.toString() === loadLocale) {
+        if (ctx.extensions['g:i18n'].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
@@ -263,7 +263,7 @@ describe('translation adapter', () => {
     const ctx = await createCommandContext<
       GunshiParams<{
         args: typeof args
-        extensions: { i18n: Awaited<ReturnType<typeof plugin.extension.factory>> }
+        extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
       }>
     >({
       args,
@@ -274,7 +274,7 @@ describe('translation adapter', () => {
       tokens: [], // dummy, due to test
       command,
       extensions: {
-        i18n: plugin.extension
+        'g:i18n': plugin.extension
       },
       omitted: false,
       callMode: 'entry',
@@ -283,8 +283,8 @@ describe('translation adapter', () => {
       }
     })
 
-    expect(ctx.extensions.i18n.translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
-    expect(ctx.extensions.i18n.translate('user', { user: 'kazupon' })).toEqual(
+    expect(ctx.extensions['g:i18n'].translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
+    expect(ctx.extensions['g:i18n'].translate('user', { user: 'kazupon' })).toEqual(
       `こんにちは、kazupon`
     )
   })

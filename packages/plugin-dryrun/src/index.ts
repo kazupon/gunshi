@@ -14,7 +14,7 @@ export interface DryRunCommandContext {}
  */
 export default function dryrun(): PluginWithoutExtension<DryRunCommandContext> {
   return plugin({
-    name: 'dryrun',
+    name: 'g:dryrun',
 
     setup(_ctx) {
       // TODO(kazupon): implement dryrun option plugin logic

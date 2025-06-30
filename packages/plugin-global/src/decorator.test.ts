@@ -8,13 +8,13 @@ import type { GlobalsCommandContext } from './extension.ts'
 test('enable version option', async () => {
   const version = '1.0.0'
   const ctx = await createMockCommandContext<{
-    globals: GlobalsCommandContext
+    'g:globals': GlobalsCommandContext
   }>({
     version,
     values: { version: true },
     extensions: {
-      globals: {
-        key: Symbol('globals'),
+      'g:globals': {
+        key: Symbol('g:globals'),
         factory: extension
       }
     }
@@ -29,13 +29,13 @@ test('enable version option', async () => {
 test('enable help option', async () => {
   const usage = 'Usage: test [options]'
   const ctx = await createMockCommandContext<{
-    globals: GlobalsCommandContext
+    'g:globals': GlobalsCommandContext
   }>({
     renderUsage: async () => usage,
     values: { help: true },
     extensions: {
-      globals: {
-        key: Symbol('globals'),
+      'g:globals': {
+        key: Symbol('g:globals'),
         factory: extension
       }
     }
@@ -51,14 +51,14 @@ test('header rendering', async () => {
   const header = 'Welcome to the Test Application'
   const usage = 'Usage: test [options]'
   const ctx = await createMockCommandContext<{
-    globals: GlobalsCommandContext
+    'g:globals': GlobalsCommandContext
   }>({
     renderHeader: async () => header,
     renderUsage: async () => usage,
     values: { help: true },
     extensions: {
-      globals: {
-        key: Symbol('globals'),
+      'g:globals': {
+        key: Symbol('g:globals'),
         factory: extension
       }
     }
@@ -72,12 +72,12 @@ test('header rendering', async () => {
 
 test('base runner execution', async () => {
   const ctx = await createMockCommandContext<{
-    globals: GlobalsCommandContext
+    'g:globals': GlobalsCommandContext
   }>({
     values: {},
     extensions: {
-      globals: {
-        key: Symbol('globals'),
+      'g:globals': {
+        key: Symbol('g:globals'),
         factory: extension
       }
     }

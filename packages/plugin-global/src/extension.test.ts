@@ -9,14 +9,14 @@ describe('showVersion', () => {
     const version = '1.0.0'
     const {
       log,
-      extensions: { globals }
+      extensions: { 'g:globals': globals }
     } = await createMockCommandContext<{
-      globals: GlobalsCommandContext
+      'g:globals': GlobalsCommandContext
     }>({
       version,
       extensions: {
-        globals: {
-          key: Symbol('globals'),
+        'g:globals': {
+          key: Symbol('g:globals'),
           factory: extension
         }
       }
@@ -30,14 +30,14 @@ describe('showVersion', () => {
   test('no version', async () => {
     const {
       log,
-      extensions: { globals }
+      extensions: { 'g:globals': globals }
     } = await createMockCommandContext<{
-      globals: GlobalsCommandContext
+      'g:globals': GlobalsCommandContext
     }>({
       version: null,
       extensions: {
-        globals: {
-          key: Symbol('globals'),
+        'g:globals': {
+          key: Symbol('g:globals'),
           factory: extension
         }
       }
@@ -52,15 +52,15 @@ describe('showVersion', () => {
     const version = '1.0.0'
     const {
       log,
-      extensions: { globals }
+      extensions: { 'g:globals': globals }
     } = await createMockCommandContext<{
-      globals: GlobalsCommandContext
+      'g:globals': GlobalsCommandContext
     }>({
       version,
       usageSilent: true,
       extensions: {
-        globals: {
-          key: Symbol('globals'),
+        'g:globals': {
+          key: Symbol('g:globals'),
           factory: extension
         }
       }
@@ -77,14 +77,14 @@ describe('showHeader', () => {
     const header = 'Welcome to the Test Application'
     const {
       log,
-      extensions: { globals }
+      extensions: { 'g:globals': globals }
     } = await createMockCommandContext<{
-      globals: GlobalsCommandContext
+      'g:globals': GlobalsCommandContext
     }>({
       renderHeader: async () => header,
       extensions: {
-        globals: {
-          key: Symbol('globals'),
+        'g:globals': {
+          key: Symbol('g:globals'),
           factory: extension
         }
       }
@@ -98,14 +98,14 @@ describe('showHeader', () => {
 
   test('no header', async () => {
     const {
-      extensions: { globals }
+      extensions: { 'g:globals': globals }
     } = await createMockCommandContext<{
-      globals: GlobalsCommandContext
+      'g:globals': GlobalsCommandContext
     }>({
       renderHeader: null,
       extensions: {
-        globals: {
-          key: Symbol('globals'),
+        'g:globals': {
+          key: Symbol('g:globals'),
           factory: extension
         }
       }
@@ -121,14 +121,14 @@ describe('showUsage', () => {
     const usage = 'Usage: test-app [options]'
     const {
       log,
-      extensions: { globals }
+      extensions: { 'g:globals': globals }
     } = await createMockCommandContext<{
-      globals: GlobalsCommandContext
+      'g:globals': GlobalsCommandContext
     }>({
       renderUsage: async () => usage,
       extensions: {
-        globals: {
-          key: Symbol('globals'),
+        'g:globals': {
+          key: Symbol('g:globals'),
           factory: extension
         }
       }
@@ -141,14 +141,14 @@ describe('showUsage', () => {
 
   test('no usage', async () => {
     const {
-      extensions: { globals }
+      extensions: { 'g:globals': globals }
     } = await createMockCommandContext<{
-      globals: GlobalsCommandContext
+      'g:globals': GlobalsCommandContext
     }>({
       renderUsage: null,
       extensions: {
-        globals: {
-          key: Symbol('globals'),
+        'g:globals': {
+          key: Symbol('g:globals'),
           factory: extension
         }
       }

@@ -7,7 +7,7 @@ import type { Awaitable, CommandContextCore, DefaultGunshiParams } from '@gunshi
 
 /**
  * Extended command context which provides utilities via global options plugin.
- * These utilities are available via `CommandContext.extensions.globals`.
+ * These utilities are available via `CommandContext.extensions['g:globals']`.
  */
 export interface GlobalsCommandContext {
   /**

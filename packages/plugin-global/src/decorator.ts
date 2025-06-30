@@ -12,14 +12,14 @@ import type { GlobalsCommandContext } from './extension.ts'
 const decorator: CommandDecorator<{
   args: DefaultGunshiParams['args']
   extensions: {
-    globals: GlobalsCommandContext
+    'g:globals': GlobalsCommandContext
   }
 }> = baseRunner => async ctx => {
   const {
     values,
     validationError,
     extensions: {
-      globals: { showVersion, showHeader, showUsage, showValidationErrors }
+      'g:globals': { showVersion, showHeader, showUsage, showValidationErrors }
     }
   } = ctx
 

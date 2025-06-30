@@ -8,6 +8,7 @@ import type { CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
 
 /**
  * Extended command context which provides utilities via usage renderer plugin.
+ * These utilities are available via `CommandContext.extensions['g:renderer']`.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface UsageRendererCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {

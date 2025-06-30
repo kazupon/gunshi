@@ -65,7 +65,7 @@ export type { UsageRendererCommandContext } from './types.ts'
 type RendererCommandContext = GunshiParams<{
   args: Args
   extensions: {
-    renderer: UsageRendererCommandContext<DefaultGunshiParams>
+    'g:renderer': UsageRendererCommandContext<DefaultGunshiParams>
   }
 }>
 
@@ -74,18 +74,18 @@ type RendererCommandContext = GunshiParams<{
  */
 export default function renderer(): PluginWithExtension<UsageRendererCommandContext> {
   return plugin({
-    name: 'renderer',
+    name: 'g:renderer',
 
-    dependencies: [{ name: 'i18n', optional: true }],
+    dependencies: [{ name: 'g:i18n', optional: true }],
 
     extension: (ctx: CommandContextCore, cmd: Command): UsageRendererCommandContext => {
       // TODO(kazupon): This is a workaround for the type system.
       const {
-        extensions: { i18n }
+        extensions: { 'g:i18n': i18n }
       } = ctx as unknown as CommandContext<{
         args: Args
         extensions: {
-          i18n?: I18nCommandContext
+          'g:i18n'?: I18nCommandContext
         }
       }>
 
