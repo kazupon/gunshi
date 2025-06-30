@@ -135,6 +135,27 @@ importers:
         specifier: ^3.2.1
         version: 3.2.1(@types/debug@4.1.12)(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.29.3)(tsx@4.19.3)(yaml@2.8.0)
 
+  packages/bone:
+    devDependencies:
+      deno:
+        specifier: 'catalog:'
+        version: 2.3.3
+      gunshi:
+        specifier: workspace:*
+        version: link:../gunshi
+      jsr:
+        specifier: 'catalog:'
+        version: 0.13.4
+      jsr-exports-lint:
+        specifier: 'catalog:'
+        version: 0.4.1(tsdown@0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3))
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.12
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
+
   packages/docs:
     devDependencies:
       typedoc:

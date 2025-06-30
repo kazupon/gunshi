@@ -2,10 +2,12 @@
   "imports": {
     "gunshi": "./packages/gunshi/src/index.ts",
     "gunshi/plugin": "./packages/gunshi/src/plugin.ts",
+    "gunshi/bone": "./packages/gunshi/src/bone.ts",
     "gunshi/definition": "./packages/gunshi/src/definition.ts",
     "gunshi/context": "./packages/gunshi/src/context.ts",
     "gunshi/utils": "./packages/gunshi/src/utils.ts",
     "@gunshi/plugin": "./packages/plugin/src/index.ts",
+    "@gunshi/bone": "./packages/bone/src/index.ts",
     "@gunshi/shared": "./packages/shared/src/index.ts",
     "@gunshi/resources": "./packages/resources/src/index.ts",
     "@gunshi/resources/en-US": "./packages/resources/locales/en-US.json",
