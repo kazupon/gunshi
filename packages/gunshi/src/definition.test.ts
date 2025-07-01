@@ -121,7 +121,7 @@ describe('define with type parameters', () => {
         logout: () => Promise<void>
       }
     }
-    const command = define<GunshiParams<{ args: Args; extensions: AuthExt }>>({
+    const command = define<AuthExt>({
       name: 'profile',
       run: async ctx => {
         const userName: string = ctx.extensions.auth.user.name
@@ -171,15 +171,13 @@ describe('lazy with type parameters', () => {
       }
     }
     const loader = vi.fn(async () => {
-      const runner: CommandRunner<
-        GunshiParams<{ args: Args; extensions: AuthExt }>
-      > = async ctx => {
+      const runner: CommandRunner<{ args: Args; extensions: AuthExt }> = async ctx => {
         expectTypeOf(ctx.extensions.auth.authenticated).toEqualTypeOf<boolean>()
         return 'deployed'
       }
       return runner
     })
-    const lazyCmd = lazy<GunshiParams<{ args: Args; extensions: AuthExt }>>(loader, {
+    const lazyCmd = lazy<AuthExt>(loader, {
       name: 'lazy-deploy',
       description: 'Lazy deploy command'
     })

@@ -9,6 +9,20 @@
  * @example
  * ```js
  * import { define } from 'gunshi/definition'
+ *
+ * export default define({
+ *   name: 'say',
+ *   args: {
+ *     say: {
+ *       type: 'string',
+ *       description: 'say something',
+ *       default: 'hello!'
+ *     }
+ *   },
+ *   run: ctx => {
+ *     return `You said: ${ctx.values.say}`
+ *   }
+ * })
  * ```
  *
  * @module
@@ -29,32 +43,92 @@ import type {
   LazyCommand
 } from './types.ts'
 
-export type { Args, ArgSchema, ArgValues } from './types.ts'
+export type {
+  Args,
+  ArgSchema,
+  ArgValues,
+  Command,
+  CommandLoader,
+  CommandRunner,
+  DefaultGunshiParams,
+  ExtendContext,
+  GunshiParams,
+  LazyCommand
+} from './types.ts'
 
 /**
  * Define a {@link Command | command}
  * @param definition A {@link Command | command} definition
  */
-// Overload for args with explicit type (improved type inference for ArgValues)
 export function define<A extends Args>(
-  definition: Command<GunshiParams<{ args: A; extensions: {} }>> & { args: A }
-): Command<GunshiParams<{ args: A; extensions: {} }>>
+  definition: Command<{ args: A; extensions: {} }>
+): Command<{ args: A; extensions: {} }>
 
-// Overload for extensions only
+/**
+ * Define a {@link Command | command}
+ * @param definition A {@link Command | command} definition
+ */
 export function define<E extends ExtendContext>(
-  definition: Command<GunshiParams<{ args: Args; extensions: E }>>
-): Command<GunshiParams<{ args: Args; extensions: E }>>
+  definition: Command<{ args: Args; extensions: E }>
+): Command<{ args: Args; extensions: E }>
 
-// Generic overload (default)
+/**
+ * Define a {@link Command | command}
+ * @param definition A {@link Command | command} definition
+ */
 export function define<
   G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams
 >(definition: Command<G>): Command<G>
 
+/**
+ * Define a {@link Command | command}
+ * @param definition A {@link Command | command} definition
+ */
 export function define<
   G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams
 >(definition: Command<G>): Command<G> {
   return definition
 }
+
+/**
+ * Define a {@link LazyCommand | lazy command}
+ * @param loader A {@link CommandLoader | command loader}
+ * @returns A {@link LazyCommand | lazy command} loader
+ */
+export function lazy<A extends Args>(
+  loader: CommandLoader<{ args: A; extensions: {} }>
+): LazyCommand<{ args: A; extensions: {} }>
+
+/**
+ * Define a {@link LazyCommand | lazy command} with definition.
+ * @param loader A {@link CommandLoader | command loader} function that returns a command definition
+ * @param definition An optional {@link Command | command} definition
+ * @returns A {@link LazyCommand | lazy command} that can be executed later
+ */
+export function lazy<A extends Args>(
+  loader: CommandLoader<{ args: A; extensions: {} }>,
+  definition: Command<{ args: A; extensions: {} }>
+): LazyCommand<{ args: A; extensions: {} }>
+
+/**
+ * Define a {@link LazyCommand | lazy command}
+ * @param loader A {@link CommandLoader | command loader}
+ * @returns A {@link LazyCommand | lazy command} loader
+ */
+export function lazy<E extends ExtendContext>(
+  loader: CommandLoader<{ args: Args; extensions: E }>
+): LazyCommand<{ args: Args; extensions: E }>
+
+/**
+ * Define a {@link LazyCommand | lazy command} with definition.
+ * @param loader A {@link CommandLoader | command loader} function that returns a command definition
+ * @param definition An optional {@link Command | command} definition
+ * @returns A {@link LazyCommand | lazy command} that can be executed later
+ */
+export function lazy<E extends ExtendContext>(
+  loader: CommandLoader<{ args: Args; extensions: E }>,
+  definition: Command<{ args: Args; extensions: E }>
+): LazyCommand<{ args: Args; extensions: E }>
 
 /**
  * Define a {@link LazyCommand | lazy command}

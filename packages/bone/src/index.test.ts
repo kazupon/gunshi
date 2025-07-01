@@ -2,14 +2,11 @@ import { define } from '@gunshi/definition'
 import global from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
 import { describe, expect, test, vi } from 'vitest'
-import { Args, cli, GunshiParams, RemovedIndex } from './index.ts'
+import { cli } from './index.ts'
 
-type GlobalsCommandContext = Awaited<ReturnType<ReturnType<typeof global>['extension']['factory']>>
+import type { GlobalsCommandContext } from '@gunshi/plugin-global'
 
-// TODO(kazupon): more useful type inference for exntensions
-const entry = define<
-  GunshiParams<{ args: Args; extensions: { 'g:globals': RemovedIndex<GlobalsCommandContext> } }>
->({
+const entry = define<{ 'g:globals': GlobalsCommandContext }>({
   name: 'entry',
   args: {
     say: {

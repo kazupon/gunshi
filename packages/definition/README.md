@@ -37,8 +37,29 @@ bun add @gunshi/definition
 
 ## 🚀 Usage
 
+You can define the gunshi command as JavaScript module with using `define` or `lazy`.
+
+The bellow example case which is using `define`:
+
 ```js
-// TODO(kazupon): prepare the example
+import { define } from '@gunshi/definition'
+
+/**
+ * define `say` command as javascript module
+ */
+export default define({
+  name: 'say',
+  args: {
+    say: {
+      type: 'string',
+      description: 'say something',
+      default: 'hello!'
+    }
+  },
+  run: ctx => {
+    return `You said: ${ctx.values.say}`
+  }
+})
 ```
 
 ## ©️ License
