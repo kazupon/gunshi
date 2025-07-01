@@ -167,12 +167,6 @@ importers:
 
   packages/definition:
     devDependencies:
-      '@gunshi/plugin-global':
-        specifier: workspace:*
-        version: link:../plugin-global
-      '@gunshi/plugin-renderer':
-        specifier: workspace:*
-        version: link:../plugin-renderer
       deno:
         specifier: 'catalog:'
         version: 2.3.3
