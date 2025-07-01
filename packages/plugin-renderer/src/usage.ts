@@ -17,6 +17,7 @@ import type {
   Args,
   Command,
   CommandContext,
+  CommandExamplesFetcher,
   DefaultGunshiParams,
   GunshiParams
 } from '@gunshi/plugin'
@@ -232,7 +233,10 @@ async function resolveExamples<
     return ret
   }
   const command = ctx.env.subCommands?.get(ctx.name || '') as Command<G> | undefined
-  return await _resolvedExamples(ctx, command?.examples)
+  return await _resolvedExamples(
+    ctx,
+    command?.examples as string | CommandExamplesFetcher<G> | undefined
+  )
 }
 
 /**

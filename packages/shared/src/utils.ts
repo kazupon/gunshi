@@ -10,6 +10,7 @@ import type {
   CommandContext,
   CommandExamplesFetcher,
   DefaultGunshiParams,
+  ExtendContext,
   GunshiParams
 } from 'gunshi'
 import type {
@@ -33,7 +34,9 @@ export function resolveArgKey<
   return `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
-export async function resolveExamples<G extends GunshiParams = DefaultGunshiParams>(
+export async function resolveExamples<
+  G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams
+>(
   ctx: Readonly<CommandContext<G>>,
   examples?: string | CommandExamplesFetcher<G>
 ): Promise<string> {

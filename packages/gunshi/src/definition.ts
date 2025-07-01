@@ -46,13 +46,13 @@ export function define<E extends ExtendContext>(
 ): Command<GunshiParams<{ args: Args; extensions: E }>>
 
 // Generic overload (default)
-export function define<G extends GunshiParams = DefaultGunshiParams>(
-  definition: Command<G>
-): Command<G>
+export function define<
+  G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams
+>(definition: Command<G>): Command<G>
 
-export function define<G extends GunshiParams = DefaultGunshiParams>(
-  definition: Command<G>
-): Command<G> {
+export function define<
+  G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams
+>(definition: Command<G>): Command<G> {
   return definition
 }
 
@@ -61,7 +61,7 @@ export function define<G extends GunshiParams = DefaultGunshiParams>(
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
-export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+export function lazy<G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams>(
   loader: CommandLoader<G>
 ): LazyCommand<G>
 
@@ -71,7 +71,7 @@ export function lazy<G extends GunshiParams = DefaultGunshiParams>(
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+export function lazy<G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition: Command<G>
 ): LazyCommand<G>
@@ -82,7 +82,7 @@ export function lazy<G extends GunshiParams = DefaultGunshiParams>(
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+export function lazy<G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition?: Command<G>
 ): LazyCommand<G> {

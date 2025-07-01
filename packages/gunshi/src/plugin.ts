@@ -51,6 +51,7 @@ export type {
   CommandResourceFetcher,
   CommandRunner,
   DefaultGunshiParams,
+  ExtendContext,
   GunshiParams,
   LazyCommand,
   RendererDecorator,

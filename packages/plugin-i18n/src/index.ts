@@ -218,7 +218,7 @@ export default function i18n(
             : ''
       adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-      const originalResource = await loadCommandResource(ctx, cmd)
+      const originalResource = await loadCommandResource(ctx as unknown as CommandContext, cmd)
       if (originalResource) {
         const resource = Object.assign(
           Object.create(null),
@@ -251,11 +251,11 @@ function toLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadCommandResource<G extends GunshiParams = DefaultGunshiParams>(
-  ctx: CommandContext<G>,
-  command: Command<G> | LazyCommand<G>
-): Promise<CommandResource<G> | undefined> {
-  let resource: CommandResource<G> | undefined
+async function loadCommandResource(
+  ctx: CommandContext,
+  command: Command | LazyCommand
+): Promise<CommandResource | undefined> {
+  let resource: CommandResource | undefined
   try {
     // TODO(kazupon): should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)

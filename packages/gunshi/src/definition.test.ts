@@ -218,10 +218,11 @@ describe('lazy with type parameters', () => {
 
   test('handles type parameters from loaded command', () => {
     const loader = vi.fn(async () => {
-      type TestExt = {
-        existing: { existing: boolean }
+      interface TestExt {
+        existing: { test: boolean }
       }
-      const runner: CommandRunner<GunshiParams<{ args: Args; extensions: TestExt }>> = async () => {
+      const runner: CommandRunner<{ extensions: { test: TestExt } }> = async ctx => {
+        expectTypeOf(ctx.extensions.test.existing.test).toEqualTypeOf<boolean>()
         return 'done'
       }
       return runner
