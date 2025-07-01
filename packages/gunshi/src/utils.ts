@@ -7,19 +7,24 @@ import type {
   Command,
   Commandable,
   DefaultGunshiParams,
+  ExtendContext,
   GunshiParams,
   LazyCommand
 } from './types.ts'
 
 export { kebabnize } from 'args-tokens/utils'
 
-export function isLazyCommand<G extends GunshiParams = DefaultGunshiParams>(
-  cmd: unknown
-): cmd is LazyCommand<G> {
+export function isLazyCommand<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+>(cmd: unknown): cmd is LazyCommand<G> {
   return typeof cmd === 'function' && 'commandName' in cmd && !!cmd.commandName
 }
 
-export async function resolveLazyCommand<G extends GunshiParams = DefaultGunshiParams>(
+export async function resolveLazyCommand<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+>(
   cmd: Commandable<G>,
   name?: string | undefined,
   needRunResolving: boolean = false

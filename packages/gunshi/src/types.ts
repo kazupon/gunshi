@@ -46,6 +46,21 @@ export interface GunshiParams<
  */
 export type DefaultGunshiParams = GunshiParams
 
+/**
+ * Type helper to extract args from G
+ * @internal
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
+
+/**
+ * Type helper to extract extensions from G
+ * @internal
+ */
+export type ExtractExtensions<G> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> ? G['extensions'] : G extends { extensions: infer E } ? E : {}
+
 type RemoveIndexSignature<T> = {
   [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]
 }
@@ -81,8 +96,11 @@ export type GenerateNamespacedKey<
 /**
  * Command environment.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface CommandEnvironment<G extends GunshiParams<any> = DefaultGunshiParams> {
+
+export interface CommandEnvironment<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+> {
   /**
    * Current working directory.
    * @see {@link CliOptions.cwd}
@@ -168,8 +186,11 @@ export interface CommandEnvironment<G extends GunshiParams<any> = DefaultGunshiP
 /**
  * CLI options of `cli` function.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface CliOptions<G extends GunshiParams<any> = DefaultGunshiParams> {
+
+export interface CliOptions<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+> {
   /**
    * Current working directory.
    */
@@ -243,21 +264,6 @@ export interface CliOptions<G extends GunshiParams<any> = DefaultGunshiParams> {
  * Command call mode.
  */
 export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
-
-/**
- * Type helper to extract args from G
- * @internal
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
-
-/**
- * Type helper to extract extensions from G
- * @internal
- */
-type ExtractExtensions<G> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> ? G['extensions'] : G extends { extensions: infer E } ? E : {}
 
 /**
  * Type helper to normalize G to GunshiParams

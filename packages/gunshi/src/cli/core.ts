@@ -23,11 +23,16 @@ import type {
   CommandDecorator,
   CommandRunner,
   DefaultGunshiParams,
+  ExtendContext,
+  ExtractArgs,
   GunshiParams,
   LazyCommand
 } from '../types.ts'
 
-export async function cliCore<G extends GunshiParams = DefaultGunshiParams>(
+export async function cliCore<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+>(
   argv: string[],
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: CliOptions<G>,
@@ -80,13 +85,13 @@ export async function cliCore<G extends GunshiParams = DefaultGunshiParams>(
   return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
 
-async function applyPlugins<G extends GunshiParams>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function applyPlugins<G extends GunshiParams<any> | { extensions: ExtendContext }>(
   pluginContext: PluginContext<G>,
   plugins: Plugin[]
 ): Promise<Plugin[]> {
   const sortedPlugins = resolveDependencies(plugins)
   try {
-    // TODO(kazupon): add more user plugins loading logic
     for (const plugin of sortedPlugins) {
       /**
        * NOTE(kazupon):
@@ -103,24 +108,33 @@ async function applyPlugins<G extends GunshiParams>(
   return sortedPlugins
 }
 
-function getCommandArgs<G extends GunshiParams>(cmd?: Command<G> | LazyCommand<G>): G['args'] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getCommandArgs<G extends GunshiParams<any> | { extensions: ExtendContext }>(
+  cmd?: Command<G> | LazyCommand<G>
+): ExtractArgs<G> {
   if (isLazyCommand<G>(cmd)) {
-    return cmd.args || create<G['args']>()
+    return cmd.args || create<ExtractArgs<G>>()
   } else if (typeof cmd === 'object') {
-    return cmd.args || create<G['args']>()
+    return cmd.args || create<ExtractArgs<G>>()
   } else {
-    return create<G['args']>()
+    return create<ExtractArgs<G>>()
   }
 }
 
-function resolveArguments<G extends GunshiParams>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function resolveArguments<G extends GunshiParams<any> | { extensions: ExtendContext }>(
   pluginContext: PluginContext<G>,
-  args?: G['args']
-): G['args'] {
-  return Object.assign(create<G['args']>(), Object.fromEntries(pluginContext.globalOptions), args)
+  args?: ExtractArgs<G>
+): ExtractArgs<G> {
+  return Object.assign(
+    create<ExtractArgs<G>>(),
+    Object.fromEntries(pluginContext.globalOptions),
+    args
+  )
 }
 
-function normalizeCliOptions<G extends GunshiParams>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normalizeCliOptions<G extends GunshiParams<any> | { extensions: ExtendContext }>(
   options: CliOptions<G>,
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   decorators: Decorators<G>
@@ -163,7 +177,10 @@ function getSubCommand(tokens: ArgToken[]): string {
     : ''
 }
 
-type ResolveCommandContext<G extends GunshiParams = DefaultGunshiParams> = {
+type ResolveCommandContext<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+> = {
   commandName?: string | undefined
   command?: Command<G> | LazyCommand<G> | undefined
   callMode: CommandCallMode
@@ -173,7 +190,8 @@ const CANNOT_RESOLVE_COMMAND = {
   callMode: 'unexpected'
 } as const satisfies ResolveCommandContext
 
-async function resolveCommand<G extends GunshiParams>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function resolveCommand<G extends GunshiParams<any> | { extensions: ExtendContext }>(
   sub: string,
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: CliOptions<G>
@@ -231,7 +249,10 @@ async function resolveCommand<G extends GunshiParams>(
   }
 }
 
-function resolveEntryName<G extends GunshiParams>(entry: Command<G>): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function resolveEntryName<G extends GunshiParams<any> | { extensions: ExtendContext }>(
+  entry: Command<G>
+): string {
   return entry.name || ANONYMOUS_COMMAND_NAME
 }
 
@@ -252,7 +273,10 @@ function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextEx
   return extensions
 }
 
-async function executeCommand<G extends GunshiParams = DefaultGunshiParams>(
+async function executeCommand<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+>(
   cmd: Command<G> | LazyCommand<G>,
   ctx: Readonly<CommandContext<G>>,
   name: string,

@@ -50,11 +50,12 @@ test('@gunshi/plugin', async () => {
    * define entry runner with type parameters
    */
   const entry: CommandRunner<{ extensions: { perf: PerfCommandContext } }> = ctx => {
-    // enable type-safe extensions access
+    // enable type-safe extensions
     return `Execution start time: ${ctx.extensions.perf.start}`
   }
 
   // run!
+  // @ts-expect-error
   const result = await cli([], entry, {
     plugins: [perf] // install a plugin
   })

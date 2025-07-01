@@ -10,6 +10,9 @@ import type {
   CommandContext,
   CommandDecorator,
   DefaultGunshiParams,
+  ExtendContext,
+  ExtractArgs,
+  ExtractExtensions,
   GunshiParams,
   RendererDecorator,
   ValidationErrorsDecorator
@@ -18,7 +21,10 @@ import type {
 /**
  * Gunshi plugin context interface.
  */
-export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
+export interface PluginContext<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+> {
   /**
    * Get the global options
    * @returns A map of global options.
@@ -40,12 +46,10 @@ export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
     decorator: (
       baseRenderer: (
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >
       ) => Promise<string>,
-      ctx: Readonly<
-        CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
-      >
+      ctx: Readonly<CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>>
     ) => Promise<string>
   ): void
 
@@ -57,12 +61,10 @@ export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
     decorator: (
       baseRenderer: (
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >
       ) => Promise<string>,
-      ctx: Readonly<
-        CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
-      >
+      ctx: Readonly<CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>>
     ) => Promise<string>
   ): void
 
@@ -76,13 +78,11 @@ export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
     decorator: (
       baseRenderer: (
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >,
         error: AggregateError
       ) => Promise<string>,
-      ctx: Readonly<
-        CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
-      >,
+      ctx: Readonly<CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>>,
       error: AggregateError
     ) => Promise<string>
   ): void
@@ -96,13 +96,11 @@ export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
     decorator: (
       baseRunner: (
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >
       ) => Awaitable<void | string>
     ) => (
-      ctx: Readonly<
-        CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
-      >
+      ctx: Readonly<CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>>
     ) => Awaitable<void | string>
   ): void
 }
@@ -112,9 +110,10 @@ export interface PluginContext<G extends GunshiParams = DefaultGunshiParams> {
  * @param decorators - A {@link Decorators} instance.
  * @returns A new {@link PluginContext} instance.
  */
-export function createPluginContext<G extends GunshiParams = DefaultGunshiParams>(
-  decorators: Decorators<G>
-): PluginContext<G> {
+export function createPluginContext<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+>(decorators: Decorators<G>): PluginContext<G> {
   /**
    * private states
    */
@@ -144,11 +143,11 @@ export function createPluginContext<G extends GunshiParams = DefaultGunshiParams
       decorator: (
         baseRenderer: (
           ctx: Readonly<
-            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+            CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
           >
         ) => Promise<string>,
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >
       ) => Promise<string>
     ): void {
@@ -159,11 +158,11 @@ export function createPluginContext<G extends GunshiParams = DefaultGunshiParams
       decorator: (
         baseRenderer: (
           ctx: Readonly<
-            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+            CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
           >
         ) => Promise<string>,
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >
       ) => Promise<string>
     ): void {
@@ -176,12 +175,12 @@ export function createPluginContext<G extends GunshiParams = DefaultGunshiParams
       decorator: (
         baseRenderer: (
           ctx: Readonly<
-            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+            CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
           >,
           error: AggregateError
         ) => Promise<string>,
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >,
         error: AggregateError
       ) => Promise<string>
@@ -193,12 +192,12 @@ export function createPluginContext<G extends GunshiParams = DefaultGunshiParams
       decorator: (
         baseRunner: (
           ctx: Readonly<
-            CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+            CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
           >
         ) => Awaitable<void | string>
       ) => (
         ctx: Readonly<
-          CommandContext<GunshiParams<{ args: G['args']; extensions: G['extensions'] & L }>>
+          CommandContext<{ args: ExtractArgs<G>; extensions: ExtractExtensions<G> & L }>
         >
       ) => Awaitable<void | string>
     ): void {
