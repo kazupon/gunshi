@@ -72,15 +72,21 @@ export function log(...args: unknown[]): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function deepFreeze<T extends Record<string, any>>(obj: T): Readonly<T> {
+export function deepFreeze<T extends Record<string, any>>(
+  obj: T,
+  ignores: string[] = []
+): Readonly<T> {
   if (obj === null || typeof obj !== 'object') {
     return obj
   }
 
   for (const key of Object.keys(obj)) {
     const value = obj[key]
+    if (ignores.includes(key)) {
+      continue
+    }
     if (typeof value === 'object' && value !== null) {
-      deepFreeze(value)
+      deepFreeze(value, ignores)
     }
   }
 

@@ -186,7 +186,7 @@ export async function createCommandContext<
       }
     }
   }
-  const ctx = deepFreeze(core)
+  const ctx = deepFreeze(core, ['extensions'])
 
   return ctx as {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<G>>

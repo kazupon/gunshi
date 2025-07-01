@@ -54,10 +54,7 @@ test('@gunshi/plugin', async () => {
     return `Execution start time: ${ctx.extensions.perf.start}`
   }
 
-  /**
-   * run!
-   */
-  // @ts-expect-error
+  // run!
   const result = await cli([], entry, {
     plugins: [perf] // install a plugin
   })
