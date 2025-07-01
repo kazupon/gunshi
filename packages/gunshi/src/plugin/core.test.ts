@@ -320,7 +320,7 @@ describe('Plugin Extensions Integration', () => {
         })
       },
       extension: (
-        core: CommandContextCore<GunshiParams>
+        core: CommandContextCore
       ): {
         getValue: () => string
         doubled: (n: number) => number
@@ -344,9 +344,7 @@ describe('Plugin Extensions Integration', () => {
     type TestExtension = Awaited<ReturnType<typeof testPlugin.extension.factory>>
 
     // create a command that uses the extension
-    const testCommand = define<
-      GunshiParams<{ args: typeof args; extensions: { test: TestExtension } }>
-    >({
+    const testCommand = define<{ args: typeof args; extensions: { test: TestExtension } }>({
       name: 'test-cmd',
       args,
       async run(ctx) {
@@ -358,9 +356,10 @@ describe('Plugin Extensions Integration', () => {
     })
 
     // create command context directly
-    const ctx = await createCommandContext<
-      GunshiParams<{ args: typeof args; extensions: { test: TestExtension } }>
-    >({
+    const ctx = await createCommandContext<{
+      args: typeof args
+      extensions: { test: TestExtension }
+    }>({
       args,
       values: { 'test-opt': 'custom', num: 5 },
       positionals: [],
@@ -381,7 +380,7 @@ describe('Plugin Extensions Integration', () => {
 
   test('multiple plugins with extensions work together', async () => {
     // auth plugin
-    const authExtension = vi.fn((core: CommandContextCore<GunshiParams>) => ({
+    const authExtension = vi.fn((core: CommandContextCore) => ({
       getUser: () => core.values.user || 'guest',
       isAdmin: () => core.values.user === 'admin'
     }))
@@ -396,7 +395,7 @@ describe('Plugin Extensions Integration', () => {
 
     // logger plugin
     const logs = [] as string[]
-    const loggerExtension = vi.fn((core: CommandContextCore<GunshiParams>) => ({
+    const loggerExtension = vi.fn((core: CommandContextCore) => ({
       log: (msg: string) => logs.push(`[${core.values['log-level'] || 'info'}] ${msg}`),
       getLogs: (): string[] => logs
     }))
@@ -415,7 +414,7 @@ describe('Plugin Extensions Integration', () => {
     }
 
     // command using both extensions
-    const multiCommand = define<GunshiParams<{ args: Args; extensions: ExtendContext }>>({
+    const multiCommand = define<ExtendContext>({
       name: 'multi',
       run(ctx) {
         ctx.extensions.logger.log(`User ${ctx.extensions.auth.getUser()} executed command`)
@@ -434,7 +433,7 @@ describe('Plugin Extensions Integration', () => {
       rest: [],
       argv: [],
       tokens: [],
-      command: multiCommand as Command<GunshiParams<{ args: Args }>>,
+      command: multiCommand,
       extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension },
       omitted: false,
       callMode: 'entry',
@@ -499,12 +498,9 @@ describe('Plugin Extensions Integration', () => {
       onExtension
     })
 
-    const contextCommand = define<
-      GunshiParams<{
-        args: Args
-        extensions: { ctx: Awaited<ReturnType<typeof contextPlugin.extension.factory>> }
-      }>
-    >({
+    const contextCommand = define<{
+      ctx: Awaited<ReturnType<typeof contextPlugin.extension.factory>>
+    }>({
       name: 'ctx-test',
       run(ctx) {
         return String(ctx.extensions.ctx.captured)

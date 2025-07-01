@@ -125,8 +125,9 @@ export interface PluginWithoutExtension<
 }
 
 /**
- * Create a plugin with extension capabilities
+ * Define a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
+ * @return A defined plugin with extension capabilities.
  */
 export function plugin<
   I extends string,
@@ -144,6 +145,11 @@ export function plugin<
   onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]: ReturnType<P> } }>
 }): PluginWithExtension<ReturnType<P>>
 
+/**
+ * Define a plugin without extension capabilities
+ * @param options - {@link PluginOptions | plugin options} without extension
+ * @returns A defined plugin without extension capabilities.
+ */
 export function plugin(options: {
   id: string
   name?: string
@@ -151,6 +157,11 @@ export function plugin(options: {
   setup?: (ctx: Readonly<PluginContext<DefaultGunshiParams>>) => Awaitable<void>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
+/**
+ * Define a plugin
+ * @param options - {@link PluginOptions | plugin options}
+ * @returns A defined plugin.
+ */
 export function plugin<
   I extends string,
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']

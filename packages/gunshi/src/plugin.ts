@@ -7,7 +7,7 @@
  *
  * export default yourPlugin() {
  *   return plugin({
- *     name: 'your-plugin',
+ *     id: 'your-plugin-id',
  *     setup: (ctx) => {
  *       // your plugin setup logic here
  *     },
