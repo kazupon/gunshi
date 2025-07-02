@@ -76,12 +76,12 @@ When these options are used:
 
 ## 🧩 Context Extensions
 
-When using the global plugin, your command context is extended via `ctx.extensions['g:globals']`.
+When using the global options plugin, your command context is extended via `ctx.extensions['g:global']`.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!IMPORTANT]
-> This plugin extension is namespaced in `CommandContext.extensions` using this plugin ID `g:globals` by the gunshi plugin system.
+> This plugin extension is namespaced in `CommandContext.extensions` using this plugin ID `g:global` by the gunshi plugin system.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -105,7 +105,7 @@ const command = {
   name: 'deploy',
   run: async ctx => {
     // Access globals extensions
-    const { showVersion, showHeader } = ctx.extensions['g:globals']
+    const { showVersion, showHeader } = ctx.extensions['g:global']
 
     // Manually show version if needed
     console.log(`Deploying with CLI version: ${showVersion()}`)
