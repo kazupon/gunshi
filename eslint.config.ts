@@ -29,6 +29,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   comments({
     kazupon: {
       ignores: [
+        './scripts/**',
         './bench/**',
         './playground/**',
         './packages/docs/**',

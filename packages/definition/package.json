@@ -56,7 +56,7 @@
     "build": "tsdown",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
-    "typecheck:deno": "deno check --import-map=../../import_map.json ./src"
+    "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "devDependencies": {
     "deno": "catalog:",
