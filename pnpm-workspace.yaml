@@ -10,3 +10,5 @@ catalog:
   publint: ^0.3.12
   tsdown: ^0.12.3
   '@types/node': ^22.15.29
+  typedoc: ^0.28.4
+  typedoc-plugin-markdown: ^4.6.3

@@ -23,8 +23,8 @@
     "preview": "vitepress preview src"
   },
   "devDependencies": {
-    "typedoc": "^0.28.4",
-    "typedoc-plugin-markdown": "^4.6.3",
+    "typedoc": "catalog:",
+    "typedoc-plugin-markdown": "catalog:",
     "typedoc-vitepress-theme": "^1.1.2",
     "vitepress": "^1.6.3",
     "vitepress-plugin-group-icons": "^1.5.5",

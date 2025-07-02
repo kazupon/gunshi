@@ -24,6 +24,12 @@ catalogs:
     tsdown:
       specifier: ^0.12.3
       version: 0.12.3
+    typedoc:
+      specifier: ^0.28.4
+      version: 0.28.4
+    typedoc-plugin-markdown:
+      specifier: ^4.6.3
+      version: 4.6.3
     typescript:
       specifier: ^5.8.3
       version: 5.8.3
@@ -189,10 +195,10 @@ importers:
   packages/docs:
     devDependencies:
       typedoc:
-        specifier: ^0.28.4
+        specifier: 'catalog:'
         version: 0.28.4(typescript@5.8.3)
       typedoc-plugin-markdown:
-        specifier: ^4.6.3
+        specifier: 'catalog:'
         version: 4.6.3(typedoc@0.28.4(typescript@5.8.3))
       typedoc-vitepress-theme:
         specifier: ^1.1.2
@@ -364,6 +370,12 @@ importers:
       tsdown:
         specifier: 'catalog:'
         version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
+      typedoc:
+        specifier: 'catalog:'
+        version: 0.28.4(typescript@5.8.3)
+      typedoc-plugin-markdown:
+        specifier: 'catalog:'
+        version: 4.6.3(typedoc@0.28.4(typescript@5.8.3))
 
   packages/plugin-renderer:
     dependencies:
