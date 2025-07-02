@@ -34,6 +34,7 @@ import type {
   ExtendContext,
   ExtractArgs,
   GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand
 } from './types.ts'
 
@@ -110,8 +111,7 @@ interface CommandContextParams<
  * @returns A {@link CommandContext | command context}, which is readonly
  */
 export async function createCommandContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams,
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
   V extends ArgValues<ExtractArgs<G>> = ArgValues<ExtractArgs<G>>,
   C extends Command<G> | LazyCommand<G> = Command<G>,
   E extends Record<string, CommandContextExtension> = {}

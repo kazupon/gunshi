@@ -7,8 +7,7 @@ import type {
   CommandContext,
   CommandDecorator,
   DefaultGunshiParams,
-  ExtendContext,
-  GunshiParams,
+  GunshiParamsConstraint,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
@@ -19,10 +18,7 @@ const EMPTY_RENDERER = async () => ''
  * Interface for managing renderer and command decorators.
  * This interface defines the contract for decorator management in plugins.
  */
-export interface Decorators<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> {
+export interface Decorators<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   addHeaderDecorator(decorator: RendererDecorator<string, G>): void
   addUsageDecorator(decorator: RendererDecorator<string, G>): void
   addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<G>): void
@@ -41,8 +37,7 @@ export interface Decorators<
  * @returns A new decorators manager instance
  */
 export function createDecorators<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
+  G extends GunshiParamsConstraint = DefaultGunshiParams
 >(): Decorators<G> {
   /**
    * private states

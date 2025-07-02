@@ -47,6 +47,13 @@ export interface GunshiParams<
 export type DefaultGunshiParams = GunshiParams
 
 /**
+ * Generic constraint for command-related types.
+ * This type constraint allows both GunshiParams and objects with extensions.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendContext }
+
+/**
  * Type helper to extract args from G
  * @internal
  */
@@ -97,10 +104,7 @@ export type GenerateNamespacedKey<
  * Command environment.
  */
 
-export interface CommandEnvironment<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> {
+export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Current working directory.
    * @see {@link CliOptions.cwd}
@@ -187,10 +191,7 @@ export interface CommandEnvironment<
  * CLI options of `cli` function.
  */
 
-export interface CliOptions<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> {
+export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Current working directory.
    */
@@ -281,10 +282,7 @@ type NormalizeToGunshiParams<G> =
  * Command context.
  * Command context is the context of the command execution.
  */
-export interface CommandContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> {
+export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Command name, that is the command that is executed.
    * The command name is same {@link CommandEnvironment.name}.
@@ -365,10 +363,9 @@ export interface CommandContext<
  * CommandContextCore type (base type without extensions)
  */
 
-export type CommandContextCore<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = Readonly<CommandContext<G>>
+export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<
+  CommandContext<G>
+>
 
 /**
  * Command context extension
@@ -385,10 +382,7 @@ export interface CommandContextExtension<
  * Command interface.
  */
 
-export interface Command<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> {
+export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Command name.
    * It's used to find command line arguments to execute from sub commands, and it's recommended to specify.
@@ -429,10 +423,7 @@ export interface Command<
  * Lazy command that's not loaded until it is executed.
  */
 
-export type LazyCommand<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = {
+export type LazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
   /**
    * Command load function
    */
@@ -447,19 +438,15 @@ export type LazyCommand<
  * Define a command type.
  */
 
-export type Commandable<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = Command<G> | LazyCommand<G>
+export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
+  | Command<G>
+  | LazyCommand<G>
 
 /**
  * Command resource.
  */
 
-export type CommandResource<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = {
+export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
   /**
    * Command description.
    */
@@ -478,10 +465,9 @@ export type CommandResource<
  * @returns A fetched command examples.
  */
 
-export type CommandExamplesFetcher<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = (ctx: Readonly<CommandContext<G>>) => Awaitable<string>
+export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
+) => Awaitable<string>
 
 /**
  * Command resource fetcher.
@@ -489,10 +475,9 @@ export type CommandExamplesFetcher<
  * @returns A fetched {@link CommandResource | command resource}.
  */
 
-export type CommandResourceFetcher<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = (ctx: Readonly<CommandContext<G>>) => Awaitable<CommandResource<G>>
+export type CommandResourceFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
+) => Awaitable<CommandResource<G>>
 
 /**
  * Command runner.
@@ -500,10 +485,9 @@ export type CommandResourceFetcher<
  * @returns void or string (for CLI output)
  */
 
-export type CommandRunner<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = (ctx: Readonly<CommandContext<G>>) => Awaitable<void | string>
+export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
+) => Awaitable<void | string>
 
 /**
  * Command loader.
@@ -512,10 +496,9 @@ export type CommandRunner<
  * @returns A command or command runner
  */
 
-export type CommandLoader<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = () => Awaitable<Command<G> | CommandRunner<G>>
+export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams> = () => Awaitable<
+  Command<G> | CommandRunner<G>
+>
 
 /**
  * Command decorator.
@@ -524,10 +507,7 @@ export type CommandLoader<
  * @returns The decorated command runner
  */
 
-export type CommandDecorator<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = (
+export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<void | string>
 ) => (ctx: Readonly<CommandContext<G>>) => Awaitable<void | string>
 
@@ -539,11 +519,7 @@ export type CommandDecorator<
  * @returns The decorated result
  */
 
-export type RendererDecorator<
-  T,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = (
+export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>,
   ctx: Readonly<CommandContext<G>>
 ) => Promise<T>
@@ -557,10 +533,7 @@ export type RendererDecorator<
  * @returns The decorated result
  */
 
-export type ValidationErrorsDecorator<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = (
+export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>,
   ctx: Readonly<CommandContext<G>>,
   error: AggregateError

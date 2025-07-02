@@ -39,7 +39,7 @@ import type {
   CommandLoader,
   DefaultGunshiParams,
   ExtendContext,
-  GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand
 } from './types.ts'
 
@@ -76,17 +76,17 @@ export function define<E extends ExtendContext>(
  * Define a {@link Command | command}
  * @param definition A {@link Command | command} definition
  */
-export function define<
-  G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams
->(definition: Command<G>): Command<G>
+export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
+  definition: Command<G>
+): Command<G>
 
 /**
  * Define a {@link Command | command}
  * @param definition A {@link Command | command} definition
  */
-export function define<
-  G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams
->(definition: Command<G>): Command<G> {
+export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
+  definition: Command<G>
+): Command<G> {
   return definition
 }
 
@@ -135,7 +135,7 @@ export function lazy<E extends ExtendContext>(
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
-export function lazy<G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams>(
+export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>
 ): LazyCommand<G>
 
@@ -145,7 +145,7 @@ export function lazy<G extends GunshiParams | { extensions: ExtendContext } = De
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams>(
+export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition: Command<G>
 ): LazyCommand<G>
@@ -156,7 +156,7 @@ export function lazy<G extends GunshiParams | { extensions: ExtendContext } = De
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<G extends GunshiParams | { extensions: ExtendContext } = DefaultGunshiParams>(
+export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition?: Command<G>
 ): LazyCommand<G> {

@@ -10,10 +10,9 @@ import type {
   CommandContext,
   CommandDecorator,
   DefaultGunshiParams,
-  ExtendContext,
   ExtractArgs,
   ExtractExtensions,
-  GunshiParams,
+  GunshiParamsConstraint,
   RendererDecorator,
   ValidationErrorsDecorator
 } from '../types.ts'
@@ -21,10 +20,7 @@ import type {
 /**
  * Gunshi plugin context interface.
  */
-export interface PluginContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> {
+export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Get the global options
    * @returns A map of global options.
@@ -110,10 +106,9 @@ export interface PluginContext<
  * @param decorators - A {@link Decorators} instance.
  * @returns A new {@link PluginContext} instance.
  */
-export function createPluginContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
->(decorators: Decorators<G>): PluginContext<G> {
+export function createPluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams>(
+  decorators: Decorators<G>
+): PluginContext<G> {
   /**
    * private states
    */

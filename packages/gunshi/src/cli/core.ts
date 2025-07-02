@@ -23,16 +23,12 @@ import type {
   CommandDecorator,
   CommandRunner,
   DefaultGunshiParams,
-  ExtendContext,
   ExtractArgs,
-  GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand
 } from '../types.ts'
 
-export async function cliCore<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
->(
+export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   argv: string[],
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: CliOptions<G>,
@@ -85,8 +81,7 @@ export async function cliCore<
   return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function applyPlugins<G extends GunshiParams<any> | { extensions: ExtendContext }>(
+async function applyPlugins<G extends GunshiParamsConstraint>(
   pluginContext: PluginContext<G>,
   plugins: Plugin[]
 ): Promise<Plugin[]> {
@@ -108,8 +103,7 @@ async function applyPlugins<G extends GunshiParams<any> | { extensions: ExtendCo
   return sortedPlugins
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getCommandArgs<G extends GunshiParams<any> | { extensions: ExtendContext }>(
+function getCommandArgs<G extends GunshiParamsConstraint>(
   cmd?: Command<G> | LazyCommand<G>
 ): ExtractArgs<G> {
   if (isLazyCommand<G>(cmd)) {
@@ -121,8 +115,7 @@ function getCommandArgs<G extends GunshiParams<any> | { extensions: ExtendContex
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function resolveArguments<G extends GunshiParams<any> | { extensions: ExtendContext }>(
+function resolveArguments<G extends GunshiParamsConstraint>(
   pluginContext: PluginContext<G>,
   args?: ExtractArgs<G>
 ): ExtractArgs<G> {
@@ -133,8 +126,7 @@ function resolveArguments<G extends GunshiParams<any> | { extensions: ExtendCont
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function normalizeCliOptions<G extends GunshiParams<any> | { extensions: ExtendContext }>(
+function normalizeCliOptions<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   decorators: Decorators<G>
@@ -177,10 +169,7 @@ function getSubCommand(tokens: ArgToken[]): string {
     : ''
 }
 
-type ResolveCommandContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
-> = {
+type ResolveCommandContext<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
   commandName?: string | undefined
   command?: Command<G> | LazyCommand<G> | undefined
   callMode: CommandCallMode
@@ -190,8 +179,7 @@ const CANNOT_RESOLVE_COMMAND = {
   callMode: 'unexpected'
 } as const satisfies ResolveCommandContext
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function resolveCommand<G extends GunshiParams<any> | { extensions: ExtendContext }>(
+async function resolveCommand<G extends GunshiParamsConstraint>(
   sub: string,
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: CliOptions<G>
@@ -249,10 +237,7 @@ async function resolveCommand<G extends GunshiParams<any> | { extensions: Extend
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function resolveEntryName<G extends GunshiParams<any> | { extensions: ExtendContext }>(
-  entry: Command<G>
-): string {
+function resolveEntryName<G extends GunshiParamsConstraint>(entry: Command<G>): string {
   return entry.name || ANONYMOUS_COMMAND_NAME
 }
 
@@ -273,10 +258,7 @@ function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextEx
   return extensions
 }
 
-async function executeCommand<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> | { extensions: ExtendContext } = DefaultGunshiParams
->(
+async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   cmd: Command<G> | LazyCommand<G>,
   ctx: Readonly<CommandContext<G>>,
   name: string,
