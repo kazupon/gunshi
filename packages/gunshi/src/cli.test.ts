@@ -490,42 +490,6 @@ describe('auto generate usage', () => {
     const message = log()
     expect(message).toMatchSnapshot()
   })
-
-  test('locale resource not found', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
-    const mockResource = vi.fn().mockRejectedValue(new Error('Resource not found'))
-    await cli(
-      ['-h'],
-      {
-        args: {
-          foo: {
-            type: 'string',
-            short: 'f',
-            description: 'The foo option'
-          }
-        },
-        name: 'command1',
-        examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
-        resource: mockResource,
-        run: vi.fn()
-      },
-      {
-        name: 'gunshi',
-        description: 'Modern CLI tool',
-        version: '0.0.0',
-        usageOptionType: true,
-        plugins: [
-          i18n({
-            locale: 'fr-FR'
-          })
-        ]
-      }
-    )
-
-    const message = log()
-    expect(message).toMatchSnapshot()
-  })
 })
 
 describe('custom generate usage', () => {

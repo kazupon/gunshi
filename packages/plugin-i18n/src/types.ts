@@ -3,6 +3,69 @@
  * @license MIT
  */
 
+import type {
+  Awaitable,
+  Command,
+  CommandContext,
+  DefaultGunshiParams,
+  ExtractArgs,
+  GunshiParams,
+  GunshiParamsConstraint,
+  NormalizeToGunshiParams
+} from '@gunshi/plugin'
+import { ARG_PREFIX, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
+
+import type {
+  BuiltinResourceKeys,
+  GenerateNamespacedKey,
+  KeyOfArgs,
+  RemovedIndex
+} from '@gunshi/shared'
+
+/**
+ * Extended command context which provides utilities via i18n plugin.
+ * These utilities are available via `CommandContext.extensions['g:i18n']`.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
+  /**
+   * Command locale
+   */
+  locale: string | Intl.Locale
+  /**
+   * Translate a message
+   * @param key Translation key
+   * @param values Values to interpolate
+   * @returns Translated message
+   */
+  translate: <
+    T extends string = CommandBuiltinKeys,
+    O = CommandArgKeys<G['args']>,
+    K = CommandBuiltinKeys | O | T
+  >(
+    key: K,
+    values?: Record<string, unknown>
+  ) => string
+}
+
+/**
+ * i18n plugin options
+ */
+export interface I18nPluginOptions {
+  /**
+   * Locale to use for translations
+   */
+  locale?: string | Intl.Locale
+  /**
+   * Translation adapter factory
+   */
+  translationAdapterFactory?: TranslationAdapterFactory
+  /**
+   * Built-in localizable resources
+   */
+  resources?: Record<string, Record<BuiltinResourceKeys, string>>
+}
+
 /**
  * Translation adapter factory.
  */
@@ -57,4 +120,50 @@ export interface TranslationAdapter<MessageResource = string> {
    * @returns A translated message, if message is not translated, return `undefined`.
    */
   translate(locale: string, key: string, values?: Record<string, unknown>): string | undefined
+}
+
+/**
+ * Command resource type for i18n plugin.
+ */
+export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
+  /**
+   * Command description.
+   */
+  description: string
+  /**
+   * Examples usage.
+   */
+  examples: string | CommandExamplesFetcher<NormalizeToGunshiParams<G>>
+} & {
+  [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]: string
+} & { [key: string]: string } // Infer the arguments usage, Define the user resources
+
+/**
+ * Command examples fetcher.
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A fetched command examples.
+ */
+export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
+) => Awaitable<string>
+
+/**
+ * Command resource fetcher.
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A fetched {@link CommandResource | command resource}.
+ */
+export type CommandResourceFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
+) => Awaitable<CommandResource<G>>
+
+/**
+ * I18n-aware command interface that extends the base Command with resource support
+ */
+export interface I18nCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>
+  extends Command<G> {
+  /**
+   * Command resource fetcher for i18n support.
+   * This property is specific to i18n-enabled commands.
+   */
+  resource?: CommandResourceFetcher<G>
 }

@@ -47,13 +47,14 @@ export type {
   CommandContextCore,
   CommandDecorator,
   CommandExamplesFetcher,
-  CommandResource,
-  CommandResourceFetcher,
   CommandRunner,
   DefaultGunshiParams,
   ExtendContext,
+  ExtractArgs,
   GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand,
+  NormalizeToGunshiParams,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'

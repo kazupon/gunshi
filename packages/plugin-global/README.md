@@ -8,16 +8,16 @@
 # npm
 npm install --save @gunshi/plugin-global
 
-## pnpm
+# pnpm
 pnpm add @gunshi/plugin-global
 
-## yarn
+# yarn
 yarn add @gunshi/plugin-global
 
-## deno
+# deno
 deno add jsr:@gunshi/plugin-global
 
-## bun
+# bun
 bun add @gunshi/plugin-global
 ```
 

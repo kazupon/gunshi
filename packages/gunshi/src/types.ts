@@ -3,10 +3,7 @@
  * @license MIT
  */
 
-import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
-
 import type { Args, ArgToken, ArgValues } from 'args-tokens'
-import type { TranslationAdapterFactory } from '../../plugin-i18n/src/index.ts' // TODO(kazupon): remove this import after the next major release
 import type { Plugin } from './plugin/core.ts'
 
 export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
@@ -68,38 +65,6 @@ export type ExtractExtensions<G> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   G extends GunshiParams<any> ? G['extensions'] : G extends { extensions: infer E } ? E : {}
 
-type RemoveIndexSignature<T> = {
-  [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]
-}
-
-/**
- * Remove index signature from object or record type.
- * @internal
- */
-export type RemovedIndex<T> = RemoveIndexSignature<{
-  [K in keyof T]: T[K]
-}>
-
-/** @internal */
-export type KeyOfArgs<A extends Args> =
-  | keyof A
-  | {
-      [K in keyof A]: A[K]['type'] extends 'boolean'
-        ? A[K]['negatable'] extends true
-          ? `no-${Extract<K, string>}`
-          : never
-        : never
-    }[keyof A]
-
-/**
- * Generate a namespaced key.
- * @internal
- */
-export type GenerateNamespacedKey<
-  Key extends string,
-  Prefixed extends string = typeof BUILT_IN_PREFIX
-> = `${Prefixed}${typeof BUILT_IN_KEY_SEPARATOR}${Key}`
-
 /**
  * Command environment.
  */
@@ -126,11 +91,6 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    * @see {@link CliOptions.version}
    */
   version: string | undefined
-  /**
-   * Command program locale.
-   * @see {@link CliOptions.locale}
-   */
-  locale?: string | Intl.Locale
   /**
    * Left margin of the command output.
    * @default 2
@@ -181,10 +141,6 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
     | null
     | undefined
-  /**
-   * Translation adapter factory.
-   */
-  translationAdapterFactory?: TranslationAdapterFactory
 }
 
 /**
@@ -209,10 +165,6 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Command program version.
    */
   version?: string
-  /**
-   * Command program locale.
-   */
-  locale?: string | Intl.Locale
   /**
    * Sub commands.
    */
@@ -252,10 +204,6 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
     | null
   /**
-   * Translation adapter factory.
-   */
-  translationAdapterFactory?: TranslationAdapterFactory
-  /**
    * User plugins.
    */
   plugins?: Plugin[]
@@ -270,7 +218,7 @@ export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
  * Type helper to normalize G to GunshiParams
  * @internal
  */
-type NormalizeToGunshiParams<G> =
+export type NormalizeToGunshiParams<G> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   G extends GunshiParams<any>
     ? G
@@ -408,10 +356,6 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    */
   run?: CommandRunner<G>
   /**
-   * Command resource fetcher.
-   */
-  resource?: CommandResourceFetcher<NormalizeToGunshiParams<G>>
-  /**
    * Whether to convert the camel-case style argument name to kebab-case.
    * If you will set to `true`, All {@link Command.args} names will be converted to kebab-case.
    */
@@ -443,23 +387,6 @@ export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> 
   | LazyCommand<G>
 
 /**
- * Command resource.
- */
-
-export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
-  /**
-   * Command description.
-   */
-  description: string
-  /**
-   * Examples usage.
-   */
-  examples: string | CommandExamplesFetcher<NormalizeToGunshiParams<G>>
-} & {
-  [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]: string
-} & { [key: string]: string } // Infer the arguments usage, Define the user resources
-
-/**
  * Command examples fetcher.
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched command examples.
@@ -468,16 +395,6 @@ export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiPara
 export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   ctx: Readonly<CommandContext<G>>
 ) => Awaitable<string>
-
-/**
- * Command resource fetcher.
- * @param ctx A {@link CommandContext | command context}
- * @returns A fetched {@link CommandResource | command resource}.
- */
-
-export type CommandResourceFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
-  ctx: Readonly<CommandContext<G>>
-) => Awaitable<CommandResource<G>>
 
 /**
  * Command runner.

@@ -40,15 +40,20 @@ import { createTranslationAdapter } from './translation.ts'
 import type {
   Command,
   CommandContext,
-  CommandResource,
   DefaultGunshiParams,
-  GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand,
   PluginWithExtension
 } from '@gunshi/plugin'
 import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
-import type { TranslationAdapterFactory } from './types.ts'
+import type {
+  CommandResource,
+  I18nCommand,
+  I18nCommandContext,
+  I18nPluginOptions
+} from './types.ts'
 
+export * from './helpers.ts'
 export * from './translation.ts'
 
 export type * from './types.ts'
@@ -56,53 +61,9 @@ export type * from './types.ts'
 /**
  * The default locale string, which format is BCP 47 language tag.
  */
-const DEFAULT_LOCALE = 'en-US'
-
-/**
- * Extended command context which provides utilities via i18n plugin.
- * These utilities are available via `CommandContext.extensions['g:i18n']`.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
-  /**
-   * Command locale
-   */
-  locale: string | Intl.Locale
-  /**
-   * Translate a message
-   * @param key Translation key
-   * @param values Values to interpolate
-   * @returns Translated message
-   */
-  translate: <
-    T extends string = CommandBuiltinKeys,
-    O = CommandArgKeys<G['args']>,
-    K = CommandBuiltinKeys | O | T
-  >(
-    key: K,
-    values?: Record<string, unknown>
-  ) => string
-}
+export const DEFAULT_LOCALE = 'en-US'
 
 const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
-
-/**
- * i18n plugin options
- */
-export interface I18nPluginOptions {
-  /**
-   * Locale to use for translations
-   */
-  locale?: string | Intl.Locale
-  /**
-   * Translation adapter factory
-   */
-  translationAdapterFactory?: TranslationAdapterFactory
-  /**
-   * Built-in localizable resources
-   */
-  resources?: Record<string, Record<BuiltinResourceKeys, string>>
-}
 
 /**
  * i18n plugin
@@ -255,10 +216,15 @@ async function loadCommandResource(
   ctx: CommandContext,
   command: Command | LazyCommand
 ): Promise<CommandResource | undefined> {
+  // check if command has i18n resource support
+  if (!hasI18nResource(command)) {
+    return undefined
+  }
+
   let resource: CommandResource | undefined
   try {
     // TODO(kazupon): should check the resource which is a dictionary object
-    resource = await command.resource?.(ctx)
+    resource = await command.resource!(ctx)
   } catch {}
   return resource
 }
@@ -268,4 +234,10 @@ function mapResourceWithBuiltinKey(resource: Record<string, string>): Record<str
     acc[resolveBuiltInKey(key)] = value
     return acc
   }, Object.create(null))
+}
+
+function hasI18nResource<G extends GunshiParamsConstraint = DefaultGunshiParams>(
+  command: Command<G>
+): command is I18nCommand<G> {
+  return 'resource' in command && typeof command.resource === 'function'
 }

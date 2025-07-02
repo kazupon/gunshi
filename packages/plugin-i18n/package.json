@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/plugin-i18n",
-  "description": "i18n plugin for gunshi",
+  "description": "internationalization plugin for gunshi",
   "version": "0.26.3",
   "author": {
     "name": "kazuya kawaguchi",

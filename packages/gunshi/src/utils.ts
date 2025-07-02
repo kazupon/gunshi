@@ -24,15 +24,18 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
   name?: string | undefined,
   needRunResolving: boolean = false
 ): Promise<Command<G>> {
-  let command: Command<G> | undefined
+  let command: Command<G>
   if (isLazyCommand<G>(cmd)) {
-    command = Object.assign(create<Command<G>>(), {
+    const baseCommand: Record<string, unknown> = {
       name: cmd.commandName,
       description: cmd.description,
       args: cmd.args,
-      examples: cmd.examples,
-      resource: cmd.resource
-    })
+      examples: cmd.examples
+    }
+    if ('resource' in cmd && cmd.resource) {
+      baseCommand.resource = cmd.resource
+    }
+    command = Object.assign(create<Command<G>>(), baseCommand)
 
     if (needRunResolving) {
       const loaded = await cmd()
@@ -47,7 +50,10 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         command.description = loaded.description
         command.args = loaded.args
         command.examples = loaded.examples
-        command.resource = loaded.resource
+        if ('resource' in loaded && loaded.resource) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ;(command as any).resource = loaded.resource
+        }
       } else {
         throw new TypeError(`Cannot resolve command: ${cmd.name || name}`)
       }

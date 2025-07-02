@@ -7,16 +7,15 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../test/helper.ts'
-import i18n from './index.ts'
+import i18n, { defineI18n } from './index.ts'
 
+import type { Args, Command, GunshiParams } from '@gunshi/plugin'
 import type {
-  Args,
-  Command,
   CommandResource,
   CommandResourceFetcher,
-  GunshiParams
-} from '@gunshi/plugin'
-import type { TranslationAdapter } from './types.ts'
+  I18nCommandContext,
+  TranslationAdapter
+} from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -158,14 +157,7 @@ describe('translation adapter', () => {
       locale: loadLocale
     })
     using mockResource = vi
-      .fn<
-        CommandResourceFetcher<
-          GunshiParams<{
-            args: typeof args
-            extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
-          }>
-        >
-      >()
+      .fn<CommandResourceFetcher<{ extensions: { 'g:i18n': I18nCommandContext } }>>()
       .mockImplementation(ctx => {
         if (ctx.extensions['g:i18n'].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
@@ -174,30 +166,23 @@ describe('translation adapter', () => {
         }
       })
 
-    const command = {
+    const command = defineI18n({
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',
       run: vi.fn(),
       resource: mockResource
-    } satisfies Command<GunshiParams<{ args: typeof args }>>
+    })
 
-    const ctx = await createCommandContext<
-      GunshiParams<{
-        args: typeof args
-        extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
-      }>
-    >({
+    const ctx = await createCommandContext<{ extensions: { 'g:i18n': I18nCommandContext } }>({
       args,
       values: { foo: 'foo' },
       positionals: ['bar'],
       rest: [],
       argv: ['bar'],
-      tokens: [], // dummy, due to test
+      tokens: [],
       command,
-      extensions: {
-        'g:i18n': plugin.extension
-      },
+      extensions: { [plugin.id]: plugin.extension },
       omitted: false,
       callMode: 'entry',
       cliOptions: {
@@ -205,12 +190,11 @@ describe('translation adapter', () => {
       }
     })
 
+    const ext = ctx.extensions['g:i18n']
     const mf1 = new MessageFormat('ja-JP', jaJPResource['arg:foo'])
-    expect(ctx.extensions['g:i18n'].translate('arg:foo')).toEqual(mf1.format())
+    expect(ext.translate('arg:foo')).toEqual(mf1.format())
     const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
-    expect(ctx.extensions['g:i18n'].translate('user', { user: 'kazupon' })).toEqual(
-      mf2.format({ user: 'kazupon' })
-    )
+    expect(ext.translate('user', { user: 'kazupon' })).toEqual(mf2.format({ user: 'kazupon' }))
   })
 
   test('Intlify Message Format', async () => {
@@ -236,14 +220,7 @@ describe('translation adapter', () => {
       locale: loadLocale
     })
     using mockResource = vi
-      .fn<
-        CommandResourceFetcher<
-          GunshiParams<{
-            args: typeof args
-            extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
-          }>
-        >
-      >()
+      .fn<CommandResourceFetcher<{ extensions: { 'g:i18n': I18nCommandContext } }>>()
       .mockImplementation(ctx => {
         if (ctx.extensions['g:i18n'].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
@@ -252,30 +229,23 @@ describe('translation adapter', () => {
         }
       })
 
-    const command = {
+    const command = defineI18n({
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',
       run: vi.fn(),
       resource: mockResource
-    } satisfies Command<GunshiParams<{ args: typeof args }>>
+    })
 
-    const ctx = await createCommandContext<
-      GunshiParams<{
-        args: typeof args
-        extensions: { 'g:i18n': Awaited<ReturnType<typeof plugin.extension.factory>> }
-      }>
-    >({
+    const ctx = await createCommandContext<{ extensions: { 'g:i18n': I18nCommandContext } }>({
       args,
       values: { foo: 'foo' },
       positionals: ['bar'],
       rest: [],
       argv: ['bar'],
-      tokens: [], // dummy, due to test
+      tokens: [],
       command,
-      extensions: {
-        'g:i18n': plugin.extension
-      },
+      extensions: { [plugin.id]: plugin.extension },
       omitted: false,
       callMode: 'entry',
       cliOptions: {
@@ -283,9 +253,8 @@ describe('translation adapter', () => {
       }
     })
 
-    expect(ctx.extensions['g:i18n'].translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
-    expect(ctx.extensions['g:i18n'].translate('user', { user: 'kazupon' })).toEqual(
-      `こんにちは、kazupon`
-    )
+    const ext = ctx.extensions['g:i18n']
+    expect(ext.translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
+    expect(ext.translate('user', { user: 'kazupon' })).toEqual(`こんにちは、kazupon`)
   })
 })

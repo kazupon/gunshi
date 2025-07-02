@@ -5,16 +5,6 @@
 
 import type { CliOptions, DefaultGunshiParams } from './types.ts'
 
-export const BUILT_IN_PREFIX = '_'
-
-export const ARG_PREFIX = 'arg'
-
-export const BUILT_IN_KEY_SEPARATOR = ':'
-
-export const BUILD_IN_PREFIX_AND_KEY_SEPARATOR: string = `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}`
-
-export const ARG_PREFIX_AND_KEY_SEPARATOR: string = `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}`
-
 export const ANONYMOUS_COMMAND_NAME = '(anonymous)'
 
 export const NOOP: () => void = () => {}
