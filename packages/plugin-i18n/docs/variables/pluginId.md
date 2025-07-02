@@ -7,7 +7,7 @@
 # Variable: pluginId
 
 ```ts
-const pluginId: "g:i18n";
+const pluginId: GenerateNamespacedKey<"i18n", typeof PLUGIN_PREFIX>;
 ```
 
 The unique identifier for the i18n plugin.

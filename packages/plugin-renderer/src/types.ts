@@ -3,15 +3,16 @@
  * @license MIT
  */
 
-import { namespacedId } from '@gunshi/shared'
+import { namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
 
 import type { Command, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
-import type { CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
+import type { CommandArgKeys, CommandBuiltinKeys, GenerateNamespacedKey } from '@gunshi/shared'
 
 /**
  * The unique identifier for usage renderer plugin.
  */
-export const pluginId = namespacedId('renderer')
+export const pluginId: GenerateNamespacedKey<'renderer', typeof PLUGIN_PREFIX> =
+  namespacedId('renderer')
 
 /**
  * Type representing the unique identifier for usage renderer plugin.
