@@ -113,7 +113,7 @@ Example with globals plugin:
 ```ts
 import { cli } from 'gunshi'
 import i18n from '@gunshi/plugin-i18n'
-import globals from '@gunshi/plugin-globals'
+import globals from '@gunshi/plugin-global'
 
 await cli(args, command, {
   plugins: [
