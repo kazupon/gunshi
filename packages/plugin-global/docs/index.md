@@ -1,0 +1,38 @@
+**@gunshi/plugin-global**
+
+---
+
+# @gunshi/plugin-global
+
+The entry point of global options plugin
+
+## Example
+
+```js
+import global from '@gunshi/plugin-global'
+import { cli } from 'gunshi'
+
+const entry = ctx => {
+  // ...
+}
+
+await cli(process.argv.slice(2), entry, {
+  // ...
+
+  plugins: [global()]
+
+  // ...
+})
+```
+
+## Functions
+
+| Function                        | Description           |
+| ------------------------------- | --------------------- |
+| [default](functions/default.md) | global options plugin |
+
+## Interfaces
+
+| Interface                                                    | Description                                                                                                                                              |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [GlobalsCommandContext](interfaces/GlobalsCommandContext.md) | Extended command context which provides utilities via global options plugin. These utilities are available via `CommandContext.extensions['g:globals']`. |

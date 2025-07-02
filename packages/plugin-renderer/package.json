@@ -54,7 +54,9 @@
     }
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "pnpm run build:typedoc && pnpm run build:plugin",
+    "build:plugin": "tsdown",
+    "build:typedoc": "typedoc --excludeInternal",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
     "typecheck:deno": "deno check --import-map=../../import_map.json ./src"
@@ -71,6 +73,8 @@
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "typedoc": "catalog:",
+    "typedoc-plugin-markdown": "catalog:"
   }
 }

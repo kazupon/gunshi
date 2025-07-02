@@ -333,6 +333,12 @@ importers:
       tsdown:
         specifier: 'catalog:'
         version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
+      typedoc:
+        specifier: 'catalog:'
+        version: 0.28.4(typescript@5.8.3)
+      typedoc-plugin-markdown:
+        specifier: 'catalog:'
+        version: 4.6.3(typedoc@0.28.4(typescript@5.8.3))
 
   packages/plugin-i18n:
     dependencies:
@@ -404,6 +410,12 @@ importers:
       tsdown:
         specifier: 'catalog:'
         version: 0.12.3(oxc-resolver@9.0.2)(publint@0.3.12)(typescript@5.8.3)
+      typedoc:
+        specifier: 'catalog:'
+        version: 0.28.4(typescript@5.8.3)
+      typedoc-plugin-markdown:
+        specifier: 'catalog:'
+        version: 4.6.3(typedoc@0.28.4(typescript@5.8.3))
 
   packages/resources:
     devDependencies:
