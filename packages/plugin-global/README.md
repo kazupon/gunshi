@@ -98,14 +98,14 @@ Available extensions:
 ### Usage Example
 
 ```ts
-import global from '@gunshi/plugin-global'
+import global, { pluginId } from '@gunshi/plugin-global'
 import { cli } from 'gunshi'
 
 const command = {
   name: 'deploy',
   run: async ctx => {
     // Access globals extensions
-    const { showVersion, showHeader } = ctx.extensions['g:global']
+    const { showVersion, showHeader } = ctx.extensions[pluginId]
 
     // Manually show version if needed
     console.log(`Deploying with CLI version: ${showVersion()}`)
