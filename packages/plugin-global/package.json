@@ -52,9 +52,8 @@
     }
   },
   "scripts": {
-    "build": "pnpm run build:typedoc && pnpm run build:plugin",
-    "build:plugin": "tsdown",
-    "build:typedoc": "typedoc --excludeInternal",
+    "build": "tsdown",
+    "build:docs": "typedoc --excludeInternal",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
     "typecheck:deno": "deno check ./src"

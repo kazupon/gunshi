@@ -15,7 +15,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "pnpm run build:typedoc && pnpm run build:vitepress",
+    "build:docs": "pnpm run build:typedoc && pnpm run build:vitepress",
     "build:typedoc": "typedoc --excludeInternal",
     "build:vitepress": "vitepress build src",
     "dev": "pnpm run build:typedoc && pnpm run dev:vitepress",
