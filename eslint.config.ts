@@ -93,6 +93,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   globalIgnores([
     '.vscode',
     'tsconfig.json',
+    './packages/**/docs/**',
     'pnpm-lock.yaml',
     'playground/**',
     'design/**'

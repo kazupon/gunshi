@@ -1,7 +1,7 @@
 import {
   createCoreContext,
   getLocaleMessage,
-  NOT_REOSLVED,
+  NOT_REOSLVED as NOT_RESOLVED,
   setLocaleMessage,
   translate
 } from '@intlify/core'
@@ -126,6 +126,6 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
     }
 
     const ret = translate(this.#context, key, values)
-    return typeof ret === 'number' && ret === NOT_REOSLVED ? undefined : (ret as string)
+    return typeof ret === 'number' && ret === NOT_RESOLVED ? undefined : (ret as string)
   }
 }

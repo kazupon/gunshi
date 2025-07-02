@@ -36,7 +36,9 @@ export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiP
    * Translate a message
    * @param key Translation key
    * @param values Values to interpolate
-   * @returns Translated message
+   * @returns Translated message. If the key is not found:
+   *   - For custom keys: returns an empty string ('')
+   *   - For built-in keys (prefixed with '_:'): returns the key itself
    */
   translate: <
     T extends string = CommandBuiltinKeys,
@@ -78,11 +80,12 @@ export type TranslationAdapterFactory = (
  */
 export interface TranslationAdapterFactoryOptions {
   /**
-   * A locale.
+   * A locale (BCP 47 language tag).
    */
   locale: string
   /**
    * A fallback locale.
+   * @default DEFAULT_LOCALE ('en-US')
    */
   fallbackLocale: string
 }

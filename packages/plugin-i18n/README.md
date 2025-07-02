@@ -374,7 +374,7 @@ import i18n, { defineI18n } from '@gunshi/plugin-i18n'
 import {
   createCoreContext,
   getLocaleMessage,
-  NOT_REOSLVED,
+  NOT_REOSLVED as NOT_RESOLVED,
   setLocaleMessage,
   translate as intlifyTranslate
 } from '@intlify/core' // need to install `npm install --save @intlify/core@next`
@@ -434,7 +434,7 @@ class IntlifyTranslation {
 
     // Use Intlify's translate function
     const result = intlifyTranslate(this.#context, key, values)
-    return typeof result === 'number' && result === NOT_REOSLVED ? undefined : result
+    return typeof result === 'number' && result === NOT_RESOLVED ? undefined : result
   }
 }
 
@@ -517,6 +517,10 @@ With Intlify, you get advanced features like:
 > Intlify uses `{name}` syntax for interpolation (without the `$` prefix), which is different from Gunshi's default adapter that uses `{$name}`.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
+
+## API References
+
+See the [API References](./docs/index.md)
 
 ## License
 
