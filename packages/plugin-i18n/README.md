@@ -72,7 +72,7 @@ await cli(process.argv.slice(2), greetCommand, {
 })
 ```
 
-## Plugin Options
+## ⚙️ Plugin Options
 
 ### `locale`
 
@@ -94,7 +94,7 @@ await cli(process.argv.slice(2), greetCommand, {
 - Default: `createTranslationAdapter`
 - Description: Factory function to create a custom translation adapter. Useful for integrating with existing i18n libraries.
 
-## Plugin Dependencies
+## 🔗 Plugin Dependencies
 
 The i18n plugin has an optional dependency on the `g:globals` plugin:
 
@@ -132,7 +132,7 @@ await cli(args, command, {
 })
 ```
 
-## Helper Functions
+## 🛠️ Helper Functions
 
 ### `defineI18n`
 
@@ -185,7 +185,7 @@ const i18nCommand = withI18nResource(basicCommand, async ctx => {
 })
 ```
 
-## Context Extensions
+## 🧩 Context Extensions
 
 When using the i18n plugin, your command context is extended via `ctx.extensions['g:i18n']`.
 
@@ -201,7 +201,7 @@ Available extensions:
 - `locale: Intl.Locale`: The current locale
 - `translate<T>(key: T, values?: Record<string, unknown>): string`: Translation function
 
-## Resource Key Naming Conventions
+## 📝 Resource Key Naming Conventions
 
 When defining your localization resources (either directly in the `resource` function or in separate files), there are specific naming conventions to follow for the keys:
 
@@ -284,7 +284,7 @@ Bad Nested structure (won't work with `ctx.extensions['g:i18n'].translate('messa
 }
 ```
 
-## Translation Interpolation
+## 🔤 Translation Interpolation
 
 The default translation adapter supports simple interpolation using `{$key}` syntax:
 
@@ -311,7 +311,7 @@ translate('error_message', { error: 'File not found' }) // "Error: File not foun
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
-## Custom Translation Adapter
+## 🎨 Custom Translation Adapter
 
 The default translation adapter provides basic string interpolation, but you might want to integrate with more powerful i18n libraries for features like:
 
@@ -518,10 +518,10 @@ With Intlify, you get advanced features like:
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
-## API References
+## 📚 API References
 
 See the [API References](./docs/index.md)
 
-## License
+## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
