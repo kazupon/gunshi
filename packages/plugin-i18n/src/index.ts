@@ -34,8 +34,15 @@
  */
 
 import { plugin } from '@gunshi/plugin'
-import { BUILT_IN_PREFIX, DefaultResource, resolveArgKey, resolveBuiltInKey } from '@gunshi/shared'
+import {
+  BUILT_IN_PREFIX,
+  DefaultResource,
+  namespacedId,
+  resolveArgKey,
+  resolveBuiltInKey
+} from '@gunshi/shared'
 import { createTranslationAdapter } from './translation.ts'
+import { pluginId as id } from './types.ts'
 
 import type {
   Command,
@@ -55,8 +62,7 @@ import type {
 
 export * from './helpers.ts'
 export * from './translation.ts'
-
-export type * from './types.ts'
+export * from './types.ts'
 
 /**
  * The default locale string, which format is BCP 47 language tag.
@@ -93,10 +99,10 @@ export default function i18n(
   let builtInLoadedResources: Record<string, string> | undefined
 
   return plugin({
-    id: 'g:i18n',
-    name: 'i18n',
+    id,
+    name: 'internationalization',
 
-    dependencies: [{ id: 'g:global', optional: true }],
+    dependencies: [{ id: namespacedId('global'), optional: true }],
 
     extension: async () => {
       // define translate function

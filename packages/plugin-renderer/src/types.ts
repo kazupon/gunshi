@@ -3,8 +3,20 @@
  * @license MIT
  */
 
+import { namespacedId } from '@gunshi/shared'
+
 import type { Command, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
 import type { CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
+
+/**
+ * The unique identifier for usage renderer plugin.
+ */
+export const pluginId = namespacedId('renderer')
+
+/**
+ * Type representing the unique identifier for usage renderer plugin.
+ */
+export type PluginId = typeof pluginId
 
 /**
  * Extended command context which provides utilities via usage renderer plugin.

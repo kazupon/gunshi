@@ -5,6 +5,8 @@
 
 export const BUILT_IN_PREFIX = '_'
 
+export const PLUGIN_PREFIX = 'g'
+
 export const ARG_PREFIX = 'arg'
 
 export const BUILT_IN_KEY_SEPARATOR = ':'

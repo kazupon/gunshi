@@ -13,7 +13,7 @@ import type {
   GunshiParamsConstraint,
   NormalizeToGunshiParams
 } from '@gunshi/plugin'
-import { ARG_PREFIX, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
+import { ARG_PREFIX, CommandArgKeys, CommandBuiltinKeys, namespacedId } from '@gunshi/shared'
 
 import type {
   BuiltinResourceKeys,
@@ -21,6 +21,16 @@ import type {
   KeyOfArgs,
   RemovedIndex
 } from '@gunshi/shared'
+
+/**
+ * The unique identifier for the i18n plugin.
+ */
+export const pluginId = namespacedId('i18n')
+
+/**
+ * Type representing the unique identifier for i18n plugin.
+ */
+export type PluginId = typeof pluginId
 
 /**
  * Extended command context which provides utilities via i18n plugin.

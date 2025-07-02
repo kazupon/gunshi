@@ -2,19 +2,21 @@ import { expect, test, vi } from 'vitest'
 import { createMockCommandContext } from '../../gunshi/test/utils.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
+import { pluginId } from './types.ts'
 
 import type { GlobalCommandContext } from './extension.ts'
+import type { PluginId } from './types.ts'
 
 test('enable version option', async () => {
   const version = '1.0.0'
   const ctx = await createMockCommandContext<{
-    'g:global': GlobalCommandContext
+    [K in PluginId]: GlobalCommandContext
   }>({
     version,
     values: { version: true },
     extensions: {
-      'g:global': {
-        key: Symbol('g:global'),
+      [pluginId]: {
+        key: Symbol(pluginId),
         factory: extension
       }
     }
@@ -29,13 +31,13 @@ test('enable version option', async () => {
 test('enable help option', async () => {
   const usage = 'Usage: test [options]'
   const ctx = await createMockCommandContext<{
-    'g:global': GlobalCommandContext
+    [K in PluginId]: GlobalCommandContext
   }>({
     renderUsage: async () => usage,
     values: { help: true },
     extensions: {
-      'g:global': {
-        key: Symbol('g:global'),
+      [pluginId]: {
+        key: Symbol(pluginId),
         factory: extension
       }
     }
@@ -51,14 +53,14 @@ test('header rendering', async () => {
   const header = 'Welcome to the Test Application'
   const usage = 'Usage: test [options]'
   const ctx = await createMockCommandContext<{
-    'g:global': GlobalCommandContext
+    [K in PluginId]: GlobalCommandContext
   }>({
     renderHeader: async () => header,
     renderUsage: async () => usage,
     values: { help: true },
     extensions: {
-      'g:global': {
-        key: Symbol('g:global'),
+      [pluginId]: {
+        key: Symbol(pluginId),
         factory: extension
       }
     }
@@ -72,12 +74,12 @@ test('header rendering', async () => {
 
 test('base runner execution', async () => {
   const ctx = await createMockCommandContext<{
-    'g:global': GlobalCommandContext
+    [K in PluginId]: GlobalCommandContext
   }>({
     values: {},
     extensions: {
-      'g:global': {
-        key: Symbol('g:global'),
+      [pluginId]: {
+        key: Symbol(pluginId),
         factory: extension
       }
     }

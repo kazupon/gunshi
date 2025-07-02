@@ -25,6 +25,12 @@ await cli(process.argv.slice(2), entry, {
 })
 ```
 
+## Variables
+
+| Variable                          | Description                                          |
+| --------------------------------- | ---------------------------------------------------- |
+| [pluginId](variables/pluginId.md) | The unique identifier for the global options plugin. |
+
 ## Functions
 
 | Function                        | Description           |
@@ -33,6 +39,12 @@ await cli(process.argv.slice(2), entry, {
 
 ## Interfaces
 
-| Interface                                                  | Description                                                                                                                                            |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [GlobalCommandContext](interfaces/GlobalCommandContext.md) | Extended command context which provides utilities via global options plugin. These utilities are available via `CommandContext.extensions['g:global]`. |
+| Interface                                                  | Description                                                                                                                                             |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [GlobalCommandContext](interfaces/GlobalCommandContext.md) | Extended command context which provides utilities via global options plugin. These utilities are available via `CommandContext.extensions['g:global']`. |
+
+## Type Aliases
+
+| Type Alias                           | Description                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------- |
+| [PluginId](type-aliases/PluginId.md) | Type representing the unique identifier for the global options plugin. |

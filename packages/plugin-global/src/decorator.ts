@@ -3,8 +3,11 @@
  * @license MIT
  */
 
+import { pluginId as I18n } from './types.ts'
+
 import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
 import type { GlobalCommandContext } from './extension.ts'
+import type { PluginId } from './types.ts'
 
 /**
  * Decorator function to extend the command with global options.
@@ -12,14 +15,14 @@ import type { GlobalCommandContext } from './extension.ts'
 const decorator: CommandDecorator<{
   args: DefaultGunshiParams['args']
   extensions: {
-    'g:global': GlobalCommandContext
+    [K in PluginId]: GlobalCommandContext
   }
 }> = baseRunner => async ctx => {
   const {
     values,
     validationError,
     extensions: {
-      'g:global': { showVersion, showHeader, showUsage, showValidationErrors }
+      [I18n]: { showVersion, showHeader, showUsage, showValidationErrors }
     }
   } = ctx
 

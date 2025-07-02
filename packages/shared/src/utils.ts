@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
+import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, PLUGIN_PREFIX } from './constants.ts'
 
 import type {
   Args,
@@ -42,4 +42,10 @@ export async function resolveExamples<G extends GunshiParamsConstraint = Default
     : typeof examples === 'function'
       ? await examples(ctx)
       : ''
+}
+
+export function namespacedId<K extends string>(
+  id: K
+): GenerateNamespacedKey<K, typeof PLUGIN_PREFIX> {
+  return `${PLUGIN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${id}`
 }

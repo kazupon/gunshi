@@ -1,27 +1,29 @@
 import { describe, expect, test } from 'vitest'
 import { createMockCommandContext } from '../../gunshi/test/utils.ts'
 import extension from './extension.ts'
+import { pluginId } from './types.ts'
 
 import type { GlobalCommandContext } from './extension.ts'
+import type { PluginId } from './types.ts'
 
 describe('showVersion', () => {
   test('basic', async () => {
     const version = '1.0.0'
     const {
       log,
-      extensions: { 'g:global': globals }
+      extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      'g:global': GlobalCommandContext
+      [K in PluginId]: GlobalCommandContext
     }>({
       version,
       extensions: {
-        'g:global': {
-          key: Symbol('g:global'),
+        [pluginId]: {
+          key: Symbol(pluginId),
           factory: extension
         }
       }
     })
-    const rendered = globals.showVersion()
+    const rendered = global.showVersion()
 
     expect(rendered).toEqual(version)
     expect(log).toHaveBeenCalledWith(version)
@@ -30,19 +32,19 @@ describe('showVersion', () => {
   test('no version', async () => {
     const {
       log,
-      extensions: { 'g:global': globals }
+      extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      'g:global': GlobalCommandContext
+      [K in PluginId]: GlobalCommandContext
     }>({
       version: null,
       extensions: {
-        'g:global': {
-          key: Symbol('g:global'),
+        [pluginId]: {
+          key: Symbol(pluginId),
           factory: extension
         }
       }
     })
-    const rendered = await globals.showVersion()
+    const rendered = await global.showVersion()
 
     expect(rendered).toBe('unknown')
     expect(log).toHaveBeenCalledWith('unknown')
@@ -52,20 +54,20 @@ describe('showVersion', () => {
     const version = '1.0.0'
     const {
       log,
-      extensions: { 'g:global': globals }
+      extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      'g:global': GlobalCommandContext
+      [K in PluginId]: GlobalCommandContext
     }>({
       version,
       usageSilent: true,
       extensions: {
-        'g:global': {
-          key: Symbol('g:global'),
+        [pluginId]: {
+          key: Symbol(pluginId),
           factory: extension
         }
       }
     })
-    const rendered = await globals.showVersion()
+    const rendered = await global.showVersion()
 
     expect(rendered).toEqual(version)
     expect(log).not.toHaveBeenCalled()
@@ -77,19 +79,19 @@ describe('showHeader', () => {
     const header = 'Welcome to the Test Application'
     const {
       log,
-      extensions: { 'g:global': globals }
+      extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      'g:global': GlobalCommandContext
+      [K in PluginId]: GlobalCommandContext
     }>({
       renderHeader: async () => header,
       extensions: {
-        'g:global': {
-          key: Symbol('g:global'),
+        [pluginId]: {
+          key: Symbol(pluginId),
           factory: extension
         }
       }
     })
-    const rendered = await globals.showHeader()
+    const rendered = await global.showHeader()
 
     expect(rendered).toEqual(header)
     expect(log).toHaveBeenCalledWith(header)
@@ -98,19 +100,19 @@ describe('showHeader', () => {
 
   test('no header', async () => {
     const {
-      extensions: { 'g:global': globals }
+      extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      'g:global': GlobalCommandContext
+      [K in PluginId]: GlobalCommandContext
     }>({
       renderHeader: null,
       extensions: {
-        'g:global': {
-          key: Symbol('g:global'),
+        [pluginId]: {
+          key: Symbol(pluginId),
           factory: extension
         }
       }
     })
-    const rendered = await globals.showHeader()
+    const rendered = await global.showHeader()
 
     expect(rendered).toBeUndefined()
   })
@@ -121,19 +123,19 @@ describe('showUsage', () => {
     const usage = 'Usage: test-app [options]'
     const {
       log,
-      extensions: { 'g:global': globals }
+      extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      'g:global': GlobalCommandContext
+      [K in PluginId]: GlobalCommandContext
     }>({
       renderUsage: async () => usage,
       extensions: {
-        'g:global': {
-          key: Symbol('g:global'),
+        [pluginId]: {
+          key: Symbol(pluginId),
           factory: extension
         }
       }
     })
-    const rendered = await globals.showUsage()
+    const rendered = await global.showUsage()
 
     expect(rendered).toEqual(usage)
     expect(log).toHaveBeenCalledWith(usage)
@@ -141,19 +143,19 @@ describe('showUsage', () => {
 
   test('no usage', async () => {
     const {
-      extensions: { 'g:global': globals }
+      extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      'g:global': GlobalCommandContext
+      [K in PluginId]: GlobalCommandContext
     }>({
       renderUsage: null,
       extensions: {
-        'g:global': {
-          key: Symbol('g:global'),
+        [pluginId]: {
+          key: Symbol(pluginId),
           factory: extension
         }
       }
     })
-    const rendered = await globals.showUsage()
+    const rendered = await global.showUsage()
 
     expect(rendered).toBeUndefined()
   })

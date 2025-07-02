@@ -35,10 +35,12 @@ import {
   ARG_PREFIX_AND_KEY_SEPARATOR,
   BUILD_IN_PREFIX_AND_KEY_SEPARATOR,
   DefaultResource,
+  namespacedId,
   resolveExamples,
   resolveLazyCommand
 } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
+import { pluginId as id } from './types.ts'
 import { makeShortLongOptionPair, renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'
 
@@ -53,7 +55,7 @@ import type {
 } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 import type { CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
-import type { UsageRendererCommandContext } from './types.ts'
+import type { PluginId, UsageRendererCommandContext } from './types.ts'
 
 export { renderHeader } from './header.ts'
 export { renderUsage } from './usage.ts'
@@ -65,28 +67,29 @@ export type { UsageRendererCommandContext } from './types.ts'
 type RendererCommandContext = GunshiParams<{
   args: Args
   extensions: {
-    'g:renderer': UsageRendererCommandContext<DefaultGunshiParams>
+    [K in PluginId]: UsageRendererCommandContext<DefaultGunshiParams>
   }
 }>
+
+const i18nPluginId = namespacedId('i18n')
 
 /**
  * usage renderer plugin
  */
 export default function renderer(): PluginWithExtension<UsageRendererCommandContext> {
   return plugin({
-    id: 'g:renderer',
+    id,
     name: 'usage renderer',
 
-    dependencies: [{ id: 'g:i18n', optional: true }],
+    dependencies: [{ id: i18nPluginId, optional: true }],
 
     extension: (ctx: CommandContextCore, cmd: Command): UsageRendererCommandContext => {
-      // TODO(kazupon): This is a workaround for the type system.
       const {
-        extensions: { 'g:i18n': i18n }
+        extensions: { [i18nPluginId]: i18n }
       } = ctx as unknown as CommandContext<{
         args: Args
         extensions: {
-          'g:i18n'?: I18nCommandContext
+          [i18nPluginId]?: I18nCommandContext
         }
       }>
 

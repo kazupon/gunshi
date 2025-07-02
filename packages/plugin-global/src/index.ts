@@ -33,18 +33,20 @@ import { plugin } from '@gunshi/plugin'
 import { COMMON_ARGS } from '@gunshi/shared'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
+import { pluginId as id } from './types.ts'
 
 import type { PluginWithExtension } from '@gunshi/plugin'
 import type { GlobalCommandContext } from './extension.ts'
 
 export type { GlobalCommandContext } from './extension.ts'
+export * from './types.ts'
 
 /**
  * global options plugin
  */
 export default function global(): PluginWithExtension<GlobalCommandContext> {
   return plugin({
-    id: 'g:global',
+    id,
     name: 'global options',
 
     // install global options plugin extension

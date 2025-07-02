@@ -35,6 +35,7 @@ await cli(process.argv.slice(2), entry, {
 | Variable                                      | Description                                                     |
 | --------------------------------------------- | --------------------------------------------------------------- |
 | [DEFAULT_LOCALE](variables/DEFAULT_LOCALE.md) | The default locale string, which format is BCP 47 language tag. |
+| [pluginId](variables/pluginId.md)             | The unique identifier for the i18n plugin.                      |
 
 ## Functions
 
@@ -63,9 +64,10 @@ await cli(process.argv.slice(2), entry, {
 
 ## Type Aliases
 
-| Type Alias                                                             | Description                            |
-| ---------------------------------------------------------------------- | -------------------------------------- |
-| [CommandExamplesFetcher](type-aliases/CommandExamplesFetcher.md)       | Command examples fetcher.              |
-| [CommandResource](type-aliases/CommandResource.md)                     | Command resource type for i18n plugin. |
-| [CommandResourceFetcher](type-aliases/CommandResourceFetcher.md)       | Command resource fetcher.              |
-| [TranslationAdapterFactory](type-aliases/TranslationAdapterFactory.md) | Translation adapter factory.           |
+| Type Alias                                                             | Description                                              |
+| ---------------------------------------------------------------------- | -------------------------------------------------------- |
+| [CommandExamplesFetcher](type-aliases/CommandExamplesFetcher.md)       | Command examples fetcher.                                |
+| [CommandResource](type-aliases/CommandResource.md)                     | Command resource type for i18n plugin.                   |
+| [CommandResourceFetcher](type-aliases/CommandResourceFetcher.md)       | Command resource fetcher.                                |
+| [PluginId](type-aliases/PluginId.md)                                   | Type representing the unique identifier for i18n plugin. |
+| [TranslationAdapterFactory](type-aliases/TranslationAdapterFactory.md) | Translation adapter factory.                             |

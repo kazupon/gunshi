@@ -1,12 +1,12 @@
 import { define } from '@gunshi/definition'
-import global from '@gunshi/plugin-global'
+import global, { pluginId as globalPluginId } from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
 import { describe, expect, test, vi } from 'vitest'
 import { cli } from './index.ts'
 
-import type { GlobalCommandContext } from '@gunshi/plugin-global'
+import type { GlobalCommandContext, PluginId } from '@gunshi/plugin-global'
 
-const entry = define<{ 'g:global': GlobalCommandContext }>({
+const entry = define<{ [K in PluginId]: GlobalCommandContext }>({
   name: 'entry',
   args: {
     say: {
@@ -17,7 +17,7 @@ const entry = define<{ 'g:global': GlobalCommandContext }>({
   },
   run: ctx => {
     if (ctx.values.say === 'version?') {
-      ctx.extensions['g:global'].showVersion()
+      ctx.extensions[globalPluginId].showVersion()
       return
     }
     return `You said: ${ctx.values.say}`

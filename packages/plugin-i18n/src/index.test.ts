@@ -1,4 +1,4 @@
-import { resolveBuiltInKey } from '@gunshi/shared'
+import { namespacedId, resolveBuiltInKey } from '@gunshi/shared'
 import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
@@ -156,10 +156,12 @@ describe('translation adapter', () => {
       translationAdapterFactory: createTranslationAdapterForMessageFormat2,
       locale: loadLocale
     })
+
+    const id = namespacedId('i18n')
     using mockResource = vi
-      .fn<CommandResourceFetcher<{ extensions: { 'g:i18n': I18nCommandContext } }>>()
+      .fn<CommandResourceFetcher<{ extensions: { [K in typeof id]: I18nCommandContext } }>>()
       .mockImplementation(ctx => {
-        if (ctx.extensions['g:i18n'].locale.toString() === loadLocale) {
+        if (ctx.extensions[id].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
@@ -174,7 +176,9 @@ describe('translation adapter', () => {
       resource: mockResource
     })
 
-    const ctx = await createCommandContext<{ extensions: { 'g:i18n': I18nCommandContext } }>({
+    const ctx = await createCommandContext<{
+      extensions: { [K in typeof id]: I18nCommandContext }
+    }>({
       args,
       values: { foo: 'foo' },
       positionals: ['bar'],
@@ -190,7 +194,7 @@ describe('translation adapter', () => {
       }
     })
 
-    const ext = ctx.extensions['g:i18n']
+    const ext = ctx.extensions[id]
     const mf1 = new MessageFormat('ja-JP', jaJPResource['arg:foo'])
     expect(ext.translate('arg:foo')).toEqual(mf1.format())
     const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
@@ -219,10 +223,12 @@ describe('translation adapter', () => {
       translationAdapterFactory: createTranslationAdapterForIntlifyMessageFormat,
       locale: loadLocale
     })
+
+    const id = namespacedId('i18n')
     using mockResource = vi
-      .fn<CommandResourceFetcher<{ extensions: { 'g:i18n': I18nCommandContext } }>>()
+      .fn<CommandResourceFetcher<{ extensions: { [K in typeof id]: I18nCommandContext } }>>()
       .mockImplementation(ctx => {
-        if (ctx.extensions['g:i18n'].locale.toString() === loadLocale) {
+        if (ctx.extensions[id].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
@@ -237,7 +243,9 @@ describe('translation adapter', () => {
       resource: mockResource
     })
 
-    const ctx = await createCommandContext<{ extensions: { 'g:i18n': I18nCommandContext } }>({
+    const ctx = await createCommandContext<{
+      extensions: { [K in typeof id]: I18nCommandContext }
+    }>({
       args,
       values: { foo: 'foo' },
       positionals: ['bar'],
@@ -253,7 +261,7 @@ describe('translation adapter', () => {
       }
     })
 
-    const ext = ctx.extensions['g:i18n']
+    const ext = ctx.extensions[id]
     expect(ext.translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
     expect(ext.translate('user', { user: 'kazupon' })).toEqual(`こんにちは、kazupon`)
   })
