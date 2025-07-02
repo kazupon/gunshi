@@ -1,6 +1,8 @@
-# `@gunshi/plugin-global`
+# @gunshi/plugin-global
 
-> global options plugin for gunshi
+> global options plugin for gunshi.
+
+This plugin provides standard global options (`--help` and `--version`) for all commands in your CLI application. It's installed by default in gunshi, ensuring consistent behavior across all CLI applications.
 
 ## 💿 Installation
 
@@ -23,19 +25,28 @@ bun add @gunshi/plugin-global
 
 ## 🚀 Usage
 
-```js
+```ts
 import global from '@gunshi/plugin-global'
 import { cli } from 'gunshi'
 
-const entry = ctx => {
-  // your entry ...
+const command = {
+  name: 'my-command',
+  args: {
+    target: {
+      type: 'string',
+      description: 'Target to process'
+    }
+  },
+  run: ctx => {
+    console.log(`Processing ${ctx.values.target}`)
+  }
 }
 
-await cli(process.argv.slice(2), entry, {
-  // ...
-
+await cli(process.argv.slice(2), command, {
+  name: 'my-cli',
+  version: '1.0.0',
   plugins: [
-    global() // install global options plugin
+    global() // Adds --help and --version options
   ]
 })
 ```
@@ -43,57 +54,91 @@ await cli(process.argv.slice(2), entry, {
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!TIP]
-> This plugin is installed in gunshi **as default**.
+> This plugin is installed in gunshi **by default**. You don't need to explicitly add it unless you've disabled default plugins.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## ✨ Features
 
-### Enable globally options
+### Global Options
 
-This plugin will add the following options to your all commands as globally.
+This plugin automatically adds the following options to all commands:
 
-- `--help`, `-h`: help option, which show the command usage
-- `--version`, `-v`: version option, which show the your application version
+- **`--help`, `-h`**: Display the command usage and available options
+- **`--version`, `-v`**: Display the application version
 
-### Extensions
+### Automatic Behavior
 
-This plugin extends gunshi's `CommandContext` to provide the following `GlobalsCommandContext`:
+When these options are used:
+
+- **With `--help`**: The command execution is bypassed, and the usage information is displayed instead
+- **With `--version`**: The command execution is bypassed, and only the version number is printed
+
+## 🧩 Context Extensions
+
+When using the global plugin, your command context is extended via `ctx.extensions['g:globals']`.
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!IMPORTANT]
+> This plugin extension is namespaced in `CommandContext.extensions` using this plugin ID `g:globals` by the gunshi plugin system.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+Available extensions:
+
+- **`showVersion(): string`**: Display the application version. Returns `'unknown'` if no version is specified in the CLI configuration.
+
+- **`showHeader(): Awaitable<string | undefined>`**: Display the application header. Returns `undefined` if no `renderHeader` function is provided in the CLI configuration.
+
+- **`showUsage(): Awaitable<string | undefined>`**: Display the command usage information. This is automatically called when `--help` is used. Returns `undefined` if no `renderUsage` function is provided.
+
+- **`showValidationErrors(error: AggregateError): Awaitable<string | undefined>`**: Display validation errors when argument validation fails. Returns `undefined` if `renderValidationErrors` is null.
+
+### Usage Example
 
 ```ts
-/**
- * Extended command context which provides utilities via global options plugin.
- * These utilities are available via `CommandContext.extensions.globals`.
- */
-interface GlobalsCommandContext {
-  /**
-   * Show the version of the application. if `--version` option is specified, it will print the version to the console.
-   * @returns The version of the application, or `unknown` if the version is not specified.
-   */
-  showVersion: () => string
+import global from '@gunshi/plugin-global'
+import { cli } from 'gunshi'
 
-  /**
-   * Show the header of the application.
-   * @returns The header of the application, or `undefined` if the `renderHeader` is not specified.
-   */
-  showHeader: () => Awaitable<string | undefined>
+const command = {
+  name: 'deploy',
+  run: async ctx => {
+    // Access globals extensions
+    const { showVersion, showHeader } = ctx.extensions['g:globals']
 
-  /**
-   * Show the usage of the application. if `--help` option is specified, it will print the usage to the console.
-   * @returns The usage of the application, or `undefined` if the `renderUsage` is not specified.
-   */
-  showUsage: () => Awaitable<string | undefined>
+    // Manually show version if needed
+    console.log(`Deploying with CLI version: ${showVersion()}`)
 
-  /**
-   * Show validation errors. This is called when argument validation fails.
-   * @param error The aggregate error containing validation failures
-   * @returns The rendered error message, or `undefined` if `renderValidationErrors` is null
-   */
-  showValidationErrors: (error: AggregateError) => Awaitable<string | undefined>
+    // Show custom header
+    const header = await showHeader()
+    if (header) {
+      console.log(header)
+    }
+
+    // Your command logic here...
+  }
 }
+
+await cli(process.argv.slice(2), command, {
+  name: 'deploy-cli',
+  version: '2.1.0',
+  plugins: [global()],
+
+  // Optional: Custom header renderer
+  renderHeader: async () => {
+    return `
+╔══════════════════════╗
+║   Deploy CLI v2.1.0  ║
+╚══════════════════════╝
+`
+  }
+})
 ```
 
-TODO(kazupon): more explanation
+## 📚 API References
+
+See the [API References](./docs/index.md)
 
 ## ©️ License
 
