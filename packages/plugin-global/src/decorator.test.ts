@@ -3,18 +3,18 @@ import { createMockCommandContext } from '../../gunshi/test/utils.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
 
-import type { GlobalsCommandContext } from './extension.ts'
+import type { GlobalCommandContext } from './extension.ts'
 
 test('enable version option', async () => {
   const version = '1.0.0'
   const ctx = await createMockCommandContext<{
-    'g:globals': GlobalsCommandContext
+    'g:global': GlobalCommandContext
   }>({
     version,
     values: { version: true },
     extensions: {
-      'g:globals': {
-        key: Symbol('g:globals'),
+      'g:global': {
+        key: Symbol('g:global'),
         factory: extension
       }
     }
@@ -29,13 +29,13 @@ test('enable version option', async () => {
 test('enable help option', async () => {
   const usage = 'Usage: test [options]'
   const ctx = await createMockCommandContext<{
-    'g:globals': GlobalsCommandContext
+    'g:global': GlobalCommandContext
   }>({
     renderUsage: async () => usage,
     values: { help: true },
     extensions: {
-      'g:globals': {
-        key: Symbol('g:globals'),
+      'g:global': {
+        key: Symbol('g:global'),
         factory: extension
       }
     }
@@ -51,14 +51,14 @@ test('header rendering', async () => {
   const header = 'Welcome to the Test Application'
   const usage = 'Usage: test [options]'
   const ctx = await createMockCommandContext<{
-    'g:globals': GlobalsCommandContext
+    'g:global': GlobalCommandContext
   }>({
     renderHeader: async () => header,
     renderUsage: async () => usage,
     values: { help: true },
     extensions: {
-      'g:globals': {
-        key: Symbol('g:globals'),
+      'g:global': {
+        key: Symbol('g:global'),
         factory: extension
       }
     }
@@ -72,12 +72,12 @@ test('header rendering', async () => {
 
 test('base runner execution', async () => {
   const ctx = await createMockCommandContext<{
-    'g:globals': GlobalsCommandContext
+    'g:global': GlobalCommandContext
   }>({
     values: {},
     extensions: {
-      'g:globals': {
-        key: Symbol('g:globals'),
+      'g:global': {
+        key: Symbol('g:global'),
         factory: extension
       }
     }

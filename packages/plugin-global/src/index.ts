@@ -35,16 +35,16 @@ import decorator from './decorator.ts'
 import extension from './extension.ts'
 
 import type { PluginWithExtension } from '@gunshi/plugin'
-import type { GlobalsCommandContext } from './extension.ts'
+import type { GlobalCommandContext } from './extension.ts'
 
-export type { GlobalsCommandContext } from './extension.ts'
+export type { GlobalCommandContext } from './extension.ts'
 
 /**
  * global options plugin
  */
-export default function globals(): PluginWithExtension<GlobalsCommandContext> {
+export default function global(): PluginWithExtension<GlobalCommandContext> {
   return plugin({
-    id: 'g:globals',
+    id: 'g:global',
     name: 'global options',
 
     // install global options plugin extension

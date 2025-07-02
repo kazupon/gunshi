@@ -2,12 +2,12 @@
 
 ---
 
-[@gunshi/plugin-global](../index.md) / GlobalsCommandContext
+[@gunshi/plugin-global](../index.md) / GlobalCommandContext
 
-# Interface: GlobalsCommandContext
+# Interface: GlobalCommandContext
 
 Extended command context which provides utilities via global options plugin.
-These utilities are available via `CommandContext.extensions['g:globals']`.
+These utilities are available via `CommandContext.extensions['g:global']`.
 
 ## Properties
 

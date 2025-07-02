@@ -2,21 +2,21 @@ import { describe, expect, test } from 'vitest'
 import { createMockCommandContext } from '../../gunshi/test/utils.ts'
 import extension from './extension.ts'
 
-import type { GlobalsCommandContext } from './extension.ts'
+import type { GlobalCommandContext } from './extension.ts'
 
 describe('showVersion', () => {
   test('basic', async () => {
     const version = '1.0.0'
     const {
       log,
-      extensions: { 'g:globals': globals }
+      extensions: { 'g:global': globals }
     } = await createMockCommandContext<{
-      'g:globals': GlobalsCommandContext
+      'g:global': GlobalCommandContext
     }>({
       version,
       extensions: {
-        'g:globals': {
-          key: Symbol('g:globals'),
+        'g:global': {
+          key: Symbol('g:global'),
           factory: extension
         }
       }
@@ -30,14 +30,14 @@ describe('showVersion', () => {
   test('no version', async () => {
     const {
       log,
-      extensions: { 'g:globals': globals }
+      extensions: { 'g:global': globals }
     } = await createMockCommandContext<{
-      'g:globals': GlobalsCommandContext
+      'g:global': GlobalCommandContext
     }>({
       version: null,
       extensions: {
-        'g:globals': {
-          key: Symbol('g:globals'),
+        'g:global': {
+          key: Symbol('g:global'),
           factory: extension
         }
       }
@@ -52,15 +52,15 @@ describe('showVersion', () => {
     const version = '1.0.0'
     const {
       log,
-      extensions: { 'g:globals': globals }
+      extensions: { 'g:global': globals }
     } = await createMockCommandContext<{
-      'g:globals': GlobalsCommandContext
+      'g:global': GlobalCommandContext
     }>({
       version,
       usageSilent: true,
       extensions: {
-        'g:globals': {
-          key: Symbol('g:globals'),
+        'g:global': {
+          key: Symbol('g:global'),
           factory: extension
         }
       }
@@ -77,14 +77,14 @@ describe('showHeader', () => {
     const header = 'Welcome to the Test Application'
     const {
       log,
-      extensions: { 'g:globals': globals }
+      extensions: { 'g:global': globals }
     } = await createMockCommandContext<{
-      'g:globals': GlobalsCommandContext
+      'g:global': GlobalCommandContext
     }>({
       renderHeader: async () => header,
       extensions: {
-        'g:globals': {
-          key: Symbol('g:globals'),
+        'g:global': {
+          key: Symbol('g:global'),
           factory: extension
         }
       }
@@ -98,14 +98,14 @@ describe('showHeader', () => {
 
   test('no header', async () => {
     const {
-      extensions: { 'g:globals': globals }
+      extensions: { 'g:global': globals }
     } = await createMockCommandContext<{
-      'g:globals': GlobalsCommandContext
+      'g:global': GlobalCommandContext
     }>({
       renderHeader: null,
       extensions: {
-        'g:globals': {
-          key: Symbol('g:globals'),
+        'g:global': {
+          key: Symbol('g:global'),
           factory: extension
         }
       }
@@ -121,14 +121,14 @@ describe('showUsage', () => {
     const usage = 'Usage: test-app [options]'
     const {
       log,
-      extensions: { 'g:globals': globals }
+      extensions: { 'g:global': globals }
     } = await createMockCommandContext<{
-      'g:globals': GlobalsCommandContext
+      'g:global': GlobalCommandContext
     }>({
       renderUsage: async () => usage,
       extensions: {
-        'g:globals': {
-          key: Symbol('g:globals'),
+        'g:global': {
+          key: Symbol('g:global'),
           factory: extension
         }
       }
@@ -141,14 +141,14 @@ describe('showUsage', () => {
 
   test('no usage', async () => {
     const {
-      extensions: { 'g:globals': globals }
+      extensions: { 'g:global': globals }
     } = await createMockCommandContext<{
-      'g:globals': GlobalsCommandContext
+      'g:global': GlobalCommandContext
     }>({
       renderUsage: null,
       extensions: {
-        'g:globals': {
-          key: Symbol('g:globals'),
+        'g:global': {
+          key: Symbol('g:global'),
           factory: extension
         }
       }

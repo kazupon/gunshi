@@ -4,7 +4,7 @@
  */
 
 import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
-import type { GlobalsCommandContext } from './extension.ts'
+import type { GlobalCommandContext } from './extension.ts'
 
 /**
  * Decorator function to extend the command with global options.
@@ -12,14 +12,14 @@ import type { GlobalsCommandContext } from './extension.ts'
 const decorator: CommandDecorator<{
   args: DefaultGunshiParams['args']
   extensions: {
-    'g:globals': GlobalsCommandContext
+    'g:global': GlobalCommandContext
   }
 }> = baseRunner => async ctx => {
   const {
     values,
     validationError,
     extensions: {
-      'g:globals': { showVersion, showHeader, showUsage, showValidationErrors }
+      'g:global': { showVersion, showHeader, showUsage, showValidationErrors }
     }
   } = ctx
 

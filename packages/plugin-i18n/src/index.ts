@@ -96,7 +96,7 @@ export default function i18n(
     id: 'g:i18n',
     name: 'i18n',
 
-    dependencies: [{ id: 'g:globals', optional: true }],
+    dependencies: [{ id: 'g:global', optional: true }],
 
     extension: async () => {
       // define translate function

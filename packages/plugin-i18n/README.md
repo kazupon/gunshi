@@ -96,9 +96,9 @@ await cli(process.argv.slice(2), greetCommand, {
 
 ## 🔗 Plugin Dependencies
 
-The i18n plugin has an optional dependency on the `g:globals` plugin:
+The i18n plugin has an optional dependency on the `g:global` plugin:
 
-- **Plugin ID**: `g:globals` (optional)
+- **Plugin ID**: `g:global` (optional)
 - **Purpose**: Provides global options support for `--help` and `--version`
 - **Effect**: When the globals plugin is present, the i18n plugin automatically sets up translations for the `help` and `version` built-in resources
 

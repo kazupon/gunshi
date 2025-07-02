@@ -4,9 +4,9 @@ import renderer from '@gunshi/plugin-renderer'
 import { describe, expect, test, vi } from 'vitest'
 import { cli } from './index.ts'
 
-import type { GlobalsCommandContext } from '@gunshi/plugin-global'
+import type { GlobalCommandContext } from '@gunshi/plugin-global'
 
-const entry = define<{ 'g:globals': GlobalsCommandContext }>({
+const entry = define<{ 'g:global': GlobalCommandContext }>({
   name: 'entry',
   args: {
     say: {
@@ -17,7 +17,7 @@ const entry = define<{ 'g:globals': GlobalsCommandContext }>({
   },
   run: ctx => {
     if (ctx.values.say === 'version?') {
-      ctx.extensions['g:globals'].showVersion()
+      ctx.extensions['g:global'].showVersion()
       return
     }
     return `You said: ${ctx.values.say}`

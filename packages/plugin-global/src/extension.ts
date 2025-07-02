@@ -7,9 +7,9 @@ import type { Awaitable, CommandContextCore, DefaultGunshiParams } from '@gunshi
 
 /**
  * Extended command context which provides utilities via global options plugin.
- * These utilities are available via `CommandContext.extensions['g:globals']`.
+ * These utilities are available via `CommandContext.extensions['g:global']`.
  */
-export interface GlobalsCommandContext {
+export interface GlobalCommandContext {
   /**
    * Show the version of the application. if `--version` option is specified, it will print the version to the console.
    * @returns The version of the application, or `unknown` if the version is not specified.
@@ -38,7 +38,7 @@ export interface GlobalsCommandContext {
 
 export default function extension(
   ctx: CommandContextCore<DefaultGunshiParams>
-): GlobalsCommandContext {
+): GlobalCommandContext {
   return {
     showVersion: () => {
       const version = ctx.env.version || 'unknown'
