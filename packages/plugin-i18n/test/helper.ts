@@ -1,7 +1,7 @@
 import {
   createCoreContext,
   getLocaleMessage,
-  NOT_REOSLVED as NOT_RESOLVED,
+  NOT_RESOLVED,
   setLocaleMessage,
   translate
 } from '@intlify/core'

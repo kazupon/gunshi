@@ -374,7 +374,7 @@ import i18n, { defineI18n } from '@gunshi/plugin-i18n'
 import {
   createCoreContext,
   getLocaleMessage,
-  NOT_REOSLVED as NOT_RESOLVED,
+  NOT_RESOLVED,
   setLocaleMessage,
   translate as intlifyTranslate
 } from '@intlify/core' // need to install `npm install --save @intlify/core@next`

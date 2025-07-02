@@ -357,7 +357,7 @@ importers:
         version: link:../shared
       '@intlify/core':
         specifier: next
-        version: 12.0.0-alpha.2
+        version: 12.0.0-alpha.3
       deno:
         specifier: 'catalog:'
         version: 2.3.3
@@ -1138,20 +1138,20 @@ packages:
   '@iconify/utils@2.3.0':
     resolution: {integrity: sha512-GmQ78prtwYW6EtzXRU1rY+KwOKfz32PD7iJh6Iyqw68GiKuoZ2A6pRtzWONz5VQJbp50mEjXh/7NkumtrAgRKA==}
 
-  '@intlify/core-base@12.0.0-alpha.2':
-    resolution: {integrity: sha512-sPWvQ1Z4Wyw9Kp8xqjAk2sMOeZ4pO7p/NL3Eol8l9a7iPyMTuHyJ2DZVbOBG6zDnCupvLAqnRMAT1LAgvx0QRQ==}
+  '@intlify/core-base@12.0.0-alpha.3':
+    resolution: {integrity: sha512-LEvBHBUbiOOtIBkp4IIQENVC5Fg2YHsvdXN1+WRIxQ8hzHbHSBiqZ2l68B/yg8sE1a4S7dqhkaAedunShWPH+Q==}
     engines: {node: '>= 16'}
 
-  '@intlify/core@12.0.0-alpha.2':
-    resolution: {integrity: sha512-2vCkVknkEH51I+2EV62AoXLBA7ulFJQ6yRSlQNqZw+uEptQ9Y4PquZj1h+6zB/aftDC5wNdl57pRfxsx/KVCwQ==}
+  '@intlify/core@12.0.0-alpha.3':
+    resolution: {integrity: sha512-nxkzmsIlE/W8IRYDEu+oiJjBX6cpnREk4s+kQ+rk6yRKTsCoM18cyQCmT5NLcG4PO5w+xn9SDtWmszVgJwXDUw==}
     engines: {node: '>= 16'}
 
-  '@intlify/message-compiler@12.0.0-alpha.2':
-    resolution: {integrity: sha512-PD9C+oQbb7BF52hec0+vLnScaFkvnfX+R7zSbODYuRo/E2niAtGmHd0wPvEMsDhf9Z9b8f/qyDsVeZnD/ya9Ug==}
+  '@intlify/message-compiler@12.0.0-alpha.3':
+    resolution: {integrity: sha512-mDDTN3gfYOHhBnpnlby19UHyvMaOnzdlpsIrxUfs44R/vCATfn8pMOkE8PXD2t410xkocEj3FpDcC9XC/0v4Dg==}
     engines: {node: '>= 16'}
 
-  '@intlify/shared@12.0.0-alpha.2':
-    resolution: {integrity: sha512-P2DULVX9nz3y8zKNqLw9Es1aAgQ1JGC+kgpx5q7yLmrnAKkPR5MybQWoEhxanefNJgUY5ehsgo+GKif59SrncA==}
+  '@intlify/shared@12.0.0-alpha.3':
+    resolution: {integrity: sha512-ryaNYBvxQjyJUmVuBBg+HHUsmGnfxcEUPR0NCeG4/K9N2qtyFE35C80S15IN6iYFE2MGWLN7HfOSyg0MXZIc9w==}
     engines: {node: '>= 16'}
 
   '@isaacs/cliui@8.0.2':
@@ -5491,22 +5491,22 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@intlify/core-base@12.0.0-alpha.2':
+  '@intlify/core-base@12.0.0-alpha.3':
     dependencies:
-      '@intlify/message-compiler': 12.0.0-alpha.2
-      '@intlify/shared': 12.0.0-alpha.2
+      '@intlify/message-compiler': 12.0.0-alpha.3
+      '@intlify/shared': 12.0.0-alpha.3
 
-  '@intlify/core@12.0.0-alpha.2':
+  '@intlify/core@12.0.0-alpha.3':
     dependencies:
-      '@intlify/core-base': 12.0.0-alpha.2
-      '@intlify/shared': 12.0.0-alpha.2
+      '@intlify/core-base': 12.0.0-alpha.3
+      '@intlify/shared': 12.0.0-alpha.3
 
-  '@intlify/message-compiler@12.0.0-alpha.2':
+  '@intlify/message-compiler@12.0.0-alpha.3':
     dependencies:
-      '@intlify/shared': 12.0.0-alpha.2
+      '@intlify/shared': 12.0.0-alpha.3
       source-map-js: 1.2.1
 
-  '@intlify/shared@12.0.0-alpha.2': {}
+  '@intlify/shared@12.0.0-alpha.3': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
