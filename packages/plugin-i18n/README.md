@@ -91,7 +91,7 @@ await cli(process.argv.slice(2), greetCommand, {
 ### `translationAdapterFactory`
 
 - Type: `(options: TranslationAdapterFactoryOptions) => TranslationAdapter`
-- Default: Built-in adapter
+- Default: `createTranslationAdapter`
 - Description: Factory function to create a custom translation adapter. Useful for integrating with existing i18n libraries.
 
 ## Plugin Dependencies
@@ -196,7 +196,7 @@ When using the i18n plugin, your command context is extended via `ctx.extensions
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
-The below extensions:
+Available extensions:
 
 - `locale: Intl.Locale`: The current locale
 - `translate<T>(key: T, values?: Record<string, unknown>): string`: Translation function
@@ -273,7 +273,7 @@ Good Flat structure:
 }
 ```
 
-Bad Nested structure (won't work with `ctx.extensions['g:i18n'].translate('messages.greeting')`:
+Bad Nested structure (won't work with `ctx.extensions['g:i18n'].translate('messages.greeting')`):
 
 ```json
 {
