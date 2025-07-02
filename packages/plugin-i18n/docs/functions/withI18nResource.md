@@ -1,28 +1,28 @@
 [**@gunshi/plugin-i18n**](../index.md)
 
----
+***
 
 [@gunshi/plugin-i18n](../index.md) / withI18nResource
 
 # Function: withI18nResource()
 
 ```ts
-function withI18nResource<G>(command, resource): I18nCommand<G>
+function withI18nResource<G>(command, resource): I18nCommand<G>;
 ```
 
 Add i18n resource to an existing command
 
 ## Type Parameters
 
-| Type Parameter                         |
-| -------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` |
+| Type Parameter |
+| ------ |
+| `G` *extends* `GunshiParamsConstraint` |
 
 ## Parameters
 
-| Parameter  | Type                                                                         |
-| ---------- | ---------------------------------------------------------------------------- |
-| `command`  | `Command`\<`G`\>                                                             |
+| Parameter | Type |
+| ------ | ------ |
+| `command` | `Command`\<`G`\> |
 | `resource` | [`CommandResourceFetcher`](../type-aliases/CommandResourceFetcher.md)\<`G`\> |
 
 ## Returns
@@ -40,7 +40,7 @@ const myCommand = define({
   args: {
     input: { type: 'string', description: 'Input value' }
   },
-  run: async ctx => {
+  run: async (ctx) => {
     console.log(`Input: ${ctx.values.input}`)
   }
 })

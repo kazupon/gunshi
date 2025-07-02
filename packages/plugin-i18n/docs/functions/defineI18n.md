@@ -1,27 +1,27 @@
 [**@gunshi/plugin-i18n**](../index.md)
 
----
+***
 
 [@gunshi/plugin-i18n](../index.md) / defineI18n
 
 # Function: defineI18n()
 
 ```ts
-function defineI18n<G>(command): I18nCommand<G>
+function defineI18n<G>(command): I18nCommand<G>;
 ```
 
 Define an i18n-aware command with type safety
 
 ## Type Parameters
 
-| Type Parameter                         | Default type          |
-| -------------------------------------- | --------------------- |
-| `G` _extends_ `GunshiParamsConstraint` | `DefaultGunshiParams` |
+| Type Parameter | Default type |
+| ------ | ------ |
+| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` |
 
 ## Parameters
 
-| Parameter | Type                        |
-| --------- | --------------------------- |
+| Parameter | Type |
+| ------ | ------ |
 | `command` | `Command`\<`G`\> & `object` |
 
 ## Returns
@@ -38,11 +38,11 @@ const greetCommand = defineI18n({
   args: {
     name: { type: 'string', description: 'Name to greet' }
   },
-  resource: async ctx => ({
+  resource: async (ctx) => ({
     description: 'Greet someone',
     'arg:name': 'The name to greet'
   }),
-  run: async ctx => {
+  run: async (ctx) => {
     console.log(`Hello, ${ctx.values.name}!`)
   }
 })

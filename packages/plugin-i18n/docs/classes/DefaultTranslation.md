@@ -1,6 +1,6 @@
 [**@gunshi/plugin-i18n**](../index.md)
 
----
+***
 
 [@gunshi/plugin-i18n](../index.md) / DefaultTranslation
 
@@ -24,8 +24,8 @@ new DefaultTranslation(options): DefaultTranslation;
 
 #### Parameters
 
-| Parameter | Type                                                                                    |
-| --------- | --------------------------------------------------------------------------------------- |
+| Parameter | Type |
+| ------ | ------ |
 | `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) |
 
 #### Returns
@@ -44,10 +44,10 @@ Get a message of locale.
 
 #### Parameters
 
-| Parameter | Type     | Description                                                                   |
-| --------- | -------- | ----------------------------------------------------------------------------- |
-| `locale`  | `string` | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
-| `key`     | `string` | A key of message resource                                                     |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `locale` | `string` | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
+| `key` | `string` | A key of message resource |
 
 #### Returns
 
@@ -59,7 +59,7 @@ A message of locale. if message not found, return `undefined`.
 
 [`TranslationAdapter`](../interfaces/TranslationAdapter.md).[`getMessage`](../interfaces/TranslationAdapter.md#getmessage)
 
----
+***
 
 ### getResource()
 
@@ -71,9 +71,9 @@ Get a resource of locale.
 
 #### Parameters
 
-| Parameter | Type     | Description                                                                   |
-| --------- | -------- | ----------------------------------------------------------------------------- |
-| `locale`  | `string` | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `locale` | `string` | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
 
 #### Returns
 
@@ -85,7 +85,7 @@ A resource of locale. if resource not found, return `undefined`.
 
 [`TranslationAdapter`](../interfaces/TranslationAdapter.md).[`getResource`](../interfaces/TranslationAdapter.md#getresource)
 
----
+***
 
 ### setResource()
 
@@ -97,10 +97,10 @@ Set a resource of locale.
 
 #### Parameters
 
-| Parameter  | Type                           | Description                                                                   |
-| ---------- | ------------------------------ | ----------------------------------------------------------------------------- |
-| `locale`   | `string`                       | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
-| `resource` | `Record`\<`string`, `string`\> | A resource of locale                                                          |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `locale` | `string` | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
+| `resource` | `Record`\<`string`, `string`\> | A resource of locale |
 
 #### Returns
 
@@ -110,14 +110,14 @@ Set a resource of locale.
 
 [`TranslationAdapter`](../interfaces/TranslationAdapter.md).[`setResource`](../interfaces/TranslationAdapter.md#setresource)
 
----
+***
 
 ### translate()
 
 ```ts
 translate(
-   locale,
-   key,
+   locale, 
+   key, 
    values): undefined | string;
 ```
 
@@ -125,11 +125,11 @@ Translate a message.
 
 #### Parameters
 
-| Parameter | Type                            | Description                                                                   |
-| --------- | ------------------------------- | ----------------------------------------------------------------------------- |
-| `locale`  | `string`                        | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
-| `key`     | `string`                        | A key of message resource                                                     |
-| `values`  | `Record`\<`string`, `unknown`\> | A values to be resolved in the message                                        |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `locale` | `string` | A Locale at the time of command execution. That is Unicord locale ID (BCP 47) |
+| `key` | `string` | A key of message resource |
+| `values` | `Record`\<`string`, `unknown`\> | A values to be resolved in the message |
 
 #### Returns
 

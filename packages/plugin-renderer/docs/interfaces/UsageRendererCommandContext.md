@@ -1,6 +1,6 @@
 [**@gunshi/plugin-renderer**](../index.md)
 
----
+***
 
 [@gunshi/plugin-renderer](../index.md) / UsageRendererCommandContext
 
@@ -11,13 +11,13 @@ These utilities are available via `CommandContext.extensions['g:renderer']`.
 
 ## Type Parameters
 
-| Type Parameter                        | Default type          |
-| ------------------------------------- | --------------------- |
-| `G` _extends_ `GunshiParams`\<`any`\> | `DefaultGunshiParams` |
+| Type Parameter | Default type |
+| ------ | ------ |
+| `G` *extends* `GunshiParams`\<`any`\> | `DefaultGunshiParams` |
 
 ## Properties
 
-| Property                                 | Type                                                         | Description             |
-| ---------------------------------------- | ------------------------------------------------------------ | ----------------------- |
-| <a id="loadcommands"></a> `loadCommands` | \<`G`\>() => `Promise`\<`Command`\<`G`\>[]\>                 | Load commands           |
-| <a id="text"></a> `text`                 | \<`T`, `O`, `K`\>(`key`, `values?`) => `Promise`\<`string`\> | Render the text message |
+| Property | Type | Description |
+| ------ | ------ | ------ |
+| <a id="loadcommands"></a> `loadCommands` | \<`G`\>() => `Promise`\<`Command`\<`G`\>[]\> | Load commands |
+| <a id="text"></a> `text` | \<`T`, `O`, `K`\>(`key`, `values?`) => `Promise`\<`string`\> | Render the text message |

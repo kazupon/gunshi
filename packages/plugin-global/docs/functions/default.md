@@ -1,6 +1,6 @@
 [**@gunshi/plugin-global**](../index.md)
 
----
+***
 
 [@gunshi/plugin-global](../index.md) / default
 

@@ -1,19 +1,19 @@
 [**@gunshi/plugin-i18n**](../index.md)
 
----
+***
 
 [@gunshi/plugin-i18n](../index.md) / createTranslationAdapter
 
 # Function: createTranslationAdapter()
 
 ```ts
-function createTranslationAdapter(options): TranslationAdapter
+function createTranslationAdapter(options): TranslationAdapter;
 ```
 
 ## Parameters
 
-| Parameter | Type                                                                                    |
-| --------- | --------------------------------------------------------------------------------------- |
+| Parameter | Type |
+| ------ | ------ |
 | `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) |
 
 ## Returns
