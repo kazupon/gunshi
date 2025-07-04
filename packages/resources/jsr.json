@@ -2,7 +2,7 @@
   "$id": "https://jsr.io/schema/config-file.v1.json",
   "$schema": "http://json-schema.org/draft-07/schema",
   "name": "@gunshi/resources",
-  "description": "built-in resources for gunshi",
+  "description": "built-in localization resources for gunshi",
   "version": "0.26.3",
   "license": "MIT",
   "publish": {

@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/resources",
-  "description": "built-in resources for gunshi",
+  "description": "built-in localization resources for gunshi",
   "version": "0.26.3",
   "author": {
     "name": "kazuya kawaguchi",

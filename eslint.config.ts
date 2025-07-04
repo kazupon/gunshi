@@ -85,7 +85,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   }),
   markdown({
     rules: {
-      'import/extensions': 'off'
+      'import/extensions': 'off',
+      'unused-imports/no-unused-imports': 'off'
     }
   }),
   vitest(),
