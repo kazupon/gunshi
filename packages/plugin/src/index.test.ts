@@ -13,7 +13,7 @@ test('@gunshi/plugin', async () => {
     end: number
   }
 
-  // unique plugin id, reccommended to use a namespaced id
+  // unique plugin id, recommended to use a namespaced id
   const perfPluginId = 'my:perf'
   type PerfPluginId = typeof perfPluginId
   type Extensions = Record<PerfPluginId, PerfCommandContext>
