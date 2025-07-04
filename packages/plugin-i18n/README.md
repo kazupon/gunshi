@@ -213,8 +213,6 @@ When defining your localization resources (either directly in the `resource` fun
   - **Negatable Argument Descriptions**: For boolean options (e.g., `--verbose`), Gunshi automatically generates a description for the negatable version (e.g., `--no-verbose`) using the built-in `NEGATABLE` key (e.g., "Negatable of --verbose"). To provide a custom translation for a specific negatable option, use the pattern `arg:no-<optionName>`, for example, `arg:no-verbose`.
 - **Custom Keys**: Any other keys you define for custom translation messages (like greetings, error messages, etc.) do not require a prefix and can be named freely (e.g., `informal_greeting`, `error_file_not_found`).
 - **Built-in Keys**: Keys for built-in functionalities are handled by Gunshi's default locales. The complete list includes:
-  - `help` - Description for the help option ("Display this help message")
-  - `version` - Description for the version option ("Display this version")
   - `USAGE` - Usage section header
   - `OPTIONS` - Options section header
   - `ARGUMENTS` - Arguments section header
@@ -224,6 +222,8 @@ When defining your localization resources (either directly in the `resource` fun
   - `NEGATABLE` - Prefix for negatable options (e.g., "Negatable of --verbose")
   - `DEFAULT` - Prefix for default values (e.g., "default: 5")
   - `CHOICES` - Prefix for available choices (e.g., "choices: red, green, blue")
+  - `help` - Description for the help option ("Display this help message")
+  - `version` - Description for the version option ("Display this version")
 
   Internally, these keys are prefixed with `_:` (e.g., `_:USAGE`, `_:OPTIONS`), but you don't need to use this prefix directly. When overriding built-in translations in your resources, use the key names without the prefix (e.g., providing your own translation for `NEGATABLE`, not `_:NEGATABLE`).
 
