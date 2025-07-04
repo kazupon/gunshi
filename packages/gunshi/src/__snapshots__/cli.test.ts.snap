@@ -26,25 +26,6 @@ OPTIONS:
 "
 `;
 
-exports[`auto generate usage > locale resource not found 1`] = `
-"Modern CLI tool (gunshi v0.0.0)
-
-USAGE:
-  gunshi <OPTIONS>
-
-OPTIONS:
-  -h, --help               [boolean] Display this help message
-  -v, --version            [boolean] Display this version
-  -f, --foo <foo>          [string]  The foo option
-
-EXAMPLES:
-  # Example 1
-  $ gunshi --foo bar
-  # Example 2
-  $ gunshi -f bar
-"
-`;
-
 exports[`auto generate usage > loosely entry command > USAGE:
   COMMAND <OPTIONS>
 

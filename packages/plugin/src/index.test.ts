@@ -13,13 +13,18 @@ test('@gunshi/plugin', async () => {
     end: number
   }
 
+  // unique plugin id, reccommended to use a namespaced id
+  const perfPluginId = 'my:perf'
+  type PerfPluginId = typeof perfPluginId
+  type Extensions = Record<PerfPluginId, PerfCommandContext>
+
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
   /**
    * define a plugin that measures command performance
    */
   const perf = plugin({
-    id: 'perf', // need to define a unique id for the plugin
+    id: perfPluginId, // need to define a unique id for the plugin
     name: 'Performance Plugin', // optional name
 
     // extend `CommandContext` with exntension
@@ -32,14 +37,14 @@ test('@gunshi/plugin', async () => {
        */
       ctx.decorateCommand(baseRunner => async cmdCtx => {
         // measure start time
-        cmdCtx.extensions.perf.start = performance.now()
+        cmdCtx.extensions[perfPluginId].start = performance.now()
 
         // execute base command runner
         const ret = await baseRunner(cmdCtx)
         await delay(10) // simulate command runner time
 
         // measure end time
-        cmdCtx.extensions.perf.end = performance.now()
+        cmdCtx.extensions[perfPluginId].end = performance.now()
 
         return ret
       })
@@ -49,15 +54,20 @@ test('@gunshi/plugin', async () => {
   /**
    * define entry runner with type parameters
    */
-  const entry: CommandRunner<{ extensions: { perf: PerfCommandContext } }> = ctx => {
+  const entry: CommandRunner<{ extensions: Extensions }> = ctx => {
     // enable type-safe extensions
-    return `Execution start time: ${ctx.extensions.perf.start}`
+    return `Execution start time: ${ctx.extensions[perfPluginId].start}`
   }
 
   // run!
-  // @ts-expect-error
-  const result = await cli([], entry, {
-    plugins: [perf] // install a plugin
+  const result = await cli<Extensions>([], entry, {
+    plugins: [perf], // register the plugin
+    onAfterCommand(ctx, result) {
+      expect(result).toEqual(`Execution start time: ${ctx.extensions[perfPluginId].start}`)
+      expect(ctx.extensions[perfPluginId].end).toBeGreaterThanOrEqual(
+        ctx.extensions[perfPluginId].start
+      )
+    }
   })
 
   expect(result).toContain('Execution start time: ')

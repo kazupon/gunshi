@@ -273,9 +273,32 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
     baseRunner
   )
 
-  // execute and return result
-  const result = await decoratedRunner(ctx as Parameters<typeof baseRunner>[0])
+  try {
+    // execute onBeforeCommand hook
+    if (ctx.env.onBeforeCommand) {
+      await ctx.env.onBeforeCommand(ctx)
+    }
 
-  // return string if one was returned
-  return typeof result === 'string' ? result : undefined
+    // execute decorated runner
+    const result = await decoratedRunner(ctx as Parameters<typeof baseRunner>[0])
+
+    // execute onAfterCommand hook only on success
+    if (ctx.env.onAfterCommand) {
+      await ctx.env.onAfterCommand(ctx, result)
+    }
+
+    // return string if one was returned
+    return typeof result === 'string' ? result : undefined
+  } catch (error) {
+    // execute onErrorCommand hook
+    if (ctx.env.onErrorCommand) {
+      try {
+        await ctx.env.onErrorCommand(ctx, error as Error)
+      } catch (hookError) {
+        // log but don't swallow the original error
+        console.error('Error in onErrorCommand hook:', hookError)
+      }
+    }
+    throw error
+  }
 }

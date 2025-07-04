@@ -1196,3 +1196,170 @@ describe('edge cases', () => {
     expect(stdout).toMatchSnapshot()
   })
 })
+
+describe('command lifecycle hooks', () => {
+  test('onBeforeCommand and onAfterCommand hooks', async () => {
+    const executionOrder: string[] = []
+    const mockCommand = vi.fn().mockImplementation(() => {
+      executionOrder.push('command')
+      return 'command result'
+    })
+
+    await cli(
+      [],
+      { run: mockCommand },
+      {
+        onBeforeCommand: async ctx => {
+          executionOrder.push('before')
+          expect(ctx.name).toBe('(anonymous)')
+        },
+        onAfterCommand: async (_ctx, result) => {
+          executionOrder.push('after')
+          expect(result).toBe('command result')
+        }
+      }
+    )
+
+    expect(executionOrder).toEqual(['before', 'command', 'after'])
+    expect(mockCommand).toHaveBeenCalledOnce()
+  })
+
+  test('onErrorCommand hook', async () => {
+    const executionOrder: string[] = []
+    const testError = new Error('Test error')
+    const mockCommand = vi.fn().mockImplementation(() => {
+      executionOrder.push('command')
+      throw testError
+    })
+
+    let capturedError: Error | undefined
+
+    await expect(
+      cli(
+        [],
+        { run: mockCommand },
+        {
+          onBeforeCommand: async () => {
+            executionOrder.push('before')
+          },
+          onAfterCommand: async () => {
+            executionOrder.push('after') // Should not be called
+          },
+          onErrorCommand: async (ctx, error) => {
+            executionOrder.push('error')
+            capturedError = error
+            expect(ctx.name).toBe('(anonymous)')
+          }
+        }
+      )
+    ).rejects.toThrow('Test error')
+
+    expect(executionOrder).toEqual(['before', 'command', 'error'])
+    expect(capturedError).toBe(testError)
+  })
+
+  test('hooks with subcommands', async () => {
+    const executionOrder: string[] = []
+    const deployCommand = define({
+      name: 'deploy',
+      run: () => {
+        executionOrder.push('deploy')
+      }
+    })
+
+    const testCommand = define({
+      name: 'test',
+      run: () => {
+        executionOrder.push('test')
+      }
+    })
+
+    await cli(
+      ['deploy'],
+      { run: () => {} },
+      {
+        subCommands: new Map([
+          ['deploy', deployCommand],
+          ['test', testCommand]
+        ]),
+        onBeforeCommand: async ctx => {
+          executionOrder.push(`before-${ctx.name}`)
+        },
+        onAfterCommand: async ctx => {
+          executionOrder.push(`after-${ctx.name}`)
+        }
+      }
+    )
+
+    expect(executionOrder).toEqual(['before-deploy', 'deploy', 'after-deploy'])
+  })
+
+  test('onErrorCommand hook error handling', async () => {
+    const mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const testError = new Error('Command error')
+    const hookError = new Error('Hook error')
+
+    await expect(
+      cli(
+        [],
+        {
+          run: () => {
+            throw testError
+          }
+        },
+        {
+          onErrorCommand: async () => {
+            throw hookError
+          }
+        }
+      )
+    ).rejects.toThrow('Command error')
+
+    expect(mockConsoleError).toHaveBeenCalledWith('Error in onErrorCommand hook:', hookError)
+    mockConsoleError.mockRestore()
+  })
+
+  test('hooks with plugins', async () => {
+    const executionOrder: string[] = []
+
+    const testPlugin = plugin({
+      id: 'test',
+      name: 'Test Plugin',
+      setup: ctx => {
+        ctx.decorateCommand(baseRunner => async cmdCtx => {
+          executionOrder.push('plugin-before')
+          const result = await baseRunner(cmdCtx)
+          executionOrder.push('plugin-after')
+          return result
+        })
+      }
+    })
+
+    await cli(
+      [],
+      {
+        run: () => {
+          executionOrder.push('command')
+        }
+      },
+      {
+        plugins: [testPlugin],
+        onBeforeCommand: async () => {
+          executionOrder.push('hook-before')
+        },
+        onAfterCommand: async () => {
+          executionOrder.push('hook-after')
+        }
+      }
+    )
+
+    // hooks run outside plugins
+    expect(executionOrder).toEqual([
+      'hook-before',
+      'plugin-before',
+      'command',
+      'plugin-after',
+      'hook-after'
+    ])
+  })
+})

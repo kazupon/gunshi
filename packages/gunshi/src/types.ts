@@ -66,6 +66,18 @@ export type ExtractExtensions<G> =
   G extends GunshiParams<any> ? G['extensions'] : G extends { extensions: infer E } ? E : {}
 
 /**
+ * Type helper to normalize G to GunshiParams
+ * @internal
+ */
+export type NormalizeToGunshiParams<G> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any>
+    ? G
+    : G extends { extensions: ExtendContext }
+      ? GunshiParams<{ args: Args; extensions: G['extensions'] }>
+      : DefaultGunshiParams
+
+/**
  * Command environment.
  */
 
@@ -141,6 +153,23 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
     | null
     | undefined
+  /**
+   * Hook that runs before any command execution
+   * @see {@link CliOptions.onBeforeCommand}
+   */
+  onBeforeCommand: ((ctx: Readonly<CommandContext<G>>) => Awaitable<void>) | undefined
+  /**
+   * Hook that runs after successful command execution
+   * @see {@link CliOptions.onAfterCommand}
+   */
+  onAfterCommand:
+    | ((ctx: Readonly<CommandContext<G>>, result: string | void) => Awaitable<void>)
+    | undefined
+  /**
+   * Hook that runs when a command throws an error
+   * @see {@link CliOptions.onErrorCommand}
+   */
+  onErrorCommand: ((ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>) | undefined
 }
 
 /**
@@ -207,24 +236,29 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * User plugins.
    */
   plugins?: Plugin[]
+  /**
+   * Hook that runs before any command execution
+   * @param ctx - The command context
+   */
+  onBeforeCommand?: (ctx: Readonly<CommandContext<G>>) => Awaitable<void>
+  /**
+   * Hook that runs after successful command execution
+   * @param ctx - The command context
+   * @param result - The command execution result
+   */
+  onAfterCommand?: (ctx: Readonly<CommandContext<G>>, result: string | void) => Awaitable<void>
+  /**
+   * Hook that runs when a command throws an error
+   * @param ctx - The command context
+   * @param error - The error thrown during execution
+   */
+  onErrorCommand?: (ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>
 }
 
 /**
  * Command call mode.
  */
 export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
-
-/**
- * Type helper to normalize G to GunshiParams
- * @internal
- */
-export type NormalizeToGunshiParams<G> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any>
-    ? G
-    : G extends { extensions: ExtendContext }
-      ? GunshiParams<{ args: Args; extensions: G['extensions'] }>
-      : DefaultGunshiParams
 
 /**
  * Command context.
@@ -245,7 +279,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    * Command environment, that is the environment of the command that is executed.
    * The command environment is same {@link CommandEnvironment}.
    */
-  env: Readonly<CommandEnvironment<NormalizeToGunshiParams<G>>>
+  env: Readonly<CommandEnvironment<G>>
   /**
    * Command arguments, that is the arguments of the command that is executed.
    * The command arguments is same {@link Command.args}.
@@ -350,7 +384,7 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * Command examples.
    * examples of how to use the command.
    */
-  examples?: string | CommandExamplesFetcher<NormalizeToGunshiParams<G>>
+  examples?: string | CommandExamplesFetcher<G>
   /**
    * Command runner. it's the command to be executed
    */
