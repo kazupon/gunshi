@@ -26,7 +26,7 @@ for PKG in packages/* ; do
       cp ../../CHANGELOG.md ./CHANGELOG.md
       cp ../../LICENSE ./LICENSE
     fi
-    TAG="latest"
+    TAG="alpha"
     echo "⚡ Publishing $PKG with tag $TAG"
     pnpm publish --access public --no-git-checks --tag $TAG
     echo "⚡ Publishing $PKG for jsr registry"
