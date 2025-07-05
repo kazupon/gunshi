@@ -74,11 +74,19 @@ async function main() {
     with: { type: 'json' }
   }).then(m => m.default || m)) as Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
   json = updatePkgJson(pkg as string, json)
-  await fs.writeFile(
-    path.resolve(import.meta.dirname, `../${pkg}/package.json`),
-    JSON.stringify(json, null, 2),
-    'utf8'
-  )
+  try {
+    await fs.writeFile(
+      path.resolve(import.meta.dirname, `../${pkg}/package.json`),
+      JSON.stringify(json, null, 2),
+      'utf8'
+    )
+  } catch (error) {
+    throw new Error(
+      `Failed to write package.json for ${pkg}: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    )
+  }
 }
 
 await main()
