@@ -451,7 +451,7 @@ export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGun
 
 export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   ctx: Readonly<CommandContext<G>>
-) => Awaitable<void | string>
+) => Awaitable<string | void>
 
 /**
  * Command loader.
@@ -473,8 +473,8 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
  */
 
 export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
-  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<void | string>
-) => (ctx: Readonly<CommandContext<G>>) => Awaitable<void | string>
+  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>
+) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>
 
 /**
  * Renderer decorator type.

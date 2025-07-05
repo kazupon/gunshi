@@ -284,7 +284,7 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
 
     // execute onAfterCommand hook only on success
     if (ctx.env.onAfterCommand) {
-      await ctx.env.onAfterCommand(ctx, result)
+      await ctx.env.onAfterCommand(ctx, result as string | undefined)
     }
 
     // return string if one was returned
