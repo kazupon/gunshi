@@ -33,4 +33,6 @@ jobs:
         run: pnpm build
 
       - name: Release with pkg-pr-new
-        run: pnpx pkg-pr-new publish --compact --pnpm './packages/gunshi' './packages/bone' './packages/definition' './packages/plugin' './packages/resources' './packages/shared' './packages/plugin-global' './packages/plugin-i18n' './packages/plugin-renderer' './packages/plugin-completion' './packages/plugin-dryrun'
+        run: |
+          pkgs=$(ls -d ./packages/* | grep -v ./packages/docs)
+          pnpx pkg-pr-new publish --compact --pnpm $pkgs
