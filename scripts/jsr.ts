@@ -21,11 +21,13 @@ const args = parseArgs({
 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function updatePkgJson(pkg: string, json: Record<string, any>) {
-  const version = json.version as string
+function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, any> {
+  const version: string = json.version
   if (!version) {
     throw new Error(`Package ${pkg} does not have a version defined in package.json`)
   }
+  // …rest of the function…
+}
 
   json.dependencies = json.dependencies || {}
   switch (pkg) {
