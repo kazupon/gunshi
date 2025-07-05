@@ -168,7 +168,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    * @since v0.24.0
    */
   onAfterCommand:
-    | ((ctx: Readonly<CommandContext<G>>, result: string | void) => Awaitable<void>)
+    | ((ctx: Readonly<CommandContext<G>>, result: string | undefined) => Awaitable<void>)
     | undefined
   /**
    * Hook that runs when a command throws an error
@@ -255,7 +255,7 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * @param result - The command execution result
    * @since v0.24.0
    */
-  onAfterCommand?: (ctx: Readonly<CommandContext<G>>, result: string | void) => Awaitable<void>
+  onAfterCommand?: (ctx: Readonly<CommandContext<G>>, result: string | undefined) => Awaitable<void>
   /**
    * Hook that runs when a command throws an error
    * @param ctx - The command context
