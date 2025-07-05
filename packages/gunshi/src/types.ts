@@ -12,12 +12,14 @@ export type Awaitable<T> = T | Promise<T>
 
 /**
  * Extend command context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
+ * @since v0.24.0
  */
 export type ExtendContext = Record<string, unknown>
 
 /**
  * Gunshi unified parameter type.
  * This type combines both argument definitions and command context extensions.
+ * @since v0.24.0
  */
 export interface GunshiParams<
   P extends {
@@ -40,12 +42,14 @@ export interface GunshiParams<
 
 /**
  * Default Gunshi parameters
+ * @since v0.24.0
  */
 export type DefaultGunshiParams = GunshiParams
 
 /**
  * Generic constraint for command-related types.
  * This type constraint allows both GunshiParams and objects with extensions.
+ * @since v0.24.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendContext }
@@ -156,11 +160,13 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
   /**
    * Hook that runs before any command execution
    * @see {@link CliOptions.onBeforeCommand}
+   * @since v0.24.0
    */
   onBeforeCommand: ((ctx: Readonly<CommandContext<G>>) => Awaitable<void>) | undefined
   /**
    * Hook that runs after successful command execution
    * @see {@link CliOptions.onAfterCommand}
+   * @since v0.24.0
    */
   onAfterCommand:
     | ((ctx: Readonly<CommandContext<G>>, result: string | void) => Awaitable<void>)
@@ -168,6 +174,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
   /**
    * Hook that runs when a command throws an error
    * @see {@link CliOptions.onErrorCommand}
+   * @since v0.24.0
    */
   onErrorCommand: ((ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>) | undefined
 }
@@ -234,23 +241,27 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
     | null
   /**
    * User plugins.
+   * @since v0.24.0
    */
   plugins?: Plugin[]
   /**
    * Hook that runs before any command execution
    * @param ctx - The command context
+   * @since v0.24.0
    */
   onBeforeCommand?: (ctx: Readonly<CommandContext<G>>) => Awaitable<void>
   /**
    * Hook that runs after successful command execution
    * @param ctx - The command context
    * @param result - The command execution result
+   * @since v0.24.0
    */
   onAfterCommand?: (ctx: Readonly<CommandContext<G>>, result: string | void) => Awaitable<void>
   /**
    * Hook that runs when a command throws an error
    * @param ctx - The command context
    * @param error - The error thrown during execution
+   * @since v0.24.0
    */
   onErrorCommand?: (ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>
 }
@@ -331,7 +342,8 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
-   *  Command context extensions.
+   * Command context extensions.
+   * @since v0.24.0
    */
   extensions: keyof ExtractExtensions<G> extends never ? undefined : ExtractExtensions<G>
   /**
@@ -343,6 +355,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
 
 /**
  * CommandContextCore type (base type without extensions)
+ * @since v0.24.0
  */
 
 export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<
@@ -351,6 +364,7 @@ export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiP
 
 /**
  * Command context extension
+ * @since v0.24.0
  */
 export interface CommandContextExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
@@ -456,6 +470,7 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
  * A function that wraps a command runner to add or modify its behavior.
  * @param baseRunner The base command runner to decorate
  * @returns The decorated command runner
+ * @since v0.24.0
  */
 
 export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
@@ -468,6 +483,7 @@ export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiPar
  * @param baseRenderer The base renderer function to decorate
  * @param ctx The command context
  * @returns The decorated result
+ * @since v0.24.0
  */
 
 export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (
@@ -482,6 +498,7 @@ export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunsh
  * @param ctx The command context
  * @param error The aggregate error containing validation errors
  * @returns The decorated result
+ * @since v0.24.0
  */
 
 export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
