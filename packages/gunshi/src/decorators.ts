@@ -17,6 +17,7 @@ const EMPTY_RENDERER = async () => ''
 /**
  * Interface for managing renderer and command decorators.
  * This interface defines the contract for decorator management in plugins.
+ * @internal
  */
 export interface Decorators<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   addHeaderDecorator(decorator: RendererDecorator<string, G>): void
