@@ -222,6 +222,15 @@ importers:
         specifier: ^0.20.1
         version: 0.20.1
     devDependencies:
+      '@gunshi/plugin-global':
+        specifier: workspace:*
+        version: link:../plugin-global
+      '@gunshi/plugin-i18n':
+        specifier: workspace:*
+        version: link:../plugin-i18n
+      '@gunshi/plugin-renderer':
+        specifier: workspace:*
+        version: link:../plugin-renderer
       '@gunshi/resources':
         specifier: workspace:*
         version: link:../resources

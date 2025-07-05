@@ -1,7 +1,7 @@
 {
   "$id": "https://jsr.io/schema/config-file.v1.json",
   "$schema": "http://json-schema.org/draft-07/schema",
-  "name": "@gunshi/plugin-global",
+  "name": "@gunshi/plugin",
   "description": "utilities for gunshi plugin",
   "version": "0.27.0-alpha.2",
   "license": "MIT",

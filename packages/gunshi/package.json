@@ -105,6 +105,9 @@
     "args-tokens": "^0.20.1"
   },
   "devDependencies": {
+    "@gunshi/plugin-global": "workspace:*",
+    "@gunshi/plugin-i18n": "workspace:*",
+    "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "deno": "catalog:",
     "jsr": "catalog:",

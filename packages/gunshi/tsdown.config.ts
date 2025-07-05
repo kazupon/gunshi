@@ -16,6 +16,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
   clean: true,
   publint: true,
   dts: true,
+  noExternal: ['@gunshi/plugin-global', '@gunshi/plugin-renderer', '@gunshi/plugin-i18n'],
   hooks: {
     'build:done': lintJsrExports()
   }

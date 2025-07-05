@@ -29,8 +29,10 @@ for PKG in packages/* ; do
     TAG="alpha"
     echo "⚡ Publishing $PKG with tag $TAG"
     pnpm publish --access public --no-git-checks --tag $TAG
-    # echo "⚡ Publishing $PKG for jsr registry"
-    # pnpx jsr publish -c jsr.json --allow-dirty
+    pnpx tsx ../../scripts/jsr.ts --package $PKG --tag $TAG
+    pnpm install
+    echo "⚡ Publishing $PKG for jsr registry"
+    pnpx jsr publish -c jsr.json --allow-dirty
     popd > /dev/null
   fi
 done

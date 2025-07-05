@@ -14,8 +14,4 @@
  * @license MIT
  */
 
-export {
-  renderHeader,
-  renderUsage,
-  renderValidationErrors
-} from '../../plugin-renderer/src/index.ts'
+export { renderHeader, renderUsage, renderValidationErrors } from '@gunshi/plugin-renderer'

@@ -3,8 +3,8 @@
  * @license MIT
  */
 
-import globals from '../../../plugin-global/src/index.ts'
-import renderer from '../../../plugin-renderer/src/index.ts'
+import globals from '@gunshi/plugin-global'
+import renderer from '@gunshi/plugin-renderer'
 import { cliCore } from './core.ts'
 
 import type { Plugin } from '../plugin.ts'
