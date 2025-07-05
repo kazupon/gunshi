@@ -84,7 +84,6 @@ export type NormalizeToGunshiParams<G> =
 /**
  * Command environment.
  */
-
 export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Current working directory.
