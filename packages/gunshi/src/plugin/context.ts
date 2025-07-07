@@ -57,10 +57,7 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
    * @param name Command name
    * @param command Command definition
    */
-  addCommand<C extends GunshiParamsConstraint>(
-    name: string,
-    command: Command<C> | LazyCommand<C>
-  ): void
+  addCommand(name: string, command: Command<G> | LazyCommand<G>): void
 
   /**
    * Check if a command exists.
@@ -161,17 +158,14 @@ export function createPluginContext<G extends GunshiParamsConstraint = DefaultGu
       return new Map(subCommands)
     },
 
-    addCommand<C extends GunshiParamsConstraint>(
-      name: string,
-      command: Command<C> | LazyCommand<C>
-    ): void {
+    addCommand(name: string, command: Command<G> | LazyCommand<G>): void {
       if (!name) {
         throw new Error('Command name must be a non-empty string')
       }
       if (subCommands.has(name)) {
         throw new Error(`Command '${name}' is already registered`)
       }
-      subCommands.set(name, command as Command<G> | LazyCommand<G>)
+      subCommands.set(name, command)
     },
 
     hasCommand(name: string): boolean {
