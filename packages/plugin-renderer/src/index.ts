@@ -103,11 +103,12 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
         }
 
         const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
-        cachedCommands = (await Promise.all(
+        const allCommands = await Promise.all(
           subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
-        )) as unknown as Command<DefaultGunshiParams>[]
+        )
 
-        return cachedCommands as unknown as Command<G>[]
+        // filter out internal commands
+        return (cachedCommands = allCommands.filter(cmd => !cmd.internal).filter(Boolean))
       }
 
       async function text<

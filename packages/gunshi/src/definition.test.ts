@@ -187,7 +187,8 @@ describe('lazy with type parameters', () => {
       description: 'Test lazy command',
       args: { opt: { type: 'string' as const } },
       examples: 'lazy-test --opt value',
-      toKebab: true
+      toKebab: true,
+      internal: true
     })
 
     expect(lazyCmd.commandName).toBe('lazy-test')
@@ -195,6 +196,7 @@ describe('lazy with type parameters', () => {
     expect(lazyCmd.args).toEqual({ opt: { type: 'string' } })
     expect(lazyCmd.examples).toEqual('lazy-test --opt value')
     expect(lazyCmd.toKebab).toBe(true)
+    expect(lazyCmd.internal).toBe(true)
   })
 
   test('handles type parameters from loaded command', () => {

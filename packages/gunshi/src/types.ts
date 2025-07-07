@@ -407,6 +407,13 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * If you will set to `true`, All {@link Command.args} names will be converted to kebab-case.
    */
   toKebab?: boolean
+  /**
+   * Whether this is an internal command.
+   * Internal commands are not shown in help usage.
+   * @default false
+   * @since v0.27.0
+   */
+  internal?: boolean
 }
 
 /**

@@ -624,3 +624,62 @@ test('not install i18n plugin', async () => {
 
   expect(await renderUsage<WithRendererOnly>(ctx)).toMatchSnapshot()
 })
+
+test('internal commands are filtered out', async () => {
+  const COMMANDS_WITH_INTERNAL = new Map<string, Command<WithRendererOnly>>([
+    [
+      'public',
+      {
+        name: 'public',
+        description: 'Public command',
+        run: NOOP
+      }
+    ],
+    [
+      'internal',
+      {
+        name: 'internal',
+        description: 'Internal command',
+        internal: true,
+        run: NOOP
+      }
+    ],
+    [
+      'another',
+      {
+        name: 'another',
+        description: 'Another public command',
+        run: NOOP
+      }
+    ]
+  ])
+
+  const ctx = await createCommandContext({
+    args: {},
+    values: {},
+    omitted: true,
+    callMode: 'entry',
+    positionals: [],
+    rest: [],
+    argv: [],
+    tokens: [], // dummy, due to test
+    command: {},
+    extensions: {
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd',
+      version: '1.0.0',
+      name: 'test-cli',
+      subCommands: COMMANDS_WITH_INTERNAL
+    }
+  })
+
+  const usage = await renderUsage<WithRendererOnly>(ctx)
+
+  // internal command should not appear in usage
+  expect(usage).toContain('public')
+  expect(usage).toContain('another')
+  expect(usage).not.toContain('internal')
+  expect(usage).not.toContain('Internal command')
+})
