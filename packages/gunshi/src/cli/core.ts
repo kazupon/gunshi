@@ -35,14 +35,17 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   plugins: Plugin[]
 ): Promise<string | undefined> {
   const decorators = createDecorators<G>()
-  const pluginContext = createPluginContext<G>(decorators)
+
+  const initialSubCommands = createInitialSubCommands(options, entry)
+
+  const pluginContext = createPluginContext<G>(decorators, initialSubCommands)
 
   const resolvedPlugins = await applyPlugins(pluginContext, [
     ...plugins,
     ...(options.plugins || [])
   ])
 
-  const cliOptions = normalizeCliOptions(options, entry, decorators)
+  const cliOptions = normalizeCliOptions(options, decorators, pluginContext)
 
   const tokens = parseArgs(argv)
   const subCommand = getSubCommand(tokens)
@@ -126,20 +129,31 @@ function resolveArguments<G extends GunshiParamsConstraint>(
   )
 }
 
-function normalizeCliOptions<G extends GunshiParamsConstraint>(
+function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
-  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
-  decorators: Decorators<G>
-): CliOptions<G> {
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>
+): Map<string, Command<G> | LazyCommand<G>> {
   const subCommands = new Map(options.subCommands)
-  if (options.subCommands) {
+
+  // add entry command to sub commands if there are sub commands
+  if (options.subCommands || subCommands.size > 0) {
     if (isLazyCommand(entry)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      subCommands.set(entry.commandName!, entry as LazyCommand<any>)
+      if (entry.commandName) subCommands.set(entry.commandName, entry as LazyCommand<G>)
     } else if (typeof entry === 'object' && entry.name) {
-      subCommands.set(entry.name, entry)
+      subCommands.set(entry.name, entry as Command<G>)
     }
   }
+
+  return subCommands
+}
+
+function normalizeCliOptions<G extends GunshiParamsConstraint>(
+  options: CliOptions<G>,
+  decorators: Decorators<G>,
+  pluginContext: PluginContext<G>
+): CliOptions<G> {
+  // get the latest sub commands from plugin context (already includes entry command)
+  const subCommands = new Map(pluginContext.subCommands)
 
   const resolvedOptions = Object.assign(create<CliOptions<G>>(), COMMAND_OPTIONS_DEFAULT, options, {
     subCommands

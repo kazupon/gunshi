@@ -7,12 +7,14 @@ import type { ArgSchema } from 'args-tokens'
 import type { Decorators } from '../decorators.ts'
 import type {
   Awaitable,
+  Command,
   CommandContext,
   CommandDecorator,
   DefaultGunshiParams,
   ExtractArgs,
   ExtractExtensions,
   GunshiParamsConstraint,
+  LazyCommand,
   RendererDecorator,
   ValidationErrorsDecorator
 } from '../types.ts'
@@ -38,11 +40,34 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
   readonly globalOptions: Map<string, ArgSchema>
 
   /**
+   * Get the registered sub commands
+   * @returns A map of sub commands.
+   */
+  readonly subCommands: ReadonlyMap<string, Command<G> | LazyCommand<G>>
+
+  /**
    * Add a global option.
    * @param name An option name
    * @param schema An {@link ArgSchema} for the option
    */
   addGlobalOption(name: string, schema: ArgSchema): void
+
+  /**
+   * Add a sub command.
+   * @param name Command name
+   * @param command Command definition
+   */
+  addCommand<C extends GunshiParamsConstraint>(
+    name: string,
+    command: Command<C> | LazyCommand<C>
+  ): void
+
+  /**
+   * Check if a command exists.
+   * @param name Command name
+   * @returns True if the command exists, false otherwise
+   */
+  hasCommand(name: string): boolean
 
   /**
    * Decorate the header renderer.
@@ -98,16 +123,20 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
 /**
  * Factory function for creating a plugin context.
  * @param decorators - A {@link Decorators} instance.
+ * @param initialSubCommands - Initial sub commands map.
  * @returns A new {@link PluginContext} instance.
  */
 export function createPluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  decorators: Decorators<G>
+  decorators: Decorators<G>,
+  initialSubCommands?: Map<string, Command<G> | LazyCommand<G>>
 ): PluginContext<G> {
   /**
    * private states
    */
 
   const globalOptions = new Map<string, ArgSchema>()
+
+  const subCommands = new Map<string, Command<G> | LazyCommand<G>>(initialSubCommands || [])
 
   /**
    * public interfaces
@@ -126,6 +155,27 @@ export function createPluginContext<G extends GunshiParamsConstraint = DefaultGu
         throw new Error(`Global option '${name}' is already registered`)
       }
       globalOptions.set(name, schema)
+    },
+
+    get subCommands(): ReadonlyMap<string, Command<G> | LazyCommand<G>> {
+      return new Map(subCommands)
+    },
+
+    addCommand<C extends GunshiParamsConstraint>(
+      name: string,
+      command: Command<C> | LazyCommand<C>
+    ): void {
+      if (!name) {
+        throw new Error('Command name must be a non-empty string')
+      }
+      if (subCommands.has(name)) {
+        throw new Error(`Command '${name}' is already registered`)
+      }
+      subCommands.set(name, command as Command<G> | LazyCommand<G>)
+    },
+
+    hasCommand(name: string): boolean {
+      return subCommands.has(name)
     },
 
     decorateHeaderRenderer<L extends Record<string, unknown> = DefaultGunshiParams['extensions']>(

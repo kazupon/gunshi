@@ -120,3 +120,156 @@ test('PluginContext#decorateCommand', async () => {
 
   expect(result).toBe('[USAGE] [TEST]')
 })
+
+describe('PluginContext#addCommand', () => {
+  test('basic', () => {
+    const decorators = createDecorators()
+    const ctx = createPluginContext(decorators)
+    const command = {
+      name: 'test',
+      description: 'Test command',
+      run: () => {
+        console.log('test')
+      }
+    }
+
+    ctx.addCommand('test', command)
+
+    expect(ctx.subCommands.size).toBe(1)
+    expect(ctx.subCommands.get('test')).toEqual(command)
+    expect(ctx.hasCommand('test')).toBe(true)
+  })
+
+  test('with initial sub commands', () => {
+    const decorators = createDecorators()
+    const initialCommand = {
+      name: 'initial',
+      description: 'Initial command',
+      run: () => {
+        console.log('initial')
+      }
+    }
+    const initialSubCommands = new Map([['initial', initialCommand]])
+
+    const ctx = createPluginContext(decorators, initialSubCommands)
+
+    expect(ctx.subCommands.size).toBe(1)
+    expect(ctx.subCommands.get('initial')).toEqual(initialCommand)
+
+    const newCommand = {
+      name: 'new',
+      description: 'New command',
+      run: () => {
+        console.log('new')
+      }
+    }
+
+    ctx.addCommand('new', newCommand)
+
+    expect(ctx.subCommands.size).toBe(2)
+    expect(ctx.subCommands.get('new')).toEqual(newCommand)
+    expect(ctx.hasCommand('new')).toBe(true)
+  })
+
+  test('lazy command', () => {
+    const decorators = createDecorators()
+    const ctx = createPluginContext(decorators)
+    const lazyCommand = Object.assign(
+      () => ({
+        name: 'lazy',
+        description: 'Lazy command',
+        run: () => {
+          console.log('lazy')
+        }
+      }),
+      {
+        commandName: 'lazy',
+        description: 'Lazy command'
+      }
+    )
+
+    ctx.addCommand('lazy', lazyCommand)
+
+    expect(ctx.subCommands.size).toBe(1)
+    expect(ctx.subCommands.get('lazy')).toEqual(lazyCommand)
+    expect(ctx.hasCommand('lazy')).toBe(true)
+  })
+
+  test('name empty', () => {
+    const decorators = createDecorators()
+    const ctx = createPluginContext(decorators)
+    const command = {
+      name: 'test',
+      description: 'Test command',
+      run: () => {
+        console.log('test')
+      }
+    }
+
+    expect(() => ctx.addCommand('', command)).toThrow('Command name must be a non-empty string')
+  })
+
+  test('duplicate name', () => {
+    const decorators = createDecorators()
+    const ctx = createPluginContext(decorators)
+    const command = {
+      name: 'test',
+      description: 'Test command',
+      run: () => {
+        console.log('test')
+      }
+    }
+
+    ctx.addCommand('test', command)
+
+    expect(() => ctx.addCommand('test', command)).toThrow(`Command 'test' is already registered`)
+  })
+})
+
+describe('PluginContext#hasCommand', () => {
+  test('returns true for existing command', () => {
+    const decorators = createDecorators()
+    const ctx = createPluginContext(decorators)
+    const command = {
+      name: 'test',
+      description: 'Test command',
+      run: () => {
+        console.log('test')
+      }
+    }
+
+    ctx.addCommand('test', command)
+
+    expect(ctx.hasCommand('test')).toBe(true)
+  })
+
+  test('returns false for non-existing command', () => {
+    const decorators = createDecorators()
+    const ctx = createPluginContext(decorators)
+
+    expect(ctx.hasCommand('nonexistent')).toBe(false)
+  })
+})
+
+describe('PluginContext#subCommands', () => {
+  test('returns readonly map', () => {
+    const decorators = createDecorators()
+    const ctx = createPluginContext(decorators)
+    const command = {
+      name: 'test',
+      description: 'Test command',
+      run: () => {
+        console.log('test')
+      }
+    }
+
+    ctx.addCommand('test', command)
+
+    const subCommands = ctx.subCommands
+    expect(subCommands.size).toBe(1)
+    expect(subCommands.get('test')).toEqual(command)
+
+    // verify that it's a new Map instance (readonly)
+    expect(subCommands).not.toBe(ctx.subCommands)
+  })
+})
