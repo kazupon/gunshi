@@ -102,7 +102,7 @@
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "dependencies": {
-    "args-tokens": "^0.20.1"
+    "args-tokens": "^0.21.0"
   },
   "devDependencies": {
     "@gunshi/plugin-global": "workspace:*",
