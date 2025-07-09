@@ -34,8 +34,8 @@ catalogs:
       specifier: ^5.8.3
       version: 5.8.3
     zod:
-      specifier: ^3.25.74
-      version: 3.25.74
+      specifier: ^4.0.0
+      version: 4.0.0
 
 importers:
 
@@ -251,7 +251,7 @@ importers:
         version: 0.12.9(@typescript/native-preview@7.0.0-dev.20250709.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
       zod:
         specifier: 'catalog:'
-        version: 3.25.74
+        version: 4.0.0
 
   packages/plugin:
     devDependencies:
@@ -503,7 +503,7 @@ importers:
         version: link:../../packages/gunshi
       zod:
         specifier: 'catalog:'
-        version: 3.25.74
+        version: 4.0.0
 
   playground/custom-usage:
     dependencies:
@@ -5016,11 +5016,11 @@ packages:
     peerDependencies:
       zod: ^3.18.0
 
-  zod@3.25.51:
-    resolution: {integrity: sha512-TQSnBldh+XSGL+opiSIq0575wvDPqu09AqWe1F7JhUMKY+M91/aGlK4MhpVNO7MgYfHcVCB1ffwAUTJzllKJqg==}
-
   zod@3.25.74:
     resolution: {integrity: sha512-J8poo92VuhKjNknViHRAIuuN6li/EwFbAC8OedzI8uxpEPGiXHGQu9wemIAioIpqgfB4SySaJhdk0mH5Y4ICBg==}
+
+  zod@4.0.0:
+    resolution: {integrity: sha512-9diLdTPc/L7w/5jI4C3gHYNiGHDV9IZYxo1e5LSD8cabi65WVTWWb+g2BGPEpUUCOxR4D+6O5B0AzyMdUAXwrw==}
 
   zodiarg@0.2.1:
     resolution: {integrity: sha512-Vbd8aW709iKX0XbMvjYkyjQYDBvWKedaUWNelcNeO1OxVYJ8jqUpj6lRBoO0PtN3b1DM6Ykz+hf9Y8e9pczmLQ==}
@@ -7630,8 +7630,8 @@ snapshots:
     dependencies:
       ohmyfetch: 0.4.21
       semver: 7.7.1
-      zod: 3.25.51
-      zodiarg: 0.2.1(zod@3.25.51)
+      zod: 3.25.74
+      zodiarg: 0.2.1(zod@3.25.74)
 
   giget@2.0.0:
     dependencies:
@@ -7998,8 +7998,8 @@ snapshots:
       smol-toml: 1.3.4
       strip-json-comments: 5.0.2
       typescript: 5.8.3
-      zod: 3.25.51
-      zod-validation-error: 3.4.0(zod@3.25.51)
+      zod: 3.25.74
+      zod-validation-error: 3.4.0(zod@3.25.74)
 
   kolorist@1.8.0: {}
 
@@ -8802,7 +8802,7 @@ snapshots:
       quick-lru: 7.0.1
       url-join: 5.0.0
       validate-npm-package-name: 5.0.1
-      zod: 3.25.51
+      zod: 3.25.74
       zod-package-json: 1.1.0
 
   query-string@9.1.1:
@@ -9893,18 +9893,18 @@ snapshots:
 
   zod-package-json@1.1.0:
     dependencies:
-      zod: 3.25.51
+      zod: 3.25.74
 
-  zod-validation-error@3.4.0(zod@3.25.51):
+  zod-validation-error@3.4.0(zod@3.25.74):
     dependencies:
-      zod: 3.25.51
-
-  zod@3.25.51: {}
+      zod: 3.25.74
 
   zod@3.25.74: {}
 
-  zodiarg@0.2.1(zod@3.25.51):
+  zod@4.0.0: {}
+
+  zodiarg@0.2.1(zod@3.25.74):
     dependencies:
-      zod: 3.25.51
+      zod: 3.25.74
 
   zwitch@2.0.4: {}
