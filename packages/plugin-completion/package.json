@@ -55,12 +55,15 @@
     "build": "tsdown",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
-    "typecheck:deno": "deno check ./src"
+    "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "dependencies": {
+    "@bombsh/tab": "git+ssh://git@github.com:bombshell-dev/tab.git",
     "@gunshi/plugin": "workspace:*"
   },
   "devDependencies": {
+    "@gunshi/shared": "workspace:*",
+    "@types/node": "catalog:",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",

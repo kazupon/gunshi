@@ -33,6 +33,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
         './bench/**',
         './playground/**',
         './packages/docs/**',
+        './packages/**/examples/**',
         './**/test/**',
         './**/src/**/*.test.ts',
         './**/src/**/*.test-d.ts'

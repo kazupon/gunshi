@@ -30,6 +30,7 @@
     "build:docs": "pnpm -r build:docs",
     "build:gunshi": "pnpm -F gunshi build",
     "build:plugin": "pnpm -F @gunshi/bone build",
+    "build:plugin:completion": "pnpm -F @gunshi/plugin-completion build",
     "build:plugin:global": "pnpm -F @gunshi/plugin-global build",
     "build:plugin:i18n": "pnpm -F @gunshi/plugin-i18n build",
     "build:plugin:renderer": "pnpm -F @gunshi/plugin-renderer build",

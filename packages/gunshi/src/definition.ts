@@ -169,6 +169,7 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
     lazyCommand.args = definition.args
     lazyCommand.examples = definition.examples
     lazyCommand.internal = definition.internal
+    lazyCommand.entry = definition.entry
     // @ts-ignore - resource property is now provided by plugin-i18n
     if ('resource' in definition) {
       // @ts-ignore

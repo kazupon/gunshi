@@ -4,7 +4,7 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
+import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from '../plugin/context.ts'
@@ -131,17 +131,17 @@ function resolveArguments<G extends GunshiParamsConstraint>(
 
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
-  entry: Command<G> | CommandRunner<G> | LazyCommand<G>
+  entryCmd: Command<G> | CommandRunner<G> | LazyCommand<G>
 ): Map<string, Command<G> | LazyCommand<G>> {
   const subCommands = new Map(options.subCommands)
 
   // add entry command to sub commands if there are sub commands
-  if (options.subCommands || subCommands.size > 0) {
-    if (isLazyCommand(entry)) {
-      if (entry.commandName) subCommands.set(entry.commandName, entry as LazyCommand<G>)
-    } else if (typeof entry === 'object' && entry.name) {
-      subCommands.set(entry.name, entry as Command<G>)
-    }
+  if (
+    (options.subCommands || subCommands.size > 0) &&
+    (isLazyCommand(entryCmd) || typeof entryCmd === 'object')
+  ) {
+    entryCmd.entry = true
+    subCommands.set(resolveEntryName(entryCmd as LazyCommand<G> | Command<G>), entryCmd)
   }
 
   return subCommands
@@ -155,7 +155,7 @@ function normalizeCliOptions<G extends GunshiParamsConstraint>(
   // get the latest sub commands from plugin context (already includes entry command)
   const subCommands = new Map(pluginContext.subCommands)
 
-  const resolvedOptions = Object.assign(create<CliOptions<G>>(), COMMAND_OPTIONS_DEFAULT, options, {
+  const resolvedOptions = Object.assign(create<CliOptions<G>>(), CLI_OPTIONS_DEFAULT, options, {
     subCommands
   }) as CliOptions<G>
 
@@ -209,7 +209,7 @@ async function resolveCommand<G extends GunshiParamsConstraint>(
       } else {
         // inline command (command runner)
         return {
-          command: { run: entry as CommandRunner<G> } as Command<G>,
+          command: { run: entry as CommandRunner<G>, entry: true } as Command<G>,
           callMode: 'entry'
         }
       }
@@ -251,8 +251,12 @@ async function resolveCommand<G extends GunshiParamsConstraint>(
   }
 }
 
-function resolveEntryName<G extends GunshiParamsConstraint>(entry: Command<G>): string {
-  return entry.name || ANONYMOUS_COMMAND_NAME
+function resolveEntryName<G extends GunshiParamsConstraint>(
+  entry: Command<G> | LazyCommand<G>
+): string {
+  return isLazyCommand<G>(entry)
+    ? entry.commandName || ANONYMOUS_COMMAND_NAME
+    : entry.name || ANONYMOUS_COMMAND_NAME
 }
 
 function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextExtension> {

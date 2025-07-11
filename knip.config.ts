@@ -9,6 +9,9 @@ export default {
     'packages/gunshi': {
       entry: ['src/constants.ts']
     },
+    'packages/plugin-completion': {
+      ignore: ['examples/**/*.ts']
+    },
     'packages/docs': {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts']
     }

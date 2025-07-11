@@ -31,7 +31,8 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
       description: cmd.description,
       args: cmd.args,
       examples: cmd.examples,
-      internal: cmd.internal
+      internal: cmd.internal,
+      entry: cmd.entry
     }
     if ('resource' in cmd && cmd.resource) {
       baseCommand.resource = cmd.resource
@@ -52,6 +53,7 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         command.args = loaded.args
         command.examples = loaded.examples
         command.internal = loaded.internal
+        command.entry = loaded.entry
         if ('resource' in loaded && loaded.resource) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ;(command as any).resource = loaded.resource

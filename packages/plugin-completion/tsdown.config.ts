@@ -7,6 +7,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
   clean: true,
   publint: true,
   dts: true,
+  noExternal: ['@bombsh/tab'],
   external: ['@gunshi/plugin'],
   hooks: {
     'build:done': lintJsrExports()

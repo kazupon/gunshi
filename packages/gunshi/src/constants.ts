@@ -9,7 +9,7 @@ export const ANONYMOUS_COMMAND_NAME = '(anonymous)'
 
 export const NOOP: () => void = () => {}
 
-export const COMMAND_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
+export const CLI_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   name: undefined,
   description: undefined,
   version: undefined,

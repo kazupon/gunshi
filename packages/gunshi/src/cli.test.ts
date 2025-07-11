@@ -390,6 +390,10 @@ describe('auto generate usage', () => {
   test('loosely sub commands', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
+    const meta = {
+      name: 'my-cli',
+      renderHeader: null // no header
+    }
 
     const entryArgs = {
       foo: {
@@ -398,6 +402,7 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const entry = {
+      name: 'command1',
       args: entryArgs,
       run: vi.fn()
     } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
@@ -417,8 +422,10 @@ describe('auto generate usage', () => {
     const subCommands = new Map()
     subCommands.set('command2', command2)
 
-    expect(await cli(['-h'], entry, { subCommands })).toMatchSnapshot('main')
-    expect(await cli(['command2', '-h'], entry, { subCommands })).toMatchSnapshot('command2')
+    expect(await cli(['-h'], entry, { ...meta, subCommands })).toMatchSnapshot('main')
+    expect(await cli(['command2', '-h'], entry, { ...meta, subCommands })).toMatchSnapshot(
+      'command2'
+    )
 
     const message = log()
     expect(message).toMatchSnapshot()

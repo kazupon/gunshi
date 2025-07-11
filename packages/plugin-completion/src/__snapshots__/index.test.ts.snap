@@ -1,0 +1,128 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`default command > suggest duplicate options 1`] = `
+"--config	Use specified config file
+--mode	Set env mode
+--logLevel	info | warn | error | silent
+:4
+"
+`;
+
+exports[`default command > suggest duplicate options for short option 1`] = `
+"--config	Use specified config file
+--mode	Set env mode
+--logLevel	info | warn | error | silent
+:4
+"
+`;
+
+exports[`default command > suggest for inputting 1`] = `
+"--config	Use specified config file
+--mode	Set env mode
+--logLevel	info | warn | error | silent
+:4
+"
+`;
+
+exports[`default command > suggest for long option 1`] = `
+"--config	Use specified config file
+:4
+"
+`;
+
+exports[`default command > suggest for short option 1`] = `
+"-c	Use specified config file
+:4
+"
+`;
+
+exports[`default command > suggest value if option values correctly 1`] = `
+"vite.config.ts	Vite config file
+vite.config.js	Vite config file
+:4
+"
+`;
+
+exports[`no input 1`] = `
+"dev	Start dev server
+build	Build project
+lint	Lint project
+:4
+"
+`;
+
+exports[`positional arguments > multiple positional arguments when ending with part of the value 1`] = `
+"index.ts	Index file
+:4
+"
+`;
+
+exports[`positional arguments > single positional argument when ending with space 1`] = `
+"main.ts	Main file
+index.ts	Index file
+:4
+"
+`;
+
+exports[`positional arguments > suggest multiple positional arguments when ending with space 1`] = `
+"main.ts	Main file
+index.ts	Index file
+:4
+"
+`;
+
+exports[`subcommand > keep suggesting the --port option if user typed partial but didn't end with space 1`] = `
+"--port	Specify port
+:4
+"
+`;
+
+exports[`subcommand > not handle if unknown option 1`] = `
+":4
+"
+`;
+
+exports[`subcommand > resolve value if long option and value 1`] = `
+"--port=3000	Development server port
+:4
+"
+`;
+
+exports[`subcommand > suggest for command only 1`] = `
+"dev	Start dev server
+:4
+"
+`;
+
+exports[`subcommand > suggest for long option 1`] = `
+"--port	Specify port
+:4
+"
+`;
+
+exports[`subcommand > suggest for option inputting 1`] = `
+"--host	Specify hostname
+--port	Specify port
+:4
+"
+`;
+
+exports[`subcommand > suggest for short option 1`] = `
+"-H	Specify hostname
+:4
+"
+`;
+
+exports[`subcommand > suggest if user ends with space after \`--port\` 1`] = `
+"3000	Development server port
+8080	Alternative port
+:4
+"
+`;
+
+exports[`subcommand > user typed \`--port=\` and hasn't typed a space or value yet 1`] = `
+"--port=3000	Development server port
+--port=8080	Alternative port
+:4
+"
+`;

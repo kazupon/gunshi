@@ -57,7 +57,7 @@ OPTIONS:
 
 exports[`auto generate usage > loosely sub commands > command2 1`] = `
 "USAGE:
-  COMMAND command2 <OPTIONS>
+  my-cli command2 <OPTIONS>
 
 OPTIONS:
   -h, --help               Display this help message
@@ -68,7 +68,16 @@ OPTIONS:
 
 exports[`auto generate usage > loosely sub commands > main 1`] = `
 "USAGE:
-  COMMAND <OPTIONS>
+  my-cli [command1] <OPTIONS>
+  my-cli <COMMANDS>
+
+COMMANDS:
+  command2            
+  command1            
+
+For more info, run any command with the \`--help\` flag:
+  my-cli command2 --help
+  my-cli command1 --help
 
 OPTIONS:
   -h, --help               Display this help message
@@ -79,7 +88,16 @@ OPTIONS:
 
 exports[`auto generate usage > loosely sub commands 1`] = `
 "USAGE:
-  COMMAND <OPTIONS>
+  my-cli [command1] <OPTIONS>
+  my-cli <COMMANDS>
+
+COMMANDS:
+  command2            
+  command1            
+
+For more info, run any command with the \`--help\` flag:
+  my-cli command2 --help
+  my-cli command1 --help
 
 OPTIONS:
   -h, --help               Display this help message
@@ -87,7 +105,7 @@ OPTIONS:
   -f, --foo <foo>          
 
 USAGE:
-  COMMAND command2 <OPTIONS>
+  my-cli command2 <OPTIONS>
 
 OPTIONS:
   -h, --help               Display this help message

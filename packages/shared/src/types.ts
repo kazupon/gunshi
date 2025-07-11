@@ -5,7 +5,7 @@
 
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
-import type { Args } from 'gunshi'
+import type { Args, DefaultGunshiParams, GunshiParams } from 'gunshi'
 
 type RemoveIndexSignature<T> = {
   [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]
@@ -69,3 +69,17 @@ export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
   KeyOfArgs<RemovedIndex<A>>,
   typeof ARG_PREFIX
 >
+
+/**
+ * Translation function interface
+ */
+export interface Translation<
+  T extends string = CommandBuiltinKeys,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> = DefaultGunshiParams
+> {
+  <O = CommandArgKeys<G['args']>, K = CommandBuiltinKeys | O | T>(
+    key: K,
+    values?: Record<string, unknown>
+  ): string
+}

@@ -276,10 +276,19 @@ importers:
 
   packages/plugin-completion:
     dependencies:
+      '@bombsh/tab':
+        specifier: git+ssh://git@github.com:bombshell-dev/tab.git
+        version: tab@https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138
       '@gunshi/plugin':
         specifier: workspace:*
         version: link:../plugin
     devDependencies:
+      '@gunshi/shared':
+        specifier: workspace:*
+        version: link:../shared
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.16.0
       deno:
         specifier: 'catalog:'
         version: 2.4.0
@@ -1912,9 +1921,6 @@ packages:
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
-
-  '@types/node@22.15.29':
-    resolution: {integrity: sha512-LNdjOkUDlU1RZb8e1kOIUpN1qQUlzGkEtbVNo53vbrwDg5om6oduhm4SiUaPW5ASTXhAiP0jInWG8Qx9fVlOeQ==}
 
   '@types/node@22.16.0':
     resolution: {integrity: sha512-B2egV9wALML1JCpv3VQoQ+yesQKAmNMBIAY7OteVrikcOcAkWm+dGL6qpeCktPjAv6N1JLnhbNiqS35UpFyBsQ==}
@@ -4497,6 +4503,10 @@ packages:
     resolution: {integrity: sha512-2pR2ubZSV64f/vqm9eLPz/KOvR9Dm+Co/5ChLgeHl0yEDRc6h5hXHoxEQH8Y5Ljycozd3p1k5TTSVdzYGkPvLw==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
+  tab@https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138:
+    resolution: {tarball: https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138}
+    version: 0.0.0
+
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
 
@@ -6128,10 +6138,6 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@22.15.29':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@22.16.0':
     dependencies:
       undici-types: 6.21.0
@@ -6743,7 +6749,7 @@ snapshots:
 
   bun-types@1.2.18(@types/react@19.1.8):
     dependencies:
-      '@types/node': 22.15.29
+      '@types/node': 22.16.0
       '@types/react': 19.1.8
 
   byte-size@9.0.1: {}
@@ -9258,6 +9264,10 @@ snapshots:
   synckit@0.11.6:
     dependencies:
       '@pkgr/core': 0.2.4
+
+  tab@https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138:
+    dependencies:
+      mri: 1.2.0
 
   tabbable@6.2.0: {}
 

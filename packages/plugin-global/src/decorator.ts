@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { pluginId as I18n } from './types.ts'
+import { pluginId as Global } from './types.ts'
 
 import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
 import type { GlobalCommandContext } from './extension.ts'
@@ -22,7 +22,7 @@ const decorator: CommandDecorator<{
     values,
     validationError,
     extensions: {
-      [I18n]: { showVersion, showHeader, showUsage, showValidationErrors }
+      [Global]: { showVersion, showHeader, showUsage, showValidationErrors }
     }
   } = ctx
 

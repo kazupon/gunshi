@@ -8,6 +8,7 @@
   "publish": {
     "include": ["src/**/*.ts", "package.json", "jsr.json", "README.md", "CHANGELOG.md", "LICENSE"],
     "exclude": [
+      "examples/**/*.ts",
       "src/**/*.test.ts",
       "src/**/*.test-d.ts",
       "**/__snapshots__/**",

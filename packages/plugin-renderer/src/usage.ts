@@ -8,6 +8,7 @@ import {
   COMMON_ARGS,
   resolveExamples as _resolvedExamples,
   kebabnize,
+  makeShortLongOptionPair,
   resolveArgKey,
   resolveBuiltInKey
 } from '@gunshi/shared'
@@ -322,20 +323,6 @@ async function generateOptionsSymbols<
       ? `[${await ctx.extensions![pluginId].text(resolveBuiltInKey('OPTIONS'))}]`
       : `<${await ctx.extensions![pluginId].text(resolveBuiltInKey('OPTIONS'))}>`
     : ''
-}
-
-export function makeShortLongOptionPair(
-  schema: ArgSchema,
-  name: string,
-  toKebab?: boolean
-): string {
-  // Convert camelCase to kebab-case for display in help text if toKebab is true
-  const displayName = toKebab || schema.toKebab ? kebabnize(name) : name
-  let key = `--${displayName}`
-  if (schema.short) {
-    key = `-${schema.short}, ${key}`
-  }
-  return key
 }
 
 /**

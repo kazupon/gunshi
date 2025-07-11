@@ -44,8 +44,10 @@
       "@gunshi/resources/en-US": ["./packages/resources/locales/en-US.json"],
       "@gunshi/resources/ja-JP": ["./packages/resources/locales/ja-JP.json"],
       "@gunshi/plugin-renderer": ["./packages/plugin-renderer/src/index.ts"],
+      "@gunshi/plugin-completion": ["./packages/plugin-completion/src/index.ts"],
       "@gunshi/plugin-i18n": ["./packages/plugin-i18n/src/index.ts"],
-      "@gunshi/plugin-global": ["./packages/plugin-global/src/index.ts"]
+      "@gunshi/plugin-global": ["./packages/plugin-global/src/index.ts"],
+      "@bombsh/tab": ["./packages/plugin-completion/node_modules/@bombsh/tab"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

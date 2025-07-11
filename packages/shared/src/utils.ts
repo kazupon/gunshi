@@ -3,10 +3,12 @@
  * @license MIT
  */
 
+import { kebabnize } from 'gunshi/utils'
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, PLUGIN_PREFIX } from './constants.ts'
 
 import type {
   Args,
+  ArgSchema,
   CommandContext,
   CommandExamplesFetcher,
   DefaultGunshiParams,
@@ -48,4 +50,18 @@ export function namespacedId<K extends string>(
   id: K
 ): GenerateNamespacedKey<K, typeof PLUGIN_PREFIX> {
   return `${PLUGIN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${id}`
+}
+
+export function makeShortLongOptionPair(
+  schema: ArgSchema,
+  name: string,
+  toKebab?: boolean
+): string {
+  // Convert camelCase to kebab-case for display in help text if toKebab is true
+  const displayName = toKebab || schema.toKebab ? kebabnize(name) : name
+  let key = `--${displayName}`
+  if (schema.short) {
+    key = `-${schema.short}, ${key}`
+  }
+  return key
 }

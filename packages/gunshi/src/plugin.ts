@@ -23,6 +23,8 @@
  * @license MIT
  */
 
+export { CLI_OPTIONS_DEFAULT } from './constants.ts'
+export { createCommandContext } from './context.ts'
 export { plugin } from './plugin/core.ts'
 
 export type { PluginContext } from './plugin/context.ts'

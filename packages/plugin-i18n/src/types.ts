@@ -13,19 +13,14 @@ import type {
   GunshiParamsConstraint,
   NormalizeToGunshiParams
 } from '@gunshi/plugin'
-import {
-  ARG_PREFIX,
-  CommandArgKeys,
-  CommandBuiltinKeys,
-  namespacedId,
-  PLUGIN_PREFIX
-} from '@gunshi/shared'
+import { ARG_PREFIX, CommandBuiltinKeys, namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
 
 import type {
   BuiltinResourceKeys,
   GenerateNamespacedKey,
   KeyOfArgs,
-  RemovedIndex
+  RemovedIndex,
+  Translation
 } from '@gunshi/shared'
 
 /**
@@ -56,14 +51,7 @@ export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiP
    *   - For custom keys: returns an empty string ('')
    *   - For built-in keys (prefixed with '_:'): returns the key itself
    */
-  translate: <
-    T extends string = CommandBuiltinKeys,
-    O = CommandArgKeys<G['args']>,
-    K = CommandBuiltinKeys | O | T
-  >(
-    key: K,
-    values?: Record<string, unknown>
-  ) => string
+  translate: Translation<CommandBuiltinKeys, G>
 }
 
 /**

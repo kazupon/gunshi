@@ -15,7 +15,7 @@
  * @license MIT
  */
 
-import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { create, deepFreeze, isLazyCommand, log } from './utils.ts'
 
 import type {
@@ -148,7 +148,7 @@ export async function createCommandContext<
    * setup the environment
    */
 
-  const env = Object.assign(create<CommandEnvironment<G>>(), COMMAND_OPTIONS_DEFAULT, cliOptions)
+  const env = Object.assign(create<CommandEnvironment<G>>(), CLI_OPTIONS_DEFAULT, cliOptions)
 
   /**
    * create the command context

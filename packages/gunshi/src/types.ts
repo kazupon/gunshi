@@ -414,6 +414,12 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * @since v0.27.0
    */
   internal?: boolean
+  /**
+   * Whether this command is an entry command.
+   * @default undefined
+   * @since v0.27.0
+   */
+  entry?: boolean
 }
 
 /**
