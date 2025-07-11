@@ -32,6 +32,7 @@ import type {
   CommandEnvironment,
   DefaultGunshiParams,
   ExtendContext,
+  ExtractArgExplicitlyProvided,
   ExtractArgs,
   GunshiParams,
   GunshiParamsConstraint,
@@ -59,6 +60,12 @@ interface CommandContextParams<
    * An arguments of target command
    */
   args: ExtractArgs<G>
+
+  /**
+   * Explicitly provided arguments
+   */
+  explicit: ExtractArgExplicitlyProvided<G>
+
   /**
    * A values of target command
    */
