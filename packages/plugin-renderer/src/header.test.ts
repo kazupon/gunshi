@@ -15,6 +15,7 @@ const command = {
 test('basic', async () => {
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -37,6 +38,7 @@ test('basic', async () => {
 test('no description', async () => {
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -58,6 +60,7 @@ test('no description', async () => {
 test('no name & no description', async () => {
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -75,6 +78,7 @@ test('no name & no description', async () => {
 test('no version', async () => {
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],

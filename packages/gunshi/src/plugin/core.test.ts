@@ -361,6 +361,7 @@ describe('Plugin Extensions Integration', () => {
       extensions: { test: TestExtension }
     }>({
       args,
+      explicit: { num: false, 'test-opt': false },
       values: { 'test-opt': 'custom', num: 5 },
       positionals: [],
       rest: [],
@@ -428,6 +429,7 @@ describe('Plugin Extensions Integration', () => {
     // create command context directly
     const ctx = await createCommandContext({
       args: {} as Args,
+      explicit: {},
       values: { user: 'admin', 'log-level': 'debug' },
       positionals: [],
       rest: [],
@@ -463,6 +465,7 @@ describe('Plugin Extensions Integration', () => {
         msg: { type: 'string', default: 'hello' },
         upper: { type: 'boolean', default: false }
       },
+      explicit: { msg: false, upper: false },
       values: { msg: 'hello', upper: true },
       positionals: [],
       rest: [],
@@ -509,6 +512,7 @@ describe('Plugin Extensions Integration', () => {
 
     const ctx = await createCommandContext({
       args: {} as Args,
+      explicit: {},
       values: {},
       positionals: [],
       rest: [],

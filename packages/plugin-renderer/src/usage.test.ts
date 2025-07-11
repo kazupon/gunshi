@@ -155,6 +155,7 @@ test('basic', async () => {
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -188,6 +189,7 @@ test('no arguments', async () => {
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -235,6 +237,7 @@ test('no required on optional arguments', async () => {
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -276,6 +279,7 @@ test('positional arguments', async () => {
 
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -327,6 +331,7 @@ test('mixed positionals and optionals', async () => {
 
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -380,6 +385,7 @@ test('no examples', async () => {
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -434,6 +440,7 @@ test('enable usageOptionType', async () => {
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -462,6 +469,7 @@ test('enable usageOptionType', async () => {
 test('sub commands', async () => {
   const ctx = await createCommandContext({
     args: SHOW.args!,
+    explicit: {},
     values: {},
     omitted: true,
     callMode: 'entry',
@@ -522,6 +530,7 @@ test('kebab-case arguments with toKebab option', async () => {
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -578,6 +587,7 @@ test('kebab-case arguments with Command.toKebab option', async () => {
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
     args: command.args!,
+    explicit: {},
     values: {},
     positionals: [],
     rest: [],
@@ -603,6 +613,7 @@ test('kebab-case arguments with Command.toKebab option', async () => {
 test('not install i18n plugin', async () => {
   const ctx = await createCommandContext({
     args: SHOW.args!,
+    explicit: {},
     values: {},
     omitted: false,
     callMode: 'subCommand',
@@ -656,6 +667,7 @@ test('internal commands are filtered out', async () => {
 
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: {},
     omitted: true,
     callMode: 'entry',

@@ -57,6 +57,7 @@ test('basic', async () => {
 
   const ctx = await createCommandContext({
     args,
+    explicit: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     rest: [],
@@ -137,6 +138,7 @@ test('default', async () => {
   }
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     rest: [],
@@ -221,6 +223,7 @@ describe('plugin extensions', () => {
       extensions: { auth: AuthExtension; db: DbExtension }
     }>({
       args,
+      explicit: { token: false },
       values: { token: 'test-token' },
       positionals: [],
       rest: [],
@@ -284,6 +287,7 @@ describe('plugin extensions', () => {
     }
     const ctx = await createCommandContext({
       args: {},
+      explicit: {},
       values: {},
       positionals: [],
       rest: [],
@@ -339,6 +343,7 @@ describe('plugin extensions', () => {
 
     await createCommandContext({
       args: {},
+      explicit: {},
       values: {},
       positionals: [],
       rest: [],
@@ -369,6 +374,7 @@ describe('plugin extensions', () => {
 
     const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
+      explicit: { name: false },
       values: { name: 'World' },
       positionals: [],
       rest: [],
@@ -428,6 +434,7 @@ describe('plugin extensions', () => {
 
     await createCommandContext<{ args: typeof args; extensions: { test: TestExtension } }>({
       args,
+      explicit: { opt: false },
       values: { opt: 'value' },
       positionals: ['pos1', 'pos2'],
       rest: ['rest1'],
@@ -464,6 +471,7 @@ describe('CommandContextCore type', () => {
 
     const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
+      explicit: { flag: false },
       values: { flag: true },
       positionals: [],
       rest: [],
