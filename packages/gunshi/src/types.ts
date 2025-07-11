@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { Args, ArgToken, ArgValues } from 'args-tokens'
+import type { ArgExplicitlyProvided, Args, ArgToken, ArgValues } from 'args-tokens'
 import type { Plugin } from './plugin/core.ts'
 
 export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
@@ -60,6 +60,12 @@ export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendCon
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
+
+/**
+ * Type helper to extract explicitly provided argument flags from G
+ * @internal
+ */
+export type ExtractArgExplicitlyProvided<G> = ArgExplicitlyProvided<ExtractArgs<G>>
 
 /**
  * Type helper to extract extensions from G
@@ -295,6 +301,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    * The command arguments is same {@link Command.args}.
    */
   args: ExtractArgs<G>
+
   /**
    * Command values, that is the values of the command that is executed.
    * Resolve values with `resolveArgs` from command arguments and {@link Command.args}.
