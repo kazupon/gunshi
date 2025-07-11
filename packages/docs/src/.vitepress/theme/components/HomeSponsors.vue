@@ -11,7 +11,7 @@ const text = 'Become a sponsor'
         <div class="love">
           <span class="vpi-heart icon" />
         </div>
-        <h2 class="message">The development of Gunish is supported by my OSS sponsors!</h2>
+        <h2 class="message">The development of Gunshi is supported by my OSS sponsors!</h2>
       </div>
       <div class="sponsors">
         <a href="https://cdn.jsdelivr.net/gh/kazupon/sponsors/sponsors.svg">
