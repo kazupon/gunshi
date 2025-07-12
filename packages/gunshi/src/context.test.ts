@@ -57,6 +57,7 @@ test('basic', async () => {
 
   const ctx = await createCommandContext({
     args,
+    explicit: { foo: true, bar: true, baz: false, qux: false },
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     rest: [],
@@ -89,6 +90,7 @@ test('basic', async () => {
     name: 'cmd1',
     description: 'this is cmd1',
     args: { foo: { type: 'string' } },
+    explicit: { foo: true, bar: true, baz: false, qux: false },
     values: { foo: 'foo' },
     positionals: ['bar'],
     omitted: true
@@ -129,6 +131,7 @@ test('basic', async () => {
     expect(Object.isFrozen(value)).toEqual(true)
   }
   expect(Object.isFrozen(ctx.values)).toEqual(true)
+  expect(Object.isFrozen(ctx.explicit)).toEqual(true)
 })
 
 test('default', async () => {
@@ -137,6 +140,7 @@ test('default', async () => {
   }
   const ctx = await createCommandContext({
     args: {},
+    explicit: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     rest: [],
@@ -157,6 +161,7 @@ test('default', async () => {
     name: ANONYMOUS_COMMAND_NAME,
     description: undefined,
     args: {},
+    explicit: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     omitted: false
@@ -173,6 +178,7 @@ test('default', async () => {
     renderUsage: undefined,
     renderValidationErrors: undefined
   })
+  expect(Object.isFrozen(ctx.explicit)).toEqual(true)
 })
 
 describe('plugin extensions', () => {
@@ -221,6 +227,7 @@ describe('plugin extensions', () => {
       extensions: { auth: AuthExtension; db: DbExtension }
     }>({
       args,
+      explicit: { token: true },
       values: { token: 'test-token' },
       positionals: [],
       rest: [],
@@ -284,6 +291,7 @@ describe('plugin extensions', () => {
     }
     const ctx = await createCommandContext({
       args: {},
+      explicit: {},
       values: {},
       positionals: [],
       rest: [],
@@ -339,6 +347,7 @@ describe('plugin extensions', () => {
 
     await createCommandContext({
       args: {},
+      explicit: {},
       values: {},
       positionals: [],
       rest: [],
@@ -369,6 +378,7 @@ describe('plugin extensions', () => {
 
     const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
+      explicit: { name: true },
       values: { name: 'World' },
       positionals: [],
       rest: [],
@@ -428,6 +438,7 @@ describe('plugin extensions', () => {
 
     await createCommandContext<{ args: typeof args; extensions: { test: TestExtension } }>({
       args,
+      explicit: { opt: true },
       values: { opt: 'value' },
       positionals: ['pos1', 'pos2'],
       rest: ['rest1'],
@@ -464,6 +475,7 @@ describe('CommandContextCore type', () => {
 
     const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
       args,
+      explicit: { flag: true },
       values: { flag: true },
       positionals: [],
       rest: [],
