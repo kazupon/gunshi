@@ -66,7 +66,7 @@ describe('@gunshi/definition', () => {
     // test command execution
     const ctx = await createCommandContext({
       args: command.args!,
-      explicit: {},
+      explicit: { foo: true },
       values: { foo: 'bar' },
       positionals: [],
       rest: [],

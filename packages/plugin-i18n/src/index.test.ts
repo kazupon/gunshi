@@ -180,7 +180,7 @@ describe('translation adapter', () => {
       extensions: { [K in typeof id]: I18nCommandContext }
     }>({
       args,
-      explicit: {},
+      explicit: { foo: true },
       values: { foo: 'foo' },
       positionals: ['bar'],
       rest: [],
@@ -248,7 +248,7 @@ describe('translation adapter', () => {
       extensions: { [K in typeof id]: I18nCommandContext }
     }>({
       args,
-      explicit: {},
+      explicit: { foo: true },
       values: { foo: 'foo' },
       positionals: ['bar'],
       rest: [],

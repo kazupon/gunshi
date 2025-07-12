@@ -465,7 +465,7 @@ describe('Plugin Extensions Integration', () => {
         msg: { type: 'string', default: 'hello' },
         upper: { type: 'boolean', default: false }
       },
-      explicit: { msg: false, upper: false },
+      explicit: { msg: false, upper: true },
       values: { msg: 'hello', upper: true },
       positionals: [],
       rest: [],
