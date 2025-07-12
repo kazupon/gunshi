@@ -303,6 +303,16 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
   args: ExtractArgs<G>
 
   /**
+   * Whether arguments were explicitly provided by the user.
+   *
+   * - `true`: The argument was explicitly provided via command line
+   * - `false`: The argument was not explicitly provided. This means either:
+   *   - The value comes from a default value defined in the argument schema
+   *   - The value is `undefined` (no explicit input and no default value)
+   */
+  explicit: ExtractArgExplicitlyProvided<G>
+
+  /**
    * Command values, that is the values of the command that is executed.
    * Resolve values with `resolveArgs` from command arguments and {@link Command.args}.
    */

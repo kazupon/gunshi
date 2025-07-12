@@ -57,7 +57,7 @@ test('basic', async () => {
 
   const ctx = await createCommandContext({
     args,
-    explicit: {},
+    explicit: { foo: true, bar: false, baz: false, qux: false },
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     rest: [],
@@ -90,6 +90,7 @@ test('basic', async () => {
     name: 'cmd1',
     description: 'this is cmd1',
     args: { foo: { type: 'string' } },
+    explicit: { foo: true, bar: false, baz: false, qux: false },
     values: { foo: 'foo' },
     positionals: ['bar'],
     omitted: true
@@ -130,6 +131,7 @@ test('basic', async () => {
     expect(Object.isFrozen(value)).toEqual(true)
   }
   expect(Object.isFrozen(ctx.values)).toEqual(true)
+  expect(Object.isFrozen(ctx.explicit)).toEqual(true)
 })
 
 test('default', async () => {
@@ -159,6 +161,7 @@ test('default', async () => {
     name: ANONYMOUS_COMMAND_NAME,
     description: undefined,
     args: {},
+    explicit: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     omitted: false
@@ -175,6 +178,7 @@ test('default', async () => {
     renderUsage: undefined,
     renderValidationErrors: undefined
   })
+  expect(Object.isFrozen(ctx.explicit)).toEqual(true)
 })
 
 describe('plugin extensions', () => {

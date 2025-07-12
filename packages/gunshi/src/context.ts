@@ -124,6 +124,7 @@ export async function createCommandContext<
   E extends Record<string, CommandContextExtension> = {}
 >({
   args,
+  explicit,
   values,
   positionals,
   rest,
@@ -168,6 +169,7 @@ export async function createCommandContext<
     callMode,
     env,
     args: _args,
+    explicit,
     values,
     positionals,
     rest,
