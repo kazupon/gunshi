@@ -176,7 +176,7 @@ describe('plugin function', () => {
 
     expect(simplePlugin.id).toBe('simple-plugin')
     expect(simplePlugin.name).toBe('simple-plugin')
-    expect(simplePlugin.extension).toBeUndefined()
+    expect(simplePlugin.extension).toBeDefined()
 
     // check that setup function is callable
     const decorators = createDecorators()
@@ -247,7 +247,7 @@ describe('plugin function', () => {
         })
       }
     })
-    expect(testPlugin.extension).toBeUndefined()
+    expect(testPlugin.extension).toBeDefined()
   })
 })
 

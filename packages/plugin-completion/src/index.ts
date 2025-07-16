@@ -10,8 +10,14 @@ import { pluginId } from './types.ts'
 import { quoteExec } from './utils.ts'
 
 import type { Handler } from '@bombsh/tab'
-import type { Args, Command, LazyCommand, PluginContext, PluginWithExtension } from '@gunshi/plugin'
-import type { CompletionCommandContext, CompletionConfig, CompletionOptions } from './types.ts'
+import type {
+  Args,
+  Command,
+  LazyCommand,
+  PluginContext,
+  PluginWithoutExtension
+} from '@gunshi/plugin'
+import type { CompletionConfig, CompletionOptions } from './types.ts'
 
 export * from './types.ts'
 
@@ -27,9 +33,7 @@ const NOOP_HANDLER: Handler = () => {
 /**
  * completion plugin for gunshi
  */
-export default function completion(
-  options: CompletionOptions = {}
-): PluginWithExtension<CompletionCommandContext> {
+export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {
   const config = options.config || {}
   const completion = new Completion()
 
@@ -76,18 +80,11 @@ export default function completion(
       ctx.decorateHeaderRenderer(async (_baseRenderer, _cmdCtx) => '')
     },
 
-    // TODO(kazupon): type inference with plugin function type parameter
-    extension: (_ctx, _cmd): CompletionCommandContext => {
-      return {} as CompletionCommandContext
-    },
-
     /**
      * setup bombshell completion with `onExtension` hook
      */
 
     onExtension: async (ctx, _cmd) => {
-      // TODO(kazupon): type inference with plugin function type parameter, more improvements!
-
       // NOTE(kazupon): we should use plugin-i18n for completion localization, but it is not ready yet.
       // const extensions = ctx.extensions as unknown as { [i18nPluginId]: I18nCommandContext }
       // const i18n = extensions[i18nPluginId]

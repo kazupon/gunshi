@@ -15,6 +15,10 @@ import type {
 } from '../types.ts'
 import type { PluginContext } from './context.ts'
 
+const NOOP_EXTENSION = () => {
+  return Object.create(null)
+}
+
 /**
  * Plugin dependency definition
  * @since v0.27.0
@@ -163,6 +167,7 @@ export function plugin(options: {
   name?: string
   dependencies?: (PluginDependency | string)[]
   setup?: (ctx: Readonly<PluginContext<DefaultGunshiParams>>) => Awaitable<void>
+  onExtension?: OnPluginExtension<DefaultGunshiParams>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
 /**
@@ -184,7 +189,8 @@ export function plugin<
   extension?: PluginExtension<E, DefaultGunshiParams>
   onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]?: E } }>
 }): PluginWithExtension<E> | PluginWithoutExtension<DefaultGunshiParams['extensions']> {
-  const { id, name, setup, extension, onExtension, dependencies } = options
+  const { id, name, setup, onExtension, dependencies } = options
+  const extension = options.extension || (NOOP_EXTENSION as PluginExtension<E, DefaultGunshiParams>)
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
