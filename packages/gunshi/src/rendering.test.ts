@@ -8,7 +8,7 @@ import type { Command } from './types.ts'
 
 describe('Command rendering options', () => {
   describe('header rendering', () => {
-    test('should disable header when header is null', async () => {
+    test('disable header when header is null', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -29,7 +29,7 @@ describe('Command rendering options', () => {
       expect(stdout).toBe('Command executed')
     })
 
-    test('should use custom header renderer', async () => {
+    test('use custom header renderer', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -51,7 +51,7 @@ describe('Command rendering options', () => {
       expect(stdout).toContain('Command executed')
     })
 
-    test('should use default renderer when header is undefined', async () => {
+    test('use default renderer when header is undefined', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -73,7 +73,7 @@ describe('Command rendering options', () => {
   })
 
   describe('usage rendering', () => {
-    test('should disable usage when usage is null', async () => {
+    test('disable usage when usage is null', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -99,7 +99,7 @@ describe('Command rendering options', () => {
       expect(stdout).toBe('')
     })
 
-    test('should use custom usage renderer', async () => {
+    test('use custom usage renderer', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -126,7 +126,7 @@ describe('Command rendering options', () => {
   })
 
   describe('validation errors rendering', () => {
-    test('should disable validation errors when validationErrors is null', async () => {
+    test('disable validation errors when validationErrors is null', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -152,7 +152,7 @@ describe('Command rendering options', () => {
       expect(stdout).toBe('')
     })
 
-    test('should use custom validation errors renderer', async () => {
+    test('use custom validation errors renderer', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -181,7 +181,7 @@ describe('Command rendering options', () => {
   })
 
   describe('integration with plugin-renderer', () => {
-    test('Command rendering option should take precedence over plugin decorators', async () => {
+    test('command rendering option should take precedence over plugin decorators', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
@@ -213,7 +213,7 @@ describe('Command rendering options', () => {
   })
 
   describe('partial rendering customization', () => {
-    test('should customize only specified renderers', async () => {
+    test('customize only specified renderers', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
