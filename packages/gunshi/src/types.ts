@@ -392,7 +392,7 @@ export interface CommandContextExtension<
 
 /**
  * Rendering control options
- * @since 0.27.0
+ * @since v0.27.0
  */
 export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
@@ -471,7 +471,7 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
   entry?: boolean
   /**
    * Rendering control options
-   * @since 0.27.0
+   * @since v0.27.0
    */
   rendering?: RenderingOptions<G>
 }
