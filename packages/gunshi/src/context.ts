@@ -159,6 +159,25 @@ export async function createCommandContext<
   const env = Object.assign(create<CommandEnvironment<G>>(), CLI_OPTIONS_DEFAULT, cliOptions)
 
   /**
+   * apply Command definition's rendering option with highest priority
+   */
+  if (command.rendering) {
+    const { header, usage, validationErrors } = command.rendering
+    // apply header renderer
+    if (header !== undefined) {
+      env.renderHeader = header as typeof env.renderHeader
+    }
+    // apply usage renderer
+    if (usage !== undefined) {
+      env.renderUsage = usage as typeof env.renderUsage
+    }
+    // apply validation errors renderer
+    if (validationErrors !== undefined) {
+      env.renderValidationErrors = validationErrors as typeof env.renderValidationErrors
+    }
+  }
+
+  /**
    * create the command context
    */
 

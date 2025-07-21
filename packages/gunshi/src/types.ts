@@ -391,6 +391,38 @@ export interface CommandContextExtension<
 }
 
 /**
+ * Rendering control options
+ * @since 0.27.0
+ */
+export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> {
+  /**
+   * Header rendering configuration
+   * - `null`: Disable rendering
+   * - `function`: Use custom renderer
+   * - `undefined` (when omitted): Use default renderer
+   */
+  header?: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null
+
+  /**
+   * Usage rendering configuration
+   * - `null`: Disable rendering
+   * - `function`: Use custom renderer
+   * - `undefined` (when omitted): Use default renderer
+   */
+  usage?: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null
+
+  /**
+   * Validation errors rendering configuration
+   * - `null`: Disable rendering
+   * - `function`: Use custom renderer
+   * - `undefined` (when omitted): Use default renderer
+   */
+  validationErrors?:
+    | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
+    | null
+}
+
+/**
  * Command interface.
  */
 
@@ -437,6 +469,11 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * @since v0.27.0
    */
   entry?: boolean
+  /**
+   * Rendering control options
+   * @since 0.27.0
+   */
+  rendering?: RenderingOptions<G>
 }
 
 /**

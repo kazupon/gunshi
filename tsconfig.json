@@ -127,5 +127,5 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "include": ["**/*.ts"],
-  "exclude": ["playground/bun/index.ts", "playground/deno/main.ts"]
+  "exclude": ["playground/bun/index.ts", "playground/deno/main.ts", "design/*.ts"]
 }

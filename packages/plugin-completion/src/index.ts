@@ -54,6 +54,9 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
         name: completeName,
         // TODO(kazupon): support description localization
         description: 'Generate shell completion script',
+        rendering: {
+          header: null // disable header rendering for completion command
+        },
         run: async cmdCtx => {
           if (!cmdCtx.env.name) {
             throw new Error('your cli name is not defined.')
@@ -72,12 +75,6 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
           }
         }
       })
-
-      /**
-       * disable header renderer
-       */
-      // TODO(kazupon): we might be change this to a more flexible way
-      ctx.decorateHeaderRenderer(async (_baseRenderer, _cmdCtx) => '')
     },
 
     /**
