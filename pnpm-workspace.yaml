@@ -8,7 +8,7 @@ catalog:
   jsr: ^0.13.5
   jsr-exports-lint: ^0.4.1
   publint: ^0.3.12
-  tsdown: ^0.12.9
+  tsdown: ^0.13.0
   '@types/node': ^22.16.5
   typedoc: ^0.28.7
   typedoc-plugin-markdown: ^4.7.1
