@@ -5,7 +5,7 @@
 
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
-import type { Args, DefaultGunshiParams, GunshiParams } from 'gunshi'
+import type { Args } from 'gunshi'
 
 type RemoveIndexSignature<T> = {
   [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]
@@ -48,38 +48,52 @@ export type CommandBuiltinResourceKeys =
   (typeof import('./constants.ts'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
 
 /**
- * i18n built-in resource keys.
+ * Built-in resource keys.
  */
 export type BuiltinResourceKeys = CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
 
 /**
- * Command i18n built-in keys.
- * The command i18n built-in keys are used by the i18n plugin for translation.
+ * Command built-in keys.
  */
-export type CommandBuiltinKeys =
-  | GenerateNamespacedKey<BuiltinResourceKeys>
-  | 'description'
-  | 'examples'
+export type CommandBuiltinKeys = GenerateNamespacedKey<BuiltinResourceKeys>
 
 /**
  * Command i18n option keys.
  * The command i18n option keys are used by the i18n plugin for translation.
  */
-export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
-  KeyOfArgs<RemovedIndex<A>>,
-  typeof ARG_PREFIX
->
+export type CommandArgKeys<
+  A extends Args,
+  C = {},
+  K extends string = GenerateNamespacedKey<
+    Extract<KeyOfArgs<RemovedIndex<A>>, string>,
+    typeof ARG_PREFIX
+  >
+> = C extends { name: infer N } ? (N extends string ? GenerateNamespacedKey<K, N> : K) : K
+
+/**
+ * Resolve translation keys for command context.
+ */
+export type ResolveTranslationKeys<
+  A extends Args,
+  C = {}, // for CommandContext
+  E extends Record<string, string> = {}, // for extended resources
+  R extends string = keyof RemovedIndex<E>,
+  T extends string = C extends { name: infer N }
+    ? N extends string
+      ? GenerateNamespacedKey<R, N>
+      : R
+    : R | CommandBuiltinKeys,
+  O = CommandArgKeys<A, C>
+> = CommandBuiltinKeys | O | T
 
 /**
  * Translation function interface
  */
 export interface Translation<
-  T extends string = CommandBuiltinKeys,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> = DefaultGunshiParams
+  A extends Args,
+  C = {}, // for CommandContext
+  E extends Record<string, string> = {}, // for extended resources
+  K = ResolveTranslationKeys<A, C, E>
 > {
-  <O = CommandArgKeys<G['args']>, K = CommandBuiltinKeys | O | T>(
-    key: K,
-    values?: Record<string, unknown>
-  ): string
+  (key: K, values?: Record<string, unknown>): string
 }

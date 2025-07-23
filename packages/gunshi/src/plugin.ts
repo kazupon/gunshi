@@ -47,6 +47,7 @@ export type {
   Command,
   CommandContext,
   CommandContextCore,
+  CommandContextExtension,
   CommandDecorator,
   CommandExamplesFetcher,
   CommandRunner,

@@ -61,7 +61,11 @@
     "@bombsh/tab": "https://pkg.pr.new/bombshell-dev/tab@main",
     "@gunshi/plugin": "workspace:*"
   },
+  "peerDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*"
+  },
   "devDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*",
     "@gunshi/shared": "workspace:*",
     "@types/node": "catalog:",
     "deno": "catalog:",

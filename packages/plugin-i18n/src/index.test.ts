@@ -1,4 +1,4 @@
-import { namespacedId, resolveBuiltInKey } from '@gunshi/shared'
+import { namespacedId, resolveArgKey, resolveBuiltInKey, resolveKey } from '@gunshi/shared'
 import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
@@ -7,9 +7,9 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../test/helper.ts'
-import i18n, { defineI18n } from './index.ts'
+import i18n, { defineI18n, pluginId } from './index.ts'
 
-import type { Args, Command, GunshiParams } from '@gunshi/plugin'
+import type { Args, Command, CommandContext, GunshiParams } from '@gunshi/plugin'
 import type {
   CommandResource,
   CommandResourceFetcher,
@@ -21,116 +21,120 @@ afterEach(() => {
   vi.resetAllMocks()
 })
 
-test('create i18n extension with default locale', async () => {
-  const plugin = i18n()
-  const ctx = await createMockCommandContext()
-  const extension = await plugin.extension.factory(ctx, {} as Command)
-
-  expect(extension).toBeDefined()
-  expect(extension.locale.toString()).toBe('en-US')
-  expect(typeof extension.translate).toBe('function')
-})
-
-test('create i18n extension with custom locale', async () => {
-  const plugin = i18n({ locale: 'ja-JP' })
-  const ctx = await createMockCommandContext()
-  const extension = await plugin.extension.factory(ctx, {} as Command)
-
-  expect(extension.locale.toString()).toBe('ja-JP')
-})
-
-describe('translate built-in keys', () => {
-  test('default: en-US', async () => {
+describe('extension: locale', () => {
+  test('create i18n extension with default locale', async () => {
     const plugin = i18n()
     const ctx = await createMockCommandContext()
     const extension = await plugin.extension.factory(ctx, {} as Command)
 
-    expect(extension.translate(resolveBuiltInKey('ARGUMENTS'))).toEqual('ARGUMENTS')
-    expect(extension.translate(resolveBuiltInKey('OPTIONS'))).toEqual('OPTIONS')
-    expect(extension.translate(resolveBuiltInKey('COMMANDS'))).toEqual('COMMANDS')
-    expect(extension.translate(resolveBuiltInKey('USAGE'))).toEqual('USAGE')
-    expect(extension.translate(resolveBuiltInKey('COMMAND'))).toEqual('COMMAND')
-    expect(extension.translate(resolveBuiltInKey('EXAMPLES'))).toEqual('EXAMPLES')
-    expect(extension.translate(resolveBuiltInKey('SUBCOMMAND'))).toEqual('SUBCOMMAND')
-    expect(extension.translate(resolveBuiltInKey('CHOICES'))).toEqual('choices')
-    expect(extension.translate(resolveBuiltInKey('DEFAULT'))).toEqual('default')
-    expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
-      'For more info, run any command with the `--help` flag'
-    )
-    expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('Negatable of')
-    expect(extension.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
-    expect(extension.translate(resolveBuiltInKey('version'))).toEqual('Display this version')
+    expect(extension).toBeDefined()
+    expect(extension.locale.toString()).toBe('en-US')
+    expect(typeof extension.translate).toBe('function')
   })
 
-  test('custom locale: ja-JP', async () => {
-    const jaJPResource = await import('@gunshi/resources/ja-JP', { with: { type: 'json' } }).then(
-      m => m.default || m
-    )
-    const plugin = i18n({ locale: 'ja-JP', resources: { 'ja-JP': jaJPResource } })
+  test('create i18n extension with custom locale', async () => {
+    const plugin = i18n({ locale: 'ja-JP' })
     const ctx = await createMockCommandContext()
     const extension = await plugin.extension.factory(ctx, {} as Command)
 
-    expect(extension.translate(resolveBuiltInKey('ARGUMENTS'))).toEqual('引数')
-    expect(extension.translate(resolveBuiltInKey('OPTIONS'))).toEqual('オプション')
-    expect(extension.translate(resolveBuiltInKey('COMMANDS'))).toEqual('コマンド')
-    expect(extension.translate(resolveBuiltInKey('USAGE'))).toEqual('使い方')
-    expect(extension.translate(resolveBuiltInKey('COMMAND'))).toEqual('コマンド')
-    expect(extension.translate(resolveBuiltInKey('EXAMPLES'))).toEqual('例')
-    expect(extension.translate(resolveBuiltInKey('SUBCOMMAND'))).toEqual('サブコマンド')
-    expect(extension.translate(resolveBuiltInKey('CHOICES'))).toEqual('選択肢')
-    expect(extension.translate(resolveBuiltInKey('DEFAULT'))).toEqual('デフォルト')
-    expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
-      '詳細は、コマンドと`--help`フラグを実行してください'
-    )
-    expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('否定可能な')
-    expect(extension.translate(resolveBuiltInKey('help'))).toEqual('このヘルプメッセージを表示')
-    expect(extension.translate(resolveBuiltInKey('version'))).toEqual('このバージョンを表示')
+    expect(extension.locale.toString()).toBe('ja-JP')
   })
 })
 
-describe('translate non-built-in keys', () => {
-  test('default: en-US', async () => {
-    const translation = {
-      getMessage: vi.fn(),
-      setResource: vi.fn(),
-      getResource: vi.fn(),
-      translate: vi.fn().mockImplementation(key => key)
-    } as TranslationAdapter
-    const plugin = i18n({ translationAdapterFactory: () => translation })
-    const ctx = await createMockCommandContext()
-    const extension = await plugin.extension.factory(ctx, {} as Command)
-    extension.translate(resolveBuiltInKey('ARGUMENTS'))
-    extension.translate('description')
+describe('extension: translate', () => {
+  describe('translate built-in keys', () => {
+    test('default: en-US', async () => {
+      const plugin = i18n()
+      const ctx = await createMockCommandContext()
+      const extension = await plugin.extension.factory(ctx, {} as Command)
 
-    expect(translation.translate).toHaveBeenCalledTimes(1)
-    expect(translation.translate).toHaveBeenCalledWith('en-US', 'description', {})
+      expect(extension.translate(resolveBuiltInKey('ARGUMENTS'))).toEqual('ARGUMENTS')
+      expect(extension.translate(resolveBuiltInKey('OPTIONS'))).toEqual('OPTIONS')
+      expect(extension.translate(resolveBuiltInKey('COMMANDS'))).toEqual('COMMANDS')
+      expect(extension.translate(resolveBuiltInKey('USAGE'))).toEqual('USAGE')
+      expect(extension.translate(resolveBuiltInKey('COMMAND'))).toEqual('COMMAND')
+      expect(extension.translate(resolveBuiltInKey('EXAMPLES'))).toEqual('EXAMPLES')
+      expect(extension.translate(resolveBuiltInKey('SUBCOMMAND'))).toEqual('SUBCOMMAND')
+      expect(extension.translate(resolveBuiltInKey('CHOICES'))).toEqual('choices')
+      expect(extension.translate(resolveBuiltInKey('DEFAULT'))).toEqual('default')
+      expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
+        'For more info, run any command with the `--help` flag'
+      )
+      expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('Negatable of')
+      expect(extension.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
+      expect(extension.translate(resolveBuiltInKey('version'))).toEqual('Display this version')
+    })
+
+    test('custom locale: ja-JP', async () => {
+      const jaJPResource = await import('@gunshi/resources/ja-JP', { with: { type: 'json' } }).then(
+        m => m.default || m
+      )
+      const plugin = i18n({ locale: 'ja-JP', resources: { 'ja-JP': jaJPResource } })
+      const ctx = await createMockCommandContext()
+      const extension = await plugin.extension.factory(ctx, {} as Command)
+
+      expect(extension.translate(resolveBuiltInKey('ARGUMENTS'))).toEqual('引数')
+      expect(extension.translate(resolveBuiltInKey('OPTIONS'))).toEqual('オプション')
+      expect(extension.translate(resolveBuiltInKey('COMMANDS'))).toEqual('コマンド')
+      expect(extension.translate(resolveBuiltInKey('USAGE'))).toEqual('使い方')
+      expect(extension.translate(resolveBuiltInKey('COMMAND'))).toEqual('コマンド')
+      expect(extension.translate(resolveBuiltInKey('EXAMPLES'))).toEqual('例')
+      expect(extension.translate(resolveBuiltInKey('SUBCOMMAND'))).toEqual('サブコマンド')
+      expect(extension.translate(resolveBuiltInKey('CHOICES'))).toEqual('選択肢')
+      expect(extension.translate(resolveBuiltInKey('DEFAULT'))).toEqual('デフォルト')
+      expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
+        '詳細は、コマンドと`--help`フラグを実行してください'
+      )
+      expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('否定可能な')
+      expect(extension.translate(resolveBuiltInKey('help'))).toEqual('このヘルプメッセージを表示')
+      expect(extension.translate(resolveBuiltInKey('version'))).toEqual('このバージョンを表示')
+    })
   })
 
-  test('custom locale: ja-JP', async () => {
-    const translation = {
-      getMessage: vi.fn(),
-      setResource: vi.fn(),
-      getResource: vi.fn(),
-      translate: vi.fn().mockImplementation(key => key)
-    } as TranslationAdapter
-    const plugin = i18n({ translationAdapterFactory: () => translation, locale: 'ja-JP' })
+  describe('translate non-built-in keys', () => {
+    test('default: en-US', async () => {
+      const translation = {
+        getMessage: vi.fn(),
+        setResource: vi.fn(),
+        getResource: vi.fn(),
+        translate: vi.fn().mockImplementation(key => key)
+      } as TranslationAdapter
+      const plugin = i18n({ translationAdapterFactory: () => translation })
+      const ctx = await createMockCommandContext()
+      const extension = await plugin.extension.factory(ctx, {} as Command)
+      extension.translate(resolveBuiltInKey('ARGUMENTS'))
+      extension.translate('description')
+
+      expect(translation.translate).toHaveBeenCalledTimes(1)
+      expect(translation.translate).toHaveBeenCalledWith('en-US', 'description', {})
+    })
+
+    test('custom locale: ja-JP', async () => {
+      const translation = {
+        getMessage: vi.fn(),
+        setResource: vi.fn(),
+        getResource: vi.fn(),
+        translate: vi.fn().mockImplementation(key => key)
+      } as TranslationAdapter
+      const plugin = i18n({ translationAdapterFactory: () => translation, locale: 'ja-JP' })
+      const ctx = await createMockCommandContext()
+      const extension = await plugin.extension.factory(ctx, {} as Command)
+      extension.translate(resolveBuiltInKey('ARGUMENTS'))
+      extension.translate('examples', { foo: 'bar' })
+
+      expect(translation.translate).toHaveBeenCalledTimes(1)
+      expect(translation.translate).toHaveBeenCalledWith('ja-JP', 'examples', { foo: 'bar' })
+    })
+  })
+
+  test('handle missing translations gracefully', async () => {
+    const plugin = i18n()
     const ctx = await createMockCommandContext()
     const extension = await plugin.extension.factory(ctx, {} as Command)
-    extension.translate(resolveBuiltInKey('ARGUMENTS'))
-    extension.translate('examples', { foo: 'bar' })
 
-    expect(translation.translate).toHaveBeenCalledTimes(1)
-    expect(translation.translate).toHaveBeenCalledWith('ja-JP', 'examples', { foo: 'bar' })
+    // test non-existent key
+    expect(extension.translate('non-existent-key')).toBe('')
   })
-})
-
-test('handle missing translations gracefully', async () => {
-  const plugin = i18n()
-  const ctx = await createMockCommandContext()
-  const extension = await plugin.extension.factory(ctx, {} as Command)
-
-  // test non-existent key
-  expect(extension.translate('non-existent-key')).toBe('')
 })
 
 describe('translation adapter', () => {
@@ -159,9 +163,13 @@ describe('translation adapter', () => {
 
     const id = namespacedId('i18n')
     using mockResource = vi
-      .fn<CommandResourceFetcher<{ extensions: { [K in typeof id]: I18nCommandContext } }>>()
+      .fn<
+        CommandResourceFetcher<{
+          extensions: { [K in typeof id]: I18nCommandContext }
+        }>
+      >()
       .mockImplementation(ctx => {
-        if (ctx.extensions[id].locale.toString() === loadLocale) {
+        if (ctx.extensions[pluginId].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
@@ -197,9 +205,15 @@ describe('translation adapter', () => {
 
     const ext = ctx.extensions[id]
     const mf1 = new MessageFormat('ja-JP', jaJPResource['arg:foo'])
-    expect(ext.translate('arg:foo')).toEqual(mf1.format())
+    expect(
+      ext.translate(resolveArgKey<typeof args>('foo', ctx as unknown as CommandContext))
+    ).toEqual(mf1.format())
     const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
-    expect(ext.translate('user', { user: 'kazupon' })).toEqual(mf2.format({ user: 'kazupon' }))
+    expect(
+      ext.translate(resolveKey<{ user: string }>('user', ctx as unknown as CommandContext), {
+        user: 'kazupon'
+      })
+    ).toEqual(mf2.format({ user: 'kazupon' }))
   })
 
   test('Intlify Message Format', async () => {
@@ -227,9 +241,13 @@ describe('translation adapter', () => {
 
     const id = namespacedId('i18n')
     using mockResource = vi
-      .fn<CommandResourceFetcher<{ extensions: { [K in typeof id]: I18nCommandContext } }>>()
+      .fn<
+        CommandResourceFetcher<{
+          extensions: { [K in typeof id]: I18nCommandContext }
+        }>
+      >()
       .mockImplementation(ctx => {
-        if (ctx.extensions[id].locale.toString() === loadLocale) {
+        if (ctx.extensions[pluginId].locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
@@ -264,7 +282,11 @@ describe('translation adapter', () => {
     })
 
     const ext = ctx.extensions[id]
-    expect(ext.translate('arg:foo')).toEqual(jaJPResource['arg:foo'])
-    expect(ext.translate('user', { user: 'kazupon' })).toEqual(`こんにちは、kazupon`)
+    expect(ext.translate(resolveArgKey('foo', ctx as unknown as CommandContext))).toEqual(
+      jaJPResource['arg:foo']
+    )
+    expect(
+      ext.translate(resolveKey('user', ctx as unknown as CommandContext), { user: 'kazupon' })
+    ).toEqual(`こんにちは、kazupon`)
   })
 })

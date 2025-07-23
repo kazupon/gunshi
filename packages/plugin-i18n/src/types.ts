@@ -4,23 +4,23 @@
  */
 
 import type {
+  Args,
   Awaitable,
   Command,
   CommandContext,
   DefaultGunshiParams,
   ExtractArgs,
   GunshiParams,
-  GunshiParamsConstraint,
-  NormalizeToGunshiParams
+  GunshiParamsConstraint
 } from '@gunshi/plugin'
-import { ARG_PREFIX, CommandBuiltinKeys, namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
+import { ARG_PREFIX, namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
 
 import type {
   BuiltinResourceKeys,
   GenerateNamespacedKey,
   KeyOfArgs,
   RemovedIndex,
-  Translation
+  ResolveTranslationKeys
 } from '@gunshi/shared'
 
 /**
@@ -44,14 +44,33 @@ export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiP
    */
   locale: string | Intl.Locale
   /**
-   * Translate a message
+   * Translate a message.
    * @param key Translation key
    * @param values Values to interpolate
    * @returns Translated message. If the key is not found:
    *   - For custom keys: returns an empty string ('')
    *   - For built-in keys (prefixed with '_:'): returns the key itself
    */
-  translate: Translation<CommandBuiltinKeys, G>
+  translate: <
+    A extends Args = G['args'],
+    C = {}, // for CommandContext
+    E extends Record<string, string> = {}, // for extended resources
+    K = ResolveTranslationKeys<A, C, E>
+  >(
+    key: K,
+    values?: Record<string, unknown>
+  ) => string
+  /**
+   * Load command resources.
+   * @param ctx Command context
+   * @param command Command
+   * @returns Whether the resources were loaded successfully
+   */
+  loadResource: (
+    locale: string | Intl.Locale,
+    ctx: CommandContext,
+    command: Command
+  ) => Promise<boolean>
 }
 
 /**
@@ -137,22 +156,9 @@ export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Command description.
    */
   description: string
-  /**
-   * Examples usage.
-   */
-  examples: string | CommandExamplesFetcher<NormalizeToGunshiParams<G>>
 } & {
   [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]: string
 } & { [key: string]: string } // Infer the arguments usage, Define the user resources
-
-/**
- * Command examples fetcher.
- * @param ctx A {@link CommandContext | command context}
- * @returns A fetched command examples.
- */
-export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
-  ctx: Readonly<CommandContext<G>>
-) => Awaitable<string>
 
 /**
  * Command resource fetcher.

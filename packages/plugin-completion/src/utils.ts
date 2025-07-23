@@ -3,26 +3,44 @@
  * @license MIT
  */
 
-// NOTE(kazupon): comment out, because it is not used yet.
-// import { CLI_OPTIONS_DEFAULT, createCommandContext as _createCommandContext } from '@gunshi/plugin'
-//
-// import type { Args, Command, CommandContext, LazyCommand } from '@gunshi/plugin'
-//
-// async function createCommandContext(cmd: Command | LazyCommand): Promise<CommandContext> {
-//   return await _createCommandContext({
-//     args: cmd.args || (Object.create(null) as Args),
-//     values: Object.create(null),
-//     positionals: [],
-//     rest: [],
-//     argv: [],
-//     tokens: [],
-//     omitted: false,
-//     callMode: cmd.entry ? 'entry' : 'subCommand',
-//     command: cmd,
-//     extensions: Object.create(null),
-//     cliOptions: CLI_OPTIONS_DEFAULT
-//   })
-// }
+import { CLI_OPTIONS_DEFAULT, createCommandContext as _createCommandContext } from '@gunshi/plugin'
+
+import type {
+  Args,
+  Command,
+  CommandContext,
+  CommandContextExtension,
+  LazyCommand
+} from '@gunshi/plugin'
+import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+
+export async function createCommandContext(
+  cmd: Command | LazyCommand,
+  id: string,
+  i18n?: I18nCommandContext
+): Promise<CommandContext> {
+  const extensions: Record<string, CommandContextExtension> = Object.create(null)
+  if (i18n) {
+    extensions[id] = {
+      key: Symbol(id),
+      factory: () => i18n
+    }
+  }
+  return await _createCommandContext({
+    args: cmd.args || (Object.create(null) as Args),
+    values: Object.create(null),
+    positionals: [],
+    rest: [],
+    argv: [],
+    explicit: Object.create(null),
+    tokens: [],
+    omitted: false,
+    callMode: cmd.entry ? 'entry' : 'subCommand',
+    command: cmd,
+    extensions,
+    cliOptions: CLI_OPTIONS_DEFAULT
+  })
+}
 
 function detectRuntime(): 'bun' | 'deno' | 'node' | 'unknown' {
   // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`

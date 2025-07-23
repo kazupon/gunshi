@@ -35,11 +35,14 @@
 
 import { plugin } from '@gunshi/plugin'
 import {
+  ARG_PREFIX_AND_KEY_SEPARATOR,
   BUILT_IN_PREFIX,
   DefaultResource,
   namespacedId,
   resolveArgKey,
-  resolveBuiltInKey
+  resolveBuiltInKey,
+  resolveExamples,
+  resolveKey
 } from '@gunshi/shared'
 import { createTranslationAdapter } from './translation.ts'
 import { pluginId as id } from './types.ts'
@@ -156,13 +159,38 @@ export default function i18n(
       // keep built-in locale resources for later use
       builtInLoadedResources = getResource(locale)
 
+      // define loadResource function
+      async function loadResource(
+        locale: string | Intl.Locale,
+        ctx: CommandContext,
+        cmd: Command
+      ): Promise<boolean> {
+        let loaded = false
+        const originalResource = await loadCommandResource(ctx, cmd)
+        if (originalResource) {
+          const resource = await normalizeResource(originalResource, ctx)
+          if (builtInLoadedResources) {
+            // NOTE(kazupon): setup resource for global opsions
+            resource.help = builtInLoadedResources.help
+            resource.version = builtInLoadedResources.version
+          }
+          adapter.setResource(toLocaleString(locale), resource)
+          loaded = true
+        }
+        return loaded
+      }
+
       return {
         locale,
-        translate
+        translate,
+        loadResource
       } as I18nCommandContext
     },
 
     onExtension: async (ctx, cmd) => {
+      // TODO(kazupon): should fix the type of ctx.extensions, should be infered etended context, exlude Promise type...
+      const i18n = ctx.extensions[id] as unknown as I18nCommandContext
+
       /**
        * load command resources, after the command context is extended
        */
@@ -173,39 +201,15 @@ export default function i18n(
       )
 
       const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
-        res[resolveArgKey(key)] = value
+        res[resolveArgKey(key, ctx)] = value
         return res
       }, Object.create(null))
-      defaultCommandResource.description = cmd.description || ''
-      defaultCommandResource.examples =
-        typeof cmd.examples === 'string'
-          ? cmd.examples
-          : typeof cmd.examples === 'function'
-            ? await cmd.examples(ctx)
-            : ''
+      defaultCommandResource[resolveKey('description', ctx)] = cmd.description || ''
+      defaultCommandResource[resolveKey('examples', ctx)] = await resolveExamples(ctx, cmd.examples)
       adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-      const originalResource = await loadCommandResource(ctx as unknown as CommandContext, cmd)
-      if (originalResource) {
-        const resource = Object.assign(
-          Object.create(null),
-          originalResource as Record<string, string>,
-          {
-            examples:
-              typeof originalResource.examples === 'string'
-                ? originalResource.examples
-                : typeof originalResource.examples === 'function'
-                  ? await originalResource.examples(ctx)
-                  : ''
-          } as Record<string, string>
-        )
-        if (builtInLoadedResources) {
-          // NOTE(kazupon): setup resource for global opsions
-          resource.help = builtInLoadedResources.help
-          resource.version = builtInLoadedResources.version
-        }
-        adapter.setResource(localeStr, resource)
-      }
+      // load resource for target command
+      await i18n.loadResource(localeStr, ctx as unknown as CommandContext, cmd)
     }
   })
 }
@@ -216,6 +220,10 @@ function toLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
     : typeof locale === 'string'
       ? new Intl.Locale(locale)
       : new Intl.Locale(DEFAULT_LOCALE)
+}
+
+function toLocaleString(locale: string | Intl.Locale): string {
+  return locale instanceof Intl.Locale ? locale.toString() : locale
 }
 
 async function loadCommandResource(
@@ -229,9 +237,10 @@ async function loadCommandResource(
 
   let resource: CommandResource | undefined
   try {
-    // TODO(kazupon): should check the resource which is a dictionary object
     resource = await command.resource!(ctx)
-  } catch {}
+  } catch (error) {
+    console.error(`Failed to load resource for command "${command.name}":`, error)
+  }
   return resource
 }
 
@@ -246,4 +255,26 @@ function hasI18nResource<G extends GunshiParamsConstraint = DefaultGunshiParams>
   command: Command<G>
 ): command is I18nCommand<G> {
   return 'resource' in command && typeof command.resource === 'function'
+}
+
+async function normalizeResource(
+  resource: CommandResource,
+  ctx: CommandContext
+): Promise<Record<string, string>> {
+  const ret: Record<string, string> = Object.create(null)
+  for (const [key, value] of Object.entries(resource as Record<string, string>)) {
+    if (key.startsWith(ARG_PREFIX_AND_KEY_SEPARATOR)) {
+      // argument key
+      ret[resolveKey(key, ctx)] = value
+    } else {
+      if (key === 'examples') {
+        // examples key
+        ret[resolveKey('examples', ctx)] = await resolveExamples(ctx, value)
+      } else {
+        // other keys
+        ret[resolveKey(key, ctx)] = value
+      }
+    }
+  }
+  return ret
 }

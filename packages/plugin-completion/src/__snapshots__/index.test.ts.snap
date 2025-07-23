@@ -43,6 +43,133 @@ vite.config.js	Vite config file
 "
 `;
 
+exports[`i18n support > default command > suggest duplicate options 1`] = `
+"--config	設定ファイルを指定します
+--mode	環境モードを設定します
+--logLevel	ログレベルを設定します
+:4
+"
+`;
+
+exports[`i18n support > default command > suggest duplicate options for short option 1`] = `
+"--config	設定ファイルを指定します
+--mode	環境モードを設定します
+--logLevel	ログレベルを設定します
+:4
+"
+`;
+
+exports[`i18n support > default command > suggest for inputting 1`] = `
+"--config	設定ファイルを指定します
+--mode	環境モードを設定します
+--logLevel	ログレベルを設定します
+:4
+"
+`;
+
+exports[`i18n support > default command > suggest for long option 1`] = `
+"--config	設定ファイルを指定します
+:4
+"
+`;
+
+exports[`i18n support > default command > suggest for short option 1`] = `
+"-c	設定ファイルを指定します
+:4
+"
+`;
+
+exports[`i18n support > default command > suggest value if option values correctly 1`] = `
+"vite.config.ts	Vite設定ファイル
+vite.config.js	Vite設定ファイル
+:4
+"
+`;
+
+exports[`i18n support > no input 1`] = `
+"dev	開発サーバーを起動します
+build	プロジェクトをビルドします
+lint	プロジェクトをリントします
+:4
+"
+`;
+
+exports[`i18n support > positional arguments > multiple positional arguments when ending with part of the value 1`] = `
+"index.ts	インデックスファイル
+:4
+"
+`;
+
+exports[`i18n support > positional arguments > single positional argument when ending with space 1`] = `
+"main.ts	メインファイル
+index.ts	インデックスファイル
+:4
+"
+`;
+
+exports[`i18n support > positional arguments > suggest multiple positional arguments when ending with space 1`] = `
+"main.ts	メインファイル
+index.ts	インデックスファイル
+:4
+"
+`;
+
+exports[`i18n support > subcommand > keep suggesting the --port option if user typed partial but didn't end with space 1`] = `
+"--port	ポート番号を指定します
+:4
+"
+`;
+
+exports[`i18n support > subcommand > not handle if unknown option 1`] = `
+":4
+"
+`;
+
+exports[`i18n support > subcommand > resolve value if long option and value 1`] = `
+"--port=3000	開発サーバーポート
+:4
+"
+`;
+
+exports[`i18n support > subcommand > suggest for command only 1`] = `
+"dev	開発サーバーを起動します
+:4
+"
+`;
+
+exports[`i18n support > subcommand > suggest for long option 1`] = `
+"--port	ポート番号を指定します
+:4
+"
+`;
+
+exports[`i18n support > subcommand > suggest for option inputting 1`] = `
+"--host	ホスト名を指定します
+--port	ポート番号を指定します
+:4
+"
+`;
+
+exports[`i18n support > subcommand > suggest for short option 1`] = `
+"-H	ホスト名を指定します
+:4
+"
+`;
+
+exports[`i18n support > subcommand > suggest if user ends with space after \`--port\` 1`] = `
+"3000	開発サーバーポート
+8080	代替ポート
+:4
+"
+`;
+
+exports[`i18n support > subcommand > user typed \`--port=\` and hasn't typed a space or value yet 1`] = `
+"--port=3000	開発サーバーポート
+--port=8080	代替ポート
+:4
+"
+`;
+
 exports[`no input 1`] = `
 "dev	Start dev server
 build	Build project

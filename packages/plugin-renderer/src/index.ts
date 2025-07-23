@@ -46,7 +46,6 @@ import type {
   PluginWithExtension
 } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
-import type { CommandBuiltinKeys } from '@gunshi/shared'
 import type { PluginId, UsageRendererCommandContext } from './types.ts'
 
 export { renderHeader } from './header.ts'
@@ -104,7 +103,7 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
       }
 
       return {
-        text: localizable<CommandBuiltinKeys>(ctx, cmd, i18n?.translate),
+        text: localizable(ctx, cmd, i18n?.translate),
         loadCommands
       }
     },

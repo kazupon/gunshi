@@ -31,8 +31,15 @@ export function resolveBuiltInKey<
 export function resolveArgKey<
   A extends Args = DefaultGunshiParams['args'],
   K extends string = KeyOfArgs<RemovedIndex<A>>
->(key: K): GenerateNamespacedKey<K, typeof ARG_PREFIX> {
-  return `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+>(key: K, ctx?: Readonly<CommandContext>): string {
+  return `${ctx?.name ? `${ctx.name}${BUILT_IN_KEY_SEPARATOR}` : ''}${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+}
+
+export function resolveKey<
+  T extends Record<string, string> = {},
+  K = keyof T extends string ? keyof T : string
+>(key: K, ctx?: Readonly<CommandContext>): string {
+  return `${ctx?.name ? `${ctx.name}${BUILT_IN_KEY_SEPARATOR}` : ''}${key}`
 }
 
 export async function resolveExamples<G extends GunshiParamsConstraint = DefaultGunshiParams>(

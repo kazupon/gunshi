@@ -5,8 +5,8 @@
 
 import { namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
 
-import type { Command, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
-import type { CommandBuiltinKeys, GenerateNamespacedKey, Localization } from '@gunshi/shared'
+import type { Args, Command, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
+import type { GenerateNamespacedKey, ResolveTranslationKeys } from '@gunshi/shared'
 
 /**
  * The unique identifier for usage renderer plugin.
@@ -28,10 +28,18 @@ export interface UsageRendererCommandContext<G extends GunshiParams<any> = Defau
   /**
    * Render the text message
    */
-  text: Localization<CommandBuiltinKeys, G>
+  text: <
+    A extends Args = G['args'],
+    C = {}, // for CommandContext
+    E extends Record<string, string> = {}, // for extended resources
+    K = ResolveTranslationKeys<A, C, E>
+  >(
+    key: K,
+    values?: Record<string, unknown>
+  ) => string
   /**
    * Load commands
-   * @returns A list of commands loaded from the command loader plugin.
+   * @returns A list of commands loaded from the usage renderert plugin.
    */
   loadCommands: <G extends GunshiParams = DefaultGunshiParams>() => Promise<Command<G>[]>
 }

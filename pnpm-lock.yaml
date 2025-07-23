@@ -283,6 +283,9 @@ importers:
         specifier: workspace:*
         version: link:../plugin
     devDependencies:
+      '@gunshi/plugin-i18n':
+        specifier: workspace:*
+        version: link:../plugin-i18n
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared

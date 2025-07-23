@@ -50,7 +50,6 @@ const greetCommand = defineI18n({
   // Define resource fetcher for translations
   resource: async ctx => ({
     description: 'Greet someone in their language',
-    examples: '$ your-cli --name yourname',
     'arg:name': "The person's name",
     greeting: 'Hello, {$name}!'
   }),
@@ -242,7 +241,6 @@ const command = defineI18n({
     // Example for 'en-US' locale
     return {
       description: 'This is my command.', // No prefix
-      examples: '$ my-command --target file.txt', // No prefix
       'arg:target': 'The target file to process.', // 'arg:' prefix
       'arg:verbose': 'Enable verbose output.', // 'arg:' prefix
       'arg:no-verbose': 'Disable verbose logging specifically.', // Optional custom translation for the negatable option

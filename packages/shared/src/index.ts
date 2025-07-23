@@ -5,7 +5,7 @@
 
 export * from 'gunshi/utils'
 export * from './constants.ts'
-export * from './localize.ts'
+export * from './localization.ts'
 export { default as DefaultResource } from './resource.ts'
 export * from './utils.ts'
 

@@ -20,6 +20,21 @@ export const pluginId: GenerateNamespacedKey<'completion', typeof PLUGIN_PREFIX>
 export type PluginId = typeof pluginId
 
 /**
+ * Parameters for {@link CompletionHandler | the completion handler}.
+ */
+export interface CompletionParams {
+  previousArgs: Parameters<Handler>[0]
+  toComplete: Parameters<Handler>[1]
+  endWithSpace: Parameters<Handler>[2]
+  locale?: Intl.Locale
+}
+
+/**
+ * The handler for completion.
+ */
+export type CompletionHandler = (params: CompletionParams) => ReturnType<Handler>
+
+/**
  * Extended command context which provides utilities via completion plugin.
  * These utilities are available via `CommandContext.extensions['g:completion']`.
  */
@@ -29,8 +44,8 @@ export interface CompletionCommandContext {}
  * Completion configuration, which structure is similar `bombsh/tab`'s `CompletionConfig`.
  */
 export interface CompletionConfig {
-  handler?: Handler
-  args?: Record<string, { handler: Handler }>
+  handler?: CompletionHandler
+  args?: Record<string, { handler: CompletionHandler }>
 }
 
 /**

@@ -1,30 +1,32 @@
 import { define } from 'gunshi'
 import { createCommandContext } from 'gunshi/context'
 import { describe, expect, test, vi } from 'vitest'
-import { localizable } from './localize.ts'
+import { localizable } from './localization.ts'
 import { resolveArgKey, resolveBuiltInKey } from './utils.ts'
 
 const LANG_RESOURCES = {
   description: 'これはcommand1の説明です',
   foo: 'foo引数の説明'
-} as Record<string, string>
+} as const
+
+const args = {
+  foo: {
+    type: 'string',
+    description: 'Foo argument description',
+    short: 'f'
+  },
+  bar: {
+    type: 'boolean',
+    description: 'Bar argument description',
+    negatable: true
+  }
+} as const
 
 async function setup() {
   const command1 = define({
     name: 'command1',
     description: 'Command 1 description',
-    args: {
-      foo: {
-        type: 'string',
-        description: 'Foo argument description',
-        short: 'f'
-      },
-      bar: {
-        type: 'boolean',
-        description: 'Bar argument description',
-        negatable: true
-      }
-    },
+    args,
     examples: () => {
       return `command1 --foo value --no-bar`
     }
@@ -52,7 +54,7 @@ test('with translation function', async () => {
   const mockTranslate = vi
     .fn()
     .mockImplementation((key: string, _values: Record<string, unknown>): string => {
-      return LANG_RESOURCES[key] || key
+      return LANG_RESOURCES[key as keyof typeof LANG_RESOURCES] || key
     })
 
   const { ctx, command1 } = await setup()
@@ -74,28 +76,34 @@ describe('without translation function', () => {
 
   test('gunshi args keys', async () => {
     const { ctx, command1 } = await setup()
-    const localize = localizable(ctx, command1)
+    const localize = localizable<
+      typeof args,
+      { name: 'command1' },
+      { description: string; exmaples: string }
+    >(ctx, command1)
 
     // normal argument
-    expect(await localize(resolveArgKey<NonNullable<typeof command1.args>>('foo'))).toEqual(
+    expect(await localize(resolveArgKey<NonNullable<typeof command1.args>>('foo', ctx))).toEqual(
       'Foo argument description'
     )
     // negatable argument
-    expect(await localize(resolveArgKey<NonNullable<typeof command1.args>>('no-bar'))).toEqual(
+    expect(await localize(resolveArgKey<NonNullable<typeof command1.args>>('no-bar', ctx))).toEqual(
       'Negatable of --bar'
     )
     // non-existent argument
-    expect(await localize(resolveArgKey('test'))).toEqual('test')
+    expect(await localize(resolveArgKey('test', ctx))).toEqual('test')
   })
 
   test('other keys', async () => {
     const { ctx, command1 } = await setup()
     const localize = localizable(ctx, command1)
 
+    // `description` key with command name
+    expect(await localize('command1:description')).toEqual('')
     // `description` key
-    expect(await localize('description')).toEqual('')
-    // `examples` key
-    expect(await localize('examples')).toEqual('command1 --foo value --no-bar')
+    expect(await localize('description')).toEqual('description')
+    // `examples` key with command name
+    expect(await localize('command1:examples')).toEqual('command1 --foo value --no-bar')
     // other keys
     expect(await localize('other_key')).toEqual('other_key')
   })
