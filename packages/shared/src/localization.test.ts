@@ -79,7 +79,7 @@ describe('without translation function', () => {
     const localize = localizable<
       typeof args,
       { name: 'command1' },
-      { description: string; exmaples: string }
+      { description: string; examples: string }
     >(ctx, command1)
 
     // normal argument

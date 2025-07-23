@@ -188,7 +188,7 @@ export default function i18n(
     },
 
     onExtension: async (ctx, cmd) => {
-      // TODO(kazupon): should fix the type of ctx.extensions, should be infered etended context, exlude Promise type...
+      // TODO(kazupon): should fix the type of ctx.extensions, should be inferred extended context, exclude Promise type...
       const i18n = ctx.extensions[id] as unknown as I18nCommandContext
 
       /**
