@@ -286,4 +286,4 @@ See the [API References](./docs/index.md)
 
 ## ©️ License
 
-[MIT](http://opensource.org/licenses/MIT)T)
+[MIT](http://opensource.org/licenses/MIT)
