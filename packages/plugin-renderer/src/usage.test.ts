@@ -162,7 +162,7 @@ test('basic', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -196,7 +196,7 @@ test('no arguments', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -244,7 +244,7 @@ test('no required on optional arguments', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -286,7 +286,7 @@ test('positional arguments', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -338,7 +338,7 @@ test('mixed positionals and optionals', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -392,7 +392,7 @@ test('no examples', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -447,7 +447,7 @@ test('enable usageOptionType', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -537,7 +537,7 @@ test('kebab-case arguments with toKebab option', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -594,7 +594,7 @@ test('kebab-case arguments with Command.toKebab option', async () => {
     argv: [],
     tokens: [], // dummy, due to test
     omitted: false,
-    callMode: 'entry',
+    callMode: 'subCommand',
     command,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -670,7 +670,7 @@ test('internal commands are filtered out', async () => {
     explicit: {},
     values: {},
     omitted: true,
-    callMode: 'entry',
+    callMode: 'subCommand',
     positionals: [],
     rest: [],
     argv: [],
