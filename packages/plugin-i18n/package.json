@@ -1,7 +1,7 @@
 {
   "name": "@gunshi/plugin-i18n",
   "description": "internationalization plugin for gunshi",
-  "version": "0.27.0-alpha.8",
+  "version": "0.27.0-alpha.9",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
