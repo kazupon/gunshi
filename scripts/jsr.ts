@@ -55,6 +55,7 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
     case 'packages/plugin-completion': {
       json.dependencies['@gunshi/plugin'] = version
       json.dependencies['@gunshi/shared'] = version
+      json.dependencies['@gunshi/plugin-i18n'] = version
       break
     }
     case 'packages/plugin-renderer': {
