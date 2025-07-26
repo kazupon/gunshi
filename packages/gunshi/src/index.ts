@@ -25,6 +25,7 @@
 export { DefaultTranslation } from '@gunshi/plugin-i18n' // TODO(kazupon): remove this import after the next major release
 export { parseArgs, resolveArgs } from 'args-tokens'
 export * from './cli.ts'
+export { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 export { define, lazy } from './definition.ts'
 export { plugin } from './plugin/core.ts'
 

@@ -336,14 +336,15 @@ describe('auto generate usage', () => {
     const renderedUsage = await cli(['-h'], vi.fn())
 
     const message = log()
-    expect(message).toMatchSnapshot()
-    expect(message).toMatchSnapshot(renderedUsage)
+    expect(message).toMatchSnapshot('console')
+    expect(renderedUsage).toMatchSnapshot('rendered')
   })
 
   test('loosely entry command', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const renderedUsage = await cli(['-h'], {
+      description: 'This is a loosely entry command',
       args: {
         foo: {
           type: 'string',
@@ -354,8 +355,8 @@ describe('auto generate usage', () => {
     })
 
     const message = log()
-    expect(message).toMatchSnapshot()
-    expect(message).toMatchSnapshot(renderedUsage)
+    expect(message).toMatchSnapshot('console')
+    expect(renderedUsage).toMatchSnapshot('rendered')
   })
 
   test('strictly entry command', async () => {
@@ -364,6 +365,8 @@ describe('auto generate usage', () => {
     const renderedUsage = await cli(
       ['-h'],
       {
+        name: 'command1',
+        description: 'This is command1',
         args: {
           foo: {
             type: 'string',
@@ -371,7 +374,6 @@ describe('auto generate usage', () => {
             description: 'The foo option'
           }
         },
-        name: 'command1',
         examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
         run: vi.fn()
       },
@@ -384,7 +386,8 @@ describe('auto generate usage', () => {
     )
 
     const message = log()
-    expect(message).toMatchSnapshot(renderedUsage)
+    expect(message).toMatchSnapshot('console')
+    expect(renderedUsage).toMatchSnapshot('rendered')
   })
 
   test('loosely sub commands', async () => {
@@ -398,11 +401,12 @@ describe('auto generate usage', () => {
     const entryArgs = {
       foo: {
         type: 'string',
+        description: 'The foo option',
         short: 'f'
       }
     } satisfies Args
     const entry = {
-      name: 'command1',
+      description: 'This is entry command',
       args: entryArgs,
       run: vi.fn()
     } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
@@ -415,6 +419,7 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const command2 = {
+      description: 'This is command2',
       args: command2Args,
       run: vi.fn()
     } satisfies Command<GunshiParams<{ args: typeof command2Args }>>
@@ -422,13 +427,13 @@ describe('auto generate usage', () => {
     const subCommands = new Map()
     subCommands.set('command2', command2)
 
-    expect(await cli(['-h'], entry, { ...meta, subCommands })).toMatchSnapshot('main')
+    expect(await cli(['-h'], entry, { ...meta, subCommands })).toMatchSnapshot('entry')
     expect(await cli(['command2', '-h'], entry, { ...meta, subCommands })).toMatchSnapshot(
       'command2'
     )
 
     const message = log()
-    expect(message).toMatchSnapshot()
+    expect(message).toMatchSnapshot('console output')
   })
 
   test('strictly sub commands', async () => {
@@ -443,8 +448,9 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const entry = {
-      args: entryArgs,
       name: 'command1',
+      description: 'This is command1 (entry)',
+      args: entryArgs,
       examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
       run: vi.fn()
     } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
@@ -458,10 +464,10 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const command2 = {
-      args: command2Args,
       name: 'command2',
+      description: 'This is command2',
+      args: command2Args,
       examples: '# Example 1\n$ gunshi command2 --bar 42\n# Example 2\n$ gunshi command2 -b 42',
-      // run: vi.fn()
       run: ctx => {
         console.log(ctx.values)
       }
@@ -470,11 +476,16 @@ describe('auto generate usage', () => {
     const subCommands = new Map()
     subCommands.set('command2', command2)
 
-    const mainUsageRendered = await cli(['-h'], entry, {
-      subCommands,
+    const meta = {
       name: 'gunshi',
       description: 'Modern CLI tool',
-      version: '0.0.0',
+      version: '0.0.0'
+    }
+
+    // execute the entry command (implicitly called `command1`)
+    const mainUsageRendered = await cli(['-h'], entry, {
+      ...meta,
+      subCommands,
       leftMargin: 4,
       middleMargin: 15,
       plugins: [
@@ -484,18 +495,23 @@ describe('auto generate usage', () => {
         })
       ]
     })
-    expect(mainUsageRendered).toMatchSnapshot('main')
+    expect(mainUsageRendered).toMatchSnapshot('entry')
+
+    // explicitly execute the default command
+    const command1UsageRendered = await cli(['command1', '-h'], entry, {
+      ...meta,
+      subCommands
+    })
+    expect(command1UsageRendered).toMatchSnapshot('command1')
 
     const command2UsageRendered = await cli(['command2', '-h'], entry, {
-      subCommands,
-      name: 'gunshi',
-      description: 'Modern CLI tool',
-      version: '0.0.0'
+      ...meta,
+      subCommands
     })
     expect(command2UsageRendered).toMatchSnapshot('command2')
 
     const message = log()
-    expect(message).toMatchSnapshot()
+    expect(message).toMatchSnapshot('console output')
   })
 })
 
@@ -1368,5 +1384,46 @@ describe('command lifecycle hooks', () => {
       'plugin-after',
       'hook-after'
     ])
+  })
+})
+
+describe('github issues', () => {
+  test('#252', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const meta = {
+      name: 'mycli',
+      description: 'mycli description',
+      version: '1.2.3'
+    }
+
+    const rendered1 = await cli(['-h'], { run: vi.fn() }, { ...meta })
+    expect(rendered1).toMatchSnapshot('example1')
+
+    const rendered2 = await cli(
+      ['-h'],
+      { run: vi.fn() },
+      {
+        ...meta,
+        subCommands: new Map([['cmd1', { run: vi.fn() }]])
+      }
+    )
+    expect(rendered2).toMatchSnapshot('example2')
+
+    const rendered3 = await cli(
+      ['-h'],
+      { run: vi.fn() },
+      {
+        ...meta,
+        subCommands: new Map([
+          ['cmd1', { run: vi.fn() }],
+          ['cmd2', { run: vi.fn() }]
+        ])
+      }
+    )
+    expect(rendered3).toMatchSnapshot('example3')
+
+    expect(log()).toMatchSnapshot('console output')
   })
 })

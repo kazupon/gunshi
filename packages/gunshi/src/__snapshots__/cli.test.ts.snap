@@ -1,12 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`auto generate usage > inline function > USAGE:
-  COMMAND <OPTIONS>
-
-OPTIONS:
-  -h, --help             Display this help message
-  -v, --version          Display this version
- 1`] = `
+exports[`auto generate usage > inline function > console 1`] = `
 "USAGE:
   COMMAND <OPTIONS>
 
@@ -16,7 +10,7 @@ OPTIONS:
 "
 `;
 
-exports[`auto generate usage > inline function 1`] = `
+exports[`auto generate usage > inline function > rendered 1`] = `
 "USAGE:
   COMMAND <OPTIONS>
 
@@ -26,83 +20,30 @@ OPTIONS:
 "
 `;
 
-exports[`auto generate usage > loosely entry command > USAGE:
-  COMMAND <OPTIONS>
-
-OPTIONS:
-  -h, --help               Display this help message
-  -v, --version            Display this version
-  -f, --foo <foo>          
- 1`] = `
+exports[`auto generate usage > loosely entry command > console 1`] = `
 "USAGE:
   COMMAND <OPTIONS>
 
 OPTIONS:
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          
+  -f, --foo <foo>
 "
 `;
 
-exports[`auto generate usage > loosely entry command 1`] = `
+exports[`auto generate usage > loosely entry command > rendered 1`] = `
 "USAGE:
   COMMAND <OPTIONS>
 
 OPTIONS:
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          
+  -f, --foo <foo>
 "
 `;
 
 exports[`auto generate usage > loosely sub commands > command2 1`] = `
-"USAGE:
-  my-cli command2 <OPTIONS>
-
-OPTIONS:
-  -h, --help               Display this help message
-  -v, --version            Display this version
-  -b, --bar [bar]           (default: 42)
-"
-`;
-
-exports[`auto generate usage > loosely sub commands > main 1`] = `
-"USAGE:
-  my-cli [command1] <OPTIONS>
-  my-cli <COMMANDS>
-
-COMMANDS:
-  command2            
-  command1            
-
-For more info, run any command with the \`--help\` flag:
-  my-cli command2 --help
-  my-cli command1 --help
-
-OPTIONS:
-  -h, --help               Display this help message
-  -v, --version            Display this version
-  -f, --foo <foo>          
-"
-`;
-
-exports[`auto generate usage > loosely sub commands 1`] = `
-"USAGE:
-  my-cli [command1] <OPTIONS>
-  my-cli <COMMANDS>
-
-COMMANDS:
-  command2            
-  command1            
-
-For more info, run any command with the \`--help\` flag:
-  my-cli command2 --help
-  my-cli command1 --help
-
-OPTIONS:
-  -h, --help               Display this help message
-  -v, --version            Display this version
-  -f, --foo <foo>          
+"This is command2
 
 USAGE:
   my-cli command2 <OPTIONS>
@@ -114,7 +55,57 @@ OPTIONS:
 "
 `;
 
-exports[`auto generate usage > strictly entry command > Modern CLI tool (gunshi v0.0.0)
+exports[`auto generate usage > loosely sub commands > console output 1`] = `
+"USAGE:
+  my-cli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS>                     This is entry command
+  command2 <OPTIONS>            This is command2
+
+For more info, run any command with the \`--help\` flag:
+  my-cli --help
+  my-cli command2 --help
+
+OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
+  -f, --foo <foo>          The foo option
+
+This is command2
+
+USAGE:
+  my-cli command2 <OPTIONS>
+
+OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
+  -b, --bar [bar]           (default: 42)
+"
+`;
+
+exports[`auto generate usage > loosely sub commands > entry 1`] = `
+"USAGE:
+  my-cli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS>                     This is entry command
+  command2 <OPTIONS>            This is command2
+
+For more info, run any command with the \`--help\` flag:
+  my-cli --help
+  my-cli command2 --help
+
+OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
+  -f, --foo <foo>          The foo option
+"
+`;
+
+exports[`auto generate usage > strictly entry command > console 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+
 USAGE:
   gunshi <OPTIONS>
 
@@ -128,9 +119,11 @@ EXAMPLES:
   $ gunshi --foo bar
   # Example 2
   $ gunshi -f bar
- 1`] = `
-"Modern CLI tool (gunshi v0.0.0)
+"
+`;
 
+exports[`auto generate usage > strictly entry command > rendered 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
 USAGE:
   gunshi <OPTIONS>
 
@@ -138,6 +131,26 @@ OPTIONS:
   -h, --help               [boolean] Display this help message
   -v, --version            [boolean] Display this version
   -f, --foo <foo>          [string]  The foo option
+
+EXAMPLES:
+  # Example 1
+  $ gunshi --foo bar
+  # Example 2
+  $ gunshi -f bar
+"
+`;
+
+exports[`auto generate usage > strictly sub commands > command1 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+This is command1 (entry)
+
+USAGE:
+  gunshi command1 <OPTIONS>
+
+OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
+  -f, --foo <foo>          The foo option
 
 EXAMPLES:
   # Example 1
@@ -149,6 +162,8 @@ EXAMPLES:
 
 exports[`auto generate usage > strictly sub commands > command2 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
+This is command2
+
 USAGE:
   gunshi command2 <OPTIONS>
 
@@ -165,47 +180,19 @@ EXAMPLES:
 "
 `;
 
-exports[`auto generate usage > strictly sub commands > main 1`] = `
-"Modern CLI tool (gunshi v0.0.0)
-使い方:
-    gunshi [command1] <オプション>
-    gunshi <コマンド>
-
-コマンド:
-    command2                 
-    command1                 
-
-詳細は、コマンドと\`--help\`フラグを実行してください:
-    gunshi command2 --help
-    gunshi command1 --help
-
-オプション:
-    -h, --help                    Display this help message
-    -v, --version                 Display this version
-    -f, --foo <foo>               The foo option
-
-例:
-    # Example 1
-    $ gunshi --foo bar
-    # Example 2
-    $ gunshi -f bar
-"
-`;
-
-exports[`auto generate usage > strictly sub commands 1`] = `
+exports[`auto generate usage > strictly sub commands > console output 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
 使い方:
-    gunshi [command1] <オプション>
-    gunshi <コマンド>
+    gunshi [コマンド] <オプション>
 
 コマンド:
-    command2                 
-    command1                 
+    [command1] <オプション>            This is command1 (entry)
+    command2 <オプション>              This is command2
 
 詳細は、コマンドと\`--help\`フラグを実行してください:
+    gunshi --help
     gunshi command2 --help
-    gunshi command1 --help
 
 オプション:
     -h, --help                    Display this help message
@@ -220,6 +207,26 @@ exports[`auto generate usage > strictly sub commands 1`] = `
 
 Modern CLI tool (gunshi v0.0.0)
 
+This is command1 (entry)
+
+USAGE:
+  gunshi command1 <OPTIONS>
+
+OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
+  -f, --foo <foo>          The foo option
+
+EXAMPLES:
+  # Example 1
+  $ gunshi --foo bar
+  # Example 2
+  $ gunshi -f bar
+
+Modern CLI tool (gunshi v0.0.0)
+
+This is command2
+
 USAGE:
   gunshi command2 <OPTIONS>
 
@@ -233,6 +240,32 @@ EXAMPLES:
   $ gunshi command2 --bar 42
   # Example 2
   $ gunshi command2 -b 42
+"
+`;
+
+exports[`auto generate usage > strictly sub commands > entry 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+使い方:
+    gunshi [コマンド] <オプション>
+
+コマンド:
+    [command1] <オプション>            This is command1 (entry)
+    command2 <オプション>              This is command2
+
+詳細は、コマンドと\`--help\`フラグを実行してください:
+    gunshi --help
+    gunshi command2 --help
+
+オプション:
+    -h, --help                    Display this help message
+    -v, --version                 Display this version
+    -f, --foo <foo>               The foo option
+
+例:
+    # Example 1
+    $ gunshi --foo bar
+    # Example 2
+    $ gunshi -f bar
 "
 `;
 
@@ -272,6 +305,105 @@ OPTIONS:
   -h, --help                               Display this help message
   -v, --version                            Display this version
   -d, --description <description>          This is a description of description option
+"
+`;
+
+exports[`github issues > #252 > console output 1`] = `
+"mycli description (mycli v1.2.3)
+
+USAGE:
+  mycli <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+
+mycli description (mycli v1.2.3)
+
+USAGE:
+  mycli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS> 
+  cmd1 <OPTIONS>
+
+For more info, run any command with the \`--help\` flag:
+  mycli --help
+  mycli cmd1 --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+
+mycli description (mycli v1.2.3)
+
+USAGE:
+  mycli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS> 
+  cmd1 <OPTIONS>
+  cmd2 <OPTIONS>
+
+For more info, run any command with the \`--help\` flag:
+  mycli --help
+  mycli cmd1 --help
+  mycli cmd2 --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`github issues > #252 > example1 1`] = `
+"mycli description (mycli v1.2.3)
+USAGE:
+  mycli <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`github issues > #252 > example2 1`] = `
+"mycli description (mycli v1.2.3)
+USAGE:
+  mycli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS> 
+  cmd1 <OPTIONS>
+
+For more info, run any command with the \`--help\` flag:
+  mycli --help
+  mycli cmd1 --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`github issues > #252 > example3 1`] = `
+"mycli description (mycli v1.2.3)
+USAGE:
+  mycli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS> 
+  cmd1 <OPTIONS>
+  cmd2 <OPTIONS>
+
+For more info, run any command with the \`--help\` flag:
+  mycli --help
+  mycli cmd1 --help
+  mycli cmd2 --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
 "
 `;
 

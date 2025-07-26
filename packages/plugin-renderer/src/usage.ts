@@ -3,6 +3,7 @@
  * @license MIT
  */
 
+import { ANONYMOUS_COMMAND_NAME } from '@gunshi/plugin'
 import {
   ARG_NEGATABLE_PREFIX,
   COMMON_ARGS,
@@ -57,12 +58,12 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
   }
 
   // render positional arguments section
-  if (hasPositionalArgs(ctx)) {
+  if (hasPositionalArgs(ctx.args)) {
     messages.push(...(await renderPositionalArgsSection(ctx)), '')
   }
 
   // render optional arguments section
-  if (hasOptionalArgs(ctx)) {
+  if (hasOptionalArgs(ctx.args)) {
     messages.push(...(await renderOptionalArgsSection(ctx)), '')
   }
 
@@ -150,18 +151,36 @@ async function renderUsageSection<
   const messages: string[] = [
     `${await ctx.extensions![pluginId].text(resolveBuiltInKey('USAGE'))}:`
   ]
+  const usageStr = await makeUsageSymbols(ctx)
+  messages.push(usageStr.padStart(ctx.env.leftMargin + usageStr.length))
+  return messages
+}
+
+async function makeUsageSymbols<
+  G extends GunshiParams<{
+    args: Args
+    extensions: Extensions
+  }>
+>(ctx: Readonly<CommandContext<G>>): Promise<string> {
+  const messages = [await resolveEntry(ctx)]
   if (ctx.omitted) {
-    const defaultCommand = `${await resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${await resolveSubCommand(ctx)}]` : ''} ${[await generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
-    messages.push(defaultCommand.padStart(ctx.env.leftMargin + defaultCommand.length))
     if (await hasCommands(ctx)) {
-      const commandsUsage = `${await resolveEntry(ctx)} <${await ctx.extensions![pluginId].text(resolveBuiltInKey('COMMANDS'))}>`
-      messages.push(commandsUsage.padStart(ctx.env.leftMargin + commandsUsage.length))
+      messages.push(` [${await ctx.extensions![pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
+    } else {
+      messages.push(`${ctx.callMode === 'subCommand' ? ` ${await resolveSubCommand(ctx)}` : ''}`)
     }
   } else {
-    const usageStr = `${await resolveEntry(ctx)} ${await resolveSubCommand(ctx)} ${[await generateOptionsSymbols(ctx), generatePositionalSymbols(ctx)].filter(Boolean).join(' ')}`
-    messages.push(usageStr.padStart(ctx.env.leftMargin + usageStr.length))
+    messages.push(`${ctx.callMode === 'subCommand' ? ` ${await resolveSubCommand(ctx)}` : ''}`)
   }
-  return messages
+  const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args)
+  if (optionsSymbols) {
+    messages.push(' ', optionsSymbols)
+  }
+  const positionalSymbols = generatePositionalSymbols(ctx.args)
+  if (positionalSymbols) {
+    messages.push(' ', positionalSymbols)
+  }
+  return messages.join('')
 }
 
 /**
@@ -181,11 +200,15 @@ async function renderCommandsSection<
   const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
   const commandsStr = await Promise.all(
-    loadedCommands.map(cmd => {
-      const key = cmd.name || ''
+    loadedCommands.map(async cmd => {
       const desc = cmd.description || ''
-      const command = `${key.padEnd(commandMaxLength + ctx.env.middleMargin)}${desc} `
-      return `${command.padStart(ctx.env.leftMargin + command.length)} `
+      const optionSymbol = await generateOptionsSymbols(ctx, ctx.args)
+      const positionalSymbol = generatePositionalSymbols(ctx.args)
+      const commandStr = await makeCommandSymbol(ctx, cmd)
+      const symbolLength =
+        desc.length > 0 ? commandMaxLength + optionSymbol.length + positionalSymbol.length : 0
+      const command = `${commandStr.padEnd(symbolLength + ctx.env.middleMargin)}${desc}`
+      return `${command.padStart(ctx.env.leftMargin + command.length)}`
     })
   )
   messages.push(
@@ -195,11 +218,43 @@ async function renderCommandsSection<
   )
   messages.push(
     ...loadedCommands.map(cmd => {
-      const commandHelp = `${ctx.env.name} ${cmd.name} --help`
+      let commandStr = cmd.entry ? '' : cmd.name || ''
+      if (commandStr) {
+        commandStr += ' '
+      }
+      const commandHelp = `${ctx.env.name} ${commandStr}--help`
       return `${commandHelp.padStart(ctx.env.leftMargin + commandHelp.length)}`
     })
   )
   return messages
+}
+
+async function makeCommandSymbol<
+  G extends GunshiParams<{
+    args: Args
+    extensions: Extensions
+  }>
+>(ctx: CommandContext<G>, cmd: Command): Promise<string> {
+  const optionSymbol = await generateOptionsSymbols(ctx, ctx.args)
+  const positionalSymbol = generatePositionalSymbols(ctx.args)
+  let commandStr = cmd.entry
+    ? cmd.name === undefined || cmd.name === ANONYMOUS_COMMAND_NAME
+      ? ''
+      : `[${cmd.name}]`
+    : cmd.name || ''
+  if (optionSymbol) {
+    if (commandStr) {
+      commandStr += ' '
+    }
+    commandStr += `${optionSymbol}`
+  }
+  if (positionalSymbol) {
+    if (commandStr) {
+      commandStr += ' '
+    }
+    commandStr += `${positionalSymbol}`
+  }
+  return commandStr
 }
 
 /**
@@ -287,29 +342,29 @@ async function hasCommands<
 
 /**
  * Check if the command has optional arguments
- * @param ctx A {@link CommandContext | command context}
+ * @param args A {@link Args | command optional arguments}
  * @returns True if the command has options
  */
-function hasOptionalArgs<G extends GunshiParams>(ctx: CommandContext<G>): boolean {
-  return !!(ctx.args && Object.values(ctx.args).some(arg => arg.type !== 'positional'))
+function hasOptionalArgs(args: Args): boolean {
+  return Object.values(args).some(arg => arg.type !== 'positional')
 }
 
 /**
  * Check if the command has positional arguments
- * @param ctx A {@link CommandContext | command context}
+ * @param args A {@link Args | command positional arguments}
  * @returns True if the command has options
  */
-function hasPositionalArgs<G extends GunshiParams>(ctx: CommandContext<G>): boolean {
-  return !!(ctx.args && Object.values(ctx.args).some(arg => arg.type === 'positional'))
+function hasPositionalArgs(args: Args): boolean {
+  return Object.values(args).some(arg => arg.type === 'positional')
 }
 
 /**
  * Check if all options have default values
- * @param ctx A {@link CommandContext | command context}
+ * @param args An {@link Args | command argument}
  * @returns True if all options have default values
  */
-function hasAllDefaultOptions<G extends GunshiParams>(ctx: CommandContext<G>): boolean {
-  return !!(ctx.args && Object.values(ctx.args).every(arg => arg.default))
+function hasAllDefaultOptions(args: Args): boolean {
+  return !!(args && Object.values(args).every(arg => arg.default))
 }
 
 /**
@@ -322,9 +377,9 @@ async function generateOptionsSymbols<
     args: Args
     extensions: Extensions
   }>
->(ctx: CommandContext<G>): Promise<string> {
-  return hasOptionalArgs(ctx)
-    ? hasAllDefaultOptions(ctx)
+>(ctx: CommandContext<G>, args: Args): Promise<string> {
+  return hasOptionalArgs(args)
+    ? hasAllDefaultOptions(args)
       ? `[${await ctx.extensions![pluginId].text(resolveBuiltInKey('OPTIONS'))}]`
       : `<${await ctx.extensions![pluginId].text(resolveBuiltInKey('OPTIONS'))}>`
     : ''
@@ -445,7 +500,8 @@ async function generateOptionalArgsUsage<
         : await resolveDisplayValue(ctx, key)
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
-      const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
+      const descLength = desc.length + valueDesc.length
+      const option = `${value.padEnd((descLength > 0 ? optionsMaxLength : 0) + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
       return `${option.padStart(ctx.env.leftMargin + option.length)}`
     })
   )
@@ -453,8 +509,8 @@ async function generateOptionalArgsUsage<
   return usages.join('\n')
 }
 
-function getPositionalArgs<G extends GunshiParams>(ctx: CommandContext<G>): [string, ArgSchema][] {
-  return Object.entries(ctx.args).filter(([_, schema]) => schema.type === 'positional')
+function getPositionalArgs(args: Args): [string, ArgSchema][] {
+  return Object.entries(args).filter(([_, schema]) => schema.type === 'positional')
 }
 
 async function generatePositionalArgsUsage<
@@ -463,7 +519,7 @@ async function generatePositionalArgsUsage<
     extensions: Extensions
   }>
 >(ctx: CommandContext<G>): Promise<string> {
-  const positionals = getPositionalArgs(ctx)
+  const positionals = getPositionalArgs(ctx.args)
   const argsMaxLength = Math.max(...positionals.map(([name]) => name.length))
 
   const usages = await Promise.all(
@@ -480,9 +536,9 @@ async function generatePositionalArgsUsage<
   return usages.join('\n')
 }
 
-function generatePositionalSymbols<G extends GunshiParams>(ctx: CommandContext<G>): string {
-  return hasPositionalArgs(ctx)
-    ? getPositionalArgs(ctx)
+function generatePositionalSymbols(args: Args): string {
+  return hasPositionalArgs(args)
+    ? getPositionalArgs(args)
         .map(([name]) => `<${name}>`)
         .join(' ')
     : ''
