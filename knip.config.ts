@@ -10,7 +10,7 @@ export default {
       entry: ['src/constants.ts']
     },
     'packages/plugin-completion': {
-      ignore: ['examples/**/*.ts']
+      ignore: ['examples/**/*.ts', 'src/bombshell/*.ts']
     },
     'packages/docs': {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts']

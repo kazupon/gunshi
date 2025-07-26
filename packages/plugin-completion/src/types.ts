@@ -5,8 +5,8 @@
 
 import { namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
 
-import type { Handler } from '@bombsh/tab'
 import type { GenerateNamespacedKey } from '@gunshi/shared'
+import type { Handler } from './bombshell/index.ts'
 
 /**
  * The unique identifier for the completion plugin.

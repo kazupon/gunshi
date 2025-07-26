@@ -55,7 +55,6 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
     case 'packages/plugin-completion': {
       json.dependencies['@gunshi/plugin'] = version
       json.dependencies['@gunshi/shared'] = version
-      json.dependencies['@bombsh/tab'] = 'https://pkg.pr.new/bombshell-dev/tab@main'
       break
     }
     case 'packages/plugin-renderer': {

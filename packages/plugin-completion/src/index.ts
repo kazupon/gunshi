@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-import { Completion, script } from '@bombsh/tab'
 import { plugin } from '@gunshi/plugin'
 import {
   localizable,
@@ -12,10 +11,10 @@ import {
   resolveKey,
   resolveLazyCommand
 } from '@gunshi/shared'
+import { Completion, script } from './bombshell/index.ts'
 import { pluginId } from './types.ts'
 import { createCommandContext, quoteExec } from './utils.ts'
 
-import type { Handler } from '@bombsh/tab'
 import type {
   Args,
   Command,
@@ -24,6 +23,7 @@ import type {
   PluginWithoutExtension
 } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+import type { Handler } from './bombshell/index.ts'
 import type { CompletionConfig, CompletionHandler, CompletionOptions } from './types.ts'
 
 export * from './types.ts'

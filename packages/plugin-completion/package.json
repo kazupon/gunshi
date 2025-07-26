@@ -58,7 +58,6 @@
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "dependencies": {
-    "@bombsh/tab": "https://pkg.pr.new/bombshell-dev/tab@main",
     "@gunshi/plugin": "workspace:*"
   },
   "peerDependencies": {
@@ -72,6 +71,7 @@
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
+    "rollup-plugin-license": "^3.6.0",
     "tsdown": "catalog:"
   }
 }
