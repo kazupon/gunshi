@@ -101,7 +101,7 @@ exports[`no arguments 1`] = `
 "A test command
 
 USAGE:
-  cmd1 test 
+  cmd1 test
 
 EXAMPLES:
   # Example 1
@@ -177,18 +177,17 @@ ARGUMENTS:
 
 exports[`sub commands 1`] = `
 "USAGE:
-  cmd1 [show] <OPTIONS> <positional1>
-  cmd1 <COMMANDS>
+  cmd1 [COMMANDS] <OPTIONS> <positional1>
 
 COMMANDS:
-  show              A show command  
-  command1          this is command1  
-  command2            
+  command1 <OPTIONS> <positional1>        this is command1
+  command2 <OPTIONS> <positional1>
+  show <OPTIONS> <positional1>            A show command
 
 For more info, run any command with the \`--help\` flag:
-  cmd1 show --help
   cmd1 command1 --help
   cmd1 command2 --help
+  cmd1 show --help
 
 ARGUMENTS:
   positional1           The positional argument 1

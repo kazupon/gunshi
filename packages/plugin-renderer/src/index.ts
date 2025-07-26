@@ -99,7 +99,32 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
         )
 
         // filter out internal commands
-        return (cachedCommands = allCommands.filter(cmd => !cmd.internal).filter(Boolean))
+        cachedCommands = allCommands.filter(cmd => !cmd.internal).filter(Boolean)
+        cachedCommands.sort((a, b) => {
+          // first, prioritize entry commands
+          if (a.entry && !b.entry) {
+            return -1
+          }
+          if (!a.entry && b.entry) {
+            return 1
+          }
+
+          // then sort by name
+          if (a.name && b.name) {
+            return a.name.localeCompare(b.name)
+          }
+
+          // handle cases where one or both names are missing
+          if (a.name && !b.name) {
+            return -1
+          }
+          if (!a.name && b.name) {
+            return 1
+          }
+
+          return 0 // keep original order if both have no name
+        })
+        return cachedCommands
       }
 
       return {
