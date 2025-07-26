@@ -2,7 +2,7 @@
   "name": "@gunshi/docs",
   "description": "Documentation for gunshi",
   "private": true,
-  "version": "0.27.0-alpha.9",
+  "version": "0.27.0-alpha.10",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
