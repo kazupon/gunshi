@@ -15,7 +15,13 @@ import { Completion, script } from './bombshell/index.ts'
 import { pluginId } from './types.ts'
 import { createCommandContext, quoteExec } from './utils.ts'
 
-import type { Args, Command, LazyCommand, PluginContext } from '@gunshi/plugin'
+import type {
+  Args,
+  Command,
+  LazyCommand,
+  PluginContext,
+  PluginWithoutExtension
+} from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 import type { Handler } from './bombshell/index.ts'
 import type { CompletionConfig, CompletionHandler, CompletionOptions } from './types.ts'
@@ -33,7 +39,7 @@ const i18nPluginId = namespacedId('i18n')
 /**
  * completion plugin for gunshi
  */
-export default function completion(options: CompletionOptions = {}) {
+export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {
   const config = options.config || {}
   const completion = new Completion()
 
