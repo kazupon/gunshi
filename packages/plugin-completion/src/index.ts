@@ -43,7 +43,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
   const config = options.config || {}
   const completion = new Completion()
 
-  return plugin({
+  return plugin<{ 'g:i18n': I18nCommandContext }>({
     id: pluginId,
     name: 'completion',
 
@@ -87,7 +87,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
      */
 
     onExtension: async (ctx, cmd) => {
-      const i18n = ctx.extensions?.[i18nPluginId] as I18nCommandContext | undefined
+      const i18n = ctx.extensions[i18nPluginId]
       const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
 
       const entry = [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry)

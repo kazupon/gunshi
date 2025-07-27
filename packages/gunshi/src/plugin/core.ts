@@ -11,6 +11,7 @@ import type {
   CommandContextCore,
   CommandContextExtension,
   DefaultGunshiParams,
+  ExtendContext,
   GunshiParams
 } from '../types.ts'
 import type { PluginContext } from './context.ts'
@@ -135,6 +136,34 @@ export interface PluginWithoutExtension<
 }
 
 /**
+ * Define a plugin with extension capabilities and typed dependency extensions
+ * @param options - {@link PluginOptions | plugin options}
+ * @return A defined plugin with extension capabilities.
+ * @since v0.27.0
+ */
+export function plugin<
+  E extends ExtendContext,
+  I extends string,
+  P extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
+>(options: {
+  id: I
+  name?: string
+  dependencies?: (PluginDependency | string)[]
+  setup?: (
+    ctx: Readonly<
+      PluginContext<
+        GunshiParams<{ args: Args; extensions: { [K in I]: Awaited<ReturnType<P>> } & E }>
+      >
+    >
+  ) => Awaitable<void>
+  extension: P
+  onExtension?: OnPluginExtension<{
+    args: Args
+    extensions: { [K in I]: Awaited<ReturnType<P>> } & E
+  }>
+}): PluginWithExtension<Awaited<ReturnType<P>>>
+
+/**
  * Define a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
  * @return A defined plugin with extension capabilities.
@@ -155,6 +184,22 @@ export function plugin<
   extension: P
   onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]: Awaited<ReturnType<P>> } }>
 }): PluginWithExtension<Awaited<ReturnType<P>>>
+
+/**
+ * Define a plugin without extension capabilities but with typed dependency extensions
+ * @param options - {@link PluginOptions | plugin options} without extension
+ * @returns A defined plugin without extension capabilities.
+ * @since v0.27.0
+ */
+export function plugin<E extends ExtendContext>(options: {
+  id: string
+  name?: string
+  dependencies?: (PluginDependency | string)[]
+  setup?: (
+    ctx: Readonly<PluginContext<GunshiParams<{ args: Args; extensions: E }>>>
+  ) => Awaitable<void>
+  onExtension?: OnPluginExtension<GunshiParams<{ args: Args; extensions: E }>>
+}): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
 /**
  * Define a plugin without extension capabilities
