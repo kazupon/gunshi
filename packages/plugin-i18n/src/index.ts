@@ -105,8 +105,7 @@ export default function i18n(
   return plugin({
     id,
     name: 'internationalization',
-
-    dependencies: [{ id: namespacedId('global'), optional: true }],
+    dependencies: [{ id: namespacedId('global'), optional: true }] as const,
 
     extension: async () => {
       // define translate function
@@ -185,7 +184,7 @@ export default function i18n(
         locale,
         translate,
         loadResource
-      } as I18nCommandContext
+      }
     },
 
     onExtension: async (ctx, cmd) => {

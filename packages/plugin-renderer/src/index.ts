@@ -37,52 +37,39 @@ import { renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'
 
 import type {
-  Args,
   Command,
   CommandContext,
-  CommandContextCore,
   DefaultGunshiParams,
   GunshiParams,
   PluginWithExtension
 } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
-import type { PluginId, UsageRendererCommandContext } from './types.ts'
+import type { UsageRendererCommandContext } from './types.ts'
 
 export { renderHeader } from './header.ts'
 export { renderUsage } from './usage.ts'
 export { renderValidationErrors } from './validation.ts'
 
-export type { UsageRendererCommandContext } from './types.ts'
-
-// type for the command context with renderer extension
-type RendererCommandContext = GunshiParams<{
-  args: Args
-  extensions: {
-    [K in PluginId]: UsageRendererCommandContext<DefaultGunshiParams>
-  }
-}>
-
 const i18nPluginId = namespacedId('i18n')
+
+const dependencies = [{ id: i18nPluginId, optional: true }] as const
 
 /**
  * usage renderer plugin
  */
 export default function renderer(): PluginWithExtension<UsageRendererCommandContext> {
-  return plugin({
+  return plugin<
+    Record<typeof i18nPluginId, I18nCommandContext>,
+    typeof id,
+    typeof dependencies,
+    UsageRendererCommandContext
+  >({
     id,
     name: 'usage renderer',
+    dependencies,
 
-    dependencies: [{ id: i18nPluginId, optional: true }],
-
-    extension: (ctx: CommandContextCore, cmd: Command): UsageRendererCommandContext => {
-      const {
-        extensions: { [i18nPluginId]: i18n }
-      } = ctx as unknown as CommandContext<{
-        args: Args
-        extensions: {
-          [i18nPluginId]?: I18nCommandContext
-        }
-      }>
+    extension: async (ctx, cmd) => {
+      const i18n = ctx.extensions[i18nPluginId]
 
       let cachedCommands: Command[] | undefined
 
@@ -128,21 +115,16 @@ export default function renderer(): PluginWithExtension<UsageRendererCommandCont
       }
 
       return {
-        text: localizable(ctx, cmd, i18n?.translate),
+        text: localizable(ctx as unknown as CommandContext, cmd, i18n?.translate),
         loadCommands
       }
     },
 
     setup: ctx => {
-      ctx.decorateHeaderRenderer(
-        async (_baseRenderer, cmdCtx) => await renderHeader<RendererCommandContext>(cmdCtx)
-      )
-      ctx.decorateUsageRenderer(
-        async (_baseRenderer, cmdCtx) => await renderUsage<RendererCommandContext>(cmdCtx)
-      )
+      ctx.decorateHeaderRenderer(async (_baseRenderer, cmdCtx) => await renderHeader(cmdCtx))
+      ctx.decorateUsageRenderer(async (_baseRenderer, cmdCtx) => await renderUsage(cmdCtx))
       ctx.decorateValidationErrorsRenderer(
-        async (_baseRenderer, cmdCtx, error) =>
-          await renderValidationErrors<RendererCommandContext>(cmdCtx, error)
+        async (_baseRenderer, cmdCtx, error) => await renderValidationErrors(cmdCtx, error)
       )
     }
   })

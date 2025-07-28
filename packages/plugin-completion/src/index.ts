@@ -36,6 +36,8 @@ const NOOP_HANDLER = () => {
 
 const i18nPluginId = namespacedId('i18n')
 
+const dependencies = [{ id: i18nPluginId, optional: true }] as const
+
 /**
  * completion plugin for gunshi
  */
@@ -43,11 +45,14 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
   const config = options.config || {}
   const completion = new Completion()
 
-  return plugin<{ 'g:i18n': I18nCommandContext }>({
+  return plugin<
+    Record<typeof i18nPluginId, I18nCommandContext>,
+    typeof pluginId,
+    typeof dependencies
+  >({
     id: pluginId,
     name: 'completion',
-
-    dependencies: [{ id: i18nPluginId, optional: true }],
+    dependencies,
 
     async setup(ctx) {
       /**
