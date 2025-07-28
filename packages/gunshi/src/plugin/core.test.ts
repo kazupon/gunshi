@@ -7,7 +7,7 @@ import { createPluginContext } from './context.ts'
 import { plugin } from './core.ts'
 
 import type { Args } from 'args-tokens'
-import type { Command, CommandContextCore, ExtendContext, GunshiParams } from '../types.ts'
+import type { Command, CommandContextCore, GunshiParams } from '../types.ts'
 import type { PluginContext } from './context.ts'
 import type { Plugin } from './core.ts'
 
@@ -201,21 +201,19 @@ describe('plugin function', () => {
         ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
           const user = cmdCtx.extensions.auth.user
 
-          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<
-            {
-              auth: ReturnType<typeof extensionFactory>
-            } & ExtendContext
-          >()
+          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{
+            auth: ReturnType<typeof extensionFactory>
+          }>()
+          // } & ExtendContext
 
           console.log(`User: ${user.name} (${user.id})`)
           return await baseRenderer(cmdCtx)
         })
         ctx.decorateCommand(baseRunner => async ctx => {
-          expectTypeOf(ctx.extensions).toEqualTypeOf<
-            {
-              auth: ReturnType<typeof extensionFactory>
-            } & ExtendContext
-          >()
+          expectTypeOf(ctx.extensions).toEqualTypeOf<{
+            auth: ReturnType<typeof extensionFactory>
+          }>()
+          // } & ExtendContext
 
           const result = await baseRunner(ctx)
           return `[AUTH] ${result}`
@@ -240,12 +238,12 @@ describe('plugin function', () => {
       setup: async ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateUsageRenderer(async (baseRenderer, cmdCtx) => {
-          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<ExtendContext>()
+          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{ auth: {} }>()
 
           return await baseRenderer(cmdCtx)
         })
         ctx.decorateValidationErrorsRenderer(async (baseRenderer, cmdCtx, error) => {
-          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<ExtendContext>()
+          expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{ auth: {} }>()
 
           return await baseRenderer(cmdCtx, error)
         })

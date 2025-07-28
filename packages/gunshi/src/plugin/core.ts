@@ -21,6 +21,56 @@ const NOOP_EXTENSION = () => {
 }
 
 /**
+ * Helper type to extract plugin ID from dependency
+ * @internal
+ */
+export type ExtractDependencyId<D> = D extends PluginDependency
+  ? D['id']
+  : D extends string
+    ? D
+    : never
+
+/**
+ * Helper type to check if dependency is optional
+ * @internal
+ */
+export type IsOptionalDependency<D> = D extends PluginDependency
+  ? D['optional'] extends true
+    ? true
+    : false
+  : false
+
+type ProcessDependency<D, A extends ExtendContext> = D extends string
+  ? D extends keyof A
+    ? { [K in D]: A[K] }
+    : {}
+  : D extends { id: infer ID; optional?: any } // eslint-disable-line @typescript-eslint/no-explicit-any
+    ? ID extends string
+      ? ID extends keyof A
+        ? D extends { optional: true }
+          ? { [K in ID]: A[K] | undefined }
+          : { [K in ID]: A[K] }
+        : {}
+      : never
+    : never
+
+/**
+ * Helper type to infer dependency extensions with optional support
+ * @internal
+ */
+export type InferDependencyExtensions<
+  D extends ReadonlyArray<PluginDependency | string>,
+  A extends ExtendContext
+> = D extends readonly []
+  ? {}
+  : D extends readonly [infer First, ...infer Rest]
+    ? ProcessDependency<First, A> &
+        (Rest extends ReadonlyArray<PluginDependency | string>
+          ? InferDependencyExtensions<Rest, A>
+          : {})
+    : {}
+
+/**
  * Plugin dependency definition
  * @since v0.27.0
  */
@@ -62,18 +112,47 @@ export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
   cmd: Readonly<Command<G>>
 ) => Awaitable<void>
 
+type IsStringLiteral<S extends string> = string extends S ? false : true
+
+type MergeExtension<
+  Id,
+  ResolvedDepExt extends ExtendContext,
+  PluginExt extends ExtendContext
+> = Id extends infer I
+  ? I extends string
+    ? IsStringLiteral<I> extends true
+      ? ResolvedDepExt & { [K in I]: PluginExt }
+      : ResolvedDepExt
+    : ResolvedDepExt
+  : ResolvedDepExt
+
 /**
  * Plugin definition options
  * @since v0.27.0
  */
 export interface PluginOptions<
-  T extends Record<string, unknown> = Record<never, never>,
-  G extends GunshiParams = DefaultGunshiParams
+  DepExt extends ExtendContext = DefaultGunshiParams['extensions'], // for plugin dependency extensions
+  Id extends string = string, // for plugin id
+  Deps extends ReadonlyArray<PluginDependency | string> = (PluginDependency | string)[], // for plugin dependencies
+  Ext extends Record<string, unknown> = {}, // for plugin extension type
+  ResolvedDepExt extends GunshiParams = GunshiParams<{
+    args: Args
+    extensions: InferDependencyExtensions<Deps, DepExt>
+  }>,
+  PluginExt extends PluginExtension<Ext, ResolvedDepExt> = PluginExtension<Ext, ResolvedDepExt>,
+  MergedExt extends GunshiParams = GunshiParams<{
+    args: Args
+    extensions: MergeExtension<
+      Id,
+      InferDependencyExtensions<Deps, DepExt>,
+      Awaited<ReturnType<PluginExt>>
+    >
+  }>
 > {
   /**
    * Plugin unique identifier
    */
-  id: string
+  id: Id
   /**
    * Plugin name
    */
@@ -81,19 +160,19 @@ export interface PluginOptions<
   /**
    * Plugin dependencies
    */
-  dependencies?: (PluginDependency | string)[]
+  dependencies?: Deps
   /**
    * Plugin setup function
    */
-  setup?: PluginFunction<G>
+  setup?: PluginFunction<MergedExt>
   /**
    * Plugin extension
    */
-  extension?: PluginExtension<T, G>
+  extension?: PluginExt
   /**
    * Callback for when the plugin is extended with `extension` option.
    */
-  onExtension?: OnPluginExtension<G>
+  onExtension?: OnPluginExtension<MergedExt>
 }
 
 /**
@@ -136,83 +215,100 @@ export interface PluginWithoutExtension<
 }
 
 /**
- * Define a plugin with extension capabilities and typed dependency extensions
+ * Define a plugin with extension compatibility and typed dependency extensions
  * @param options - {@link PluginOptions | plugin options}
- * @return A defined plugin with extension capabilities.
+ * @return A defined plugin with extension compatibility.
  * @since v0.27.0
  */
 export function plugin<
-  E extends ExtendContext,
-  I extends string,
-  P extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
+  Context extends ExtendContext = DefaultGunshiParams['extensions'], // for plugin dependency extensions
+  Id extends string = string, // for plugin id
+  Deps extends ReadonlyArray<PluginDependency | string> = [], // for plugin dependencies
+  Extension extends {} = {}, // for plugin extension type
+  ResolvedDepExtensions extends GunshiParams = GunshiParams<{
+    args: Args
+    extensions: InferDependencyExtensions<Deps, Context>
+  }>,
+  PluginExt extends PluginExtension<Extension, DefaultGunshiParams> = PluginExtension<
+    Extension,
+    ResolvedDepExtensions
+  >,
+  MergedExtentions extends GunshiParams = GunshiParams<{
+    args: Args
+    extensions: MergeExtension<
+      Id,
+      InferDependencyExtensions<Deps, Context>,
+      Awaited<ReturnType<PluginExt>>
+    >
+  }>
 >(options: {
-  id: I
+  id: Id
   name?: string
-  dependencies?: (PluginDependency | string)[]
+  dependencies?: Deps
   setup?: (
     ctx: Readonly<
       PluginContext<
-        GunshiParams<{ args: Args; extensions: { [K in I]: Awaited<ReturnType<P>> } & E }>
+        GunshiParams<{
+          args: Args
+          extensions: MergeExtension<
+            Id,
+            InferDependencyExtensions<Deps, Context>,
+            Awaited<ReturnType<PluginExt>>
+          >
+        }>
       >
     >
   ) => Awaitable<void>
-  extension: P
-  onExtension?: OnPluginExtension<{
-    args: Args
-    extensions: { [K in I]: Awaited<ReturnType<P>> } & E
-  }>
-}): PluginWithExtension<Awaited<ReturnType<P>>>
+  extension: PluginExt
+  onExtension?: OnPluginExtension<MergedExtentions>
+}): PluginWithExtension<Awaited<ReturnType<PluginExt>>>
 
 /**
- * Define a plugin with extension capabilities
- * @param options - {@link PluginOptions | plugin options}
- * @return A defined plugin with extension capabilities.
+ * Define a plugin without extension and typed dependency extensions
+ * @param options - {@link PluginOptions | plugin options} without extension
+ * @returns A defined plugin without extension
  * @since v0.27.0
  */
 export function plugin<
-  I extends string,
-  P extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
+  Context extends ExtendContext = DefaultGunshiParams['extensions'], // for plugin dependency extensions
+  Id extends string = string, // for plugin id
+  Deps extends ReadonlyArray<PluginDependency | string> = [], // for plugin dependencies
+  Extension extends Record<string, unknown> = {}, // for plugin extension type
+  ResolvedDepExtensions extends GunshiParams = GunshiParams<{
+    args: Args
+    extensions: InferDependencyExtensions<Deps, Context>
+  }>,
+  PluginExt extends PluginExtension<Extension, DefaultGunshiParams> = PluginExtension<
+    Extension,
+    ResolvedDepExtensions
+  >,
+  MergedExtentions extends GunshiParams = GunshiParams<{
+    args: Args
+    extensions: MergeExtension<
+      Id,
+      InferDependencyExtensions<Deps, Context>,
+      Awaited<ReturnType<PluginExt>>
+    >
+  }>
 >(options: {
-  id: I
+  id: Id
   name?: string
-  dependencies?: (PluginDependency | string)[]
+  dependencies?: Deps
   setup?: (
     ctx: Readonly<
-      PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]: Awaited<ReturnType<P>> } }>>
+      PluginContext<
+        GunshiParams<{
+          args: Args
+          extensions: MergeExtension<
+            Id,
+            InferDependencyExtensions<Deps, Context>,
+            Awaited<ReturnType<PluginExt>>
+          >
+        }>
+      >
     >
   ) => Awaitable<void>
-  extension: P
-  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]: Awaited<ReturnType<P>> } }>
-}): PluginWithExtension<Awaited<ReturnType<P>>>
-
-/**
- * Define a plugin without extension capabilities but with typed dependency extensions
- * @param options - {@link PluginOptions | plugin options} without extension
- * @returns A defined plugin without extension capabilities.
- * @since v0.27.0
- */
-export function plugin<E extends ExtendContext>(options: {
-  id: string
-  name?: string
-  dependencies?: (PluginDependency | string)[]
-  setup?: (
-    ctx: Readonly<PluginContext<GunshiParams<{ args: Args; extensions: E }>>>
-  ) => Awaitable<void>
-  onExtension?: OnPluginExtension<GunshiParams<{ args: Args; extensions: E }>>
-}): PluginWithoutExtension<DefaultGunshiParams['extensions']>
-
-/**
- * Define a plugin without extension capabilities
- * @param options - {@link PluginOptions | plugin options} without extension
- * @returns A defined plugin without extension capabilities.
- * @since v0.27.0
- */
-export function plugin(options: {
-  id: string
-  name?: string
-  dependencies?: (PluginDependency | string)[]
-  setup?: (ctx: Readonly<PluginContext<DefaultGunshiParams>>) => Awaitable<void>
-  onExtension?: OnPluginExtension<DefaultGunshiParams>
+  onExtension?: OnPluginExtension<MergedExtentions>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
 /**
@@ -221,23 +317,10 @@ export function plugin(options: {
  * @returns A defined plugin.
  * @since v0.27.0
  */
-export function plugin<
-  I extends string,
-  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
->(options: {
-  id: I
-  name?: string
-  dependencies?: (PluginDependency | string)[]
-  setup?: (
-    ctx: Readonly<
-      PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]?: Awaited<E> } }>>
-    >
-  ) => Awaitable<void>
-  extension?: PluginExtension<E, DefaultGunshiParams>
-  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]?: Awaited<E> } }>
-}): PluginWithExtension<Awaited<E>> | PluginWithoutExtension<DefaultGunshiParams['extensions']> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function plugin(options: any = {}): any {
   const { id, name, setup, onExtension, dependencies } = options
-  const extension = options.extension || (NOOP_EXTENSION as PluginExtension<E, DefaultGunshiParams>)
+  const extension = options.extension || NOOP_EXTENSION
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -283,5 +366,5 @@ export function plugin<
         configurable: true
       }
     })
-  }) as PluginWithExtension<Awaited<E>> | PluginWithoutExtension<DefaultGunshiParams['extensions']>
+  })
 }
