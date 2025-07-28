@@ -204,7 +204,6 @@ describe('plugin function', () => {
           expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{
             auth: ReturnType<typeof extensionFactory>
           }>()
-          // } & ExtendContext
 
           console.log(`User: ${user.name} (${user.id})`)
           return await baseRenderer(cmdCtx)
@@ -213,7 +212,6 @@ describe('plugin function', () => {
           expectTypeOf(ctx.extensions).toEqualTypeOf<{
             auth: ReturnType<typeof extensionFactory>
           }>()
-          // } & ExtendContext
 
           const result = await baseRunner(ctx)
           return `[AUTH] ${result}`
