@@ -233,7 +233,7 @@ export function plugin<
     Extension,
     ResolvedDepExtensions
   >,
-  MergedExtentions extends GunshiParams = GunshiParams<{
+  MergedExtensions extends GunshiParams = GunshiParams<{
     args: Args
     extensions: MergeExtension<
       Id,
@@ -260,7 +260,7 @@ export function plugin<
     >
   ) => Awaitable<void>
   extension: PluginExt
-  onExtension?: OnPluginExtension<MergedExtentions>
+  onExtension?: OnPluginExtension<MergedExtensions>
 }): PluginWithExtension<Awaited<ReturnType<PluginExt>>>
 
 /**
@@ -282,7 +282,7 @@ export function plugin<
     Extension,
     ResolvedDepExtensions
   >,
-  MergedExtentions extends GunshiParams = GunshiParams<{
+  MergedExtensions extends GunshiParams = GunshiParams<{
     args: Args
     extensions: MergeExtension<
       Id,
@@ -308,7 +308,7 @@ export function plugin<
       >
     >
   ) => Awaitable<void>
-  onExtension?: OnPluginExtension<MergedExtentions>
+  onExtension?: OnPluginExtension<MergedExtensions>
 }): PluginWithoutExtension<DefaultGunshiParams['extensions']>
 
 /**

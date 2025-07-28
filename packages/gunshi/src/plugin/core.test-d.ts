@@ -54,7 +54,7 @@ type Ext3 = { baz: boolean }
 type Ext4 = { qux: symbol }
 
 describe('InferDependencyExtensions', () => {
-  test('required and optionnal dependencies', () => {
+  test('required and optional dependencies', () => {
     type T = InferDependencyExtensions<
       [{ id: 'ext1' }, { id: 'ext2'; optional: true }],
       { ext1: Ext1; ext2: Ext2 }
