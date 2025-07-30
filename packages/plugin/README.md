@@ -21,7 +21,6 @@ This package provides comprehensive APIs and TypeScript type definitions for cre
 - [Gunshi Lifecycle and Plugins](#-gunshi-lifecycle-and-plugins)
 - [Plugin in Depth](#-plugin-in-depth)
 - [Plugin Communication & Collaboration](#-plugin-communication--collaboration)
-- [Plugin Package Naming Conventions](#-plugin-package-naming-conventions)
 - [Plugin Best Practices](#-plugin-best-practices)
 - [Official Plugins](#-official-plugins)
 - [Community Plugins](#-community-plugins)
@@ -585,7 +584,9 @@ export const deployCommand = define<MyCommandExtensions>({
 })
 ```
 
-## 📋 Plugin Package Naming Conventions
+## 💡 Plugin Best Practices
+
+### Plugin Package Naming Conventions
 
 Follow these naming conventions for consistency:
 
@@ -593,8 +594,6 @@ Follow these naming conventions for consistency:
   - Example: `gunshi-plugin-logger`, `gunshi-plugin-auth`
 - **Scoped packages**: `@{scope}/plugin-{feature}`
   - Example: `@mycompany/plugin-logger`
-
-## 💡 Plugin Best Practices
 
 ### Plugin ID Namespacing & Definition
 
