@@ -209,7 +209,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   /**
    * Sub commands.
    */
-  subCommands?: Map<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
+  subCommands?:
+    | Record<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
+    | Map<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
   /**
    * Left margin of the command output.
    */
