@@ -283,7 +283,7 @@ function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextEx
       const key = plugin.id
       if (extensions[key]) {
         console.warn(
-          `Plugin "${key}" is already installed.ignore it for command context extending.`
+          `Plugin "${key}" is already installed. Ignore it for command context extending.`
         )
       } else {
         extensions[key] = plugin.extension
