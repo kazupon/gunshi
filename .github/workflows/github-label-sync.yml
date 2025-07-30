@@ -7,7 +7,7 @@ on:
     paths:
       - .github/labels.yml
       - .github/workflows/github-label-sync.yml
-  workflow_dispatch: # eslint-disable-line yml/no-empty-mapping-value
+  workflow_dispatch: # eslint-disable-line yml/no-empty-mapping-value -- NOTE(kazupon): to work manually on GitHub Web UIs
 
 jobs:
   sync:

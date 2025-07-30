@@ -51,14 +51,14 @@ export type DefaultGunshiParams = GunshiParams
  * This type constraint allows both GunshiParams and objects with extensions.
  * @since v0.27.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendContext }
 
 /**
  * Type helper to extract args from G
  * @internal
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
 
 /**
@@ -72,7 +72,7 @@ export type ExtractArgExplicitlyProvided<G> = ArgExplicitlyProvided<ExtractArgs<
  * @internal
  */
 export type ExtractExtensions<G> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
   G extends GunshiParams<any> ? G['extensions'] : G extends { extensions: infer E } ? E : {}
 
 /**
@@ -80,7 +80,7 @@ export type ExtractExtensions<G> =
  * @internal
  */
 export type NormalizeToGunshiParams<G> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
   G extends GunshiParams<any>
     ? G
     : G extends { extensions: ExtendContext }
@@ -146,7 +146,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    * Sub commands.
    * @see {@link CliOptions.subCommands}
    */
-  subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined // eslint-disable-line @typescript-eslint/no-explicit-any
+  subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
   /**
    * Render function the command usage.
    */
@@ -209,7 +209,7 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   /**
    * Sub commands.
    */
-  subCommands?: Map<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any
+  subCommands?: Map<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
   /**
    * Left margin of the command output.
    */
@@ -356,7 +356,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    * @param optionalParams an optional parameters, @see {@link console.log}
    * @internal
    */
-  log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any
+  log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic optional parameters
   /**
    * Command context extensions.
    * @since v0.27.0

@@ -37,7 +37,7 @@ export type GenerateOptions<G extends GunshiParams = DefaultGunshiParams> = CliO
  * @param options - A {@link CliOptions | cli options}
  * @returns A rendered usage.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export async function generate<G extends GunshiParams<any> = DefaultGunshiParams>(
   command: string | null,
   entry: Command<G> | LazyCommand<G>,

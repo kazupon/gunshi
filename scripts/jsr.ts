@@ -20,7 +20,7 @@ const args = parseArgs({
   }
 })
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): This is a utility script and we can use `any` here.
 function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, any> {
   const version: string = json.version
   if (!version) {
@@ -76,7 +76,8 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
 async function main() {
   const { package: pkg } = args.values
 
-  let json: Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): This is a utility script and we can use `any` here.
+  let json: Record<string, any>
   try {
     const module = await import(`../${pkg}/package.json`, {
       with: { type: 'json' }

@@ -516,7 +516,7 @@ describe('CommandContextExtension type', () => {
 
   test('extension factory can return complex objects', async () => {
     const dbExtension: CommandContextExtension<{
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for test codes
       query: (sql: string) => Promise<any>
       transaction: (fn: () => Promise<void>) => Promise<void>
     }> = {

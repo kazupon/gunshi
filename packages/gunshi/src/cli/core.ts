@@ -203,7 +203,7 @@ async function resolveCommand<G extends GunshiParamsConstraint>(
 
   async function doResolveCommand(): Promise<ResolveCommandContext<G>> {
     if (typeof entry === 'function') {
-      // eslint-disable-next-line unicorn/prefer-ternary
+      // eslint-disable-next-line unicorn/prefer-ternary -- NOTE(kazupon): to keep the human-readable codes
       if ('commandName' in entry && entry.commandName) {
         // lazy command
         return { commandName: entry.commandName, command: entry, callMode: 'entry' }

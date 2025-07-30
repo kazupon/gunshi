@@ -37,7 +37,7 @@ export type PluginId = typeof pluginId
  * Extended command context which provides utilities via i18n plugin.
  * These utilities are available via `CommandContext.extensions['g:i18n']`.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Command locale

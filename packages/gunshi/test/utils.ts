@@ -39,7 +39,7 @@ type CreateMockCommandContext<G extends GunshiParams = DefaultGunshiParams> = Pa
 export async function createMockCommandContext<E extends ExtendContext = NoExt>(
   options: CreateMockCommandContext = {}
 ): Promise<CommandContext<GunshiParams<{ args: Args; extensions: E }>>> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): test utility function
   let ctx: any = {
     name: options.name || 'mock-command',
     description: options.description || 'Mock command',
@@ -71,7 +71,7 @@ export async function createMockCommandContext<E extends ExtendContext = NoExt>(
   }
 
   if (options.extensions) {
-    const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): Test utility function
     Object.defineProperty(ctx, 'extensions', {
       value: ext,
       writable: false,
@@ -84,10 +84,10 @@ export async function createMockCommandContext<E extends ExtendContext = NoExt>(
         options.command as Command
       )
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): utilify for test codes
     ctx = Object.assign(create<any>(), ctx, { extensions: ext })
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): utilify for test codes
     ctx = Object.assign(create<any>(), ctx, { extensions: {} })
   }
 

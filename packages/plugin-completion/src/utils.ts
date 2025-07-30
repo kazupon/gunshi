@@ -43,15 +43,15 @@ export async function createCommandContext(
 }
 
 function detectRuntime(): 'bun' | 'deno' | 'node' | 'unknown' {
-  // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
+  // @ts-ignore -- NOTE(kazupon): ignore, because `process` will detect ts compile error on `deno check`
   if (globalThis.process !== undefined && globalThis.process.release?.name === 'node') {
     return 'node'
   }
-  // @ts-ignore -- NOTE: ignore, because development env is node.js
+  // @ts-ignore -- NOTE(kazupon): ignore, because development env is node.js
   if (globalThis.Deno !== undefined) {
     return 'deno'
   }
-  // @ts-ignore -- NOTE: ignore, because development env is node.js
+  // @ts-ignore -- NOTE(kazupon): ignore, because development env is node.js
   if (globalThis.Bun !== undefined) {
     return 'bun'
   }
@@ -66,15 +66,15 @@ export function quoteExec(): string {
   const runtime = detectRuntime()
   switch (runtime) {
     case 'node': {
-      // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
+      // @ts-ignore -- NOTE(kazupon): ignore, because `process` will detect ts compile error on `deno check`
       const execPath = globalThis.process.execPath
-      // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
+      // @ts-ignore -- NOTE(kazupon): ignore, because `process` will detect ts compile error on `deno check`
       const processArgs = globalThis.process.argv.slice(1)
       const quotedExecPath = quoteIfNeeded(execPath)
-      // eslint-disable-next-line unicorn/no-array-callback-reference
+      // eslint-disable-next-line unicorn/no-array-callback-reference -- NOTE(kazupon): callback should be testable
       const quotedProcessArgs = processArgs.map(quoteIfNeeded)
-      // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
-      // eslint-disable-next-line unicorn/no-array-callback-reference
+      // @ts-ignore -- NOTE(kazupon): ignore, because `process` will detect ts compile error on `deno check`
+      // eslint-disable-next-line unicorn/no-array-callback-reference -- NOTE(kazupon): callback should be testable
       const quotedProcessExecArgs = globalThis.process.execArgv.map(quoteIfNeeded)
       return `${quotedExecPath} ${quotedProcessExecArgs.join(' ')} ${quotedProcessArgs[0]}`
     }

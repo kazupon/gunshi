@@ -23,7 +23,7 @@ export type PluginId = typeof pluginId
  * Extended command context which provides utilities via usage renderer plugin.
  * These utilities are available via `CommandContext.extensions['g:renderer']`.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export interface UsageRendererCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Render the text message

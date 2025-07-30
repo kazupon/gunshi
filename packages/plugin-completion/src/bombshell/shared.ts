@@ -34,6 +34,6 @@ export function assertDoubleDashes(programName: string = 'cli'): void {
   if (dashDashIndex === -1) {
     const errorMessage = `Error: You need to use -- to separate completion arguments.\nExample: ${programName} complete -- <args>`
     console.error(errorMessage)
-    process.exit(1) // eslint-disable-line unicorn/no-process-exit
+    process.exit(1) // eslint-disable-line unicorn/no-process-exit -- NOTE(kazupon): keep code as forked
   }
 }

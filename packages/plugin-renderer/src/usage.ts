@@ -453,9 +453,7 @@ async function resolveDisplayValue<
   }
   if (schema.type === 'enum') {
     const _default =
-      schema.default !== undefined // eslint-disable-line unicorn/no-negated-condition
-        ? await generateDefaultDisplayValue(ctx, schema)
-        : ''
+      schema.default === undefined ? '' : await generateDefaultDisplayValue(ctx, schema)
     const choices = `${await ctx.extensions![pluginId].text(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
     return `(${_default ? `${_default}, ${choices}` : choices})`
   }
