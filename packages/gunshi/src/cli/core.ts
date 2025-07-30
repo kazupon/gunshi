@@ -28,6 +28,11 @@ import type {
   LazyCommand
 } from '../types.ts'
 
+type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 'subCommands'> & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for subCommands
+  subCommands: Exclude<CliOptions['subCommands'], Record<string, Command<any> | LazyCommand<any>>>
+}
+
 export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   argv: string[],
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
@@ -130,17 +135,28 @@ function resolveArguments<G extends GunshiParamsConstraint>(
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
+const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object'
+
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
   entryCmd: Command<G> | CommandRunner<G> | LazyCommand<G>
 ): Map<string, Command<G> | LazyCommand<G>> {
-  const subCommands = new Map(options.subCommands)
+  const hasSubCommands = options.subCommands
+    ? options.subCommands instanceof Map
+      ? options.subCommands.size > 0
+      : isObject(options.subCommands) && Object.keys(options.subCommands).length > 0
+    : false
+
+  const subCommands = new Map(options.subCommands instanceof Map ? options.subCommands : [])
+  if (!(options.subCommands instanceof Map) && isObject(options.subCommands)) {
+    for (const [name, cmd] of Object.entries(options.subCommands)) {
+      subCommands.set(name, cmd)
+    }
+  }
 
   // add entry command to sub commands if there are sub commands
-  if (
-    (options.subCommands || subCommands.size > 0) &&
-    (isLazyCommand(entryCmd) || typeof entryCmd === 'object')
-  ) {
+  if (hasSubCommands && (isLazyCommand(entryCmd) || typeof entryCmd === 'object')) {
     entryCmd.entry = true
     subCommands.set(resolveEntryName(entryCmd as LazyCommand<G> | Command<G>), entryCmd)
   }
@@ -152,13 +168,13 @@ function normalizeCliOptions<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
   decorators: Decorators<G>,
   pluginContext: PluginContext<G>
-): CliOptions<G> {
+): InternalCliOptions<G> {
   // get the latest sub commands from plugin context (already includes entry command)
   const subCommands = new Map(pluginContext.subCommands)
 
   const resolvedOptions = Object.assign(create<CliOptions<G>>(), CLI_OPTIONS_DEFAULT, options, {
     subCommands
-  }) as CliOptions<G>
+  }) as InternalCliOptions<G>
 
   // set default renderers if not provided via cli options
   if (resolvedOptions.renderHeader === undefined) {
@@ -197,7 +213,7 @@ const CANNOT_RESOLVE_COMMAND = {
 async function resolveCommand<G extends GunshiParamsConstraint>(
   sub: string,
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
-  options: CliOptions<G>
+  options: InternalCliOptions<G>
 ): Promise<ResolveCommandContext<G>> {
   const omitted = !sub
 
@@ -267,7 +283,7 @@ function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextEx
       const key = plugin.id
       if (extensions[key]) {
         console.warn(
-          `Plugin "${key}" is already installed. ignore it for command context extending.`
+          `Plugin "${key}" is already installed. Ignore it for command context extending.`
         )
       } else {
         extensions[key] = plugin.extension

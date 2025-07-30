@@ -1387,6 +1387,25 @@ describe('command lifecycle hooks', () => {
   })
 })
 
+test('subCommands option with command array', async () => {
+  const mockCommand1 = vi.fn()
+  const mockCommand2 = vi.fn()
+  const subCommands = {
+    command1: {
+      run: mockCommand1
+    },
+    command2: {
+      run: mockCommand2
+    }
+  }
+
+  await cli(['command1'], { run: vi.fn() }, { subCommands })
+  expect(mockCommand1).toBeCalled()
+
+  await cli(['command2'], { run: vi.fn() }, { subCommands })
+  expect(mockCommand2).toBeCalled()
+})
+
 describe('github issues', () => {
   test('#252', async () => {
     const utils = await import('./utils.ts')
