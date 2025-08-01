@@ -57,8 +57,8 @@ importers:
         specifier: 'catalog:'
         version: 22.16.5
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20250731.1
-        version: 7.0.0-dev.20250731.1
+        specifier: 7.0.0-dev.20250801.1
+        version: 7.0.0-dev.20250801.1
       '@vitest/coverage-v8':
         specifier: 3.2.4
         version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.16.5)(jiti@2.4.2)(lightningcss@1.29.3)(tsx@4.19.3)(yaml@2.8.0))
@@ -163,13 +163,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   packages/definition:
     devDependencies:
@@ -184,13 +184,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   packages/docs:
     devDependencies:
@@ -242,13 +242,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
       zod:
         specifier: 'catalog:'
         version: 4.0.13
@@ -266,13 +266,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   packages/plugin-completion:
     dependencies:
@@ -297,7 +297,7 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
@@ -306,7 +306,7 @@ importers:
         version: 3.6.0(picomatch@4.0.2)(rollup@4.40.0)
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   packages/plugin-dryrun:
     dependencies:
@@ -322,13 +322,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   packages/plugin-global:
     dependencies:
@@ -347,13 +347,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
       typedoc:
         specifier: 'catalog:'
         version: 0.28.8(typescript@5.8.3)
@@ -387,7 +387,7 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       messageformat:
         specifier: 4.0.0-12
         version: 4.0.0-12
@@ -396,7 +396,7 @@ importers:
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
       typedoc:
         specifier: 'catalog:'
         version: 0.28.8(typescript@5.8.3)
@@ -424,13 +424,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
       typedoc:
         specifier: 'catalog:'
         version: 0.28.8(typescript@5.8.3)
@@ -451,13 +451,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   packages/shared:
     devDependencies:
@@ -475,13 +475,13 @@ importers:
         version: 0.13.5
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
+        version: 0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3))
       publint:
         specifier: 'catalog:'
         version: 0.3.12
       tsdown:
         specifier: 'catalog:'
-        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+        version: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   playground/auto-usage:
     dependencies:
@@ -2049,50 +2049,50 @@ packages:
     resolution: {integrity: sha512-pWrTcoFNWuwHlA9CvlfSsGWs14JxfN1TH25zM5L7o0pRLhsoZkDnTsXfQRJBEWJoV5DL0jf+Z+sxiud+K0mq1g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-fSCRGy6nA3y2lAxOYypiagEATGBnIi/yHFcgmBIGjeLgHzkciRmBLBbgobsZR9lZRZzazkTi3ZnG4fF/OUaqIg==}
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-7/qpMwgcqYNNXpH5j+qX6itquTI/vd+ltRdALmTLBgO36bx09E53zAk2nrAoD1jPEvyJ8N07JpzqTlj6DWOuUQ==}
     engines: {node: '>=20.6.0'}
     cpu: [arm64]
     os: [darwin]
 
-  '@typescript/native-preview-darwin-x64@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-U4Kw2MUhYitK6atMhV/0c76/u/5+amuhP58fICwNPnQi9JN1DDJuhvQSyIVRBPqw17nyER+RyZ2j/b+G+HEPcA==}
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-noNDBOjQ3tAdEeW3KEeckk67uiJ868CxZmnzysP3A23B6olZC/hoWZpdcTjLtOR9l1tvcAxeHCYaHTk5lW5OyQ==}
     engines: {node: '>=20.6.0'}
     cpu: [x64]
     os: [darwin]
 
-  '@typescript/native-preview-linux-arm64@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-FZovNMm9RqXLuEqV804Po+dv8+1GCBTV2CVGyvdEnKFPxU1l34DRa88jNB/4JuSjOedrHU9jh2ML7OfSJmKJmw==}
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-khr24vveYsHFE1ieVPhcrbe6PggV8qiQifF9vnRk65Xfn+GyBs63lVK838KkjVZMj9MXs3QYLsaK405j+S3NZw==}
     engines: {node: '>=20.6.0'}
     cpu: [arm64]
     os: [linux]
 
-  '@typescript/native-preview-linux-arm@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-bUgN2ImqUjrMYpMq7WXHxMuPgVW+eIJY4NUPmH8M50ptE4e6QWBOkjhDWfYJDxEh5/v//rI3gGuAnWlS1MrDtg==}
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-uzhaqEsQmNODNUEwpliLcN2hiBbxnsxVNIwToGNsYhKB8gbtFFHExImmNBuU0LZcDYZWKc/kEYqYS3W+a/5wtQ==}
     engines: {node: '>=20.6.0'}
     cpu: [arm]
     os: [linux]
 
-  '@typescript/native-preview-linux-x64@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-mdXIS9UDEiXMO1R51LFx7Kr8Z6qzl8eU93C9z1NmSZYOhoSGaBl/y4eMjQZ0JS7bsbcxDGgkcgs9yYc7z/DriQ==}
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-VPeMlnahbxQIAk97PNjJqBWlOMRULwhM0RqCfrEsacTH+FjDmheYIH4bBaF7urCjb2n/NlLv/cfK+Xpl1lKvog==}
     engines: {node: '>=20.6.0'}
     cpu: [x64]
     os: [linux]
 
-  '@typescript/native-preview-win32-arm64@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-s+8YBAuTGM29WYTpzqH2uZXX43p344dAavE4lPUI7Ezv1SmZdEheAYm9lRR2PNgUEu5qtjCUWA/jHTa3j17ENQ==}
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-TmX2Prf3L+UaCYoixczGiF9Dbc7LFndys2GD5o508lra2Dp+sE5msdaxr4djpv9HTtm8qJIoq2hSZ74aCQDlWA==}
     engines: {node: '>=20.6.0'}
     cpu: [arm64]
     os: [win32]
 
-  '@typescript/native-preview-win32-x64@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-FBVKs9QGBc6+yRoANgTwGo8LvgwywTRAevIkKplfJvu2nnX3c57QpouiCyGEHHv2hCNLX8V/JU6eg+yq3rMeEQ==}
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-ou7svsHuCBj5i5qa0jg7RxxBEXIXiNd3Ws2VzPMLuRnszvuj6ngHy3J4ukw+pP3XKrqAPe28GJhLFj4WtCJ3tw==}
     engines: {node: '>=20.6.0'}
     cpu: [x64]
     os: [win32]
 
-  '@typescript/native-preview@7.0.0-dev.20250731.1':
-    resolution: {integrity: sha512-vvqBh80diUqVR3Z62+AbcLdup6a2g88XWtKErOzWbHQh4AlXMarRpNIBiS0eP98cL5ypNAVivkndGD9cR+nXRA==}
+  '@typescript/native-preview@7.0.0-dev.20250801.1':
+    resolution: {integrity: sha512-yIfAEMeRXKB0YAAZIMkpWThfs861vbvZnTPgOyx63iYfEDqiWW5ZxjAaAT3JmijIawTtMxXOUaMoMFNpmFL8nA==}
     engines: {node: '>=20.6.0'}
     hasBin: true
 
@@ -6355,36 +6355,36 @@ snapshots:
       '@typescript-eslint/types': 8.38.0
       eslint-visitor-keys: 4.2.1
 
-  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20250731.1':
+  '@typescript/native-preview-darwin-arm64@7.0.0-dev.20250801.1':
     optional: true
 
-  '@typescript/native-preview-darwin-x64@7.0.0-dev.20250731.1':
+  '@typescript/native-preview-darwin-x64@7.0.0-dev.20250801.1':
     optional: true
 
-  '@typescript/native-preview-linux-arm64@7.0.0-dev.20250731.1':
+  '@typescript/native-preview-linux-arm64@7.0.0-dev.20250801.1':
     optional: true
 
-  '@typescript/native-preview-linux-arm@7.0.0-dev.20250731.1':
+  '@typescript/native-preview-linux-arm@7.0.0-dev.20250801.1':
     optional: true
 
-  '@typescript/native-preview-linux-x64@7.0.0-dev.20250731.1':
+  '@typescript/native-preview-linux-x64@7.0.0-dev.20250801.1':
     optional: true
 
-  '@typescript/native-preview-win32-arm64@7.0.0-dev.20250731.1':
+  '@typescript/native-preview-win32-arm64@7.0.0-dev.20250801.1':
     optional: true
 
-  '@typescript/native-preview-win32-x64@7.0.0-dev.20250731.1':
+  '@typescript/native-preview-win32-x64@7.0.0-dev.20250801.1':
     optional: true
 
-  '@typescript/native-preview@7.0.0-dev.20250731.1':
+  '@typescript/native-preview@7.0.0-dev.20250801.1':
     optionalDependencies:
-      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20250731.1
-      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20250731.1
-      '@typescript/native-preview-linux-arm': 7.0.0-dev.20250731.1
-      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20250731.1
-      '@typescript/native-preview-linux-x64': 7.0.0-dev.20250731.1
-      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20250731.1
-      '@typescript/native-preview-win32-x64': 7.0.0-dev.20250731.1
+      '@typescript/native-preview-darwin-arm64': 7.0.0-dev.20250801.1
+      '@typescript/native-preview-darwin-x64': 7.0.0-dev.20250801.1
+      '@typescript/native-preview-linux-arm': 7.0.0-dev.20250801.1
+      '@typescript/native-preview-linux-arm64': 7.0.0-dev.20250801.1
+      '@typescript/native-preview-linux-x64': 7.0.0-dev.20250801.1
+      '@typescript/native-preview-win32-arm64': 7.0.0-dev.20250801.1
+      '@typescript/native-preview-win32-x64': 7.0.0-dev.20250801.1
 
   '@ungap/structured-clone@1.3.0': {}
 
@@ -8037,11 +8037,11 @@ snapshots:
 
   jsonc-parser@3.3.1: {}
 
-  jsr-exports-lint@0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)):
+  jsr-exports-lint@0.4.1(tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)):
     dependencies:
       picocolors: 1.1.1
     optionalDependencies:
-      tsdown: 0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
+      tsdown: 0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3)
 
   jsr@0.13.5:
     dependencies:
@@ -9016,7 +9016,7 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rolldown-plugin-dts@0.14.1(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(rolldown@1.0.0-beta.9-commit.d91dfb5)(typescript@5.8.3):
+  rolldown-plugin-dts@0.14.1(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(rolldown@1.0.0-beta.9-commit.d91dfb5)(typescript@5.8.3):
     dependencies:
       '@babel/generator': 7.28.0
       '@babel/parser': 7.28.0
@@ -9028,7 +9028,7 @@ snapshots:
       get-tsconfig: 4.10.1
       rolldown: 1.0.0-beta.9-commit.d91dfb5
     optionalDependencies:
-      '@typescript/native-preview': 7.0.0-dev.20250731.1
+      '@typescript/native-preview': 7.0.0-dev.20250801.1
       typescript: 5.8.3
     transitivePeerDependencies:
       - oxc-resolver
@@ -9424,7 +9424,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3):
+  tsdown@0.13.0(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(publint@0.3.12)(typescript@5.8.3):
     dependencies:
       ansis: 4.1.0
       cac: 6.7.14
@@ -9434,7 +9434,7 @@ snapshots:
       empathic: 2.0.0
       hookable: 5.5.3
       rolldown: 1.0.0-beta.9-commit.d91dfb5
-      rolldown-plugin-dts: 0.14.1(@typescript/native-preview@7.0.0-dev.20250731.1)(oxc-resolver@11.1.0)(rolldown@1.0.0-beta.9-commit.d91dfb5)(typescript@5.8.3)
+      rolldown-plugin-dts: 0.14.1(@typescript/native-preview@7.0.0-dev.20250801.1)(oxc-resolver@11.1.0)(rolldown@1.0.0-beta.9-commit.d91dfb5)(typescript@5.8.3)
       semver: 7.7.2
       tinyexec: 1.0.1
       tinyglobby: 0.2.14
