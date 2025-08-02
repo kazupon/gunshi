@@ -11,6 +11,11 @@
 
 import { ShellCompDirective } from './index.ts'
 
+/**
+ *
+ * @param name
+ * @param exec
+ */
 export function generate(name: string, exec: string): string {
   // Replace '-' and ':' with '_' for variable names
   const nameForVar = name.replace(/[-:]/g, '_')

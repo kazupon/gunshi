@@ -32,6 +32,7 @@ export type GenerateOptions<G extends GunshiParams = DefaultGunshiParams> = CliO
 
 /**
  * Generate the command usage.
+ *
  * @param command - usage generate command, if you want to generate the usage of the default command where there are target commands and sub-commands, specify `null`.
  * @param entry - A {@link Command | entry command}
  * @param options - A {@link CliOptions | cli options}

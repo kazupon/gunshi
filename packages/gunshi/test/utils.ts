@@ -14,6 +14,10 @@ import type {
 
 type NoExt = Record<never, never>
 
+/**
+ *
+ * @param utils
+ */
 export function defineMockLog(utils: typeof import('../src/utils.ts')) {
   const logs: unknown[] = []
   vi.spyOn(utils, 'log').mockImplementation((...args: unknown[]) => {
@@ -23,6 +27,10 @@ export function defineMockLog(utils: typeof import('../src/utils.ts')) {
   return () => logs.join(`\n`)
 }
 
+/**
+ *
+ * @param obj
+ */
 export function hasPrototype(obj: unknown): boolean {
   return Object.getPrototypeOf(obj) !== null
 }
@@ -36,9 +44,25 @@ type CreateMockCommandContext<G extends GunshiParams = DefaultGunshiParams> = Pa
     }
 >
 
+/**
+ *
+ * @param options
+ */
 export async function createMockCommandContext<E extends ExtendContext = NoExt>(
   options: CreateMockCommandContext = {}
-): Promise<CommandContext<GunshiParams<{ args: Args; extensions: E }>>> {
+): Promise<
+  CommandContext<
+    GunshiParams<{
+      /**
+       *
+       */
+      args: Args /**
+       *
+       */
+      extensions: E
+    }>
+  >
+> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): test utility function
   let ctx: any = {
     name: options.name || 'mock-command',
@@ -91,5 +115,15 @@ export async function createMockCommandContext<E extends ExtendContext = NoExt>(
     ctx = Object.assign(create<any>(), ctx, { extensions: {} })
   }
 
-  return ctx as CommandContext<GunshiParams<{ args: Args; extensions: E }>>
+  return ctx as CommandContext<
+    GunshiParams<{
+      /**
+       *
+       */
+      args: Args /**
+       *
+       */
+      extensions: E
+    }>
+  >
 }

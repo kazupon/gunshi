@@ -9,6 +9,9 @@ import type { CommandResourceFetcher, I18nCommand } from './types.ts'
 /**
  * Define an i18n-aware command with type safety
  *
+ * @param command - A command definition with i18n support
+ * @returns A defined command with i18n support
+ *
  * @example
  * ```ts
  * import { defineI18n } from '@gunshi/plugin-i18n'
@@ -36,6 +39,10 @@ export function defineI18n<G extends GunshiParamsConstraint = DefaultGunshiParam
 
 /**
  * Add i18n resource to an existing command
+ *
+ * @param command - A defined command with `define` function
+ * @param resource - A resource fetcher for the command
+ * @returns A command with i18n resource support
  *
  * @example
  * ```ts

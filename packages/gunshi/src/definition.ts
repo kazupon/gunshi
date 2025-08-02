@@ -58,7 +58,9 @@ export type {
 
 /**
  * Define a {@link Command | command}
+ *
  * @param definition A {@link Command | command} definition
+ * @returns A defined {@link Command | command}
  */
 export function define<A extends Args>(
   definition: Command<{ args: A; extensions: {} }>
@@ -66,7 +68,9 @@ export function define<A extends Args>(
 
 /**
  * Define a {@link Command | command}
+ *
  * @param definition A {@link Command | command} definition
+ * @returns A defined {@link Command | command}
  */
 export function define<E extends ExtendContext>(
   definition: Command<{ args: Args; extensions: E }>
@@ -74,7 +78,9 @@ export function define<E extends ExtendContext>(
 
 /**
  * Define a {@link Command | command}
+ *
  * @param definition A {@link Command | command} definition
+ * @returns A defined {@link Command | command}
  */
 export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   definition: Command<G>
@@ -82,7 +88,9 @@ export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 
 /**
  * Define a {@link Command | command}
+ *
  * @param definition A {@link Command | command} definition
+ * @returns A defined {@link Command | command}
  */
 export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   definition: Command<G>
@@ -92,6 +100,7 @@ export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 
 /**
  * Define a {@link LazyCommand | lazy command}
+ *
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
@@ -101,6 +110,7 @@ export function lazy<A extends Args>(
 
 /**
  * Define a {@link LazyCommand | lazy command} with definition.
+ *
  * @param loader A {@link CommandLoader | command loader} function that returns a command definition
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
@@ -112,6 +122,7 @@ export function lazy<A extends Args>(
 
 /**
  * Define a {@link LazyCommand | lazy command}
+ *
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
@@ -121,6 +132,7 @@ export function lazy<E extends ExtendContext>(
 
 /**
  * Define a {@link LazyCommand | lazy command} with definition.
+ *
  * @param loader A {@link CommandLoader | command loader} function that returns a command definition
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
@@ -132,6 +144,7 @@ export function lazy<E extends ExtendContext>(
 
 /**
  * Define a {@link LazyCommand | lazy command}
+ *
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
@@ -141,6 +154,7 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 
 /**
  * Define a {@link LazyCommand | lazy command} with definition.
+ *
  * @param loader A {@link CommandLoader | command loader} function that returns a command definition
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
@@ -152,6 +166,7 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 
 /**
  * Define a {@link LazyCommand | lazy command} with or without definition.
+ *
  * @param loader A {@link CommandLoader | command loader} function that returns a command definition
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later

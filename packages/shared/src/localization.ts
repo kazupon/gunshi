@@ -14,6 +14,9 @@ import { makeShortLongOptionPair, resolveExamples, resolveKey } from './utils.ts
 import type { Args, Command, CommandContext } from 'gunshi'
 import type { ResolveTranslationKeys, Translation } from './types.ts'
 
+/**
+ * Localization function type.
+ */
 export interface Localization<
   A extends Args,
   C = {}, // for CommandContext
@@ -25,6 +28,7 @@ export interface Localization<
 /**
  * Create a localizable function for a command.
  * This function will resolve the translation key based on the command context and the provided translation function.
+ *
  * @param ctx Command context
  * @param cmd Command
  * @param translate Translation function

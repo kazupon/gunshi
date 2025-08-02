@@ -14,6 +14,14 @@ import type {
 } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 
+/**
+ * Create a command context for a given command and specialized with i18n.
+ *
+ * @param cmd The command to create a context for
+ * @param id The id of the command
+ * @param i18n The i18n context to use
+ * @returns A command context specialized with i18n
+ */
 export async function createCommandContext(
   cmd: Command | LazyCommand,
   id: string,
@@ -62,6 +70,11 @@ function quoteIfNeeded(path: string): string {
   return path.includes(' ') ? `'${path}'` : path
 }
 
+/**
+ * Quote the exec command for the current runtime.
+ *
+ * @returns The quoted exec command string
+ */
 export function quoteExec(): string {
   const runtime = detectRuntime()
   switch (runtime) {

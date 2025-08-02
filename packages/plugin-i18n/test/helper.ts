@@ -11,6 +11,10 @@ import { DefaultTranslation } from '../src/translation.ts'
 import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core'
 import type { TranslationAdapter, TranslationAdapterFactoryOptions } from '../src/types.ts'
 
+/**
+ *
+ * @param options
+ */
 export function createTranslationAdapterForMessageFormat2(
   options: TranslationAdapterFactoryOptions
 ): TranslationAdapter {
@@ -74,6 +78,10 @@ class MessageFormat2Translation extends DefaultTranslation {
   }
 }
 
+/**
+ *
+ * @param options
+ */
 export function createTranslationAdapterForIntlifyMessageFormat(
   options: TranslationAdapterFactoryOptions
 ): TranslationAdapter {

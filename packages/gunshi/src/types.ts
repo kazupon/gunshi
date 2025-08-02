@@ -8,10 +8,14 @@ import type { Plugin } from './plugin/core.ts'
 
 export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 
+/**
+ * Awaitable type.
+ */
 export type Awaitable<T> = T | Promise<T>
 
 /**
  * Extend command context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
+ *
  * @since v0.27.0
  */
 export type ExtendContext = Record<string, unknown>
@@ -19,6 +23,7 @@ export type ExtendContext = Record<string, unknown>
 /**
  * Gunshi unified parameter type.
  * This type combines both argument definitions and command context extensions.
+ *
  * @since v0.27.0
  */
 export interface GunshiParams<
@@ -42,6 +47,7 @@ export interface GunshiParams<
 
 /**
  * Default Gunshi parameters
+ *
  * @since v0.27.0
  */
 export type DefaultGunshiParams = GunshiParams
@@ -49,6 +55,7 @@ export type DefaultGunshiParams = GunshiParams
 /**
  * Generic constraint for command-related types.
  * This type constraint allows both GunshiParams and objects with extensions.
+ *
  * @since v0.27.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
@@ -56,6 +63,7 @@ export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendCon
 
 /**
  * Type helper to extract args from G
+ *
  * @internal
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
@@ -63,12 +71,14 @@ export type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
 
 /**
  * Type helper to extract explicitly provided argument flags from G
+ *
  * @internal
  */
 export type ExtractArgExplicitlyProvided<G> = ArgExplicitlyProvided<ExtractArgs<G>>
 
 /**
  * Type helper to extract extensions from G
+ *
  * @internal
  */
 export type ExtractExtensions<G> =
@@ -77,6 +87,7 @@ export type ExtractExtensions<G> =
 
 /**
  * Type helper to normalize G to GunshiParams
+ *
  * @internal
  */
 export type NormalizeToGunshiParams<G> =
@@ -93,57 +104,66 @@ export type NormalizeToGunshiParams<G> =
 export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Current working directory.
+   *
    * @see {@link CliOptions.cwd}
    */
   cwd: string | undefined
   /**
    * Command name.
+   *
    * @see {@link CliOptions.name}
    */
   name: string | undefined
   /**
    * Command description.
-   * @see {@link CliOptions.description}
    *
+   * @see {@link CliOptions.description}
    */
   description: string | undefined
   /**
    * Command version.
+   *
    * @see {@link CliOptions.version}
    */
   version: string | undefined
   /**
    * Left margin of the command output.
+   *
    * @default 2
    * @see {@link CliOptions.leftMargin}
    */
   leftMargin: number
   /**
    * Middle margin of the command output.
+   *
    * @default 10
    * @see {@link CliOptions.middleMargin}
    */
   middleMargin: number
   /**
    * Whether to display the usage option type.
+   *
    * @default false
    * @see {@link CliOptions.usageOptionType}
    */
   usageOptionType: boolean
   /**
    * Whether to display the option value.
+   *
    * @default true
    * @see {@link CliOptions.usageOptionValue}
    */
   usageOptionValue: boolean
   /**
    * Whether to display the command usage.
+   *
    * @default false
    * @see {@link CliOptions.usageSilent}
    */
   usageSilent: boolean
   /**
    * Sub commands.
+   *
    * @see {@link CliOptions.subCommands}
    */
   subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
@@ -164,12 +184,14 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
     | undefined
   /**
    * Hook that runs before any command execution
+   *
    * @see {@link CliOptions.onBeforeCommand}
    * @since v0.27.0
    */
   onBeforeCommand: ((ctx: Readonly<CommandContext<G>>) => Awaitable<void>) | undefined
   /**
    * Hook that runs after successful command execution
+   *
    * @see {@link CliOptions.onAfterCommand}
    * @since v0.27.0
    */
@@ -178,6 +200,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
     | undefined
   /**
    * Hook that runs when a command throws an error
+   *
    * @see {@link CliOptions.onErrorCommand}
    * @since v0.27.0
    */
@@ -187,7 +210,6 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
 /**
  * CLI options of `cli` function.
  */
-
 export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Current working directory.
@@ -248,17 +270,20 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
     | null
   /**
    * User plugins.
+   *
    * @since v0.27.0
    */
   plugins?: Plugin[]
   /**
    * Hook that runs before any command execution
+   *
    * @param ctx - The command context
    * @since v0.27.0
    */
   onBeforeCommand?: (ctx: Readonly<CommandContext<G>>) => Awaitable<void>
   /**
    * Hook that runs after successful command execution
+   *
    * @param ctx - The command context
    * @param result - The command execution result
    * @since v0.27.0
@@ -266,6 +291,7 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   onAfterCommand?: (ctx: Readonly<CommandContext<G>>, result: string | undefined) => Awaitable<void>
   /**
    * Hook that runs when a command throws an error
+   *
    * @param ctx - The command context
    * @param error - The error thrown during execution
    * @since v0.27.0
@@ -354,6 +380,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
   /**
    * Output a message.
    * If {@link CommandEnvironment.usageSilent} is true, the message is not output.
+   *
    * @param message an output message, @see {@link console.log}
    * @param optionalParams an optional parameters, @see {@link console.log}
    * @internal
@@ -361,6 +388,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic optional parameters
   /**
    * Command context extensions.
+   *
    * @since v0.27.0
    */
   extensions: keyof ExtractExtensions<G> extends never ? undefined : ExtractExtensions<G>
@@ -373,27 +401,38 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
 
 /**
  * CommandContextCore type (base type without extensions)
+ *
  * @since v0.27.0
  */
-
 export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<
   CommandContext<G>
 >
 
 /**
  * Command context extension
+ *
  * @since v0.27.0
  */
 export interface CommandContextExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > {
+  /**
+   * Plugin identifier
+   */
   readonly key: symbol
+  /**
+   * Plugin extension factory
+   */
   readonly factory: (ctx: CommandContextCore, cmd: Command) => Awaitable<E>
+  /**
+   * Plugin extension factory after hook
+   */
   readonly onFactory?: (ctx: Readonly<CommandContext>, cmd: Readonly<Command>) => Awaitable<void>
 }
 
 /**
  * Rendering control options
+ *
  * @since v0.27.0
  */
 export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> {
@@ -427,7 +466,6 @@ export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGuns
 /**
  * Command interface.
  */
-
 export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Command name.
@@ -461,18 +499,21 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
   /**
    * Whether this is an internal command.
    * Internal commands are not shown in help usage.
+   *
    * @default false
    * @since v0.27.0
    */
   internal?: boolean
   /**
    * Whether this command is an entry command.
+   *
    * @default undefined
    * @since v0.27.0
    */
   entry?: boolean
   /**
    * Rendering control options
+   *
    * @since v0.27.0
    */
   rendering?: RenderingOptions<G>
@@ -482,7 +523,6 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
  */
-
 export type LazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
   /**
    * Command load function
@@ -497,27 +537,26 @@ export type LazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams> 
 /**
  * Define a command type.
  */
-
 export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
   | Command<G>
   | LazyCommand<G>
 
 /**
  * Command examples fetcher.
+ *
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched command examples.
  */
-
 export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   ctx: Readonly<CommandContext<G>>
 ) => Awaitable<string>
 
 /**
  * Command runner.
+ *
  * @param ctx A {@link CommandContext | command context}
  * @returns void or string (for CLI output)
  */
-
 export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   ctx: Readonly<CommandContext<G>>
 ) => Awaitable<string | void>
@@ -526,9 +565,9 @@ export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams
  * Command loader.
  * A function that returns a command or command runner.
  * This is used to lazily load commands.
+ *
  * @returns A command or command runner
  */
-
 export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams> = () => Awaitable<
   Command<G> | CommandRunner<G>
 >
@@ -536,11 +575,11 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
 /**
  * Command decorator.
  * A function that wraps a command runner to add or modify its behavior.
+ *
  * @param baseRunner The base command runner to decorate
  * @returns The decorated command runner
  * @since v0.27.0
  */
-
 export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>
 ) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>
@@ -548,12 +587,12 @@ export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiPar
 /**
  * Renderer decorator type.
  * A function that wraps a base renderer to add or modify its behavior.
+ *
  * @param baseRenderer The base renderer function to decorate
  * @param ctx The command context
  * @returns The decorated result
  * @since v0.27.0
  */
-
 export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>,
   ctx: Readonly<CommandContext<G>>
@@ -562,13 +601,13 @@ export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunsh
 /**
  * Validation errors renderer decorator type.
  * A function that wraps a validation errors renderer to add or modify its behavior.
+ *
  * @param baseRenderer The base validation errors renderer function to decorate
  * @param ctx The command context
  * @param error The aggregate error containing validation errors
  * @returns The decorated result
  * @since v0.27.0
  */
-
 export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>,
   ctx: Readonly<CommandContext<G>>,

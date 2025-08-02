@@ -11,6 +11,9 @@ import type { PluginId } from './types.ts'
 
 /**
  * Decorator function to extend the command with global options.
+ *
+ * @param baseRunner The base command runner
+ * @returns A command decorator that adds global options handling
  */
 const decorator: CommandDecorator<{
   args: DefaultGunshiParams['args']

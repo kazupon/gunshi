@@ -7,6 +7,9 @@ import type { CliOptions, DefaultGunshiParams } from './types.ts'
 
 export const ANONYMOUS_COMMAND_NAME = '(anonymous)'
 
+/**
+ * A no-operation function.
+ */
 export const NOOP: () => void = () => {}
 
 export const CLI_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {

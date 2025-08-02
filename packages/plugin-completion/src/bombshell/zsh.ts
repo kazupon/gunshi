@@ -11,6 +11,11 @@
 
 import { ShellCompDirective } from './index.ts'
 
+/**
+ *
+ * @param name
+ * @param exec
+ */
 export function generate(name: string, exec: string) {
   return `#compdef ${name}
 compdef _${name} ${name}

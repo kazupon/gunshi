@@ -77,6 +77,9 @@ const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 
 /**
  * i18n plugin
+ *
+ * @param options I18n plugin options
+ * @returns A defined plugin as i18n
  */
 export default function i18n(
   options: I18nPluginOptions = {}

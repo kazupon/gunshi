@@ -39,6 +39,7 @@ export interface UsageRendererCommandContext<G extends GunshiParams<any> = Defau
   ) => string
   /**
    * Load commands
+   *
    * @returns A list of commands loaded from the usage renderert plugin.
    */
   loadCommands: <G extends GunshiParams = DefaultGunshiParams>() => Promise<Command<G>[]>

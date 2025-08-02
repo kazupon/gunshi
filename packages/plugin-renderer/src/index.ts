@@ -56,6 +56,8 @@ const dependencies = [{ id: i18nPluginId, optional: true }] as const
 
 /**
  * usage renderer plugin
+ *
+ * @returns A defined plugin as usage renderer
  */
 export default function renderer(): PluginWithExtension<UsageRendererCommandContext> {
   return plugin<

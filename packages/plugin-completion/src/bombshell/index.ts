@@ -66,9 +66,21 @@ export const ShellCompDirective = {
   ShellCompDirectiveDefault: 0
 }
 
+/**
+ *
+ */
 export type Positional = {
+  /**
+   *
+   */
   required: boolean
+  /**
+   *
+   */
   variadic: boolean
+  /**
+   *
+   */
   completion: Handler
 }
 
@@ -77,6 +89,9 @@ type Item = {
   value: string
 }
 
+/**
+ *
+ */
 export type Handler = (
   previousArgs: string[],
   toComplete: string,
@@ -98,6 +113,9 @@ type Command = {
   parent?: Command
 }
 
+/**
+ *
+ */
 export class Completion {
   commands = new Map<string, Command>()
   completions: Item[] = []
@@ -105,6 +123,14 @@ export class Completion {
 
   // vite <entry> <another> [...files]
   // args: [false, false, true], only the last argument can be variadic
+  /**
+   *
+   * @param name
+   * @param description
+   * @param args
+   * @param handler
+   * @param parent
+   */
   addCommand(
     name: string,
     description: string,
@@ -125,6 +151,14 @@ export class Completion {
   }
 
   // --port
+  /**
+   *
+   * @param command
+   * @param option
+   * @param description
+   * @param handler
+   * @param alias
+   */
   addOption(
     command: string,
     option: string,
@@ -181,6 +215,10 @@ export class Completion {
     return [matched, remaining]
   }
 
+  /**
+   *
+   * @param args
+   */
   async parse(args: string[]) {
     const endsWithSpace = args.at(-1) === ''
 
@@ -373,6 +411,12 @@ export class Completion {
   }
 }
 
+/**
+ *
+ * @param shell
+ * @param name
+ * @param x
+ */
 export function script(shell: 'zsh' | 'bash' | 'fish' | 'powershell', name: string, x: string) {
   switch (shell) {
     case 'zsh': {

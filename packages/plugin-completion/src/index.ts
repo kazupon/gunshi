@@ -39,7 +39,10 @@ const i18nPluginId = namespacedId('i18n')
 const dependencies = [{ id: i18nPluginId, optional: true }] as const
 
 /**
- * completion plugin for gunshi
+ * completion plugin
+ *
+ * @param options Completion options
+ * @returns A defined plugin as completion
  */
 export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {
   const config = options.config || {}

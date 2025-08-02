@@ -1,5 +1,8 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noUnusedParameters": false
+  },
   "include": ["**/*.ts"],
   "exclude": [
     "playground/type-safe/index.ts",

@@ -7,10 +7,15 @@ import { plugin } from '@gunshi/plugin'
 
 import type { PluginWithoutExtension } from '@gunshi/plugin'
 
+/**
+ * Dry run command context.
+ */
 export interface DryRunCommandContext {}
 
 /**
- * dryrun option plugin for gunshi
+ * dryrun plugin
+ *
+ * @returns A defined plugin as dryrun
  */
 export default function dryrun(): PluginWithoutExtension<DryRunCommandContext> {
   return plugin({

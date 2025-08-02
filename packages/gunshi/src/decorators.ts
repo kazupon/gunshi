@@ -17,16 +17,41 @@ const EMPTY_RENDERER = async () => ''
 /**
  * Interface for managing renderer and command decorators.
  * This interface defines the contract for decorator management in plugins.
+ *
  * @internal
  */
 export interface Decorators<G extends GunshiParamsConstraint = DefaultGunshiParams> {
+  /**
+   * Add a header renderer decorator.
+   */
   addHeaderDecorator(decorator: RendererDecorator<string, G>): void
+  /**
+   * Add a usage renderer decorator.
+   */
   addUsageDecorator(decorator: RendererDecorator<string, G>): void
+  /**
+   * Add a validation errors renderer decorator.
+   */
   addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<G>): void
+  /**
+   * Add a command decorator.
+   */
   addCommandDecorator(decorator: CommandDecorator<G>): void
+  /**
+   * Get the list of command decorators.
+   */
   readonly commandDecorators: readonly CommandDecorator<G>[]
+  /**
+   * Get the header renderer.
+   */
   getHeaderRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string>
+  /**
+   * Get the usage renderer.
+   */
   getUsageRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string>
+  /**
+   * Get the validation errors renderer.
+   */
   getValidationErrorsRenderer(): (
     ctx: Readonly<CommandContext<G>>,
     error: AggregateError
@@ -35,6 +60,7 @@ export interface Decorators<G extends GunshiParamsConstraint = DefaultGunshiPara
 
 /**
  * Factory function for creating a decorators manager.
+ *
  * @returns A new decorators manager instance
  */
 export function createDecorators<

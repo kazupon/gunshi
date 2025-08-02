@@ -13,6 +13,12 @@ import { ShellCompDirective } from './index.ts'
 
 // TODO(bombshell): issue with -- -- completions
 
+/**
+ *
+ * @param name
+ * @param exec
+ * @param _includeDesc
+ */
 export function generate(name: string, exec: string, _includeDesc = false): string {
   // Replace '-' and ':' with '_' for variable names
   const nameForVar = name.replace(/[-:]/g, '_')

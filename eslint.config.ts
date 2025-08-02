@@ -4,6 +4,7 @@ import {
   defineConfig,
   imports,
   javascript,
+  jsdoc,
   jsonc,
   markdown,
   prettier,
@@ -39,6 +40,14 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
         './**/src/**/*.test-d.ts'
       ]
     }
+  }),
+  jsdoc({
+    typescript: 'syntax',
+    ignores: [
+      './packages/plugin-completion/src/bombshell/*.ts', // NOTE(kazupon): bombshell code is forked, so ignore.
+      './packages/plugin-i18n/test/*.ts', // NOTE(kazupon): test codes
+      './packages/gunshi/test/*.ts' // NOTE(kazupon): test codes
+    ]
   }),
   imports({
     typescript: true,

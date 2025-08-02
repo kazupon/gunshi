@@ -8,6 +8,7 @@ import type { Plugin } from './core.ts'
 
 /**
  * Resolve plugin dependencies using topological sort
+ *
  * @param plugins - Array of plugins to resolve
  * @returns Array of plugins sorted by dependencies
  * @throws Error if circular dependency is detected or required dependency is missing

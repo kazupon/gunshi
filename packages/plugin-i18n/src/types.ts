@@ -45,6 +45,7 @@ export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiP
   locale: Intl.Locale
   /**
    * Translate a message.
+   *
    * @param key Translation key
    * @param values Values to interpolate
    * @returns Translated message. If the key is not found:
@@ -62,6 +63,7 @@ export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiP
   ) => string
   /**
    * Load command resources.
+   *
    * @param ctx Command context
    * @param command Command
    * @returns Whether the resources were loaded successfully
@@ -108,6 +110,7 @@ export interface TranslationAdapterFactoryOptions {
   locale: string
   /**
    * A fallback locale.
+   *
    * @default DEFAULT_LOCALE ('en-US')
    */
   fallbackLocale: string
@@ -121,18 +124,21 @@ export interface TranslationAdapterFactoryOptions {
 export interface TranslationAdapter<MessageResource = string> {
   /**
    * Get a resource of locale.
+   *
    * @param locale A Locale at the time of command execution. That is Unicord locale ID (BCP 47)
    * @returns A resource of locale. if resource not found, return `undefined`.
    */
   getResource(locale: string): Record<string, string> | undefined
   /**
    * Set a resource of locale.
+   *
    * @param locale A Locale at the time of command execution. That is Unicord locale ID (BCP 47)
    * @param resource A resource of locale
    */
   setResource(locale: string, resource: Record<string, string>): void
   /**
    * Get a message of locale.
+   *
    * @param locale A Locale at the time of command execution. That is Unicord locale ID (BCP 47)
    * @param key A key of message resource
    * @returns A message of locale. if message not found, return `undefined`.
@@ -140,6 +146,7 @@ export interface TranslationAdapter<MessageResource = string> {
   getMessage(locale: string, key: string): MessageResource | undefined
   /**
    * Translate a message.
+   *
    * @param locale A Locale at the time of command execution. That is Unicord locale ID (BCP 47)
    * @param key A key of message resource
    * @param values A values to be resolved in the message
@@ -162,6 +169,7 @@ export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiPara
 
 /**
  * Command resource fetcher.
+ *
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched {@link CommandResource | command resource}.
  */

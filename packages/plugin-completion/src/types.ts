@@ -23,9 +23,21 @@ export type PluginId = typeof pluginId
  * Parameters for {@link CompletionHandler | the completion handler}.
  */
 export interface CompletionParams {
+  /**
+   * The previous arguments
+   */
   previousArgs: Parameters<Handler>[0]
+  /**
+   * A value to complete.
+   */
   toComplete: Parameters<Handler>[1]
+  /**
+   * Whether to end the completion with a space.
+   */
   endWithSpace: Parameters<Handler>[2]
+  /**
+   * The locale to use for i18n.
+   */
   locale?: Intl.Locale
 }
 
@@ -44,7 +56,13 @@ export interface CompletionCommandContext {}
  * Completion configuration, which structure is similar `bombsh/tab`'s `CompletionConfig`.
  */
 export interface CompletionConfig {
+  /**
+   * The handler for the completion.
+   */
   handler?: CompletionHandler
+  /**
+   * The command arguments for the completion.
+   */
   args?: Record<string, { handler: CompletionHandler }>
 }
 
@@ -52,6 +70,9 @@ export interface CompletionConfig {
  * Completion plugin options.
  */
 export interface CompletionOptions {
+  /**
+   * The completion configuration
+   */
   config?: {
     /**
      * The entry point completion configuration.

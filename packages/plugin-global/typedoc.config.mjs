@@ -1,6 +1,5 @@
 // @ts-check
 
-/** @type {import('typedoc').TypeDocOptions & import('typedoc-plugin-markdown').PluginOptions & { docsRoot?: string } } */
 export default {
   /**
    * typedoc options

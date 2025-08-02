@@ -18,6 +18,9 @@ export type RemovedIndex<T> = RemoveIndexSignature<{
   [K in keyof T]: T[K]
 }>
 
+/**
+ * Resolve a key on {@link Args}.
+ */
 export type KeyOfArgs<A extends Args> =
   | keyof A
   | {

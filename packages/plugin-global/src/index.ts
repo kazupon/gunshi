@@ -43,6 +43,8 @@ export * from './types.ts'
 
 /**
  * global options plugin
+ *
+ * @returns A defined plugin as global options
  */
 export default function global(): PluginWithExtension<GlobalCommandContext> {
   return plugin({

@@ -22,6 +22,7 @@ const NOOP_EXTENSION = () => {
 
 /**
  * Helper type to extract plugin ID from dependency
+ *
  * @internal
  */
 export type ExtractDependencyId<D> = D extends PluginDependency
@@ -32,6 +33,7 @@ export type ExtractDependencyId<D> = D extends PluginDependency
 
 /**
  * Helper type to check if dependency is optional
+ *
  * @internal
  */
 export type IsOptionalDependency<D> = D extends PluginDependency
@@ -56,6 +58,7 @@ type ProcessDependency<D, A extends ExtendContext> = D extends string
 
 /**
  * Helper type to infer dependency extensions with optional support
+ *
  * @internal
  */
 export type InferDependencyExtensions<
@@ -72,6 +75,7 @@ export type InferDependencyExtensions<
 
 /**
  * Plugin dependency definition
+ *
  * @since v0.27.0
  */
 export interface PluginDependency {
@@ -81,13 +85,14 @@ export interface PluginDependency {
   id: string
   /**
    * Optional dependency flag.
-   * If true, the plugin will not throw an error if the dependency is not found.
+   * If `true`, the plugin will not throw an error if the dependency is not found
    */
   optional?: boolean
 }
 
 /**
  * Plugin function type
+ *
  * @since v0.27.0
  */
 export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
@@ -95,7 +100,8 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 ) => Awaitable<void>
 
 /**
- * Plugin extension for CommandContext
+ * Plugin extension
+ *
  * @since v0.27.0
  */
 export type PluginExtension<
@@ -104,7 +110,8 @@ export type PluginExtension<
 > = (ctx: CommandContextCore<G>, cmd: Command<G>) => Awaitable<T>
 
 /**
- * Plugin extension callback type
+ * Plugin extension callback, which is called when the plugin is extended with `extension` option.
+ *
  * @since v0.27.0
  */
 export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
@@ -128,6 +135,7 @@ type MergeExtension<
 
 /**
  * Plugin definition options
+ *
  * @since v0.27.0
  */
 export interface PluginOptions<
@@ -177,8 +185,10 @@ export interface PluginOptions<
 
 /**
  * Gunshi plugin, which is a function that receives a PluginContext.
+ *
  * @param ctx - A {@link PluginContext}.
  * @returns An {@link Awaitable} that resolves when the plugin is loaded.
+ *
  * @since v0.27.0
  */
 export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> =
@@ -190,34 +200,63 @@ export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['e
   }
 
 /**
- * Plugin return type with extension
- * @internal
+ * Plugin return type with extension, which includes the plugin ID, name, dependencies, and extension.
+ * This type is used to define a plugin at `plugin` function.
  */
 export interface PluginWithExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > extends Plugin<E> {
+  /**
+   * Plugin identifier
+   */
   id: string
+  /**
+   * Plugin name
+   */
   name: string
+  /**
+   * Plugin dependencies
+   */
   dependencies?: (PluginDependency | string)[]
+  /**
+   * Plugin extension
+   */
   extension: CommandContextExtension<E>
 }
 
 /**
- * Plugin return type without extension
- * @internal
+ * Plugin return type without extension, which includes the plugin ID, name, and dependencies, but no extension.
+ * This type is used to define a plugin at `plugin` function without extension.
  */
 export interface PluginWithoutExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > extends Plugin<E> {
+  /**
+   * Plugin identifier
+   */
   id: string
+  /**
+   * Plugin name
+   */
   name: string
+  /**
+   * Plugin dependencies
+   */
   dependencies?: (PluginDependency | string)[]
 }
 
 /**
  * Define a plugin with extension compatibility and typed dependency extensions
+ *
  * @param options - {@link PluginOptions | plugin options}
- * @return A defined plugin with extension compatibility.
+ * @param options.id see {@link PluginOptions.id}
+ * @param options.name see {@link PluginOptions.name}
+ * @param options.dependencies see {@link PluginOptions.dependencies}
+ * @param options.setup see {@link PluginOptions.setup}
+ * @param options.extension see {@link PluginOptions.extension}
+ * @param options.onExtension see {@link PluginOptions.onExtension}
+ * @returns A defined plugin with extension
+ *
  * @since v0.27.0
  */
 export function plugin<
@@ -265,8 +304,15 @@ export function plugin<
 
 /**
  * Define a plugin without extension and typed dependency extensions
+ *
  * @param options - {@link PluginOptions | plugin options} without extension
+ * @param options.id see {@link PluginOptions.id}
+ * @param options.name see {@link PluginOptions.name}
+ * @param options.dependencies see {@link PluginOptions.dependencies}
+ * @param options.setup see {@link PluginOptions.setup}
+ * @param options.onExtension see {@link PluginOptions.onExtension}
  * @returns A defined plugin without extension
+ *
  * @since v0.27.0
  */
 export function plugin<
@@ -313,8 +359,10 @@ export function plugin<
 
 /**
  * Define a plugin
+ *
  * @param options - {@link PluginOptions | plugin options}
- * @returns A defined plugin.
+ * @returns A defined plugin
+ *
  * @since v0.27.0
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for plugin options

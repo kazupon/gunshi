@@ -51,9 +51,6 @@ test('@gunshi/plugin', async () => {
     }
   })
 
-  /**
-   * define entry runner with type parameters
-   */
   const entry: CommandRunner<{ extensions: Extensions }> = ctx => {
     // enable type-safe extensions
     return `Execution start time: ${ctx.extensions[perfPluginId].start}`
