@@ -17,9 +17,9 @@ import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 /**
  * Create a command context for a given command and specialized with i18n.
  *
- * @param cmd The command to create a context for
- * @param id The id of the command
- * @param i18n The i18n context to use
+ * @param cmd - The command to create a context for
+ * @param id - The id of the command
+ * @param i18n - The i18n context to use
  * @returns A command context specialized with i18n
  */
 export async function createCommandContext(

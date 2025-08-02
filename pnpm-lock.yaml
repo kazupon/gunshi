@@ -48,8 +48,8 @@ importers:
         specifier: ^7.1.0
         version: 7.1.0
       '@kazupon/eslint-config':
-        specifier: ^0.33.1
-        version: 0.33.1(3045722384ee5b17bd1e1fb76d4de261)
+        specifier: ^0.33.3
+        version: 0.33.3(3045722384ee5b17bd1e1fb76d4de261)
       '@kazupon/prettier-config':
         specifier: ^0.1.1
         version: 0.1.1
@@ -222,8 +222,8 @@ importers:
   packages/gunshi:
     dependencies:
       args-tokens:
-        specifier: ^0.22.1
-        version: 0.22.1
+        specifier: ^0.22.6
+        version: 0.22.6
     devDependencies:
       '@gunshi/plugin-global':
         specifier: workspace:*
@@ -1223,8 +1223,8 @@ packages:
     resolution: {integrity: sha512-f5DRIOZf7wxogefH03RjMPMdBF7ADTWUMoOs9kaJo06EfwF+aFhMZMDZxHg/Xe12hptN9xoZjGso2fdjapBRIA==}
     engines: {node: '>=10'}
 
-  '@kazupon/eslint-config@0.33.1':
-    resolution: {integrity: sha512-6Ox3KrjlN7zl4UhC0WMrKhpnJ46FZ//+kVIH3Y6fvli4biyvBJoAWvPcjnSuk0wTPjOLWaSbLhu3Gur5aL1bMA==}
+  '@kazupon/eslint-config@0.33.3':
+    resolution: {integrity: sha512-mSrJ1p28+RJr7HUHoYTnbifg5xpgl3AKzJqAoCRq8RDJC89lQT2SxXzYN60xi8YJTYolVvwnwejMKzro2/RXAg==}
     engines: {node: '>= 20'}
     peerDependencies:
       '@eslint/css': '>=0.5.0'
@@ -2409,8 +2409,8 @@ packages:
     resolution: {integrity: sha512-kWceoEa1zXbcBvgy+BT1ddTLyB7B51u32EhOK/ZMY324nxmQAm767HD+g+9avBEPVmoDjWIYLvsSCQqtbcph/g==}
     engines: {node: '>= 20'}
 
-  args-tokens@0.22.1:
-    resolution: {integrity: sha512-Lwia8tKJHB+AXESZhm//u/zxK5F0csmBfxEC6YUvxBMWGwsHrWOeWlws1y71gXbYipcM9vXcaS7Cp+OcshZBVA==}
+  args-tokens@0.22.6:
+    resolution: {integrity: sha512-Q28D+oCfm3FGRNcHLJ+jkqOgaWsN5zl2uU5hd0x4EAuHnWO1ADJ3Ae8oK6QWF0rqkClQBGxh4pMLTgK2yifEmA==}
     engines: {node: '>= 20'}
 
   array-buffer-byte-length@1.0.2:
@@ -5679,7 +5679,7 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.33.1(3045722384ee5b17bd1e1fb76d4de261)':
+  '@kazupon/eslint-config@0.33.3(3045722384ee5b17bd1e1fb76d4de261)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.32.0(jiti@2.4.2))
       '@eslint/js': 9.32.0
@@ -6710,7 +6710,7 @@ snapshots:
 
   args-tokens@0.17.1: {}
 
-  args-tokens@0.22.1: {}
+  args-tokens@0.22.6: {}
 
   array-buffer-byte-length@1.0.2:
     dependencies:

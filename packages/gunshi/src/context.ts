@@ -116,7 +116,7 @@ interface CommandContextParams<
 /**
  * Create a {@link CommandContext | command context}
  *
- * @param param A {@link CommandContextParams | parameters} to create a {@link CommandContext | command context}
+ * @param param - A {@link CommandContextParams | parameters} to create a {@link CommandContext | command context}
  * @param param.args - An arguments of target command
  * @param param.explicit - Explicitly provided arguments
  * @param param.values - A values of target command

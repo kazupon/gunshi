@@ -8,7 +8,7 @@ import type { CommandContext, DefaultGunshiParams, GunshiParams } from '@gunshi/
 /**
  * Render the header.
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A rendered header.
  */
 export function renderHeader<G extends GunshiParams = DefaultGunshiParams>(

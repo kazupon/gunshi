@@ -8,8 +8,8 @@ import type { CommandContext, DefaultGunshiParams, GunshiParams } from '@gunshi/
 /**
  * Render the validation errors.
  *
- * @param ctx A {@link CommandContext | command context}
- * @param error An {@link AggregateError} of option in `args-token` validation
+ * @param ctx - A {@link CommandContext | command context}
+ * @param error - An {@link AggregateError} of option in `args-token` validation
  * @returns A rendered validation error.
  */
 export function renderValidationErrors<G extends GunshiParams = DefaultGunshiParams>(

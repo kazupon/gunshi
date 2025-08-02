@@ -34,7 +34,7 @@ const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
 /**
  * Render the usage.
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A rendered usage.
  */
 export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
@@ -80,7 +80,7 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
 /**
  * Render the positional arguments section
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A rendered arguments section
  */
 async function renderPositionalArgsSection<
@@ -98,7 +98,7 @@ async function renderPositionalArgsSection<
 /**
  * Render the optional arguments section
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A rendered options section
  */
 async function renderOptionalArgsSection<
@@ -116,7 +116,7 @@ async function renderOptionalArgsSection<
 /**
  * Render the examples section
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A rendered examples section
  */
 async function renderExamplesSection<
@@ -144,7 +144,7 @@ async function renderExamplesSection<
 /**
  * Render the usage section
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A rendered usage section
  */
 async function renderUsageSection<
@@ -191,7 +191,7 @@ async function makeUsageSymbols<
 /**
  * Render the commands section
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A rendered commands section
  */
 async function renderCommandsSection<
@@ -266,7 +266,7 @@ async function makeCommandSymbol<
 /**
  * Resolve the entry command name
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns The entry command name
  */
 async function resolveEntry<
@@ -281,7 +281,7 @@ async function resolveEntry<
 /**
  * Resolve the sub command name
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns The sub command name
  */
 async function resolveSubCommand<
@@ -296,7 +296,7 @@ async function resolveSubCommand<
 /**
  * Resolve the command description
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns resolved command description
  */
 async function resolveDescription<
@@ -315,7 +315,7 @@ async function resolveDescription<
 /**
  * Resolve the command examples
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns resolved command examples, if not resolved, return empty string
  */
 async function resolveExamples<
@@ -338,7 +338,7 @@ async function resolveExamples<
 /**
  * Check if the command has sub commands
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns True if the command has sub commands
  */
 async function hasCommands<
@@ -354,7 +354,7 @@ async function hasCommands<
 /**
  * Check if the command has optional arguments
  *
- * @param args A {@link Args | command optional arguments}
+ * @param args - A {@link Args | command optional arguments}
  * @returns True if the command has options
  */
 function hasOptionalArgs(args: Args): boolean {
@@ -364,7 +364,7 @@ function hasOptionalArgs(args: Args): boolean {
 /**
  * Check if the command has positional arguments
  *
- * @param args A {@link Args | command positional arguments}
+ * @param args - A {@link Args | command positional arguments}
  * @returns True if the command has options
  */
 function hasPositionalArgs(args: Args): boolean {
@@ -374,7 +374,7 @@ function hasPositionalArgs(args: Args): boolean {
 /**
  * Check if all options have default values
  *
- * @param args An {@link Args | command argument}
+ * @param args - An {@link Args | command argument}
  * @returns True if all options have default values
  */
 function hasAllDefaultOptions(args: Args): boolean {
@@ -384,8 +384,8 @@ function hasAllDefaultOptions(args: Args): boolean {
 /**
  * Generate options symbols for usage
  *
- * @param ctx A {@link CommandContext | command context}
- * @param args {@link Args | command arguments}
+ * @param ctx - A {@link CommandContext | command context}
+ * @param args - {@link Args | command arguments}
  * @returns Options symbols for usage
  */
 async function generateOptionsSymbols<
@@ -404,7 +404,7 @@ async function generateOptionsSymbols<
 /**
  * Get optional arguments pairs for usage
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns Options pairs for usage
  */
 function getOptionalArgsPairs<G extends GunshiParams>(
@@ -481,8 +481,8 @@ async function resolveDisplayValue<
 /**
  * Generate optional arguments usage
  *
- * @param ctx A {@link CommandContext | command context}
- * @param optionsPairs Options pairs for usage
+ * @param ctx - A {@link CommandContext | command context}
+ * @param optionsPairs - Options pairs for usage
  * @returns Generated options usage
  */
 async function generateOptionalArgsUsage<

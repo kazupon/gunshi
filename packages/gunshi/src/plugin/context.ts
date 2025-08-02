@@ -52,23 +52,23 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
   /**
    * Add a global option.
    *
-   * @param name An option name
-   * @param schema An {@link ArgSchema} for the option
+   * @param name - An option name
+   * @param schema - An {@link ArgSchema} for the option
    */
   addGlobalOption(name: string, schema: ArgSchema): void
 
   /**
    * Add a sub command.
    *
-   * @param name Command name
-   * @param command Command definition
+   * @param name - Command name
+   * @param command - Command definition
    */
   addCommand(name: string, command: Command<G> | LazyCommand<G>): void
 
   /**
    * Check if a command exists.
    *
-   * @param name Command name
+   * @param name - Command name
    * @returns True if the command exists, false otherwise
    */
   hasCommand(name: string): boolean

@@ -381,8 +381,8 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    * Output a message.
    * If {@link CommandEnvironment.usageSilent} is true, the message is not output.
    *
-   * @param message an output message, @see {@link console.log}
-   * @param optionalParams an optional parameters, @see {@link console.log}
+   * @param message - an output message, @see {@link console.log}
+   * @param optionalParams - an optional parameters, @see {@link console.log}
    * @internal
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic optional parameters
@@ -544,7 +544,7 @@ export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> 
 /**
  * Command examples fetcher.
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns A fetched command examples.
  */
 export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
@@ -554,7 +554,7 @@ export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGun
 /**
  * Command runner.
  *
- * @param ctx A {@link CommandContext | command context}
+ * @param ctx - A {@link CommandContext | command context}
  * @returns void or string (for CLI output)
  */
 export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
@@ -576,7 +576,7 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
  * Command decorator.
  * A function that wraps a command runner to add or modify its behavior.
  *
- * @param baseRunner The base command runner to decorate
+ * @param baseRunner - The base command runner to decorate
  * @returns The decorated command runner
  * @since v0.27.0
  */
@@ -588,8 +588,8 @@ export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiPar
  * Renderer decorator type.
  * A function that wraps a base renderer to add or modify its behavior.
  *
- * @param baseRenderer The base renderer function to decorate
- * @param ctx The command context
+ * @param baseRenderer - The base renderer function to decorate
+ * @param ctx - The command context
  * @returns The decorated result
  * @since v0.27.0
  */
@@ -602,9 +602,9 @@ export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunsh
  * Validation errors renderer decorator type.
  * A function that wraps a validation errors renderer to add or modify its behavior.
  *
- * @param baseRenderer The base validation errors renderer function to decorate
- * @param ctx The command context
- * @param error The aggregate error containing validation errors
+ * @param baseRenderer - The base validation errors renderer function to decorate
+ * @param ctx - The command context
+ * @param error - The aggregate error containing validation errors
  * @returns The decorated result
  * @since v0.27.0
  */

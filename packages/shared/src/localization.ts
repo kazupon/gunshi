@@ -29,9 +29,9 @@ export interface Localization<
  * Create a localizable function for a command.
  * This function will resolve the translation key based on the command context and the provided translation function.
  *
- * @param ctx Command context
- * @param cmd Command
- * @param translate Translation function
+ * @param ctx - Command context
+ * @param cmd - Command
+ * @param translate - Translation function
  * @returns Localizable function
  */
 export function localizable<

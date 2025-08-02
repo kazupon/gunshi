@@ -41,7 +41,7 @@ const dependencies = [{ id: i18nPluginId, optional: true }] as const
 /**
  * completion plugin
  *
- * @param options Completion options
+ * @param options - Completion options
  * @returns A defined plugin as completion
  */
 export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {

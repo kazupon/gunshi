@@ -22,9 +22,9 @@ import type {
 /**
  * Run the command.
  *
- * @param args Command line arguments
- * @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
- * @param options A {@link CliOptions | CLI options}
+ * @param args - Command line arguments
+ * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<
@@ -39,9 +39,9 @@ export async function cli<
 /**
  * Run the command.
  *
- * @param args Command line arguments
- * @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
- * @param options A {@link CliOptions | CLI options}
+ * @param args - Command line arguments
+ * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<
@@ -56,9 +56,9 @@ export async function cli<
 /**
  * Run the command.
  *
- * @param args Command line arguments
- * @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
- * @param options A {@link CliOptions | CLI options}
+ * @param args - Command line arguments
+ * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(
@@ -70,9 +70,9 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 /**
  * Run the command.
  *
- * @param args Command line arguments
- * @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
- * @param options A {@link CliOptions | CLI options}
+ * @param args - Command line arguments
+ * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(

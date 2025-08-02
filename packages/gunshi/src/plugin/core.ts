@@ -249,12 +249,6 @@ export interface PluginWithoutExtension<
  * Define a plugin with extension compatibility and typed dependency extensions
  *
  * @param options - {@link PluginOptions | plugin options}
- * @param options.id see {@link PluginOptions.id}
- * @param options.name see {@link PluginOptions.name}
- * @param options.dependencies see {@link PluginOptions.dependencies}
- * @param options.setup see {@link PluginOptions.setup}
- * @param options.extension see {@link PluginOptions.extension}
- * @param options.onExtension see {@link PluginOptions.onExtension}
  * @returns A defined plugin with extension
  *
  * @since v0.27.0
@@ -306,11 +300,6 @@ export function plugin<
  * Define a plugin without extension and typed dependency extensions
  *
  * @param options - {@link PluginOptions | plugin options} without extension
- * @param options.id see {@link PluginOptions.id}
- * @param options.name see {@link PluginOptions.name}
- * @param options.dependencies see {@link PluginOptions.dependencies}
- * @param options.setup see {@link PluginOptions.setup}
- * @param options.onExtension see {@link PluginOptions.onExtension}
  * @returns A defined plugin without extension
  *
  * @since v0.27.0

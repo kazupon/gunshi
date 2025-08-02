@@ -34,7 +34,7 @@ export interface GlobalCommandContext {
   /**
    * Show validation errors. This is called when argument validation fails.
    *
-   * @param error The aggregate error containing validation failures
+   * @param error - The aggregate error containing validation failures
    * @returns The rendered error message, or `undefined` if `renderValidationErrors` is null
    */
   showValidationErrors: (error: AggregateError) => Awaitable<string | undefined>
@@ -43,7 +43,7 @@ export interface GlobalCommandContext {
 /**
  * Extends the command context for global options plugin.
  *
- * @param ctx The command context core
+ * @param ctx - The command context core
  * @returns An {@link GlobalCommandContext} of global options plugin
  */
 export default function extension(

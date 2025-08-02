@@ -36,10 +36,10 @@ type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 
 /**
  * Run the command.
  *
- * @param argv Command line arguments
- * @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
- * @param options A {@link CliOptions | CLI options}
- * @param plugins An array of {@link Plugin | plugins} to be applied
+ * @param argv - Command line arguments
+ * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options - A {@link CliOptions | CLI options}
+ * @param plugins - An array of {@link Plugin | plugins} to be applied
  * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiParams>(

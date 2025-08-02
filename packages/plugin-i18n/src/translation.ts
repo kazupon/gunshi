@@ -8,7 +8,7 @@ import type { TranslationAdapter, TranslationAdapterFactoryOptions } from './typ
 /**
  * Create a translation adapter.
  *
- * @param options Options for the translation adapter, see {@link TranslationAdapterFactoryOptions}
+ * @param options - Options for the translation adapter, see {@link TranslationAdapterFactoryOptions}
  * @returns A translation adapter instance
  */
 export function createTranslationAdapter(
@@ -27,7 +27,7 @@ export class DefaultTranslation implements TranslationAdapter {
   /**
    * Creates a new instance of DefaultTranslation.
    *
-   * @param options Options for the translation adapter, see {@link TranslationAdapterFactoryOptions}
+   * @param options - Options for the translation adapter, see {@link TranslationAdapterFactoryOptions}
    */
   constructor(options: TranslationAdapterFactoryOptions) {
     this.#options = options
@@ -40,7 +40,7 @@ export class DefaultTranslation implements TranslationAdapter {
   /**
    * Get a resource of locale.
    *
-   * @param locale A locale of resource (BCP 47 language tag)
+   * @param locale - A locale of resource (BCP 47 language tag)
    * @returns A resource of locale. If resource not found, return `undefined`.
    */
   getResource(locale: string): Record<string, string> | undefined {
@@ -50,8 +50,8 @@ export class DefaultTranslation implements TranslationAdapter {
   /**
    * Set a resource of locale.
    *
-   * @param locale A locale of resource (BCP 47 language tag)
-   * @param resource A resource of locale
+   * @param locale - A locale of resource (BCP 47 language tag)
+   * @param resource - A resource of locale
    */
   setResource(locale: string, resource: Record<string, string>): void {
     this.#resources.set(locale, resource)
@@ -60,8 +60,8 @@ export class DefaultTranslation implements TranslationAdapter {
   /**
    * Get a message of locale.
    *
-   * @param locale A locale of message (BCP 47 language tag)
-   * @param key A key of message resource
+   * @param locale - A locale of message (BCP 47 language tag)
+   * @param key - A key of message resource
    * @returns A message of locale. If message not found, return `undefined`.
    */
   getMessage(locale: string, key: string): string | undefined {
@@ -75,9 +75,9 @@ export class DefaultTranslation implements TranslationAdapter {
   /**
    * Translate a message.
    *
-   * @param locale A locale of message (BCP 47 language tag)
-   * @param key A key of message resource
-   * @param values A values to interpolate in the message
+   * @param locale - A locale of message (BCP 47 language tag)
+   * @param key - A key of message resource
+   * @param values - A values to interpolate in the message
    * @returns A translated message, if message is not translated, return `undefined`.
    */
   translate(
