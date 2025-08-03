@@ -48,8 +48,8 @@ importers:
         specifier: ^7.1.0
         version: 7.1.0
       '@kazupon/eslint-config':
-        specifier: ^0.33.3
-        version: 0.33.3(3045722384ee5b17bd1e1fb76d4de261)
+        specifier: ^0.35.0
+        version: 0.35.0(3045722384ee5b17bd1e1fb76d4de261)
       '@kazupon/prettier-config':
         specifier: ^0.1.1
         version: 0.1.1
@@ -1223,8 +1223,8 @@ packages:
     resolution: {integrity: sha512-f5DRIOZf7wxogefH03RjMPMdBF7ADTWUMoOs9kaJo06EfwF+aFhMZMDZxHg/Xe12hptN9xoZjGso2fdjapBRIA==}
     engines: {node: '>=10'}
 
-  '@kazupon/eslint-config@0.33.3':
-    resolution: {integrity: sha512-mSrJ1p28+RJr7HUHoYTnbifg5xpgl3AKzJqAoCRq8RDJC89lQT2SxXzYN60xi8YJTYolVvwnwejMKzro2/RXAg==}
+  '@kazupon/eslint-config@0.35.0':
+    resolution: {integrity: sha512-G/sdLi19dhfLLuVUGmKirXypVbV30Xj+2+KK/aGF8sWQtjd63p3pbUA1c0kVHSScx8dKIeMMbIUpNm1tkA4XEw==}
     engines: {node: '>= 20'}
     peerDependencies:
       '@eslint/css': '>=0.5.0'
@@ -1238,6 +1238,7 @@ packages:
       eslint-plugin-import: '>=2.31.0'
       eslint-plugin-jsdoc: '>=51.0.0'
       eslint-plugin-jsonc: '>=2.16.0'
+      eslint-plugin-markdown-preferences: '>=0.5.0'
       eslint-plugin-module-interop: '>=0.3.0'
       eslint-plugin-promise: '>=6.4.0'
       eslint-plugin-react: '>=7.35.0'
@@ -1276,6 +1277,8 @@ packages:
         optional: true
       eslint-plugin-jsonc:
         optional: true
+      eslint-plugin-markdown-preferences:
+        optional: true
       eslint-plugin-module-interop:
         optional: true
       eslint-plugin-promise:
@@ -1311,8 +1314,8 @@ packages:
       typescript-eslint:
         optional: true
 
-  '@kazupon/eslint-plugin@0.5.0':
-    resolution: {integrity: sha512-yduSJRvNGOy7eHz3j+hdTBLBRqV5QCTAB80QblDXZRkh5/P1W98sefcxDiH5YAp9xu6xz0UD/DjCb8o+1HF83Q==}
+  '@kazupon/eslint-plugin@0.6.1':
+    resolution: {integrity: sha512-xBzcYN3cTEd7y88pB9xM+3hHOoyBbo3vf+SN+ti1misKEDhmJ0yjWWTjqoJ5lQfGT1wDOdahjlw85nB4+axx+Q==}
     engines: {node: '>= 20'}
     peerDependencies:
       eslint: ^9.0.0
@@ -5679,11 +5682,11 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.33.3(3045722384ee5b17bd1e1fb76d4de261)':
+  '@kazupon/eslint-config@0.35.0(3045722384ee5b17bd1e1fb76d4de261)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.32.0(jiti@2.4.2))
       '@eslint/js': 9.32.0
-      '@kazupon/eslint-plugin': 0.5.0(eslint@9.32.0(jiti@2.4.2))
+      '@kazupon/eslint-plugin': 0.6.1(eslint@9.32.0(jiti@2.4.2))
       '@kazupon/jts-utils': 0.6.0(@vue/reactivity@3.5.14)(publint@0.3.12)(typescript@5.8.3)
       '@stylistic/eslint-plugin': 4.4.1(eslint@9.32.0(jiti@2.4.2))(typescript@5.8.3)
       eslint: 9.32.0(jiti@2.4.2)
@@ -5715,7 +5718,7 @@ snapshots:
       - typescript
       - unplugin-unused
 
-  '@kazupon/eslint-plugin@0.5.0(eslint@9.32.0(jiti@2.4.2))':
+  '@kazupon/eslint-plugin@0.6.1(eslint@9.32.0(jiti@2.4.2))':
     dependencies:
       '@es-joy/jsdoccomment': 0.52.0
       '@eslint/core': 0.15.1
