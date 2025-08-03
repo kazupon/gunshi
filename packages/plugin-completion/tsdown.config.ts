@@ -2,7 +2,9 @@ import { lintJsrExports } from 'jsr-exports-lint/tsdown'
 import license from 'rollup-plugin-license'
 import { defineConfig } from 'tsdown'
 
-const config: ReturnType<typeof defineConfig> = defineConfig({
+import type { UserConfig } from 'tsdown'
+
+const config: UserConfig = defineConfig({
   entry: ['./src/index.ts'],
   outDir: 'lib',
   clean: true,

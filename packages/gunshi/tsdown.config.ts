@@ -1,7 +1,9 @@
 import { lintJsrExports } from 'jsr-exports-lint/tsdown'
 import { defineConfig } from 'tsdown'
 
-const config: ReturnType<typeof defineConfig> = defineConfig({
+import type { UserConfig } from 'tsdown'
+
+const config: UserConfig = defineConfig({
   entry: [
     './src/index.ts',
     './src/bone.ts',
