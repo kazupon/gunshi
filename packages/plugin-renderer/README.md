@@ -26,8 +26,8 @@ bun add @gunshi/plugin-renderer
 ## 🚀 Usage
 
 ```ts
-import renderer from '@gunshi/plugin-renderer'
 import { cli, define } from 'gunshi'
+import renderer from '@gunshi/plugin-renderer'
 
 const command = define({
   name: 'deploy',
@@ -80,7 +80,7 @@ This plugin automatically handles rendering for:
 
 The plugin provides smart text rendering with automatic fallback:
 
-- **With i18n plugin**: Uses translations from the i18n plugin
+- **With i18n plugin**: Uses translations from the `@gunshi/plugin-i18n`
 - **Without i18n plugin**: Falls back to default English messages and descriptions
 
 ### Rendered Example
@@ -130,8 +130,8 @@ Available extensions:
 ### Usage Example
 
 ```ts
-import renderer from '@gunshi/plugin-renderer'
 import { cli, define } from 'gunshi'
+import renderer from '@gunshi/plugin-renderer'
 
 const deploy = define({
   name: 'deploy',
@@ -191,19 +191,19 @@ await cli(process.argv.slice(2), command, {
 
 ### Integration with i18n Plugin
 
-The renderer plugin has an optional dependency on the i18n plugin. When both plugins are used together, all rendered text automatically uses translations:
+The renderer plugin has an optional dependency on the `@gunshi/plugin-i18n`. When both plugins are used together, all rendered text automatically uses translations:
 
 ```ts
+import { cli } from 'gunshi'
 import renderer from '@gunshi/plugin-renderer'
 import i18n from '@gunshi/plugin-i18n'
 import resources from '@gunshi/resources'
-import { cli } from 'gunshi'
 
 await cli(args, command, {
   plugins: [
     i18n({
       locale: 'ja-JP',
-      resources // Uses built-in resources from @gunshi/resources
+      resources // Uses built-in resources from `@gunshi/resources`
     }),
     renderer() // Will use Japanese translations
   ]
@@ -215,10 +215,10 @@ await cli(args, command, {
 You can extend the built-in resources with your own translations:
 
 ```ts
+import { cli } from 'gunshi'
 import renderer from '@gunshi/plugin-renderer'
 import i18n from '@gunshi/plugin-i18n'
 import resources from '@gunshi/resources'
-import { cli } from 'gunshi'
 
 // Extend built-in resources with custom messages
 const customResources = {

@@ -112,7 +112,8 @@ Example with globals plugin:
 ```ts
 import { cli } from 'gunshi'
 import i18n from '@gunshi/plugin-i18n'
-import globals from '@gunshi/plugin-global'
+import globals from '@gunshi/plugin-global' // need install `@gunshi/plugin-global`
+import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' } // need install `@gunshi/resources`
 
 await cli(args, command, {
   plugins: [
@@ -120,11 +121,7 @@ await cli(args, command, {
     i18n({
       locale: 'ja-JP',
       resources: {
-        'ja-JP': {
-          help: 'ヘルプメッセージを表示', // Override help translation
-          version: 'バージョンを表示' // Override version translation
-          // ... other built-in translations
-        }
+        'ja-JP': jsJPResource // Set from with providing gunshi built-in resources
       }
     })
   ]
@@ -160,7 +157,7 @@ const command = defineI18n({
 Add i18n resource to an existing command. This helper is useful for extending an already defined command.
 
 ```ts
-import { define } from 'gunshi' // 'gunshi/definition', or '@gunshi/definition'
+import { define } from 'gunshi' // alternative 'gunshi/definition', or '@gunshi/definition'
 import { withI18nResource } from '@gunshi/plugin-i18n'
 
 const basicCommand = define({
@@ -330,11 +327,11 @@ const command = defineI18n({
   resource: async ctx => {
     // Example for 'en-US' locale
     return {
-      description: 'This is my command.', // No prefix
-      'arg:target': 'The target file to process.', // 'arg:' prefix
-      'arg:verbose': 'Enable verbose output.', // 'arg:' prefix
+      description: 'This is my command.', // built-in key, No prefix
+      'arg:target': 'The target file to process.', // argument key, 'arg:' prefix
+      'arg:verbose': 'Enable verbose output.', // argument key, 'arg:' prefix
       'arg:no-verbose': 'Disable verbose logging specifically.', // Optional custom translation for the negatable option
-      processing_message: 'Processing target...' // No prefix
+      processing_message: 'Processing target...' // custom keys, No prefix
     }
   },
   run: ctx => {

@@ -117,19 +117,6 @@ interface CommandContextParams<
  * Create a {@link CommandContext | command context}
  *
  * @param param - A {@link CommandContextParams | parameters} to create a {@link CommandContext | command context}
- * @param param.args - An arguments of target command
- * @param param.explicit - Explicitly provided arguments
- * @param param.values - A values of target command
- * @param param.positionals - A positionals arguments, which passed to the target command
- * @param param.rest - A rest arguments, which passed to the target command
- * @param param.argv - Original command line arguments
- * @param param.tokens - Argument tokens that are parsed by the `parseArgs` function
- * @param param.command - A target command
- * @param param.extensions - Plugin extensions to apply as the command context extension.
- * @param param.cliOptions - A command options, which is spicialized from `cli` function
- * @param param.callMode - Command call mode.
- * @param param.omitted - Whether the command is omitted
- * @param param.validationError - Validation error from argument parsing.
  * @returns A {@link CommandContext | command context}, which is readonly
  */
 export async function createCommandContext<

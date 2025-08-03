@@ -10,6 +10,8 @@ export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 
 /**
  * Awaitable type.
+ *
+ * @typeParam T - The type of the value that can be awaited.
  */
 export type Awaitable<T> = T | Promise<T>
 
@@ -22,7 +24,10 @@ export type ExtendContext = Record<string, unknown>
 
 /**
  * Gunshi unified parameter type.
+ *
  * This type combines both argument definitions and command context extensions.
+ *
+ * @typeParam P - The type of parameters, which can include `args` and `extensions`.
  *
  * @since v0.27.0
  */
@@ -36,17 +41,17 @@ export interface GunshiParams<
   }
 > {
   /**
-   * Command argument definitions
+   * Command argument definitions.
    */
   args: P extends { args: infer A extends Args } ? A : Args
   /**
-   * Command context extensions
+   * Command context extensions.
    */
   extensions: P extends { extensions: infer E extends ExtendContext } ? E : {}
 }
 
 /**
- * Default Gunshi parameters
+ * Default Gunshi parameters.
  *
  * @since v0.27.0
  */
@@ -54,7 +59,8 @@ export type DefaultGunshiParams = GunshiParams
 
 /**
  * Generic constraint for command-related types.
- * This type constraint allows both GunshiParams and objects with extensions.
+ *
+ * This type constraint allows both {@link GunshiParams} and objects with extensions.
  *
  * @since v0.27.0
  */
@@ -62,7 +68,9 @@ export type DefaultGunshiParams = GunshiParams
 export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendContext }
 
 /**
- * Type helper to extract args from G
+ * Type helper to extract args
+ *
+ * @typeParam G - The type of {@link GunshiParams} or an object with {@link Args}.
  *
  * @internal
  */
@@ -70,7 +78,9 @@ export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendCon
 export type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
 
 /**
- * Type helper to extract explicitly provided argument flags from G
+ * Type helper to extract explicitly provided argument flags.
+ *
+ * @typeParam G - The type of {@link GunshiParams}.
  *
  * @internal
  */
@@ -578,6 +588,7 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
  *
  * @param baseRunner - The base command runner to decorate
  * @returns The decorated command runner
+ *
  * @since v0.27.0
  */
 export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
@@ -591,6 +602,7 @@ export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiPar
  * @param baseRenderer - The base renderer function to decorate
  * @param ctx - The command context
  * @returns The decorated result
+ *
  * @since v0.27.0
  */
 export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (
@@ -606,6 +618,7 @@ export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunsh
  * @param ctx - The command context
  * @param error - The aggregate error containing validation errors
  * @returns The decorated result
+ *
  * @since v0.27.0
  */
 export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
