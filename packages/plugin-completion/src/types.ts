@@ -50,7 +50,7 @@ export type CompletionHandler = (params: CompletionParams) => ReturnType<Handler
  * Extended command context which provides utilities via completion plugin.
  * These utilities are available via `CommandContext.extensions['g:completion']`.
  */
-export interface CompletionCommandContext {}
+export interface CompletionExtension {}
 
 /**
  * Completion configuration, which structure is similar `bombsh/tab`'s `CompletionConfig`.

@@ -56,12 +56,7 @@ import type {
   PluginWithExtension
 } from '@gunshi/plugin'
 import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
-import type {
-  CommandResource,
-  I18nCommand,
-  I18nCommandContext,
-  I18nPluginOptions
-} from './types.ts'
+import type { CommandResource, I18nCommand, I18nExtension, I18nPluginOptions } from './types.ts'
 
 export { resolveArgKey, resolveBuiltInKey, resolveKey } from '@gunshi/shared'
 export * from './helpers.ts'
@@ -83,7 +78,7 @@ const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
  */
 export default function i18n(
   options: I18nPluginOptions = {}
-): PluginWithExtension<I18nCommandContext<DefaultGunshiParams>> {
+): PluginWithExtension<I18nExtension<DefaultGunshiParams>> {
   // extract locale configuration from options
   const locale = toLocale(options.locale)
   const localeStr = toLocaleString(locale)

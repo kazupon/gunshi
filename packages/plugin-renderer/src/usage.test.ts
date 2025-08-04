@@ -5,8 +5,8 @@ import renderer from './index.ts'
 import { renderUsage } from './usage.ts'
 
 import type { Args, Command, DefaultGunshiParams, GunshiParams, LazyCommand } from '@gunshi/plugin'
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
-import type { UsageRendererCommandContext } from './types.ts'
+import type { I18nExtension } from '@gunshi/plugin-i18n'
+import type { UsageRendererExtension } from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -19,17 +19,15 @@ afterEach(() => {
 type WithI18nAndRenderer = GunshiParams<{
   args: Args
   extensions: {
-    'g:i18n':
-      | I18nCommandContext<DefaultGunshiParams>
-      | Promise<I18nCommandContext<DefaultGunshiParams>>
-    'g:renderer': UsageRendererCommandContext<DefaultGunshiParams>
+    'g:i18n': I18nExtension<DefaultGunshiParams> | Promise<I18nExtension<DefaultGunshiParams>>
+    'g:renderer': UsageRendererExtension<DefaultGunshiParams>
   }
 }>
 
 type WithRendererOnly = GunshiParams<{
   args: Args
   extensions: {
-    'g:renderer': UsageRendererCommandContext<DefaultGunshiParams>
+    'g:renderer': UsageRendererExtension<DefaultGunshiParams>
   }
 }>
 

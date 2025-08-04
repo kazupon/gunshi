@@ -7,11 +7,11 @@
 # Function: default()
 
 ```ts
-function default(): PluginWithExtension<GlobalCommandContext>;
+function default(): PluginWithExtension<GlobalExtension>;
 ```
 
 global options plugin
 
 ## Returns
 
-`PluginWithExtension`\<[`GlobalCommandContext`](../interfaces/GlobalCommandContext.md)\>
+`PluginWithExtension`\<[`GlobalExtension`](../interfaces/GlobalExtension.md)\>

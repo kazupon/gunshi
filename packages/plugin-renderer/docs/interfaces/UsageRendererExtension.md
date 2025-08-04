@@ -2,9 +2,9 @@
 
 ***
 
-[@gunshi/plugin-renderer](../index.md) / UsageRendererCommandContext
+[@gunshi/plugin-renderer](../index.md) / UsageRendererExtension
 
-# Interface: UsageRendererCommandContext\<G\>
+# Interface: UsageRendererExtension\<G\>
 
 Extended command context which provides utilities via usage renderer plugin.
 These utilities are available via `CommandContext.extensions['g:renderer']`.

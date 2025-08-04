@@ -22,7 +22,7 @@ import type {
   PluginContext,
   PluginWithoutExtension
 } from '@gunshi/plugin'
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+import type { I18nExtension } from '@gunshi/plugin-i18n'
 import type { Handler } from './bombshell/index.ts'
 import type { CompletionConfig, CompletionHandler, CompletionOptions } from './types.ts'
 
@@ -48,11 +48,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
   const config = options.config || {}
   const completion = new Completion()
 
-  return plugin<
-    Record<typeof i18nPluginId, I18nCommandContext>,
-    typeof pluginId,
-    typeof dependencies
-  >({
+  return plugin<Record<typeof i18nPluginId, I18nExtension>, typeof pluginId, typeof dependencies>({
     id: pluginId,
     name: 'completion',
     dependencies,
@@ -149,7 +145,7 @@ async function handleSubCommands(
   subCommands: PluginContext['subCommands'],
   configs: Record<string, CompletionConfig> = {},
   i18nPluginId: string,
-  i18n?: I18nCommandContext | undefined
+  i18n?: I18nExtension | undefined
 ) {
   for (const [name, cmd] of subCommands) {
     if (cmd.internal || cmd.entry || name === 'complete') {

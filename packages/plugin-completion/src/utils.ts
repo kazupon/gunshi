@@ -12,7 +12,7 @@ import type {
   CommandContextExtension,
   LazyCommand
 } from '@gunshi/plugin'
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+import type { I18nExtension } from '@gunshi/plugin-i18n'
 
 /**
  * Create a command context for a given command and specialized with i18n.
@@ -25,7 +25,7 @@ import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 export async function createCommandContext(
   cmd: Command | LazyCommand,
   id: string,
-  i18n?: I18nCommandContext
+  i18n?: I18nExtension
 ): Promise<CommandContext> {
   const extensions: Record<string, CommandContextExtension> = Object.create(null)
   if (i18n) {

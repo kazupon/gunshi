@@ -2,9 +2,9 @@
 
 ***
 
-[@gunshi/plugin-i18n](../index.md) / I18nCommandContext
+[@gunshi/plugin-i18n](../index.md) / I18nExtension
 
-# Interface: I18nCommandContext\<G\>
+# Interface: I18nExtension\<G\>
 
 Extended command context which provides utilities via i18n plugin.
 These utilities are available via `CommandContext.extensions['g:i18n']`.

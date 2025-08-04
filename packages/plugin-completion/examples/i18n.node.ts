@@ -2,11 +2,11 @@ import i18n, { defineI18n } from '@gunshi/plugin-i18n'
 import { cli } from 'gunshi'
 import completion from '../src/index.ts'
 
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+import type { I18nExtension } from '@gunshi/plugin-i18n'
 
 const entry = defineI18n<{
   extensions: {
-    'g:i18n': I18nCommandContext
+    'g:i18n': I18nExtension
   }
 }>({
   name: 'root',
@@ -44,7 +44,7 @@ const entry = defineI18n<{
 
 const dev = defineI18n<{
   extensions: {
-    'g:i18n': I18nCommandContext
+    'g:i18n': I18nExtension
   }
 }>({
   name: 'dev',
@@ -77,7 +77,7 @@ const dev = defineI18n<{
 
 const build = defineI18n<{
   extensions: {
-    'g:i18n': I18nCommandContext
+    'g:i18n': I18nExtension
   }
 }>({
   name: 'build',
@@ -96,7 +96,7 @@ const build = defineI18n<{
 
 const lint = defineI18n<{
   extensions: {
-    'g:i18n': I18nCommandContext
+    'g:i18n': I18nExtension
   }
 }>({
   name: 'lint',

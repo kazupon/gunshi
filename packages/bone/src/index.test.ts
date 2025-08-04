@@ -4,9 +4,9 @@ import renderer from '@gunshi/plugin-renderer'
 import { describe, expect, test, vi } from 'vitest'
 import { cli } from './index.ts'
 
-import type { GlobalCommandContext, PluginId } from '@gunshi/plugin-global'
+import type { GlobalExtension, PluginId } from '@gunshi/plugin-global'
 
-const entry = define<{ [K in PluginId]: GlobalCommandContext }>({
+const entry = define<{ [K in PluginId]: GlobalExtension }>({
   name: 'entry',
   args: {
     say: {

@@ -36,9 +36,9 @@ import extension from './extension.ts'
 import { pluginId as id } from './types.ts'
 
 import type { PluginWithExtension } from '@gunshi/plugin'
-import type { GlobalCommandContext } from './extension.ts'
+import type { GlobalExtension } from './extension.ts'
 
-export type { GlobalCommandContext } from './extension.ts'
+export type { GlobalExtension } from './extension.ts'
 export * from './types.ts'
 
 /**
@@ -46,7 +46,7 @@ export * from './types.ts'
  *
  * @returns A defined plugin as global options
  */
-export default function global(): PluginWithExtension<GlobalCommandContext> {
+export default function global(): PluginWithExtension<GlobalExtension> {
   return plugin({
     id,
     name: 'global options',

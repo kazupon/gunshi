@@ -848,10 +848,10 @@ When declaring optional dependencies, your plugin must be designed to work corre
 ```ts
 export default function renderer() {
   return plugin<
-    Record<typeof i18nPluginId, I18nCommandContext>,
+    Record<typeof i18nPluginId, I18nExtension>,
     typeof id,
     typeof dependencies,
-    UsageRendererCommandContext
+    UsageRendererExtension
   >({
     id: 'renderer',
     name: 'Usage Renderer',

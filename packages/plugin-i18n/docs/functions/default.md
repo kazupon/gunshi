@@ -7,7 +7,7 @@
 # Function: default()
 
 ```ts
-function default(options): PluginWithExtension<Promise<I18nCommandContext<DefaultGunshiParams>>>;
+function default(options): PluginWithExtension<Promise<I18nExtension<DefaultGunshiParams>>>;
 ```
 
 i18n plugin
@@ -20,4 +20,4 @@ i18n plugin
 
 ## Returns
 
-`PluginWithExtension`\<`Promise`\<[`I18nCommandContext`](../interfaces/I18nCommandContext.md)\<`DefaultGunshiParams`\>\>\>
+`PluginWithExtension`\<`Promise`\<[`I18nExtension`](../interfaces/I18nExtension.md)\<`DefaultGunshiParams`\>\>\>

@@ -57,7 +57,7 @@ await cli(process.argv.slice(2), entry, {
 | Interface | Description |
 | ------ | ------ |
 | [I18nCommand](interfaces/I18nCommand.md) | I18n-aware command interface that extends the base Command with resource support |
-| [I18nCommandContext](interfaces/I18nCommandContext.md) | Extended command context which provides utilities via i18n plugin. These utilities are available via `CommandContext.extensions['g:i18n']`. |
+| [I18nExtension](interfaces/I18nExtension.md) | Extended command context which provides utilities via i18n plugin. These utilities are available via `CommandContext.extensions['g:i18n']`. |
 | [I18nPluginOptions](interfaces/I18nPluginOptions.md) | i18n plugin options |
 | [TranslationAdapter](interfaces/TranslationAdapter.md) | Translation adapter. This adapter is used to custom message formatter like [Intlify message format](https://github.com/intlify/vue-i18n/blob/master/spec/syntax.ebnf), [\`Intl.MessageFormat\` (MF2)](https://github.com/tc39/proposal-intl-messageformat), and etc. This adapter will support localization with your preferred message format. |
 | [TranslationAdapterFactoryOptions](interfaces/TranslationAdapterFactoryOptions.md) | Translation adapter factory options. |

@@ -7,11 +7,11 @@
 # Function: default()
 
 ```ts
-function default(): PluginWithExtension<UsageRendererCommandContext<DefaultGunshiParams>>;
+function default(): PluginWithExtension<UsageRendererExtension<DefaultGunshiParams>>;
 ```
 
 usage renderer plugin
 
 ## Returns
 
-`PluginWithExtension`\<[`UsageRendererCommandContext`](../interfaces/UsageRendererCommandContext.md)\<`DefaultGunshiParams`\>\>
+`PluginWithExtension`\<[`UsageRendererExtension`](../interfaces/UsageRendererExtension.md)\<`DefaultGunshiParams`\>\>

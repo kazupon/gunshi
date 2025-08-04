@@ -43,7 +43,7 @@ await cli(process.argv.slice(2), entry, {
 
 | Interface | Description |
 | ------ | ------ |
-| [GlobalCommandContext](interfaces/GlobalCommandContext.md) | Extended command context which provides utilities via global options plugin. These utilities are available via `CommandContext.extensions['g:global']`. |
+| [GlobalExtension](interfaces/GlobalExtension.md) | Extended command context which provides utilities via global options plugin. These utilities are available via `CommandContext.extensions['g:global']`. |
 
 ## Type Aliases
 

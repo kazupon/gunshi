@@ -25,9 +25,9 @@ import type {
   DefaultGunshiParams,
   GunshiParams
 } from '@gunshi/plugin'
-import type { PluginId, UsageRendererCommandContext } from './types.ts'
+import type { PluginId, UsageRendererExtension } from './types.ts'
 
-type Extensions = Record<PluginId, UsageRendererCommandContext>
+type Extensions = Record<PluginId, UsageRendererExtension>
 
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
 

@@ -13,7 +13,7 @@ import type { Args, Command, CommandContext, GunshiParams } from '@gunshi/plugin
 import type {
   CommandResource,
   CommandResourceFetcher,
-  I18nCommandContext,
+  I18nExtension,
   TranslationAdapter
 } from './types.ts'
 
@@ -165,7 +165,7 @@ describe('translation adapter', () => {
     using mockResource = vi
       .fn<
         CommandResourceFetcher<{
-          extensions: { [K in typeof id]: I18nCommandContext }
+          extensions: { [K in typeof id]: I18nExtension }
         }>
       >()
       .mockImplementation(ctx => {
@@ -185,7 +185,7 @@ describe('translation adapter', () => {
     })
 
     const ctx = await createCommandContext<{
-      extensions: { [K in typeof id]: I18nCommandContext }
+      extensions: { [K in typeof id]: I18nExtension }
     }>({
       args,
       explicit: { foo: true },
@@ -243,7 +243,7 @@ describe('translation adapter', () => {
     using mockResource = vi
       .fn<
         CommandResourceFetcher<{
-          extensions: { [K in typeof id]: I18nCommandContext }
+          extensions: { [K in typeof id]: I18nExtension }
         }>
       >()
       .mockImplementation(ctx => {
@@ -263,7 +263,7 @@ describe('translation adapter', () => {
     })
 
     const ctx = await createCommandContext<{
-      extensions: { [K in typeof id]: I18nCommandContext }
+      extensions: { [K in typeof id]: I18nExtension }
     }>({
       args,
       explicit: { foo: true },

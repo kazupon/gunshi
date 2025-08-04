@@ -6,7 +6,7 @@
 import { pluginId as Global } from './types.ts'
 
 import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
-import type { GlobalCommandContext } from './extension.ts'
+import type { GlobalExtension } from './extension.ts'
 import type { PluginId } from './types.ts'
 
 /**
@@ -18,7 +18,7 @@ import type { PluginId } from './types.ts'
 const decorator: CommandDecorator<{
   args: DefaultGunshiParams['args']
   extensions: {
-    [K in PluginId]: GlobalCommandContext
+    [K in PluginId]: GlobalExtension
   }
 }> = baseRunner => async ctx => {
   const {

@@ -38,7 +38,7 @@ export type PluginId = typeof pluginId
  * These utilities are available via `CommandContext.extensions['g:i18n']`.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
-export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
+export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Command locale
    */

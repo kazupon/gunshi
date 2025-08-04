@@ -40,4 +40,4 @@ await cli(process.argv.slice(2), entry, {
 
 | Interface | Description |
 | ------ | ------ |
-| [UsageRendererCommandContext](interfaces/UsageRendererCommandContext.md) | Extended command context which provides utilities via usage renderer plugin. These utilities are available via `CommandContext.extensions['g:renderer']`. |
+| [UsageRendererExtension](interfaces/UsageRendererExtension.md) | Extended command context which provides utilities via usage renderer plugin. These utilities are available via `CommandContext.extensions['g:renderer']`. |

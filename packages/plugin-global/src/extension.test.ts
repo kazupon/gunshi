@@ -3,7 +3,7 @@ import { createMockCommandContext } from '../../gunshi/test/utils.ts'
 import extension from './extension.ts'
 import { pluginId } from './types.ts'
 
-import type { GlobalCommandContext } from './extension.ts'
+import type { GlobalExtension } from './extension.ts'
 import type { PluginId } from './types.ts'
 
 describe('showVersion', () => {
@@ -13,7 +13,7 @@ describe('showVersion', () => {
       log,
       extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      [K in PluginId]: GlobalCommandContext
+      [K in PluginId]: GlobalExtension
     }>({
       version,
       extensions: {
@@ -34,7 +34,7 @@ describe('showVersion', () => {
       log,
       extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      [K in PluginId]: GlobalCommandContext
+      [K in PluginId]: GlobalExtension
     }>({
       version: null,
       extensions: {
@@ -56,7 +56,7 @@ describe('showVersion', () => {
       log,
       extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      [K in PluginId]: GlobalCommandContext
+      [K in PluginId]: GlobalExtension
     }>({
       version,
       usageSilent: true,
@@ -81,7 +81,7 @@ describe('showHeader', () => {
       log,
       extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      [K in PluginId]: GlobalCommandContext
+      [K in PluginId]: GlobalExtension
     }>({
       renderHeader: async () => header,
       extensions: {
@@ -102,7 +102,7 @@ describe('showHeader', () => {
     const {
       extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      [K in PluginId]: GlobalCommandContext
+      [K in PluginId]: GlobalExtension
     }>({
       renderHeader: null,
       extensions: {
@@ -125,7 +125,7 @@ describe('showUsage', () => {
       log,
       extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      [K in PluginId]: GlobalCommandContext
+      [K in PluginId]: GlobalExtension
     }>({
       renderUsage: async () => usage,
       extensions: {
@@ -145,7 +145,7 @@ describe('showUsage', () => {
     const {
       extensions: { [pluginId]: global }
     } = await createMockCommandContext<{
-      [K in PluginId]: GlobalCommandContext
+      [K in PluginId]: GlobalExtension
     }>({
       renderUsage: null,
       extensions: {

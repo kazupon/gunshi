@@ -43,8 +43,8 @@ import type {
   GunshiParams,
   PluginWithExtension
 } from '@gunshi/plugin'
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
-import type { UsageRendererCommandContext } from './types.ts'
+import type { I18nExtension } from '@gunshi/plugin-i18n'
+import type { UsageRendererExtension } from './types.ts'
 
 export { renderHeader } from './header.ts'
 export { renderUsage } from './usage.ts'
@@ -59,12 +59,12 @@ const dependencies = [{ id: i18nPluginId, optional: true }] as const
  *
  * @returns A defined plugin as usage renderer
  */
-export default function renderer(): PluginWithExtension<UsageRendererCommandContext> {
+export default function renderer(): PluginWithExtension<UsageRendererExtension> {
   return plugin<
-    Record<typeof i18nPluginId, I18nCommandContext>,
+    Record<typeof i18nPluginId, I18nExtension>,
     typeof id,
     typeof dependencies,
-    UsageRendererCommandContext
+    UsageRendererExtension
   >({
     id,
     name: 'usage renderer',
