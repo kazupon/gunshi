@@ -160,14 +160,10 @@ describe('execute command', () => {
     await cli(['show'], show, options)
     await cli(['command1', '--foo', 'foo', 'position1'], show, options)
     await cli(['command2', '--bar=1', 'position2'], show, options)
-    await cli(['position3'], show, options)
 
-    expect(mockShow).toBeCalledTimes(3)
+    expect(mockShow).toBeCalledTimes(2)
     expect(mockShow).toHaveBeenCalledWith(
       expect.objectContaining({ callMode: 'entry', positionals: [''] })
-    )
-    expect(mockShow).toHaveBeenCalledWith(
-      expect.objectContaining({ callMode: 'entry', positionals: ['positional3'] })
     )
     expect(mockCommand1).toBeCalledTimes(1)
     expect(mockCommand1).toHaveBeenCalledWith(
@@ -185,6 +181,68 @@ describe('execute command', () => {
         callMode: 'subCommand'
       })
     )
+  })
+
+  test('fallback to entry command', async () => {
+    const mockShow = vi.fn()
+    const mockCommand1 = vi.fn()
+    const mockCommand2 = vi.fn()
+    const show = {
+      name: 'show',
+      run: mockShow
+    }
+    const subCommands = new Map()
+    subCommands.set('command1', {
+      name: 'command1',
+      args: {
+        foo: {
+          type: 'string',
+          short: 'f'
+        }
+      },
+      run: mockCommand1
+    })
+    subCommands.set('command2', {
+      name: 'command2',
+      args: {
+        bar: {
+          type: 'number',
+          short: 'b'
+        }
+      },
+      run: mockCommand2
+    })
+
+    await expect(
+      cli(['position1'], show, {
+        subCommands
+      })
+    ).rejects.toThrowError('Command not found: position1')
+    await expect(
+      cli(['position2'], show, {
+        subCommands,
+        fallbackToEntry: false
+      })
+    ).rejects.toThrowError('Command not found: position2')
+    await expect(
+      cli(['position3'], show, {
+        subCommands,
+        fallbackToEntry: true
+      })
+    ).resolves.toBeUndefined()
+    await expect(
+      cli(['command1'], show, {
+        subCommands,
+        fallbackToEntry: true
+      })
+    ).resolves.toBeUndefined()
+
+    expect(mockShow).toBeCalledTimes(1)
+    expect(mockShow).toHaveBeenCalledWith(
+      expect.objectContaining({ callMode: 'entry', positionals: ['position3'] })
+    )
+    expect(mockCommand1).toBeCalledTimes(1)
+    expect(mockCommand2).toBeCalledTimes(0)
   })
 
   test('entry loose command + sub commands', async () => {

@@ -257,6 +257,9 @@ async function resolveCommand<G extends GunshiParamsConstraint>(
 
   const cmd = options.subCommands?.get(sub)
   if (cmd == null) {
+    if (options.fallbackToEntry) {
+      return doResolveCommand()
+    }
     return {
       commandName: sub,
       callMode: 'unexpected'
