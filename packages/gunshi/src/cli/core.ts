@@ -77,7 +77,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const { explicit, values, positionals, rest, error } = resolveArgs(args, tokens, {
     shortGrouping: true,
     toKebab: command.toKebab,
-    skipPositional: cliOptions.subCommands!.size > 0 ? 0 : -1
+    skipPositional: callMode === 'subCommand' && cliOptions.subCommands!.size > 0 ? 0 : -1
   })
   const omitted = !subCommand
   const commandContext = await createCommandContext({
