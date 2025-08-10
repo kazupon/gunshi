@@ -160,9 +160,15 @@ describe('execute command', () => {
     await cli(['show'], show, options)
     await cli(['command1', '--foo', 'foo', 'position1'], show, options)
     await cli(['command2', '--bar=1', 'position2'], show, options)
+    await cli(['position3'], show, options)
 
-    expect(mockShow).toBeCalledTimes(2)
-    expect(mockShow).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
+    expect(mockShow).toBeCalledTimes(3)
+    expect(mockShow).toHaveBeenCalledWith(
+      expect.objectContaining({ callMode: 'entry', positionals: [''] })
+    )
+    expect(mockShow).toHaveBeenCalledWith(
+      expect.objectContaining({ callMode: 'entry', positionals: ['positional3'] })
+    )
     expect(mockCommand1).toBeCalledTimes(1)
     expect(mockCommand1).toHaveBeenCalledWith(
       expect.objectContaining({
