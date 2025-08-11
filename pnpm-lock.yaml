@@ -225,8 +225,8 @@ importers:
   packages/gunshi:
     dependencies:
       args-tokens:
-        specifier: ^0.22.6
-        version: 0.22.6
+        specifier: ^0.23.0
+        version: 0.23.0
     devDependencies:
       '@gunshi/plugin-global':
         specifier: workspace:*
@@ -2513,8 +2513,8 @@ packages:
     resolution: {integrity: sha512-kWceoEa1zXbcBvgy+BT1ddTLyB7B51u32EhOK/ZMY324nxmQAm767HD+g+9avBEPVmoDjWIYLvsSCQqtbcph/g==}
     engines: {node: '>= 20'}
 
-  args-tokens@0.22.6:
-    resolution: {integrity: sha512-Q28D+oCfm3FGRNcHLJ+jkqOgaWsN5zl2uU5hd0x4EAuHnWO1ADJ3Ae8oK6QWF0rqkClQBGxh4pMLTgK2yifEmA==}
+  args-tokens@0.23.0:
+    resolution: {integrity: sha512-VZETsQmpEGO7A9adjfIOTyZuxKzurUas9kh1Hm0WGhFq8dOyw50P6OjiTwKyURwnmDabw0DbFjI+BUucJfCtnQ==}
     engines: {node: '>= 20'}
 
   array-buffer-byte-length@1.0.2:
@@ -6906,7 +6906,7 @@ snapshots:
 
   args-tokens@0.17.1: {}
 
-  args-tokens@0.22.6: {}
+  args-tokens@0.23.0: {}
 
   array-buffer-byte-length@1.0.2:
     dependencies:
