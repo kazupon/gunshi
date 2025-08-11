@@ -280,6 +280,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
     | null
   /**
    * Whether to fallback to entry command when the sub-command is not found.
+   *
+   * @default false
+   * @since v0.27.0
    */
   fallbackToEntry?: boolean
   /**
