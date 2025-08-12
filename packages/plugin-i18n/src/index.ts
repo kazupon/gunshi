@@ -83,8 +83,8 @@ export default function i18n(
   const locale = toLocale(options.locale)
   const localeStr = toLocaleString(locale)
 
-  const resources =
-    options.resources ||
+  const builtinResources =
+    options.builtinResources ||
     (Object.create(null) as Record<string, Record<BuiltinResourceKeys, string>>)
 
   // create translation adapter
@@ -150,7 +150,7 @@ export default function i18n(
       setResource(DEFAULT_LOCALE, DefaultResource as Record<BuiltinResourceKeys, string>)
 
       // install built-in locale resources
-      for (const [locale, resource] of Object.entries(resources)) {
+      for (const [locale, resource] of Object.entries(builtinResources)) {
         setResource(locale, resource)
       }
 

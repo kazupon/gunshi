@@ -555,7 +555,7 @@ describe('auto generate usage', () => {
       plugins: [
         i18n({
           locale: 'ja-JP',
-          resources: { 'ja-JP': jsJPResource }
+          builtinResources: { 'ja-JP': jsJPResource }
         })
       ]
     })

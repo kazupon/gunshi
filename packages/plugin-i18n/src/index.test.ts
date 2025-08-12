@@ -69,7 +69,7 @@ describe('extension: translate', () => {
       const jaJPResource = await import('@gunshi/resources/ja-JP', { with: { type: 'json' } }).then(
         m => m.default || m
       )
-      const plugin = i18n({ locale: 'ja-JP', resources: { 'ja-JP': jaJPResource } })
+      const plugin = i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jaJPResource } })
       const ctx = await createMockCommandContext()
       const extension = await plugin.extension.factory(ctx, {} as Command)
 
