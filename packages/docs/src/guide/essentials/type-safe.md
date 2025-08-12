@@ -82,3 +82,14 @@ With `define`:
   - Boolean flags (like `verbose`) are always typed as `boolean`. They resolve to `true` if the flag is present (e.g., `--verbose`), `false` if the negating flag is present (e.g., `--no-verbose`), and `false` if neither is present.
 
 This approach significantly simplifies creating type-safe CLIs with Gunshi.
+
+## Advanced Type Safety with Type Parameters
+
+While the basic `define` function provides excellent type inference for command arguments, Gunshi v0.27 introduces even more powerful type safety features through type parameters. These advanced features enable:
+
+- **Plugin Extension Type Safety**: Ensure type-safe access to plugin-provided functionality
+- **Type Parameters for Core Functions**: Use type parameters with `define`, `lazy`, `cli`, and `plugin` functions
+- **Compile-Time Validation**: Get full TypeScript checking for plugin interactions and command composition
+- **Better IDE Support**: Enhanced IntelliSense and autocompletion across your entire CLI application
+
+For comprehensive coverage of these advanced type system features, including practical examples and migration guidance, see the [Type System](/guide/advanced/type-system) documentation.
