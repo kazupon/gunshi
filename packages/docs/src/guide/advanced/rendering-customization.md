@@ -112,11 +112,11 @@ const command = define({
 
   // Command-specific rendering for interactive watch mode
   rendering: {
-    header: async ctx => {
+    header: ctx => {
       return `👁️  WATCH MODE - Press Ctrl+C to stop`
     },
 
-    usage: async ctx => {
+    usage: ctx => {
       return `Usage: ${ctx.name} [options]
 
 Watch Options:
@@ -130,14 +130,14 @@ Keyboard Shortcuts (during watch):
   q - Quit watch mode`
     },
 
-    validationErrors: async (ctx, error) => {
+    validationErrors: (ctx, error) => {
       // Watch-specific error formatting
       return `⚠️  Watch mode cannot start:\n${error.errors.map(err => `   • ${err.message}`).join('\n')}`
     }
   },
 
   run: async ctx => {
-    // Command logic
+    // Command logic ...
   }
 })
 ```
@@ -169,15 +169,15 @@ await cli(process.argv.slice(2), command, {
   version: '1.0.0',
 
   // Apply to all commands
-  renderHeader: async ctx => {
+  renderHeader: ctx => {
     return `=== ${ctx.env.name} v${ctx.env.version} ===`
   },
 
-  renderUsage: async ctx => {
+  renderUsage: ctx => {
     return `${ctx.env.name} ${ctx.name || 'command'} [options]`
   },
 
-  renderValidationErrors: async (ctx, error) => {
+  renderValidationErrors: (ctx, error) => {
     return `Error: ${error.message}`
   }
 })

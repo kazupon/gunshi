@@ -103,34 +103,38 @@ Implement comprehensive logging across all commands:
 
 ```ts
 import { cli } from 'gunshi'
-import { createLogger } from './logger'
-
-const logger = createLogger()
+import logger, { pluginId as loggerId } from '@my/plugin-logger'
 
 await cli(process.argv.slice(2), commands, {
   name: 'my-app',
 
-  onBeforeCommand: async ctx => {
+  // Install logger plugin
+  plugins: [logger()],
+
+  onBeforeCommand: ctx => {
+    const logger = ctx.extensions[loggerId]
     // Log command start with arguments
-    logger.info('Command started', {
+    logger?.info('Command started', {
       command: ctx.name,
       args: ctx.values,
       timestamp: new Date().toISOString()
     })
   },
 
-  onAfterCommand: async (ctx, result) => {
+  onAfterCommand: (ctx, result) => {
+    const logger = ctx.extensions[loggerId]
     // Log successful completion
-    logger.info('Command completed', {
+    logger?.info('Command completed', {
       command: ctx.name,
-      duration: Date.now() - ctx.startTime,
+      duration: Date.now() - logger?.startTime,
       result: typeof result
     })
   },
 
-  onErrorCommand: async (ctx, error) => {
+  onErrorCommand: (ctx, error) => {
+    const logger = ctx.extensions[loggerId]
     // Log errors with full context
-    logger.error('Command failed', {
+    logger?.error('Command failed', {
       command: ctx.name,
       error: error.message,
       stack: error.stack,
@@ -145,59 +149,56 @@ await cli(process.argv.slice(2), commands, {
 Track command execution times and performance metrics:
 
 ```ts
-interface PerformanceMetrics {
-  command: string
-  startTime: number
-  endTime?: number
-  duration?: number
-  status: 'started' | 'completed' | 'failed'
-  error?: string
-}
+import { cli } from 'gunshi'
+import metrics, { pluginId as metricsId } from '@my/plugin-metrics'
 
-const metrics: Map<string, PerformanceMetrics> = new Map()
+await cli(process.argv.slice(2), commands, {
+  name: 'my-app',
 
-const performanceHooks = {
-  onBeforeCommand: async (ctx: CommandContext) => {
-    const key = `${ctx.name}-${Date.now()}`
-    metrics.set(key, {
+  // Install metrics plugin
+  plugins: [metrics()],
+
+  onBeforeCommand: ctx => {
+    const metrics = ctx.extensions[metricsId]
+    // Start tracking command execution
+    metrics?.startTracking({
       command: ctx.name,
-      startTime: Date.now(),
-      status: 'started'
+      args: ctx.values,
+      environment: process.env.NODE_ENV
     })
-
-    // Store key in context for later retrieval
-    ;(ctx as any).__metricsKey = key
   },
 
-  onAfterCommand: async (ctx: CommandContext, result: string | undefined) => {
-    const key = (ctx as any).__metricsKey
-    const metric = metrics.get(key)
+  onAfterCommand: async (ctx, result) => {
+    const metrics = ctx.extensions[metricsId]
+    // Record successful completion
+    const duration = metrics?.endTracking()
 
-    if (metric) {
-      metric.endTime = Date.now()
-      metric.duration = metric.endTime - metric.startTime
-      metric.status = 'completed'
-
-      // Send to monitoring service
-      await sendMetrics(metric)
-    }
+    // Send metrics to monitoring service
+    await metrics?.send({
+      command: ctx.name,
+      status: 'success',
+      duration,
+      memoryUsage: process.memoryUsage(),
+      resultSize: result?.length || 0
+    })
   },
 
-  onErrorCommand: async (ctx: CommandContext, error: Error) => {
-    const key = (ctx as any).__metricsKey
-    const metric = metrics.get(key)
+  onErrorCommand: async (ctx, error) => {
+    const metrics = ctx.extensions[metricsId]
+    // Record failure metrics
+    const duration = metrics?.endTracking()
 
-    if (metric) {
-      metric.endTime = Date.now()
-      metric.duration = metric.endTime - metric.startTime
-      metric.status = 'failed'
-      metric.error = error.message
-
-      // Send to monitoring service
-      await sendMetrics(metric)
-    }
+    // Send error metrics with additional context
+    await metrics?.send({
+      command: ctx.name,
+      status: 'failed',
+      duration,
+      error: error.message,
+      errorType: error.constructor.name,
+      stackTrace: error.stack
+    })
   }
-}
+})
 ```
 
 ### Validation and Guards
@@ -205,31 +206,61 @@ const performanceHooks = {
 Use hooks to implement global validation or access control:
 
 ```ts
-import { verifyAuth } from './auth'
+import { cli } from 'gunshi'
+import auth, { pluginId as authId } from '@my/plugin-auth'
 
-const authHooks = {
-  onBeforeCommand: async (ctx: CommandContext) => {
-    // Skip auth for certain commands
-    const publicCommands = ['help', 'version', 'login']
-    if (publicCommands.includes(ctx.name || '')) {
+await cli(process.argv.slice(2), commands, {
+  name: 'my-app',
+
+  // Install auth plugin
+  plugins: [
+    auth({
+      publicCommands: ['help', 'version', 'login'],
+      tokenSource: ['env:AUTH_TOKEN', 'args:token']
+    })
+  ],
+
+  onBeforeCommand: async ctx => {
+    const auth = ctx.extensions[authId]
+
+    // Skip auth for public commands
+    if (auth?.isPublicCommand(ctx.name)) {
       return
     }
 
     // Verify authentication
-    const token = process.env.AUTH_TOKEN || ctx.values.token
+    const token = auth?.getToken()
     if (!token) {
       throw new Error('Authentication required. Please run "login" first.')
     }
 
-    const isValid = await verifyAuth(token)
-    if (!isValid) {
+    const user = await auth?.verifyToken(token)
+    if (!user) {
       throw new Error('Invalid or expired token. Please login again.')
     }
 
-    // Store user info in context for command use
-    ;(ctx as any).user = await getUserInfo(token)
+    // Store user info for command use
+    await auth?.setCurrentUser(user)
+  },
+
+  onAfterCommand: async ctx => {
+    const auth = ctx.extensions[authId]
+    // Clean up sensitive data after command execution
+    await auth?.clearSession()
+  },
+
+  onErrorCommand: async (ctx, error) => {
+    const auth = ctx.extensions[authId]
+    // Log security-related errors
+    if (error.message.includes('Authentication') || error.message.includes('token')) {
+      await auth?.logSecurityEvent({
+        type: 'auth_failure',
+        command: ctx.name,
+        timestamp: new Date().toISOString()
+      })
+    }
   }
-}
+})
 ```
 
 ### Transaction Management
@@ -237,39 +268,70 @@ const authHooks = {
 Implement database transactions or rollback mechanisms:
 
 ```ts
-import { db } from './database'
+import { cli } from 'gunshi'
+import database, { pluginId as dbId } from '@my/plugin-database'
 
-const transactionHooks = {
-  onBeforeCommand: async (ctx: CommandContext) => {
+await cli(process.argv.slice(2), commands, {
+  name: 'my-app',
+
+  // Install database plugin with transaction support
+  plugins: [
+    database({
+      connectionString: process.env.DATABASE_URL,
+      transactionalCommands: ['create', 'update', 'delete', 'migrate']
+    })
+  ],
+
+  onBeforeCommand: async ctx => {
+    const db = ctx.extensions[dbId]
+
     // Start transaction for data-modifying commands
-    const transactionalCommands = ['create', 'update', 'delete', 'migrate']
-
-    if (transactionalCommands.includes(ctx.name || '')) {
+    if (db?.isTransactionalCommand(ctx.name)) {
       const transaction = await db.beginTransaction()
-      ;(ctx as any).__transaction = transaction
+
+      // Store transaction ID for tracking
+      await db?.setCurrentTransaction(transaction.id)
+
+      console.log(`Transaction ${transaction.id} started for command: ${ctx.name}`)
     }
   },
 
-  onAfterCommand: async (ctx: CommandContext, result: string | undefined) => {
-    const transaction = (ctx as any).__transaction
+  onAfterCommand: async (ctx, result) => {
+    const db = ctx.extensions[dbId]
+    const transaction = db?.getCurrentTransaction()
 
     if (transaction) {
       // Commit on success
-      await transaction.commit()
-      console.log('Transaction committed successfully')
+      await db.commit(transaction.id)
+      console.log(`Transaction ${transaction.id} committed successfully`)
+
+      // Clean up transaction reference
+      await db.clearCurrentTransaction()
     }
   },
 
-  onErrorCommand: async (ctx: CommandContext, error: Error) => {
-    const transaction = (ctx as any).__transaction
+  onErrorCommand: async (ctx, error) => {
+    const db = ctx.extensions[dbId]
+    const transaction = db?.getCurrentTransaction()
 
     if (transaction) {
       // Rollback on error
-      await transaction.rollback()
-      console.error('Transaction rolled back due to error:', error.message)
+      await db?.rollback(transaction.id)
+      console.error(`Transaction ${transaction.id} rolled back due to error:`, error.message)
+
+      // Log the failed transaction for audit
+      await db?.logTransactionFailure({
+        id: transaction.id,
+        command: ctx.name,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      })
+
+      // Clean up transaction reference
+      await db?.clearCurrentTransaction()
     }
   }
-}
+})
 ```
 
 ## Hook Execution Order
