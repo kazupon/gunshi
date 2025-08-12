@@ -1,5 +1,9 @@
 # `@gunshi/bone`
 
+[![Version][npm-version-src]][npm-version-href]
+[![InstallSize][install-size-src]][install-size-src]
+[![JSR][jsr-src]][jsr-href]
+
 > gunshi minimum
 
 This package exports the bellow APIs and types.
@@ -65,3 +69,11 @@ await cli(process.argv.slice(2), entry, {
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/@gunshi/bone?style=flat
+[npm-version-href]: https://npmjs.com/package/@gunshi/bone@alpha
+[jsr-src]: https://jsr.io/badges/@gunshi/bone
+[jsr-href]: https://jsr.io/@gunshi/bone
+[install-size-src]: https://pkg-size.dev/badge/install/57026
