@@ -1,5 +1,9 @@
 # @gunshi/plugin-global
 
+[![Version][npm-version-src]][npm-version-href]
+[![InstallSize][install-size-src]][install-size-src]
+[![JSR][jsr-src]][jsr-href]
+
 > global options plugin for gunshi.
 
 This plugin provides standard global options (`--help` and `--version`) for all commands in your CLI application. It's installed by default in gunshi, ensuring consistent behavior across all CLI applications.
@@ -143,3 +147,11 @@ See the [API References](./docs/index.md)
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-global?style=flat
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-global@alpha
+[jsr-src]: https://jsr.io/badges/@gunshi/plugin-global
+[jsr-href]: https://jsr.io/@gunshi/plugin-global
+[install-size-src]: https://pkg-size.dev/badge/install/39632

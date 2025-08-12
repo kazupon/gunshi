@@ -1,5 +1,9 @@
 # @gunshi/plugin-completion
 
+[![Version][npm-version-src]][npm-version-href]
+[![InstallSize][install-size-src]][install-size-src]
+[![JSR][jsr-src]][jsr-href]
+
 > shell completion plugin for gunshi.
 
 This plugin provides tab completion functionality for your CLI applications, allowing users to auto-complete commands, options, and arguments in their shell. It generates shell-specific completion scripts and handles runtime completion suggestions.
@@ -238,3 +242,11 @@ Thank you!
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-completion?style=flat
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-completion@alpha
+[jsr-src]: https://jsr.io/badges/@gunshi/plugin-completion
+[jsr-href]: https://jsr.io/@gunshi/plugin-completion
+[install-size-src]: https://pkg-size.dev/badge/install/30875

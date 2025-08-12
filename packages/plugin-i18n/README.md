@@ -1,5 +1,9 @@
 # @gunshi/plugin-i18n
 
+[![Version][npm-version-src]][npm-version-href]
+[![InstallSize][install-size-src]][install-size-src]
+[![JSR][jsr-src]][jsr-href]
+
 > internationalization (i18n) plugin for gunshi.
 
 This plugin provides multi-language support for your CLI applications, allowing you to create commands that can display messages in different languages based on user locale.
@@ -79,7 +83,7 @@ await cli(process.argv.slice(2), greetCommand, {
 - Default: `'en-US'`
 - Description: The locale to use for translations. Can be a BCP 47 language tag string or an `Intl.Locale` object.
 
-### `resources`
+### `builtinResources`
 
 - Type: `Record<string, Record<BuiltinResourceKeys, string>>`
 - Default: `{}`
@@ -120,7 +124,7 @@ await cli(args, command, {
     globals(), // Adds --help and --version options
     i18n({
       locale: 'ja-JP',
-      resources: {
+      builtinResources: {
         'ja-JP': jsJPResource // Set from with providing gunshi built-in resources
       }
     })
@@ -726,3 +730,11 @@ See the [API References](./docs/index.md)
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-i18n?style=flat
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-i18n@alpha
+[jsr-src]: https://jsr.io/badges/@gunshi/plugin-i18n
+[jsr-href]: https://jsr.io/@gunshi/plugin-i18n
+[install-size-src]: https://pkg-size.dev/badge/install/67599

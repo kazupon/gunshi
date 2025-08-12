@@ -90,7 +90,7 @@ export interface I18nPluginOptions {
   /**
    * Built-in localizable resources
    */
-  resources?: Record<string, Record<BuiltinResourceKeys, string>>
+  builtinResources?: Record<string, Record<BuiltinResourceKeys, string>>
 }
 
 /**

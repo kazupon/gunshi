@@ -1,5 +1,9 @@
 # `@gunshi/plugin`
 
+[![Version][npm-version-src]][npm-version-href]
+[![InstallSize][install-size-src]][install-size-src]
+[![JSR][jsr-src]][jsr-href]
+
 > plugin development kit for gunshi
 
 This package provides comprehensive APIs and TypeScript type definitions for creating plugins for gunshi, a modern JavaScript command-line library.
@@ -1018,3 +1022,11 @@ TODO: referer the API section of gunshi docs
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin?style=flat
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin@alpha
+[jsr-src]: https://jsr.io/badges/@gunshi/plugin
+[jsr-href]: https://jsr.io/@gunshi/plugin
+[install-size-src]: https://pkg-size.dev/badge/install/27672
