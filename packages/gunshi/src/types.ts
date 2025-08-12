@@ -400,7 +400,6 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    *
    * @param message - an output message, @see {@link console.log}
    * @param optionalParams - an optional parameters, @see {@link console.log}
-   * @internal
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic optional parameters
   /**
