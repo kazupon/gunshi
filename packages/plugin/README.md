@@ -868,7 +868,7 @@ const dependencies = [i18nPluginId] as const
 export default function renderer() {
   return plugin<
     Record<typeof i18nPluginId, I18nExtension>,
-    typeof id,
+    typeof pluginId,
     typeof dependencies,
     UsageRendererExtension
   >({
