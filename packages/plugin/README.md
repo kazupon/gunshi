@@ -104,7 +104,7 @@ Dynamically register new commands.
 addCommand('config', configCommand)
 ```
 
-### Manage Dependencies
+### Manage Plugin Dependencies
 
 Declare dependencies between plugins with automatic resolution.
 
@@ -173,12 +173,14 @@ export default plugin({
   name: 'Logger Plugin',
 
   // Called for each command execution
-  extension: async (ctx, cmd) => {
+  extension: (ctx, cmd) => {
     const quiet = ctx.values.quiet ?? false
 
     return {
       log: (message: string) => {
-        if (!quiet) console.log(message)
+        if (!quiet) {
+          console.log(message)
+        }
       },
       error: (message: string) => {
         console.error(message)
@@ -187,7 +189,7 @@ export default plugin({
   },
 
   // Called after extension is applied
-  onExtension: async (ctx, cmd) => {
+  onExtension: (ctx, cmd) => {
     ctx.extensions.logger.log('Logger initialized')
   }
 })
@@ -448,7 +450,7 @@ plugin({
         throw new Error('Authentication required. Please login first.')
       }
 
-      return runner(ctx)
+      return await runner(ctx)
     })
   }
 })
@@ -513,12 +515,12 @@ export const authPlugin = plugin<
   name: 'Authentication Plugin',
   dependencies: ['logger'], // dependency declaration
 
-  setup: async ctx => {
+  setup: ctx => {
     // Type-safe access to logger in setup
     ctx.decorateCommand(runner => async cmdCtx => {
       // cmdCtx.extensions is typed as { auth: AuthExtension, logger: LoggerExtension }
       cmdCtx.extensions.logger.log('Command started')
-      return runner(cmdCtx)
+      return await runner(cmdCtx)
     })
   },
 
@@ -567,7 +569,7 @@ type MyCommandExtensions = {
 export const deployCommand = define<MyCommandExtensions>({
   name: 'deploy',
   description: 'Deploy the application',
-  runner: async ctx => {
+  run: async ctx => {
     // All extensions are fully typed
     const { logger, auth, db } = ctx.extensions
 
@@ -665,7 +667,7 @@ export default function api() {
     id: pluginId,
     dependencies,
 
-    onExtension: async ctx => {
+    onExtension: ctx => {
       // Access extension using imported ID
       const auth = ctx.extensions[authPluginId]
 
@@ -690,7 +692,7 @@ import type { AuthExtension, PluginId as AuthId } from 'your-auth-plugin'
 const myCommand = define<Record<AuthId, AuthExtension>>({
   name: 'deploy',
 
-  run: async ctx => {
+  run: ctx => {
     // Type-safe access using imported plugin id, no hardcoded 'mycompany:auth' strings!
     const auth = ctx.extensions[authId]
 
@@ -715,6 +717,8 @@ import { cli } from 'gunshi'
 import auth, { pluginId as authId } from '@mycompany/plugin-auth'
 import logger, { pluginId as loggerId } from '@mycompany/plugin-logger'
 import db, { pluginId as dbId } from '@mycompany/plugin-database'
+
+// Import extension types
 import type { PluginId as AuthId, AuthExtension } from '@mycompany/plugin-auth'
 import type { PluginId as LoggerId, LoggerExtension } from '@mycompany/plugin-logger'
 import type { PluginId as DbId, DbExtension } from '@mycompany/plugin-database'
@@ -778,7 +782,7 @@ export default function analytics() {
       { id: 'mycompany:database', optional: true } // Optional: can work without persistence
     ],
 
-    extension: async ctx => {
+    extension: ctx => {
       // Required dependencies are guaranteed to exist
       const logger = ctx.extensions['mycompany:logger'] // Safe to access
       const auth = ctx.extensions['mycompany:auth'] // Safe to access
@@ -850,6 +854,17 @@ When declaring optional dependencies, your plugin must be designed to work corre
 **Example implementation pattern:**
 
 ```ts
+import { pluginId as i18nPluginId, resolveKey } from '@gunshi/plugin-i18n'
+import type { I18nExtension } from '@gunshi/plugin-i18n'
+
+export const pluginId = 'g:renderer' as const
+
+export interface UsageRendererExtension {
+  // ...
+}
+
+const dependencies = [i18nPluginId] as const
+
 export default function renderer() {
   return plugin<
     Record<typeof i18nPluginId, I18nExtension>,
@@ -857,23 +872,23 @@ export default function renderer() {
     typeof dependencies,
     UsageRendererExtension
   >({
-    id: 'renderer',
+    id: pluginId,
     name: 'Usage Renderer',
     dependencies,
 
-    extension: async (ctx, cmd) => {
+    extension: (ctx, cmd) => {
       // Get optional extension (may be undefined)
-      const i18n = ctx.extensions['i18n']
+      const i18n = ctx.extensions[i18nPluginId]
 
       return {
         // Gracefully handle missing i18n plugin
         text: localizable(ctx, cmd, i18n?.translate), // Pass undefined if i18n not available
 
-        renderHelp: () => {
+        renderHelp: ctx => {
           // eslint-disable-next-line unicorn/prefer-ternary -- example
           if (i18n) {
             // Use i18n features when available
-            return i18n.translate('help.message')
+            return i18n.translate(resolveKey('message', ctx))
           } else {
             // Fallback to default behavior
             return 'Help message'
@@ -883,7 +898,7 @@ export default function renderer() {
     },
 
     onExtension: async (ctx, cmd) => {
-      const i18n = ctx.extensions['i18n']
+      const i18n = ctx.extensions[i18nPluginId]
 
       // Only use optional features if available
       if (i18n) {
