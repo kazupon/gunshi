@@ -279,6 +279,13 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
     | null
   /**
+   * Whether to fallback to entry command when the sub-command is not found.
+   *
+   * @default false
+   * @since v0.27.0
+   */
+  fallbackToEntry?: boolean
+  /**
    * User plugins.
    *
    * @since v0.27.0

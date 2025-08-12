@@ -26,5 +26,6 @@ export const CLI_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   renderHeader: undefined,
   renderUsage: undefined,
   renderValidationErrors: undefined,
-  plugins: undefined
+  plugins: undefined,
+  fallbackToEntry: false
 }
