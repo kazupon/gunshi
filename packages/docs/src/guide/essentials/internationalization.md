@@ -215,8 +215,8 @@ const command = defineI18n({
 
     // Always use resolveKey for custom keys
     const greetingKey = formal
-      ? resolveKey('formal_greeting', ctx.name)
-      : resolveKey('informal_greeting', ctx.name)
+      ? resolveKey('formal_greeting', ctx)
+      : resolveKey('informal_greeting', ctx)
 
     const greeting = t(greetingKey)
     console.log(`${greeting}, ${name}!`)
@@ -283,9 +283,9 @@ const command = defineI18n({
     const { app, environment } = ctx.values
 
     // Use resolveKey for all custom keys
-    const deployingKey = resolveKey('deploying', ctx.name)
-    const successKey = resolveKey('success', ctx.name)
-    const errorKey = resolveKey('error', ctx.name)
+    const deployingKey = resolveKey('deploying', ctx)
+    const successKey = resolveKey('success', ctx)
+    const errorKey = resolveKey('error', ctx)
 
     console.log(t(deployingKey, { app, environment }))
 
@@ -339,8 +339,8 @@ const createCommand = defineI18n({
     const { name } = ctx.values
 
     // For custom keys in subcommands, always use resolveKey helper
-    const creatingKey = resolveKey('creating', ctx.name)
-    const successKey = resolveKey('success', ctx.name)
+    const creatingKey = resolveKey('creating', ctx)
+    const successKey = resolveKey('success', ctx)
 
     console.log(t(creatingKey, { name }))
     console.log(t(successKey))
@@ -358,7 +358,7 @@ const mainCommand = defineI18n({
     const t = ctx.extensions[i18nId].translate
 
     // Use resolveKey for main command's custom keys too
-    const hintKey = resolveKey('usage_hint', ctx.name)
+    const hintKey = resolveKey('usage_hint', ctx)
     console.log(t(hintKey))
   }
 })
@@ -400,7 +400,7 @@ const command = defineI18n({
   }),
   run: ctx => {
     // TypeScript knows about available translation keys
-    const welcomeKey = resolveKey('welcome', ctx.name)
+    const welcomeKey = resolveKey('welcome', ctx)
     console.log(ctx.extensions['g:i18n'].translate(welcomeKey))
   }
 })
@@ -418,7 +418,7 @@ const existingCommand = {
   run: ctx => {
     const t = ctx.extensions[i18nId]?.translate
     if (t) {
-      const messageKey = resolveKey('message', ctx.name)
+      const messageKey = resolveKey('message', ctx)
       console.log(t(messageKey))
     }
   }
@@ -439,11 +439,11 @@ The `resolveKey` helper ensures proper namespace handling for custom translation
 import { resolveKey } from '@gunshi/plugin-i18n'
 
 // For a command named 'build'
-const key = resolveKey('starting', 'build')
+const key = resolveKey('starting', ctx)
 // Returns: 'build:starting'
 
 // In subcommands, it creates proper namespacing
-const subKey = resolveKey('message', 'create')
+const subKey = resolveKey('message', ctx)
 // Returns: 'create:message'
 ```
 
@@ -655,9 +655,9 @@ const command = defineI18n({
     }
 
     // Always use resolveKey for custom keys
-    const processingKey = resolveKey('processing', ctx.name)
-    const successKey = resolveKey('success', ctx.name)
-    const errorKey = resolveKey('error', ctx.name)
+    const processingKey = resolveKey('processing', ctx)
+    const successKey = resolveKey('success', ctx)
+    const errorKey = resolveKey('error', ctx)
 
     console.log(t(processingKey, { action, target: target || 'default' }))
 
@@ -730,7 +730,7 @@ Japanese (with proper locale):
 const message = t('welcome')
 
 // ✅ Correct - Always use resolveKey for custom keys
-const welcomeKey = resolveKey('welcome', ctx.name)
+const welcomeKey = resolveKey('welcome', ctx)
 const message = t(welcomeKey)
 ```
 
