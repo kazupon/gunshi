@@ -79,7 +79,7 @@ await cli(process.argv.slice(2), greetCommand, {
 - Default: `'en-US'`
 - Description: The locale to use for translations. Can be a BCP 47 language tag string or an `Intl.Locale` object.
 
-### `resources`
+### `builtinResources`
 
 - Type: `Record<string, Record<BuiltinResourceKeys, string>>`
 - Default: `{}`
@@ -120,7 +120,7 @@ await cli(args, command, {
     globals(), // Adds --help and --version options
     i18n({
       locale: 'ja-JP',
-      resources: {
+      builtinResources: {
         'ja-JP': jsJPResource // Set from with providing gunshi built-in resources
       }
     })
