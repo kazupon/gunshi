@@ -110,7 +110,7 @@ HELLO, ALICE!
 
 ## Built-in Help
 
-Gunshi automatically generates help information for your commands. Run:
+Gunshi automatically generates help information for your commands through its built-in plugin system. Run:
 
 ```sh
 node index.js --help
@@ -122,6 +122,8 @@ You'll see a help message that includes:
 - Available options
 - Option descriptions
 
+This functionality is provided by Gunshi's built-in plugins (`@gunshi/plugin-global` and `@gunshi/plugin-renderer`), which are automatically included when you use the standard `cli()` function. These plugins also provide `--version` support and formatted output for your CLI.
+
 ## Next Steps
 
 Now that you've created your first Gunshi CLI application, you can explore more advanced features:
@@ -132,3 +134,12 @@ Now that you've created your first Gunshi CLI application, you can explore more 
 - [Auto Usage Generation](./auto-usage-generation.md) - Customize help messages
 - [Lazy & Async Command Loading](./lazy-async.md) - Improve performance with lazy loading
 - [Internationalization](./internationalization.md) - Add multi-language support
+
+### Enhance Your CLI with Official Plugins
+
+Gunshi provides several official plugins to enhance your CLI applications:
+
+- [Plugin Ecosystem](./plugin-ecosystem.md) - Discover available plugins and how to use them
+- **Shell Completion** - Add tab completion support with `@gunshi/plugin-completion`
+- **Internationalization** - Comprehensive i18n support with `@gunshi/plugin-i18n`
+- **Context Extensions** - Learn how plugins extend your command functionality
