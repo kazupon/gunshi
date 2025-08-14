@@ -301,211 +301,24 @@ node index.js
 ✅ Completed in 1007ms
 ```
 
-## Complete Example: Database Plugin
+## Summary
 
-Here's a more realistic plugin that provides database functionality:
+You've now learned the basics of Gunshi plugin development:
 
-```ts
-import { plugin } from 'gunshi/plugin'
-import { Database } from './database' // Your database library
+- Creating minimal plugins with setup functions
+- Adding global options available to all commands
+- Building plugins with extensions to provide functionality
+- Decorating renderers for custom output
+- Wrapping command execution with decorators
 
-// Define what the plugin provides
-interface DatabaseExtension {
-  db: Database
-  query: <T>(sql: string, params?: any[]) => Promise<T[]>
-  transaction: <T>(fn: () => Promise<T>) => Promise<T>
-}
-
-// Export the plugin ID for type-safe access
-export const pluginId = 'db' as const
-
-// Create the plugin
-export default function databasePlugin(config?: { connectionString?: string }) {
-  return plugin<{}, typeof pluginId, [], DatabaseExtension>({
-    id: pluginId,
-    name: 'Database Plugin',
-
-    // Add database-related global options
-    setup: ctx => {
-      ctx.addGlobalOption('dbUrl', {
-        type: 'string',
-        description: 'Database connection string',
-        default: config?.connectionString
-      })
-    },
-
-    // Provide database functionality
-    extension: (ctx, cmd) => {
-      const connectionString = ctx.values.dbUrl || 'sqlite::memory:'
-      const db = new Database(connectionString)
-
-      return {
-        db,
-        query: async (sql, params) => {
-          console.log(`[DB] Executing: ${sql}`)
-          return db.query(sql, params)
-        },
-        transaction: async fn => {
-          return db.transaction(fn)
-        }
-      }
-    },
-
-    // Cleanup when extension is created
-    onExtension: async (ctx, cmd) => {
-      // This runs after the extension is created
-      console.log('Database connected')
-
-      // You could register cleanup handlers here
-      process.on('exit', () => {
-        ctx.extensions[pluginId].db.close()
-      })
-    }
-  })
-}
-
-// Use the database plugin
-const command = {
-  name: 'migrate',
-  run: async ctx => {
-    const { db, query, transaction } = ctx.extensions.db
-
-    await transaction(async () => {
-      await query('CREATE TABLE IF NOT EXISTS users (id INT, name TEXT)')
-      await query('INSERT INTO users VALUES (?, ?)', [1, 'Alice'])
-    })
-
-    const users = await query('SELECT * FROM users')
-    console.log('Users:', users)
-  }
-}
-
-await cli(args, command, {
-  plugins: [
-    databasePlugin({
-      connectionString: 'postgresql://localhost/myapp'
-    })
-  ]
-})
-```
-
-## Testing Your Plugin
-
-### Running Your Plugin
-
-Create a simple test CLI to verify your plugin works:
-
-```ts
-// test-plugin.ts
-import { cli } from 'gunshi'
-import myPlugin from './my-plugin'
-
-const testCommand = {
-  name: 'test',
-  run: ctx => {
-    console.log('Command context:', ctx)
-    // Test your plugin's functionality here
-  }
-}
-
-await cli(process.argv.slice(2), testCommand, {
-  plugins: [myPlugin()]
-})
-```
-
-Run it:
-
-```bash
-node test-plugin.js test --help
-```
-
-### Debugging Techniques
-
-1. **Log in Setup Phase**:
-
-```ts
-setup: ctx => {
-  console.log('Plugin loaded:', ctx)
-  console.log('Available commands:', ctx.subCommands)
-}
-```
-
-2. **Log in Extension Creation**:
-
-```ts
-extension: (ctx, cmd) => {
-  console.log('Creating extension for:', cmd.name)
-  console.log('Context values:', ctx.values)
-  return {
-    /* extension */
-  }
-}
-```
-
-3. **Use Debug Mode**:
-
-```ts
-setup: ctx => {
-  const debug = process.env.DEBUG === 'true'
-  if (debug) {
-    console.log('Plugin context:', ctx)
-  }
-}
-```
-
-## TypeScript Support
-
-For the best development experience, use TypeScript with proper type exports:
-
-```ts
-// my-plugin.ts
-import { plugin } from 'gunshi/plugin'
-
-// Export your extension interface
-export interface MyExtension {
-  doSomething: () => void
-}
-
-// Export your plugin ID as a const
-export const pluginId = 'my-plugin' as const
-export type PluginId = typeof pluginId
-
-// Export a factory function
-export default function myPlugin(options?: { verbose?: boolean }) {
-  return plugin<{}, PluginId, [], MyExtension>({
-    id: pluginId,
-    name: 'My Plugin',
-    extension: () => ({
-      doSomething: () => {
-        if (options?.verbose) {
-          console.log('Doing something verbosely')
-        }
-      }
-    })
-  })
-}
-```
-
-Commands can then use your plugin with full type safety:
-
-```ts
-import { define } from 'gunshi'
-import type { MyExtension } from './my-plugin'
-
-const command = define<MyExtension>({
-  name: 'example',
-  run: ctx => {
-    // TypeScript knows about your extension!
-    ctx.extensions.doSomething()
-  }
-})
-```
+These fundamentals provide a solid foundation for building more complex plugins.
 
 ## Next Steps
 
 Now that you've created your first plugin:
 
 1. Learn about the [Plugin Lifecycle](./lifecycle.md) to understand when plugins execute
-2. Explore [Plugin Dependencies](./dependencies.md) for building complex plugin systems
-3. Review [Best Practices](./best-practices.md) for production-ready plugins
-4. Check out [Official Plugins](./official-plugins.md) for inspiration and examples
+2. Explore [Advanced Plugin Development](./advanced.md) for complex patterns and real-world examples
+3. Understand [Plugin Dependencies](./dependencies.md) for building plugin ecosystems
+4. Review [Best Practices](./best-practices.md) for production-ready plugins
+5. Check out [Official Plugins](./official-plugins.md) for inspiration and examples
