@@ -228,7 +228,7 @@ When two plugins need to share functionality, extract that functionality into a 
 
 **Problem: Circular dependency between two plugins**
 
-```ts
+```js
 // ❌ Circular dependency - This will fail!
 const pluginA = plugin({
   id: 'plugin-a',
@@ -256,7 +256,7 @@ const pluginB = plugin({
 
 **Solution: Extract shared functionality into a common plugin**
 
-```ts
+```js
 // ✅ Create a common base plugin with shared functionality
 const sharedPlugin = plugin({
   id: 'shared',

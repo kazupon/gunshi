@@ -240,11 +240,15 @@ const myPlugin = plugin({
   onExtension: async (ctx, cmd) => {
     // This runs during step J
     // ctx: full context with extensions available
+    // Access own extension using the plugin's id
     await ctx.extensions.db.connect()
     console.log('Database connected for command:', cmd.name)
   }
 })
 ```
+
+> [!IMPORTANT]
+> Within the `onExtension` callback, you can access your own plugin's extension through `ctx.extensions` using the plugin ID you defined. This allows you to call methods or access properties that your extension provides.
 
 ### Step K: Execute Command
 
