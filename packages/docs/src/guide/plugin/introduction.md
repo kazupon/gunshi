@@ -115,7 +115,7 @@ The `gunshi/plugin` entry point provides essential plugin functionality:
 // Using the entry point for simple plugins
 import { plugin } from 'gunshi/plugin'
 
-const simplePlugin = plugin({
+export default plugin({
   id: 'simple',
   setup: ctx => {
     // Simple plugin logic
@@ -157,7 +157,7 @@ You can create custom plugins tailored to your specific needs:
 
 ```ts
 // Domain-specific plugin for your application
-const apiPlugin = plugin({
+export default plugin({
   id: 'api',
   extension: () => ({
     client: new ApiClient(),
@@ -250,7 +250,7 @@ The following is an example of code for installing the official `@gunshi/plugin-
 ```js
 import { cli } from 'gunshi'
 import i18n from '@gunshi/plugin-i18n'
-import custom from './plugins/custom'
+import custom from './plugins/custom.js'
 
 const entry = ctx => {}
 
