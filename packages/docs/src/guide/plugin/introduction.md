@@ -202,7 +202,7 @@ You can decorate the renderers such as header, usage/help and validation errors:
 
 ```js
 setup: ctx => {
-  ctx.decorateUsageRenderer((baseRenderer, ctx) => {
+  ctx.decorateUsageRenderer(async (baseRenderer, ctx) => {
     const base = await baseRenderer(ctx)
     return `${base}\n\nEnhanced by plugin`
   })

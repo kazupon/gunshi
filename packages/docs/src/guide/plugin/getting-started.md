@@ -27,7 +27,7 @@ import hello from './plugin.js'
 
 const entry = () => {}
 
-await cli(process.argv.slide(2), entry, {
+await cli(process.argv.slice(2), entry, {
   plugins: [hello]
 })
 ```
