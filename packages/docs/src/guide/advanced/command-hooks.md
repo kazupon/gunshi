@@ -28,9 +28,9 @@ graph TD
     N --> P([End])
     O --> P
 
-    style G fill:#468c56,color:#000000
-    style L fill:#468c56,color:#000000
-    style K fill:#468c56,color:#000000
+    style G fill:#468c56,color:white
+    style L fill:#468c56,color:white
+    style K fill:#468c56,color:white
 ```
 
 ## Available Hooks
@@ -369,11 +369,11 @@ graph TD
 
     G --> J[Throw Error]
 
-    style A fill:#468c56,color:#000000
-    style F fill:#468c56,color:#000000
-    style G fill:#468c56,color:#000000
-    style C fill:#7EA6E0,color:#000000
-    style D fill:#7EA6E0,color:#000000
+    style A fill:#468c56,color:white
+    style F fill:#468c56,color:white
+    style G fill:#468c56,color:white
+    style C fill:#7EA6E0,color:white
+    style D fill:#7EA6E0,color:white
 ```
 
 ### Detailed Execution Sequence

@@ -26,15 +26,15 @@ graph TB
         end
     end
 
-    style CH fill:#468c56,color:#000000
-    style CU fill:#468c56,color:#000000
-    style CE fill:#468c56,color:#000000
-    style CLH fill:#468c56,color:#000000
-    style CLU fill:#468c56,color:#000000
-    style CLE fill:#468c56,color:#000000
-    style PH fill:#468c56,color:#000000
-    style PU fill:#468c56,color:#000000
-    style PE fill:#468c56,color:#000000
+    style CH fill:#468c56,color:white
+    style CU fill:#468c56,color:white
+    style CE fill:#468c56,color:white
+    style CLH fill:#468c56,color:white
+    style CLU fill:#468c56,color:white
+    style CLE fill:#468c56,color:white
+    style PH fill:#468c56,color:white
+    style PU fill:#468c56,color:white
+    style PE fill:#468c56,color:white
 ```
 
 The diagram above shows that:
@@ -62,10 +62,10 @@ graph TD
     UsePlugin --> Output
     Default --> Output
 
-    style UseCommand fill:#468c56,color:#000000
-    style UseCLI fill:#468c56,color:#000000
-    style UsePlugin fill:#468c56,color:#000000
-    style Default fill:#468c56,color:#000000
+    style UseCommand fill:#468c56,color:white
+    style UseCLI fill:#468c56,color:white
+    style UsePlugin fill:#468c56,color:white
+    style Default fill:#468c56,color:white
 ```
 
 ## How It Works
