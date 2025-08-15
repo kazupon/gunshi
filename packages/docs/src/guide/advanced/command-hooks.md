@@ -63,15 +63,15 @@ await cli(
     version: '1.0.0',
 
     // Define lifecycle hooks
-    onBeforeCommand: async ctx => {
+    onBeforeCommand: ctx => {
       console.log(`About to run: ${ctx.name}`)
     },
 
-    onAfterCommand: async (ctx, result) => {
+    onAfterCommand: (ctx, result) => {
       console.log(`Command ${ctx.name} completed successfully`)
     },
 
-    onErrorCommand: async (ctx, error) => {
+    onErrorCommand: (ctx, error) => {
       console.error(`Command ${ctx.name} failed:`, error)
     }
   }
