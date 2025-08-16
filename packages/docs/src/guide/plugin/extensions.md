@@ -53,52 +53,57 @@ During command execution, extensions go through three distinct phases:
 2. **Post-Extension Hook (Step J)**: The `onExtension` callback is executed after all extensions are created
 3. **Command Execution (Step K)**: The actual command runs with all extensions available
 
+The following diagram illustrates the relationship between `extension` and `onExtension`:
+
 ```mermaid
-graph TB
-    A[Parse & Validate] --> B[Create Extensions]
-    C[Run onExtension]
-    D[Execute Command]
+graph TD
+    subgraph "Step I: Extension Creation"
+        I1[Plugin A extension]
+        I2[Plugin B extension]
+        I3[Plugin C extension]
+    end
 
-    B --> B1[Plugin A extension]
-    B --> B2[Plugin B extension]
-    B --> B3[Plugin C extension]
+    subgraph "Context Building"
+        CTX[ctx.extensions.A = extensionA<br/>ctx.extensions.B = extensionB<br/>ctx.extensions.C = extensionC]
+    end
 
-    B1 --> C
-    B2 --> C
-    B3 --> C
+    subgraph "Step J: onExtension Callbacks"
+        J1[Plugin A onExtension]
+        J2[Plugin B onExtension]
+        J3[Plugin C onExtension]
+    end
 
-    C --> C1[Plugin A onExtension]
-    C --> C2[Plugin B onExtension]
-    C --> C3[Plugin C onExtension]
+    I1 --> CTX
+    I2 --> CTX
+    I3 --> CTX
+    CTX --> J1
+    CTX --> J2
+    CTX --> J3
 
-    C1 --> D
-    C2 --> D
-    C3 --> D
-
-    style B fill:#468c56,color:white
-    style C fill:#468c56,color:white
-    style B1 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
-    style B2 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
-    style B3 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
-    style C1 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
-    style C2 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
-    style C3 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
+    style I1 fill:#468c56,color:white
+    style I2 fill:#468c56,color:white
+    style I3 fill:#468c56,color:white
+    style J1 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style J2 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style J3 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
 ```
 
 ### Execution Order Guarantees
 
 Gunshi guarantees the following execution order:
 
-1. All `extension` factories are called in dependency order
-2. All extensions are attached to `ctx.extensions` before any `onExtension` runs
-3. All `onExtension` callbacks run in dependency order
-4. The command executes only after all `onExtension` callbacks complete
+1. **All extensions are created first** (Step I) - All `extension` factories are called in dependency order
+2. **Extensions are attached to context** - All extensions are attached to `ctx.extensions` before any `onExtension` runs
+3. **All `onExtension` callbacks run** (Step J) - Callbacks execute in dependency order with full context available
+4. **Command execution** (Step K) - The command executes only after all `onExtension` callbacks complete
 
 This ensures that:
 
 - Extensions can safely access other extensions in `onExtension`
+- Dependencies are respected in both creation and callback order
 - Initialization happens in the correct order
 - Commands have a fully initialized context
+- When `onExtension` runs, all plugin extensions (including dependencies) are available through `ctx.extensions`
 
 ## Creating Extensions
 

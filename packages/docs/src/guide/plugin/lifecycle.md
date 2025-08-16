@@ -34,61 +34,21 @@ The lifecycle consists of 12 steps (A through L), where plugins are primarily in
 - **Steps I-J**: Plugin extension creation and activation
 - **Step K**: Command execution with plugin decorators applied
 
-## Plugin Interaction Points
+## Plugin-Specific Lifecycle Steps
 
-Plugins interact with gunshi at two distinct phases during the CLI lifecycle:
+Plugins are primarily involved in specific steps of the CLI lifecycle. This section focuses on the steps where plugins actively participate.
 
-### Setup Phase
+### Setup Phase (Steps B-D)
 
-**Steps B-D in the lifecycle:**
+During the setup phase, plugins are loaded, dependencies are resolved, and plugin setup functions are executed. This phase occurs once at CLI initialization.
 
-- Occurs during plugin initialization
+**What happens in this phase:**
+
 - Plugins configure the CLI by adding options, commands, and decorators
 - All modifications are registered but not yet executed
-- This is when the `setup()` function runs
+- The `setup()` function runs for each plugin
 
-### Execution Phase
-
-**Steps I-K in the lifecycle:**
-
-- Occurs when a command is actually being executed
-- Extensions are created and applied to CommandContext
-- Decorators are executed to modify behavior
-- This is when `extension()` and `onExtension()` run
-
-## How Setup Connects to Execution
-
-The following diagram shows how setup configurations connect to execution behaviors:
-
-```mermaid
-graph LR
-    subgraph "Setup Phase"
-        S1[addGlobalOption<br/>Register global options]
-        S2[addCommand<br/>Register commands]
-        S3[decorateHeaderRenderer<br/>Customize header]
-        S4[decorateUsageRenderer<br/>Customize usage]
-        S5[decorateValidationErrorsRenderer<br/>Customize errors]
-        S6[decorateCommand<br/>Wrap execution]
-    end
-
-    subgraph "Execution Phase"
-        E1[extension factory<br/>Create context extension]
-        E2[onExtension callback<br/>Post-extension hook]
-        E3[Decorated renderers<br/>Custom rendering]
-        E4[Decorated command<br/>Wrapped execution]
-    end
-
-    S1 --> E3
-    S2 --> E4
-    S3 --> E3
-    S4 --> E3
-    S5 --> E3
-    S6 --> E4
-```
-
-## Detailed Phase Breakdown
-
-### Step B: Load Plugins
+#### Step B: Load Plugins
 
 Plugins are collected from CLI options and prepared for initialization.
 
@@ -104,7 +64,7 @@ await cli(args, command, {
 })
 ```
 
-### Step C: Resolve Dependencies
+#### Step C: Resolve Dependencies
 
 Gunshi uses **topological sorting** to resolve plugin dependencies.
 
@@ -136,7 +96,7 @@ const pluginD = plugin({
 > [!TIP]
 > For a comprehensive guide on plugin dependency resolution, including circular dependency detection, optional dependencies, see [Plugin Dependencies](./dependencies.md).
 
-### Step D: Execute Plugin Setup
+#### Step D: Execute Plugin Setup
 
 The `setup` function of each plugin is called in dependency order.
 
@@ -172,34 +132,29 @@ const myPlugin = plugin({
 })
 ```
 
-### Steps E-H: Argument Processing and Context Creation
+### Command Processing (Steps E-H)
 
-These steps handle the core CLI processing between plugin setup and command execution:
+Between the setup phase and execution phase, Gunshi processes the command-line arguments and prepares the execution context:
 
-**Step E: Parse Arguments**
+- **Step E**: Parse command-line arguments into structured tokens
+- **Step F**: Resolve which command to execute
+- **Step G**: Validate arguments against the command's schema
+- **Step H**: Create the CommandContext object
 
-- Converts raw command-line arguments into structured tokens
-- Example: `['build', '--verbose']` becomes parsed tokens with types and positions
+> [!NOTE]
+> These internal processing steps are handled automatically by Gunshi. Plugin developers don't need to interact with these steps directly.
 
-**Step F: Resolve Command**
+### Execution Phase (Steps I-K)
 
-- Determines which command to execute based on parsed arguments
-- Matches the first positional argument against registered commands
-- Example: `'build'` resolves to the build command definition
+During the execution phase, plugin extensions are created, initialized, and the command is executed with all decorators applied.
 
-**Step G: Resolve & Validate Args**
+**What happens in this phase:**
 
-- Validates all arguments against the command's argument schema
-- Checks required arguments, types, and constraints
-- Example: Validates that `--verbose` is a valid boolean flag
+- Extensions are created and attached to CommandContext
+- The `onExtension()` callback runs after all extensions are ready
+- Command executes with decorators applied in LIFO order
 
-**Step H: Create CommandContext**
-
-- Builds the complete context object with all parsed data
-- Includes resolved values, environment settings, and plugin extensions
-- This context will be passed to the command's run function
-
-### Step I: Apply Extensions
+#### Step I: Apply Extensions
 
 Plugin extensions are created and attached to the command context.
 
@@ -223,7 +178,7 @@ const myPlugin = plugin({
 })
 ```
 
-### Step J: Execute onExtension
+#### Step J: Execute onExtension
 
 After all extensions are created, `onExtension` callbacks are invoked.
 
@@ -250,7 +205,7 @@ const myPlugin = plugin({
 > [!IMPORTANT]
 > Within the `onExtension` callback, you can access your own plugin's extension through `ctx.extensions` using the plugin ID you defined. This allows you to call methods or access properties that your extension provides.
 
-### Step K: Execute Command
+#### Step K: Execute Command
 
 The actual command runs with all command decorators applied in LIFO order.
 
@@ -269,6 +224,18 @@ const command = {
   }
 }
 ```
+
+## Extension Lifecycle in Detail
+
+Understanding the relationship between `extension` and `onExtension` is crucial for effective plugin development. During Steps I and J:
+
+- **Step I**: All plugin `extension` factories are called to create extensions
+- **Step J**: All `onExtension` callbacks run with the complete context available
+
+This two-phase approach ensures that when `onExtension` runs, all plugin extensions (including dependencies) are available through `ctx.extensions`.
+
+> [!TIP]
+> For a detailed visual representation of the extension lifecycle and execution order guarantees, see [Extension Lifecycle](./extensions.md#extension-lifecycle) in the Plugin Extensions guide.
 
 ## Lifecycle with Command Hooks
 
