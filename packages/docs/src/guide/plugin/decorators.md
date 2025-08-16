@@ -11,9 +11,28 @@ In Gunshi, decorators create a wrapping structure around the original functional
 
 ## Command Decorators
 
-Command decorators wrap command execution for cross-cutting concerns like logging, authentication, and error handling.
+Command decorators wrap command execution for cross-cutting concerns like logging, authentication, and error handling. Unlike renderer decorators that only affect output formatting, command decorators can control the entire execution flow, including validation, authentication, logging, and error handling.
 
-### How Command Decorators Are Applied
+### How Command Decorators Work
+
+Command decorators use the `decorateCommand()` method provided by the `PluginContext`. Each decorator receives a runner function (the next decorator or original command) and returns a new function that wraps it:
+
+```js
+ctx.decorateCommand(runner => async ctx => {
+  // Pre-execution logic
+  console.log('Before command')
+
+  // Call the next decorator or original command
+  const result = await runner(ctx)
+
+  // Post-execution logic
+  console.log('After command')
+
+  return result
+})
+```
+
+### Command Decorator Execution Order
 
 Gunshi applies command decorators using the `reduceRight` method, which processes the decorator array from the last element to the first. This approach creates a nested wrapper structure where the first registered decorator becomes the outermost layer.
 
@@ -32,7 +51,7 @@ graph LR
     style D fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
 ```
 
-### Command Decorator Example
+### Basic Command Decorator Example
 
 The following example demonstrates the execution order when using `reduceRight`:
 
@@ -99,11 +118,84 @@ Decorator B: after     # Middle completes
 Decorator A: after     # Outermost completes last
 ```
 
+### Advanced Command Decorator Example
+
+Here's a complete example demonstrating how multiple command decorators work together for different purposes:
+
+```js [plugin.js]
+import { plugin } from 'gunshi/plugin'
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export default plugin({
+  id: 'multi-decorator',
+  setup(ctx) {
+    // First decorator: Logging
+    ctx.decorateCommand(runner => async ctx => {
+      console.log('[LOG] Command started:', ctx.name)
+      const result = await runner(ctx)
+      console.log('[LOG] Command completed')
+      return result
+    })
+
+    // Second decorator: Timing
+    ctx.decorateCommand(runner => async ctx => {
+      const start = Date.now()
+      await sleep(10)
+      const result = await runner(ctx)
+      console.log(`[TIME] Execution: ${Date.now() - start}ms`)
+      return result
+    })
+
+    // Third decorator: Error wrapper
+    ctx.decorateCommand(runner => async ctx => {
+      try {
+        console.log('[ERROR] Monitoring enabled')
+        return await runner(ctx)
+      } catch (error) {
+        console.error('[ERROR] Command failed:', error.message)
+        throw error
+      }
+    })
+  }
+})
+```
+
+```js [index.js]
+import { cli } from 'gunshi'
+import multi from './plugin.js'
+
+const command = {
+  name: 'process',
+  run: ctx => {
+    console.log('>>> Executing actual command <<<')
+    return 'Command result'
+  }
+}
+
+await cli(process.argv.slice(2), command, {
+  plugins: [multi]
+})
+```
+
+Running `node index.js` outputs:
+
+```sh
+[LOG] Command started: process
+[ERROR] Monitoring enabled
+>>> Executing actual command <<<
+[TIME] Execution: 11ms
+[LOG] Command completed
+```
+
+> [!NOTE]
+> The `@gunshi/plugin-global` plugin uses a command decorator to intercept `--help` and `--version` options, preventing normal command execution and triggering rendering instead.
+
 ## Renderer Decorators
 
 Gunshi provides a powerful API for customizing how your CLI displays information through renderer decorators. These decorators allow you to wrap and enhance the rendering of headers, usage/help messages, and validation errors, enabling consistent styling, branding, and enhanced user experience across your CLI application.
 
-### How Renderer Decorators Are Applied
+### How Renderer Decorators Work
 
 Gunshi applies renderer decorators using a standard `for` loop that iterates through the decorator array from first to last. Each iteration wraps the previous renderer function, building a chain of decorators.
 
@@ -357,120 +449,7 @@ const final = await customBDecorator(afterCustomA, ctx) // Adds "Styled by Plugi
 > [!NOTE]
 > Renderer decorators have the lowest priority in Gunshi's rendering system. Command-level and CLI-level renderers will override plugin decorators. See [Rendering Customization](../advanced/rendering-customization.md) for details on renderer priority.
 
-## Command Decorators
-
-Command decorators wrap the actual command execution logic, allowing plugins to intercept, modify, or enhance command behavior. Unlike renderer decorators that only affect output formatting, command decorators can control the entire execution flow, including validation, authentication, logging, and error handling.
-
-### Understanding Command Decorators
-
-Command decorators use the `decorateCommand()` method provided by the `PluginContext`. Each decorator receives a runner function (the next decorator or original command) and returns a new function that wraps it:
-
-```js
-ctx.decorateCommand(runner => async ctx => {
-  // Pre-execution logic
-  console.log('Before command')
-
-  // Call the next decorator or original command
-  const result = await runner(ctx)
-
-  // Post-execution logic
-  console.log('After command')
-
-  return result
-})
-```
-
-### Command Decorator Execution Order
-
-Command decorators are processed using `reduceRight`, which processes the decorator array from last to first. This creates a nested wrapper structure:
-
-```mermaid
-graph LR
-    A[User Input] --> B[Decorator A<br/>First in array - Outermost wrapper]
-    B --> C[Decorator B<br/>Second in array]
-    C --> D[Decorator C<br/>Last in array - Innermost wrapper]
-    D --> E[Original Command]
-    E --> F[Result]
-
-    style B fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
-    style C fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
-    style D fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
-    style E fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
-```
-
-The `reduceRight` method processes decorators from the end of the array to the beginning, making the first registered decorator the outermost wrapper.
-
-### Basic Command Decorator Example
-
-Here's a complete example demonstrating how multiple command decorators work together:
-
-```js [plugin.js]
-import { plugin } from 'gunshi/plugin'
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-export default plugin({
-  id: 'multi-decorator',
-  setup(ctx) {
-    // First decorator: Logging
-    ctx.decorateCommand(runner => async ctx => {
-      console.log('[LOG] Command started:', ctx.name)
-      const result = await runner(ctx)
-      console.log('[LOG] Command completed')
-      return result
-    })
-
-    // Second decorator: Timing
-    ctx.decorateCommand(runner => async ctx => {
-      const start = Date.now()
-      await sleep(10)
-      const result = await runner(ctx)
-      console.log(`[TIME] Execution: ${Date.now() - start}ms`)
-      return result
-    })
-
-    // Third decorator: Error wrapper
-    ctx.decorateCommand(runner => async ctx => {
-      try {
-        console.log('[ERROR] Monitoring enabled')
-        return await runner(ctx)
-      } catch (error) {
-        console.error('[ERROR] Command failed:', error.message)
-        throw error
-      }
-    })
-  }
-})
-```
-
-```js [index.js]
-import { cli } from 'gunshi'
-import multi from './plugin.js'
-
-const command = {
-  name: 'process',
-  run: ctx => {
-    console.log('>>> Executing actual command <<<')
-    return 'Command result'
-  }
-}
-
-await cli(process.argv.slice(2), command, {
-  plugins: [multi]
-})
-```
-
-Running `node index.js` outputs:
-
-```sh
-[LOG] Command started: process
-[ERROR] Monitoring enabled
->>> Executing actual command <<<
-[TIME] Execution: 11ms
-[LOG] Command completed
-```
-
-### Command Decorator vs Renderer Decorator
+## Command vs Renderer Decorators
 
 Understanding the difference between these two decorator types is crucial:
 
@@ -481,9 +460,6 @@ Understanding the difference between these two decorator types is crucial:
 | **Can modify** | Command behavior, flow control     | Output formatting only                  |
 | **Can access** | Full CommandContext                | CommandContext + render-specific params |
 | **Use cases**  | Auth, logging, validation, caching | Styling, i18n, branding                 |
-
-> [!NOTE]
-> The `@gunshi/plugin-global` plugin uses a command decorator to intercept `--help` and `--version` options, preventing normal command execution and triggering rendering instead.
 
 ## Next Steps
 
