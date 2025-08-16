@@ -1,17 +1,30 @@
 # Plugin Decorators
 
-Decorators are a powerful pattern in Gunshi's plugin system that allows you to wrap and enhance existing functionality. This guide explains how to effectively use decorators in your plugins.
+Decorators are a powerful mechanism in Gunshi's plugin system that allows you to wrap and enhance existing functionality. This guide explains how to effectively use decorators in your plugins.
 
-## Understanding the Decorator Pattern
+## Understanding Decorator Mechanism
 
-In Gunshi, decorators follow the **LIFO (Last In, First Out)** execution order. This means the last decorator registered is the first to execute, creating a wrapping effect around the original functionality.
+In Gunshi, decorators create a wrapping structure around the original functionality. Gunshi implements two types of decorators with different processing methods:
+
+- **Command Decorators**: Processed using `reduceRight`, creating a nested wrapper structure
+- **Renderer Decorators**: Processed using a `for` loop, building a chain of transformations
+
+## Command Decorators
+
+Command decorators wrap command execution for cross-cutting concerns like logging, authentication, and error handling.
+
+### How Command Decorators Are Applied
+
+Gunshi applies command decorators using the `reduceRight` method, which processes the decorator array from the last element to the first. This approach creates a nested wrapper structure where the first registered decorator becomes the outermost layer.
+
+The following diagram illustrates the wrapper structure:
 
 ```mermaid
 graph LR
-    A[User Input] --> B[Decorator C]
-    B --> C[Decorator B]
-    C --> D[Decorator A]
-    D --> E[Original Function]
+    A[User Input] --> B[Decorator A<br/>First registered - Outermost wrapper]
+    B --> C[Decorator B<br/>Second registered]
+    C --> D[Decorator C<br/>Last registered - Innermost wrapper]
+    D --> E[Original Command]
     E --> F[Result]
 
     style B fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
@@ -19,14 +32,9 @@ graph LR
     style D fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
 ```
 
-Gunshi supports two types of decorators:
+### Command Decorator Example
 
-- **Command Decorators**: Wrap command execution for cross-cutting concerns like logging, authentication, and error handling
-- **Renderer Decorators**: Customize output rendering for headers, usage/help messages, and validation errors
-
-## LIFO Execution Order
-
-Understanding LIFO order is crucial for proper decorator composition. The following code demonstrates the execution flow shown in the diagram above using command decorators, where decorators A, B, and C are registered in sequence but execute in reverse order:
+The following example demonstrates the execution order when using `reduceRight`:
 
 ```js [plugin.js]
 import { plugin } from 'gunshi/plugin'
@@ -78,26 +86,32 @@ await cli(
 )
 ```
 
-Run your application with plugin:
+When executed, `reduceRight` creates a wrapper structure where Decorator A wraps B, B wraps C, and C wraps the original command:
 
 ```sh
 node index.js
-Decorator A: before
-Decorator B: before
-Decorator C: before
+Decorator A: before    # Outermost wrapper executes first
+Decorator B: before    # Middle wrapper
+Decorator C: before    # Innermost wrapper
 Original command execution
-Decorator C: after
-Decorator B: after
-Decorator A: after
+Decorator C: after     # Innermost completes first
+Decorator B: after     # Middle completes
+Decorator A: after     # Outermost completes last
 ```
 
 ## Renderer Decorators
 
 Gunshi provides a powerful API for customizing how your CLI displays information through renderer decorators. These decorators allow you to wrap and enhance the rendering of headers, usage/help messages, and validation errors, enabling consistent styling, branding, and enhanced user experience across your CLI application.
 
-### Understanding Renderer Decorators
+### How Renderer Decorators Are Applied
 
-Renderer decorators follow the same LIFO principle as command decorators but specifically target the presentation layer of your CLI. Gunshi provides three renderer decorator methods via `PluginContext`:
+Gunshi applies renderer decorators using a standard `for` loop that iterates through the decorator array from first to last. Each iteration wraps the previous renderer function, building a chain of decorators.
+
+This approach means that each decorator in the array wraps the accumulated result of all previous decorators, with each decorator receiving the previous renderer as its `baseRenderer` parameter.
+
+### Available Renderer Decorator Methods
+
+Gunshi provides three renderer decorator methods via `PluginContext`:
 
 - **`decorateHeaderRenderer`**: Customizes command headers (title/branding)
 - **`decorateUsageRenderer`**: Enhances usage and help message display
@@ -180,11 +194,11 @@ Generated: 2025-08-15T14:26:43.121Z
 
 ### Multiple Plugin Decorator Execution Order
 
-When multiple plugins register renderer decorators, they follow the LIFO (Last In, First Out) principle. This is particularly important to understand because Gunshi uses two built-in plugins by default: `@gunshi/plugin-global` (adds --help and --version options) and `@gunshi/plugin-renderer` (provides default rendering). When you add your own plugins, they interact with these default plugins in a specific order.
+When multiple plugins register renderer decorators, the order matters. Gunshi uses two built-in plugins by default: `@gunshi/plugin-global` (adds --help and --version options) and `@gunshi/plugin-renderer` (provides default rendering). When you add your own plugins, they interact with these default plugins in a specific order based on how the `for` loop processes the decorators.
 
-#### Plugin Registration and Execution Order
+#### Plugin Registration and Decorator Chain Building
 
-The following diagram shows how plugins are registered versus how their decorators are executed:
+The following diagram shows how plugins are registered and how the `for` loop builds the decorator chain:
 
 ```mermaid
 graph TD
@@ -196,11 +210,11 @@ graph TD
         R1 --> R2 --> R3 --> R4
     end
 
-    subgraph "Renderer Decorator Order"
-        E1[custom-plugin-B decorator]
-        E2[custom-plugin-A decorator]
-        E3[plugin-renderer decorator]
-        E4[Base Renderer]
+    subgraph "Renderer Decorator Chain (for loop builds)"
+        E1[Base Renderer<br/>empty string]
+        E2[plugin-renderer wraps base]
+        E3[custom-A wraps plugin-renderer]
+        E4[custom-B wraps custom-A]
         E1 --> E2 --> E3 --> E4
     end
 
@@ -208,10 +222,10 @@ graph TD
     style R2 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
     style R3 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
     style R4 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
-    style E1 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
-    style E2 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
-    style E3 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
-    style E4 fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
+    style E1 fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
+    style E2 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
+    style E3 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
+    style E4 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
 ```
 
 #### How Default and Custom Plugins Interact
@@ -282,21 +296,27 @@ When you run `node index.js --help`, two different types of decorators work toge
 - Intercepts the `--help` option
 - Calls the renderer functions to generate output
 
-**2. Renderer Decorators (LIFO wrapping, depth-first execution):**
+**2. Renderer Decorators (chain built by for loop):**
 
-- **Wrapping order (LIFO):** custom-plugin-B wraps custom-plugin-A wraps plugin-renderer wraps base
-- **Execution flow:**
-  1. custom-plugin-B decorator starts → calls `baseRenderer` first
-  2. custom-plugin-A decorator starts → calls `baseRenderer` first
-  3. plugin-renderer decorator executes → returns full usage
-  4. custom-plugin-A continues → logs and adds "📦 Enhanced by Plugin A"
-  5. custom-plugin-B continues → logs and adds "🎨 Styled by Plugin B"
+The `for` loop builds a chain where:
 
-The console output would show:
+- custom-plugin-B wraps custom-plugin-A
+- custom-plugin-A wraps plugin-renderer
+- plugin-renderer wraps the base renderer (empty string)
+
+**Execution flow when each decorator calls `baseRenderer` first:**
+
+1. custom-plugin-B decorator starts → calls `baseRenderer`
+2. custom-plugin-A decorator starts → calls `baseRenderer`
+3. plugin-renderer decorator executes → returns full usage
+4. custom-plugin-A continues → logs and adds "📦 Enhanced by Plugin A"
+5. custom-plugin-B continues → logs and adds "🎨 Styled by Plugin B"
+
+The console output in this example:
 
 ```sh
-[custom-a] Decorating usage    // Logs after calling its baseRenderer
-[custom-b] Decorating usage    // Logs after calling its baseRenderer
+[custom-a] Decorating usage    // Logs after its baseRenderer returns
+[custom-b] Decorating usage    // Logs after its baseRenderer returns
 ```
 
 And the final rendered output:
@@ -319,7 +339,7 @@ The renderer decorator chain works differently than you might expect:
 ```js
 // Actual execution flow for renderer decorators
 const base = await baseRenderer(ctx) // Returns ""
-const afterRenderer = await rendererDecorator(base, ctx) // Ignores base, returns full usage
+const afterRenderer = await rendererDecorator(base, ctx) // Doesn't call base, returns full usage
 const afterCustomA = await customADecorator(afterRenderer, ctx) // Adds "Enhanced by Plugin A"
 const final = await customBDecorator(afterCustomA, ctx) // Adds "Styled by Plugin B"
 ```
@@ -362,13 +382,13 @@ ctx.decorateCommand(runner => async ctx => {
 
 ### Command Decorator Execution Order
 
-Command decorators follow a specific execution pattern. When multiple decorators are registered, `reduceRight` processes them from last to first, but this creates a wrapper structure where the first registered decorator becomes the outermost layer:
+Command decorators are processed using `reduceRight`, which processes the decorator array from last to first. This creates a nested wrapper structure:
 
 ```mermaid
 graph LR
-    A[User Input] --> B[Plugin A Decorator<br/>First registered - Outermost]
-    B --> C[Plugin B Decorator<br/>Second registered]
-    C --> D[Plugin C Decorator<br/>Last registered - Innermost]
+    A[User Input] --> B[Decorator A<br/>First in array - Outermost wrapper]
+    B --> C[Decorator B<br/>Second in array]
+    C --> D[Decorator C<br/>Last in array - Innermost wrapper]
     D --> E[Original Command]
     E --> F[Result]
 
@@ -377,6 +397,8 @@ graph LR
     style D fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
     style E fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
 ```
+
+The `reduceRight` method processes decorators from the end of the array to the beginning, making the first registered decorator the outermost wrapper.
 
 ### Basic Command Decorator Example
 
