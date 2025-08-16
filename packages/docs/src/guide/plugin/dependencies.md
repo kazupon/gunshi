@@ -11,6 +11,16 @@ Plugin dependencies allow you to:
 - Build composable plugin ecosystems
 - Handle optional features gracefully
 
+## Why Declare Dependencies?
+
+Declaring dependencies explicitly provides several benefits:
+
+1. **Load Order Guarantee**: Ensures your plugin's dependencies are initialized before your plugin runs
+2. **Runtime Safety**: Prevents runtime errors from missing required functionality
+3. **Clear Documentation**: Makes plugin relationships explicit and discoverable
+4. **Type Safety**: Enables TypeScript to validate extension availability at compile time (see [Type-Safe Dependencies](./types.md#type-safe-dependencies))
+5. **Error Prevention**: Gunshi can detect missing dependencies and provide helpful error messages
+
 ## Dependency Resolution Process
 
 Gunshi uses **topological sorting** to resolve plugin dependencies, ensuring that:
@@ -60,16 +70,6 @@ Note that Cache and API could load in either order relative to each other since 
 ## Declaring Dependencies
 
 Plugin dependencies are declared in the plugin configuration using the `dependencies` property. This property accepts an array of dependency specifications that tell Gunshi which other plugins must be loaded before your plugin can function correctly.
-
-### Why Declare Dependencies?
-
-Declaring dependencies explicitly provides several benefits:
-
-1. **Load Order Guarantee**: Ensures your plugin's dependencies are initialized before your plugin runs
-2. **Runtime Safety**: Prevents runtime errors from missing required functionality
-3. **Clear Documentation**: Makes plugin relationships explicit and discoverable
-4. **Type Safety**: Enables TypeScript to validate extension availability at compile time (see [Type-Safe Dependencies](./types.md#type-safe-dependencies))
-5. **Error Prevention**: Gunshi can detect missing dependencies and provide helpful error messages
 
 ### Dependency Declaration Syntax
 
@@ -158,7 +158,7 @@ Circular dependencies create logical paradoxes in the loading order:
 - Plugin B requires Plugin A to be loaded first
 - Neither can be loaded before the other
 
-This situation makes it impossible to determine a valid initialization sequence.
+This situation makes it impossible to determine a valid initialization sequence and indicates architectural issues such as tight coupling and reduced reusability.
 
 ### Detection and Prevention
 
@@ -180,8 +180,6 @@ const pluginB = plugin({
 
 // Error: Circular dependency detected: A → B → A
 ```
-
-### Complex Circular Dependencies
 
 Circular dependencies can also occur in longer chains:
 
@@ -208,23 +206,11 @@ const pluginZ = plugin({
 // Error: Circular dependency detected: X → Y → Z → X
 ```
 
-### Why Circular Dependencies are problematic
-
-Circular dependencies indicate several architectural issues:
-
-1. **Tight Coupling**: Plugins are too interdependent, making them hard to maintain and test
-2. **Initialization Deadlock**: No valid initialization order exists
-3. **Reduced Reusability**: Plugins cannot be used independently
-4. **Complex Mental Model**: Understanding the system becomes difficult
-5. **Testing Challenges**: Cannot test plugins in isolation
-
-### Avoiding Circular Dependencies
+### Resolving Circular Dependencies
 
 The most practical and recommended approach to resolve circular dependencies is to extract common functionality into a separate plugin. This creates a clean architecture where both plugins can depend on the shared functionality without depending on each other.
 
-#### Extract Common Functionality (Recommended)
-
-When two plugins need to share functionality, extract that functionality into a base plugin that both can depend on. This transforms a circular dependency into a hierarchical one.
+When two plugins need to share functionality, extract that functionality into a base plugin that both can depend on:
 
 **Problem: Circular dependency between two plugins**
 
@@ -313,15 +299,6 @@ This approach offers several benefits:
 3. **Reusability**: The shared plugin can be used by other plugins
 4. **Testability**: Each plugin can be tested independently
 5. **Maintainability**: Changes to shared logic are centralized
-
-#### Alternative Approaches
-
-While extracting common functionality is the recommended approach, there are other patterns that might be suitable in specific situations:
-
-- **Dependency Inversion**: Define interfaces and use a coordinator plugin to manage interactions between plugins
-- **Lazy Resolution**: Avoid declaring dependencies and resolve them dynamically at runtime (note: this sacrifices type safety)
-
-Choose the approach that best fits your architecture and requirements, but in most cases, extracting common functionality provides the cleanest and most maintainable solution.
 
 ## Complete Dependency Resolution Example
 
