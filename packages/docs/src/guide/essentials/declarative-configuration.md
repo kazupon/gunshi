@@ -164,6 +164,7 @@ Each option can have the following properties:
 - `multiple`: Set to `true` if the multiple option values are be allowed
 - `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
+- `conflicts`: Specify mutually exclusive options that cannot be used together
 
 #### Positional Arguments
 
@@ -345,9 +346,269 @@ Without `negatable: true`, only the positive form (e.g., `--verbose`) is recogni
 
 The description for the negatable option (e.g., `--no-verbose`) is automatically generated (e.g., "Negatable of --verbose"). You can customize this message using [internationalization resource files](../essentials/internationalization.md) by providing a translation for the specific `arg:no-<optionName>` key (e.g., `arg:no-verbose`).
 
+#### Conflicting Options
+
+You can define mutually exclusive options using the `conflicts` property. This ensures that conflicting options cannot be used together:
+
+```js
+const command = {
+  name: 'server',
+  description: 'Server configuration',
+  args: {
+    // These options are mutually exclusive
+    verbose: {
+      type: 'boolean',
+      short: 'v',
+      description: 'Enable verbose output',
+      conflicts: 'quiet' // Cannot be used with --quiet
+    },
+    quiet: {
+      type: 'boolean',
+      short: 'q',
+      description: 'Suppress all output',
+      conflicts: 'verbose' // Cannot be used with --verbose
+    },
+
+    // Multiple conflicts
+    development: {
+      type: 'boolean',
+      description: 'Development mode',
+      conflicts: ['production', 'staging'] // Cannot be used with either
+    },
+    production: {
+      type: 'boolean',
+      description: 'Production mode',
+      conflicts: ['development', 'staging']
+    },
+    staging: {
+      type: 'boolean',
+      description: 'Staging mode',
+      conflicts: ['development', 'production']
+    }
+  },
+  run: ctx => {
+    // Only one of the conflicting options can be true
+    if (ctx.values.verbose) {
+      console.log('Verbose mode enabled')
+    } else if (ctx.values.quiet) {
+      // Minimal output
+    }
+  }
+}
+```
+
+When conflicting options are used together, Gunshi will throw an error:
+
+- Bidirectional conflict detection works with both long and short option forms
+- Clear error messages indicate which options are conflicting
+- Helps prevent invalid command configurations
+
 ### Examples
 
-The `examples` property provides example commands showing how to use the CLI.
+The `examples` property provides example commands showing how to use the CLI. This helps users understand how to use your command correctly and is displayed in the help output.
+
+#### Basic Examples
+
+You can provide examples as a simple string:
+
+```js
+const command = {
+  name: 'copy',
+  description: 'Copy files',
+  args: {
+    source: {
+      type: 'positional',
+      description: 'Source file'
+    },
+    destination: {
+      type: 'positional',
+      description: 'Destination file'
+    },
+    recursive: {
+      type: 'boolean',
+      short: 'r',
+      description: 'Copy recursively'
+    }
+  },
+  examples: 'copy file1.txt file2.txt',
+  run: ctx => {
+    // Implementation
+  }
+}
+```
+
+#### Multiple Examples
+
+For multiple examples, use a multi-line string with clear formatting:
+
+```js
+const command = {
+  name: 'deploy',
+  description: 'Deploy application',
+  args: {
+    environment: {
+      type: 'string',
+      short: 'e',
+      required: true,
+      description: 'Target environment'
+    },
+    tag: {
+      type: 'string',
+      short: 't',
+      description: 'Version tag'
+    },
+    dryRun: {
+      type: 'boolean',
+      description: 'Perform a dry run'
+    }
+  },
+  examples: `
+# Deploy to production with a specific tag
+deploy --environment production --tag v1.2.3
+
+# Deploy to staging with dry run
+deploy -e staging --dry-run
+
+# Deploy to development (using short option)
+deploy -e development
+
+# Deploy with multiple options
+deploy --environment production --tag latest --dry-run
+  `.trim(),
+  run: ctx => {
+    // Implementation
+  }
+}
+```
+
+#### Dynamic Examples
+
+You can also provide examples as a function that returns a string. This is useful when examples need to be generated dynamically or localized:
+
+```js
+const command = {
+  name: 'serve',
+  description: 'Start development server',
+  args: {
+    port: {
+      type: 'number',
+      short: 'p',
+      default: 3000,
+      description: 'Port number'
+    },
+    host: {
+      type: 'string',
+      short: 'h',
+      default: 'localhost',
+      description: 'Host address'
+    }
+  },
+  examples: ctx => {
+    // Generate examples dynamically based on context
+    const appName = ctx.name || 'serve'
+    return `
+# Start server with default settings
+${appName}
+
+# Start server on custom port
+${appName} --port 8080
+
+# Start server on all interfaces
+${appName} --host 0.0.0.0 --port 3000
+
+# Using short options
+${appName} -h 192.168.1.100 -p 8080
+    `.trim()
+  },
+  run: ctx => {
+    console.log(`Server starting on ${ctx.values.host}:${ctx.values.port}`)
+  }
+}
+```
+
+#### Formatted Examples with Descriptions
+
+For better readability, you can include descriptions with your examples:
+
+```js
+const command = {
+  name: 'git-flow',
+  description: 'Git flow commands',
+  args: {
+    feature: {
+      type: 'string',
+      description: 'Feature name'
+    },
+    hotfix: {
+      type: 'string',
+      description: 'Hotfix name'
+    },
+    release: {
+      type: 'string',
+      description: 'Release version'
+    }
+  },
+  examples: `
+Examples:
+  # Start a new feature
+  $ git-flow --feature user-authentication
+  
+  # Create a hotfix for production
+  $ git-flow --hotfix critical-bug-fix
+  
+  # Prepare a new release
+  $ git-flow --release 2.0.0
+  
+Notes:
+  - Feature branches are created from develop
+  - Hotfixes are created from master
+  - Releases merge into both master and develop
+  `.trim(),
+  run: ctx => {
+    // Implementation
+  }
+}
+```
+
+#### Async Examples
+
+When using the function form, you can also return a Promise for async example generation:
+
+```js
+const command = {
+  name: 'config',
+  description: 'Manage configuration',
+  args: {
+    set: {
+      type: 'string',
+      description: 'Set configuration value'
+    },
+    get: {
+      type: 'string',
+      description: 'Get configuration value'
+    }
+  },
+  examples: async ctx => {
+    // Could load examples from external source
+    const examples = await loadExamplesFromFile('config-examples.txt')
+    return (
+      examples ||
+      `
+# Set a configuration value
+config --set "api.key=abc123"
+
+# Get a configuration value  
+config --get "api.key"
+    `.trim()
+    )
+  },
+  run: ctx => {
+    // Implementation
+  }
+}
+```
+
+The examples are displayed when users run the command with `--help` flag, making it easier for them to understand the correct usage patterns.
 
 ### Command Execution
 
@@ -355,6 +616,7 @@ The `run` function receives a command context object (`ctx`) with:
 
 - `args`: The command arguments configuration (`ArgSchema` object).
 - `values`: An object containing the resolved values for both named options (e.g., `ctx.values.name`) and positional arguments (accessed via their _key_ from the `args` definition, e.g., `ctx.values.file`). Positional values are stored as strings.
+- `explicit`: An object that tracks which arguments were explicitly provided by the user. Each property corresponds to an argument name and is `true` if the user explicitly provided it, `false` otherwise. This is useful for distinguishing between default values and user-provided values.
 - `positionals`: An array of strings containing the raw values of the arguments identified as positional, in the order they were parsed. Useful if you need the original order, but `ctx.values.<key>` is generally recommended.
 - `rest`: An array of strings containing arguments that appear after the `--` separator.
 - `argv`: The raw argument array passed to the `cli` function.
@@ -365,6 +627,46 @@ The `run` function receives a command context object (`ctx`) with:
 - `name`: The name of the _currently executing_ command.
 - `description`: The description of the _currently executing_ command.
 - `env`: The command environment settings (version, logger, renderers, etc.).
+
+#### Tracking Explicitly Provided Arguments
+
+The `explicit` property allows you to determine whether an argument was explicitly provided by the user or if it's using a default value:
+
+```js
+const command = {
+  name: 'deploy',
+  args: {
+    environment: {
+      type: 'string',
+      default: 'development'
+    },
+    force: {
+      type: 'boolean',
+      default: false
+    }
+  },
+  run: ctx => {
+    // Check if the user explicitly provided the environment
+    if (ctx.explicit.environment) {
+      console.log(`User specified environment: ${ctx.values.environment}`)
+    } else {
+      console.log(`Using default environment: ${ctx.values.environment}`)
+    }
+
+    // Useful for conditional logic based on user intent
+    if (ctx.explicit.force && ctx.values.force) {
+      console.log('User explicitly requested force mode')
+    }
+  }
+}
+```
+
+This feature is particularly useful for:
+
+- Distinguishing between default values and user-provided values
+- Implementing different behavior based on whether a user explicitly set an option
+- Validation logic that needs to know if a value was user-provided
+- Warning users when they're using default values for critical options
 
 ## CLI Configuration
 
