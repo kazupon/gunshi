@@ -35,6 +35,7 @@ await cli(process.argv.slice(2), entry, {
 Run your application with plugin:
 
 ```sh
+# Run the entry with plugin
 node index.js
 
 Hello from plugin!
@@ -94,6 +95,7 @@ await cli(process.argv.slice(2), command, {
 Run your application with plugin:
 
 ```sh
+# Run command with debug option
 node ./index.js --debug
 
 Debug mode enabled
@@ -102,204 +104,146 @@ Context: ...
 Building ...
 ```
 
-## Plugin with Extension
+## Adding Sub-Commands
 
-Extensions allow plugins to provide functionality that commands can use:
+Plugins can register sub-commands that become available to the CLI:
 
-```ts [logger.js]
+```js [plugin.js]
 import { plugin } from 'gunshi/plugin'
 
-// Create a logger plugin
 export default plugin({
-  id: 'logger',
-  name: 'Logger Plugin',
+  id: 'tools',
+  name: 'Developer Tools Plugin',
 
-  // The extension factory returns the functionality
-  extension: (ctx, cmd) => {
-    const prefix = `[${cmd.name || 'CLI'}]`
-
-    return {
-      log: message => {
-        console.log(`${prefix} ${message}`)
-      },
-      error: message => {
-        console.error(`${prefix} ERROR: ${message}`)
-      },
-      debug: message => {
-        if (ctx.values.debug) {
-          console.log(`${prefix} DEBUG: ${message}`)
+  setup: ctx => {
+    // Add a new sub-command
+    ctx.addCommand('clean', {
+      name: 'clean',
+      description: 'Clean build artifacts',
+      args: {
+        cache: {
+          type: 'boolean',
+          description: 'Also clear cache',
+          default: false
         }
+      },
+      run: ctx => {
+        console.log('Cleaning build artifacts...')
+        if (ctx.values.cache) {
+          console.log('Clearing cache...')
+        }
+        console.log('Clean complete!')
       }
-    }
+    })
+
+    // Add another sub-command
+    ctx.addCommand('lint', {
+      name: 'lint',
+      description: 'Run linter',
+      run: ctx => {
+        console.log('Running linter...')
+        console.log('No issues found!')
+      }
+    })
   }
 })
 ```
 
-Use the extension in your command:
+Now your CLI has additional commands:
 
-```ts [index.js]
+```js [index.js]
 import { cli } from 'gunshi'
-import debug from './debug.js' // prepare previous your plugin
-import logger from './logger.js'
+import tools from './plugin.js'
 
+// Main command
 const command = {
-  name: 'deploy',
-  run: ctx => {
-    ctx.extensions.logger.log('Starting deployment')
-    ctx.extensions.logger.debug('Checking environment')
-
-    try {
-      // Deployment logic
-      ctx.extensions.logger.log('Deployment successful')
-    } catch (error) {
-      ctx.extensions.logger.error('Deployment failed')
-    }
-  }
+  name: 'build',
+  run: ctx => console.log('Building project...')
 }
 
 await cli(process.argv.slice(2), command, {
-  // install plugins
-  plugins: [debug, logger]
+  plugins: [tools]
 })
 ```
 
-Run your application with plugin:
+Run your application with the new sub-commands:
 
 ```sh
+# Run main command
 node index.js
-[deploy] Starting deployment
-[deploy] Deployment successful
+Building project...
 
-node index.js --debug
-[deploy] Starting deployment
-[deploy] DEBUG: Checking environment
-[deploy] Deployment successful
+# Run plugin's sub-command
+node index.js clean
+Cleaning build artifacts...
+Clean complete!
+
+# With arguments
+node index.js clean --cache
+Cleaning build artifacts...
+Clearing cache...
+Clean complete!
+
+# Run another sub-command
+node index.js lint
+Running linter...
+No issues found!
 ```
 
-## Decorating Renderers
+## Advanced Plugin Features
 
-Plugins can enhance how usage and help text is rendered:
+Beyond basic setup and global options, plugins can provide much more powerful functionality:
 
-```js [plugin.js]
-import { plugin } from 'gunshi/plugin'
+### Extensions
 
+Plugins can extend the command context with new functionality that all commands can use.
+
+```js
+// Simple example - adding logging functionality
 export default plugin({
-  id: 'branding',
-  name: 'Branding Plugin',
+  id: 'logger',
+  extension: () => ({
+    log: msg => console.log(msg)
+  })
+})
 
-  setup: ctx => {
-    // Decorate the header renderer
-    ctx.decorateHeaderRenderer(async (baseRenderer, ctx) => {
-      const baseHeader = await baseRenderer(ctx)
-      return `
-╔══════════════════════════════╗
-║     My Awesome CLI v1.0      ║
-╚══════════════════════════════╝
+// Commands can then use: ctx.extensions.logger.log('Hello')
+```
 
-${baseHeader}
-      `.trim()
-    })
+> [!TIP]
+> Extensions are the core feature for sharing functionality between plugins and commands. Learn more in [Plugin Extensions](./extensions.md).
 
-    // Decorate the usage renderer
-    ctx.decorateUsageRenderer(async (baseRenderer, ctx) => {
-      const baseUsage = await baseRenderer(ctx)
-      return `${baseUsage}
+### Decorators
 
-📚 Documentation: https://example.com/docs
-🐛 Report bugs: https://example.com/issues`
-    })
-  }
+Plugins can decorate (wrap) existing functionality to enhance behavior:
+
+```js
+// Customize how help text is displayed
+ctx.decorateUsageRenderer(async (baseRenderer, ctx) => {
+  const baseUsage = await baseRenderer(ctx)
+  return `${baseUsage}\n\n📚 Documentation: https://example.com/docs`
 })
 ```
 
-```js [index.js]
-import { cli } from 'gunshi'
-import branding from './plugin.js'
+> [!TIP]
+> Decorators allow you to wrap commands, renderers, and more. Learn about all decorator types in [Plugin Decorators](./decorators.md).
 
-await cli(process.argv.slice(2), () => {}, {
-  plugins: [branding]
-})
-```
+### Dependencies
 
-Run your application with plugin:
+Plugins can declare dependencies on other plugins:
 
-```sh
-node index.js --help
-╔══════════════════════════════╗
-║     My Awesome CLI v1.0      ║
-╚══════════════════════════════╝
-
-USAGE:
-  COMMAND <OPTIONS>
-
-OPTIONS:
-  -h, --help             Display this help message
-  -v, --version          Display this version
-
-
-📚 Documentation: https://example.com/docs
-🐛 Report bugs: https://example.com/issues
-```
-
-## Command Decorators
-
-Decorate command execution to add pre/post processing:
-
-```js [plugin.js]
-import { plugin } from 'gunshi/plugin'
-
+```js
 export default plugin({
-  id: 'timing',
-  name: 'Timing Plugin',
-
+  id: 'auth',
+  dependencies: ['logger'], // Requires logger plugin
   setup: ctx => {
-    ctx.decorateCommand(baseRunner => async ctx => {
-      const start = Date.now()
-
-      console.log(`⏱️ Starting ${ctx.name}...`)
-
-      try {
-        const result = await baseRunner(ctx)
-        const duration = Date.now() - start
-        console.log(`✅ Completed in ${duration}ms`)
-        return result
-      } catch (error) {
-        const duration = Date.now() - start
-        console.log(`❌ Failed after ${duration}ms`)
-        throw error
-      }
-    })
+    // Logger plugin is guaranteed to be loaded
   }
 })
 ```
 
-```js [index.js]
-import { cli } from 'gunshi'
-import timing from './plugin.js'
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-await cli(
-  process.argv.slice(2),
-  {
-    name: 'entry',
-    run: async () => {
-      await sleep(1000)
-    }
-  },
-  {
-    plugins: [timing]
-  }
-)
-```
-
-Run your application with plugin:
-
-```sh
-node index.js
-⏱️ Starting entry...
-✅ Completed in 1007ms
-```
+> [!TIP]
+> Dependencies ensure plugins load in the correct order. Learn more in [Plugin Dependencies](./dependencies.md).
 
 ## Summary
 
@@ -307,18 +251,17 @@ You've now learned the basics of Gunshi plugin development:
 
 - Creating minimal plugins with setup functions
 - Adding global options available to all commands
-- Building plugins with extensions to provide functionality
-- Decorating renderers for custom output
-- Wrapping command execution with decorators
+- Registering sub-commands through plugins
+- Understanding advanced features (extensions, decorators, dependencies)
 
 These fundamentals provide a solid foundation for building more complex plugins.
 
 ## Next Steps
 
-Now that you've created your first plugin:
+Now that you've created your first plugin, continue with:
 
-1. Learn about the [Plugin Lifecycle](./lifecycle.md) to understand when plugins execute
-2. Explore [Advanced Plugin Development](./advanced.md) for complex patterns and real-world examples
-3. Understand [Plugin Dependencies](./dependencies.md) for building plugin ecosystems
-4. Review [Best Practices](./best-practices.md) for production-ready plugins
-5. Check out [Official Plugins](./official-plugins.md) for inspiration and examples
+1. [Plugin Lifecycle](./lifecycle.md) - Understand when and how plugins execute
+2. [Plugin Dependencies](./dependencies.md) - Build plugin ecosystems
+3. [Plugin Decorators](./decorators.md) - Wrap and enhance functionality
+4. [Plugin Extensions](./extensions.md) - Share functionality between plugins and commands
+5. [Official Plugins](./official-plugins.md) - Real-world examples and inspiration
