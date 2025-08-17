@@ -265,5 +265,5 @@ await cli(args, entry, {
 - [Plugin Lifecycle](./lifecycle.md) - Understand how plugins integrate with CLI execution
 - [Advanced Development](./advanced.md) - Master complex plugin patterns
 - [Dependencies](./dependencies.md) - Learn about plugin dependency management
-- [Best Practices](./best-practices.md) - Follow proven patterns for plugin development
+- [Guidelines](./guidelines.md) - Follow proven patterns for plugin development
 - [Official Plugins](./official-plugins.md) - Explore the official plugin ecosystem

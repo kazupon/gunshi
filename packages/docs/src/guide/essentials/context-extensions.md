@@ -387,7 +387,7 @@ if (i18n) {
 }
 ```
 
-## Best Practices
+## Guidelines
 
 ### 1. Always Import Plugin IDs
 

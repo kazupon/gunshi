@@ -512,4 +512,4 @@ my-cli (my-cli v1.0.0)
 - Learn about [Plugin Extensions](./extensions.md) for implementing extension factories
 - Explore [Plugin Dependencies](./dependencies.md) for dependency management
 - Study [Official Plugins](./official-plugins.md) for type implementation examples
-- Review [Best Practices](./best-practices.md) for production-ready plugins
+- Review [Guidelines](./guidelines.md) for production-ready plugins
