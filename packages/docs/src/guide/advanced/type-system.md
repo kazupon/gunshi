@@ -11,11 +11,24 @@ The v0.27 release fundamentally improves type safety through:
 - **Unified Type System (GunshiParams)**: A single, coherent type system for arguments and extensions
 - **Plugin Extension Type Safety**: Full compile-time validation of plugin interactions
 
-## `define` Function Type Parameters
+### Understanding GunshiParams
+
+`GunshiParams` is a utility type that provides complete type safety for both command arguments and plugin extensions:
+
+```ts
+type GunshiParams<{
+  args: Args         // Command arguments definition
+  extensions: Ext    // Plugin extensions
+}>
+```
+
+This unified type system ensures that your command context (`ctx`) has properly typed `values` (from args) and `extensions` (from plugins).
+
+## The `define` Function Type Parameters
 
 The `define` function offers multiple type parameter patterns for maximum flexibility:
 
-### Type-safe with Extension
+### Type-safe Extensions
 
 The most common pattern ensures type safety for plugin extensions:
 
@@ -48,7 +61,7 @@ const deployCommand = define<AuthExtension>({
 })
 ```
 
-### Type-safe for Arguments
+### Type-safe Arguments
 
 For commands without extensions, focus on argument type safety:
 
@@ -78,7 +91,7 @@ const processCommand = define<typeof args>({
 
 ### Type-safe with `GunshiParams`
 
-For complete control over both arguments and extensions:
+When you need to type both arguments and extensions together, use the `GunshiParams` utility type explained above:
 
 ```ts
 import type { GunshiParams } from 'gunshi'
@@ -111,55 +124,91 @@ const serverCommand = define<MyCommandParams>({
 
 The `lazy` function maintains type safety even with deferred loading:
 
-### Type-safe with Extension Type
+### Basic Lazy Loading with Types
 
 ```ts
-type AuthExt = {
-  auth: {
-    authenticated: boolean
-  }
+import { lazy } from 'gunshi'
+import type { CommandRunner } from 'gunshi'
+
+// Define extension interface
+interface AuthExtension {
+  isAuthenticated: () => boolean
+  getUser: () => { id: string; name: string }
 }
 
-const loader = async () => {
-  const runner: CommandRunner<{ args: Args; extensions: AuthExt }> = async ctx => {
-    // ctx.extensions.auth.authenticated is typed as boolean
-    if (!ctx.extensions.auth?.authenticated) {
-      throw new Error('Authentication required')
+// Create lazy-loaded command
+const lazyDeployCommand = lazy<{ auth: AuthExtension }>(
+  async () => {
+    // This function runs only when the command is executed
+    const { deployLogic } = await import('./deploy-logic')
+
+    const runner: CommandRunner = async ctx => {
+      // Type-safe access to extensions
+      if (!ctx.extensions.auth?.isAuthenticated()) {
+        throw new Error('Authentication required')
+      }
+
+      const user = ctx.extensions.auth.getUser()
+      console.log(`Deploying as ${user.name}...`)
+
+      return await deployLogic()
     }
-    return 'deployed'
-  }
-  return runner
-}
 
-const lazyCmd = lazy<AuthExt>(loader, {
-  name: 'lazy-deploy',
-  description: 'Lazy deploy command'
-})
+    return runner
+  },
+  {
+    name: 'deploy',
+    description: 'Deploy application (lazy-loaded)'
+  }
+)
 ```
 
-### Type-Safe Command Loading
-
-The lazy function preserves type information from the loaded command:
+### Lazy Loading with Arguments
 
 ```ts
-interface TestExt {
-  existing: { test: boolean }
-}
+import type { Args, GunshiParams } from 'gunshi'
 
-const loader = async () => {
-  const runner: CommandRunner<{ extensions: { test: TestExt } }> = async ctx => {
-    // Type-safe access to extensions
-    if (ctx.extensions.test?.existing.test) {
-      console.log('Test mode enabled')
-    }
-    return 'done'
+const buildArgs = {
+  target: {
+    type: 'string' as const,
+    required: true,
+    choices: ['development', 'production'] as const
+  },
+  minify: {
+    type: 'boolean' as const,
+    default: false
   }
-  return runner
-}
+} satisfies Args
 
-const lazyCmd = lazy(loader, {
-  name: 'test'
-})
+type BuildParams = GunshiParams<{
+  args: typeof buildArgs
+  extensions: {
+    logger: { log: (msg: string) => void }
+  }
+}>
+
+const lazyBuildCommand = lazy<BuildParams>(
+  async () => {
+    // Heavy build dependencies loaded only when needed
+    const { buildProject } = await import('./build-system')
+
+    return async ctx => {
+      ctx.extensions.logger?.log(`Building for ${ctx.values.target}`)
+
+      await buildProject({
+        target: ctx.values.target,
+        minify: ctx.values.minify
+      })
+
+      return 'Build complete'
+    }
+  },
+  {
+    name: 'build',
+    description: 'Build the project',
+    args: buildArgs
+  }
+)
 ```
 
 ## The `cli` Function Type Parameters
@@ -168,11 +217,13 @@ The `cli` function provides global type safety for your entire CLI:
 
 ### Type-safe with `GunshiParams`
 
+Use `GunshiParams` to type the entire CLI context:
+
 ```ts
 import { cli } from 'gunshi'
 import type { GunshiParams } from 'gunshi'
 
-type GlobalExtensions = GunshiParams<{
+type GlobalParams = GunshiParams<{
   args: Args
   extensions: {
     logger: LoggerExtension
@@ -181,7 +232,7 @@ type GlobalExtensions = GunshiParams<{
   }
 }>
 
-await cli<GlobalExtensions>(
+await cli<GlobalParams>(
   process.argv.slice(2),
   {
     name: 'main',
@@ -204,7 +255,9 @@ await cli<GlobalExtensions>(
 )
 ```
 
-### Type-safe for Extensions
+### Type-safe Extensions Only
+
+When you only need to type extensions without arguments:
 
 ```ts
 type Extensions = {
@@ -217,83 +270,35 @@ await cli<Extensions>(args, mainCommand, {
 })
 ```
 
-## The `plugin` Function Type Parameters
+## Using Plugin Extensions in Commands
 
-The `plugin` function has the most sophisticated type system for managing dependencies:
-
-### Complex Type Signature
+When using plugins in your commands, you can leverage their exported types for full type safety:
 
 ```ts
-plugin<DependencyExtensions, PluginId, Dependencies, Extension>(options)
-```
+import { define } from 'gunshi'
+import { pluginId as apiId, type ApiExtension } from './plugins/api'
+import { pluginId as authId, type AuthExtension } from './plugins/auth'
 
-### Type-safe Plugin with Extension
-
-```ts
-import { plugin } from 'gunshi/plugin'
-
-export const pluginId = 'g:completion' as const
-export type PluginId = typeof pluginId
-
-export interface CompletionExtension {
-  getCompletions: (input: string) => string[]
-  addCompletion: (value: string) => void
-}
-
-export default function completion() {
-  return plugin<{}, PluginId, [], CompletionExtension>({
-    id: pluginId,
-    name: 'Completion Plugin',
-
-    extension: () => {
-      const completions = new Set<string>()
-
-      return {
-        getCompletions: (input: string) => {
-          return Array.from(completions).filter(c => c.startsWith(input))
-        },
-        addCompletion: (value: string) => {
-          completions.add(value)
-        }
-      }
+// Use plugin extensions in command definition
+const deployCommand = define<{
+  [apiId]: ApiExtension
+  [authId]: AuthExtension
+}>({
+  name: 'deploy',
+  run: async ctx => {
+    // Access plugin extensions with full type safety
+    if (!ctx.extensions[authId].isAuthenticated()) {
+      throw new Error('Please login first')
     }
-  })
-}
+
+    const result = await ctx.extensions[apiId].post('/deployments', {
+      environment: 'production'
+    })
+
+    console.log('Deployment successful:', result)
+  }
+})
 ```
 
-### Type-safe Plugin with Dependencies
-
-```ts
-import { pluginId as i18nId, type I18nExtension } from '@gunshi/plugin-i18n'
-
-type DependencyExtensions = {
-  [i18nId]: I18nExtension
-}
-
-const dependencies = [{ id: i18nId, optional: true }] as const
-
-export default function completionWithI18n() {
-  return plugin<DependencyExtensions, PluginId, typeof dependencies, CompletionExtension>({
-    id: pluginId,
-    dependencies,
-
-    extension: (ctx, cmd) => {
-      // Access i18n if available
-      const i18n = ctx.extensions[i18nId]
-
-      return {
-        getCompletions: (input: string) => {
-          const completions = ['deploy', 'build', 'test']
-
-          if (i18n) {
-            // Localize completions if i18n is available
-            return completions.map(c => i18n.translate(c))
-          }
-
-          return completions
-        }
-      }
-    }
-  })
-}
-```
+> [!NOTE]
+> For information on developing type-safe plugins with the `plugin` function, see the [Plugin Type System](../plugin/type-system.md) guide.
