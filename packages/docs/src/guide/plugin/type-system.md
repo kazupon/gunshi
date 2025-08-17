@@ -13,7 +13,7 @@ Gunshi is designed with a **TypeScript-first** philosophy, providing:
 
 This guide focuses on TypeScript's type system for plugin development.
 
-## Plugin Type Basics
+## Basic Type Definitions
 
 Every type-safe plugin starts with two fundamental type definitions:
 
@@ -37,14 +37,18 @@ export interface LoggerExtension {
 **Key principles:**
 
 - **Literal types** (`as const`) enable TypeScript to track specific plugin IDs
+  - Without `as const`, TypeScript widens the type to `string`, losing the specific ID value
+  - Literal types allow TypeScript to infer the exact key when accessing `ctx.extensions['mycompany:logger']`
+  - This enables autocomplete for available extensions and compile-time validation of plugin ID references
 - **Exported types** allow other plugins and commands to reference your plugin
 - **Well-defined interfaces** provide IntelliSense and compile-time validation
 
-## The `plugin` Function Type System
+> [!TIP]
+> Plugin consumers can use these exported interfaces to type their command context's extensions, enabling type-safe access to plugin functionality in their command runners. For detailed usage patterns of type-safe command definitions with plugin extensions, see [Advanced Type System](../advanced/type-system.md).
 
-The `plugin` function uses TypeScript's generics to ensure complete type safety.
+## The `plugin` Function Type Parameters
 
-Here's the function signature showing all four type parameters:
+The `plugin` function uses TypeScript's generics to ensure complete type safety through four type parameters:
 
 ```ts
 plugin<
@@ -55,9 +59,71 @@ plugin<
 >(options)
 ```
 
-### Progressive Examples
+Each parameter serves a specific purpose:
 
-#### 1. Simple Plugin (No Dependencies)
+- **DependencyExtensions**: Types of extensions this plugin depends on
+- **PluginId**: The literal type of this plugin's ID
+- **Dependencies**: The literal type of the dependencies array
+- **Extension**: The type of extension this plugin provides
+
+### Why These Type Parameters Are Necessary
+
+While TypeScript can infer some types automatically, explicitly specifying all four type parameters provides several critical benefits:
+
+1. **Complete Type Safety**: Ensures that dependency access in your extension is fully typed
+2. **Compile-time Validation**: Catches plugin ID mismatches and missing dependencies before runtime
+3. **Better IntelliSense**: Provides accurate autocompletion for `ctx.extensions` access
+4. **Clear API Contracts**: Makes plugin dependencies and provided extensions explicit
+
+### What Happens When Type Parameters Are Omitted
+
+If you omit type parameters, TypeScript falls back to default or inferred types:
+
+```ts
+// Without type parameters - loses type safety
+const plugin1 = plugin({
+  id: 'my-plugin',
+  dependencies: ['other-plugin'],
+  extension: ctx => ({
+    method: () => {
+      // ctx.extensions['other-plugin'] is typed as 'any'
+      const other = ctx.extensions['other-plugin'] // No type checking!
+      return other.someMethod() // No IntelliSense, no error if method doesn't exist
+    }
+  })
+})
+
+// With type parameters - full type safety
+const plugin2 = plugin<
+  { 'other-plugin': OtherExtension },
+  'my-plugin',
+  ['other-plugin'],
+  MyExtension
+>({
+  id: 'my-plugin',
+  dependencies: ['other-plugin'],
+  extension: ctx => ({
+    method: () => {
+      // ctx.extensions['other-plugin'] is typed as OtherExtension
+      const other = ctx.extensions['other-plugin'] // Fully typed!
+      return other.someMethod() // IntelliSense works, compile error if method doesn't exist
+    }
+  })
+})
+```
+
+Without explicit type parameters:
+
+- Dependencies are not type-checked against actual usage
+- Extension access returns `any` type, losing all type safety
+- Plugin IDs are treated as generic strings rather than literal types
+- No compile-time validation of plugin interactions
+
+## Progressive Type Safety Examples
+
+Let's explore these type parameters through increasingly complex examples:
+
+### 1. Simple Plugin (No Dependencies)
 
 This example demonstrates a basic plugin without any dependencies, using only the essential type parameters:
 
@@ -82,49 +148,9 @@ export default function logger() {
 }
 ```
 
-#### 2. Plugin with Dependencies
+### 2. Plugin with Dependencies
 
 This example shows how to declare and use dependencies with proper type definitions:
-
-```ts [api.ts]
-import { plugin } from 'gunshi/plugin'
-import { pluginId as loggerId } from './logger.ts'
-
-import type { ApiExtension } from './types.ts'
-import type { LoggerExtension } from './logger.ts'
-
-// Define what extensions we depend on
-type DependencyExtensions = {
-  [loggerId]: LoggerExtension
-}
-
-// Define dependecies
-const dependencies = [loggerId] as const
-
-export default function api() {
-  return plugin<DependencyExtensions, typeof pluginId, typeof dependencies, ApiExtension>({
-    id: pluginId,
-    dependencies,
-
-    extension: ctx => {
-      const logger = ctx.extensions[loggerId] // Fully typed!
-
-      return {
-        request: async (url: string) => {
-          logger.log(`Requesting: ${url}`)
-          // Implementation...
-        }
-      }
-    }
-  })
-}
-```
-
-#### 3. Full Type Parameters
-
-When using all four type parameters, you get complete type safety.
-
-This comprehensive example demonstrates all type parameters working together:
 
 ```ts [api.ts]
 import { plugin } from 'gunshi/plugin'
@@ -142,10 +168,13 @@ export interface ApiExtension {
   post: <T = unknown>(endpoint: string, data: unknown) => Promise<T>
 }
 
-// Define all type parameters
-type DependencyExtensions = Record<typeof loggerId, LoggerExtension> &
-  Record<typeof authId, AuthExtension>
+// Define dependency types using object notation
+type DependencyExtensions = {
+  [loggerId]: LoggerExtension
+  [authId]: AuthExtension
+}
 
+// Define dependencies array
 const dependencies = [loggerId, authId] as const
 type Dependencies = typeof dependencies
 
@@ -155,8 +184,8 @@ export default function apiPlugin() {
     dependencies,
 
     extension: ctx => {
-      const logger = ctx.extensions[loggerId] // Fully typed
-      const auth = ctx.extensions[authId] // Fully typed
+      const logger = ctx.extensions[loggerId] // Fully typed!
+      const auth = ctx.extensions[authId] // Fully typed!
 
       return {
         get: async endpoint => {
@@ -174,9 +203,7 @@ export default function apiPlugin() {
 }
 ```
 
-## Working with Dependencies
-
-### Required vs Optional Dependencies
+### 3. Plugin with Optional Dependencies
 
 Gunshi supports both required and optional plugin dependencies with full type safety.
 
@@ -209,7 +236,7 @@ export interface MetricsExtension {
   // ...
 }
 
-export default function metricsPlugin() {
+export default function metrics() {
   return plugin<DependencyExtensions, typeof pluginId, typeof dependencies, MetricsExtension>({
     id: pluginId,
     dependencies,
@@ -233,7 +260,7 @@ export default function metricsPlugin() {
 }
 ```
 
-### Dependency Chain Example
+### 4. Dependency Chain
 
 Plugins can depend on other plugins that have their own dependencies.
 
@@ -262,7 +289,7 @@ export interface LoggerExtension {
 const loggerDeps = [baseId] as const
 
 export default plugin<
-  Record<typeof baseId, BaseExtension>,
+  { [baseId]: BaseExtension },
   typeof loggerId,
   typeof loggerDeps,
   LoggerExtension
@@ -298,7 +325,10 @@ export interface ApiExtension {
 const apiDeps = [baseId, loggerId] as const
 
 export default plugin<
-  Record<typeof baseId, BaseExtension> & Record<typeof loggerId, LoggerExtension>,
+  {
+    [baseId]: BaseExtension
+    [loggerId]: LoggerExtension
+  },
   typeof apiId,
   typeof apiDeps,
   ApiExtension
