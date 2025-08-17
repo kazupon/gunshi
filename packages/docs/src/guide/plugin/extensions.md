@@ -36,7 +36,7 @@ Extensions enable:
 - **State Management**: Maintain state across command execution
 
 > [!NOTE]
-> For advanced type safety patterns and type-safe plugin communication, see the [Plugin Types](./types.md) guide.
+> For advanced type safety patterns and type-safe plugin communication, see the [Plugin Type System](./type-system.md) guide.
 
 ## Extension Lifecycle
 
@@ -281,7 +281,7 @@ export default plugin({
 
 ## Next Steps
 
-- Learn about [Plugin Types](./types.md) for advanced type safety
+- Learn about [Plugin Type System](./type-system.md) for advanced type safety
 - Explore [Plugin Testing](./testing.md) strategies
 - Review [Best Practices](./best-practices.md) for extension lifecycle management
 - See [Official Plugins](./official-plugins.md) for real-world extension examples

@@ -18,7 +18,7 @@ Declaring dependencies explicitly provides several benefits:
 1. **Load Order Guarantee**: Ensures your plugin's dependencies are initialized before your plugin runs
 2. **Runtime Safety**: Prevents runtime errors from missing required functionality
 3. **Clear Documentation**: Makes plugin relationships explicit and discoverable
-4. **Type Safety**: Enables TypeScript to validate extension availability at compile time (see [Type-Safe Dependencies](./types.md#type-safe-dependencies))
+4. **Type Safety**: Enables TypeScript to validate extension availability at compile time (see [Type-Safe Dependencies](./type-system.md#working-with-dependencies))
 5. **Error Prevention**: Gunshi can detect missing dependencies and provide helpful error messages
 
 ## Dependency Resolution Process
@@ -466,7 +466,7 @@ This example demonstrates:
 
 ## Next Steps
 
-- Learn about [Type-Safe Dependencies](./types.md#type-safe-dependencies) for compile-time validation
+- Learn about [Type-Safe Dependencies](./type-system.md#working-with-dependencies) for compile-time validation
 - Review [Best Practices](./best-practices.md) for production-ready plugins
 - Explore [Official Plugins](./official-plugins.md) to see dependency patterns in action
 - Understand [Plugin Lifecycle](./lifecycle.md) to see when dependencies are resolved
