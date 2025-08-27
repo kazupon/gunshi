@@ -89,7 +89,7 @@
     "knip": "^5.62.0",
     "lint-staged": "^16.1.2",
     "mitata": "^1.0.34",
-    "pkg-pr-new": "^0.0.54",
+    "pkg-pr-new": "^0.0.58",
     "prettier": "^3.6.2",
     "typescript": "catalog:",
     "typescript-eslint": "^8.38.0",
