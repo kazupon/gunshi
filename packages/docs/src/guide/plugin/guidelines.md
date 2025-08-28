@@ -2,6 +2,12 @@
 
 This guide provides practical guidelines for developing reliable, maintainable, and performant Gunshi plugins. While other sections cover implementation details and APIs, this guide focuses on recommended approaches and techniques for production-ready plugins.
 
+> [!TIP]
+> We recommend developing Gunshi plugins with TypeScript for enhanced type safety, better IDE support, and compile-time error detection. All examples and code snippets in this guide are written in TypeScript. While JavaScript plugins are supported, TypeScript helps prevent runtime errors and provides a superior developer experience through auto-completion and type checking.
+
+> [!NOTE]
+> Some code examples in this guide include TypeScript file extensions (`.ts`) in import/export statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+
 ## Design Principles
 
 When developing Gunshi plugins, follow these core principles:
@@ -165,7 +171,7 @@ export default function api(endpoint: string) {
     extension: () => ({
       fetch: async (path: string) => {
         // Endpoint is already validated
-        return fetch(`${endpoint}${path}`)
+        return await fetch(`${endpoint}${path}`)
       }
     })
   })
@@ -258,8 +264,8 @@ Proper resource cleanup helps prevent memory leaks in long-running CLI tools. Sy
 The following example demonstrates how to implement cleanup mechanisms for managing multiple database connections. The plugin tracks all created connections in an array and provides a cleanup method that closes them all when the process exits:
 
 ```ts
-import type { Connection } from './types'
-import { createConnection } from './database'
+import type { Connection } from './types.ts'
+import { createConnection } from './database.ts'
 
 extension: () => {
   const connections: Connection[] = []
@@ -278,8 +284,8 @@ extension: () => {
   }
 }
 
-// Use in onExtension or command hooks
-onExtension: async ctx => {
+// Use in `onExtension` or command hooks
+onExtension: ctx => {
   process.once('exit', () => ctx.extensions.myPlugin.cleanup())
 }
 ```
@@ -289,9 +295,7 @@ onExtension: async ctx => {
 Your plugin should respond to system signals for graceful shutdown. The following code shows how to register cleanup handlers that disconnect from a database when the process receives termination signals (SIGINT from Ctrl+C or SIGTERM from system shutdown):
 
 ```ts
-import type { ExtensionContext } from 'gunshi'
-
-onExtension: async (ctx: ExtensionContext) => {
+onExtension: ctx => {
   const cleanup = async () => {
     await ctx.extensions.database.disconnect()
     process.exit(0)
@@ -301,8 +305,6 @@ onExtension: async (ctx: ExtensionContext) => {
   process.once('SIGTERM', cleanup)
 }
 ```
-
-Note that signal handling behavior may vary across runtimes. Node.js provides full signal support, while Deno requires specific permissions (`--allow-run`) and Bun's signal handling is still evolving.
 
 ## Performance Considerations
 
@@ -328,7 +330,7 @@ extension: () => {
   }
 
   return {
-    query: async (sql: string): Promise<any> => {
+    query: async (sql: string) => {
       // Lazily initialize connection when query is first called
       const conn = await getConnection()
       return conn.execute(sql)
@@ -379,15 +381,19 @@ Loading heavy dependencies at startup increases CLI initialization time and memo
 These examples demonstrate how to use dynamic imports to defer loading heavy dependencies:
 
 ```ts
+// Bad: Module-level import loads dependency at startup
+import ExcelJS from 'exceljs' // 4MB loaded at startup!
+
 extension: () => ({
-  // Bad: Loads heavy dependency even if never used
   generateReport: async data => {
-    const ExcelJS = require('exceljs') // 4MB loaded at startup!
     const workbook = new ExcelJS.Workbook()
     // Generate report...
-  },
+  }
+  // Other methods that don't use ExcelJS...
+})
 
-  // Good: Dynamic import loads dependency only when needed
+// Good: Dynamic import loads dependency only when needed
+extension: () => ({
   generateReport: async data => {
     // Load 4MB dependency only when report is actually generated
     const { Workbook } = await import('exceljs')
@@ -602,7 +608,7 @@ Start your main plugin file with module-level JSDoc that explains the plugin's p
  *
  * @module
  */
-````
+```
 
 ### Factory Function Documentation
 
@@ -710,20 +716,6 @@ export type CommandResourceFetcher<G extends GunshiParamsConstraint> = (
 
 For more complex generic types, see official plugin implementations.
 
-### Internal Implementation Documentation
-
-Use the `@internal` tag for non-public APIs:
-
-```ts
-/**
- * @internal
- * Converts locale to Intl.Locale object
- */
-function toLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
-  // Implementation details
-}
-```
-
 ### Plugin Dependencies Documentation
 
 Document plugin dependencies clearly:
@@ -745,6 +737,9 @@ In your README, explain:
 
 ### README Template Structure
 
+> [!NOTE]
+> Gunshi plans to provide official tooling for plugin authors to automatically generate README templates in future releases. This tooling will help scaffold standard README files with the correct structure, sections, and formatting. Until then, the following template demonstrates the recommended structure for plugin README files.
+
 A comprehensive README should follow this structure:
 
 ```markdown
@@ -759,10 +754,6 @@ A comprehensive README should follow this structure:
 # npm
 
 npm install --save @yourorg/gunshi-plugin-{name}
-
-# pnpm
-
-pnpm add @yourorg/gunshi-plugin-{name}
 \`\`\`
 
 For other package managers, see [installation guide](./docs/install.md).
@@ -800,7 +791,14 @@ See the [examples directory](./examples) for usage examples.
 
 ### API Documentation Generation
 
-Configure `TypeDoc` for generating API documentation. Create a `typedoc.config.mjs` file:
+Generate API documentation directly from your JSDoc comments to maintain a single source of truth. This approach ensures your documentation stays synchronized with your code, as updates to JSDoc comments automatically reflect in generated documentation.
+
+Various tools can generate documentation from JSDoc comments:
+
+- **[TypeDoc](https://typedoc.org/)** - Recommended for TypeScript projects, generates documentation from TypeScript declarations and JSDoc
+- **[API Extractor](https://api-extractor.com/)** - Microsoft's tool focusing on API review and documentation for TypeScript libraries
+
+The following example demonstrates configuring `TypeDoc`, a popular choice for TypeScript plugin projects. Create a `typedoc.config.mjs` file:
 
 ```js
 // @ts-check
@@ -849,3 +847,6 @@ Add documentation scripts to your `package.json`:
   }
 }
 ```
+
+This configuration extracts documentation from your JSDoc comments and TypeScript types, generating comprehensive API documentation without manual maintenance. The generated documentation includes all exported functions, interfaces, types, and their associated JSDoc descriptions, ensuring consistency between code and documentation.
+````
