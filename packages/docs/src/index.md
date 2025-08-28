@@ -20,33 +20,25 @@ hero:
 features:
   - icon: 📏
     title: Simple & Universal
-    details: Run the commands with simple API and support universal runtime.
+    details: Run commands with simple API and support for universal runtime (Node.js, Deno, Bun).
 
   - icon: ⚙️
-    title: Declarative Configuration
-    details: Configure command modules declaratively for better organization and maintainability.
-
-  - icon: 🛡️
-    title: Type Safe
-    details: TypeScript support with type-safe argument parsing and option resolution.
+    title: Declarative & Type Safe
+    details: Configure commands declaratively with full TypeScript support and type-safe argument parsing.
 
   - icon: 🧩
-    title: Composable
-    details: Create modular sub-commands that can be composed together for complex CLIs.
-
-  - icon: ⏳
-    title: Lazy & Async
-    details: Load command modules lazily and execute them asynchronously for better performance.
-
-  - icon: 📜
-    title: Auto Usage Generation
-    details: Generate helpful usage messages automatically for your commands.
+    title: Composable & Lazy
+    details: Create modular sub-commands with context sharing and lazy loading for better performance.
 
   - icon: 🎨
-    title: Custom Usage Generation
-    details: Customize how usage messages are generated to match your CLI's style.
+    title: Flexible Rendering
+    details: Customize usage generation, validation errors, and help messages with pluggable renderers.
 
   - icon: 🌍
     title: Internationalization
-    details: Support multiple languages with built-in i18n, locale resource lazy loading and i18n library integration.
+    details: Built with global users in mind, featuring locale-aware design, resource management, and multi-language support.
+
+  - icon: 🔌
+    title: Pluggable
+    details: Extensible plugin system with dependency management and lifecycle hooks for modular CLI development.
 ---
