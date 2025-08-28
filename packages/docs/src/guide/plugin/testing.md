@@ -10,35 +10,7 @@ Testing is a crucial part of plugin development to ensure reliability and mainta
 
 ## Table of Contents
 
-- [Your First Plugin Test](#your-first-plugin-test)
-  - [Creating a Minimal Plugin to Test](#creating-a-minimal-plugin-to-test)
-  - [Writing Your First Test](#writing-your-first-test)
-- [Testing Extension Methods](#testing-extension-methods)
-- [Setting Up Test Utilities](#setting-up-test-utilities)
-  - [Why Test Helpers?](#why-test-helpers)
-  - [Creating Test Helpers](#creating-test-helpers)
-- [Testing Plugin Initialization](#testing-plugin-initialization)
-  - [Structure Validation Tests](#structure-validation-tests)
-  - [Dependency Declaration Tests](#dependency-declaration-tests)
-  - [Configuration Validation Tests](#configuration-validation-tests)
-  - [Initialization State Tests](#initialization-state-tests)
-- [Testing Extensions with Mock Context](#testing-extensions-with-mock-context)
-  - [Using createMockCommandContext](#using-createmockcommandcontext)
-  - [Testing Complex Extension Methods](#testing-complex-extension-methods)
-  - [Testing Configuration-Driven Behavior](#testing-configuration-driven-behavior)
-  - [Testing Dependency Runtime Behavior](#testing-dependency-runtime-behavior)
-- [Testing Decorators](#testing-decorators)
-  - [Command Decorator Testing](#command-decorator-testing)
-  - [Testing with Renderers](#testing-with-renderers)
-- [Testing Type-Safe Plugins](#testing-type-safe-plugins)
-  - [Using Type Parameters for Full Type Safety](#using-type-parameters-for-full-type-safety)
-  - [Testing Async Extensions](#testing-async-extensions)
-- [Testing Plugin Lifecycle Callbacks](#testing-plugin-lifecycle-callbacks)
-  - [The setup Function](#the-setup-function)
-  - [The onExtension Callback](#the-onextension-callback)
-- [Integration Testing](#integration-testing)
-  - [Testing Complete Plugin Flow](#testing-complete-plugin-flow)
-  - [Testing with Multiple Plugins](#testing-with-multiple-plugins)
+[[toc]]
 
 ## Your First Plugin Test
 
@@ -187,6 +159,9 @@ describe('extension methods', () => {
 This approach works well for simple tests, but as your plugin grows more complex, you'll find yourself repeatedly creating similar mock contexts.
 
 ## Setting Up Test Utilities
+
+> [!NOTE]
+> Gunshi plans to provide official test utilities for plugin authors in future releases. These utilities will simplify plugin testing by providing pre-built helpers for common testing scenarios. Until then, the following sections demonstrate how to create your own test utilities.
 
 ### Why Test Helpers?
 
