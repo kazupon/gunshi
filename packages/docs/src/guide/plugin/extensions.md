@@ -57,53 +57,50 @@ The following diagram illustrates the relationship between `extension` and `onEx
 
 ```mermaid
 graph TD
-    subgraph "Step I: Extension Creation"
-        I1[Plugin A extension]
-        I2[Plugin B extension]
-        I3[Plugin C extension]
+    subgraph "Plugin Processing (in dependency order)"
+        A1[Plugin A: extension factory] --> A2[Attach to ctx.extensions.A]
+        A2 --> A3[Plugin A: onExtension]
+        A3 --> B1[Plugin B: extension factory]
+        B1 --> B2[Attach to ctx.extensions.B]
+        B2 --> B3[Plugin B: onExtension]
+        B3 --> C1[Plugin C: extension factory]
+        C1 --> C2[Attach to ctx.extensions.C]
+        C2 --> C3[Plugin C: onExtension]
     end
 
-    subgraph "Context Building"
-        CTX[ctx.extensions.A = extensionA<br/>ctx.extensions.B = extensionB<br/>ctx.extensions.C = extensionC]
-    end
+    C3 --> CMD[Command Execution]
 
-    subgraph "Step J: onExtension Callbacks"
-        J1[Plugin A onExtension]
-        J2[Plugin B onExtension]
-        J3[Plugin C onExtension]
-    end
-
-    I1 --> CTX
-    I2 --> CTX
-    I3 --> CTX
-    CTX --> J1
-    CTX --> J2
-    CTX --> J3
-
-    style I1 fill:#468c56,color:white
-    style I2 fill:#468c56,color:white
-    style I3 fill:#468c56,color:white
-    style J1 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
-    style J2 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
-    style J3 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style A1 fill:#468c56,color:white
+    style B1 fill:#468c56,color:white
+    style C1 fill:#468c56,color:white
+    style A3 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style B3 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style C3 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style CMD fill:#3498db,color:white
 ```
 
 ### Execution Order Guarantees
 
-Gunshi guarantees the following execution order:
+Gunshi processes plugins sequentially in dependency order, ensuring dependencies are always resolved before dependents:
 
-1. **All extensions are created first** (Step I) - All `extension` factories are called in dependency order
-2. **Extensions are attached to context** - All extensions are attached to `ctx.extensions` before any `onExtension` runs
-3. **All `onExtension` callbacks run** (Step J) - Callbacks execute in dependency order with full context available
-4. **Command execution** (Step K) - The command executes only after all `onExtension` callbacks complete
+1. **Plugins are sorted by dependencies** - Dependencies are processed before plugins that depend on them
+2. **For each plugin in order**:
+   a. The plugin's `extension` factory is called
+   b. The extension result is immediately attached to `ctx.extensions[pluginId]`
+   c. The plugin's `onExtension` callback runs (if defined) with access to its own extension and all dependency extensions
+3. **Command execution** - The command executes only after all plugins have been processed
 
 This ensures that:
 
-- Extensions can safely access other extensions in `onExtension`
-- Dependencies are respected in both creation and callback order
-- Initialization happens in the correct order
-- Commands have a fully initialized context
-- When `onExtension` runs, all plugin extensions (including dependencies) are available through `ctx.extensions`
+- When a plugin's `onExtension` runs, it has access to:
+  - Its own extension (just created)
+  - All dependency extensions (already processed)
+- Dependencies are always initialized before dependents
+- The execution order respects the dependency graph
+- Commands have a fully initialized context with all extensions
+
+> [!IMPORTANT]
+> A plugin's `onExtension` callback does NOT have access to extensions from plugins that depend on it, as those are processed later in the sequence.
 
 ## Creating Extensions
 
@@ -186,6 +183,8 @@ export default plugin({
     const db = ctx.extensions.database
 
     // Interact with other extensions if available
+    // Note: ctx.extensions.logger is only available here if the logger plugin
+    // was processed before this plugin (as a dependency or earlier in registration)
     if (ctx.extensions.logger) {
       ctx.extensions.logger.log('Database plugin initialized')
     }
