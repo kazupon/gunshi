@@ -45,13 +45,13 @@ Understanding when and how extensions are created is crucial for effective plugi
 ### Lifecycle Phases
 
 > [!NOTE]
-> The steps mentioned below (I, J, K) refer to the complete CLI execution lifecycle documented in the [Plugin Lifecycle](./lifecycle.md) guide. Extensions are involved in the Execution Phase, which occurs after plugins are loaded and configured during the Setup Phase.
+> The steps mentioned below (H, I) refer to the complete CLI execution lifecycle documented in the [Plugin Lifecycle](./lifecycle.md) guide. Extensions are involved in the Execution Phase, which occurs after plugins are loaded and configured during the Setup Phase.
 
 During command execution, extensions go through three distinct phases:
 
-1. **Extension Creation (Step I)**: The `extension` factory function is called to create each plugin's extension
-2. **Post-Extension Hook (Step J)**: The `onExtension` callback is executed after all extensions are created
-3. **Command Execution (Step K)**: The actual command runs with all extensions available
+1. **Extension Creation (Step H)**: The `extension` factory function is called to create each plugin's extension
+2. **Post-Extension Hook (Step H)**: The `onExtension` callback is executed after all extensions are created
+3. **Command Execution (Step I)**: The actual command runs with all extensions available
 
 The following diagram illustrates the relationship between `extension` and `onExtension`:
 
@@ -109,7 +109,7 @@ This ensures that:
 
 ### The `extension` Factory
 
-The `extension` factory function is called during Step I to create an extension object that becomes available through `ctx.extensions`. This is where you can:
+The `extension` factory function is called during Step H to create an extension object that becomes available through `ctx.extensions`. This is where you can:
 
 - Create fresh instances for each command execution
 - Access parsed arguments and command information
@@ -124,7 +124,7 @@ export default plugin({
   id: 'metrics',
 
   extension: (ctx, cmd) => {
-    // Called during Step I: Create Extensions
+    // Called during Step H: Create Extensions
     // Fresh instance for each command execution
 
     const startTime = Date.now()
@@ -176,7 +176,7 @@ export default plugin({
   },
 
   onExtension: async (ctx, cmd) => {
-    // Called during Step J: Execute onExtension
+    // Called during Step H: Execute onExtension
     // All extensions are now available
 
     // Access your own extension

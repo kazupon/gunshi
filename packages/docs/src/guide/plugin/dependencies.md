@@ -18,7 +18,7 @@ Declaring dependencies explicitly provides several benefits:
 1. **Load Order Guarantee**: Ensures your plugin's dependencies are initialized before your plugin runs
 2. **Runtime Safety**: Prevents runtime errors from missing required functionality
 3. **Clear Documentation**: Makes plugin relationships explicit and discoverable
-4. **Type Safety**: Enables TypeScript to validate extension availability at compile time (see [Type-Safe Dependencies](./type-system.md#working-with-dependencies))
+4. **Type Safety**: Enables TypeScript to validate extension availability at compile time (see [Type-Safe Dependencies](./type-system.md#plugin-with-dependencies))
 5. **Error Prevention**: Gunshi can detect missing dependencies and provide helpful error messages
 
 ## Dependency Resolution Process
@@ -65,7 +65,7 @@ This ensures that:
 3. **Cache** loads after Auth (its dependency is satisfied)
 4. **API** loads last after Auth (its dependency is satisfied)
 
-Note that Cache and API could load in either order relative to each other since they don't depend on each other, but both must load after Auth.
+Note that while Cache and API don't depend on each other, Gunshi maintains the order they appear in your plugin array when resolving plugins with the same dependency level. Both must load after Auth, their shared dependency.
 
 ## Declaring Dependencies
 
@@ -89,6 +89,9 @@ dependencies: [
 ### Required Dependencies
 
 Required dependencies must be present for your plugin to load. If a required dependency is missing, Gunshi will throw an error during initialization.
+
+> [!WARNING]
+> If you register multiple plugins with the same ID, Gunshi will emit a warning: `Duplicate plugin id detected`. While the plugins will still load, having duplicate IDs can lead to unexpected behavior when accessing extensions or resolving dependencies. Always ensure each plugin has a unique ID.
 
 Declare required dependencies using the `dependencies` array:
 
@@ -178,7 +181,7 @@ const pluginB = plugin({
   setup: ctx => {}
 })
 
-// Error: Circular dependency detected: A → B → A
+// Circular dependency detected: `a -> b -> a`
 ```
 
 Circular dependencies can also occur in longer chains:
@@ -203,7 +206,7 @@ const pluginZ = plugin({
   setup: ctx => {}
 })
 
-// Error: Circular dependency detected: X → Y → Z → X
+// Circular dependency detected: `x -> y -> z -> x`
 ```
 
 ### Resolving Circular Dependencies
@@ -237,7 +240,7 @@ const pluginB = plugin({
     }
   })
 })
-// Error: Circular dependency detected: plugin-a → plugin-b → plugin-a
+// Circular dependency detected: `plugin-a -> plugin-b -> plugin-a`
 ```
 
 **Solution: Extract shared functionality into a common plugin**
@@ -466,7 +469,7 @@ This example demonstrates:
 
 ## Next Steps
 
-- Learn about [Type-Safe Dependencies](./type-system.md#working-with-dependencies) for compile-time validation
+- Learn about [Type-Safe Dependencies](./type-system.md#plugin-with-dependencies) for compile-time validation
 - Review [Guidelines](./guidelines.md) for production-ready plugins
 - Explore [Official Plugins](./official-plugins.md) to see dependency patterns in action
 - Understand [Plugin Lifecycle](./lifecycle.md) to see when dependencies are resolved

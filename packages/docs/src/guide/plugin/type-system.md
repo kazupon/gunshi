@@ -6,7 +6,7 @@ Gunshi's plugin system leverages TypeScript's advanced type system to provide co
 
 Gunshi is designed with a **TypeScript-first** philosophy, providing:
 
-- **Full type inference** for plugin extensions and dependencies
+- **Type inference** for plugin extensions and dependencies
 - **Compile-time validation** of plugin interactions
 - **IntelliSense support** throughout development
 - **Type-safe plugin communication** between plugins
@@ -36,12 +36,12 @@ export interface LoggerExtension {
 
 **Key principles:**
 
-- **Literal types** (`as const`) enable TypeScript to track specific plugin IDs
+- Literal types (`as const`) enable TypeScript to track specific plugin IDs
   - Without `as const`, TypeScript widens the type to `string`, losing the specific ID value
   - Literal types allow TypeScript to infer the exact key when accessing `ctx.extensions['mycompany:logger']`
   - This enables autocomplete for available extensions and compile-time validation of plugin ID references
-- **Exported types** allow other plugins and commands to reference your plugin
-- **Well-defined interfaces** provide IntelliSense and compile-time validation
+- Exported types allow other plugins and commands to reference your plugin
+- Well-defined interfaces provide IntelliSense and compile-time validation
 
 > [!TIP]
 > Plugin consumers can use these exported interfaces to type their command context's extensions, enabling type-safe access to plugin functionality in their command runners. For detailed usage patterns of type-safe command definitions with plugin extensions, see [Advanced Type System](../advanced/type-system.md).

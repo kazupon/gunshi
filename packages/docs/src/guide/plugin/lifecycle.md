@@ -14,25 +14,22 @@ graph TD
     D --> E[E. Parse Arguments]
     E --> F[F. Resolve Command]
     F --> G[G. Resolve & Validate Args]
-    G --> H[H. Create CommandContext]
-    H --> I[I. Apply Extensions]
-    I --> J[J. Execute onExtension]
-    J --> K[K. Execute Command]
-    K --> L[L. CLI End]
+    G --> H[H. Create CommandContext<br/>Process each plugin sequentially:<br/>1. Create extension<br/>2. Call onExtension]
+    H --> I[I. Execute Command]
+    I --> J[J. CLI End]
 
     style B fill:#468c56,color:white
     style C fill:#468c56,color:white
     style D fill:#468c56,color:white
+    style H fill:#468c56,color:white
     style I fill:#468c56,color:white
-    style J fill:#468c56,color:white
-    style K fill:#468c56,color:white
 ```
 
-The lifecycle consists of 12 steps (A through L), where plugins are primarily involved in:
+The lifecycle consists of 10 steps (A through J), where plugins are primarily involved in:
 
 - **Steps B-D**: Plugin initialization and setup
-- **Steps I-J**: Plugin extension creation and activation
-- **Step K**: Command execution with plugin decorators applied
+- **Step H**: Plugin extension creation and activation during CommandContext creation
+- **Step I**: Command execution with plugin decorators applied
 
 ## Plugin-Specific Lifecycle Steps
 
@@ -94,7 +91,7 @@ const pluginD = plugin({
 ```
 
 > [!TIP]
-> For a comprehensive guide on plugin dependency resolution, including circular dependency detection, optional dependencies, see [Plugin Dependencies](./dependencies.md).
+> For details on plugin dependency resolution, including circular dependency detection, optional dependencies, see [Plugin Dependencies](./dependencies.md).
 
 #### Step D: Execute Plugin Setup
 
@@ -144,70 +141,32 @@ Between the setup phase and execution phase, Gunshi processes the command-line a
 > [!NOTE]
 > These internal processing steps are handled automatically by Gunshi. Plugin developers don't need to interact with these steps directly.
 
-### Execution Phase (Steps I-K)
+### Execution Phase (Steps H-I)
 
-During the execution phase, plugin extensions are created, initialized, and the command is executed with all decorators applied.
+During the execution phase, the CommandContext is created with plugin extensions, and then the command is executed with all decorators applied.
 
-**What happens in this phase:**
+### Step H: Create CommandContext & Process Plugins
 
-- Extensions are created and attached to CommandContext
-- The `onExtension()` callback runs after all extensions are ready
-- Command executes with decorators applied in LIFO order
+The CommandContext is created and each plugin's extension is initialized:
 
-#### Step I: Apply Extensions
+1. Initialize CommandContext with parsed arguments and values
+2. For each plugin (in dependency order):
+   - Call the plugin's `extension()` function to create an extension
+   - Store the extension in `context.extensions[pluginId]`
+   - Immediately call the plugin's `onExtension()` callback if present
 
-Plugin extensions are created and attached to the command context.
+This sequential processing ensures extensions from dependencies are available to dependent plugins.
 
-This example demonstrates how a plugin creates an extension that will be available to commands:
+> [!NOTE]
+> For detailed information about the extension lifecycle, including execution order guarantees, the relationship between `extension` and `onExtension`, and code examples, see the [Extension Lifecycle](./extensions.md#extension-lifecycle) section in the Plugin Extensions guide.
 
-```js
-const myPlugin = plugin({
-  id: 'logger',
-  extension: (ctx, cmd) => {
-    // This runs during step I
-    // ctx: readonly context at this point
-    // cmd: the command being executed
+### Step I: Execute Command
 
-    console.log(`Creating extension for command: ${cmd.name}`)
+The command runner executes with:
 
-    return {
-      log: msg => console.log(`[${cmd.name}] ${msg}`),
-      error: msg => console.error(`[${cmd.name}] ERROR: ${msg}`)
-    }
-  }
-})
-```
-
-#### Step J: Execute onExtension
-
-After all extensions are created, `onExtension` callbacks are invoked.
-
-This example shows how to perform initialization that depends on extensions being available:
-
-```js
-const myPlugin = plugin({
-  id: 'db',
-  extension: () => ({
-    connect: async () => {
-      // Connect to database
-    }
-  }),
-  onExtension: async (ctx, cmd) => {
-    // This runs during step J
-    // ctx: full context with extensions available
-    // Access own extension using the plugin's id
-    await ctx.extensions.db.connect()
-    console.log('Database connected for command:', cmd.name)
-  }
-})
-```
-
-> [!IMPORTANT]
-> Within the `onExtension` callback, you can access your own plugin's extension through `ctx.extensions` using the plugin ID you defined. This allows you to call methods or access properties that your extension provides.
-
-#### Step K: Execute Command
-
-The actual command runs with all command decorators applied in LIFO order.
+- All decorators applied in LIFO (Last In, First Out) order
+- Full access to all plugin extensions via `ctx.extensions`
+- Complete CommandContext with validated arguments
 
 This example illustrates the command execution with decorator wrapping and extension usage:
 
@@ -227,12 +186,11 @@ const command = {
 
 ## Extension Lifecycle in Detail
 
-Understanding the relationship between `extension` and `onExtension` is crucial for effective plugin development. During Steps I and J:
+Understanding the relationship between `extension` and `onExtension` is crucial for effective plugin development. During Step H (Create CommandContext):
 
-- **Step I**: All plugin `extension` factories are called to create extensions
-- **Step J**: All `onExtension` callbacks run with the complete context available
-
-This two-phase approach ensures that when `onExtension` runs, all plugin extensions (including dependencies) are available through `ctx.extensions`.
+- Each plugin is processed sequentially in dependency order
+- For each plugin: the `extension` factory is called, then immediately its `onExtension` callback
+- This sequential approach ensures that when a plugin's `onExtension` runs, all previous plugins' extensions are already available through `ctx.extensions`
 
 > [!TIP]
 > For a detailed visual representation of the extension lifecycle and execution order guarantees, see [Extension Lifecycle](./extensions.md#extension-lifecycle) in the Plugin Extensions guide.
@@ -242,7 +200,7 @@ This two-phase approach ensures that when `onExtension` runs, all plugin extensi
 Gunshi provides Command hooks (`onBeforeCommand`, `onAfterCommand`, `onErrorCommand`) that integrate with the plugin lifecycle. The following sequence diagram illustrates how these command hooks interact with plugins during command execution:
 
 > [!TIP]
-> For a comprehensive guide on Command Hooks, including advanced use cases like logging, performance monitoring, validation guards, and transaction management, see [Command Hooks](../advanced/command-hooks.md).
+> For details on Command Hooks, including advanced use cases like logging, performance monitoring, validation guards, and transaction management, see [Command Hooks](../advanced/command-hooks.md).
 
 ```mermaid
 sequenceDiagram
@@ -319,7 +277,7 @@ export default plugin({
     console.log('2. Setup phase completed')
   },
 
-  // Step I: Extension creation
+  // Step H: Extension creation (during CommandContext creation)
   extension: (ctx, cmd) => {
     console.log('3. Extension created for:', cmd.name)
 
@@ -329,7 +287,7 @@ export default plugin({
     }
   },
 
-  // Step J: Post-extension callback
+  // Step H: Post-extension callback (immediately after extension creation)
   onExtension: (ctx, cmd) => {
     console.log('4. All extensions ready')
   }

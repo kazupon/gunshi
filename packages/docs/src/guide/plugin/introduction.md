@@ -53,6 +53,8 @@ graph TD
     I -.->|optional| J
 ```
 
+This diagram illustrates the plugin system's execution flow. When a CLI application starts, plugins are registered and their dependencies are resolved. During the setup phase, each plugin's initialization code runs. Extensions are then created and made available to commands during execution. Plugins can depend on each other (solid lines) or have optional dependencies (dotted lines).
+
 ## Package vs Entry Point
 
 Gunshi provides two ways to work with plugins:
@@ -149,7 +151,7 @@ Gunshi provides several official plugins that cover common CLI needs:
 
 The plugin architecture enables the community to create and share plugins:
 
-TODO: should add comminty plugin pages and link
+TODO: should add community plugin pages and link
 
 ### Custom Plugins
 
@@ -172,7 +174,7 @@ export default plugin({
 
 ### 1. Add Global Options
 
-You can add options to all commands globally:
+Plugins can register global options that will be available to all commands:
 
 ```js
 setup: ctx => {
@@ -185,7 +187,7 @@ setup: ctx => {
 
 ### 2. Register Sub-Commands
 
-You can register sub-commands via plugin:
+Plugins can dynamically register new sub-commands during the setup phase:
 
 ```js
 setup: ctx => {
@@ -198,7 +200,7 @@ setup: ctx => {
 
 ### 3. Decorate Renderers
 
-You can decorate the renderers such as header, usage/help and validation errors:
+Plugins can enhance or modify the built-in renderers to customize output:
 
 ```js
 setup: ctx => {
@@ -211,7 +213,7 @@ setup: ctx => {
 
 ### 4. Extend Command Context
 
-You can extend `CommandContext` accessible from the command runner:
+Plugins can extend the `CommandContext` with additional functionality that commands can access:
 
 ```js
 extension: () => ({
@@ -223,7 +225,7 @@ extension: () => ({
 
 ### 5. Intercept Command Execution
 
-You can intercept the command runner with a decorator:
+Plugins can intercept and modify command execution using decorators:
 
 ```js
 setup: ctx => {
