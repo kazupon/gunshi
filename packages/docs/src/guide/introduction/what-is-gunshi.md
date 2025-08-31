@@ -10,14 +10,12 @@ The name "gunshi" (軍師) refers to a position in ancient Japanese samurai batt
 
 Gunshi is designed with several powerful features to make CLI development easier and more maintainable:
 
-- 📏 **Simple & Universal**: Run the commands with simple API and support universal runtime.
-- ⚙️ **Declarative configuration**: Configure command modules declaratively for better organization and maintainability.
-- 🛡️ **Type Safe**: TypeScript support with type-safe argument parsing and option resolution by [args-tokens](https://github.com/kazupon/args-tokens)
-- 🧩 **Composable**: Create modular sub-commands that can be composed together for complex CLIs.
-- ⏳ **Lazy & Async**: Load command modules lazily and execute them asynchronously for better performance.
-- 📜 **Auto usage generation**: Generate helpful usage messages automatically for your commands.
-- 🎨 **Custom usage generation**: Customize how usage messages are generated to match your CLI's style.
-- 🌍 **Internationalization**: Support multiple languages with built-in i18n, locale resource lazy loading and i18n library integration.
+- 📏 **Simple & Universal**: Run commands with simple API and support for universal runtime (Node.js, Deno, Bun).
+- ⚙️ **Declarative & Type Safe**: Configure commands declaratively with full TypeScript support and type-safe argument parsing by [args-tokens](https://github.com/kazupon/args-tokens)
+- 🧩 **Composable & Lazy**: Create modular sub-commands with context sharing and lazy loading for better performance.
+- 🎨 **Flexible Rendering**: Customize usage generation, validation errors, and help messages with pluggable renderers.
+- 🌍 **Internationalization**: Built with global users in mind, featuring locale-aware design, resource management, and multi-language support.
+- 🔌 **Pluggable**: Extensible plugin system with dependency management and lifecycle hooks for modular CLI development.
 
 ## Why Gunshi?
 
