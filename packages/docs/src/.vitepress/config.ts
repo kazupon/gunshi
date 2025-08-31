@@ -73,6 +73,24 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Plugin',
+        collapsed: false,
+        items: [
+          { text: 'Plugin System Introduction', link: '/guide/plugin/introduction.md' },
+          {
+            text: 'Getting Started with Plugin Development',
+            link: '/guide/plugin/getting-started.md'
+          },
+          { text: 'Plugin Lifecycle', link: '/guide/plugin/lifecycle.md' },
+          { text: 'Plugin Dependencies', link: '/guide/plugin/dependencies.md' },
+          { text: 'Plugin Decorators', link: '/guide/plugin/decorators.md' },
+          { text: 'Plugin Extensions', link: '/guide/plugin/extensions.md' },
+          { text: 'Plugin Type System', link: '/guide/plugin/type-system.md' },
+          { text: 'Plugin Testing', link: '/guide/plugin/testing.md' },
+          { text: 'Plugin Development Guidelines', link: '/guide/plugin/guidelines.md' }
+        ]
+      },
+      {
         text: 'API References',
         collapsed: false,
         items: typedocSidebar

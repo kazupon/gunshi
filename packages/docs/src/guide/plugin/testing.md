@@ -1,4 +1,4 @@
-# Testing Gunshi Plugins
+# Plugin Testing
 
 Testing is a crucial part of plugin development to ensure reliability and maintainability. This guide covers comprehensive testing approaches for Gunshi plugins, demonstrating techniques through practical examples.
 
