@@ -737,9 +737,3 @@ const message = t(welcomeKey)
 ## Migration from v0.26
 
 If you're migrating from Gunshi v0.26 where i18n was built into the CLI options, see the [v0.27 Release Notes](/gunshi-v027-release-notes#internationalization-migration) for detailed migration instructions.
-
-## Next Steps
-
-- Explore the [Plugin Ecosystem](./plugin-ecosystem.md) for more plugin features
-- Learn about [Context Extensions](./context-extensions.md) to understand plugin integration
-- Check the [@gunshi/plugin-i18n API Reference](https://github.com/kazupon/gunshi/tree/main/packages/plugin-i18n) for advanced features

@@ -55,7 +55,6 @@ export default defineConfig({
           { text: 'Composable', link: '/guide/essentials/composable' },
           { text: 'Lazy & Async', link: '/guide/essentials/lazy-async' },
           { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage-generation' },
-          { text: 'Internationalization', link: '/guide/essentials/internationalization' },
           { text: 'Plugin System', link: '/guide/essentials/plugin-system' }
         ]
       },
@@ -64,6 +63,7 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Command Hooks', link: '/guide/advanced/command-hooks' },
+          { text: 'Internationalization', link: '/guide/advanced/internationalization' },
           { text: 'Custom Usage Generation', link: '/guide/advanced/custom-usage-generation' },
           { text: 'Documentation Generation', link: '/guide/advanced/documentation-generation' },
           {
