@@ -1,4 +1,4 @@
-# Plugin Ecosystem
+# Plugin System
 
 Gunshi v0.27 introduces a powerful plugin system that enables modular CLI architecture. This guide explores the official plugin ecosystem and demonstrates how to leverage built-in and optional plugins to create feature-rich CLI applications.
 

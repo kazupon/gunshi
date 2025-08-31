@@ -55,7 +55,8 @@ export default defineConfig({
           { text: 'Composable', link: '/guide/essentials/composable' },
           { text: 'Lazy & Async', link: '/guide/essentials/lazy-async' },
           { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage-generation' },
-          { text: 'Internationalization', link: '/guide/essentials/internationalization' }
+          { text: 'Internationalization', link: '/guide/essentials/internationalization' },
+          { text: 'Plugin System', link: '/guide/essentials/plugin-system' }
         ]
       },
       {
