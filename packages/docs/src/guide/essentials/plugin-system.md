@@ -141,6 +141,10 @@ Key benefits:
 - Automatic locale detection from system settings
 - Simple interpolation syntax for dynamic values
 - Fallback to default locale when translation is missing
+- Plugin functionality is accessible via `ctx.extensions` in your command runners
+
+> [!NOTE]
+> The `ctx.extensions` object is how plugins extend your command context with additional functionality. The i18n plugin adds translation capabilities through `ctx.extensions['g:i18n']`. To learn more about working with plugin extensions and best practices for accessing them, see the [Context Extensions guide](../advanced/context-extensions.md).
 
 > [!TIP]
 > This example demonstrates basic internationalization setup. For comprehensive coverage including external resource files, TypeScript support, dynamic locale switching, and production deployment strategies, see the [Advanced Internationalization Guide](../advanced/internationalization.md).
