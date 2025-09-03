@@ -187,7 +187,7 @@ Note that while the argument passing differs slightly between runtimes, the Guns
 
 ## Next Steps
 
-Now that you've created your first Gunshi CLI application, you can explore more advanced features:
+Now that you've created your first Gunshi CLI application, you can explore more essential features:
 
 - [Declarative Configuration](./declarative.md) - Organize your commands with declarative structure
 - [Type Safety](./type-safe.md) - Learn how to use TypeScript for better type safety
