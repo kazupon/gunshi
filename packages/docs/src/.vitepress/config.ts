@@ -49,7 +49,7 @@ export default defineConfig({
           { text: 'Getting Started', link: '/guide/essentials/getting-started' },
           {
             text: 'Declarative Configuration',
-            link: '/guide/essentials/declarative-configuration'
+            link: '/guide/essentials/declarative'
           },
           { text: 'Type Safe', link: '/guide/essentials/type-safe' },
           { text: 'Composable', link: '/guide/essentials/composable' },

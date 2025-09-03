@@ -189,7 +189,7 @@ Note that while the argument passing differs slightly between runtimes, the Guns
 
 Now that you've created your first Gunshi CLI application, you can explore more advanced features:
 
-- [Declarative Configuration](./declarative-configuration.md) - Organize your commands with declarative structure
+- [Declarative Configuration](./declarative.md) - Organize your commands with declarative structure
 - [Type Safety](./type-safe.md) - Learn how to use TypeScript for better type safety
 - [Composable Commands](./composable.md) - Build complex CLIs with sub-commands
 - [Auto Usage Generation](./auto-usage-generation.md) - Customize help messages
