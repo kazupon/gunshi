@@ -35,6 +35,8 @@ Hello, World!
 
 Let's enhance our example to accept a name as an argument:
 
+The function receives a `CommandContext` object (abbreviated as `ctx`) as its parameter. This context object contains parsed command-line arguments, options, and other execution information:
+
 ```js
 import { cli } from 'gunshi'
 
@@ -118,11 +120,72 @@ node index.js --help
 
 You'll see a help message that includes:
 
+Here's an example of the generated help output:
+
+```sh
+greeter - A simple greeting CLI
+
+Usage:
+  greeter [options]
+
+Options:
+  -n, --name <string>      Name to greet
+  -u, --uppercase          Convert greeting to uppercase
+  -h, --help               Show help
+  -v, --version            Show version
+```
+
+The help message automatically includes:
+
 - Command description
 - Available options
 - Option descriptions
 
-This functionality is provided by Gunshi's built-in plugins (`@gunshi/plugin-global` and `@gunshi/plugin-renderer`), which are automatically included when you use the standard `cli()` function. These plugins also provide `--version` support and formatted output for your CLI.
+The standard `cli()` function automatically includes these built-in plugins:
+
+- `@gunshi/plugin-global` - Provides global options like `--help` and `--version`
+- `@gunshi/plugin-renderer` - Handles formatted output for help messages, error messages, and usage information
+
+These plugins are included by default when you use `cli()` from the main 'gunshi' package. If you use the lower-level `run()` function instead, you'll need to manually configure these plugins to get help and version functionality.
+
+> [!TIP]
+> Want to learn more about Gunshi's plugin architecture? Check out the [Plugin System guide](./plugin-system.md) to understand how plugins work, explore the built-in plugins in detail, and learn how to create your own custom plugins to extend your CLI's functionality.
+
+## Using Gunshi with Different Runtimes
+
+Gunshi is designed to work seamlessly across multiple JavaScript runtimes. Here's how to use it with each supported environment:
+
+### Node.js
+
+For Node.js applications, use `process.argv.slice(2)` to pass command-line arguments:
+
+```js
+import { cli } from 'gunshi'
+
+await cli(process.argv.slice(2), command)
+```
+
+### Deno
+
+In Deno, use `Deno.args` to access command-line arguments:
+
+```js
+import { cli } from 'jsr:@gunshi/gunshi'
+
+await cli(Deno.args, command)
+```
+
+### Bun
+
+Bun also supports `Bun.argv` like Node.js:
+
+```js
+import { cli } from 'gunshi'
+
+await cli(Bun.argv.slice(2), command) // or, `process.argv.slice(2)`, because bun support Node.js API compatible
+```
+
+Note that while the argument passing differs slightly between runtimes, the Gunshi API remains consistent across all environments.
 
 ## Next Steps
 
