@@ -6,7 +6,7 @@ This guide will help you create your first command-line application with Gunshi.
 
 Let's create a simple CLI application that greets the user. Create a new file (e.g., `index.js` or `index.ts`) and add the following code:
 
-```js
+```js [index.js]
 import { cli } from 'gunshi'
 
 // Run a simple command
@@ -37,7 +37,7 @@ Let's enhance our example to accept a name as an argument:
 
 The function receives a `CommandContext` object (abbreviated as `ctx`) as its parameter. This context object contains parsed command-line arguments, options, and other execution information:
 
-```js
+```js [index.js]
 import { cli } from 'gunshi'
 
 await cli(process.argv.slice(2), ctx => {
@@ -63,7 +63,7 @@ Hello, Alice!
 
 Let's add some options to our command:
 
-```js
+```js [index.js]
 import { cli } from 'gunshi'
 
 const command = {
@@ -123,16 +123,14 @@ You'll see a help message that includes:
 Here's an example of the generated help output:
 
 ```sh
-greeter - A simple greeting CLI
+USAGE:
+  COMMAND <OPTIONS>
 
-Usage:
-  greeter [options]
-
-Options:
-  -n, --name <string>      Name to greet
-  -u, --uppercase          Convert greeting to uppercase
-  -h, --help               Show help
-  -v, --version            Show version
+OPTIONS:
+  -h, --help                 Display this help message
+  -v, --version              Display this version
+  -n, --name <name>          Name to greet
+  -u, --uppercase            Convert greeting to uppercase
 ```
 
 The help message automatically includes:
