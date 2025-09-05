@@ -1,6 +1,8 @@
 # Composable Sub-commands
 
-Gunshi makes it easy to create CLIs with multiple sub-commands, allowing you to build complex command-line applications with a modular structure. This approach is similar to tools like Git, where commands like `git commit` and `git push` are sub-commands of the main `git` command.
+In [the previous chapter](./type-safe.md), you learned how to create type-safe commands using the `define` function. Now, let's extend that knowledge to build CLIs with multiple sub-commands while maintaining the same type safety benefits.
+
+Gunshi's composable sub-command system allows you to create modular, organized CLIs similar to tools like Git (with commands like `git commit` and `git push`).
 
 ## Why Use Sub-commands?
 
@@ -23,277 +25,268 @@ cli <command> [command options]
 For example:
 
 ```sh
-cli create --name my-resource
+your-cli create --name my-resource
 ```
 
-## Creating Sub-commands
+## Creating Type-Safe Sub-commands
 
-Here's how to create a CLI with sub-commands in Gunshi:
+Building on the `define` function from the previous chapter, let's create a CLI with multiple sub-commands:
 
-```js
-import { cli } from 'gunshi'
-
-// Define sub-commands
-const createCommand = {
-  name: 'create',
-  description: 'Create a new resource',
-  args: {
-    name: { type: 'string', short: 'n' }
-  },
-  run: ctx => {
-    console.log(`Creating resource: ${ctx.values.name}`)
-  }
-}
-
-const listCommand = {
-  name: 'list',
-  description: 'List all resources',
-  run: () => {
-    console.log('Listing all resources...')
-  }
-}
-
-// Create a Map of sub-commands
-const subCommands = new Map()
-subCommands.set('create', createCommand)
-subCommands.set('list', listCommand)
-
-// Define the main command
-const mainCommand = {
-  name: 'manage',
-  description: 'Manage resources',
-  run: () => {
-    console.log('Use one of the sub-commands: create, list')
-  }
-}
-
-// Run the CLI with composable sub-commands
-await cli(process.argv.slice(2), mainCommand, {
-  name: 'my-app',
-  version: '1.0.0',
-  subCommands
-})
-```
-
-## Type-Safe Sub-commands
-
-When working with sub-commands, you can maintain type safety:
-
-```ts
+```ts [index.ts]
 import { cli, define } from 'gunshi'
-import type { Command } from 'gunshi'
 
-// Define type-safe sub-commands using define()
+// Define type-safe sub-commands
 const createCommand = define({
   name: 'create',
+  description: 'Create a new resource',
   args: {
     name: { type: 'string', short: 'n', required: true }
   },
   run: ctx => {
     // ctx.values is fully typed
-    console.log(`Creating: ${ctx.values.name}`)
+    console.log(`Creating resource: ${ctx.values.name}`)
   }
 })
 
 const listCommand = define({
   name: 'list',
-  args: {
-    verbose: { type: 'boolean', short: 'v' }
-  },
-  run: ctx => {
-    if (ctx.values.verbose) {
-      console.log('Listing items with details...')
-    } else {
-      console.log('Listing items...')
-    }
+  description: 'List all resources',
+  run: () => {
+    console.log('Listing all resources...')
   }
 })
-
-// Create a Map of sub-commands
-const subCommands = new Map<string, Command>()
-subCommands.set('create', createCommand)
-subCommands.set('list', listCommand)
 
 // Define the main command
 const mainCommand = define({
-  name: 'app',
-  run: () => {
-    console.log('Use a sub-command: create, list')
+  name: 'manage',
+  description: 'Manage resources',
+  run: ctx => {
+    // This runs when no sub-command is provided
+    console.log('Available commands: create, list')
+    console.log('Run "manage --help" for more information')
   }
 })
 
-// Execute with type-safe sub-commands
+// Run the CLI with composable sub-commands
 await cli(process.argv.slice(2), mainCommand, {
   name: 'my-app',
   version: '1.0.0',
-  subCommands
-})
-```
-
-## Sub-commands with Object Syntax
-
-In addition to using a Map, you can define sub-commands as a plain object:
-
-```js
-import { cli, define } from 'gunshi'
-
-const createCommand = define({
-  name: 'create',
-  description: 'Create a resource',
-  run: ctx => console.log('Creating...')
-})
-
-const deleteCommand = define({
-  name: 'delete',
-  description: 'Delete a resource',
-  run: ctx => console.log('Deleting...')
-})
-
-const mainCommand = define({
-  name: 'manager',
-  run: () => console.log('Use a sub-command')
-})
-
-// Use object syntax instead of Map
-await cli(process.argv.slice(2), mainCommand, {
-  name: 'my-cli',
-  version: '1.0.0',
   subCommands: {
     create: createCommand,
-    delete: deleteCommand
+    list: listCommand
   }
 })
 ```
 
-## Sub-commands with Plugins
+This structure provides:
 
-When you add plugins to your CLI configuration, they automatically enhance all sub-commands. Each sub-command has access to plugin extensions through the command context:
+- Full type safety for all commands and sub-commands
+- Automatic help generation for each command level
+- Shared configuration across the command hierarchy
 
-```js
-import { cli, define } from 'gunshi'
-import i18n, { pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
+## Automatic Help for Sub-commands
 
-// Sub-commands can access plugin extensions
-const createCommand = define({
-  name: 'create',
-  resource: async ctx => ({
-    description: 'Create a resource',
-    success: 'Created successfully!'
-  }),
-  run: ctx => {
-    // Access i18n plugin if available
-    const translate = ctx.extensions[i18nId]?.translate
-    if (translate) {
-      const successKey = resolveKey('success', ctx.name)
-      console.log(translate(successKey))
-    }
-  }
-})
+Gunshi automatically generates help documentation for your sub-commands. Using the code from the previous section, you can see the help for each command level:
 
-const mainCommand = define({
-  name: 'manager',
-  run: () => console.log('Use a sub-command')
-})
+```sh
+# Show main command help
+$ npx tsx index.ts --help
 
-// Plugins are configured once at the top level
-await cli(process.argv.slice(2), mainCommand, {
-  name: 'my-cli',
-  version: '1.0.0',
-  subCommands: {
-    create: createCommand
-  },
-  plugins: [i18n({ locale: 'en-US' })]
-})
+# Show sub-command help
+$ npx tsx index.ts create --help
 ```
 
-Plugins provide consistent functionality across all sub-commands without requiring individual configuration. For detailed plugin usage, see the [Plugin Ecosystem](./plugin-ecosystem.md) guide.
+> [!TIP]
+> [**tsx**](https://github.com/privatenumber/tsx) is a TypeScript execution tool that allows you to run TypeScript files directly without compilation. Use it directly with `npx tsx`.
 
-## Organized Command Structure
+> [!NOTE]
+> Starting from Node.js v22.6.0, you can run TypeScript files directly using the `--experimental-strip-types` flag:
+>
+> ```sh
+> node --experimental-strip-types index.ts --help
+> ```
+>
+> Or, Node.js latest version, such as v24, that flag is not required.
 
-For better maintainability, organize sub-commands in separate files:
+Each sub-command's help includes its description, available options, and usage examples.
 
-```js
-// commands/create.js
+## Organizing Your Commands
+
+As your CLI grows, organizing commands in separate files improves maintainability. Here's a recommended project structure:
+
+```
+my-cli/
+├── src/
+│   ├── commands/
+│   │   ├── create.ts      # Create command implementation
+│   │   └── list.ts        # List command implementation
+│   ├── main.ts            # Main command definition
+│   └── cli.ts             # CLI entry point
+├── package.json
+└── tsconfig.json
+```
+
+This structure provides:
+
+- Clear separation of concerns
+- Shared utilities across commands
+- Centralized type definitions
+- Easy testing of individual components
+
+### Individual Command Files
+
+```ts [commands/create.ts]
 import { define } from 'gunshi'
 
-export const createCommand = define({
+export default define({
   name: 'create',
   description: 'Create a new resource',
   args: {
-    name: { type: 'string', required: true }
+    name: {
+      type: 'string',
+      short: 'n',
+      required: true,
+      description: 'Name of the resource'
+    },
+    type: {
+      type: 'string',
+      short: 't',
+      default: 'default',
+      description: 'Type of resource'
+    }
   },
   run: ctx => {
-    console.log(`Creating: ${ctx.values.name}`)
+    console.log(`Creating ${ctx.values.type} resource: ${ctx.values.name}`)
   }
 })
+```
 
-// commands/list.js
+```ts [commands/list.ts]
 import { define } from 'gunshi'
 
-export const listCommand = define({
+export default define({
   name: 'list',
   description: 'List all resources',
   args: {
-    filter: { type: 'string' }
+    filter: {
+      type: 'string',
+      short: 'f',
+      description: 'Filter resources'
+    }
   },
   run: ctx => {
-    console.log('Listing resources...')
-    if (ctx.values.filter) {
-      console.log(`Filter: ${ctx.values.filter}`)
-    }
+    const filter = ctx.values.filter || 'all'
+    console.log(`Listing resources with filter: ${filter}`)
   }
 })
+```
 
-// main.js
-import { cli } from 'gunshi'
-import { createCommand } from './commands/create.js'
-import { listCommand } from './commands/list.js'
+### Main Command File
 
-const mainCommand = {
-  name: 'resource-manager',
+```ts [main.ts]
+import { define } from 'gunshi'
+
+export default define({
+  name: 'manage',
+  description: 'Manage resources',
   run: () => {
     console.log('Use a sub-command')
-  }
-}
-
-await cli(process.argv.slice(2), mainCommand, {
-  name: 'resource-cli',
-  version: '1.0.0',
-  subCommands: {
-    create: createCommand,
-    list: listCommand
+    console.log('Run "resource-manager --help" for available commands')
   }
 })
 ```
 
-## Fallback to Entry Command
+### Entry Point
 
-Enable fallback behavior when an unknown sub-command is provided:
+> [!NOTE]
+> Some code examples in this guide include TypeScript file extensions (`.ts`) in import/export statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
 
-```js
-await cli(process.argv.slice(2), mainCommand, {
-  name: 'my-app',
+```ts [cli.ts]
+import { cli } from 'gunshi'
+import main from './main.ts'
+import create from './commands/create.ts'
+import list from './commands/list.ts'
+
+await cli(process.argv.slice(2), main, {
+  name: 'resource-manager',
   version: '1.0.0',
-  fallbackToEntry: true, // Enable fallback
   subCommands: {
-    create: createCommand,
-    list: listCommand
+    create,
+    list
   }
 })
-
-// Now these work:
-// $ my-app create        # Runs create sub-command
-// $ my-app list          # Runs list sub-command
-// $ my-app unknown       # Falls back to main command
-// $ my-app              # Runs main command
 ```
 
-This feature is useful when you want your main command to handle arguments that don't match any sub-command, providing a more flexible user experience.
+## Handling Unknown Sub-commands
+
+By default, Gunshi shows an error when users provide an unknown sub-command. You can customize this behavior using the `fallbackToEntry` option:
+
+```ts [cli.ts]
+await cli(process.argv.slice(2), main, {
+  name: 'resource-manager',
+  version: '1.0.0',
+  fallbackToEntry: true,
+  subCommands: {
+    create,
+    list
+  }
+})
+```
+
+This option enables flexible command handling:
+
+```sh
+# Runs the create sub-command
+npx tsx src/cli.ts create --name resource
+resource-manager (resource-manager v1.0.0)
+
+Creating default resource: resource
+
+# Runs the list sub-command
+npx tsx src/cli.ts list --filter active
+resource-manager (resource-manager v1.0.0)
+
+Listing resources with filter: active
+
+# Falls back to main command when "unknown" sub-command is not found
+npx tsx src/cli.ts unknown --flag value
+resource-manager (resource-manager v1.0.0)
+
+Use a sub-command
+Run "resource-manager --help" for available commands
+
+# Runs the main command directly
+npx tsx src/cli.ts --help
+resource-manager (resource-manager v1.0.0)
+
+USAGE:
+  resource-manager [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [manage] <OPTIONS>       Manage resources
+  create <OPTIONS>         Create a new resource
+  list <OPTIONS>           List all resources
+
+For more info, run any command with the `--help` flag:
+  resource-manager --help
+  resource-manager create --help
+  resource-manager list --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+```
+
+This approach is particularly useful for CLIs that:
+
+- Need to handle file paths or patterns as direct arguments
+- Want to provide a default action when no sub-command matches
+- Implement dynamic command resolution based on context
 
 ## Next Steps
 
-- Learn about the [Plugin Ecosystem](./plugin-ecosystem.md) to enhance your sub-commands
-- Explore [Context Extensions](./context-extensions.md) for plugin functionality
-- Check out [Internationalization](./internationalization.md) for multi-language support
-- See [Lazy Loading](./lazy-async.md) for optimizing sub-command loading
-- Review [Auto Usage Generation](./auto-usage-generation.md) for automatic help text
+Throughout this guide, you've learned how to build composable sub-commands that scale from simple to complex CLI applications. You've seen how Gunshi maintains type safety across nested command structures, enables powerful routing patterns with default commands, and supports both synchronous and asynchronous command execution.
+
+Now that you understand how to compose commands into well-organized hierarchies, you're ready to explore how to optimize their performance. The next section on [Lazy & Async Command Loading](./lazy-async.md) will show you how to significantly improve your CLI's startup time by loading commands only when they're actually needed.
+
+With composable sub-commands as your foundation, adding lazy loading will make your CLI applications both powerful and performant, especially as they grow to include many commands with varying resource requirements.
