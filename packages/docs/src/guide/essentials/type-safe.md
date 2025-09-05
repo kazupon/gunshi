@@ -124,7 +124,7 @@ While the examples above show the simplest form of the `define` function, Gunshi
 - **Explicit argument types**: Fine-grained control over type inference
 - **GunshiParams utility**: Combined typing of arguments and extensions
 
-These advanced patterns are covered in detail in the [Advanced Type System](/guide/advanced/type-system) documentation. For most commands, the basic `define` usage shown above provides sufficient type safety.
+These advanced patterns are covered in detail in the [Advanced Type System](../advanced/type-system.md) documentation. For most commands, the basic `define` usage shown above provides sufficient type safety.
 
 ## Next Steps
 
@@ -132,6 +132,6 @@ Now that you understand how to create type-safe commands with `define`, you're r
 
 - **Composable Sub-commands**: Learn how type safety extends to multi-command CLIs
 - **Plugin System**: Discover how plugins maintain type safety across extensions
-- **Advanced Type System**: For complex scenarios, Gunshi offers additional type parameters and patterns (covered in the [Advanced Type System](/guide/advanced/type-system) documentation)
+- **Advanced Type System**: For complex scenarios, Gunshi offers additional type parameters and patterns (covered in the [Advanced Type System](../advanced/type-system.md) documentation)
 
-In the next chapter, we'll explore how to create composable sub-commands while maintaining the type safety we've established here.
+In the next chapter, we'll explore how to create [composable sub-commands](./composable.md) while maintaining the type safety we've established here.
