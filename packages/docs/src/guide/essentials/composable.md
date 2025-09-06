@@ -32,7 +32,7 @@ your-cli create --name my-resource
 
 Building on the `define` function from the previous chapter, let's create a CLI with multiple sub-commands:
 
-```ts [index.ts]
+```ts [cli.ts]
 import { cli, define } from 'gunshi'
 
 // Define type-safe sub-commands
@@ -90,10 +90,10 @@ Gunshi automatically generates help documentation for your sub-commands. Using t
 
 ```sh
 # Show main command help
-$ npx tsx index.ts --help
+$ npx tsx cli.ts --help
 
 # Show sub-command help
-$ npx tsx index.ts create --help
+$ npx tsx cli.ts create --help
 ```
 
 > [!TIP]
@@ -103,7 +103,7 @@ $ npx tsx index.ts create --help
 > Starting from Node.js v22.6.0, you can run TypeScript files directly using the `--experimental-strip-types` flag:
 >
 > ```sh
-> node --experimental-strip-types index.ts --help
+> node --experimental-strip-types cli.ts --help
 > ```
 >
 > Or, Node.js latest version, such as v24, that flag is not required.

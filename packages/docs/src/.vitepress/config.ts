@@ -47,10 +47,7 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Getting Started', link: '/guide/essentials/getting-started' },
-          {
-            text: 'Declarative Configuration',
-            link: '/guide/essentials/declarative'
-          },
+          { text: 'Declarative Configuration', link: '/guide/essentials/declarative' },
           { text: 'Type Safe', link: '/guide/essentials/type-safe' },
           { text: 'Composable', link: '/guide/essentials/composable' },
           { text: 'Lazy & Async', link: '/guide/essentials/lazy-async' },

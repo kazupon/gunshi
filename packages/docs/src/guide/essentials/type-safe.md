@@ -34,7 +34,7 @@ The `define` function transforms your command configuration to provide:
 
 Let's transform the greeting command from the previous chapter to use `define` for full type safety. The `define` function is a simple wrapper that preserves your command's type information, enabling TypeScript to automatically infer types for your command options and provide IDE autocompletion:
 
-```ts [index.ts]
+```ts [cli.ts]
 import { cli, define } from 'gunshi'
 
 // Define a command using the `define` function
