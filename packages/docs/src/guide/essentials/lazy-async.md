@@ -1,244 +1,385 @@
 # Lazy & Async Command Loading
 
-Gunshi supports lazy loading of command runners and asynchronous execution, which can significantly improve the startup performance and responsiveness of your CLI applications, especially when dealing with many commands or resource-intensive operations.
+> [!NOTE]
+> This chapter continues using TypeScript for code examples, building upon the type safety concepts introduced in the [previous chapter](./type-safe.md). While all Gunshi features work with JavaScript, the TypeScript examples provide better IDE support and compile-time checking.
 
-## Why Use Lazy Loading?
+When building CLI applications with many commands or commands that require heavy dependencies, you may encounter slow startup times that frustrate users. Even simple operations like displaying help text can take seconds if your CLI loads all command implementations upfront. This guide shows you how to use Gunshi's lazy loading and asynchronous execution features to create fast, responsive CLI applications that only load what they need, when they need it.
 
-Lazy loading Command Runners is beneficial when:
+## Benefits of Lazy Loading
 
-- Your CLI has many commands, but users typically only use a few at a time
-- Some commands require heavy dependencies or complex initialization that isn't needed for other commands.
-- You want to reduce the initial startup time and package size of your CLI. Gunshi can generate usage information based on the metadata provided without needing to load the actual `run` function.
+Lazy loading provides immediate improvements to your CLI application:
 
-## Using the `lazy` Helper
+- **Faster Startup Time**: Commands are only loaded when actually executed, not when displaying help or running other commands
+- **Reduced Memory Usage**: Unexecuted commands and their dependencies stay unloaded, keeping memory footprint minimal
+- **Better Code Splitting**: When bundling your CLI, each command can be a separate chunk that loads on demand
+- **Improved User Experience**: Users see instant help text and quick responses for simple commands
 
-Gunshi provides a `lazy` helper function to facilitate lazy loading. It takes two arguments:
+These benefits become especially valuable as your CLI grows to include dozens or hundreds of commands, each potentially requiring different libraries or complex initialization.
 
-1. `loader`: An asynchronous function that returns the actual command logic when invoked. This can be either just the `CommandRunner` function (the `run` function) or the full `Command` object (which must include the `run` function).
-2. `definition` (optional): A `Command` object containing the command's metadata (like `name`, `description`, `options`, `examples`). The `run` property in this definition object is ignored if provided, as the actual runner comes from the `loader`.
+## Basic Lazy Loading
 
-<!-- eslint-disable markdown/no-missing-label-refs -->
+Let's start with a simple example that demonstrates the core concept. The following code shows how to create a lazy-loaded command that only loads its implementation when executed:
 
-> [!TIP]
-> Note that the command name attached to the loader in the metadata of the `definition` specified as `lazy` is `commandName`, not `name`. This is because Lazy Command are **functions** and `name` is controlled by the JavaScript runtime.
-
-<!-- eslint-enable markdown/no-missing-label-refs -->
-
-The `lazy` function attaches the metadata from the `definition` to the `loader` function itself. Gunshi uses this attached metadata to generate help messages (`--help`) without executing the `loader`. The `loader` is only executed when the command is actually run.
-
-Here's how to implement lazy loading using the `lazy` helper:
-
-```js
+```ts [cli.ts]
 import { cli, lazy } from 'gunshi'
+import type { Command, CommandRunner, CommandContext } from 'gunshi'
 
-// Define the metadata for the command separately
-const helloDefinition = {
-  name: 'hello', // This name is used as the key in subCommands Map
-  description: 'A command whose runner is loaded lazily',
+// Step 1: Define the command metadata separately
+const helloDefinition: Command = {
+  name: 'hello',
+  description: 'A greeting command',
   args: {
     name: {
       type: 'string',
       description: 'Name to greet',
       default: 'world'
     }
-  },
-  example: 'my-app hello --name=Gunshi'
-  // No 'run' function needed here in the definition
+  }
 }
 
-// Define the loader function that returns the CommandRunner
-const helloLoader = async () => {
-  console.log('Loading hello command runner...')
-  // Simulate loading time or dynamic import
-  await new Promise(resolve => setTimeout(resolve, 500))
-  // Dynamically import the actual run function (CommandRunner)
-  // const { run } = await import('./commands/hello.js')
-  // return run
+// Step 2: Create a loader function that returns the command implementation
+const helloLoader = async (): Promise<CommandRunner> => {
+  console.log('Loading hello command...')
 
-  // For simplicity, we define the runner inline here
-  const run = ctx => {
+  // The actual command logic is defined here
+  const run = (ctx: CommandContext) => {
     console.log(`Hello, ${ctx.values.name}!`)
   }
-  return run // Return only the runner function
+
+  return run // Return the runner function
 }
 
-// Create the LazyCommand using the lazy helper
+// Step 3: Combine them using the lazy helper
 const lazyHello = lazy(helloLoader, helloDefinition)
 
-// Create a Map of sub-commands using the LazyCommand
-const subCommands = new Map()
-// Use the name from the definition as the key
-subCommands.set(lazyHello.commandName, lazyHello)
-
-// Define the main command
-const mainCommand = {
-  // name is optional for the main command if 'name' is provided in config below
-  description: 'Example of lazy loading with the `lazy` helper',
-  run: () => {
-    // This runs if no sub-command is provided
-    console.log('Use the hello sub-command: my-app hello')
-  }
+if (!lazyHello.commandName) {
+  throw new Error('Command name is required')
 }
 
-// Run the CLI
-// Gunshi automatically resolves the LazyCommand and loads the runner when needed
-await cli(process.argv.slice(2), mainCommand, {
-  name: 'my-app',
-  version: '1.0.0',
-  subCommands
-})
-```
-
-In this example:
-
-1.  We define the command's metadata (`helloDefinition`) separately from its execution logic (`helloLoader`). The definition does not need a `run` function.
-2.  We use `lazy(helloLoader, helloDefinition)` to create `lazyHello`. This attaches the metadata from `helloDefinition` onto the `helloLoader` function.
-3.  Gunshi uses the attached metadata (`lazyHello.name`, `lazyHello.options`, etc.) to generate help messages (`my-app --help` or `my-app hello --help`) _without_ executing (resolving) `helloLoader`.
-4.  The `helloLoader` function is only called when the user actually runs `my-app hello`. It returns the `CommandRunner` function.
-5.  This approach keeps the initial bundle small, as the potentially heavy logic inside the command runner (and its dependencies) is only loaded on demand.
-
-Alternatively, the loader can return a full `Command` object:
-
-```js
-// loader returning a full Command object
-const fullCommandLoader = async () => {
-  console.log('Loading full command object...')
-  await new Promise(resolve => setTimeout(resolve, 200))
-  return {
-    // name, description, options here are optional if provided in definition
-    // but 'run' is required here!
-    run: ctx => console.log('Full command object executed!', ctx.values)
-  }
+// Step 4: Use the lazy command in your CLI
+const subCommands = {
+  [lazyHello.commandName]: lazyHello
 }
-
-const lazyFullCommand = lazy(fullCommandLoader, {
-  name: 'full',
-  description: 'Loads a full command object',
-  args: {
-    test: { type: 'boolean' }
-  }
-})
-
-// subCommands.set('full', lazyFullCommand)
-// await cli(...)
-```
-
-## Async Command Execution
-
-Gunshi naturally supports asynchronous command execution. The `CommandRunner` function returned by the `loader` (or the `run` function within the `Command` object returned by the `loader`) can be an `async` function.
-
-```js
-import { cli, lazy } from 'gunshi'
-
-// Example with an async runner function returned by the loader
-const asyncJobDefinition = {
-  name: 'async-job',
-  description: 'Example of a lazy command with an async runner',
-  args: {
-    duration: {
-      type: 'number',
-      short: 'd',
-      default: 1000,
-      description: 'Duration of the async job in milliseconds'
-    }
-  }
-}
-
-const asyncJobLoader = async () => {
-  console.log('Loading async job runner...')
-  // const { runAsyncJob } = await import('./commands/asyncJob.js')
-  // return runAsyncJob
-
-  // Define async runner inline
-  const runAsyncJob = async ctx => {
-    const { duration } = ctx.values
-    console.log(`Starting async job for ${duration}ms...`)
-    await new Promise(resolve => setTimeout(resolve, duration))
-    console.log('Async job completed!')
-  }
-  return runAsyncJob // Return the async runner function
-}
-
-const lazyAsyncJob = lazy(asyncJobLoader, asyncJobDefinition)
-
-const subCommands = new Map()
-subCommands.set(lazyAsyncJob.commandName, lazyAsyncJob)
 
 await cli(
   process.argv.slice(2),
-  { name: 'main', run: () => console.log('Use the async-job sub-command') },
   {
-    name: 'async-example', // Application name
+    description: 'My CLI application',
+    run: () => console.log('Run a sub-command with --help for more info')
+  },
+  {
+    name: 'my-app',
     version: '1.0.0',
     subCommands
   }
 )
 ```
 
-## Type Safety with Lazy Loading
+In this example, when a user runs `npx tsx cli.ts --help`, Gunshi displays help text using only the metadata from `helloDefinition`. The `helloLoader` function is never called. Only when the user runs `npx tsx cli.ts hello` does Gunshi execute the loader and run the command.
 
-When using TypeScript, you can ensure type safety with lazy commands. Use `define` function and leverage `typeof` for type inference.
+> [!NOTE]
+> The `commandName` property on `LazyCommand` can be `undefined` at the TypeScript type level, which is why the example includes a runtime check at lines 55-57. This happens because the `lazy()` function accepts an optional definition parameter - when omitted, there's no guaranteed command name.
+>
+> If you're certain the command name exists (i.e., you passed a definition with a `name` property), you can use TypeScript's non-null assertion operator (`!`) to bypass this check:
+>
+> ```ts
+> // With runtime check (safer)
+> if (!lazyHello.commandName) {
+>   throw new Error('Command name is required')
+> }
+> const subCommands = {
+>   [lazyHello.commandName]: lazyHello
+> }
+>
+> // With non-null assertion (when you're certain)
+> const subCommands = {
+>   [lazyHello.commandName!]: lazyHello // Note the ! operator
+> }
+> ```
+>
+> The runtime check approach is recommended when the command definition might come from dynamic sources or when you want extra safety. Use the assertion operator when you've explicitly defined the command name in your code.
 
-```ts
-import { cli, define, lazy } from 'gunshi'
-import type { CommandContext, CommandRunner } from 'gunshi'
+<!-- eslint-disable markdown/no-missing-label-refs -->
 
-// Define the command definition with define function
-const helloDefinition = define({
-  name: 'hello',
-  description: 'A type-safe lazy command',
+> [!TIP]
+> The command name is accessed via `commandName` property (not `name`) when using lazy commands. This is because lazy commands are functions, and the `name` property is reserved by the JavaScript runtime.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+## Dynamic Imports for Code Splitting
+
+For real-world applications, you'll typically want to use dynamic imports to load command implementations from separate files. This enables bundlers to create separate chunks for each command:
+
+```ts [cli.ts]
+import { cli, lazy } from 'gunshi'
+import type { Command, CommandRunner } from 'gunshi'
+
+// Command metadata stays in the main bundle
+const buildDefinition: Command = {
+  name: 'build',
+  description: 'Build the project',
   args: {
-    name: {
-      type: 'string',
-      description: 'Name to greet',
-      default: 'type-safe world'
+    watch: {
+      type: 'boolean',
+      short: 'w',
+      description: 'Watch for changes'
+    },
+    minify: {
+      type: 'boolean',
+      short: 'm',
+      description: 'Minify output'
     }
   }
-  // No 'run' needed in definition
-})
+}
 
-type HelloArgs = NonNullable<typeof helloDefinition.args>
-
-// Define the typed loader function
-// It must return a function matching CommandRunner<HelloArgs>
-// or a Command<HelloArgs> containing a 'run' function.
-const helloLoader = async (): Promise<CommandRunner<HelloArgs>> => {
-  console.log('Loading typed hello runner...')
-  // const { run } = await import('./commands/typedHello.js')
-  // return run
-
-  // Define typed runner inline
-  const run = (ctx: CommandContext<HelloArgs>) => {
-    // ctx.values is properly typed based on HelloArgs
-    console.log(`Hello, ${ctx.values.name}! (Typed)`)
-  }
+// Loader uses dynamic import to load the command from a separate file
+const buildLoader = async (): Promise<CommandRunner> => {
+  // This creates a separate chunk in your bundle
+  const { run } = await import('./commands/build.ts')
   return run
 }
 
-// Create the type-safe LazyCommand
-const lazyHello = lazy(helloLoader, helloDefinition)
+const lazyBuild = lazy(buildLoader, buildDefinition)
 
-const subCommands = new Map()
-subCommands.set(lazyHello.commandName, lazyHello)
+// Add more commands following the same pattern
+const deployDefinition: Command = {
+  name: 'deploy',
+  description: 'Deploy to production',
+  args: {
+    environment: {
+      type: 'string',
+      short: 'e',
+      default: 'production'
+    }
+  }
+}
+
+const deployLoader = async (): Promise<CommandRunner> => {
+  const { run } = await import('./commands/deploy.ts')
+  return run
+}
+
+const lazyDeploy = lazy(deployLoader, deployDefinition)
+
+// Register all lazy commands
+// Using ! operator since we provided definitions with names
+const subCommands = {
+  [lazyBuild.commandName!]: lazyBuild,
+  [lazyDeploy.commandName!]: lazyDeploy
+}
 
 await cli(
   process.argv.slice(2),
   {
-    name: 'main',
-    run: () => console.log('Use the hello-typed sub-command')
+    description: 'Development tools CLI',
+    run: () => console.log('Use --help to see available commands')
   },
   {
-    name: 'typed-lazy-example',
+    name: 'dev-tools',
+    version: '2.0.0',
+    subCommands
+  }
+)
+```
+
+> [!IMPORTANT]
+> The examples above use `.ts` extensions in dynamic import paths (`await import('./commands/build.ts')`). This will work in the following scenarios:
+>
+> - **During development**: When using TypeScript execution tools like `tsx`, `ts-node`, or Bun's native TypeScript support
+> - **Node.js with experimental support**: When running Node.js v22.6.0+ with the `--experimental-strip-types` flag (renamed to `--experimental-transform-types` in v22.7.0+)
+>
+> **For production builds with TypeScript compilation**:
+> TypeScript does NOT rewrite import paths during compilation. If you plan to compile your TypeScript:
+>
+> - Use `.js` extensions in your source code: `await import('./commands/build.js')`
+> - These `.js` imports will correctly resolve to the compiled JavaScript files
+> - Alternatively, configure your bundler (webpack, rollup, esbuild) to handle `.ts` extensions
+>
+> For standard JavaScript projects, always use `.js` extensions:
+>
+> ```ts
+> const { run } = await import('./commands/build.js')
+> ```
+
+With this approach, your bundler (rollup, esbuild, webpack, etc.) will automatically create separate chunks for `./commands/build.ts` and `./commands/deploy.ts`. Users only download and parse the code for commands they actually use.
+
+## Async Command Execution
+
+Gunshi seamlessly supports asynchronous command execution, which is essential for commands that perform I/O operations, network requests, or other async tasks. Building on lazy loading, your command runners can be async functions:
+
+```ts [cli.ts]
+import type { Command, CommandContext, CommandRunner, GunshiParams } from 'gunshi'
+import { cli, lazy } from 'gunshi'
+
+// Mock implementations that simulate async file operations
+// These work without requiring actual files on disk
+async function readFile(path: string): Promise<string> {
+  // Simulate async file read with a small delay
+  await new Promise(resolve => setTimeout(resolve, 100))
+  return `Sample data from ${path}`
+}
+
+async function transform(data: string): Promise<string> {
+  // Simulate async data transformation
+  await new Promise(resolve => setTimeout(resolve, 150))
+  return data.toUpperCase() + '\n[TRANSFORMED]'
+}
+
+async function writeFile(path: string, data: string): Promise<void> {
+  // Simulate async file write
+  await new Promise(resolve => setTimeout(resolve, 100))
+  console.log(`  Written to ${path}: "${data}"`)
+}
+
+// Alternative: Use real Node.js file operations
+// import { readFile as fsReadFile, writeFile as fsWriteFile } from 'node:fs/promises'
+//
+// async function readFile(path: string): Promise<string> {
+//   return await fsReadFile(path, 'utf-8')
+// }
+//
+// async function transform(data: string): Promise<string> {
+//   // Your actual transformation logic here
+//   return data.toUpperCase()
+// }
+//
+// async function writeFile(path: string, data: string): Promise<void> {
+//   await fsWriteFile(path, data, 'utf-8')
+// }
+
+const processDataDefinition = {
+  name: 'process',
+  description: 'Process data asynchronously',
+  args: {
+    input: {
+      type: 'string',
+      short: 'i',
+      description: 'Input file path',
+      required: true
+    },
+    output: {
+      type: 'string',
+      short: 'o',
+      description: 'Output file path',
+      required: true
+    }
+  }
+} satisfies Command
+
+// Extract the args type from the definition
+type ProcessDataArgs = NonNullable<typeof processDataDefinition.args>
+
+const processDataLoader = async (): Promise<
+  CommandRunner<GunshiParams<{ args: ProcessDataArgs }>>
+> => {
+  // Return an async runner function
+  const run = async (
+    ctx: CommandContext<GunshiParams<{ args: ProcessDataArgs }>>
+  ): Promise<void> => {
+    // TypeScript knows ctx.values has 'input' (string) and 'output' (string)
+    const { input, output } = ctx.values
+
+    console.log(`Processing ${input}...`)
+
+    // Simulate async operations
+    const data = await readFile(input)
+    const processed = await transform(data)
+    await writeFile(output, processed)
+
+    console.log(`Successfully processed to ${output}`)
+  }
+
+  return run
+}
+
+const lazyProcess = lazy(processDataLoader, processDataDefinition)
+
+// The CLI handles async execution automatically
+// Using ! operator since we provided a definition with name
+const subCommands = {
+  [lazyProcess.commandName!]: lazyProcess
+}
+
+await cli(
+  process.argv.slice(2),
+  {
+    description: 'Data processing CLI',
+    run: () => console.log('Use process command to transform data')
+  },
+  {
+    name: 'data-cli',
     version: '1.0.0',
     subCommands
   }
 )
 ```
 
-## Performance and Packaging Benefits
+Gunshi automatically handles the asynchronous execution, including proper error handling and process exit codes. You don't need any special configuration—just return an async function from your loader.
 
-Using the `lazy(loader, definition)` helper for sub-commands offers significant advantages:
+## Alternative Loader Return Types
 
-1.  **Faster Startup Time**: The main CLI application starts faster because it doesn't need to parse and load the code for _all_ command runners immediately. Gunshi only needs the metadata (provided via the `definition` argument) to build the initial help text.
-2.  **Reduced Initial Memory Usage**: Less code loaded upfront means lower memory consumption at startup.
-3.  **Smaller Package Size / Code Splitting**: When bundling your CLI for distribution (e.g., using `rolldown`, `esbuild`, `rspack`, `rollup`, `webpack`), dynamic `import()` statements within your `loader` functions enable code splitting. This means the code for each command runner can be placed in a separate chunk, and these chunks are only loaded when the corresponding command is executed. This significantly reduces the size of the initial bundle users need to download or load.
+<!-- TODO(kazupon): gunshiにバグがあるので治す -->
+
+While the examples above show loaders returning runner functions, loaders can also return full Command objects. This is useful when you want to dynamically construct the entire command structure:
+
+```ts [cli.ts]
+import type { Command } from 'gunshi'
+import { cli, lazy } from 'gunshi'
+
+const configLoader = async (): Promise<Command> => {
+  // Simulate loading configuration (in practice, read from file/API)
+  const isDebug = process.env.DEBUG === 'true'
+
+  return {
+    description: `Config command (debug: ${isDebug})`,
+    args: {
+      verbose: {
+        type: 'boolean',
+        description: isDebug ? 'Verbose output (DEBUG mode)' : 'Verbose output'
+      }
+    },
+    run: ctx => {
+      console.log(isDebug ? 'Running in DEBUG mode' : 'Running in normal mode')
+      if (ctx.values.verbose) {
+        console.log('Verbose:', ctx.values)
+      }
+    }
+  }
+}
+
+const lazyConfig = lazy(configLoader, {
+  name: 'config',
+  description: 'Dynamically configured command'
+})
+
+// Use in CLI
+const subCommands = { [lazyConfig.commandName!]: lazyConfig }
+
+await cli(
+  process.argv.slice(2),
+  { description: 'CLI with dynamic commands', run: () => {} },
+  { name: 'my-cli', version: '1.0.0', subCommands }
+)
+```
+
+This pattern is particularly useful when command structure depends on runtime configuration or external data sources.
+
+## Performance Considerations
+
+To maximize the benefits of lazy loading:
+
+1. **Keep loaders lightweight**: The loader function itself should be minimal. Put heavy imports and initialization inside the returned runner function or use dynamic imports.
+
+2. **Group related commands**: If multiple commands share dependencies, consider loading them together to avoid redundant imports.
+
+3. **Monitor bundle sizes**: Use your bundler's analysis tools to verify that commands are properly code-split into separate chunks.
+
+4. **Consider startup frequency**: Commands that are frequently used together might benefit from being in the same chunk, while rarely-used commands should definitely be lazy-loaded.
+
+## Next Steps
+
+Now that you understand lazy loading and async execution in Gunshi, you've learned how to optimize your CLI's performance by loading commands only when needed. You can create fast, responsive CLIs that handle complex asynchronous operations efficiently while keeping startup times minimal.
+
+The next section on [Auto Usage Generation](./auto-usage-generation.md) will show you how Gunshi automatically creates comprehensive help documentation for all your commands—including lazy-loaded ones. You'll learn how to enhance your CLI's user experience with well-structured usage information, examples, and command descriptions.
+
+With lazy loading keeping your CLI fast and auto-generated usage making it user-friendly, you'll have all the essential tools to build professional command-line applications with Gunshi.
