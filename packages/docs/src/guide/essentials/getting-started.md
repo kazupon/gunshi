@@ -191,20 +191,15 @@ Note that while the argument passing differs slightly between runtimes, the Guns
 
 ## Next Steps
 
-Now that you've created your first Gunshi CLI application, you can explore more essential features:
+You've successfully created your first Gunshi CLI application! You've learned the fundamentals: creating basic commands, handling arguments and options, using the built-in help system, and running your CLI across different JavaScript runtimes.
 
-- [Declarative Configuration](./declarative.md) - Organize your commands with declarative structure
-- [Type Safety](./type-safe.md) - Learn how to use TypeScript for better type safety
-- [Composable Commands](./composable.md) - Build complex CLIs with sub-commands
-- [Auto Usage Generation](./auto-usage-generation.md) - Customize help messages
-- [Lazy & Async Command Loading](./lazy-async.md) - Improve performance with lazy loading
-- [Internationalization](./internationalization.md) - Add multi-language support
+Now it's time to explore the essential features that will help you build powerful, production-ready CLI applications. The following chapters will guide you through each topic:
 
-### Enhance Your CLI with Official Plugins
+- **[Declarative Configuration](./declarative.md)** - Organize commands with clear, maintainable declarative structures
+- **[Type Safety](./type-safe.md)** - Leverage TypeScript for automatic type inference and compile-time checking
+- **[Composable Sub-commands](./composable.md)** - Build complex CLIs with modular sub-commands like `git commit` or `npm install`
+- **[Lazy & Async Command Loading](./lazy-async.md)** - Optimize startup performance by loading commands only when needed
+- **[Auto Usage Generation](./auto-usage-generation.md)** - Create self-documenting CLIs with automatic help and usage information
+- **[Plugin System](./plugin-system.md)** - Extend your CLI with modular plugins for features like i18n and shell completion
 
-Gunshi provides several official plugins to enhance your CLI applications:
-
-- [Plugin Ecosystem](./plugin-ecosystem.md) - Discover available plugins and how to use them
-- **Shell Completion** - Add tab completion support with `@gunshi/plugin-completion`
-- **Internationalization** - Comprehensive i18n support with `@gunshi/plugin-i18n`
-- **Context Extensions** - Learn how plugins extend your command functionality
+Each chapter builds upon the previous ones, introducing more sophisticated patterns and techniques. Start with [Declarative Configuration](./declarative.md) to learn how to structure your commands in a clean, maintainable way as your CLI grows in complexity.
