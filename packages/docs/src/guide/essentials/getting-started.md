@@ -199,7 +199,7 @@ Now it's time to explore the essential features that will help you build powerfu
 - **[Type Safety](./type-safe.md)** - Leverage TypeScript for automatic type inference and compile-time checking
 - **[Composable Sub-commands](./composable.md)** - Build complex CLIs with modular sub-commands like `git commit` or `npm install`
 - **[Lazy & Async Command Loading](./lazy-async.md)** - Optimize startup performance by loading commands only when needed
-- **[Auto Usage Generation](./auto-usage-generation.md)** - Create self-documenting CLIs with automatic help and usage information
+- **[Auto Usage Generation](./auto-usage.md)** - Create self-documenting CLIs with automatic help and usage information
 - **[Plugin System](./plugin-system.md)** - Extend your CLI with modular plugins for features like i18n and shell completion
 
 Each chapter builds upon the previous ones, introducing more sophisticated patterns and techniques. Start with [Declarative Configuration](./declarative.md) to learn how to structure your commands in a clean, maintainable way as your CLI grows in complexity.

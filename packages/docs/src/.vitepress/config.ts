@@ -51,7 +51,7 @@ export default defineConfig({
           { text: 'Type Safe', link: '/guide/essentials/type-safe' },
           { text: 'Composable', link: '/guide/essentials/composable' },
           { text: 'Lazy & Async', link: '/guide/essentials/lazy-async' },
-          { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage-generation' },
+          { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage' },
           { text: 'Plugin System', link: '/guide/essentials/plugin-system' }
         ]
       },

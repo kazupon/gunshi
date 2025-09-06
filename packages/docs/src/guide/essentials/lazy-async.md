@@ -380,6 +380,6 @@ To maximize the benefits of lazy loading:
 
 Now that you understand lazy loading and async execution in Gunshi, you've learned how to optimize your CLI's performance by loading commands only when needed. You can create fast, responsive CLIs that handle complex asynchronous operations efficiently while keeping startup times minimal.
 
-The next section on [Auto Usage Generation](./auto-usage-generation.md) will show you how Gunshi automatically creates comprehensive help documentation for all your commands—including lazy-loaded ones. You'll learn how to enhance your CLI's user experience with well-structured usage information, examples, and command descriptions.
+The next section on [Auto Usage Generation](./auto-usage.md) will show you how Gunshi automatically creates comprehensive help documentation for all your commands—including lazy-loaded ones. You'll learn how to enhance your CLI's user experience with well-structured usage information, examples, and command descriptions.
 
 With lazy loading keeping your CLI fast and auto-generated usage making it user-friendly, you'll have all the essential tools to build professional command-line applications with Gunshi.
