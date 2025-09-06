@@ -4,9 +4,9 @@ This guide will help you create your first command-line application with Gunshi.
 
 ## Hello World Example
 
-Let's create a simple CLI application that greets the user. Create a new file (e.g., `index.js` or `index.ts`) and add the following code:
+Let's create a simple CLI application that greets the user. Create a new file (e.g., `cli.js` or `cli.ts`) and add the following code:
 
-```js [index.js]
+```js [cli.js]
 import { cli } from 'gunshi'
 
 // Run a simple command
@@ -22,7 +22,7 @@ This minimal example demonstrates the core concept of Gunshi: the `cli` function
 You can run your CLI application with:
 
 ```sh
-node index.js
+node cli.js
 ```
 
 You should see the output:
@@ -37,7 +37,7 @@ Let's enhance our example to accept a name as an argument:
 
 The function receives a `CommandContext` object (abbreviated as `ctx`) as its parameter. This context object contains parsed command-line arguments, options, and other execution information:
 
-```js [index.js]
+```js [cli.js]
 import { cli } from 'gunshi'
 
 await cli(process.argv.slice(2), ctx => {
@@ -50,7 +50,7 @@ await cli(process.argv.slice(2), ctx => {
 Now you can run:
 
 ```sh
-node index.js Alice
+node cli.js Alice
 ```
 
 And you'll see:
@@ -63,7 +63,7 @@ Hello, Alice!
 
 Let's add some options to our command:
 
-```js [index.js]
+```js [cli.js]
 import { cli } from 'gunshi'
 
 const command = {
@@ -99,9 +99,9 @@ await cli(process.argv.slice(2), command)
 Now you can run:
 
 ```sh
-node index.js --name Alice --uppercase
+node cli.js --name Alice --uppercase
 # or with short options
-node index.js -n Alice -u
+node cli.js -n Alice -u
 ```
 
 And you'll see:
@@ -115,7 +115,7 @@ HELLO, ALICE!
 Gunshi automatically generates help information for your commands through its built-in plugin system. Run:
 
 ```sh
-node index.js --help
+node cli.js --help
 ```
 
 You'll see a help message that includes:
@@ -146,8 +146,12 @@ The standard `cli()` function automatically includes these built-in plugins:
 
 These plugins are included by default when you use `cli()` from the main 'gunshi' package. If you use the lower-level `run()` function instead, you'll need to manually configure these plugins to get help and version functionality.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Want to learn more about Gunshi's plugin architecture? Check out the [Plugin System guide](./plugin-system.md) to understand how plugins work, explore the built-in plugins in detail, and learn how to create your own custom plugins to extend your CLI's functionality.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Using Gunshi with Different Runtimes
 
