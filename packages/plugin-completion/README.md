@@ -106,6 +106,147 @@ The `complete` command accepts the following shell types:
 - `zsh` - Zsh shell completion
 - `fish` - Fish shell completion
 
+## Shell Completion Setup
+
+This section provides detailed instructions for setting up shell completions in different shells. The setup is a one-time process that enables tab completion for your CLI.
+
+### Prerequisites
+
+Shell completion requires Node.js runtime. Ensure your CLI is running with Node.js (not Deno or Bun).
+
+### Setup by Shell
+
+#### Bash
+
+Bash users have multiple options for installing completion scripts. Choose the approach that best fits your system:
+
+**Option 1: User-specific completion directory (Recommended)**
+
+```sh
+# Create the completion directory if it doesn't exist
+mkdir -p ~/.local/share/bash-completion/completions
+
+# Generate and install the completion script
+your-cli complete bash > ~/.local/share/bash-completion/completions/your-cli
+
+# Reload your shell configuration
+source ~/.bashrc
+```
+
+**Option 2: Alternative user directory**
+
+```sh
+# Create the completion directory if it doesn't exist
+mkdir -p ~/.bash_completion.d
+
+# Generate and install the completion script
+your-cli complete bash > ~/.bash_completion.d/your-cli
+
+# Add this line to your ~/.bashrc (only needed once)
+echo 'for f in ~/.bash_completion.d/*; do source "$f"; done' >> ~/.bashrc
+
+# Reload your shell configuration
+source ~/.bashrc
+```
+
+#### Zsh
+
+Zsh requires adding the completion directory to your `fpath`:
+
+```sh
+# Create the completion directory if it doesn't exist
+mkdir -p ~/.zsh/completions
+
+# Add the completion directory to fpath in ~/.zshrc (only needed once)
+echo 'fpath=(~/.zsh/completions $fpath)' >> ~/.zshrc
+echo 'autoload -U compinit && compinit' >> ~/.zshrc
+
+# Generate and install the completion script (note the underscore prefix)
+your-cli complete zsh > ~/.zsh/completions/_your-cli
+
+# Reload your shell configuration
+source ~/.zshrc
+# OR restart the shell
+exec zsh
+```
+
+> [!NOTE]
+> Zsh completion files must start with an underscore (`_`) followed by the command name.
+
+#### Fish
+
+Fish shell has the simplest setup process:
+
+```sh
+# Create the completion directory if it doesn't exist
+mkdir -p ~/.config/fish/completions
+
+# Generate and install the completion script
+your-cli complete fish > ~/.config/fish/completions/your-cli.fish
+
+# Completions are loaded automatically - no reload needed
+# Optionally, restart the shell for immediate effect
+exec fish
+```
+
+#### PowerShell
+
+PowerShell requires adding the completion script to your profile:
+
+```powershell
+# Create the profile directory if it doesn't exist
+New-Item -ItemType Directory -Force -Path (Split-Path $PROFILE)
+
+# Generate the completion script and test it
+your-cli complete powershell | Out-String | Invoke-Expression
+
+# To make it permanent, add it to your PowerShell profile
+your-cli complete powershell >> $PROFILE
+
+# Reload your profile
+. $PROFILE
+# OR restart PowerShell
+```
+
+### Troubleshooting
+
+If completions don't work after setup:
+
+1. **Check script generation**: Ensure `your-cli complete <shell>` outputs a valid script
+2. **Verify file location**: Confirm the completion script is in the correct directory
+3. **Reload shell**: Try opening a new terminal session
+4. **Check permissions**: Ensure the completion file is readable (`chmod +r <file>`)
+5. **Debug mode**: Some shells offer debug options:
+   - Bash: `set -x` before sourcing
+   - Zsh: `setopt xtrace` before sourcing
+   - Fish: `fish --debug=complete`
+
+### System-wide Installation
+
+> [!WARNING]
+> System-wide installation requires root/administrator permissions and is not recommended for most users. User-specific installation is preferred as it doesn't require elevated privileges and is easier to manage.
+
+If you need system-wide completions:
+
+- **Bash**: `/etc/bash_completion.d/` or `/usr/share/bash-completion/completions/`
+- **Zsh**: `/usr/share/zsh/site-functions/` or `/usr/local/share/zsh/site-functions/`
+- **Fish**: `/usr/share/fish/vendor_completions.d/`
+
+### Updating Completions
+
+When your CLI updates with new commands or options:
+
+1. Regenerate the completion script: `your-cli complete <shell> > <path-to-completion-file>`
+2. Reload your shell or start a new session
+
+### Uninstalling Completions
+
+To remove completion support:
+
+1. Delete the completion script file
+2. Remove any lines added to your shell configuration files (`.bashrc`, `.zshrc`, etc.)
+3. Reload your shell or start a new session
+
 ### Custom Completion Handlers
 
 You can provide custom completion handlers for specific arguments:
