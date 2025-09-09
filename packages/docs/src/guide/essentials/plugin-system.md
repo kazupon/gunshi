@@ -18,10 +18,11 @@ Plugins solve common CLI development challenges:
 
 Plugins integrate at specific points in your CLI's execution:
 
-1. **Registration**: When your CLI starts, plugins register themselves and declare their dependencies
-2. **Setup**: Plugins initialize and configure themselves before commands run
-3. **Extension**: Plugins add new capabilities that your commands can access
-4. **Execution**: Your commands run with all plugin functionality available
+1. **Registration**: When your CLI starts, plugins are registered and their dependencies are resolved
+2. **Setup**: Plugins initialize and configure themselves, adding any global options (like `--debug`)
+3. **Extension**: Plugins extend your command context with new functionality (like translation methods or API clients)
+4. **Decoration**: Plugins can modify how commands execute or how help text is displayed
+5. **Execution**: Your commands run with all plugin enhancements seamlessly integrated
 
 This lifecycle integration means plugins can:
 
@@ -36,11 +37,13 @@ Now that you understand how plugins work, let's explore the plugins that come wi
 
 ## Built-in Plugins
 
-When you use the standard `cli()` function from Gunshi, two essential plugins are automatically included to provide standard CLI behavior.
+Gunshi provides a standard `cli()` function that comes pre-configured with two essential plugins. These built-in plugins give your CLI the familiar behavior users expect from command-line tools. Let's explore what each plugin provides:
 
 ### @gunshi/plugin-global
 
-This plugin adds `--help` and `--version` options to all your commands automatically:
+This plugin adds `--help` and `--version` options to all your commands automatically. When either option is used, the plugin intercepts command execution to display the appropriate information.
+
+The following example demonstrates how the cli() function automatically includes the global plugin:
 
 ```js
 import { cli } from 'gunshi'
@@ -61,8 +64,9 @@ await cli(process.argv.slice(2), command, {
 
 Now your CLI automatically supports:
 
-- `my-app --help` shows usage information
+- `my-app --help` displays usage information rendered by the renderer plugin
 - `my-app --version` displays the version number
+- The plugin decorates command execution to handle these options before your command runs
 
 ### @gunshi/plugin-renderer
 
@@ -76,7 +80,7 @@ Optional plugins add specialized features to your CLI. Install them separately a
 
 Add multi-language support with the i18n plugin:
 
-```bash
+```sh
 npm install @gunshi/plugin-i18n
 ```
 
@@ -118,6 +122,8 @@ const command = defineI18n({
     }
   },
   run: ctx => {
+    // Access the i18n plugin extension via its namespaced ID 'g:i18n'
+    // (All Gunshi plugins use the 'g:' prefix to prevent naming conflicts)
     const t = ctx.extensions['g:i18n'].translate
     console.log(t(resolveKey('greeting', ctx), { name: ctx.values.name }))
     console.log(t(resolveKey('farewell', ctx)))
@@ -134,6 +140,9 @@ await cli(process.argv.slice(2), command, {
   ]
 })
 ```
+
+> [!NOTE]
+> Plugin IDs use namespacing to prevent conflicts and identify ownership. Official Gunshi plugins use the `g:` prefix (e.g., `g:i18n`, `g:completion`). When developing your own plugins, use your organization's namespace (e.g., `myorg:logger`) or scoped package format (e.g., `@company/auth`). For detailed naming conventions and guidelines, see the [Plugin ID Guidelines](../plugin/guidelines.md#plugin-ids).
 
 Key benefits:
 
@@ -200,17 +209,36 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-The completion plugin adds a special `complete` command to your CLI that generates shell-specific completion scripts. Users need to install these scripts once to enable tab completion for your CLI:
+The completion plugin adds a special `complete` command to your CLI that generates shell-specific completion scripts.
 
-To enable completion in your shell:
+### Installing Completion for End Users
+
+Once you've added the completion plugin to your CLI, your users need to perform a one-time setup to enable tab completion on their system.
+
+> [!IMPORTANT]
+> Shell completion currently requires Node.js. The completion feature is not available when running your CLI with Deno or Bun runtimes.
+
+#### Basic Setup Example (Bash)
+
+Users generate a completion script for their shell and add it to their shell configuration:
 
 ```sh
-# For bash
-deploy-cli complete bash > /etc/bash_completion.d/deploy-cli
+# Generate completion script and save it
+deploy-cli complete bash > ~/.local/share/bash-completion/completions/deploy-cli
 
-# For zsh
-deploy-cli complete zsh > ~/.zsh/completions/_deploy-cli
+# Reload your shell configuration
+source ~/.bashrc
+
+# Now tab completion works!
+deploy-cli dep<TAB>  # Completes to: deploy-cli deploy
 ```
+
+> [!TIP]
+> For detailed setup instructions for all supported shells (Bash, Zsh, Fish, PowerShell), including directory creation and configuration steps, see the [@gunshi/plugin-completion README](https://github.com/gunshi/gunshi/tree/main/packages/plugin-completion#shell-completion-setup).
+
+#### How It Works
+
+The completion plugin adds a special `complete` command to your CLI that generates shell-specific completion scripts. Users run this command once to generate the script for their shell, then source it in their shell configuration to enable tab completion.
 
 ## Combining Plugins
 
@@ -317,34 +345,45 @@ This approach keeps your production builds lean while providing developer featur
 
 ## Minimal Setup
 
-For complete control over which plugins are included, use `@gunshi/bone`:
+If you need precise control over your CLI's functionality and bundle size, you can use `@gunshi/bone` - Gunshi's bare-bones foundation package. Unlike the standard `cli()` function which includes plugins automatically, `@gunshi/bone` starts with zero plugins, letting you add only what you need:
 
 ```sh
-npm install @gunshi/bone @gunshi/plugin-global
+npm install @gunshi/bone @gunshi/plugin-global @gunshi/plugin-renderer
 ```
 
 ```js
 import { cli } from '@gunshi/bone'
 import global from '@gunshi/plugin-global'
+import renderer from '@gunshi/plugin-renderer'
 
 // Only includes plugins you explicitly add
 await cli(process.argv.slice(2), command, {
   name: 'minimal-cli',
-  plugins: [global()]
+  plugins: [
+    global(), // Adds --help and --version options
+    renderer() // Adds help text formatting
+  ]
 })
 ```
 
-With `@gunshi/bone`, you start with absolutely no plugins—even basic features like `--help` and `--version` require manual addition. Unlike the standard `cli()` which automatically includes essential plugins, `@gunshi/bone` requires you to explicitly add every plugin you want. This bare-bones approach is ideal for lightweight CLIs or when you need precise control over functionality.
+This approach gives you explicit control over every aspect of your CLI, making it ideal for applications where bundle size or specific feature control is critical.
+
+Common use cases for `@gunshi/bone`:
+
+- Embedded CLIs with size constraints
+- Custom implementations of help or version handling
+- Testing plugin interactions in isolation
+- Applications requiring precise control over all CLI behavior
 
 ## Next Steps
 
 Now that you understand the plugin system basics, you can explore more advanced topics and start building with Gunshi's plugin ecosystem.
 
-For plugin users looking to extend their Gunshi applications further:
+To deepen your understanding of the plugin system:
 
-- **Context Extensions**: Understand how plugins extend functionality through [Context Extensions](../advanced/context-extensions.md)
-- **TypeScript Support**: Learn about type-safe plugin development in the [Type System Guide](../advanced/type-system.md)
+- **Context Extensions**: Learn how plugins extend functionality through [Context Extensions](../advanced/context-extensions.md)
+- **TypeScript Support**: Explore type-safe plugin usage in the [Type System Guide](../advanced/type-system.md)
 
-For plugin developers looking to extend their Gunshi applications further:
+Ready to create your own plugins?
 
-- **Creating Custom Plugins**: Build your own plugins with the [Plugin Development Guide](../plugin/introduction.md)
+- **Plugin Development**: Build custom plugins with the [Plugin Development Guide](../plugin/introduction.md)
