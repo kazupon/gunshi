@@ -40,7 +40,6 @@ OPTIONS:
 
 Square brackets indicate optional elements or parameters with default values:
 
-- `[OPTIONS]` - All options have default values (truly optional)
 - `[name]` - An option parameter with a default value
 - `[COMMANDS]` - Sub-command selection (when multiple commands exist)
 - `[commandName]` - A default command that runs when no sub-command is specified
@@ -49,7 +48,7 @@ Example:
 
 ```sh
 USAGE:
-  app [COMMANDS] <OPTIONS>
+  app [COMMANDS]
 
 COMMANDS:
   [manage]    Default command for managing resources
@@ -216,7 +215,7 @@ OPTIONS:
   -v, --version          Display this version
 ```
 
-Positional arguments are displayed with clear, descriptive names that indicate their purpose. Positional arguments are always shown as required using angle brackets (e.g., `<resource>`) as they do not support default values.
+Positional arguments are displayed with clear, descriptive names that indicate their purpose. Currently, all positional arguments are shown as required using angle brackets (e.g., `<resource>`).
 
 ## Automatic Features
 
@@ -261,8 +260,6 @@ When working with auto-generated usage:
 
 ## Next Steps
 
-You've now seen how Gunshi automatically generates comprehensive usage information for your commands. You've learned how the framework transforms your command definitions into professional help documentation, handles bracket notation for required and optional elements, and provides automatic features like help flags and negatable options—all without requiring additional configuration from you.
-
-Now that you understand how auto usage generation makes your CLI self-documenting, you're ready to explore how Gunshi's powerful plugin architecture enables this and other features. The next section on the [Plugin System](./plugin-system.md) will show you how plugins like `@gunshi/plugin-renderer` power the auto usage generation you've just learned about, and how you can create your own plugins to extend your CLI with custom functionality.
-
-With auto usage generation providing the foundation for user-friendly CLIs, understanding the plugin system will give you the tools to customize and extend this behavior, whether you need internationalization support, custom rendering, shell completions, or entirely new capabilities tailored to your specific needs.
+- Explore [Type Safety](./type-safe.md) for compile-time guarantees
+- Learn about the [Plugin System](./plugin-system.md) to extend functionality
+- See [Internationalization](../advanced/i18n.md) for multi-language support
