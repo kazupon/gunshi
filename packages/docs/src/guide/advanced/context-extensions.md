@@ -461,9 +461,3 @@ const commandWithMultiple = define<
   }
 })
 ```
-
-## Next Steps
-
-- Explore the [Plugin Ecosystem](./plugin-ecosystem.md) for available plugins
-- Learn about [Creating Custom Plugins](/guide/plugin/getting-started.md)
-- See [Type System](/guide/advanced/type-system.md) for advanced TypeScript usage

@@ -242,9 +242,3 @@ const colorPlugin = plugin({
   }
 })
 ```
-
-## Next Steps
-
-- Learn about [Command Hooks](./command-hooks.md) for lifecycle control
-- Explore [Type System](./type-system.md) for type-safe rendering
-- See [Plugin Development](/guide/plugin/getting-started.md) for creating custom plugins
