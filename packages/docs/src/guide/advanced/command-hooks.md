@@ -45,7 +45,7 @@ Gunshi provides three main lifecycle hooks:
 
 ### Setting Up Hooks
 
-Hooks are configured at the CLI level in the options:
+The following example demonstrates how to configure lifecycle hooks when initializing your CLI application. In this setup, we define three hooks that will execute at different stages of the command lifecycle:
 
 ```ts
 import { cli } from 'gunshi'
@@ -80,7 +80,7 @@ await cli(
 
 ### Hook Parameters
 
-Each hook receives different parameters:
+Each lifecycle hook receives specific parameters that provide context about the command execution. The `CommandContext` parameter is read-only and contains all command metadata, while `onAfterCommand` also receives the command result and `onErrorCommand` receives the thrown error:
 
 ```ts
 {
@@ -95,7 +95,102 @@ Each hook receives different parameters:
 }
 ```
 
-## Use cases
+> [!NOTE]
+> The `CommandContext` object provides comprehensive information about command execution. For the complete CommandContext API reference including all properties and types, see the [CommandContext interface documentation](/api/default/interfaces/CommandContext.md).
+
+With an understanding of how hooks work and their parameters, let's explore how they differ from and interact with plugin decorators.
+
+## Hooks vs Decorators
+
+Gunshi provides two distinct mechanisms for controlling command execution:
+
+1. **CLI-level Hooks**: Lifecycle hooks that run **before and after** command execution
+   - `onBeforeCommand`: Pre-execution processing (logging, validation, initialization)
+   - `onAfterCommand`: Post-success processing (cleanup, metrics recording)
+   - `onErrorCommand`: Error handling (error logging, rollback)
+
+2. **Plugin Decorators**: **Wrap** the command itself to modify its behavior
+   - `decorateCommand`: Wraps command runner to add or modify functionality
+   - Multiple plugins can chain decorators (decorator pattern)
+
+> [!TIP]
+> The `decorateCommand` method is a powerful plugin API that allows wrapping command execution to add or modify functionality. It enables plugins to implement cross-cutting concerns like authentication, logging, and transaction management. For comprehensive information about how to use decorators in plugins, see the [Plugin Decorators documentation](/guide/plugin/decorators.md).
+
+### Execution Flow
+
+The following diagram illustrates how hooks and decorators interact during command execution:
+
+```mermaid
+graph TD
+    A[onBeforeCommand Hook] --> B{Success?}
+    B -->|Yes| C[Plugin Decorators Chain]
+    B -->|Error| G[onErrorCommand Hook]
+
+    C --> D[Decorated Command Runner]
+    D --> E{Success?}
+
+    E -->|Yes| F[onAfterCommand Hook]
+    E -->|Error| G
+
+    F --> H{Success?}
+    H -->|Yes| I[Return Result]
+    H -->|Error| G
+
+    G --> J[Throw Error]
+
+    style A fill:#468c56,color:white
+    style F fill:#468c56,color:white
+    style G fill:#468c56,color:white
+    style C fill:#7EA6E0,color:white
+    style D fill:#7EA6E0,color:white
+```
+
+### Detailed Execution Sequence
+
+1. **`onBeforeCommand` Hook** - Pre-execution setup and validation
+2. **Plugin Decorator Chain** - Command wrapping by plugins
+   - Applied in reverse order (LIFO - last registered, first executed)
+   - Each decorator wraps the next runner in the chain
+3. **Command Runner** - Actual command execution
+4. **`onAfterCommand` Hook** - Post-success processing
+5. **`onErrorCommand` Hook** - Error handling when exceptions occur
+
+### Plugin Decorator Example
+
+The following example demonstrates how to use the `decorateCommand` method in a plugin to measure command execution time:
+
+```ts
+import { plugin } from 'gunshi'
+
+// Using decorateCommand in a plugin
+export default plugin({
+  id: 'timing-plugin',
+  setup: ctx => {
+    // Wrap command execution to measure execution time
+    ctx.decorateCommand(baseRunner => {
+      return async commandCtx => {
+        const start = Date.now()
+        try {
+          const result = await baseRunner(commandCtx)
+          console.log(`Execution time: ${Date.now() - start}ms`)
+          return result
+        } catch (error) {
+          console.log(`Failed after: ${Date.now() - start}ms`)
+          throw error
+        }
+      }
+    })
+  }
+})
+```
+
+> [!NOTE]
+> Plugins don't have CLI-level hooks (`onBeforeCommand`, etc.). Instead, they use the `decorateCommand` method to wrap command execution and add custom logic. This allows plugins to extend and modify command behavior through the decorator pattern.
+
+## Practical Use Cases
+
+> [!TIP]
+> The following examples use plugin extensions through `ctx.extensions`. Extensions are how plugins add functionality to the command context, allowing you to access plugin-provided features like logging, metrics, authentication, and database connections. For comprehensive information about working with extensions, including type-safe patterns and best practices, see the [Context Extensions documentation](./context-extensions.md).
 
 ### Logging and Monitoring
 
@@ -336,86 +431,6 @@ await cli(process.argv.slice(2), commands, {
 
 ## Hook Execution Order
 
-### CLI Hooks vs Plugin Decorators
+When multiple hooks and decorators are present, they execute in a specific sequence as shown in the Hooks vs Decorators section above. Understanding this order is crucial for implementing complex behaviors like transaction management or error recovery.
 
-Gunshi provides two distinct mechanisms for controlling command execution:
-
-1. **CLI-level Hooks**: Observation and control points that run **before and after** command execution
-   - `onBeforeCommand`: Pre-execution processing (logging, validation, initialization)
-   - `onAfterCommand`: Post-success processing (cleanup, metrics recording)
-   - `onErrorCommand`: Error handling (error logging, rollback)
-
-2. **Plugin Decorators**: **Wrap** the command itself to modify its behavior
-   - `decorateCommand`: Wraps command runner to add or modify functionality
-   - Multiple plugins can chain decorators (decorator pattern)
-
-### Execution Flow
-
-```mermaid
-graph TD
-    A[onBeforeCommand Hook] --> B{Success?}
-    B -->|Yes| C[Plugin Decorators Chain]
-    B -->|Error| G[onErrorCommand Hook]
-
-    C --> D[Decorated Command Runner]
-    D --> E{Success?}
-
-    E -->|Yes| F[onAfterCommand Hook]
-    E -->|Error| G
-
-    F --> H{Success?}
-    H -->|Yes| I[Return Result]
-    H -->|Error| G
-
-    G --> J[Throw Error]
-
-    style A fill:#468c56,color:white
-    style F fill:#468c56,color:white
-    style G fill:#468c56,color:white
-    style C fill:#7EA6E0,color:white
-    style D fill:#7EA6E0,color:white
-```
-
-### Detailed Execution Sequence
-
-1. **`onBeforeCommand` Hook** - Pre-execution setup and validation
-2. **Plugin Decorator Chain** - Command wrapping by plugins
-   - Applied in reverse order (LIFO - last registered, first executed)
-   - Each decorator wraps the next runner in the chain
-3. **Command Runner** - Actual command execution
-4. **`onAfterCommand` Hook** - Post-success processing
-5. **`onErrorCommand` Hook** - Error handling when exceptions occur
-
-### Plugin Decorator Example
-
-```ts
-// Using decorateCommand in a plugin
-export default plugin({
-  id: 'timing-plugin',
-  setup: ctx => {
-    // Wrap command execution to measure execution time
-    ctx.decorateCommand(baseRunner => {
-      return async commandCtx => {
-        const start = Date.now()
-        try {
-          const result = await baseRunner(commandCtx)
-          console.log(`Execution time: ${Date.now() - start}ms`)
-          return result
-        } catch (error) {
-          console.log(`Failed after: ${Date.now() - start}ms`)
-          throw error
-        }
-      }
-    })
-  }
-})
-```
-
-> [!NOTE]
-> Plugins don't have CLI-level hooks (`onBeforeCommand`, etc.). Instead, they use the `decorateCommand` method to wrap command execution and add custom logic. This allows plugins to extend and modify command behavior through the decorator pattern.
-
-## Next Steps
-
-- Explore [Rendering Customization](./rendering-customization.md) for UI control
-- Learn about [Type System](./type-system.md) for type-safe hooks
-- See [Plugin Lifecycle](/guide/plugin/lifecycle.md) for plugin-specific hooks
+For detailed execution flow, refer to the execution diagram in the [Hooks vs Decorators](#hooks-vs-decorators) section.
