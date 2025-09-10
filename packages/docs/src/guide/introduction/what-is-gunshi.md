@@ -27,3 +27,30 @@ Gunshi provides a modern approach to building command-line interfaces in JavaScr
 - **Performant**: Lazy loading ensures resources are only loaded when needed
 
 Whether you're building a simple CLI tool or a complex command-line application with multiple sub-commands, Gunshi provides the features you need to create a great user experience.
+
+## Next Steps
+
+Now that you understand what Gunshi is and its key features, here's how to proceed with the documentation:
+
+### Documentation Structure
+
+The Gunshi documentation is organized into three main sections:
+
+- **Essentials**: Learn the fundamental concepts of Gunshi through a step-by-step tutorial format. This section covers everything from basic usage to composable commands and lazy loading.
+
+- **Advanced**: Explore specialized features organized by topic. Each chapter focuses on a specific advanced capability like internationalization, custom rendering, or type system extensions.
+
+- **Plugin**: Understand the plugin system through a tutorial approach. Learn how to create, configure, and distribute plugins for extending Gunshi's functionality.
+
+### Where to Go Next
+
+> [!TIP]
+> Start with the **Setup** guide to install Gunshi in your project, then proceed through the **Essentials** section in order. Each chapter builds upon previous concepts.
+
+1. **[Setup](./setup.md)** - Install and configure Gunshi in your project
+2. **[Getting Started](../essentials/getting-started.md)** - Create your first CLI application
+3. Continue through the **Essentials** section to learn core concepts
+
+After completing the essentials, you can explore the **Advanced** section based on your specific needs. The chapters there are independent and can be read in any order.
+
+If you're interested in extending Gunshi with plugins, the **Plugin** section provides comprehensive guidance on creating and using plugins.
