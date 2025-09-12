@@ -2,11 +2,14 @@
 
 Plugins in Gunshi extend the command context with additional functionality through the extension system. This guide explains how to leverage these extensions to build more powerful CLI applications.
 
+> [!TIP]
+> New to plugins? Start with the [Plugin System overview](../essentials/plugin-system.md) and [Getting Started with Plugins](../plugin/getting-started.md) guide. For a list of available plugins, see [Official Plugins](../plugin/official-plugins.md).
+
 ## Understanding Context Extensions
 
-The command context (`ctx`) is the central object passed to every command runner. With plugins, this context can be extended with new capabilities:
+The command context (`ctx`) is the central object passed to every command runner. Plugins enhance this context by adding new capabilities through the extensions property, allowing your commands to access additional functionality like logging, internationalization, or custom services. Each plugin contributes its own extension under a unique namespace, ensuring clean separation of concerns and preventing conflicts between different plugins.
 
-```js
+```ts
 // Basic command context
 const command = {
   run: ctx => {
@@ -24,33 +27,40 @@ const command = {
 
 ## How Extensions Work
 
-Each plugin can add its own extension to the context through a namespaced property:
+Each plugin registers its extension under a unique identifier (plugin ID) within the `ctx.extensions` object. This namespacing approach prevents collisions between plugins and makes dependencies explicit. When a plugin is added to your CLI configuration, its extension becomes available to all commands through this standardized interface:
 
-```js
-import i18n, { pluginId as i18nId } from '@gunshi/plugin-i18n'
+> [!TIP]
+> For implementation details on creating your own plugin extensions, see the [Plugin Extensions](../plugin/extensions.md) guide.
+
+```ts
+import { pluginId as globalId } from '@gunshi/plugin-global'
 
 const command = {
   run: ctx => {
-    // Access i18n plugin extension
-    const i18nExtension = ctx.extensions[i18nId]
+    // Access global plugin extension
+    const globalExtension = ctx.extensions[globalId]
 
     // Use extension methods
-    const message = i18nExtension.translate('welcome')
-    const locale = i18nExtension.locale
+    globalExtension.showVersion()
+    globalExtension.showHeader()
   }
 }
 ```
 
 ## Working with Built-in Plugin Extensions
 
+Gunshi provides several official plugins with pre-built extensions that cover common CLI needs. Understanding how to use these extensions effectively will accelerate your CLI development.
+
 ### Global Plugin Extension
 
 The global plugin (`@gunshi/plugin-global`) provides methods for displaying CLI information:
 
-```js
+```ts
+import { pluginId as globalId } from '@gunshi/plugin-global'
+
 const command = {
   run: ctx => {
-    const global = ctx.extensions['g:global']
+    const global = ctx.extensions[globalId]
 
     // Show version information
     global.showVersion()
@@ -62,21 +72,27 @@ const command = {
     global.showUsage()
 
     // Show validation errors
-    if (errors.length > 0) {
-      global.showValidationErrors(errors)
+    if (ctx.validationError) {
+      global.showValidationErrors(ctx.validationError)
     }
   }
 }
 ```
 
+> [!NOTE]
+> For a complete list of official plugins and their features, see the [Official Plugins](../plugin/official-plugins.md) guide.
+
 ### Renderer Plugin Extension
 
 The renderer plugin (`@gunshi/plugin-renderer`) provides text rendering capabilities:
 
-```js
+```ts
+import { pluginId as rendererId } from '@gunshi/plugin-renderer'
+
 const command = {
   run: async ctx => {
-    const renderer = ctx.extensions['g:renderer']
+    // Check if renderer extension is available
+    const renderer = ctx.extensions[rendererId]
 
     if (renderer) {
       // Get translated text
@@ -89,91 +105,61 @@ const command = {
 }
 ```
 
+> [!NOTE]
+> The renderer plugin is typically added by the global plugin when used together. For detailed information about the renderer plugin API, see the [Renderer Plugin documentation](https://github.com/kazupon/gunshi/tree/main/packages/plugin-renderer)
+
 ## Using Optional Plugin Extensions
+
+Beyond the core plugins, Gunshi's ecosystem includes optional plugins for specialized functionality. These extensions follow the same patterns but may not be present in all CLI configurations.
 
 ### I18n Plugin Extension
 
-The i18n plugin provides comprehensive translation capabilities:
+The i18n plugin provides translation capabilities through context extensions:
 
-```js
-import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
+```ts
+import { pluginId as i18nId } from '@gunshi/plugin-i18n'
 
-const command = defineI18n({
-  name: 'server',
-  resource: async ctx => ({
-    starting: 'Starting server on port {port}...',
-    started: 'Server started successfully!',
-    error: 'Failed to start: {error}'
-  }),
-  args: {
-    port: { type: 'number', default: 3000 }
-  },
-  run: ctx => {
-    const t = ctx.extensions[i18nId].translate
-
-    // Translate with interpolation using resolveKey for custom keys
-    const startingKey = resolveKey('starting', ctx.name)
-    console.log(t(startingKey, { port: ctx.values.port }))
-
-    try {
-      // Start server logic
-      const startedKey = resolveKey('started', ctx.name)
-      console.log(t(startedKey))
-    } catch (error) {
-      // Translate error messages
-      const errorKey = resolveKey('error', ctx.name)
-      console.error(t(errorKey, { error: error.message }))
-    }
-
-    // Access current locale
-    const locale = ctx.extensions[i18nId].locale
-    console.log(`Running in ${locale.toString()} locale`)
-  }
-})
-```
-
-### Working with Subcommands
-
-In subcommands, use the `resolveKey` helper for proper namespace handling:
-
-```js
-import { resolveKey, defineI18n } from '@gunshi/plugin-i18n'
-
-const subCommand = defineI18n({
-  name: 'start',
-  resource: async ctx => ({
-    message: 'Starting subprocess...'
-  }),
-  run: ctx => {
-    const i18n = ctx.extensions[i18nId]
-
-    // Resolve key with proper namespace
-    const key = resolveKey('message', ctx.name)
-    const message = i18n.translate(key)
-
-    console.log(message)
-  }
-})
-```
-
-## Extension Patterns
-
-### Safe Extension Access
-
-Always check if an extension exists before using it:
-
-```js
 const command = {
   run: ctx => {
-    // Safe access pattern
     const i18n = ctx.extensions[i18nId]
 
     if (i18n) {
+      // Access current locale
+      console.log(`Running in ${i18n.locale} locale`)
+
+      // Use translation function
+      const message = i18n.translate('welcome')
+      console.log(message)
+    }
+  }
+}
+```
+
+> [!NOTE]
+> For comprehensive i18n usage including `resolveKey`, `defineI18n`, resource management, and working with subcommands, see the [Internationalization guide](./internationalization.md)
+
+## Extension Techniques
+
+The following techniques demonstrate patterns for working effectively with extensions in various scenarios. These approaches ensure your commands remain flexible, maintainable, and resilient.
+
+### Safe Extension Access
+
+Extensions may not always be available depending on your CLI configuration and which plugins are installed. Commands should defensively check for extension existence to prevent runtime errors and provide graceful fallbacks. This defensive programming approach ensures your CLI remains robust even when optional plugins are not configured:
+
+```ts
+import { pluginId as globalId } from '@gunshi/plugin-global'
+
+const command = {
+  run: ctx => {
+    // Safe access technique
+    const global = ctx.extensions[globalId]
+
+    if (global) {
       // Extension is available
-      console.log(i18n.translate('message'))
+      global.showUsage()
     } else {
       // Fallback behavior
-      console.log('Default message')
+      console.log('Usage information not available')
     }
   }
 }
@@ -181,22 +167,25 @@ const command = {
 
 ### Extension Composition
 
-Multiple plugin extensions can work together:
+Commands often benefit from combining multiple plugin extensions to create richer functionality. Extensions are designed to work together harmoniously, allowing you to compose complex behaviors from simple building blocks. The following example demonstrates how global display features can be enhanced with dynamic content loading from the renderer extension:
 
-```js
+```ts
+import { pluginId as globalId } from '@gunshi/plugin-global'
+import { pluginId as rendererId } from '@gunshi/plugin-renderer'
+
 const command = {
   run: async ctx => {
-    const i18n = ctx.extensions[i18nId]
-    const global = ctx.extensions['g:global']
+    const global = ctx.extensions[globalId]
+    const renderer = ctx.extensions[rendererId]
 
     // Combine extensions for rich functionality
-    if (i18n && global) {
-      // Show localized header
-      const header = i18n.translate('app_header')
-      console.log(header)
+    if (global && renderer) {
+      // Show header using global extension
+      global.showHeader()
 
-      // Then show usage in current locale
-      global.showUsage()
+      // Load and display commands if renderer is available
+      const commands = await renderer.loadCommands()
+      console.log('Available commands:', commands)
     }
   }
 }
@@ -204,28 +193,42 @@ const command = {
 
 ### Dynamic Extension Usage
 
-Extensions can be used dynamically based on runtime conditions:
+Extensions can be conditionally utilized based on command arguments, environment variables, or other runtime conditions. This dynamic approach allows your CLI to adapt its behavior to different contexts and user preferences. The following pattern shows how to selectively engage extensions based on command flags:
 
-```js
+```ts
+import { pluginId as globalId } from '@gunshi/plugin-global'
+import { pluginId as loggerId } from '@my/plugin-logger'
+
 const command = {
   args: {
     verbose: { type: 'boolean' },
-    locale: { type: 'string' }
+    debug: { type: 'boolean' },
+    help: { type: 'boolean' }
   },
-  run: async ctx => {
-    const i18n = ctx.extensions[i18nId]
-
-    // Change locale dynamically
-    if (ctx.values.locale && i18n) {
-      await i18n.loadResource(ctx.values.locale, ctx, command)
+  run: ctx => {
+    // Use extensions based on command flags
+    if (ctx.values.help) {
+      ctx.extensions[globalId]?.showUsage()
+      return
     }
 
-    // Conditional extension usage
+    // Conditional extension usage for verbose mode
     if (ctx.values.verbose) {
-      const global = ctx.extensions['g:global']
+      const global = ctx.extensions[globalId]
       global?.showHeader()
-      global?.showUsage()
+      console.log('Running in verbose mode...')
     }
+
+    // Enable debug features if available
+    if (ctx.values.debug) {
+      // Check if a hypothetical logger extension exists
+      if (ctx.extensions[loggerId]) {
+        ctx.extensions[loggerId].setLevel('debug')
+      }
+    }
+
+    // Your command logic here
+    console.log('Command executed')
   }
 }
 ```
@@ -236,40 +239,45 @@ Use TypeScript for compile-time safety with extensions:
 
 ```ts
 import { define } from 'gunshi'
-import i18n, { pluginId as i18nId } from '@gunshi/plugin-i18n'
-import global, { pluginId as globalId } from '@gunshi/plugin-global'
-import type { I18nExtension, PluginId as I18nId } from '@gunshi/plugin-i18n'
+import { pluginId as globalId } from '@gunshi/plugin-global'
 import type { GlobalExtension, PluginId as GlobalId } from '@gunshi/plugin-global'
 
 // Define command with typed extensions
-const command = define<{
-  extensions: Record<I18nId, I18nExtension> & Record<GlobalId, GlobalExtension>
-}>({
+const command = define<Record<GlobalId, GlobalExtension>>({
   name: 'app',
   run: ctx => {
-    // TypeScript knows about available extensions
-    // Use imported plugin IDs instead of hardcoded strings
-    const message = ctx.extensions[i18nId].translate('key')
+    // TypeScript knows about the global extension
     ctx.extensions[globalId].showVersion()
+    ctx.extensions[globalId].showUsage()
 
     // Type errors for unknown extensions
-    // ctx.extensions['unknown'].method() // Error!
+    // ctx.extensions['unknown'].method() // Compile-time error!
   }
 })
 ```
 
-## Custom Extension Patterns
+> [!NOTE]
+> For comprehensive type parameter usage including `GunshiParams`, combining multiple plugin types with the `&` operator, and advanced type safety techniques, see the [Type System guide](./type-system.md)
+
+## Custom Extension Techniques
+
+Extensions can serve as a foundation for building sophisticated CLI architectures. The following advanced patterns showcase how to leverage extensions for service layers and architectural concerns.
 
 ### Extension as Service Layer
 
-Use extensions as a service layer for your CLI:
+Extensions can act as a service abstraction layer, providing consistent interfaces to external systems like databases, caches, or APIs. This pattern decouples your command logic from infrastructure concerns and simplifies testing through mockable extensions:
 
-```js
-// With a hypothetical database plugin
+```ts
+// Note: These are hypothetical example plugins for illustration purposes
+// You would need to create or install actual plugins with these capabilities
+import { pluginId as dbId } from '@my/plugin-db' // Example custom plugin
+import { pluginId as cacheId } from '@my/plugin-cache' // Example custom plugin
+
+// With hypothetical database and cache plugins
 const command = {
   run: async ctx => {
-    const db = ctx.extensions['db']
-    const cache = ctx.extensions['cache']
+    const db = ctx.extensions[dbId]
+    const cache = ctx.extensions[cacheId]
 
     // Check cache first
     const cached = await cache?.get('users')
@@ -290,19 +298,21 @@ const command = {
 
 ### Extension for Cross-Cutting Concerns
 
-Extensions are perfect for cross-cutting concerns like logging, monitoring, or authentication:
+Cross-cutting concerns are aspects of your application that affect multiple commands, such as logging, authentication, monitoring, or error tracking. Extensions provide an ideal mechanism for implementing these concerns consistently across your entire CLI. By centralizing these capabilities in plugin extensions, you ensure uniform behavior and simplify maintenance. The following example demonstrates a comprehensive approach to handling logging, authentication, and metrics collection:
 
-```js
+```ts
+// Note: These are hypothetical example plugins for illustration purposes
+import { pluginId as loggerId } from '@my/plugin-logger'
+import { pluginId as authId } from '@my/plugin-auth'
+import { pluginId as metricsId } from '@my/plugin-metrics'
+
 const command = {
   run: async ctx => {
-    const logger = ctx.extensions['logger']
-    const auth = ctx.extensions['auth']
-    const metrics = ctx.extensions['metrics']
+    const logger = ctx.extensions[loggerId]
+    const auth = ctx.extensions[authId]
+    const metrics = ctx.extensions[metricsId]
 
-    // Start timing
     const startTime = Date.now()
-
-    // Log command start
     logger?.info('Command started', { command: ctx.name })
 
     // Check authentication
@@ -312,31 +322,32 @@ const command = {
     }
 
     try {
-      // Command logic here
-      const result = await performAction()
+      // Your actual command logic
+      // processData is a placeholder for your data processing logic
+      const result = await processData(ctx.values)
 
-      // Track metrics
+      // Track success metrics
       metrics?.track('command.success', {
         command: ctx.name,
         duration: Date.now() - startTime
       })
 
+      logger?.info('Command completed successfully')
       return result
     } catch (error) {
-      // Log errors
       logger?.error('Command failed', { error: error.message })
-
-      // Track failure metrics
       metrics?.track('command.failure', {
         command: ctx.name,
         error: error.message
       })
-
       throw error
     }
   }
 }
 ```
+
+> [!TIP]
+> Learn how to create your own plugins with custom extensions in the [Plugin Development](../plugin/introduction.md) guide.
 
 ## Troubleshooting
 
@@ -365,9 +376,7 @@ For TypeScript users, ensure proper type definitions:
 import type { YourExtension, PluginId } from 'your-plugin'
 
 // Define with proper types
-const command = define<{
-  extensions: Record<PluginId, YourExtension>
-}>({
+const command = define<Record<PluginId, YourExtension>>({
   // Command definition
 })
 ```
@@ -377,13 +386,15 @@ const command = define<{
 Check the plugin documentation for correct usage:
 
 ```js
-// Wrong: Direct method call
-ctx.extensions[i18nId].translate('key') // May fail
+import { pluginId as globalId } from '@gunshi/plugin-global'
 
-// Right: Store reference first
-const i18n = ctx.extensions[i18nId]
-if (i18n) {
-  i18n.translate('key')
+// Wrong: Direct method call without checking
+ctx.extensions[globalId].showVersion() // May fail if plugin not available
+
+// Right: Store reference and check existence first
+const global = ctx.extensions[globalId]
+if (global) {
+  global.showVersion()
 }
 ```
 
@@ -411,53 +422,43 @@ const i18nExt = ctx.extensions['g:i18n'] // Don't do this!
 When plugins might not be available, always check for extension existence to avoid runtime errors:
 
 ```js
-import i18n, { pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
+import { pluginId as globalId } from '@gunshi/plugin-global'
 
 run: ctx => {
   // Safe access with optional chaining
-  const message = ctx.extensions[i18nId]?.translate(resolveKey('welcome', ctx)) || 'Welcome'
+  const version = ctx.extensions[globalId]?.showVersion() || 'Version unknown'
 
   // Or explicit checking for complex logic
-  const i18nExt = ctx.extensions[i18nId]
-  if (i18nExt) {
+  const globalExt = ctx.extensions[globalId]
+  if (globalExt) {
     // Plugin is available - use full features
-    console.log(i18nExt.translate(resolveKey('greeting', ctx), { name: ctx.values.name }))
+    globalExt.showHeader()
+    globalExt.showUsage()
   } else {
     // Graceful fallback
-    console.log(`Hello, ${ctx.values.name}!`)
+    console.log('Help not available')
   }
 }
 ```
 
-### 3. Use Type-Safe Command Definitions
+### 3. Use TypeScript for Safety
 
-Leverage TypeScript for compile-time safety with plugin extensions:
+When using TypeScript, leverage type definitions for compile-time safety:
 
 ```ts
 import { define } from 'gunshi'
-import i18n, { pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
-import global, { pluginId as globalId } from '@gunshi/plugin-global'
-import type { I18nExtension, PluginId as I18nId } from '@gunshi/plugin-i18n'
+import { pluginId as globalId } from '@gunshi/plugin-global'
 import type { GlobalExtension, PluginId as GlobalId } from '@gunshi/plugin-global'
 
-// Single plugin extension
-const command = define<Record<I18nId, I18nExtension>>({
+// Type-safe command with extension
+const command = define<Record<GlobalId, GlobalExtension>>({
   name: 'deploy',
   run: ctx => {
-    // TypeScript knows i18n extension exists
-    ctx.extensions[i18nId].translate(resolveKey('deploy_start', ctx))
-  }
-})
-
-// Multiple plugin extensions - use & to combine Records
-const commandWithMultiple = define<
-  Record<I18nId, I18nExtension> & Record<GlobalId, GlobalExtension>
->({
-  name: 'deploy',
-  run: ctx => {
-    // TypeScript knows both extensions exist
-    ctx.extensions[i18nId].translate(resolveKey('deploy_start', ctx))
+    // TypeScript ensures type safety
     ctx.extensions[globalId].showVersion()
   }
 })
 ```
+
+> [!NOTE]
+> For advanced TypeScript techniques including combining multiple plugin types and using `GunshiParams`, see the [Type System guide](./type-system.md).
