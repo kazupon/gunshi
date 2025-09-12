@@ -47,14 +47,14 @@ Gunshi provides three main lifecycle hooks:
 
 The following example demonstrates how to configure lifecycle hooks when initializing your CLI application. In this setup, we define three hooks that will execute at different stages of the command lifecycle:
 
-```ts
+```ts [cli.ts]
 import { cli } from 'gunshi'
 
 await cli(
   process.argv.slice(2),
   {
     name: 'server',
-    run: ctx => {
+    run: () => {
       console.log('Starting server...')
     }
   },
