@@ -60,8 +60,9 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Command Hooks', link: '/guide/advanced/command-hooks' },
+          { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
+          { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
           { text: 'Internationalization', link: '/guide/advanced/internationalization' },
-          { text: 'Custom Usage Generation', link: '/guide/advanced/custom-usage-generation' },
           { text: 'Documentation Generation', link: '/guide/advanced/documentation-generation' },
           {
             text: 'Advanced Lazy Loading and Sub-Commands',
