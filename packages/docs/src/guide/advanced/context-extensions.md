@@ -30,7 +30,7 @@ const command = {
 Each plugin registers its extension under a unique identifier (plugin ID) within the `ctx.extensions` object. This namespacing approach prevents collisions between plugins and makes dependencies explicit. When a plugin is added to your CLI configuration, its extension becomes available to all commands through this standardized interface:
 
 > [!TIP]
-> For implementation details on creating your own plugin extensions, see the [Plugin Extensions](../plugin/extensions.md) guide.
+> For details on how plugin extensions work, see the [Plugin Extensions](../plugin/extensions.md) guide.
 
 ```ts
 import { pluginId as globalId } from '@gunshi/plugin-global'
@@ -349,55 +349,6 @@ const command = {
 > [!TIP]
 > Learn how to create your own plugins with custom extensions in the [Plugin Development](../plugin/introduction.md) guide.
 
-## Troubleshooting
-
-### Extension Not Found
-
-If an extension is not available:
-
-```js
-// Debug which extensions are available
-console.log('Available extensions:', Object.keys(ctx.extensions))
-
-// Check if plugin was added
-if (!ctx.extensions[pluginId]) {
-  console.error(`Plugin ${pluginId} not installed`)
-  console.error('Add it to your CLI plugins:')
-  console.error('plugins: [yourPlugin()]')
-}
-```
-
-### Type Errors with Extensions
-
-For TypeScript users, ensure proper type definitions:
-
-```ts
-// Import types
-import type { YourExtension, PluginId } from 'your-plugin'
-
-// Define with proper types
-const command = define<Record<PluginId, YourExtension>>({
-  // Command definition
-})
-```
-
-### Extension Method Not Working
-
-Check the plugin documentation for correct usage:
-
-```js
-import { pluginId as globalId } from '@gunshi/plugin-global'
-
-// Wrong: Direct method call without checking
-ctx.extensions[globalId].showVersion() // May fail if plugin not available
-
-// Right: Store reference and check existence first
-const global = ctx.extensions[globalId]
-if (global) {
-  global.showVersion()
-}
-```
-
 ## Guidelines
 
 ### 1. Always Import Plugin IDs
@@ -462,3 +413,52 @@ const command = define<Record<GlobalId, GlobalExtension>>({
 
 > [!NOTE]
 > For advanced TypeScript techniques including combining multiple plugin types and using `GunshiParams`, see the [Type System guide](./type-system.md).
+
+## Troubleshooting
+
+### Extension Not Found
+
+If an extension is not available:
+
+```js
+// Debug which extensions are available
+console.log('Available extensions:', Object.keys(ctx.extensions))
+
+// Check if plugin was added
+if (!ctx.extensions[pluginId]) {
+  console.error(`Plugin ${pluginId} not installed`)
+  console.error('Add it to your CLI plugins:')
+  console.error('plugins: [yourPlugin()]')
+}
+```
+
+### Type Errors with Extensions
+
+For TypeScript users, ensure proper type definitions:
+
+```ts
+// Import types
+import type { YourExtension, PluginId } from 'your-plugin'
+
+// Define with proper types
+const command = define<Record<PluginId, YourExtension>>({
+  // Command definition
+})
+```
+
+### Extension Method Not Working
+
+Check the plugin documentation for correct usage:
+
+```js
+import { pluginId as globalId } from '@gunshi/plugin-global'
+
+// Wrong: Direct method call without checking
+ctx.extensions[globalId].showVersion() // May fail if plugin not available
+
+// Right: Store reference and check existence first
+const global = ctx.extensions[globalId]
+if (global) {
+  global.showVersion()
+}
+```
