@@ -3,7 +3,7 @@
 Plugins in Gunshi extend the command context with additional functionality through the extension system. This guide explains how to leverage these extensions to build more powerful CLI applications.
 
 > [!TIP]
-> New to plugins? Start with the [Plugin System overview](../essentials/plugin-system.md) and [Getting Started with Plugins](../plugin/getting-started.md) guide. For a list of available plugins, see [Official Plugins](../plugin/official-plugins.md).
+> This guide assumes familiarity with the basic concepts explained in the [Plugin System](../essentials/plugin-system.md). Context extensions are a core feature of the plugin system, providing the mechanism through which plugins deliver functionality to commands.
 
 ## Understanding Context Extensions
 
@@ -140,7 +140,7 @@ const command = {
 
 ## Extension Techniques
 
-The following techniques demonstrate patterns for working effectively with extensions in various scenarios. These approaches ensure your commands remain flexible, maintainable, and resilient.
+The following techniques demonstrate code for working effectively with extensions in various scenarios. These approaches ensure your commands remain flexible, maintainable, and resilient.
 
 ### Safe Extension Access
 
@@ -193,7 +193,7 @@ const command = {
 
 ### Dynamic Extension Usage
 
-Extensions can be conditionally utilized based on command arguments, environment variables, or other runtime conditions. This dynamic approach allows your CLI to adapt its behavior to different contexts and user preferences. The following pattern shows how to selectively engage extensions based on command flags:
+Extensions can be conditionally utilized based on command arguments, environment variables, or other runtime conditions. This dynamic approach allows your CLI to adapt its behavior to different contexts and user preferences. The following code shows how to selectively engage extensions based on command flags:
 
 ```ts
 import { pluginId as globalId } from '@gunshi/plugin-global'
