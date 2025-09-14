@@ -1,6 +1,11 @@
 # Type System
 
+<!-- TODO(kazupon): Gunshi's type system should be a bit easier to use, if args -->
+<!-- NOTE: If `args` is specified, `ctx.values` should be inferred even if only `extensions` is specified in the type params. -->
+
 Gunshi v0.27 introduces a powerful type parameter system that provides comprehensive type safety across all core functions: `cli`, `define`, `lazy`, and `plugin`. This enhancement brings TypeScript's full type-checking capabilities to your CLI applications, ensuring compile-time safety for command arguments and plugin extensions.
+
+This guide focuses on type safety for command definitions and their arguments. If you're creating custom plugins and need to understand the `plugin` function's type system, refer to the [Plugin Type System](../plugin/type-system.md) guide.
 
 ## Overview of v0.27 Type System
 
@@ -11,202 +16,172 @@ The v0.27 release fundamentally improves type safety through:
 - **Unified Type System (GunshiParams)**: A single, coherent type system for arguments and extensions
 - **Plugin Extension Type Safety**: Full compile-time validation of plugin interactions
 
-### Understanding GunshiParams
+### Understanding `GunshiParams`
 
-`GunshiParams` is a utility type that provides complete type safety for both command arguments and plugin extensions:
+`GunshiParams` is the core type that unifies type safety for command arguments and plugin extensions. At its simplest, it ensures that your command context has properly typed `values` (from args) and `extensions` (from plugins).
+
+Before diving into the implementation details, here's how it works in practice:
 
 ```ts
-type GunshiParams<{
-  args: Args         // Command arguments definition
-  extensions: Ext    // Plugin extensions
+// Simple usage - just arguments
+type SimpleParams = GunshiParams<{
+  args: { port: { type: 'number' } }
+}>
+
+// With extensions from plugins
+type FullParams = GunshiParams<{
+  args: { port: { type: 'number' } }
+  extensions: { logger: Logger }
 }>
 ```
 
-This unified type system ensures that your command context (`ctx`) has properly typed `values` (from args) and `extensions` (from plugins).
+The actual type definition uses TypeScript's conditional types to provide flexibility:
+
+```ts
+interface GunshiParams<
+  P extends {
+    args?: Args
+    extensions?: ExtendContext
+  } = {
+    args: Args
+    extensions: {}
+  }
+> {
+  args: P extends { args: infer A extends Args } ? A : Args
+  extensions: P extends { extensions: infer E extends ExtendContext } ? E : {}
+}
+```
 
 ## The `define` Function Type Parameters
 
-The `define` function offers multiple type parameter patterns for maximum flexibility:
-
-### Type-safe Extensions
-
-The most common pattern ensures type safety for plugin extensions:
+The `define` function uses `GunshiParams` type parameter to provide comprehensive type safety for both command arguments and plugin extensions:
 
 ```ts
 import { define } from 'gunshi'
-
-interface AuthExtension {
-  user: { id: string; name: string }
-  isAuthenticated: () => boolean
-}
-
-const deployCommand = define<AuthExtension>({
-  name: 'deploy',
-  description: 'Deploy the application',
-  args: {
-    environment: {
-      type: 'string',
-      required: true
-    }
-  },
-  run: ctx => {
-    // ctx.extensions is fully typed as AuthExtension
-    if (!ctx.extensions.auth?.isAuthenticated()) {
-      throw new Error('Authentication required')
-    }
-
-    console.log(`Deploying as ${ctx.extensions.auth?.user.name}`)
-    console.log(`Target: ${ctx.values.environment}`)
-  }
-})
-```
-
-### Type-safe Arguments
-
-For commands without extensions, focus on argument type safety:
-
-```ts
-const args = {
-  file: {
-    type: 'string' as const,
-    description: 'File to process'
-  },
-  verbose: {
-    type: 'boolean' as const,
-    short: 'v'
-  }
-} satisfies Args
-
-const processCommand = define<typeof args>({
-  name: 'process',
-  args,
-  run: ctx => {
-    // ctx.values is typed as { file?: string; verbose?: boolean }
-    if (ctx.values.verbose) {
-      console.log(`Processing ${ctx.values.file}`)
-    }
-  }
-})
-```
-
-### Type-safe with `GunshiParams`
-
-When you need to type both arguments and extensions together, use the `GunshiParams` utility type explained above:
-
-```ts
 import type { GunshiParams } from 'gunshi'
 
-type MyCommandParams = GunshiParams<{
+// Comprehensive type definition with args and extensions
+type ServerParams = GunshiParams<{
   args: {
     port: { type: 'number'; default: 3000 }
     host: { type: 'string'; default: 'localhost' }
+    verbose: { type: 'boolean'; short: 'v' }
   }
   extensions: {
-    logger: LoggerExtension
-    auth: AuthExtension
+    logger: {
+      log: (msg: string) => void
+      error: (msg: string) => void
+    }
+    auth: {
+      isAuthenticated: () => boolean
+      getUser: () => { id: string; name: string }
+    }
   }
 }>
 
-const serverCommand = define<MyCommandParams>({
+const serverCommand = define<ServerParams>({
   name: 'server',
+  description: 'Start the development server',
   args: {
     port: { type: 'number', default: 3000 },
-    host: { type: 'string', default: 'localhost' }
+    host: { type: 'string', default: 'localhost' },
+    verbose: { type: 'boolean', short: 'v' }
   },
   run: ctx => {
-    ctx.extensions.logger?.log(`Starting server on ${ctx.values.host}:${ctx.values.port}`)
-    // Both args and extensions are fully typed
+    // ctx.values contains typed arguments (port, host, verbose)
+    const { port, host, verbose } = ctx.values
+
+    // ctx.extensions contains typed plugin extensions
+    // Optional chaining (?.) is used because plugins may not be installed
+    // or may fail to load, making their extensions undefined
+    if (!ctx.extensions.auth?.isAuthenticated()) {
+      ctx.extensions.logger?.error('Authentication required')
+      throw new Error('Please login first')
+    }
+
+    const user = ctx.extensions.auth.getUser()
+    ctx.extensions.logger?.log(`Server started by ${user.name} on ${host}:${port}`)
+
+    if (verbose) {
+      ctx.extensions.logger?.log('Verbose mode enabled')
+    }
   }
 })
 ```
 
 ## The `lazy` Function Type Parameters
 
-The `lazy` function maintains type safety even with deferred loading:
-
-### Basic Lazy Loading with Types
+The `lazy` function maintains type safety through `GunshiParams` even with deferred loading:
 
 ```ts
 import { lazy } from 'gunshi'
-import type { CommandRunner } from 'gunshi'
+import type { GunshiParams, CommandRunner } from 'gunshi'
 
-// Define extension interface
-interface AuthExtension {
-  isAuthenticated: () => boolean
-  getUser: () => { id: string; name: string }
-}
-
-// Create lazy-loaded command
-const lazyDeployCommand = lazy<{ auth: AuthExtension }>(
-  async () => {
-    // This function runs only when the command is executed
-    const { deployLogic } = await import('./deploy-logic')
-
-    const runner: CommandRunner = async ctx => {
-      // Type-safe access to extensions
-      if (!ctx.extensions.auth?.isAuthenticated()) {
-        throw new Error('Authentication required')
-      }
-
-      const user = ctx.extensions.auth.getUser()
-      console.log(`Deploying as ${user.name}...`)
-
-      return await deployLogic()
-    }
-
-    return runner
-  },
-  {
-    name: 'deploy',
-    description: 'Deploy application (lazy-loaded)'
-  }
-)
-```
-
-### Lazy Loading with Arguments
-
-```ts
-import type { Args, GunshiParams } from 'gunshi'
-
-const buildArgs = {
-  target: {
-    type: 'string' as const,
-    required: true,
-    choices: ['development', 'production'] as const
-  },
-  minify: {
-    type: 'boolean' as const,
-    default: false
-  }
-} satisfies Args
-
+// Type definition for build command with performance metrics
 type BuildParams = GunshiParams<{
-  args: typeof buildArgs
+  args: {
+    target: { type: 'string'; required: true; choices: ['dev', 'prod'] }
+    minify: { type: 'boolean'; default: false }
+    watch: { type: 'boolean'; short: 'w' }
+  }
   extensions: {
-    logger: { log: (msg: string) => void }
+    logger: {
+      log: (msg: string) => void
+      startSpinner: (msg: string) => () => void
+    }
+    metrics: {
+      recordBuildTime: (target: string, duration: number) => void
+      getAverageTime: (target: string) => number
+    }
   }
 }>
 
 const lazyBuildCommand = lazy<BuildParams>(
   async () => {
-    // Heavy build dependencies loaded only when needed
-    const { buildProject } = await import('./build-system')
+    // Heavy dependencies loaded only when needed
+    const { build } = await import('./bundler')
 
-    return async ctx => {
-      ctx.extensions.logger?.log(`Building for ${ctx.values.target}`)
+    const runner: CommandRunner<BuildParams> = async ctx => {
+      const { target, minify, watch } = ctx.values
+      const startTime = Date.now()
 
-      await buildProject({
-        target: ctx.values.target,
-        minify: ctx.values.minify
-      })
+      // Use typed extensions
+      const stopSpinner = ctx.extensions.logger?.startSpinner(`Building for ${target}...`)
 
-      return 'Build complete'
+      try {
+        const result = await build({ target, minify })
+        stopSpinner?.()
+
+        // Record and compare build metrics
+        const duration = Date.now() - startTime
+        ctx.extensions.metrics?.recordBuildTime(target, duration)
+
+        const avgTime = ctx.extensions.metrics?.getAverageTime(target) || 0
+        const comparison = avgTime > 0 ? `(avg: ${avgTime}ms)` : ''
+        ctx.extensions.logger?.log(`✓ Build complete in ${duration}ms ${comparison}`)
+
+        if (watch) {
+          ctx.extensions.logger?.log('Watch mode enabled - monitoring for changes')
+        }
+
+        return result
+      } catch (error) {
+        stopSpinner?.()
+        ctx.extensions.logger?.log(`✗ Build failed: ${error}`)
+        throw error
+      }
     }
+
+    return runner
   },
   {
     name: 'build',
     description: 'Build the project',
-    args: buildArgs
+    args: {
+      target: { type: 'string', required: true, choices: ['dev', 'prod'] },
+      minify: { type: 'boolean', default: false },
+      watch: { type: 'boolean', short: 'w' }
+    }
   }
 )
 ```
@@ -215,20 +190,30 @@ const lazyBuildCommand = lazy<BuildParams>(
 
 The `cli` function provides global type safety for your entire CLI:
 
-### Type-safe with `GunshiParams`
-
-Use `GunshiParams` to type the entire CLI context:
-
 ```ts
 import { cli } from 'gunshi'
 import type { GunshiParams } from 'gunshi'
 
+// Global type definition for database management CLI
 type GlobalParams = GunshiParams<{
-  args: Args
+  args: {
+    verbose: { type: 'boolean'; short: 'v' }
+    format: { type: 'string'; choices: ['json', 'csv', 'table']; default: 'table' }
+  }
   extensions: {
-    logger: LoggerExtension
-    auth: AuthExtension
-    db: DatabaseExtension
+    database: {
+      connect: () => Promise<void>
+      disconnect: () => Promise<void>
+      isConnected: () => boolean
+    }
+    logger: {
+      setVerbose: (verbose: boolean) => void
+      log: (msg: string) => void
+    }
+    formatter: {
+      format: (data: any, format: string) => string
+      exportToFile: (data: any, path: string, format: string) => Promise<void>
+    }
   }
 }>
 
@@ -236,69 +221,198 @@ await cli<GlobalParams>(
   process.argv.slice(2),
   {
     name: 'main',
-    run: ctx => {
-      // All extensions are available and typed
-      ctx.extensions.logger?.log('Starting CLI')
+    description: 'Database management CLI',
+    args: {
+      verbose: { type: 'boolean', short: 'v' },
+      format: { type: 'string', choices: ['json', 'csv', 'table'], default: 'table' }
+    },
+    run: async ctx => {
+      // Configure logging verbosity
+      ctx.extensions.logger?.setVerbose(ctx.values.verbose)
 
-      if (!ctx.extensions.auth?.isAuthenticated()) {
-        throw new Error('Please login first')
+      // Check database connection with permission validation
+      if (!ctx.extensions.database?.isConnected()) {
+        ctx.extensions.logger?.log('Connecting to database...')
+        await ctx.extensions.database?.connect()
       }
 
-      ctx.extensions.db?.connect()
+      // Format and display database status
+      const status = {
+        connected: ctx.extensions.database?.isConnected(),
+        timestamp: new Date().toISOString(),
+        format: ctx.values.format
+      }
+      const formatted = ctx.extensions.formatter?.format(status, ctx.values.format)
+      console.log(formatted)
     }
   },
   {
-    name: 'my-cli',
-    version: '1.0.0',
-    plugins: [logger(), auth(), db()]
+    name: 'dbcli',
+    version: '2.0.0',
+    plugins: [databasePlugin(), loggerPlugin(), formatterPlugin()]
   }
 )
 ```
 
-### Type-safe Extensions Only
-
-When you only need to type extensions without arguments:
-
-```ts
-type Extensions = {
-  renderer: RendererExtension
-  i18n: I18nExtension
-}
-
-await cli<Extensions>(args, mainCommand, {
-  plugins: [rendererPlugin(), i18nPlugin()]
-})
-```
-
 ## Using Plugin Extensions in Commands
 
-When using plugins in your commands, you can leverage their exported types for full type safety:
+When using plugins in your commands, leverage their exported types with `GunshiParams` for full type safety:
 
 ```ts
 import { define } from 'gunshi'
-import { pluginId as apiId, type ApiExtension } from './plugins/api'
-import { pluginId as authId, type AuthExtension } from './plugins/auth'
+import type { GunshiParams } from 'gunshi'
+import type { FileSystemExtension } from './plugins/filesystem'
+import type { ValidationExtension } from './plugins/validation'
 
-// Use plugin extensions in command definition
-const deployCommand = define<{
-  [apiId]: ApiExtension
-  [authId]: AuthExtension
-}>({
-  name: 'deploy',
+// Define type with GunshiParams for file operations
+type SyncParams = GunshiParams<{
+  args: {
+    source: { type: 'string'; required: true }
+    destination: { type: 'string'; required: true }
+    dryRun: { type: 'boolean'; default: false }
+  }
+  extensions: {
+    fs: FileSystemExtension
+    validator: ValidationExtension
+  }
+}>
+
+const syncCommand = define<SyncParams>({
+  name: 'sync',
+  description: 'Synchronize files between directories',
+  args: {
+    source: { type: 'string', required: true },
+    destination: { type: 'string', required: true },
+    dryRun: { type: 'boolean', default: false }
+  },
   run: async ctx => {
-    // Access plugin extensions with full type safety
-    if (!ctx.extensions[authId].isAuthenticated()) {
-      throw new Error('Please login first')
+    // Validate paths and permissions
+    const canWrite = await ctx.extensions.validator?.hasWritePermission(ctx.values.destination)
+    if (!canWrite) {
+      throw new Error(`No write permission for ${ctx.values.destination}`)
     }
 
-    const result = await ctx.extensions[apiId].post('/deployments', {
-      environment: 'production'
-    })
+    // Perform file synchronization with type safety
+    const files = await ctx.extensions.fs?.listFiles(ctx.values.source)
+    const changes = await ctx.extensions.fs?.compareDirectories(
+      ctx.values.source,
+      ctx.values.destination
+    )
 
-    console.log('Deployment successful:', result)
+    if (ctx.values.dryRun) {
+      console.log('Dry run - no changes made:', changes)
+    } else {
+      const result = await ctx.extensions.fs?.sync(ctx.values.source, ctx.values.destination)
+      console.log('Sync complete:', result)
+    }
   }
 })
 ```
 
-> [!NOTE]
-> For information on developing type-safe plugins with the `plugin` function, see the [Plugin Type System](../plugin/type-system.md) guide.
+## Combining Multiple Plugin Types
+
+When working with multiple plugins, you often need to combine their extension types to create a comprehensive type definition for your commands. TypeScript's intersection operator (`&`) provides a clean way to merge multiple plugin extension types.
+
+### Using TypeScript's Intersection Operator (&)
+
+The `&` operator creates an intersection type that combines multiple type definitions. This is particularly useful when your command needs to access extensions from multiple plugins.
+
+#### With Official Gunshi Plugins
+
+When using official Gunshi plugins that provide plugin IDs, combine their extensions using Record types:
+
+```ts
+import { pluginId as globalId } from '@gunshi/plugin-global'
+import { pluginId as rendererId } from '@gunshi/plugin-renderer'
+import { pluginId as i18nId } from '@gunshi/plugin-i18n'
+
+import type { GlobalExtension, PluginId as GlobalId } from '@gunshi/plugin-global'
+import type { UsageRendererExtension, PluginId as RendererId } from '@gunshi/plugin-renderer'
+import type { I18nExtension, PluginId as I18nId } from '@gunshi/plugin-i18n'
+
+// Combine multiple plugin extension types
+type CombinedExtensions = Record<GlobalId, GlobalExtension> &
+  Record<RendererId, UsageRendererExtension> &
+  Record<I18nId, I18nExtension>
+
+type InternationalParams = GunshiParams<{
+  args: {
+    name: { type: 'string'; required: true }
+  }
+  extensions: CombinedExtensions
+}>
+
+const internationalCommand = define<InternationalParams>({
+  name: 'greet',
+  args: {
+    name: { type: 'string', required: true }
+  },
+  run: async ctx => {
+    // Access all plugin extensions with full type safety
+    const greeting = ctx.extensions[i18nId]?.translate('greeting', { name: ctx.values.name })
+
+    // UsageRendererExtension provides text localization and command loading
+    const message = ctx.extensions[rendererId]?.text('welcome')
+    const commands = await ctx.extensions[rendererId]?.loadCommands()
+
+    console.log(greeting)
+    if (message) console.log(message)
+
+    // Access environment properties directly on context (not through extensions)
+    console.log(`Running in ${ctx.env?.name || 'unknown'} environment`)
+  }
+})
+```
+
+#### With Custom Plugins
+
+For custom plugins that don't use plugin IDs, combine the extension types directly:
+
+```ts
+import { pluginId as loggerId } from './plugins/logger'
+import { pluginId as authId } from './plugins/auth'
+import { pluginId as databaseId } from './plugins/database'
+
+import type { GunshiParams } from 'gunshi'
+import type { LoggerExtension, PluginId as LoggerId } from './plugins/logger'
+import type { AuthExtension, PluginId as AuthId } from './plugins/auth'
+import type { DatabaseExtension, PluginId as DatabaseId } from './plugins/database'
+
+type CombinedExtensions = Record<LoggerId, LoggerExtension> &
+  Record<AuthId, AuthExtension> &
+  Record<DatabaseId, DatabaseExtension>
+
+type CommandParams = GunshiParams<{
+  args: {
+    table: { type: 'string'; required: true }
+    limit: { type: 'number'; default: 10 }
+  }
+  extensions: CombinedExtensions
+}>
+
+const queryCommand = define<CommandParams>({
+  name: 'query',
+  description: 'Query database tables',
+  args: {
+    table: { type: 'string', required: true },
+    limit: { type: 'number', default: 10 }
+  },
+  run: async ctx => {
+    // All extensions and arguments are fully typed
+    ctx.extensions[loggerId]?.log(`Querying ${ctx.values.table}`)
+
+    // Check read permissions for the specific table
+    if (!ctx.extensions[authId]?.hasPermission('read', ctx.values.table)) {
+      throw new Error(`No read access to table: ${ctx.values.table}`)
+    }
+
+    const results = await ctx.extensions[databaseId]?.query(ctx.values.table, {
+      limit: ctx.values.limit
+    })
+
+    return results
+  }
+})
+```
+
+Both patterns achieve the same goal: combining multiple plugin extensions with full type safety. Use Record types when working with official plugins that provide plugin IDs, and direct intersection types for custom plugins.
