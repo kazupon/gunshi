@@ -31,7 +31,7 @@ bun add @gunshi/plugin-i18n
 
 ```ts
 import { cli } from 'gunshi'
-import i18n, { defineI18n } from '@gunshi/plugin-i18n'
+import i18n, { pluginId as i18nId, defineI18n } from '@gunshi/plugin-i18n'
 
 /**
  * You can define a command with `defineI18n`, which is compatible with the `define` function.
@@ -61,7 +61,7 @@ const greetCommand = defineI18n({
   run: async ctx => {
     const { name } = ctx.values
     // Use translate function from context
-    console.log(ctx.extensions['g:i18n'].translate('greeting', { name }))
+    console.log(ctx.extensions[i18nId].translate('greeting', { name }))
   }
 })
 
@@ -117,7 +117,7 @@ Example with globals plugin:
 import { cli } from 'gunshi'
 import i18n from '@gunshi/plugin-i18n'
 import globals from '@gunshi/plugin-global' // need install `@gunshi/plugin-global`
-import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' } // need install `@gunshi/resources`
+import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' } // need install `@gunshi/resources`
 
 await cli(args, command, {
   plugins: [
@@ -125,7 +125,7 @@ await cli(args, command, {
     i18n({
       locale: 'ja-JP',
       builtinResources: {
-        'ja-JP': jsJPResource // Set from with providing gunshi built-in resources
+        'ja-JP': jaJPResource // Set from with providing gunshi built-in resources
       }
     })
   ]
@@ -136,7 +136,9 @@ await cli(args, command, {
 
 ### `defineI18n`
 
-Type-safe helper to define an i18n-aware command.
+Type-safe helper to define an i18n-aware command. this function is compatible with the `define` function.
+
+This provides full type safety for i18n commands - TypeScript will suggest the 'resource' option and ensure your resource keys match the expected structure.
 
 ```ts
 import { defineI18n } from '@gunshi/plugin-i18n'
@@ -146,6 +148,7 @@ const command = defineI18n({
   args: {
     name: { type: 'string' }
   },
+  // Define resource fetcher for translations
   resource: async ctx => ({
     description: 'Say hello',
     'arg:name': 'Your name'
@@ -158,7 +161,7 @@ const command = defineI18n({
 
 ### `withI18nResource`
 
-Add i18n resource to an existing command. This helper is useful for extending an already defined command.
+Add i18n resource to an existing command. This helper is useful for extending an already defined command with `define` function.
 
 ```ts
 import { define } from 'gunshi' // alternative 'gunshi/definition', or '@gunshi/definition'
@@ -239,14 +242,14 @@ const command = defineI18n({
     description: 'Deploy application',
     'arg:environment': 'Target environment',
     'arg:force': 'Force deployment',
-    deploy_start: 'Starting deployment...',
-    deploy_success: 'Deployment completed successfully!'
+    start: 'Starting deployment...',
+    success: 'Deployment completed successfully!'
   }),
   run: async ctx => {
     const { translate } = ctx.extensions['g:i18n']
 
-    // Direct usage (need to prefix with command name)
-    console.log(translate('deploy:deploy_start'))
+    // Usage helper for custom keys (prefix with command name)
+    console.log(translate(resolveKey('start', ctx)))
 
     // Using helpers for explicit control
     const envKey = resolveArgKey('environment', ctx)
@@ -394,13 +397,15 @@ The `translate` function has different behaviors depending on the key type:
 This difference is important for error handling and fallback displays:
 
 ```ts
+import { resolveKey, resolveBuiltInKey } from '@gunshi/plugin-i18n'
+
 const { translate } = ctx.extensions['g:i18n']
 
 // Custom key not found
-translate('nonexistent_key') // Returns: ''
+translate(resolveKey('nonexistent_key', ctx)) // Returns: ''
 
 // Built-in key not found (if not overridden)
-translate('USAGE') // Returns: 'USAGE'
+translate(resolveBuiltInKey('USAGE')) // Returns: 'USAGE'
 ```
 
 ### Resource Loading Behavior
@@ -457,19 +462,21 @@ await cli(args, command, {
 The default translation adapter supports simple interpolation using `{$key}` syntax:
 
 ```ts
+import { pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
+
 // In your resource
 const resource = {
   welcome: 'Welcome, {$name}!',
-  'items.count': 'You have {$count} items',
+  items_count: 'You have {$count} items',
   file_deleted: 'Deleted {$path}',
   error_message: 'Error: {$error}'
 }
 // In your command
-const { translate } = ctx.extensions['g:i18n']
-translate(resolveKey('welcome'), { name: 'John' }) // "Welcome, John!"
-translate(resolveKey('items.count'), { count: 5 }) // "You have 5 items"
-translate(resolveKey('file_deleted'), { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
-translate(resolveKey('error_message'), { error: 'File not found' }) // "Error: File not found"
+const { translate } = ctx.extensions[i18nId]
+translate(resolveKey('welcome', ctx), { name: 'John' }) // "Welcome, John!"
+translate(resolveKey('items_count', ctx), { count: 5 }) // "You have 5 items"
+translate(resolveKey('file_deleted', ctx), { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
+translate(resolveKey('error_message', ctx), { error: 'File not found' }) // "Error: File not found"
 ```
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
@@ -538,7 +545,7 @@ When you provide a custom translation adapter:
 
 ```ts
 import { cli } from 'gunshi'
-import i18n, { defineI18n } from '@gunshi/plugin-i18n'
+import i18n, { defineI18n, pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
 import {
   createCoreContext,
   getLocaleMessage,
@@ -624,7 +631,7 @@ const command = defineI18n({
 
   // Define a resource fetcher with Intlify syntax
   resource: async ctx => {
-    const locale = ctx.extensions['g:i18n'].locale.toString()
+    const locale = ctx.extensions[i18nId].locale.toString()
 
     if (locale === 'ja-JP') {
       return {
@@ -647,11 +654,11 @@ const command = defineI18n({
 
   run: ctx => {
     const { name = 'World', count } = ctx.values
-    const { translate } = ctx.extensions['g:i18n']
+    const { translate } = ctx.extensions[i18nId]
 
     // Use the translation function with Intlify
     const key = count > 1 ? 'greeting_plural' : 'greeting'
-    const message = translate(key, { name, count })
+    const message = translate(resolveKey(key, ctx), { name, count })
 
     console.log(message)
   }
@@ -685,43 +692,6 @@ With Intlify, you get advanced features like:
 > Intlify uses `{name}` syntax for interpolation (without the `$` prefix), which is different from Gunshi's default adapter that uses `{$name}`.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
-
-## 🎯 Type-Safe Translation Keys
-
-The i18n plugin provides sophisticated TypeScript type support for translation keys. When using TypeScript, the `translate` function will provide auto-completion and type checking for:
-
-- Built-in keys (`USAGE`, `OPTIONS`, `COMMANDS`, etc.)
-- Argument keys based on your command's args definition (`arg:name`, `arg:verbose`, etc.)
-- Custom keys defined in your resource
-
-```ts
-import { defineI18n } from '@gunshi/plugin-i18n'
-
-const command = defineI18n({
-  name: 'example',
-  args: {
-    file: { type: 'string' },
-    verbose: { type: 'boolean' }
-  },
-  resource: async () => ({
-    description: 'Example command',
-    'arg:file': 'File to process',
-    'arg:verbose': 'Enable verbose output',
-    custom_message: 'This is a custom message'
-  }),
-  run: ctx => {
-    const { translate } = ctx.extensions['g:i18n']
-
-    // TypeScript knows these are valid keys
-    translate('USAGE') // Built-in key
-    translate('arg:file') // Arg key from command definition
-    translate('custom_message') // Custom key from resource
-
-    // TypeScript will error on invalid keys
-    // translate('invalid_key')  // Type error!
-  }
-})
-```
 
 ## 📚 API References
 

@@ -135,7 +135,7 @@ Available extensions:
 
 ```ts
 import { cli, define } from 'gunshi'
-import renderer from '@gunshi/plugin-renderer'
+import renderer, { pluignId as rendererId } from '@gunshi/plugin-renderer'
 
 const deploy = define({
   name: 'deploy',
@@ -157,7 +157,7 @@ const entry = define({
   name: 'tools',
   run: async ctx => {
     // Access renderer extensions
-    const { text, loadCommands } = ctx.extensions['g:renderer']
+    const { text, loadCommands } = ctx.extensions[rendererId]
 
     // Render built-in message
     const usageHeader = await text('_:USAGE') // "USAGE" or translated
@@ -210,43 +210,6 @@ await cli(args, command, {
       resources // Uses built-in resources from `@gunshi/resources`
     }),
     renderer() // Will use Japanese translations
-  ]
-})
-```
-
-#### With Custom Resources
-
-You can extend the built-in resources with your own translations:
-
-```ts
-import { cli } from 'gunshi'
-import renderer from '@gunshi/plugin-renderer'
-import i18n from '@gunshi/plugin-i18n'
-import resources from '@gunshi/resources'
-
-// Extend built-in resources with custom messages
-const customResources = {
-  'en-US': {
-    ...resources['en-US'],
-    // Custom messages for your app
-    APP_WELCOME: 'Welcome to My CLI Tool!',
-    APP_PROCESSING: 'Processing your request...'
-  },
-  'ja-JP': {
-    ...resources['ja-JP'],
-    // Custom messages in Japanese
-    APP_WELCOME: '私のCLIツールへようこそ！',
-    APP_PROCESSING: 'リクエストを処理しています...'
-  }
-}
-
-await cli(args, command, {
-  plugins: [
-    i18n({
-      locale: 'ja-JP',
-      resources: customResources
-    }),
-    renderer() // Will use Japanese translations including custom messages
   ]
 })
 ```
