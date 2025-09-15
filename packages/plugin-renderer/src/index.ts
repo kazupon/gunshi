@@ -47,6 +47,7 @@ import type { I18nExtension } from '@gunshi/plugin-i18n'
 import type { UsageRendererExtension } from './types.ts'
 
 export { renderHeader } from './header.ts'
+export * from './types.ts'
 export { renderUsage } from './usage.ts'
 export { renderValidationErrors } from './validation.ts'
 
