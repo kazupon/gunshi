@@ -257,7 +257,7 @@ const command = define<Record<GlobalId, GlobalExtension>>({
 ```
 
 > [!NOTE]
-> For comprehensive type parameter usage including `GunshiParams`, combining multiple plugin types with the `&` operator, and advanced type safety techniques, see the [Type System guide](./type-system.md)
+> For comprehensive type parameter usage including `GunshiParams`, combining multiple plugin types with the intersection (`&`), and advanced type safety techniques, see the [Type System guide](./type-system.md)
 
 ## Custom Extension Techniques
 
