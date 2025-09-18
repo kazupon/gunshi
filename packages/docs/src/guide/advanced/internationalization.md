@@ -15,7 +15,7 @@ Internationalization offers several benefits:
 
 First, install the i18n plugin and optional resource packages:
 
-```bash
+```sh
 npm install @gunshi/plugin-i18n @gunshi/resources
 ```
 
@@ -74,8 +74,8 @@ const command = defineI18n({
 
     // Use resolveKey for custom keys with proper namespacing
     const greetingKey = formal
-      ? resolveKey('formal_greeting', ctx.name)
-      : resolveKey('informal_greeting', ctx.name)
+      ? resolveKey('formal_greeting', ctx)
+      : resolveKey('informal_greeting', ctx)
 
     const greeting = t(greetingKey)
     console.log(`${greeting}, ${name}!`)
@@ -85,7 +85,7 @@ const command = defineI18n({
     console.log(`\nCurrent locale: ${locale}`)
 
     // Use resolveKey for description as well
-    const descKey = resolveKey('description', ctx.name)
+    const descKey = resolveKey('description', ctx)
     console.log(`Command Description: ${t(descKey)}`)
   }
 })
@@ -391,7 +391,7 @@ The i18n plugin provides helpful utilities for working with translations:
 Create type-safe commands with i18n support:
 
 ```js
-import { defineI18n, resolveKey } from '@gunshi/plugin-i18n'
+import { defineI18n, resolveKey, pluginId as i18nId } from '@gunshi/plugin-i18n'
 
 const command = defineI18n({
   name: 'app',
@@ -401,7 +401,7 @@ const command = defineI18n({
   run: ctx => {
     // TypeScript knows about available translation keys
     const welcomeKey = resolveKey('welcome', ctx)
-    console.log(ctx.extensions['g:i18n'].translate(welcomeKey))
+    console.log(ctx.extensions[i18nId].translate(welcomeKey))
   }
 })
 ```
@@ -424,11 +424,9 @@ const existingCommand = {
   }
 }
 
-const i18nCommand = withI18nResource(existingCommand, {
-  resource: async ctx => ({
-    message: 'Hello from i18n!'
-  })
-})
+const i18nCommand = withI18nResource(existingCommand, async ctx => ({
+  message: 'Hello from i18n!'
+}))
 ```
 
 ### resolveKey
@@ -524,74 +522,24 @@ await cli(process.argv.slice(2), command, {
     })
   ]
 })
+```
 
+For Node.js v21+ environments, you can also detect locale using the navigator API:
+
+```js
 // For Node.js v21+, use navigator.language
 const locale = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
 ```
 
 ## Custom Translation Adapters
 
-For advanced scenarios, create custom translation adapters by implementing the TranslationAdapter interface:
+For advanced scenarios requiring custom interpolation syntax or translation logic, you can create custom translation adapters by implementing the TranslationAdapter interface. This allows full control over how translations are stored, retrieved, and interpolated.
 
-```js
-import i18n from '@gunshi/plugin-i18n'
-
-// Custom translation adapter implementation
-class CustomTranslationAdapter {
-  constructor(options) {
-    this.locale = options.locale
-    this.fallbackLocale = options.fallbackLocale
-    this.resources = new Map()
-  }
-
-  // Get resource for a locale
-  getResource(locale) {
-    return this.resources.get(locale)
-  }
-
-  // Set resource for a locale
-  setResource(locale, resource) {
-    this.resources.set(locale, resource)
-  }
-
-  // Get a specific message
-  getMessage(locale, key) {
-    const resource = this.getResource(locale)
-    return resource?.[key]
-  }
-
-  // Translate with custom logic
-  translate(locale, key, values = {}) {
-    let message = this.getMessage(locale, key)
-
-    // Fallback logic
-    if (!message && locale !== this.fallbackLocale) {
-      message = this.getMessage(this.fallbackLocale, key)
-    }
-
-    if (!message) return undefined
-
-    // Custom interpolation logic (e.g., different placeholder format)
-    return message.replace(/{(\w+)}/g, (_, name) => {
-      return values[name]?.toString() || ''
-    })
-  }
-}
-
-// Use the custom adapter
-await cli(process.argv.slice(2), command, {
-  plugins: [
-    i18n({
-      locale: 'en-US',
-      translationAdapterFactory: options => new CustomTranslationAdapter(options)
-    })
-  ]
-})
-```
+For detailed implementation guidance and examples, see the [Custom Translation Adapter documentation](https://github.com/kazupon/gunshi/tree/main/packages/plugin-i18n#-custom-translation-adapter) in the @gunshi/plugin-i18n package.
 
 ## Complete Example
 
-Here's a comprehensive example combining multiple i18n features:
+The following comprehensive example demonstrates how to combine multiple i18n features including type-safe command definitions, dynamic resource loading, interpolation, and built-in resources:
 
 ```js
 import { cli } from 'gunshi'
@@ -736,4 +684,4 @@ const message = t(welcomeKey)
 
 ## Migration from v0.26
 
-If you're migrating from Gunshi v0.26 where i18n was built into the CLI options, see the [v0.27 Release Notes](/gunshi-v027-release-notes#internationalization-migration) for detailed migration instructions.
+If you're migrating from Gunshi v0.26 where i18n was built into the CLI options, see the [v0.27 Release Notes](../../release/v0.27.md#internationalization-migration) for detailed migration instructions.
