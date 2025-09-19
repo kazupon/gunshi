@@ -349,7 +349,7 @@ const command = {
 > [!TIP]
 > Learn how to create your own plugins with custom extensions in the [Plugin Development](../plugin/introduction.md) guide.
 
-## Guidelines for Pluign using users
+## Guidelines for Plugin using users
 
 ### 1. Always Import Plugin IDs
 

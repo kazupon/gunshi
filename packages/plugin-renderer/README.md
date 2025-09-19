@@ -135,7 +135,7 @@ Available extensions:
 
 ```ts
 import { cli, define } from 'gunshi'
-import renderer, { pluignId as rendererId } from '@gunshi/plugin-renderer'
+import renderer, { pluginId as rendererId } from '@gunshi/plugin-renderer'
 
 const deploy = define({
   name: 'deploy',
