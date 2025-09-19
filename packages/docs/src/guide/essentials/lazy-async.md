@@ -203,6 +203,9 @@ await cli(
 
 With this approach, your bundler (rollup, esbuild, webpack, etc.) will automatically create separate chunks for `./commands/build.ts` and `./commands/deploy.ts`. Users only download and parse the code for commands they actually use.
 
+> [!NOTE]
+> On Node.js v23.6.0 and newer, type stripping is enabled by default so erasable TypeScript runs without flags; transformations (e.g., `enum`) still require `--experimental-transform-types`.
+
 ## Async Command Execution
 
 Gunshi seamlessly supports asynchronous command execution, which is essential for commands that perform I/O operations, network requests, or other async tasks. Building on lazy loading, your command runners can be async functions:

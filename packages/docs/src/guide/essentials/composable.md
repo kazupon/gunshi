@@ -100,13 +100,13 @@ $ npx tsx cli.ts create --help
 > [**tsx**](https://github.com/privatenumber/tsx) is a TypeScript execution tool that allows you to run TypeScript files directly without compilation. Use it directly with `npx tsx`.
 
 > [!NOTE]
-> Starting from Node.js v22.6.0, you can run TypeScript files directly using the `--experimental-strip-types` flag:
+> On Node.js v22.6.0, you can run TypeScript with `--experimental-strip-types`:
 >
 > ```sh
 > node --experimental-strip-types cli.ts --help
 > ```
 >
-> Or, Node.js latest version, such as v24, that flag is not required.
+> From Node.js v23.6.0 and newer, type stripping is enabled by default (no flag needed for erasable TS). Features requiring transformation (e.g., `enum`) still need `--experimental-transform-types`.
 
 Each sub-command's help includes its description, available options, and usage examples.
 

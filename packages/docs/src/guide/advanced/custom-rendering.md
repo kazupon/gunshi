@@ -348,6 +348,33 @@ $ task-manager --complete "Complete the project"`,
   }
 }
 
+// Define custom usage renderer
+const customUsageRenderer = ctx => {
+  const lines = []
+  lines.push('📋 USAGE:')
+  lines.push(`  ${ctx.env.name} [options]`)
+  lines.push('')
+  lines.push('⚡ QUICK START:')
+  lines.push('  Run with --help for detailed options')
+  return lines.join('\n')
+}
+
+// Define custom validation errors renderer
+const customValidationErrorsRenderer = (ctx, error) => {
+  const lines = []
+  lines.push('❌ VALIDATION ERROR')
+  lines.push('────────────────────')
+
+  // Display each validation error
+  for (const e of error.errors) {
+    lines.push(`  • ${e.message}`)
+  }
+
+  lines.push('')
+  lines.push('💡 TIP: Use --help to see valid options')
+  return lines.join('\n')
+}
+
 // Run the CLI with all custom renderers
 await cli(process.argv.slice(2), command, {
   name: 'task-manager',
@@ -475,6 +502,8 @@ When using multiple rendering plugins, they execute in the order they are regist
 Let's create a simple emoji plugin to demonstrate plugin combination:
 
 ```ts
+import { plugin } from 'gunshi/plugin'
+
 // Define a simple emoji plugin using correct decorator API
 const emojiPlugin = plugin({
   id: 'my:emoji',

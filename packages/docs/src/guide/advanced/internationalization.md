@@ -520,8 +520,23 @@ await cli(process.argv.slice(2), command, {
 In Node.js v21 and later, you can also detect locale using the navigator API:
 
 ```ts
-// For Node.js v21+, use navigator.language
-const locale = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
+// In browser or Node.js v21.2.0+ (experimental global navigator), use navigator.language
+// Otherwise, fall back to environment- or Intl-based detection
+const locale = (() => {
+  // Experimental global navigator in Node 21.2.0+
+  if (typeof globalThis.navigator !== 'undefined' && navigator.language) {
+    return navigator.language
+  }
+  // Fallback: read locale from environment variables
+  const env = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || 'en-US'
+  const base = env.split('.')[0].replace('_', '-')
+  try {
+    // Normalize and validate with Intl.Locale
+    return new Intl.Locale(base).toString()
+  } catch {
+    return 'en-US'
+  }
+})()
 ```
 
 ## Custom Translation Adapters

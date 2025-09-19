@@ -179,12 +179,12 @@ await cli(Deno.args, command)
 
 ### Bun
 
-Bun also supports `Bun.argv` like Node.js:
+Bun also provides `Bun.argv` similar to Node.js:
 
 ```js
 import { cli } from 'gunshi'
 
-await cli(Bun.argv.slice(2), command) // or, `process.argv.slice(2)`, because bun support Node.js API compatible
+await cli(Bun.argv.slice(2), command) // or use process.argv.slice(2) in Bun
 ```
 
 Note that while the argument passing differs slightly between runtimes, the Gunshi API remains consistent across all environments.
