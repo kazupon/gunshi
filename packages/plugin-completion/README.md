@@ -170,8 +170,12 @@ source ~/.zshrc
 exec zsh
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Zsh completion files must start with an underscore (`_`) followed by the command name.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Fish
 
@@ -223,8 +227,12 @@ If completions don't work after setup:
 
 ### System-wide Installation
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!WARNING]
 > System-wide installation requires root/administrator permissions and is not recommended for most users. User-specific installation is preferred as it doesn't require elevated privileges and is easier to manage.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 If you need system-wide completions:
 
