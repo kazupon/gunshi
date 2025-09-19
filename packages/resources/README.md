@@ -88,7 +88,7 @@ await cli(
     plugins: [
       i18n({
         locale: 'ja-JP',
-        resources // Use @gunshi/resources directly
+        builtinResources: resources // Use @gunshi/resources directly
       })
     ]
   }

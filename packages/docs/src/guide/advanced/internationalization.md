@@ -23,7 +23,7 @@ npm install @gunshi/plugin-i18n @gunshi/resources
 
 Here's how to implement basic internationalization using the i18n plugin:
 
-```js
+```ts [cli.ts]
 import { cli } from 'gunshi'
 import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
 
@@ -97,7 +97,7 @@ await cli(process.argv.slice(2), command, {
   plugins: [
     i18n({
       // Set locale from environment or default to en-US
-      locale: process.env.LANG || 'en-US'
+      locale: process.env.MY_LANG || 'en-US'
     })
   ]
 })
@@ -117,7 +117,7 @@ To run this example with different locales:
 
 ```sh
 # English (default)
-node index.js --name John
+node cli.ts --name John
 
 # i18n-example (i18n-example v1.0.0)
 #
@@ -127,7 +127,7 @@ node index.js --name John
 # Command Description: Greeting application
 
 # Japanese
-LANG=ja-JP node index.js --name 田中 --formal
+MY_LANG=ja-JP node cli.ts --name 田中 --formal
 
 # i18n-example (i18n-example v1.0.0)
 #
@@ -141,11 +141,10 @@ LANG=ja-JP node index.js --name 田中 --formal
 
 The `@gunshi/resources` package provides pre-translated resources for common CLI terms:
 
-```js
+```ts
 import { cli } from 'gunshi'
 import i18n from '@gunshi/plugin-i18n'
-import enUS from '@gunshi/resources/en-US.json' with { type: 'json' }
-import jaJP from '@gunshi/resources/ja-JP.json' with { type: 'json' }
+import resources from '@gunshi/resources'
 
 const command = {
   name: 'app',
@@ -160,11 +159,9 @@ await cli(process.argv.slice(2), command, {
   plugins: [
     i18n({
       locale: 'en-US',
-      // Provide built-in translations for common terms
-      builtinResources: {
-        'en-US': enUS,
-        'ja-JP': jaJP
-      }
+      // Provide built-in translations for common terms.
+      // See the support locales: https://github.com/kazupon/gunshi/tree/main/packages/resources#-supported-locales
+      builtinResources: resources
     })
   ]
 })
@@ -179,7 +176,7 @@ await cli(process.argv.slice(2), command, {
 
 For better organization, load translations from separate files:
 
-```js
+```ts [cli.ts]
 import { cli } from 'gunshi'
 import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
 
@@ -196,10 +193,10 @@ const command = defineI18n({
 
     if (locale === 'ja-JP') {
       // Dynamic import for lazy loading
-      const resource = await import('./locales/ja-JP.json', {
+      const jaJP = await import('./locales/ja-JP.json', {
         with: { type: 'json' }
       })
-      return resource.default
+      return jaJP.default
     }
 
     // Default to English
@@ -228,7 +225,7 @@ await cli(process.argv.slice(2), command, {
   version: '1.0.0',
   plugins: [
     i18n({
-      locale: process.env.LANG || 'en-US'
+      locale: process.env.MY_LANG || 'en-US'
     })
   ]
 })
@@ -264,7 +261,7 @@ Example locale files:
 
 The i18n plugin supports message interpolation for dynamic content:
 
-```js
+```ts
 import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
 
 const command = defineI18n({
@@ -305,11 +302,10 @@ Note: Interpolation placeholders use the format `{$variableName}` in the i18n pl
 
 When working with sub-commands, each command has its own namespace for translations:
 
-```js
+```ts [cli.ts]
 import { cli } from 'gunshi'
 import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
-import enUS from '@gunshi/resources/en-US.json' with { type: 'json' }
-import jaJP from '@gunshi/resources/ja-JP.json' with { type: 'json' }
+import resources from '@gunshi/resources'
 
 // Sub-command with its own translations
 const createCommand = defineI18n({
@@ -372,11 +368,8 @@ await cli(process.argv.slice(2), mainCommand, {
   },
   plugins: [
     i18n({
-      locale: process.env.LANG || 'en-US',
-      builtinResources: {
-        'en-US': enUS,
-        'ja-JP': jaJP
-      }
+      locale: process.env.MY_LANG || 'en-US',
+      builtinResources: resources
     })
   ]
 })
@@ -390,7 +383,7 @@ The i18n plugin provides helpful utilities for working with translations:
 
 Create type-safe commands with i18n support:
 
-```js
+```ts
 import { defineI18n, resolveKey, pluginId as i18nId } from '@gunshi/plugin-i18n'
 
 const command = defineI18n({
@@ -410,7 +403,7 @@ const command = defineI18n({
 
 Add i18n resources to existing commands:
 
-```js
+```ts
 import { withI18nResource, resolveKey, pluginId as i18nId } from '@gunshi/plugin-i18n'
 
 const existingCommand = {
@@ -433,7 +426,7 @@ const i18nCommand = withI18nResource(existingCommand, async ctx => ({
 
 The `resolveKey` helper ensures proper namespace handling for custom translation keys:
 
-```js
+```ts
 import { resolveKey } from '@gunshi/plugin-i18n'
 
 // For a command named 'build'
@@ -492,7 +485,7 @@ Good Flat structure:
 }
 ```
 
-Bad Nested structure (won't work with `translate('messages.greeting')`:
+Bad Nested structure (won't work with `translate('messages.greeting')`):
 
 ```json
 {
@@ -515,18 +508,18 @@ await cli(process.argv.slice(2), command, {
   plugins: [
     i18n({
       // From environment variable
-      locale: process.env.LANG || 'en-US',
+      locale: process.env.MY_LANG || 'en-US',
 
       // Or using Intl.Locale for advanced locale handling
-      locale: new Intl.Locale(process.env.LANG || 'en-US')
+      locale: new Intl.Locale(process.env.MY_LANG || 'en-US')
     })
   ]
 })
 ```
 
-For Node.js v21+ environments, you can also detect locale using the navigator API:
+In Node.js v21 and later, you can also detect locale using the navigator API:
 
-```js
+```ts
 // For Node.js v21+, use navigator.language
 const locale = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
 ```
@@ -535,104 +528,7 @@ const locale = typeof navigator !== 'undefined' && navigator.language ? navigato
 
 For advanced scenarios requiring custom interpolation syntax or translation logic, you can create custom translation adapters by implementing the TranslationAdapter interface. This allows full control over how translations are stored, retrieved, and interpolated.
 
-For detailed implementation guidance and examples, see the [Custom Translation Adapter documentation](https://github.com/kazupon/gunshi/tree/main/packages/plugin-i18n#-custom-translation-adapter) in the @gunshi/plugin-i18n package.
-
-## Complete Example
-
-The following comprehensive example demonstrates how to combine multiple i18n features including type-safe command definitions, dynamic resource loading, interpolation, and built-in resources:
-
-```js
-import { cli } from 'gunshi'
-import i18n, { pluginId as i18nId, defineI18n, resolveKey } from '@gunshi/plugin-i18n'
-import enUS from '@gunshi/resources/en-US.json' with { type: 'json' }
-import jaJP from '@gunshi/resources/ja-JP.json' with { type: 'json' }
-
-// Use defineI18n for type-safe command definition
-const command = defineI18n({
-  name: 'task-manager',
-  args: {
-    action: {
-      type: 'string',
-      required: true,
-      description: 'Action to perform'
-    },
-    target: {
-      type: 'string',
-      description: 'Target resource'
-    },
-    verbose: {
-      type: 'boolean',
-      short: 'v',
-      description: 'Verbose output'
-    }
-  },
-
-  resource: async ctx => {
-    const locale = ctx.extensions[i18nId].locale.toString()
-
-    if (locale === 'ja-JP') {
-      return {
-        description: 'タスク管理ツール',
-        'arg:action': '実行するアクション',
-        'arg:target': 'ターゲットリソース',
-        'arg:verbose': '詳細出力',
-        processing: '{$action}を実行中: {$target}',
-        success: '完了しました！',
-        error: 'エラー: {$message}'
-      }
-    }
-
-    return {
-      description: 'Task management tool',
-      'arg:action': 'Action to perform',
-      'arg:target': 'Target resource',
-      'arg:verbose': 'Verbose output',
-      processing: 'Processing {$action}: {$target}',
-      success: 'Completed successfully!',
-      error: 'Error: {$message}'
-    }
-  },
-
-  run: ctx => {
-    const t = ctx.extensions[i18nId].translate
-    const { action, target, verbose } = ctx.values
-
-    if (verbose) {
-      const locale = ctx.extensions[i18nId].locale
-      console.log(`Locale: ${locale}`)
-    }
-
-    // Always use resolveKey for custom keys
-    const processingKey = resolveKey('processing', ctx)
-    const successKey = resolveKey('success', ctx)
-    const errorKey = resolveKey('error', ctx)
-
-    console.log(t(processingKey, { action, target: target || 'default' }))
-
-    try {
-      // Perform action
-      console.log(t(successKey))
-    } catch (error) {
-      console.error(t(errorKey, { message: error.message }))
-    }
-  }
-})
-
-// Run with i18n plugin
-await cli(process.argv.slice(2), command, {
-  name: 'task-cli',
-  version: '2.0.0',
-  plugins: [
-    i18n({
-      locale: process.env.LANG || 'en-US',
-      builtinResources: {
-        'en-US': enUS,
-        'ja-JP': jaJP
-      }
-    })
-  ]
-})
-```
+For detailed implementation guidance and examples, see the [Custom Translation Adapter documentation](https://github.com/kazupon/gunshi/tree/main/packages/plugin-i18n#-custom-translation-adapter) in the `@gunshi/plugin-i18n` package.
 
 ## Translating Help Messages
 
@@ -673,7 +569,7 @@ Japanese (with proper locale):
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
-```js
+```ts
 // ❌ Wrong - Don't access custom keys directly
 const message = t('welcome')
 
