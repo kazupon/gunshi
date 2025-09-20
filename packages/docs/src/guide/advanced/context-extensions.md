@@ -1,13 +1,19 @@
 # Context Extensions
 
-Plugins in Gunshi extend the command context with additional functionality through the extension system. This guide explains how to leverage these extensions to build more powerful CLI applications.
+Plugins in Gunshi extend the command context with additional functionality through the extension system.
+
+This guide explains how to leverage these extensions to build more powerful CLI applications.
 
 > [!TIP]
 > This guide assumes familiarity with the basic concepts explained in the [Plugin System](../essentials/plugin-system.md). Context extensions are a core feature of the plugin system, providing the mechanism through which plugins deliver functionality to commands.
 
 ## Understanding Context Extensions
 
-The command context (`ctx`) is the central object passed to every command runner. Plugins enhance this context by adding new capabilities through the extensions property, allowing your commands to access additional functionality like logging, internationalization, or custom services. Each plugin contributes its own extension under a unique namespace, ensuring clean separation of concerns and preventing conflicts between different plugins.
+The command context (`ctx`) is the central object passed to every command runner.
+
+Plugins enhance this context by adding new capabilities through the extensions property, allowing your commands to access additional functionality like logging, internationalization, or custom services.
+
+Each plugin contributes its own extension under a unique namespace, ensuring clean separation of concerns and preventing conflicts between different plugins.
 
 ```ts
 // Basic command context
@@ -27,7 +33,11 @@ const command = {
 
 ## How Extensions Work
 
-Each plugin registers its extension under a unique identifier (plugin ID) within the `ctx.extensions` object. This namespacing approach prevents collisions between plugins and makes dependencies explicit. When a plugin is added to your CLI configuration, its extension becomes available to all commands through this standardized interface:
+Each plugin registers its extension under a unique identifier (plugin ID) within the `ctx.extensions` object.
+
+This namespacing approach prevents collisions between plugins and makes dependencies explicit.
+
+When a plugin is added to your CLI configuration, its extension becomes available to all commands through this standardized interface:
 
 > [!TIP]
 > For details on how plugin extensions work, see the [Plugin Extensions](../plugin/extensions.md) guide.
@@ -49,7 +59,9 @@ const command = {
 
 ## Working with Built-in Plugin Extensions
 
-Gunshi provides several official plugins with pre-built extensions that cover common CLI needs. Understanding how to use these extensions effectively will accelerate your CLI development.
+Gunshi provides several official plugins with pre-built extensions that cover common CLI needs.
+
+Understanding how to use these extensions effectively will accelerate your CLI development.
 
 ### Global Plugin Extension
 
@@ -110,7 +122,9 @@ const command = {
 
 ## Using Optional Plugin Extensions
 
-Beyond the core plugins, Gunshi's ecosystem includes optional plugins for specialized functionality. These extensions follow the same patterns but may not be present in all CLI configurations.
+Beyond the core plugins, Gunshi's ecosystem includes optional plugins for specialized functionality.
+
+These extensions follow the same patterns but may not be present in all CLI configurations.
 
 ### I18n Plugin Extension
 
@@ -140,11 +154,17 @@ const command = {
 
 ## Extension Techniques
 
-The following techniques demonstrate code for working effectively with extensions in various scenarios. These approaches ensure your commands remain flexible, maintainable, and resilient.
+The following techniques demonstrate code for working effectively with extensions in various scenarios.
+
+These approaches ensure your commands remain flexible, maintainable, and resilient.
 
 ### Safe Extension Access
 
-Extensions may not always be available depending on your CLI configuration and which plugins are installed. Commands should defensively check for extension existence to prevent runtime errors and provide graceful fallbacks. This defensive programming approach ensures your CLI remains robust even when optional plugins are not configured:
+Extensions may not always be available depending on your CLI configuration and which plugins are installed.
+
+Commands should defensively check for extension existence to prevent runtime errors and provide graceful fallbacks.
+
+This defensive programming approach ensures your CLI remains robust even when optional plugins are not configured:
 
 ```ts
 import { pluginId as globalId } from '@gunshi/plugin-global'
@@ -167,7 +187,11 @@ const command = {
 
 ### Extension Composition
 
-Commands often benefit from combining multiple plugin extensions to create richer functionality. Extensions are designed to work together harmoniously, allowing you to compose complex behaviors from simple building blocks. The following example demonstrates how global display features can be enhanced with dynamic content loading from the renderer extension:
+Commands often benefit from combining multiple plugin extensions to create richer functionality.
+
+Extensions are designed to work together harmoniously, allowing you to compose complex behaviors from simple building blocks.
+
+The following example demonstrates how global display features can be enhanced with dynamic content loading from the renderer extension:
 
 ```ts
 import { pluginId as globalId } from '@gunshi/plugin-global'
@@ -193,7 +217,11 @@ const command = {
 
 ### Dynamic Extension Usage
 
-Extensions can be conditionally utilized based on command arguments, environment variables, or other runtime conditions. This dynamic approach allows your CLI to adapt its behavior to different contexts and user preferences. The following code shows how to selectively engage extensions based on command flags:
+Extensions can be conditionally utilized based on command arguments, environment variables, or other runtime conditions.
+
+This dynamic approach allows your CLI to adapt its behavior to different contexts and user preferences.
+
+The following code shows how to selectively engage extensions based on command flags:
 
 ```ts
 import { pluginId as globalId } from '@gunshi/plugin-global'
@@ -261,11 +289,15 @@ const command = define<Record<GlobalId, GlobalExtension>>({
 
 ## Custom Extension Techniques
 
-Extensions can serve as a foundation for building sophisticated CLI architectures. The following advanced patterns showcase how to leverage extensions for service layers and architectural concerns.
+Extensions can serve as a foundation for building sophisticated CLI architectures.
+
+The following advanced patterns showcase how to leverage extensions for service layers and architectural concerns.
 
 ### Extension as Service Layer
 
-Extensions can act as a service abstraction layer, providing consistent interfaces to external systems like databases, caches, or APIs. This pattern decouples your command logic from infrastructure concerns and simplifies testing through mockable extensions:
+Extensions can act as a service abstraction layer, providing consistent interfaces to external systems like databases, caches, or APIs.
+
+This pattern decouples your command logic from infrastructure concerns and simplifies testing through mockable extensions:
 
 ```ts
 // Note: These are hypothetical example plugins for illustration purposes
@@ -298,7 +330,13 @@ const command = {
 
 ### Extension for Cross-Cutting Concerns
 
-Cross-cutting concerns are aspects of your application that affect multiple commands, such as logging, authentication, monitoring, or error tracking. Extensions provide an ideal mechanism for implementing these concerns consistently across your entire CLI. By centralizing these capabilities in plugin extensions, you ensure uniform behavior and simplify maintenance. The following example demonstrates a comprehensive approach to handling logging, authentication, and metrics collection:
+Cross-cutting concerns are aspects of your application that affect multiple commands, such as logging, authentication, monitoring, or error tracking.
+
+Extensions provide an ideal mechanism for implementing these concerns consistently across your entire CLI.
+
+By centralizing these capabilities in plugin extensions, you ensure uniform behavior and simplify maintenance.
+
+The following example demonstrates a comprehensive approach to handling logging, authentication, and metrics collection:
 
 ```ts
 // Note: These are hypothetical example plugins for illustration purposes

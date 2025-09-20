@@ -1,6 +1,8 @@
 # Plugin Type System
 
-Gunshi's plugin system leverages TypeScript's advanced type system to provide complete type safety. This guide explains how to create type-safe plugins with proper type definitions.
+Gunshi's plugin system leverages TypeScript's advanced type system to provide complete type safety.
+
+This guide explains how to create type-safe plugins with proper type definitions.
 
 ## Introduction
 

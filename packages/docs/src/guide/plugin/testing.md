@@ -1,6 +1,8 @@
 # Plugin Testing
 
-Testing is a crucial part of plugin development to ensure reliability and maintainability. This guide covers comprehensive testing approaches for Gunshi plugins, demonstrating techniques through practical examples.
+Testing is a crucial part of plugin development to ensure reliability and maintainability.
+
+This guide covers comprehensive testing approaches for Gunshi plugins, demonstrating techniques through practical examples.
 
 > [!NOTE]
 > This guide uses [Vitest](https://vitest.dev/) as the testing framework. The concepts can be adapted to other testing frameworks.
@@ -14,7 +16,9 @@ Testing is a crucial part of plugin development to ensure reliability and mainta
 
 ## Your First Plugin Test
 
-Before writing tests for a plugin, you need a plugin to test. Let's build a minimal plugin and its corresponding test step by step.
+Before writing tests for a plugin, you need a plugin to test.
+
+Let's build a minimal plugin and its corresponding test step by step.
 
 ### Creating a Minimal Plugin to Test
 
@@ -109,7 +113,11 @@ This approach gives you a working foundation that you can expand as your plugin 
 
 ## Testing Extension Methods
 
-Extension methods are the core functionality that plugins provide to commands. Testing these methods ensures that your plugin behaves correctly when commands use its features. The following example demonstrates how to test extension methods by creating a minimal mock context manually:
+Extension methods are the core functionality that plugins provide to commands.
+
+Testing these methods ensures that your plugin behaves correctly when commands use its features.
+
+The following example demonstrates how to test extension methods by creating a minimal mock context manually:
 
 ```typescript
 import { describe, expect, test, vi } from 'vitest'
@@ -292,7 +300,9 @@ With these helper functions in place, you can now write more sophisticated tests
 
 ## Testing Plugin Initialization
 
-Plugin initialization testing verifies that your plugin is correctly constructed, has proper metadata, declares dependencies appropriately, and creates valid extension factories. These tests ensure your plugin integrates properly with the Gunshi framework before testing its actual functionality.
+Plugin initialization testing verifies that your plugin is correctly constructed, has proper metadata, declares dependencies appropriately, and creates valid extension factories.
+
+These tests ensure your plugin integrates properly with the Gunshi framework before testing its actual functionality.
 
 ### Structure Validation Tests
 
@@ -300,7 +310,11 @@ The following tests verify that plugins have the correct structure with required
 
 #### Plugin Implementation for Structure Tests
 
-Gunshi plugins are created using factory functions that return configured plugin objects. The following example shows a plugin factory that accepts configuration options and creates a plugin with an extension function. The extension function receives the command context (ctx) and command definition (cmd) and returns an object containing the plugin's functionality:
+Gunshi plugins are created using factory functions that return configured plugin objects.
+
+The following example shows a plugin factory that accepts configuration options and creates a plugin with an extension function.
+
+The extension function receives the command context (ctx) and command definition (cmd) and returns an object containing the plugin's functionality:
 
 ```typescript
 import { plugin } from 'gunshi/plugin'
@@ -374,7 +388,9 @@ describe('structure validation', () => {
 
 ### Dependency Declaration Tests
 
-Plugins can declare dependencies on other plugins. Dependencies can be required (string format) or optional (object format with `optional: true`). Gunshi ensures dependencies are loaded before the plugin that requires them:
+Plugins can declare dependencies on other plugins. Dependencies can be required (string format) or optional (object format with `optional: true`).
+
+Gunshi ensures dependencies are loaded before the plugin that requires them:
 
 These tests ensure that plugin dependencies are properly declared with the correct format.
 
@@ -417,7 +433,11 @@ describe('dependency declaration', () => {
 
 ### Configuration Validation Tests
 
-Plugins often need to validate their configuration options. Validation should happen in the factory function before creating the plugin, allowing early failure with clear error messages. Here are two patterns for configuration validation:
+Plugins often need to validate their configuration options.
+
+Validation should happen in the factory function before creating the plugin, allowing early failure with clear error messages.
+
+Here are two patterns for configuration validation:
 
 Configuration validation tests verify that plugins properly validate their options during creation.
 
@@ -487,9 +507,13 @@ describe('configuration validation', () => {
 
 ### Initialization State Tests
 
-Plugins often need to initialize state when they're created, such as loading configuration files or restoring cached data. These tests verify that plugins handle initialization correctly, including error scenarios.
+Plugins often need to initialize state when they're created, such as loading configuration files or restoring cached data.
 
-The following example demonstrates a file cache plugin that loads persisted data during initialization. Note that while plugin creation itself is synchronous, the extension factory function can be asynchronous when needed for operations like loading configuration files or connecting to services. In this example, we use synchronous file operations for simplicity:
+These tests verify that plugins handle initialization correctly, including error scenarios.
+
+The following example demonstrates a file cache plugin that loads persisted data during initialization.
+
+Note that while plugin creation itself is synchronous, the extension factory function can be asynchronous when needed for operations like loading configuration files or connecting to services. In this example, we use synchronous file operations for simplicity:
 
 These tests verify how plugins handle internal state initialization, including loading persisted state during plugin creation.
 
@@ -679,9 +703,11 @@ When testing Gunshi plugins, focus on:
 
 ## Testing Extensions with Mock Context
 
-### Using createMockCommandContext
+### Using `createMockCommandContext`
 
-The `createMockCommandContext` helper simplifies testing by providing a complete mock context with all required properties and type safety. This eliminates boilerplate code and ensures consistency across tests. Here's how to use it to test extension factories:
+The `createMockCommandContext` helper simplifies testing by providing a complete mock context with all required properties and type safety.
+
+This eliminates boilerplate code and ensures consistency across tests. Here's how to use it to test extension factories:
 
 ```typescript
 import { expect, test } from 'vitest'
@@ -715,7 +741,11 @@ test('extension factory creates correct extension', async () => {
 
 ### Testing Complex Extension Methods
 
-Complex extension methods often interact with multiple parts of the command context, such as environment variables, command arguments, and other extensions. The test helpers provide a complete context that allows you to verify these interactions thoroughly. The following tests demonstrate how to test methods that depend on various context properties:
+Complex extension methods often interact with multiple parts of the command context, such as environment variables, command arguments, and other extensions.
+
+The test helpers provide a complete context that allows you to verify these interactions thoroughly.
+
+The following tests demonstrate how to test methods that depend on various context properties:
 
 ```typescript
 import { describe, expect, test, vi } from 'vitest'
@@ -779,7 +809,9 @@ describe('extension methods', () => {
 
 ### Testing Configuration-Driven Behavior
 
-Plugin options affect how the plugin behaves at runtime. Rather than testing the options directly (which are internal to the plugin factory), test the actual behavior changes that result from different configurations:
+Plugin options affect how the plugin behaves at runtime.
+
+Rather than testing the options directly (which are internal to the plugin factory), test the actual behavior changes that result from different configurations:
 
 ```typescript
 import { describe, expect, test, vi } from 'vitest'
@@ -890,7 +922,11 @@ describe('plugin dependency runtime behavior', () => {
 
 ### Command Decorator Testing
 
-Decorators are higher-order functions that wrap command runners to add functionality like logging, validation, or conditional execution. Testing decorators is crucial to ensure they correctly intercept and modify command execution. Here's how to test that decorators properly handle different scenarios:
+Decorators are higher-order functions that wrap command runners to add functionality like logging, validation, or conditional execution.
+
+Testing decorators is crucial to ensure they correctly intercept and modify command execution.
+
+Here's how to test that decorators properly handle different scenarios:
 
 ```typescript
 import { expect, test, vi } from 'vitest'
@@ -945,7 +981,9 @@ test('decorator passes through when no special options', async () => {
 
 ### Testing with Renderers
 
-This example demonstrates testing a plugin that uses Gunshi's renderer functions to display formatted output. The test verifies both the rendered content and that the plugin correctly interacts with the command context:
+This example demonstrates testing a plugin that uses Gunshi's renderer functions to display formatted output.
+
+The test verifies both the rendered content and that the plugin correctly interacts with the command context:
 
 ```typescript
 import { expect, test } from 'vitest'
@@ -980,13 +1018,17 @@ test('extension renders header correctly', async () => {
 })
 ```
 
-This test verifies that the plugin's `showHeader` method correctly uses the renderer function and outputs the result through the context's logging mechanism. Both the return value and the side effects (logging) are validated.
+This test verifies that the plugin's `showHeader` method correctly uses the renderer function and outputs the result through the context's logging mechanism.
+
+Both the return value and the side effects (logging) are validated.
 
 ## Testing Type-Safe Plugins
 
 ### Using Type Parameters for Full Type Safety
 
-Gunshi's plugin system uses four type parameters to ensure complete type safety. Here's how to test plugins with proper type definitions:
+Gunshi's plugin system uses four type parameters to ensure complete type safety.
+
+Here's how to test plugins with proper type definitions:
 
 ```typescript
 import { describe, expect, test, vi } from 'vitest'
@@ -1032,11 +1074,17 @@ describe('type-safe plugin', () => {
 
 ### Testing Async Extensions
 
-Async extension factories are used when plugins need to perform asynchronous operations during initialization, such as loading configuration files, connecting to external services, or fetching remote resources. Unlike synchronous factories that return extensions immediately, async factories return promises that resolve to the extension instance. The `createMockCommandContext` helper automatically handles async extension factories by calling them and awaiting the results, so testing async extensions is straightforward.
+Async extension factories are used when plugins need to perform asynchronous operations during initialization, such as loading configuration files, connecting to external services, or fetching remote resources.
+
+Unlike synchronous factories that return extensions immediately, async factories return promises that resolve to the extension instance.
+
+The `createMockCommandContext` helper automatically handles async extension factories by calling them and awaiting the results, so testing async extensions is straightforward.
 
 #### Testing Successful Async Initialization
 
-This test demonstrates how to verify that an async extension factory correctly loads configuration during initialization. The key aspects are mocking the async configuration loader and awaiting the factory call:
+This test demonstrates how to verify that an async extension factory correctly loads configuration during initialization.
+
+The key aspects are mocking the async configuration loader and awaiting the factory call:
 
 ```typescript
 import { describe, expect, test, vi } from 'vitest'
@@ -1075,7 +1123,9 @@ describe('async extension', () => {
 
 #### Testing Error Handling and Fallbacks
 
-Async operations can fail, so plugins should handle initialization errors gracefully. This test verifies that the extension provides sensible fallback values when configuration loading fails:
+Async operations can fail, so plugins should handle initialization errors gracefully.
+
+This test verifies that the extension provides sensible fallback values when configuration loading fails:
 
 ```typescript
 // Still inside the 'async extension' describe block
@@ -1102,7 +1152,11 @@ test('extension handles initialization errors gracefully', async () => {
 })
 ```
 
-The `createMockCommandContext` helper simplifies testing async extensions by automatically handling factory calls and promise resolution. When you pass extensions in the options, the helper calls each factory (with await if needed) and attaches the resolved extensions to the context. This lets you focus on testing the initialization behavior and error handling rather than the mechanics of async factory calls.
+The `createMockCommandContext` helper simplifies testing async extensions by automatically handling factory calls and promise resolution.
+
+When you pass extensions in the options, the helper calls each factory (with await if needed) and attaches the resolved extensions to the context.
+
+This lets you focus on testing the initialization behavior and error handling rather than the mechanics of async factory calls.
 
 > [!TIP]
 > **Why This Works**
@@ -1117,9 +1171,13 @@ The `createMockCommandContext` helper simplifies testing async extensions by aut
 
 ## Testing Plugin Lifecycle Callbacks
 
-### The setup Function
+### The `setup` Function
 
-The `setup` function runs when the plugin is registered with the CLI system via the PluginContext. Testing the setup function verifies that your plugin correctly configures global options, commands, and decorators. The following example demonstrates how to implement and test all aspects of plugin setup functionality.
+The `setup` function runs when the plugin is registered with the CLI system via the PluginContext.
+
+Testing the setup function verifies that your plugin correctly configures global options, commands, and decorators.
+
+The following example demonstrates how to implement and test all aspects of plugin setup functionality.
 
 #### Plugin Setup Example
 
@@ -1295,7 +1353,9 @@ This test suite verifies that the plugin:
 
 ### The onExtension Callback
 
-The `onExtension` callback is a lifecycle hook that runs after all plugin extensions have been created but before command execution. This allows plugins to perform cross-extension initialization, validate dependencies, or set up shared state.
+The `onExtension` callback is a lifecycle hook that runs after all plugin extensions have been created but before command execution.
+
+This allows plugins to perform cross-extension initialization, validate dependencies, or set up shared state.
 
 #### Plugin Implementation Example
 
@@ -1360,7 +1420,7 @@ This plugin demonstrates:
 - **Initialization tracking**: Shows how to track when the plugin has been fully initialized
 - **Command context access**: Both callbacks receive the command context for initialization
 
-#### Testing the onExtension Callback
+#### Testing the `onExtension` Callback
 
 ```typescript
 // test/plugins/initialization-tracker-plugin.test.ts
@@ -1530,7 +1590,9 @@ describe('plugin integration', () => {
 
 ### Testing with Multiple Plugins
 
-Testing plugin interactions requires careful consideration of dependencies and how plugins discover and use each other. The following example demonstrates a practical scenario with a logger plugin and a notification plugin that optionally depends on it.
+Testing plugin interactions requires careful consideration of dependencies and how plugins discover and use each other.
+
+The following example demonstrates a practical scenario with a logger plugin and a notification plugin that optionally depends on it.
 
 #### Creating a Logger Plugin
 

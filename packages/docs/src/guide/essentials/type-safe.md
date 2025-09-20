@@ -1,6 +1,8 @@
 # Type Safe
 
-In the previous chapter, we learned how to create commands using declarative configuration with plain JavaScript objects. While this approach works well, TypeScript users can benefit from enhanced type safety and better development experience using Gunshi's `define` function.
+In the previous chapter, we learned how to create commands using declarative configuration with plain JavaScript objects.
+
+While this approach works well, TypeScript users can benefit from enhanced type safety and better development experience using Gunshi's `define` function.
 
 The `define` function wraps your command configuration and provides automatic type inference, ensuring that your command handlers receive properly typed context objects without manual type annotations.
 
@@ -32,7 +34,9 @@ The `define` function transforms your command configuration to provide:
 - **Compile-time validation**: TypeScript catches typos and type mismatches before runtime
 - **Simplified imports**: No need to import type definitions like `Command` or `CommandContext`
 
-Let's transform the greeting command from the previous chapter to use `define` for full type safety. The `define` function is a simple wrapper that preserves your command's type information, enabling TypeScript to automatically infer types for your command options and provide IDE autocompletion:
+Let's transform the greeting command from the previous chapter to use `define` for full type safety.
+
+The `define` function is a simple wrapper that preserves your command's type information, enabling TypeScript to automatically infer types for your command options and provide IDE autocompletion:
 
 ```ts [cli.ts]
 import { cli, define } from 'gunshi'
@@ -124,7 +128,9 @@ While the examples above show the simplest form of the `define` function, Gunshi
 - **Explicit argument types**: Fine-grained control over type inference
 - **GunshiParams utility**: Combined typing of arguments and extensions
 
-These advanced patterns are covered in detail in the [Advanced Type System](../advanced/type-system.md) documentation. For most commands, the basic `define` usage shown above provides sufficient type safety.
+These advanced patterns are covered in detail in the [Advanced Type System](../advanced/type-system.md) documentation.
+
+For most commands, the basic `define` usage shown above provides sufficient type safety.
 
 ## Next Steps
 

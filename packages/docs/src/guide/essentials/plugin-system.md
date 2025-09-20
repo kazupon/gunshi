@@ -2,17 +2,17 @@
 
 ## What's a Plugin?
 
-A plugin in Gunshi is a modular extension that adds functionality to your CLI application without modifying its core code. Think of plugins as building blocks that you can snap together to create powerful command-line tools.
+A plugin in Gunshi is a modular extension that adds functionality to your CLI application without modifying its core code.
+
+Think of plugins as building blocks that you can snap together to create powerful command-line tools.
 
 ### Why Use Plugins?
 
 Plugins solve common CLI development challenges:
 
-**Separation of Concerns**: Plugins keep your command logic clean by handling cross-cutting functionality like logging, authentication, or database connections separately. Your commands focus on their primary task while plugins handle the supporting infrastructure.
-
-**Reusability**: Write functionality once, use it everywhere. A plugin created for one command can be reused across your entire CLI or even in different projects, saving development time and ensuring consistency.
-
-**Composability**: Plugins work together seamlessly. You can combine multiple plugins—an authentication plugin with a logging plugin and a database plugin—and they'll integrate naturally into your CLI's lifecycle.
+- **Separation of Concerns**: Plugins keep your command logic clean by handling cross-cutting functionality like logging, authentication, or database connections separately. Your commands focus on their primary task while plugins handle the supporting infrastructure.
+- **Reusability**: Write functionality once, use it everywhere. A plugin created for one command can be reused across your entire CLI or even in different projects, saving development time and ensuring consistency.
+- **Composability**: Plugins work together seamlessly. You can combine multiple plugins—an authentication plugin with a logging plugin and a database plugin—and they'll integrate naturally into your CLI's lifecycle.
 
 ### How Plugins Work
 
@@ -31,17 +31,27 @@ This lifecycle integration means plugins can:
 - Modify how your CLI displays help text or handles errors
 - Intercept command execution for logging or validation
 
-The beauty of Gunshi's plugin system is that it handles all the complexity behind the scenes. You simply declare which plugins you want to use, and they automatically become part of your CLI's capabilities.
+The beauty of Gunshi's plugin system is that it handles all the complexity behind the scenes.
 
-Now that you understand how plugins work, let's explore the plugins that come with Gunshi. These built-in plugins provide essential CLI functionality out of the box.
+You simply declare which plugins you want to use, and they automatically become part of your CLI's capabilities.
+
+Now that you understand how plugins work, let's explore the plugins that come with Gunshi.
+
+These built-in plugins provide essential CLI functionality out of the box.
 
 ## Built-in Plugins
 
-Gunshi provides a standard `cli()` function that comes pre-configured with two essential plugins. These built-in plugins give your CLI the familiar behavior users expect from command-line tools. Let's explore what each plugin provides:
+Gunshi provides a standard `cli()` function that comes pre-configured with two essential plugins.
+
+These built-in plugins give your CLI the familiar behavior users expect from command-line tools.
+
+Let's explore what each plugin provides:
 
 ### @gunshi/plugin-global
 
-This plugin adds `--help` and `--version` options to all your commands automatically. When either option is used, the plugin intercepts command execution to display the appropriate information.
+This plugin adds `--help` and `--version` options to all your commands automatically.
+
+When either option is used, the plugin intercepts command execution to display the appropriate information.
 
 The following example demonstrates how the cli() function automatically includes the global plugin:
 
@@ -70,19 +80,44 @@ Now your CLI automatically supports:
 
 ### @gunshi/plugin-renderer
 
-The renderer plugin automatically formats help text, usage information, and validation errors. It works behind the scenes to ensure consistent, readable output across your entire CLI.
+The renderer plugin automatically formats help text, usage information, and validation errors.
+
+It works behind the scenes to ensure consistent, readable output across your entire CLI.
 
 ## Using Optional Plugins
 
-Optional plugins add specialized features to your CLI. Install them separately and configure them based on your needs.
+Optional plugins add specialized features to your CLI.
+
+Install them separately and configure them based on your needs.
 
 ### Internationalization
 
 Add multi-language support with the i18n plugin:
 
-```sh
-npm install @gunshi/plugin-i18n
+::: code-group
+
+```sh [npm]
+npm install --save @gunshi/plugin-i18n
 ```
+
+```sh [pnpm]
+pnpm add @gunshi/plugin-i18n
+```
+
+```sh [yarn]
+yarn add @gunshi/plugin-i18n
+```
+
+```sh [deno]
+# For Deno projects, you can add Gunshi from JSR:
+deno add jsr:@gunshi/plugin-i18n
+```
+
+```sh [bun]
+bun add @gunshi/plugin-i18n
+```
+
+:::
 
 Here's a simple example using the `defineI18n` helper:
 
@@ -162,9 +197,24 @@ Key benefits:
 
 Enable tab completion across different shells:
 
-```sh
-npm install @gunshi/plugin-completion
+::: code-group
+
+```sh [npm]
+npm install --save @gunshi/plugin-completion
 ```
+
+```sh [pnpm]
+pnpm add @gunshi/plugin-completion
+```
+
+```sh [yarn]
+yarn add @gunshi/plugin-completion
+```
+
+:::
+
+> [!IMPORTANT]
+> Shell completion currently requires Node.js. The completion feature is not available when running your CLI with Deno or Bun runtimes.
 
 Here's how to add completion support:
 
@@ -215,9 +265,6 @@ The completion plugin adds a special `complete` command to your CLI that generat
 
 Once you've added the completion plugin to your CLI, your users need to perform a one-time setup to enable tab completion on their system.
 
-> [!IMPORTANT]
-> Shell completion currently requires Node.js. The completion feature is not available when running your CLI with Deno or Bun runtimes.
-
 #### Basic Setup Example (Bash)
 
 Users generate a completion script for their shell and add it to their shell configuration:
@@ -238,7 +285,9 @@ deploy-cli dep<TAB>  # Completes to: deploy-cli deploy
 
 #### How It Works
 
-The completion plugin adds a special `complete` command to your CLI that generates shell-specific completion scripts. Users run this command once to generate the script for their shell, then source it in their shell configuration to enable tab completion.
+The completion plugin adds a special `complete` command to your CLI that generates shell-specific completion scripts.
+
+Users run this command once to generate the script for their shell, then source it in their shell configuration to enable tab completion.
 
 ## Combining Plugins
 
@@ -345,11 +394,25 @@ This approach keeps your production builds lean while providing developer featur
 
 ## Minimal Setup
 
-If you need precise control over your CLI's functionality and bundle size, you can use `@gunshi/bone` - Gunshi's bare-bones foundation package. Unlike the standard `cli()` function which includes plugins automatically, `@gunshi/bone` starts with zero plugins, letting you add only what you need:
+If you need precise control over your CLI's functionality and bundle size, you can use `@gunshi/bone` - Gunshi's bare-bones foundation package.
 
-```sh
-npm install @gunshi/bone @gunshi/plugin-global @gunshi/plugin-renderer
+Unlike the standard `cli()` function which includes plugins automatically, `@gunshi/bone` starts with zero plugins, letting you add only what you need:
+
+::: code-group
+
+```sh [npm]
+npm install --save @gunshi/bone @gunshi/plugin-global @gunshi/plugin-renderer
 ```
+
+```sh [pnpm]
+pnpm add @gunshi/bone @gunshi/plugin-global @gunshi/plugin-renderer
+```
+
+```sh [yarn]
+yarn add @gunshi/bone @gunshi/plugin-global @gunshi/plugin-renderer
+```
+
+:::
 
 ```js
 import { cli } from '@gunshi/bone'
@@ -381,8 +444,8 @@ Now that you understand the plugin system basics, you can explore more advanced 
 
 To deepen your understanding of the plugin system:
 
-- **Context Extensions**: Learn how plugins extend functionality through [Context Extensions](../advanced/context-extensions.md)
 - **TypeScript Support**: Explore type-safe plugin usage in the [Type System Guide](../advanced/type-system.md)
+- **Context Extensions**: Learn how plugins extend functionality through [Context Extensions](../advanced/context-extensions.md)
 
 Ready to create your own plugins?
 

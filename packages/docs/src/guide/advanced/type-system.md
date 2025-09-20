@@ -3,7 +3,9 @@
 <!-- TODO(kazupon): Gunshi's type system should be a bit easier to use, if args -->
 <!-- NOTE: If `args` is specified, `ctx.values` should be inferred even if only `extensions` is specified in the type params. -->
 
-Gunshi v0.27 introduces a powerful type parameter system that provides comprehensive type safety across all core functions: `cli`, `define`, `lazy`, and `plugin`. This enhancement brings TypeScript's full type-checking capabilities to your CLI applications, ensuring compile-time safety for command arguments and plugin extensions.
+Gunshi v0.27 introduces a powerful type parameter system that provides comprehensive type safety across all core functions: `cli`, `define`, `lazy`, and `plugin`.
+
+This enhancement brings TypeScript's full type-checking capabilities to your CLI applications, ensuring compile-time safety for command arguments and plugin extensions.
 
 This guide focuses on type safety for command definitions and their arguments. If you're creating custom plugins and need to understand the `plugin` function's type system, refer to the [Plugin Type System](../plugin/type-system.md) guide.
 
@@ -415,4 +417,6 @@ const queryCommand = define<CommandParams>({
 })
 ```
 
-Both patterns achieve the same goal: combining multiple plugin extensions with full type safety. Use Record types when working with official plugins that provide plugin IDs, and direct intersection types for custom plugins.
+Both patterns achieve the same goal: combining multiple plugin extensions with full type safety.
+
+Use Record types when working with official plugins that provide plugin IDs, and direct intersection types for custom plugins.

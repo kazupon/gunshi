@@ -1,10 +1,14 @@
 # Getting Started
 
-This guide will help you create your first command-line application with Gunshi. We'll start with a simple "Hello World" example and gradually explore more features.
+This guide will help you create your first command-line application with Gunshi.
+
+We'll start with a simple "Hello World" example and gradually explore more features.
 
 ## Hello World Example
 
-Let's create a simple CLI application that greets the user. Create a new file (e.g., `cli.js` or `cli.ts`) and add the following code:
+Let's create a simple CLI application that greets the user.
+
+Create a new file (e.g., `cli.js` or `cli.ts`) and add the following code:
 
 ```js [cli.js]
 import { cli } from 'gunshi'
@@ -15,7 +19,9 @@ await cli(process.argv.slice(2), () => {
 })
 ```
 
-This minimal example demonstrates the core concept of Gunshi: the `cli` function takes command-line arguments and a function to execute.
+This minimal example demonstrates the core concept of Gunshi.
+
+The `cli` function takes command-line arguments and a function to execute.
 
 ## Running Your CLI
 
@@ -33,9 +39,11 @@ Hello, World!
 
 ## Adding Command-Line Arguments
 
-Let's enhance our example to accept a name as an argument:
+Let's enhance our example to accept a name as an argument.
 
-The function receives a `CommandContext` object (abbreviated as `ctx`) as its parameter. This context object contains parsed command-line arguments, options, and other execution information:
+The function receives a `CommandContext` object (abbreviated as `ctx`) as its parameter.
+
+This context object contains parsed command-line arguments, options, and other execution information:
 
 ```js [cli.js]
 import { cli } from 'gunshi'
@@ -112,13 +120,15 @@ HELLO, ALICE!
 
 ## Built-in Help
 
-Gunshi automatically generates help information for your commands through its built-in plugin system. Run:
+Gunshi automatically generates help information for your commands through its built-in plugin system.
+
+Run:
 
 ```sh
 node cli.js --help
 ```
 
-You'll see a help message that includes:
+You'll see a help message that includes.
 
 Here's an example of the generated help output:
 
@@ -144,7 +154,7 @@ The standard `cli()` function automatically includes these built-in plugins:
 - `@gunshi/plugin-global` - Provides global options like `--help` and `--version`
 - `@gunshi/plugin-renderer` - Handles formatted output for help messages, error messages, and usage information
 
-These plugins are included by default when you use `cli()` from the main 'gunshi' package. If you use the lower-level `run()` function instead, you'll need to manually configure these plugins to get help and version functionality.
+These plugins are included by default when you use `cli()` from the main `gunshi` package. If you use the lower-level `run()` function instead, you'll need to manually configure these plugins to get help and version functionality.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
@@ -193,7 +203,9 @@ Note that while the argument passing differs slightly between runtimes, the Guns
 
 You've successfully created your first Gunshi CLI application! You've learned the fundamentals: creating basic commands, handling arguments and options, using the built-in help system, and running your CLI across different JavaScript runtimes.
 
-Now it's time to explore the essential features that will help you build powerful, production-ready CLI applications. The following chapters will guide you through each topic:
+Now it's time to explore the essential features that will help you build powerful, production-ready CLI applications.
+
+The following chapters will guide you through each topic:
 
 - **[Declarative Configuration](./declarative.md)** - Organize commands with clear, maintainable declarative structures
 - **[Type Safety](./type-safe.md)** - Leverage TypeScript for automatic type inference and compile-time checking
@@ -202,4 +214,6 @@ Now it's time to explore the essential features that will help you build powerfu
 - **[Auto Usage Generation](./auto-usage.md)** - Create self-documenting CLIs with automatic help and usage information
 - **[Plugin System](./plugin-system.md)** - Extend your CLI with modular plugins for features like i18n and shell completion
 
-Each chapter builds upon the previous ones, introducing more sophisticated patterns and techniques. Start with [Declarative Configuration](./declarative.md) to learn how to structure your commands in a clean, maintainable way as your CLI grows in complexity.
+Each chapter builds upon the previous ones, introducing more sophisticated patterns and techniques.
+
+Start with [Declarative Configuration](./declarative.md) to learn how to structure your commands in a clean, maintainable way as your CLI grows in complexity.

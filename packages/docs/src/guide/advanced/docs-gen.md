@@ -1,6 +1,8 @@
 # Documentation Generation
 
-Gunshi provides a powerful feature for automatically generating documentation for your CLI applications. This guide explains how to use the `generate` function to generate documentation programmatically.
+Gunshi provides a powerful feature for automatically generating documentation for your CLI applications.
+
+This guide explains how to use the `generate` function to generate documentation programmatically.
 
 ## Using the `generate` Function
 
@@ -53,7 +55,9 @@ async function main() {
 await main()
 ```
 
-The `generate` function programmatically captures usage information for your CLI commands and returns it as a string. This allows you to generate documentation files, create API documentation, or integrate usage information into your build process.
+The `generate` function programmatically captures usage information for your CLI commands and returns it as a string.
+
+This allows you to generate documentation files, create API documentation, or integrate usage information into your build process.
 
 Unlike the `cli` function which executes commands and prints output to the console, `generate` is designed specifically for documentation generation:
 
@@ -73,11 +77,15 @@ The `generate` function takes three parameters:
   - `renderHeader`, `renderUsage`: Custom renderer functions
   - **Note**: The `usageSilent` option is automatically set to `true` internally, so any value you provide will be overridden
 
-Returns a Promise that resolves to the generated usage text as a string. If no usage is generated (e.g., when renderUsage is not defined), returns an empty string.
+Returns a Promise that resolves to the generated usage text as a string.
+
+If no usage is generated (e.g., when renderUsage is not defined), returns an empty string.
 
 ## Generating Documentation for Multiple Commands
 
-When your CLI has sub-commands, you can iterate through them to generate comprehensive documentation. Here's how to generate documentation for each command separately:
+When your CLI has sub-commands, you can iterate through them to generate comprehensive documentation.
+
+Here's how to generate documentation for each command separately:
 
 ```ts [cli.ts]
 import { define } from 'gunshi'
@@ -346,15 +354,25 @@ Then add a script to your `package.json`:
 
 ## Generating Unix Man Pages
 
-Unix man pages (short for "manual pages") are a traditional form of documentation for command-line tools on Unix-like operating systems. You can use Gunshi's `generate` function to generate man pages for your CLI applications.
+Unix man pages (short for "manual pages") are a traditional form of documentation for command-line tools on Unix-like operating systems.
+
+You can use Gunshi's `generate` function to generate man pages for your CLI applications.
 
 ### Introduction to Man Pages
 
-Man pages are the standard documentation format for Unix and Unix-like systems. They provide comprehensive documentation directly accessible from the command line using the `man` command. Man pages follow a specific structure with numbered sections (1 for user commands, 2 for system calls, etc.) and standardized formatting conventions. The most common format for man pages is roff (runoff), though modern tools allow you to write documentation in simpler formats like Markdown and convert them to roff.
+Man pages are the standard documentation format for Unix and Unix-like systems.
+
+They provide comprehensive documentation directly accessible from the command line using the `man` command.
+
+Man pages follow a specific structure with numbered sections (1 for user commands, 2 for system calls, etc.) and standardized formatting conventions.
+
+The most common format for man pages is roff (runoff), though modern tools allow you to write documentation in simpler formats like Markdown and convert them to roff.
 
 ### Generating Man Pages with Gunshi
 
-The following example demonstrates how to generate Unix man page documentation using Gunshi's `generate` function with a custom renderer. The custom renderer (`renderManPageUsage`) creates markdown output that can be converted to the man page format (roff) using tools like `marked-man`.
+The following example demonstrates how to generate Unix man page documentation using Gunshi's `generate` function with a custom renderer.
+
+The custom renderer (`renderManPageUsage`) creates markdown output that can be converted to the man page format (roff) using tools like `marked-man`.
 
 The renderer function structures the output according to standard man page sections:
 

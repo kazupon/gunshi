@@ -1,10 +1,14 @@
 # Plugin Extensions
 
-Extensions are the primary mechanism for plugins to add functionality to the command context. This guide explains how to create and use plugin extensions for type-safe inter-plugin communication.
+Extensions are the primary mechanism for plugins to add functionality to the command context.
+
+This guide explains how to create and use plugin extensions for type-safe inter-plugin communication.
 
 ## What are Extensions?
 
-Extensions allow plugins to inject custom functionality into the `CommandContext` that becomes available to all commands and other plugins. Each extension is namespaced by the plugin ID to prevent conflicts.
+Extensions allow plugins to inject custom functionality into the `CommandContext` that becomes available to all commands and other plugins.
+
+Each extension is namespaced by the plugin ID to prevent conflicts.
 
 Here's a simple example showing the concept:
 

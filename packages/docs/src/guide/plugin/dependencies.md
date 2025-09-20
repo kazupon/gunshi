@@ -1,6 +1,8 @@
 # Plugin Dependencies
 
-Gunshi's plugin system includes a sophisticated dependency management system that ensures plugins load in the correct order and can safely interact with each other. This guide covers everything you need to know about plugin dependencies.
+Gunshi's plugin system includes a sophisticated dependency management system that ensures plugins load in the correct order and can safely interact with each other.
+
+This guide covers everything you need to know about plugin dependencies.
 
 ## Understanding Plugin Dependencies
 
@@ -65,11 +67,15 @@ This ensures that:
 3. **Cache** loads after Auth (its dependency is satisfied)
 4. **API** loads last after Auth (its dependency is satisfied)
 
-Note that while Cache and API don't depend on each other, Gunshi maintains the order they appear in your plugin array when resolving plugins with the same dependency level. Both must load after Auth, their shared dependency.
+Note that while Cache and API don't depend on each other, Gunshi maintains the order they appear in your plugin array when resolving plugins with the same dependency level.
+
+Both must load after Auth, their shared dependency.
 
 ## Declaring Dependencies
 
-Plugin dependencies are declared in the plugin configuration using the `dependencies` property. This property accepts an array of dependency specifications that tell Gunshi which other plugins must be loaded before your plugin can function correctly.
+Plugin dependencies are declared in the plugin configuration using the `dependencies` property.
+
+This property accepts an array of dependency specifications that tell Gunshi which other plugins must be loaded before your plugin can function correctly.
 
 ### Dependency Declaration Syntax
 
@@ -119,7 +125,9 @@ const apiPlugin = plugin({
 
 ### Optional Dependencies
 
-Optional dependencies allow your plugin to enhance its functionality when certain plugins are available, while still functioning correctly when they're not. This enables graceful degradation and flexible plugin ecosystems.
+Optional dependencies allow your plugin to enhance its functionality when certain plugins are available, while still functioning correctly when they're not.
+
+This enables graceful degradation and flexible plugin ecosystems.
 
 #### When to Use Optional Dependencies
 
@@ -151,7 +159,9 @@ const enhancedPlugin = plugin({
 
 ## Circular Dependencies
 
-A circular dependency occurs when two or more plugins depend on each other, creating a dependency loop that cannot be resolved. Gunshi's dependency resolution system detects these cycles and prevents them to ensure a stable plugin initialization order.
+A circular dependency occurs when two or more plugins depend on each other, creating a dependency loop that cannot be resolved.
+
+Gunshi's dependency resolution system detects these cycles and prevents them to ensure a stable plugin initialization order.
 
 ### Understanding Circular Dependencies
 
@@ -211,7 +221,9 @@ const pluginZ = plugin({
 
 ### Resolving Circular Dependencies
 
-The most practical and recommended approach to resolve circular dependencies is to extract common functionality into a separate plugin. This creates a clean architecture where both plugins can depend on the shared functionality without depending on each other.
+The most practical and recommended approach to resolve circular dependencies is to extract common functionality into a separate plugin.
+
+This creates a clean architecture where both plugins can depend on the shared functionality without depending on each other.
 
 When two plugins need to share functionality, extract that functionality into a base plugin that both can depend on:
 

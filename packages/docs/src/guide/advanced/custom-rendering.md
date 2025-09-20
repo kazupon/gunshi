@@ -4,7 +4,9 @@ Gunshi provides a flexible rendering system that allows you to customize how you
 
 ## Overview
 
-Gunshi provides three levels of customization, each capable of controlling all rendering components (Header, Usage/Help, and Validation Errors). When multiple levels define the same renderer, the higher priority level wins.
+Gunshi provides three levels of customization, each capable of controlling all rendering components (Header, Usage/Help, and Validation Errors).
+
+When multiple levels define the same renderer, the higher priority level wins.
 
 Customizing rendering offers several benefits:
 
@@ -46,7 +48,9 @@ graph TB
     style PE fill:#468c56,color:white
 ```
 
-The diagram above illustrates Gunshi's three-level rendering customization system. Each level can independently control three rendering components:
+The diagram above illustrates Gunshi's three-level rendering customization system.
+
+Each level can independently control three rendering components:
 
 - **Header**: The title section of help text, typically showing the CLI name and version
 - **Usage/Help**: The main help content including command syntax, options, and arguments
@@ -120,7 +124,9 @@ The most specific way to customize rendering is at the command level. Use this w
 
 ### Understanding Command Context
 
-All renderer functions receive a Command Context object as their first parameter. This context provides comprehensive information about the current command execution state, including configuration, arguments, environment details, and more.
+All renderer functions receive a Command Context object as their first parameter.
+
+This context provides comprehensive information about the current command execution state, including configuration, arguments, environment details, and more.
 
 ```js
 // Renderer functions receive context as their first argument
@@ -135,7 +141,9 @@ renderHeader: ctx => {
 
 ### Basic Example
 
-The following example demonstrates how to customize rendering at the command level for a watch command that needs specialized formatting for its interactive mode. Notice how the renderer functions receive a Command Context (`ctx`) parameter that provides access to command information:
+The following example demonstrates how to customize rendering at the command level for a watch command that needs specialized formatting for its interactive mode.
+
+Notice how the renderer functions receive a Command Context (`ctx`) parameter that provides access to command information:
 
 ```ts
 import { define } from 'gunshi'
@@ -388,7 +396,9 @@ await cli(process.argv.slice(2), command, {
 
 ## Plugin-Level Rendering
 
-Plugins provide the most powerful way to customize rendering across your entire CLI. They can decorate renderers to add consistent behavior across all commands.
+Plugins provide the most powerful way to customize rendering across your entire CLI.
+
+They can decorate renderers to add consistent behavior across all commands.
 
 > [!NOTE]
 > Plugin-level rendering has the lowest priority in the rendering hierarchy. Command-level and global-level renderers will override plugin decorators. For detailed information on how renderer decorators work and how to implement them, see the [How Renderer Decorators Work](../plugin/decorators.md#how-renderer-decorators-work) documentation.
@@ -409,7 +419,9 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-The built-in renderer provides complete rendering implementations with improved formatting and visual hierarchy. Unlike decorator plugins, it replaces the default rendering entirely.
+The built-in renderer provides complete rendering implementations with improved formatting and visual hierarchy.
+
+Unlike decorator plugins, it replaces the default rendering entirely.
 
 > [!TIP]
 > For detailed configuration options and features of the built-in renderer plugin, see the [Official Plugins](../plugin/official-plugins.md) documentation.
@@ -497,7 +509,9 @@ const oceanThemePlugin = plugin({
 
 ### Combining Multiple Rendering Plugins
 
-When using multiple rendering plugins, they execute in the order they are registered. Each plugin receives the output from the previous one, creating a transformation chain.
+When using multiple rendering plugins, they execute in the order they are registered.
+
+Each plugin receives the output from the previous one, creating a transformation chain.
 
 Let's create a simple emoji plugin to demonstrate plugin combination:
 
@@ -641,7 +655,9 @@ await cli(process.argv.slice(2), command, {
 
 ### Working with Command Context
 
-The Command Context object (`ctx`) passed to renderer functions provides access to all information needed to customize your output. Here are the key property groups and their practical uses:
+The Command Context object (`ctx`) passed to renderer functions provides access to all information needed to customize your output.
+
+Here are the key property groups and their practical uses:
 
 #### Environment and Metadata
 
@@ -706,7 +722,11 @@ renderValidationErrors: (ctx, error) => {
 
 #### Plugin Extensions
 
-Plugins extend the command context with additional functionality through namespaced extensions. Each plugin registers its capabilities under a unique plugin ID to prevent conflicts. When accessing plugin-provided data in custom renderers, you must use the plugin's ID as the namespace key:
+Plugins extend the command context with additional functionality through namespaced extensions.
+
+Each plugin registers its capabilities under a unique plugin ID to prevent conflicts.
+
+When accessing plugin-provided data in custom renderers, you must use the plugin's ID as the namespace key:
 
 ```js
 import { pluginId as themeId } from '@my/plugin-theme' // Import plugin ID

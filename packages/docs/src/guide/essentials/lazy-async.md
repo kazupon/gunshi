@@ -3,7 +3,11 @@
 > [!NOTE]
 > This chapter continues using TypeScript for code examples, building upon the type safety concepts introduced in the [previous chapter](./type-safe.md). While all Gunshi features work with JavaScript, the TypeScript examples provide better IDE support and compile-time checking.
 
-When building CLI applications with many commands or commands that require heavy dependencies, you may encounter slow startup times that frustrate users. Even simple operations like displaying help text can take seconds if your CLI loads all command implementations upfront. This guide shows you how to use Gunshi's lazy loading and asynchronous execution features to create fast, responsive CLI applications that only load what they need, when they need it.
+When building CLI applications with many commands or commands that require heavy dependencies, you may encounter slow startup times that frustrate users.
+
+Even simple operations like displaying help text can take seconds if your CLI loads all command implementations upfront.
+
+This guide shows you how to use Gunshi's lazy loading and asynchronous execution features to create fast, responsive CLI applications that only load what they need, when they need it.
 
 ## Benefits of Lazy Loading
 
@@ -18,7 +22,9 @@ These benefits become especially valuable as your CLI grows to include dozens or
 
 ## Basic Lazy Loading
 
-Let's start with a simple example that demonstrates the core concept. The following code shows how to create a lazy-loaded command that only loads its implementation when executed:
+Let's start with a simple example that demonstrates the core concept.
+
+The following code shows how to create a lazy-loaded command that only loads its implementation when executed:
 
 ```ts [cli.ts]
 import { cli, lazy } from 'gunshi'
@@ -75,7 +81,11 @@ await cli(
 )
 ```
 
-In this example, when a user runs `npx tsx cli.ts --help`, Gunshi displays help text using only the metadata from `helloDefinition`. The `helloLoader` function is never called. Only when the user runs `npx tsx cli.ts hello` does Gunshi execute the loader and run the command.
+In this example, when a user runs `npx tsx cli.ts --help`, Gunshi displays help text using only the metadata from `helloDefinition`.
+
+The `helloLoader` function is never called.
+
+Only when the user runs `npx tsx cli.ts hello` does Gunshi execute the loader and run the command.
 
 > [!NOTE]
 > The `commandName` property on `LazyCommand` can be `undefined` at the TypeScript type level, which is why the example includes a runtime check at lines 55-57. This happens because the `lazy()` function accepts an optional definition parameter - when omitted, there's no guaranteed command name.
@@ -108,7 +118,9 @@ In this example, when a user runs `npx tsx cli.ts --help`, Gunshi displays help 
 
 ## Dynamic Imports for Code Splitting
 
-For real-world applications, you'll typically want to use dynamic imports to load command implementations from separate files. This enables bundlers to create separate chunks for each command:
+For real-world applications, you'll typically want to use dynamic imports to load command implementations from separate files.
+
+This enables bundlers to create separate chunks for each command:
 
 ```ts [cli.ts]
 import { cli, lazy } from 'gunshi'
@@ -317,13 +329,17 @@ await cli(
 )
 ```
 
-Gunshi automatically handles the asynchronous execution, including proper error handling and process exit codes. You don't need any special configuration—just return an async function from your loader.
+Gunshi automatically handles the asynchronous execution, including proper error handling and process exit codes.
+
+You don't need any special configuration—just return an async function from your loader.
 
 ## Alternative Loader Return Types
 
 <!-- TODO(kazupon): gunshiにバグがあるので治す -->
 
-While the examples above show loaders returning runner functions, loaders can also return full Command objects. This is useful when you want to dynamically construct the entire command structure:
+While the examples above show loaders returning runner functions, loaders can also return full Command objects.
+
+This is useful when you want to dynamically construct the entire command structure:
 
 ```ts [cli.ts]
 import type { Command } from 'gunshi'
@@ -381,8 +397,12 @@ To maximize the benefits of lazy loading:
 
 ## Next Steps
 
-Now that you understand lazy loading and async execution in Gunshi, you've learned how to optimize your CLI's performance by loading commands only when needed. You can create fast, responsive CLIs that handle complex asynchronous operations efficiently while keeping startup times minimal.
+Now that you understand lazy loading and async execution in Gunshi, you've learned how to optimize your CLI's performance by loading commands only when needed.
 
-The next section on [Auto Usage Generation](./auto-usage.md) will show you how Gunshi automatically creates comprehensive help documentation for all your commands—including lazy-loaded ones. You'll learn how to enhance your CLI's user experience with well-structured usage information, examples, and command descriptions.
+You can create fast, responsive CLIs that handle complex asynchronous operations efficiently while keeping startup times minimal.
+
+The next section on [Auto Usage Generation](./auto-usage.md) will show you how Gunshi automatically creates comprehensive help documentation for all your commands—including lazy-loaded ones.
+
+You'll learn how to enhance your CLI's user experience with well-structured usage information, examples, and command descriptions.
 
 With lazy loading keeping your CLI fast and auto-generated usage making it user-friendly, you'll have all the essential tools to build professional command-line applications with Gunshi.

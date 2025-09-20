@@ -1,6 +1,8 @@
 # Plugin System Introduction
 
-Gunshi's plugin system is a powerful feature that enables you to extend your CLI applications with reusable functionality, type-safe interfaces, and composable behaviors. This comprehensive system allows you to build modular, maintainable, and extensible command-line tools.
+Gunshi's plugin system is a powerful feature that enables you to extend your CLI applications with reusable functionality, type-safe interfaces, and composable behaviors.
+
+This comprehensive system allows you to build modular, maintainable, and extensible command-line tools.
 
 ## Why Plugins?
 
@@ -8,19 +10,27 @@ The plugin system addresses several key challenges in CLI development:
 
 ### 1. Separation of Concerns
 
-Plugins allow you to separate core command logic from cross-cutting concerns like logging, authentication, database connections, and rendering. This separation makes your code more organized and easier to maintain.
+Plugins allow you to separate core command logic from cross-cutting concerns like logging, authentication, database connections, and rendering.
+
+This separation makes your code more organized and easier to maintain.
 
 ### 2. Reusability
 
-Once you create a plugin, you can reuse it across multiple commands and even different CLI applications. This reduces code duplication and development time.
+Once you create a plugin, you can reuse it across multiple commands and even different CLI applications.
+
+This reduces code duplication and development time.
 
 ### 3. Type Safety
 
-Gunshi's plugin system is built with TypeScript-first design, providing full type safety for plugin extensions and their interactions. You get compile-time validation and IntelliSense support throughout your development.
+Gunshi's plugin system is built with TypeScript-first design, providing full type safety for plugin extensions and their interactions.
+
+You get compile-time validation and IntelliSense support throughout your development.
 
 ### 4. Ecosystem
 
-The plugin architecture enables a rich ecosystem where developers can share and compose plugins. Official plugins provide common functionality, while you can create custom plugins for your specific needs.
+The plugin architecture enables a rich ecosystem where developers can share and compose plugins.
+
+Official plugins provide common functionality, while you can create custom plugins for your specific needs.
 
 ## Plugin System Concepts
 
@@ -53,7 +63,13 @@ graph TD
     I -.->|optional| J
 ```
 
-This diagram illustrates the plugin system's execution flow. When a CLI application starts, plugins are registered and their dependencies are resolved. During the setup phase, each plugin's initialization code runs. Extensions are then created and made available to commands during execution. Plugins can depend on each other (solid lines) or have optional dependencies (dotted lines).
+This diagram illustrates the plugin system's execution flow.
+
+When a CLI application starts, plugins are registered and their dependencies are resolved. During the setup phase, each plugin's initialization code runs.
+
+Extensions are then created and made available to commands during execution.
+
+Plugins can depend on each other (solid lines) or have optional dependencies (dotted lines).
 
 ## Package vs Entry Point
 

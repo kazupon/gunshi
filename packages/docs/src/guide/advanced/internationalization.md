@@ -233,9 +233,7 @@ await cli(process.argv.slice(2), command, {
 
 Example locale files:
 
-`locales/en-US.json`:
-
-```json
+```json [locales/en-US.json]
 {
   "description": "Greeting application",
   "arg:name": "Name to greet",
@@ -245,9 +243,7 @@ Example locale files:
 }
 ```
 
-`locales/ja-JP.json`:
-
-```json
+```json [locales/ja-JP.json]
 {
   "description": "挨拶アプリケーション",
   "arg:name": "挨拶する相手の名前",
@@ -541,13 +537,17 @@ const locale = (() => {
 
 ## Custom Translation Adapters
 
-For advanced scenarios requiring custom interpolation syntax or translation logic, you can create custom translation adapters by implementing the TranslationAdapter interface. This allows full control over how translations are stored, retrieved, and interpolated.
+For advanced scenarios requiring custom interpolation syntax or translation logic, you can create custom translation adapters by implementing the TranslationAdapter interface.
+
+This allows full control over how translations are stored, retrieved, and interpolated.
 
 For detailed implementation guidance and examples, see the [Custom Translation Adapter documentation](https://github.com/kazupon/gunshi/tree/main/packages/plugin-i18n#-custom-translation-adapter) in the `@gunshi/plugin-i18n` package.
 
 ## Translating Help Messages
 
-The i18n plugin automatically uses your translations for help messages. When users run `--help` with different locales, they'll see help messages in their language:
+The i18n plugin automatically uses your translations for help messages.
+
+When users run `--help` with different locales, they'll see help messages in their language:
 
 English:
 

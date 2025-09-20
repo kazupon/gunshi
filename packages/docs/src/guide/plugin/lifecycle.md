@@ -1,10 +1,14 @@
 # Plugin Lifecycle
 
-Understanding the Gunshi lifecycle is crucial for effective plugin development. This guide explains how plugins integrate with the CLI execution flow and when different plugin features are activated.
+Understanding the Gunshi lifecycle is crucial for effective plugin development.
+
+This guide explains how plugins integrate with the CLI execution flow and when different plugin features are activated.
 
 ## CLI Execution Lifecycle
 
-When a Gunshi CLI application runs, it follows a specific sequence of steps from startup to completion. The diagram below shows the complete execution flow, with plugin-related steps highlighted in green:
+When a Gunshi CLI application runs, it follows a specific sequence of steps from startup to completion.
+
+The diagram below shows the complete execution flow, with plugin-related steps highlighted in green:
 
 ```mermaid
 graph TD
@@ -33,11 +37,15 @@ The lifecycle consists of 10 steps (A through J), where plugins are primarily in
 
 ## Plugin-Specific Lifecycle Steps
 
-Plugins are primarily involved in specific steps of the CLI lifecycle. This section focuses on the steps where plugins actively participate.
+Plugins are primarily involved in specific steps of the CLI lifecycle.
+
+This section focuses on the steps where plugins actively participate.
 
 ### Setup Phase (Steps B-D)
 
-During the setup phase, plugins are loaded, dependencies are resolved, and plugin setup functions are executed. This phase occurs once at CLI initialization.
+During the setup phase, plugins are loaded, dependencies are resolved, and plugin setup functions are executed.
+
+This phase occurs once at CLI initialization.
 
 **What happens in this phase:**
 
@@ -186,7 +194,9 @@ const command = {
 
 ## Extension Lifecycle in Detail
 
-Understanding the relationship between `extension` and `onExtension` is crucial for effective plugin development. During Step H (Create CommandContext):
+Understanding the relationship between `extension` and `onExtension` is crucial for effective plugin development.
+
+During Step H (Create CommandContext):
 
 - Each plugin is processed sequentially in dependency order
 - For each plugin: the `extension` factory is called, then immediately its `onExtension` callback
@@ -197,7 +207,9 @@ Understanding the relationship between `extension` and `onExtension` is crucial 
 
 ## Lifecycle with Command Hooks
 
-Gunshi provides Command hooks (`onBeforeCommand`, `onAfterCommand`, `onErrorCommand`) that integrate with the plugin lifecycle. The following sequence diagram illustrates how these command hooks interact with plugins during command execution:
+Gunshi provides Command hooks (`onBeforeCommand`, `onAfterCommand`, `onErrorCommand`) that integrate with the plugin lifecycle.
+
+The following sequence diagram illustrates how these command hooks interact with plugins during command execution:
 
 > [!TIP]
 > For details on Command Hooks, including advanced use cases like logging, performance monitoring, validation guards, and transaction management, see [Command Hooks](../advanced/command-hooks.md).

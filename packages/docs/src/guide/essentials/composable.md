@@ -1,12 +1,16 @@
 # Composable Sub-commands
 
-In [the previous chapter](./type-safe.md), you learned how to create type-safe commands using the `define` function. Now, let's extend that knowledge to build CLIs with multiple sub-commands while maintaining the same type safety benefits.
+In [the previous chapter](./type-safe.md), you learned how to create type-safe commands using the `define` function.
+
+Now, let's extend that knowledge to build CLIs with multiple sub-commands while maintaining the same type safety benefits.
 
 Gunshi's composable sub-command system allows you to create modular, organized CLIs similar to tools like Git (with commands like `git commit` and `git push`).
 
 ## Why Use Sub-commands?
 
-Sub-commands are useful when your CLI needs to perform different operations that warrant separate commands. Benefits include:
+Sub-commands are useful when your CLI needs to perform different operations that warrant separate commands.
+
+Benefits include:
 
 - **Organization**: Group related functionality logically
 - **Scalability**: Add new commands without modifying existing ones
@@ -86,7 +90,9 @@ This structure provides:
 
 ## Automatic Help for Sub-commands
 
-Gunshi automatically generates help documentation for your sub-commands. Using the code from the previous section, you can see the help for each command level:
+Gunshi automatically generates help documentation for your sub-commands.
+
+Using the code from the previous section, you can see the help for each command level:
 
 ```sh
 # Show main command help
@@ -112,7 +118,9 @@ Each sub-command's help includes its description, available options, and usage e
 
 ## Organizing Your Commands
 
-As your CLI grows, organizing commands in separate files improves maintainability. Here's a recommended project structure:
+As your CLI grows, organizing commands in separate files improves maintainability.
+
+Here's a recommended project structure:
 
 ```
 my-cli/
@@ -219,7 +227,9 @@ await cli(process.argv.slice(2), main, {
 
 ## Handling Unknown Sub-commands
 
-By default, Gunshi shows an error when users provide an unknown sub-command. You can customize this behavior using the `fallbackToEntry` option:
+By default, Gunshi shows an error when users provide an unknown sub-command.
+
+You can customize this behavior using the `fallbackToEntry` option:
 
 ```ts [cli.ts]
 await cli(process.argv.slice(2), main, {
@@ -285,8 +295,12 @@ This approach is particularly useful for CLIs that:
 
 ## Next Steps
 
-Throughout this guide, you've learned how to build composable sub-commands that scale from simple to complex CLI applications. You've seen how Gunshi maintains type safety across nested command structures, enables powerful routing patterns with default commands, and supports both synchronous and asynchronous command execution.
+Throughout this guide, you've learned how to build composable sub-commands that scale from simple to complex CLI applications.
 
-Now that you understand how to compose commands into well-organized hierarchies, you're ready to explore how to optimize their performance. The next section on [Lazy & Async Command Loading](./lazy-async.md) will show you how to significantly improve your CLI's startup time by loading commands only when they're actually needed.
+You've seen how Gunshi maintains type safety across nested command structures, enables powerful routing patterns with default commands, and supports both synchronous and asynchronous command execution.
+
+Now that you understand how to compose commands into well-organized hierarchies, you're ready to explore how to optimize their performance.
+
+The next section on [Lazy & Async Command Loading](./lazy-async.md) will show you how to significantly improve your CLI's startup time by loading commands only when they're actually needed.
 
 With composable sub-commands as your foundation, adding lazy loading will make your CLI applications both powerful and performant, especially as they grow to include many commands with varying resource requirements.

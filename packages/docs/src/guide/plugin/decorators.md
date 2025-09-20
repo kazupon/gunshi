@@ -1,21 +1,29 @@
 # Plugin Decorators
 
-Decorators are a powerful mechanism in Gunshi's plugin system that allows you to wrap and enhance existing functionality. This guide explains how to effectively use decorators in your plugins.
+Decorators are a powerful mechanism in Gunshi's plugin system that allows you to wrap and enhance existing functionality.
+
+This guide explains how to effectively use decorators in your plugins.
 
 ## Understanding Decorator Mechanism
 
-In Gunshi, decorators create a wrapping structure around the original functionality. Gunshi implements two types of decorators with different processing methods:
+In Gunshi, decorators create a wrapping structure around the original functionality.
+
+Gunshi implements two types of decorators with different processing methods:
 
 - **Command Decorators**: Processed using `reduceRight`, creating a nested wrapper structure
 - **Renderer Decorators**: Processed using a `for` loop, building a chain of transformations
 
 ## Command Decorators
 
-Command decorators wrap command execution for cross-cutting concerns like logging, authentication, and error handling. Unlike renderer decorators that only affect output formatting, command decorators can control the entire execution flow, including validation, authentication, logging, and error handling.
+Command decorators wrap command execution for cross-cutting concerns like logging, authentication, and error handling.
+
+Unlike renderer decorators that only affect output formatting, command decorators can control the entire execution flow, including validation, authentication, logging, and error handling.
 
 ### How Command Decorators Work
 
-Command decorators use the `decorateCommand()` method provided by the `PluginContext`. Each decorator receives a runner function (the next decorator or original command) and returns a new function that wraps it:
+Command decorators use the `decorateCommand()` method provided by the `PluginContext`.
+
+Each decorator receives a runner function (the next decorator or original command) and returns a new function that wraps it:
 
 ```js
 ctx.decorateCommand(runner => async ctx => {
@@ -34,7 +42,9 @@ ctx.decorateCommand(runner => async ctx => {
 
 ### Command Decorator Execution Order
 
-Gunshi applies command decorators using the `reduceRight` method, which processes the decorator array from the last element to the first. This approach creates a nested wrapper structure where the first registered decorator becomes the outermost layer.
+Gunshi applies command decorators using the `reduceRight` method, which processes the decorator array from the last element to the first.
+
+This approach creates a nested wrapper structure where the first registered decorator becomes the outermost layer.
 
 The following diagram illustrates the wrapper structure:
 
@@ -193,11 +203,15 @@ Running `node index.js` outputs:
 
 ## Renderer Decorators
 
-Gunshi provides a powerful API for customizing how your CLI displays information through renderer decorators. These decorators allow you to wrap and enhance the rendering of headers, usage/help messages, and validation errors, enabling consistent styling, branding, and enhanced user experience across your CLI application.
+Gunshi provides a powerful API for customizing how your CLI displays information through renderer decorators.
+
+These decorators allow you to wrap and enhance the rendering of headers, usage/help messages, and validation errors, enabling consistent styling, branding, and enhanced user experience across your CLI application.
 
 ### How Renderer Decorators Work
 
-Gunshi applies renderer decorators using a standard `for` loop that iterates through the decorator array from first to last. Each iteration wraps the previous renderer function, building a chain of decorators.
+Gunshi applies renderer decorators using a standard `for` loop that iterates through the decorator array from first to last.
+
+Each iteration wraps the previous renderer function, building a chain of decorators.
 
 This approach means that each decorator in the array wraps the accumulated result of all previous decorators, with each decorator receiving the previous renderer as its `baseRenderer` parameter.
 
@@ -209,11 +223,15 @@ Gunshi provides three renderer decorator methods via `PluginContext`:
 - **`decorateUsageRenderer`**: Enhances usage and help message display
 - **`decorateValidationErrorsRenderer`**: Formats validation error messages
 
-Each decorator receives the base renderer function and must call it to maintain the decorator chain. This ensures that multiple plugins can cooperatively enhance the output.
+Each decorator receives the base renderer function and must call it to maintain the decorator chain.
+
+This ensures that multiple plugins can cooperatively enhance the output.
 
 ### Complete Rendering Customization Example
 
-Here's a comprehensive example showing how to customize all three renderers in a single plugin. This plugin adds branding to headers, appends metadata to usage messages, and enhances error formatting:
+Here's a comprehensive example showing how to customize all three renderers in a single plugin.
+
+This plugin adds branding to headers, appends metadata to usage messages, and enhances error formatting:
 
 ```js [plugin.js]
 import { plugin } from 'gunshi/plugin'
@@ -286,7 +304,11 @@ Generated: 2025-08-15T14:26:43.121Z
 
 ### Multiple Plugin Decorator Execution Order
 
-When multiple plugins register renderer decorators, the order matters. Gunshi uses two built-in plugins by default: `@gunshi/plugin-global` (adds --help and --version options) and `@gunshi/plugin-renderer` (provides default rendering). When you add your own plugins, they interact with these default plugins in a specific order based on how the `for` loop processes the decorators.
+When multiple plugins register renderer decorators, the order matters.
+
+Gunshi uses two built-in plugins by default: `@gunshi/plugin-global` (adds --help and --version options) and `@gunshi/plugin-renderer` (provides default rendering).
+
+When you add your own plugins, they interact with these default plugins in a specific order based on how the `for` loop processes the decorators.
 
 #### Plugin Registration and Decorator Chain Building
 
@@ -447,7 +469,7 @@ const final = await customBDecorator(afterCustomA, ctx) // Adds "Styled by Plugi
 **Always call `baseRenderer` in your decorator to maintain the decorator chain. Skipping it will break other plugins that may depend on the output.**
 
 > [!NOTE]
-> Renderer decorators have the lowest priority in Gunshi's rendering system. Command-level and CLI-level renderers will override plugin decorators. See [Rendering Customization](../advanced/rendering-customization.md) for details on renderer priority.
+> Renderer decorators have the lowest priority in Gunshi's rendering system. Command-level and CLI-level renderers will override plugin decorators. See [Rendering Customization](../advanced/custom-rendering.md) for details on renderer priority.
 
 ## Command vs Renderer Decorators
 

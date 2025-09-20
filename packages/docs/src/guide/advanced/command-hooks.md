@@ -1,6 +1,8 @@
 # Command Hooks
 
-Gunshi provides powerful lifecycle hooks that allow you to intercept and control command execution at various stages. These hooks enable advanced scenarios like logging, monitoring, validation, and error handling.
+Gunshi provides powerful lifecycle hooks that allow you to intercept and control command execution at various stages.
+
+These hooks enable advanced scenarios like logging, monitoring, validation, and error handling.
 
 ## Understanding Command Lifecycle
 
@@ -45,7 +47,9 @@ Gunshi provides three main lifecycle hooks:
 
 ### Setting Up Hooks
 
-The following example demonstrates how to configure lifecycle hooks when initializing your CLI application. In this setup, we define three hooks that will execute at different stages of the command lifecycle:
+The following example demonstrates how to configure lifecycle hooks when initializing your CLI application.
+
+In this setup, we define three hooks that will execute at different stages of the command lifecycle:
 
 ```ts [cli.ts]
 import { cli } from 'gunshi'
@@ -80,7 +84,9 @@ await cli(
 
 ### Hook Parameters
 
-Each lifecycle hook receives specific parameters that provide context about the command execution. The `CommandContext` parameter is read-only and contains all command metadata, while `onAfterCommand` also receives the command result and `onErrorCommand` receives the thrown error:
+Each lifecycle hook receives specific parameters that provide context about the command execution.
+
+The `CommandContext` parameter is read-only and contains all command metadata, while `onAfterCommand` also receives the command result and `onErrorCommand` receives the thrown error:
 
 ```ts
 {
@@ -431,6 +437,8 @@ await cli(process.argv.slice(2), commands, {
 
 ## Hook Execution Order
 
-When multiple hooks and decorators are present, they execute in a specific sequence as shown in the Hooks vs Decorators section above. Understanding this order is crucial for implementing complex behaviors like transaction management or error recovery.
+When multiple hooks and decorators are present, they execute in a specific sequence as shown in the Hooks vs Decorators section above.
+
+Understanding this order is crucial for implementing complex behaviors like transaction management or error recovery.
 
 For detailed execution flow, refer to the execution diagram in the [Hooks vs Decorators](#hooks-vs-decorators) section.

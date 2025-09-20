@@ -1,10 +1,14 @@
 # Declarative Configuration
 
-Gunshi allows you to configure your commands declaratively, making your CLI code more organized and maintainable. This approach separates the command definition from its execution logic.
+Gunshi allows you to configure your commands declaratively, making your CLI code more organized and maintainable.
+
+This approach separates the command definition from its execution logic.
 
 ## Basic Declarative Structure
 
-If you've followed the Getting Started guide, you've seen how simple it is to create a basic CLI with Gunshi. In that guide, we created a simple greeting command. As your CLI grows with more options, validation rules, and features, declarative configuration becomes essential for managing this complexity effectively.
+If you've followed the Getting Started guide, you've seen how simple it is to create a basic CLI with Gunshi.
+
+In that guide, we created a simple greeting command. As your CLI grows with more options, validation rules, and features, declarative configuration becomes essential for managing this complexity effectively.
 
 A declaratively configured command in Gunshi follows this structure:
 
@@ -33,7 +37,9 @@ Let's see how this structure works in practice with a complete example.
 
 ## Complete Example
 
-Let's start with a simple example that demonstrates the declarative approach. We'll build a greeting command with a few basic options:
+Let's start with a simple example that demonstrates the declarative approach.
+
+We'll build a greeting command with a few basic options:
 
 ```js [cli.js]
 import { cli } from 'gunshi'
@@ -126,7 +132,7 @@ Since v0.27.0, commands support additional configuration properties:
 - `entry`: Boolean flag that marks the main command when subcommands exist (default: `undefined`). This property is typically set automatically by the framework. When used with the `fallbackToEntry` CLI option, it enables fallback behavior for unmatched subcommands.
 - `rendering`: Object to customize how the command displays help, usage, and error messages. This allows fine-grained control over command-level rendering output.
   > [!TIP]
-  > For detailed information about customizing rendering output including headers, usage text, and validation errors, see the [Rendering Customization guide](../advanced/rendering-customization.md).
+  > For detailed information about customizing rendering output including headers, usage text, and validation errors, see the [Rendering Customization guide](../advanced/custom-rendering.md).
 
 ### Command Options
 
@@ -148,7 +154,9 @@ Each option can have the following properties:
 
 #### Positional Arguments
 
-To define arguments that are identified by their position rather than a name/flag (like `--name`), set their `type` to `'positional'`. The _key_ you use for the argument in the `args` object serves as its name for accessing the value later.
+To define arguments that are identified by their position rather than a name/flag (like `--name`), set their `type` to `'positional'`.
+
+The _key_ you use for the argument in the `args` object serves as its name for accessing the value later.
 
 Here's how you define positional arguments in your command configuration:
 
@@ -182,7 +190,9 @@ const command = {
 
 #### Custom Type Arguments
 
-While the built-in types (`string`, `number`, `boolean`, `positional`) cover most use cases, you may need more complex parsing logic for certain arguments. Gunshi supports custom argument types with user-defined parsing functions, allowing you to parse structured input like JSON, validate ranges, or integrate with validation libraries like `zod`.
+While the built-in types (`string`, `number`, `boolean`, `positional`) cover most use cases, you may need more complex parsing logic for certain arguments.
+
+Gunshi supports custom argument types with user-defined parsing functions, allowing you to parse structured input like JSON, validate ranges, or integrate with validation libraries like `zod`.
 
 To define a custom argument type:
 
@@ -257,7 +267,9 @@ Custom type arguments support:
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
-By default, argument names are displayed in the help text and used on the command line exactly as they are defined in the `args` object. However, it's common practice in CLI applications to use kebab-case for multi-word argument names (e.g., `--user-name` instead of `--userName`).
+By default, argument names are displayed in the help text and used on the command line exactly as they are defined in the `args` object.
+
+However, it's common practice in CLI applications to use kebab-case for multi-word argument names (e.g., `--user-name` instead of `--userName`).
 
 Gunshi supports automatic conversion of camelCase argument names to kebab-case with the `toKebab` property, which can be set at two levels:
 
@@ -316,7 +328,11 @@ When `toKebab` is enabled:
 
 #### Negatable Boolean Options
 
-Sometimes you need to explicitly disable a boolean option that might be enabled by default or through configuration files. Negatable options solve this by providing both positive and negative forms of the same option. To enable this (e.g., allowing both `--verbose` and `--no-verbose`), add the `negatable: true` property to the option's definition.
+Sometimes you need to explicitly disable a boolean option that might be enabled by default or through configuration files.
+
+Negatable options solve this by providing both positive and negative forms of the same option.
+
+To enable this (e.g., allowing both `--verbose` and `--no-verbose`), add the `negatable: true` property to the option's definition.
 
 - If you define an option like `verbose: { type: 'boolean', negatable: true }`, Gunshi will recognize both `--verbose` and `--no-verbose`.
 - If `-V` or `--verbose` is passed, the value will be `true`.
@@ -329,7 +345,9 @@ The description for the negatable option (e.g., `--no-verbose`) is automatically
 
 #### Conflicting Options
 
-You can define mutually exclusive options using the `conflicts` property. This ensures that conflicting options cannot be used together:
+You can define mutually exclusive options using the `conflicts` property.
+
+This ensures that conflicting options cannot be used together:
 
 ```js
 const command = {
@@ -386,7 +404,9 @@ When conflicting options are used together, Gunshi will throw an error:
 
 ### Examples
 
-The `examples` property provides example commands showing how to use the CLI. This helps users understand how to use your command correctly and is displayed in the help output.
+The `examples` property provides example commands showing how to use the CLI.
+
+This helps users understand how to use your command correctly and is displayed in the help output.
 
 #### Basic Examples
 
@@ -464,7 +484,9 @@ deploy --environment production --tag latest --dry-run
 
 #### Dynamic Examples
 
-You can also provide examples as a function that returns a string. This is useful when examples need to be generated dynamically or localized:
+You can also provide examples as a function that returns a string.
+
+This is useful when examples need to be generated dynamically or localized:
 
 ```js
 const command = {
@@ -553,7 +575,9 @@ Notes:
 
 #### Async Examples
 
-For complex CLIs that need to load examples from external files or generate them based on runtime conditions, you can use async functions. When using the function form, you can return a Promise for async example generation:
+For complex CLIs that need to load examples from external files or generate them based on runtime conditions, you can use async functions.
+
+When using the function form, you can return a Promise for async example generation:
 
 ```js
 const command = {
@@ -676,6 +700,8 @@ Throughout this guide, you've seen how declarative configuration structures your
 
 ## Next Steps
 
-Now that you understand how to configure commands declaratively, you're ready to explore how Gunshi provides full type safety for your commands. The next section on [Type Safe](./type-safe.md) will show you how to leverage TypeScript's type system to catch errors at compile time and get excellent IDE support while building your CLI applications.
+Now that you understand how to configure commands declaratively, you're ready to explore how Gunshi provides full type safety for your commands.
+
+The next section on [Type Safe](./type-safe.md) will show you how to leverage TypeScript's type system to catch errors at compile time and get excellent IDE support while building your CLI applications.
 
 With declarative configuration as your foundation, adding type safety will make your CLI development even more robust and developer-friendly.

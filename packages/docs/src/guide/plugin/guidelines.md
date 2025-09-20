@@ -1,12 +1,14 @@
 # Plugin Development Guidelines
 
-This guide provides practical guidelines for developing reliable, maintainable, and performant Gunshi plugins. While other sections cover implementation details and APIs, this guide focuses on recommended approaches and techniques for production-ready plugins.
+This guide provides practical guidelines for developing reliable, maintainable, and performant Gunshi plugins.
+
+While other sections cover implementation details and APIs, this guide focuses on recommended approaches and techniques for production-ready plugins.
 
 > [!TIP]
 > We recommend developing Gunshi plugins with TypeScript for enhanced type safety, better IDE support, and compile-time error detection. All examples and code snippets in this guide are written in TypeScript. While JavaScript plugins are supported, TypeScript helps prevent runtime errors and provides a superior developer experience through auto-completion and type checking.
 
 > [!NOTE]
-> Some code examples in this guide include TypeScript file extensions (`.ts`) in import/export statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+> Some code examples in this guide include TypeScript file extensions (`.ts`) in `import`/`export` statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
 
 ## Design Principles
 
@@ -30,7 +32,9 @@ Type safety prevents runtime errors and improves developer experience. Performan
 
 Use namespaced IDs to prevent conflicts and clearly identify plugin ownership.
 
-Namespacing prevents ID collisions in large applications where multiple teams might develop plugins independently. It enables plugin discovery and filtering by namespace, making it easy to identify official plugins versus third-party extensions.
+Namespacing prevents ID collisions in large applications where multiple teams might develop plugins independently.
+
+It enables plugin discovery and filtering by namespace, making it easy to identify official plugins versus third-party extensions.
 
 Additionally, this convention clarifies ownership and responsibility, helping users understand a plugin's source, maintenance status, and trustworthiness at a glance.
 
@@ -62,9 +66,13 @@ Follow consistent naming for plugin packages:
 
 ### `gunshi/plugin` vs `@gunshi/plugin`
 
-When developing Gunshi plugins, you need to import the `plugin` function and related types. Plugin developers can import from either `gunshi/plugin` or `@gunshi/plugin`. Both provide identical APIs and type definitions.
+When developing Gunshi plugins, you need to import the `plugin` function and related types.
 
-Use `@gunshi/plugin` when you want to minimize your plugin's dependencies and reduce `node_modules` size, as it's a smaller package that only includes plugin-related functionality. For plugin development, we recommend using `@gunshi/plugin` to keep your plugin package lightweight.
+Plugin developers can import from either `gunshi/plugin` or `@gunshi/plugin`. Both provide identical APIs and type definitions.
+
+Use `@gunshi/plugin` when you want to minimize your plugin's dependencies and reduce `node_modules` size, as it's a smaller package that only includes plugin-related functionality.
+
+For plugin development, we recommend using `@gunshi/plugin` to keep your plugin package lightweight.
 
 Here are the two equivalent import options available to plugin developers:
 
@@ -78,7 +86,9 @@ import { plugin } from '@gunshi/plugin'
 
 ### Factory Function Approach
 
-Create plugins as factory functions to allow configuration at initialization. This approach enables configuration flexibility by accepting options at plugin creation time, allowing each instance to be configured independently without relying on global state or environment variables.
+Create plugins as factory functions to allow configuration at initialization.
+
+This approach enables configuration flexibility by accepting options at plugin creation time, allowing each instance to be configured independently without relying on global state or environment variables.
 
 The factory function should be named after the plugin's primary functionality to make its purpose immediately clear.
 
@@ -208,7 +218,11 @@ extension: ctx => ({
 
 ### Handle Optional Dependencies Gracefully
 
-Check for optional dependencies before using them. Graceful dependency handling ensures your plugin works across different environments and configurations, preventing cascading failures when optional plugins are not available. Choose the appropriate approach based on your needs.
+Check for optional dependencies before using them.
+
+Graceful dependency handling ensures your plugin works across different environments and configurations, preventing cascading failures when optional plugins are not available.
+
+Choose the appropriate approach based on your needs.
 
 The following example demonstrates different patterns for handling optional dependencies:
 
@@ -255,13 +269,19 @@ extension: ctx => {
 
 ## Resource Management
 
-After establishing proper error handling, the next important aspect is managing resources effectively. Proper resource management prevents memory leaks and ensures your plugin releases system resources correctly, especially important when errors occur during execution.
+After establishing proper error handling, the next important aspect is managing resources effectively.
+
+Proper resource management prevents memory leaks and ensures your plugin releases system resources correctly, especially important when errors occur during execution.
 
 ### Clean Up Resources
 
-Proper resource cleanup helps prevent memory leaks in long-running CLI tools. System resources have practical limits - file handles (typically 1024 per process) and database connections (often 100-200 per server) can be exhausted without proper cleanup.
+Proper resource cleanup helps prevent memory leaks in long-running CLI tools.
 
-The following example demonstrates how to implement cleanup mechanisms for managing multiple database connections. The plugin tracks all created connections in an array and provides a cleanup method that closes them all when the process exits:
+System resources have practical limits - file handles (typically 1024 per process) and database connections (often 100-200 per server) can be exhausted without proper cleanup.
+
+The following example demonstrates how to implement cleanup mechanisms for managing multiple database connections.
+
+The plugin tracks all created connections in an array and provides a cleanup method that closes them all when the process exits:
 
 ```ts
 import type { Connection } from './types.ts'
@@ -308,11 +328,15 @@ onExtension: ctx => {
 
 ## Performance Considerations
 
-With proper resource management in place, you can focus on optimizing when and how resources are created and accessed. The following techniques improve CLI startup time and responsiveness while maintaining the resource cleanup patterns discussed earlier.
+With proper resource management in place, you can focus on optimizing when and how resources are created and accessed.
+
+The following techniques improve CLI startup time and responsiveness while maintaining the resource cleanup patterns discussed earlier.
 
 ### Use Lazy Initialization
 
-Lazy initialization improves CLI startup time by deferring expensive operations until actually needed. This ensures quick response times for simple commands.
+Lazy initialization improves CLI startup time by deferring expensive operations until actually needed.
+
+This ensures quick response times for simple commands.
 
 The following example demonstrates how to defer database connection initialization until the first query is executed:
 
@@ -424,7 +448,9 @@ For more `extension` lifecycle details, see [Plugin Extensions](./extensions.md)
 
 ### Validate All Inputs
 
-User input should be validated and sanitized before use. The following example demonstrates how to validate file paths and extensions to prevent directory traversal attacks and restrict file types:
+User input should be validated and sanitized before use.
+
+The following example demonstrates how to validate file paths and extensions to prevent directory traversal attacks and restrict file types:
 
 ```ts
 extension: () => ({
@@ -447,7 +473,9 @@ extension: () => ({
 
 ### Protect Sensitive Data
 
-Avoid exposing sensitive information in logs or error messages. This example shows how to handle API keys securely in a plugin, validating them without logging sensitive data:
+Avoid exposing sensitive information in logs or error messages.
+
+This example shows how to handle API keys securely in a plugin, validating them without logging sensitive data:
 
 ```ts
 export default function auth(apiKey: string) {
@@ -476,7 +504,9 @@ export default function auth(apiKey: string) {
 
 ### Prevent Prototype Pollution
 
-Prototype pollution occurs when user-controlled data modifies `Object.prototype`, potentially injecting properties that affect all objects in your application. This vulnerability is particularly dangerous in CLI tools that process configuration files or user-provided options, as attackers can manipulate command behavior through crafted inputs.
+Prototype pollution occurs when user-controlled data modifies `Object.prototype`, potentially injecting properties that affect all objects in your application.
+
+This vulnerability is particularly dangerous in CLI tools that process configuration files or user-provided options, as attackers can manipulate command behavior through crafted inputs.
 
 Use `Object.create(null)` to create objects without a prototype chain when handling user input:
 
@@ -538,7 +568,9 @@ Regular object literals are safe for:
 
 ## Testing Strategies
 
-Focus testing on your plugin's extension factory and how it interacts with the command context. This ensures your plugin properly integrates with Gunshi's lifecycle and handles command metadata correctly.
+Focus testing on your plugin's extension factory and how it interacts with the command context.
+
+This ensures your plugin properly integrates with Gunshi's lifecycle and handles command metadata correctly.
 
 The following example demonstrates how to test your plugin's extension factory and its interaction with the command context:
 
@@ -576,11 +608,15 @@ For test helpers, lifecycle testing, and integration testing strategies, see [Pl
 
 ## Documentation
 
-Comprehensive documentation is crucial for plugin adoption and maintenance. This section provides guidelines and real examples from official Gunshi plugins to help you create effective documentation.
+Comprehensive documentation is crucial for plugin adoption and maintenance.
+
+This section provides guidelines and real examples from official Gunshi plugins to help you create effective documentation.
 
 ### Module-Level Documentation
 
-Start your main plugin file with module-level JSDoc that explains the plugin's purpose and provides a complete usage example. The following example from `@gunshi/plugin-global` demonstrates this approach:
+Start your main plugin file with module-level JSDoc that explains the plugin's purpose and provides a complete usage example.
+
+The following example from `@gunshi/plugin-global` demonstrates this approach:
 
 ````ts
 /**
@@ -608,7 +644,7 @@ Start your main plugin file with module-level JSDoc that explains the plugin's p
  *
  * @module
  */
-```
+````
 
 ### Factory Function Documentation
 
@@ -645,7 +681,9 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
 
 ### Extension Interface Documentation
 
-Document all methods and properties exposed through your plugin's extension. Here's a concise example:
+Document all methods and properties exposed through your plugin's extension.
+
+Here's a concise example:
 
 ```ts
 /**
@@ -742,7 +780,7 @@ In your README, explain:
 
 A comprehensive README should follow this structure:
 
-```markdown
+```markdown [README.md]
 # @yourorg/gunshi-plugin-{name}
 
 > Brief description of what your plugin does.
@@ -791,7 +829,9 @@ See the [examples directory](./examples) for usage examples.
 
 ### API Documentation Generation
 
-Generate API documentation directly from your JSDoc comments to maintain a single source of truth. This approach ensures your documentation stays synchronized with your code, as updates to JSDoc comments automatically reflect in generated documentation.
+Generate API documentation directly from your JSDoc comments to maintain a single source of truth.
+
+This approach ensures your documentation stays synchronized with your code, as updates to JSDoc comments automatically reflect in generated documentation.
 
 Various tools can generate documentation from JSDoc comments:
 
@@ -800,7 +840,7 @@ Various tools can generate documentation from JSDoc comments:
 
 The following example demonstrates configuring `TypeDoc`, a popular choice for TypeScript plugin projects. Create a `typedoc.config.mjs` file:
 
-```js
+```js [typedoc.config.mjs]
 // @ts-check
 
 export default {
@@ -834,7 +874,7 @@ export default {
 
 Add documentation scripts to your `package.json`:
 
-```json
+```json [package.json]
 {
   "scripts": {
     "docs": "typedoc",
@@ -848,5 +888,6 @@ Add documentation scripts to your `package.json`:
 }
 ```
 
-This configuration extracts documentation from your JSDoc comments and TypeScript types, generating comprehensive API documentation without manual maintenance. The generated documentation includes all exported functions, interfaces, types, and their associated JSDoc descriptions, ensuring consistency between code and documentation.
-````
+This configuration extracts documentation from your JSDoc comments and TypeScript types, generating comprehensive API documentation without manual maintenance.
+
+The generated documentation includes all exported functions, interfaces, types, and their associated JSDoc descriptions, ensuring consistency between code and documentation.

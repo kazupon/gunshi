@@ -64,7 +64,9 @@ This notation provides immediate visual feedback about what users must provide v
 
 ## Generated Help Output
 
-Gunshi transforms your command definitions into professional help documentation. Here's what users see when they request help.
+Gunshi transforms your command definitions into professional help documentation.
+
+Here's what users see when they request help.
 
 ### Basic Command Help
 
@@ -260,6 +262,4 @@ When working with auto-generated usage:
 
 ## Next Steps
 
-- Explore [Type Safety](./type-safe.md) for compile-time guarantees
-- Learn about the [Plugin System](./plugin-system.md) to extend functionality
-- See [Internationalization](../advanced/i18n.md) for multi-language support
+Learn about the [Plugin System](./plugin-system.md) to extend functionality.
