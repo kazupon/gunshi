@@ -1,10 +1,15 @@
-import { defineConfig } from 'vitepress'
+// import { defineConfig } from 'vitepress'
+import path from 'node:path'
+import { URL } from 'node:url'
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import llmstxt from 'vitepress-plugin-llms'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 import typedocSidebar from '../api/typedoc-sidebar.json' with { type: 'json' }
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default withMermaid({
   title: 'Gunshi',
   description: 'Modern JavaScript Command-line library',
   lastUpdated: true,
@@ -59,6 +64,7 @@ export default defineConfig({
         text: 'Advanced',
         collapsed: false,
         items: [
+          { text: 'Type System', link: '/guide/advanced/type-system' },
           { text: 'Command Hooks', link: '/guide/advanced/command-hooks' },
           { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
           { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
@@ -128,6 +134,32 @@ export default defineConfig({
   },
 
   vite: {
+    optimizeDeps: {
+      include: ['@braintree/sanitize-url', 'dayjs', 'debug', 'cytoscape-cose-bilkent', 'cytoscape']
+    },
+    resolve: {
+      alias:
+        process.env.NODE_ENV !== 'production'
+          ? {
+              debug: path.resolve(
+                __dirname,
+                '../../../../node_modules/.pnpm/debug@4.4.1/node_modules/debug/src/browser.js'
+              ),
+              '@braintree/sanitize-url': path.resolve(
+                __dirname,
+                '../../../../node_modules/.pnpm/@braintree+sanitize-url@7.1.1/node_modules/@braintree/sanitize-url/dist/index.js'
+              ),
+              dayjs: path.resolve(
+                __dirname,
+                '../../../../node_modules/.pnpm/dayjs@1.11.18/node_modules/dayjs/esm/index.js'
+              )
+            }
+          : undefined
+    },
+
     plugins: [groupIconVitePlugin(), llmstxt()]
-  }
+  },
+
+  mermaid: { theme: 'forest' },
+  mermaidPlugin: { class: 'mermaid my-class' }
 })
