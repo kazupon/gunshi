@@ -63,7 +63,7 @@ export default defineConfig({
           { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
           { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
           { text: 'Internationalization', link: '/guide/advanced/internationalization' },
-          { text: 'Documentation Generation', link: '/guide/advanced/documentation-generation' },
+          { text: 'Documentation Generation', link: '/guide/advanced/docs-gen' },
           {
             text: 'Advanced Lazy Loading and Sub-Commands',
             link: '/guide/advanced/advanced-lazy-loading'
