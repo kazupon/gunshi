@@ -343,7 +343,7 @@ await main()
 
 Then add a script to your `package.json`:
 
-```json
+```json [package.json]
 {
   "scripts": {
     "docs:generate": "tsx scripts/generate-docs.ts",
@@ -389,7 +389,7 @@ This approach allows you to maintain man pages alongside your CLI code, ensuring
 ```ts [cli.ts]
 import { define } from 'gunshi'
 import { generate } from 'gunshi/generator'
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
@@ -502,7 +502,7 @@ $ my-tool --input data.csv --verbose`,
 
   // Convert markdown to man page format using marked-man
   try {
-    execSync(`marked-man --input ${mdFile} --output my-tool.1`)
+    execFileSync('marked-man', ['--input', mdFile, '--output', 'my-tool.1'])
     console.log('Man page generated successfully: my-tool.1')
   } catch (error) {
     console.error('Error generating man page:', (error as Error).message)
@@ -538,7 +538,7 @@ Once you've generated a man page, you can install it on Unix-like systems:
 
 3. **Package installation** (for npm packages):
    Add this to your `package.json`:
-   ```json
+   ```json [package.json]
    {
      "man": ["./man/my-tool.1"]
    }
