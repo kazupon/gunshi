@@ -278,8 +278,7 @@ You can automate documentation generation as part of your build process:
 > - **Deno**: Use `import.meta.dirname` or `fromFileUrl(import.meta.url)`
 > - **Bun**: Use `import.meta.dir` or Node.js-compatible approach
 
-```ts
-// scripts/generate-docs.ts
+```ts [scripts/generate-docs.ts]
 import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 import { fileURLToPath } from 'node:url'

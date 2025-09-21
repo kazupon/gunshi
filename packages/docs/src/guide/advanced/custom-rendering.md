@@ -145,7 +145,7 @@ The following example demonstrates how to customize rendering at the command lev
 
 Notice how the renderer functions receive a Command Context (`ctx`) parameter that provides access to command information:
 
-```ts
+```js
 import { define } from 'gunshi'
 
 const command = define({
@@ -189,7 +189,7 @@ Keyboard Shortcuts (during watch):
 Here's how to create custom renderers for specific use cases:
 
 ```js
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 
 // Define a custom header renderer with fancy formatting
 const customHeaderRenderer = ctx => {
@@ -216,7 +216,7 @@ const customHeaderRenderer = ctx => {
 }
 
 // Define your command
-const command = {
+const command = define({
   name: 'app',
   description: 'My application',
   args: {
@@ -229,7 +229,7 @@ const command = {
   run: ctx => {
     // Command implementation
   }
-}
+})
 
 // Run the command with the custom header renderer
 await cli(process.argv.slice(2), command, {
@@ -263,7 +263,7 @@ OPTIONS:
 
 Set any renderer to `null` to disable it:
 
-```ts
+```js
 rendering: {
   header: null,           // No header
   usage: async () => '...' // Custom usage
@@ -280,7 +280,7 @@ Set default renderers for all commands in your CLI. Use this when:
 
 ### Basic Configuration
 
-```ts
+```js
 import { cli } from 'gunshi'
 
 await cli(process.argv.slice(2), command, {
@@ -307,10 +307,10 @@ await cli(process.argv.slice(2), command, {
 You can combine all three custom renderers for a completely customized help experience:
 
 ```js
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 
 // Define a command
-const command = {
+const command = define({
   name: 'task-manager',
   description: 'A task management utility',
   args: {
@@ -354,7 +354,7 @@ $ task-manager --complete "Complete the project"`,
   run: ctx => {
     // Command implementation
   }
-}
+})
 
 // Define custom usage renderer
 const customUsageRenderer = ctx => {
@@ -407,7 +407,7 @@ They can decorate renderers to add consistent behavior across all commands.
 
 The `@gunshi/plugin-renderer` package provides enhanced rendering out of the box:
 
-```ts
+```js
 import { cli } from 'gunshi/bone'
 import renderer from '@gunshi/plugin-renderer'
 
@@ -430,10 +430,10 @@ Unlike decorator plugins, it replaces the default rendering entirely.
 
 When building rendering plugins, use the decorator pattern to enhance existing output:
 
-```ts
+```js
 import { plugin } from 'gunshi/plugin'
 
-const colorPlugin = plugin({
+const color = plugin({
   id: 'my:color',
   name: 'Color Plugin',
 
@@ -464,10 +464,10 @@ const colorPlugin = plugin({
 
 Here's a complete theme plugin that enhances all rendering aspects:
 
-```ts
+```js
 import { plugin } from 'gunshi/plugin'
 
-const oceanThemePlugin = plugin({
+const oceanTheme = plugin({
   id: 'themes:ocean',
   name: 'Ocean Theme',
 
@@ -515,11 +515,11 @@ Each plugin receives the output from the previous one, creating a transformation
 
 Let's create a simple emoji plugin to demonstrate plugin combination:
 
-```ts
+```js
 import { plugin } from 'gunshi/plugin'
 
 // Define a simple emoji plugin using correct decorator API
-const emojiPlugin = plugin({
+const emoji = plugin({
   id: 'my:emoji',
   name: 'Emoji Decorator',
 
@@ -545,8 +545,8 @@ await cli(process.argv.slice(2), command, {
   name: 'my-cli',
   plugins: [
     renderer(), // Base renderer
-    oceanThemePlugin(), // Apply ocean theme colors
-    emojiPlugin() // Add emoji indicators
+    oceanTheme(), // Apply ocean theme colors
+    emoji() // Add emoji indicators
   ]
 })
 ```
@@ -754,8 +754,8 @@ For the complete list of available properties and their types, refer to the [Com
 
 Here's a comprehensive example of a task manager CLI with fully customized rendering:
 
-```js
-import { cli } from 'gunshi'
+```js [cli.js]
+import { cli, define } from 'gunshi'
 
 // Custom header renderer
 const customHeaderRenderer = ctx => {
@@ -833,7 +833,7 @@ const customValidationErrorsRenderer = (ctx, error) => {
 }
 
 // Define a command
-const command = {
+const command = define({
   name: 'task-manager',
   description: 'A task management utility with custom usage generation',
   args: {
@@ -889,7 +889,7 @@ $ task-manager --complete "Complete the project"`,
       console.log('No action specified. Run with --help to see usage information.')
     }
   }
-}
+})
 
 // Run the command with custom usage generation
 await cli(process.argv.slice(2), command, {

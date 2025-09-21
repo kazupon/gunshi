@@ -128,7 +128,7 @@ Run:
 node cli.js --help
 ```
 
-You'll see a help message that includes.
+You'll see a help message that includes:
 
 Here's an example of the generated help output:
 

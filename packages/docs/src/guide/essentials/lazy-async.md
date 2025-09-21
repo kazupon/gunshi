@@ -27,11 +27,11 @@ Let's start with a simple example that demonstrates the core concept.
 The following code shows how to create a lazy-loaded command that only loads its implementation when executed:
 
 ```ts [cli.ts]
-import { cli, lazy } from 'gunshi'
-import type { Command, CommandRunner, CommandContext } from 'gunshi'
+import { cli, define, lazy } from 'gunshi'
+import type { CommandRunner, CommandContext } from 'gunshi'
 
 // Step 1: Define the command metadata separately
-const helloDefinition: Command = {
+const helloDefinition = define({
   name: 'hello',
   description: 'A greeting command',
   args: {
@@ -41,7 +41,7 @@ const helloDefinition: Command = {
       default: 'world'
     }
   }
-}
+})
 
 // Step 2: Create a loader function that returns the command implementation
 const helloLoader = async (): Promise<CommandRunner> => {
@@ -123,11 +123,11 @@ For real-world applications, you'll typically want to use dynamic imports to loa
 This enables bundlers to create separate chunks for each command:
 
 ```ts [cli.ts]
-import { cli, lazy } from 'gunshi'
-import type { Command, CommandRunner } from 'gunshi'
+import { cli, define, lazy } from 'gunshi'
+import type { CommandRunner } from 'gunshi'
 
 // Command metadata stays in the main bundle
-const buildDefinition: Command = {
+const buildDefinition = define({
   name: 'build',
   description: 'Build the project',
   args: {
@@ -142,7 +142,7 @@ const buildDefinition: Command = {
       description: 'Minify output'
     }
   }
-}
+})
 
 // Loader uses dynamic import to load the command from a separate file
 const buildLoader = async (): Promise<CommandRunner> => {
@@ -154,7 +154,7 @@ const buildLoader = async (): Promise<CommandRunner> => {
 const lazyBuild = lazy(buildLoader, buildDefinition)
 
 // Add more commands following the same pattern
-const deployDefinition: Command = {
+const deployDefinition = define({
   name: 'deploy',
   description: 'Deploy to production',
   args: {
@@ -164,7 +164,7 @@ const deployDefinition: Command = {
       default: 'production'
     }
   }
-}
+})
 
 const deployLoader = async (): Promise<CommandRunner> => {
   const { run } = await import('./commands/deploy.ts')
@@ -223,8 +223,8 @@ With this approach, your bundler (rollup, esbuild, webpack, etc.) will automatic
 Gunshi seamlessly supports asynchronous command execution, which is essential for commands that perform I/O operations, network requests, or other async tasks. Building on lazy loading, your command runners can be async functions:
 
 ```ts [cli.ts]
+import { cli, define, lazy } from 'gunshi'
 import type { Command, CommandContext, CommandRunner, GunshiParams } from 'gunshi'
-import { cli, lazy } from 'gunshi'
 
 // Mock implementations that simulate async file operations
 // These work without requiring actual files on disk
@@ -262,7 +262,7 @@ async function writeFile(path: string, data: string): Promise<void> {
 //   await fsWriteFile(path, data, 'utf-8')
 // }
 
-const processDataDefinition = {
+const processDataDefinition = define({
   name: 'process',
   description: 'Process data asynchronously',
   args: {
@@ -279,7 +279,7 @@ const processDataDefinition = {
       required: true
     }
   }
-} satisfies Command
+})
 
 // Extract the args type from the definition
 type ProcessDataArgs = NonNullable<typeof processDataDefinition.args>
@@ -342,14 +342,13 @@ While the examples above show loaders returning runner functions, loaders can al
 This is useful when you want to dynamically construct the entire command structure:
 
 ```ts [cli.ts]
-import type { Command } from 'gunshi'
-import { cli, lazy } from 'gunshi'
+import { cli, define, lazy } from 'gunshi'
 
-const configLoader = async (): Promise<Command> => {
+const configLoader = async () => {
   // Simulate loading configuration (in practice, read from file/API)
   const isDebug = process.env.DEBUG === 'true'
 
-  return {
+  return define({
     description: `Config command (debug: ${isDebug})`,
     args: {
       verbose: {
@@ -363,7 +362,7 @@ const configLoader = async (): Promise<Command> => {
         console.log('Verbose:', ctx.values)
       }
     }
-  }
+  })
 }
 
 const lazyConfig = lazy(configLoader, {

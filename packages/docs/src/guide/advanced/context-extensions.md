@@ -16,8 +16,10 @@ Plugins enhance this context by adding new capabilities through the extensions p
 Each plugin contributes its own extension under a unique namespace, ensuring clean separation of concerns and preventing conflicts between different plugins.
 
 ```ts
+import { define } from 'gunshi'
+
 // Basic command context
-const command = {
+const command = define({
   run: ctx => {
     // Default context properties
     ctx.name // Command name
@@ -28,7 +30,7 @@ const command = {
     // Plugin extensions
     ctx.extensions // Object containing all plugin extensions
   }
-}
+})
 ```
 
 ## How Extensions Work
@@ -43,9 +45,10 @@ When a plugin is added to your CLI configuration, its extension becomes availabl
 > For details on how plugin extensions work, see the [Plugin Extensions](../plugin/extensions.md) guide.
 
 ```ts
+import { define } from 'gunshi'
 import { pluginId as globalId } from '@gunshi/plugin-global'
 
-const command = {
+const command = define({
   run: ctx => {
     // Access global plugin extension
     const globalExtension = ctx.extensions[globalId]
@@ -54,7 +57,7 @@ const command = {
     globalExtension.showVersion()
     globalExtension.showHeader()
   }
-}
+})
 ```
 
 ## Working with Built-in Plugin Extensions
@@ -68,9 +71,10 @@ Understanding how to use these extensions effectively will accelerate your CLI d
 The global plugin (`@gunshi/plugin-global`) provides methods for displaying CLI information:
 
 ```ts
+import { define } from 'gunshi'
 import { pluginId as globalId } from '@gunshi/plugin-global'
 
-const command = {
+const command = define({
   run: ctx => {
     const global = ctx.extensions[globalId]
 
@@ -88,7 +92,7 @@ const command = {
       global.showValidationErrors(ctx.validationError)
     }
   }
-}
+})
 ```
 
 > [!NOTE]
@@ -99,9 +103,10 @@ const command = {
 The renderer plugin (`@gunshi/plugin-renderer`) provides text rendering capabilities:
 
 ```ts
+import { define } from 'gunshi'
 import { pluginId as rendererId } from '@gunshi/plugin-renderer'
 
-const command = {
+const command = define({
   run: async ctx => {
     // Check if renderer extension is available
     const renderer = ctx.extensions[rendererId]
@@ -114,7 +119,7 @@ const command = {
       const commands = await renderer.loadCommands()
     }
   }
-}
+})
 ```
 
 > [!NOTE]
@@ -131,9 +136,10 @@ These extensions follow the same patterns but may not be present in all CLI conf
 The i18n plugin provides translation capabilities through context extensions:
 
 ```ts
+import { define } from 'gunshi'
 import { pluginId as i18nId } from '@gunshi/plugin-i18n'
 
-const command = {
+const command = define({
   run: ctx => {
     const i18n = ctx.extensions[i18nId]
 
@@ -146,7 +152,7 @@ const command = {
       console.log(message)
     }
   }
-}
+})
 ```
 
 > [!NOTE]
@@ -167,9 +173,10 @@ Commands should defensively check for extension existence to prevent runtime err
 This defensive programming approach ensures your CLI remains robust even when optional plugins are not configured:
 
 ```ts
+import { define } from 'gunshi'
 import { pluginId as globalId } from '@gunshi/plugin-global'
 
-const command = {
+const command = define({
   run: ctx => {
     // Safe access technique
     const global = ctx.extensions[globalId]
@@ -182,7 +189,7 @@ const command = {
       console.log('Usage information not available')
     }
   }
-}
+})
 ```
 
 ### Extension Composition
@@ -194,10 +201,11 @@ Extensions are designed to work together harmoniously, allowing you to compose c
 The following example demonstrates how global display features can be enhanced with dynamic content loading from the renderer extension:
 
 ```ts
+import { define } from 'gunshi'
 import { pluginId as globalId } from '@gunshi/plugin-global'
 import { pluginId as rendererId } from '@gunshi/plugin-renderer'
 
-const command = {
+const command = define({
   run: async ctx => {
     const global = ctx.extensions[globalId]
     const renderer = ctx.extensions[rendererId]
@@ -212,7 +220,7 @@ const command = {
       console.log('Available commands:', commands)
     }
   }
-}
+})
 ```
 
 ### Dynamic Extension Usage
@@ -224,10 +232,11 @@ This dynamic approach allows your CLI to adapt its behavior to different context
 The following code shows how to selectively engage extensions based on command flags:
 
 ```ts
+import { define } from 'gunshi'
 import { pluginId as globalId } from '@gunshi/plugin-global'
 import { pluginId as loggerId } from '@my/plugin-logger'
 
-const command = {
+const command = define({
   args: {
     verbose: { type: 'boolean' },
     debug: { type: 'boolean' },
@@ -258,7 +267,7 @@ const command = {
     // Your command logic here
     console.log('Command executed')
   }
-}
+})
 ```
 
 ## Type-Safe Extensions
@@ -302,11 +311,12 @@ This pattern decouples your command logic from infrastructure concerns and simpl
 ```ts
 // Note: These are hypothetical example plugins for illustration purposes
 // You would need to create or install actual plugins with these capabilities
+import { define } from 'gunshi'
 import { pluginId as dbId } from '@my/plugin-db' // Example custom plugin
 import { pluginId as cacheId } from '@my/plugin-cache' // Example custom plugin
 
 // With hypothetical database and cache plugins
-const command = {
+const command = define({
   run: async ctx => {
     const db = ctx.extensions[dbId]
     const cache = ctx.extensions[cacheId]
@@ -325,7 +335,7 @@ const command = {
 
     return users
   }
-}
+})
 ```
 
 ### Extension for Cross-Cutting Concerns
@@ -340,11 +350,12 @@ The following example demonstrates a comprehensive approach to handling logging,
 
 ```ts
 // Note: These are hypothetical example plugins for illustration purposes
+import { define } from 'gunshi'
 import { pluginId as loggerId } from '@my/plugin-logger'
 import { pluginId as authId } from '@my/plugin-auth'
 import { pluginId as metricsId } from '@my/plugin-metrics'
 
-const command = {
+const command = define({
   run: async ctx => {
     const logger = ctx.extensions[loggerId]
     const auth = ctx.extensions[authId]
@@ -381,7 +392,7 @@ const command = {
       throw error
     }
   }
-}
+})
 ```
 
 > [!TIP]

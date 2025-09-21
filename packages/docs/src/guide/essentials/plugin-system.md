@@ -56,15 +56,15 @@ When either option is used, the plugin intercepts command execution to display t
 The following example demonstrates how the cli() function automatically includes the global plugin:
 
 ```js
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 
-const command = {
+const command = define({
   name: 'app',
   description: 'My CLI application',
   run: ctx => {
     console.log('Running application')
   }
-}
+})
 
 await cli(process.argv.slice(2), command, {
   name: 'my-app',
@@ -219,10 +219,10 @@ yarn add @gunshi/plugin-completion
 Here's how to add completion support:
 
 ```js
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 import completion from '@gunshi/plugin-completion'
 
-const command = {
+const command = define({
   name: 'deploy',
   args: {
     environment: {
@@ -234,7 +234,7 @@ const command = {
   run: ctx => {
     console.log(`Deploying to ${ctx.values.environment}`)
   }
-}
+})
 
 await cli(process.argv.slice(2), command, {
   name: 'deploy-cli',

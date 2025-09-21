@@ -166,7 +166,7 @@ graph TD
 The following example demonstrates how to use the `decorateCommand` method in a plugin to measure command execution time:
 
 ```ts
-import { plugin } from 'gunshi'
+import { plugin } from 'gunshi/plugin'
 
 // Using decorateCommand in a plugin
 export default plugin({

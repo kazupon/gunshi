@@ -4,7 +4,7 @@ Gunshi is a modern JavaScript command-line library designed to simplify the crea
 
 ## Origin of the Name
 
-The name "gunshi" (軍師) refers to a position in ancient Japanese samurai battles where a samurai devised strategies and gave orders. This name is inspired by the word "command", reflecting the library's purpose of handling command-line commands.
+The name "gunshi" (軍師) refers to a position in ancient Japanese samurai battles where samurai devised strategies and gave orders. This name is inspired by the word "command", reflecting the library's purpose of handling command-line commands.
 
 ## Key Features
 

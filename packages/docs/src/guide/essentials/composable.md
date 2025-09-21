@@ -103,7 +103,7 @@ $ npx tsx cli.ts create --help
 ```
 
 > [!TIP]
-> [**tsx**](https://github.com/privatenumber/tsx) is a TypeScript execution tool that allows you to run TypeScript files directly without compilation. Use it directly with `npx tsx`.
+> [`tsx`](https://github.com/privatenumber/tsx) is a TypeScript execution tool that allows you to run TypeScript files directly without compilation. Use it directly with `npx tsx`.
 
 > [!NOTE]
 > On Node.js v22.6.0, you can run TypeScript with `--experimental-strip-types`:

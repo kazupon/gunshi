@@ -141,7 +141,7 @@ Each option can have the following properties:
 - `type`: The data type ('string', 'number', 'boolean', 'positional', 'custom'[, 'enum' if supported])
 - `short`: A single-character alias for the option (e.g., `-n` as a shorthand for `--name`), making commands quicker to type for frequent use.
   <!-- eslint-disable markdown/no-missing-label-refs -->
-  > [!TIP] Multiple boolean short options can be grouped together.
+  > [!TIP] Multiple boolean short option flags can be grouped together.
   > (e.g., `-Vb` is equivalent to `-V -b`). Options requiring values (like `string`, `number`, `enum`) cannot be part of a group.
   <!-- eslint-enable markdown/no-missing-label-refs -->
 - `description`: A description of what the option does
