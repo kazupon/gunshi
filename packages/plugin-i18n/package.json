@@ -77,7 +77,7 @@
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
-    "messageformat": "4.0.0-12",
+    "messageformat": "4.0.0-13",
     "publint": "catalog:",
     "tsdown": "catalog:",
     "typedoc": "catalog:",
