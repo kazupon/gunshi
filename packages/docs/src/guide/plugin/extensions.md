@@ -13,6 +13,9 @@ Each extension is namespaced by the plugin ID to prevent conflicts.
 Here's a simple example showing the concept:
 
 ```js
+import { plugin } from 'gunshi/plugin'
+import { define } from 'gunshi'
+
 // Plugin provides an extension
 const loggerPlugin = plugin({
   id: 'logger',

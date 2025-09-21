@@ -143,6 +143,8 @@ Use optional dependencies when:
 Mark dependencies as optional using the object format:
 
 ```js
+import { plugin } from 'gunshi/plugin'
+
 const enhancedPlugin = plugin({
   id: 'enhanced',
   dependencies: [
@@ -177,7 +179,9 @@ This situation makes it impossible to determine a valid initialization sequence 
 
 Gunshi automatically detects circular dependencies during the resolution phase and will throw an error:
 
-```ts
+```js
+import { plugin } from 'gunshi/plugin'
+
 // This will fail!
 const pluginA = plugin({
   id: 'A',
@@ -196,7 +200,9 @@ const pluginB = plugin({
 
 Circular dependencies can also occur in longer chains:
 
-```ts
+```js
+import { plugin } from 'gunshi/plugin'
+
 // Three-way circular dependency
 const pluginX = plugin({
   id: 'X',
@@ -230,6 +236,8 @@ When two plugins need to share functionality, extract that functionality into a 
 **Problem: Circular dependency between two plugins**
 
 ```js
+import { plugin } from 'gunshi/plugin'
+
 // ❌ Circular dependency - This will fail!
 const pluginA = plugin({
   id: 'plugin-a',
@@ -258,6 +266,8 @@ const pluginB = plugin({
 **Solution: Extract shared functionality into a common plugin**
 
 ```js
+import { plugin, cli } from 'gunshi/plugin'
+
 // ✅ Create a common base plugin with shared functionality
 const sharedPlugin = plugin({
   id: 'shared',
@@ -319,6 +329,8 @@ This approach offers several benefits:
 
 Here's a complete example demonstrating dependency resolution order with complex dependencies:
 
+logger plugin:
+
 ```js [logger.js]
 import { plugin } from 'gunshi/plugin'
 
@@ -333,6 +345,8 @@ export default plugin({
   })
 })
 ```
+
+cache plugin:
 
 ```js [cache.js]
 import { plugin } from 'gunshi/plugin'
@@ -353,6 +367,8 @@ export default plugin({
 })
 ```
 
+auth plugin:
+
 ```js [auth.js]
 import { plugin } from 'gunshi/plugin'
 
@@ -372,6 +388,8 @@ export default plugin({
   })
 })
 ```
+
+metrics plugin:
 
 ```js [metrics.js]
 import { plugin } from 'gunshi/plugin'
@@ -395,6 +413,8 @@ export default plugin({
 })
 ```
 
+api plugin:
+
 ```js [api.js]
 import { plugin } from 'gunshi/plugin'
 
@@ -417,8 +437,10 @@ export default plugin({
 })
 ```
 
-```js [index.js]
-import { cli } from 'gunshi'
+Last, install all plugins on CLI application:
+
+```js [cli.js]
+import { cli, define } from 'gunshi'
 import logger from './logger.js'
 import cache from './cache.js'
 import auth from './auth.js'
@@ -426,7 +448,7 @@ import metrics from './metrics.js'
 import api from './api.js'
 
 // Command to demonstrate plugin loading
-const command = {
+const command = define({
   name: 'demo',
   run: ctx => {
     console.log('\n=== Command execution starts ===')
@@ -437,7 +459,7 @@ const command = {
 
     console.log('=== Command execution ends ===')
   }
-}
+})
 
 // Run with plugins in random order - Gunshi will resolve correct order
 await cli(process.argv.slice(2), command, {
@@ -455,7 +477,7 @@ await cli(process.argv.slice(2), command, {
 Run your application with plugin:
 
 ```sh
-node index.js
+node cli.js
 1. Logger plugin loaded
 2. Cache plugin loaded (depends on logger)
 3. Auth plugin loaded (depends on logger, cache)

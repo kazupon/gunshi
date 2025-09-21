@@ -82,6 +82,8 @@ While TypeScript can infer some types automatically, explicitly specifying all f
 If you omit type parameters, TypeScript falls back to default or inferred types:
 
 ```ts
+import { plugin } from 'gunshi/plugin'
+
 // Without type parameters - loses type safety
 const plugin1 = plugin({
   id: 'my-plugin',
@@ -180,7 +182,7 @@ type DependencyExtensions = {
 const dependencies = [loggerId, authId] as const
 type Dependencies = typeof dependencies
 
-export default function apiPlugin() {
+export default function api() {
   return plugin<DependencyExtensions, PluginId, Dependencies, ApiExtension>({
     id: pluginId,
     dependencies,
@@ -369,7 +371,7 @@ export interface ApiExtension {
 }
 ```
 
-```ts [index.ts]
+```ts [api.ts]
 import { plugin } from 'gunshi/plugin'
 import { pluginId } from './types.ts'
 import { pluginId as loggerId } from './logger.ts'
@@ -434,7 +436,7 @@ export default function api(baseUrl: string) {
 
 Usage in your CLI application:
 
-```ts [index.ts]
+```ts [cli.ts]
 import { cli, define } from 'gunshi'
 import api, { pluginId as apiId } from './api.ts'
 import auth from './auth.ts'

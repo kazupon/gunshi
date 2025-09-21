@@ -21,7 +21,7 @@ export default plugin({
 
 Use it in your CLI:
 
-```js [index.js]
+```js [cli.js]
 import { cli } from 'gunshi'
 import hello from './plugin.js'
 
@@ -36,7 +36,7 @@ Run your application with plugin:
 
 ```sh
 # Run the entry with plugin
-node index.js
+node cli.js
 
 Hello from plugin!
 ```
@@ -72,11 +72,11 @@ export default plugin({
 
 Now all commands have access to `--debug`:
 
-```js [index.js]
-import { cli } from 'gunshi'
+```js [cli.js]
+import { cli, define } from 'gunshi'
 import debug from './plugin.js'
 
-const command = {
+const command = define({
   name: 'build',
   run: ctx => {
     if (ctx.values.debug) {
@@ -85,7 +85,7 @@ const command = {
     }
     console.log('Building...')
   }
-}
+})
 
 await cli(process.argv.slice(2), command, {
   plugins: [debug]
@@ -96,7 +96,7 @@ Run your application with plugin:
 
 ```sh
 # Run command with debug option
-node ./index.js --debug
+node cli.js --debug
 
 Debug mode enabled
 Context: ...
@@ -151,15 +151,15 @@ export default plugin({
 
 Now your CLI has additional commands:
 
-```js [index.js]
-import { cli } from 'gunshi'
+```js [cli.js]
+import { cli, define } from 'gunshi'
 import tools from './plugin.js'
 
 // Main command
-const command = {
+const command = define({
   name: 'build',
   run: ctx => console.log('Building project...')
-}
+})
 
 await cli(process.argv.slice(2), command, {
   plugins: [tools]
@@ -170,22 +170,22 @@ Run your application with the new sub-commands:
 
 ```sh
 # Run main command
-node index.js
+node cli.js
 Building project...
 
 # Run plugin's sub-command
-node index.js clean
+node cli.js clean
 Cleaning build artifacts...
 Clean complete!
 
 # With arguments
-node index.js clean --cache
+node cli.js clean --cache
 Cleaning build artifacts...
 Clearing cache...
 Clean complete!
 
 # Run another sub-command
-node index.js lint
+node cli.js lint
 Running linter...
 No issues found!
 ```

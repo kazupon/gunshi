@@ -100,7 +100,7 @@ export default plugin({
 
 Application codes:
 
-```js [index.js]
+```js [cli.js]
 import { cli } from 'gunshi'
 import lifo from './plugin.js'
 
@@ -118,7 +118,7 @@ await cli(
 When executed, `reduceRight` creates a wrapper structure where Decorator A wraps B, B wraps C, and C wraps the original command:
 
 ```sh
-node index.js
+node cli.js
 Decorator A: before    # Outermost wrapper executes first
 Decorator B: before    # Middle wrapper
 Decorator C: before    # Innermost wrapper
@@ -171,17 +171,17 @@ export default plugin({
 })
 ```
 
-```js [index.js]
-import { cli } from 'gunshi'
+```js [cli.js]
+import { cli, define } from 'gunshi'
 import multi from './plugin.js'
 
-const command = {
+const command = define({
   name: 'process',
   run: ctx => {
     console.log('>>> Executing actual command <<<')
     return 'Command result'
   }
-}
+})
 
 await cli(process.argv.slice(2), command, {
   plugins: [multi]
@@ -262,19 +262,19 @@ export default plugin({
 
 Application code:
 
-```js [index.js]
-import { cli } from 'gunshi'
+```js [cli.js]
+import { cli, define } from 'gunshi'
 import customRenderer from './plugin.js'
 
 await cli(
   process.argv.slice(2),
-  {
+  define({
     name: 'build',
     args: {
       output: { type: 'string', required: true }
     },
     run: ctx => console.log(`Building to ${ctx.values.output}`)
-  },
+  }),
   {
     name: 'my-cli',
     version: '1.0.0',
@@ -286,7 +286,7 @@ await cli(
 Run with `--help` to see customized output:
 
 ```sh
-node index.js --help
+node cli.js --help
 🚀 My CLI v1.0.0
 my-cli (my-cli v1.0.0)
 
@@ -306,7 +306,7 @@ Generated: 2025-08-15T14:26:43.121Z
 
 When multiple plugins register renderer decorators, the order matters.
 
-Gunshi uses two built-in plugins by default: `@gunshi/plugin-global` (adds --help and --version options) and `@gunshi/plugin-renderer` (provides default rendering).
+Gunshi uses two built-in plugins by default: `@gunshi/plugin-global` (adds `--help` and `--version` options) and `@gunshi/plugin-renderer` (provides default rendering).
 
 When you add your own plugins, they interact with these default plugins in a specific order based on how the `for` loop processes the decorators.
 
@@ -380,17 +380,19 @@ export default plugin({
 })
 ```
 
-```js [index.js]
-import { cli } from 'gunshi' // Includes plugin-global and plugin-renderer by default
+Last, install all plugins on CLI application:
+
+```js [cli.js]
+import { cli, define } from 'gunshi' // Includes plugin-global and plugin-renderer by default
 import pluginA from './plugin-a.js'
 import pluginB from './plugin-b.js'
 
 await cli(
   process.argv.slice(2),
-  {
+  define({
     name: 'demo',
     run: () => console.log('Demo command')
-  },
+  }),
   {
     name: 'my-cli',
     version: '1.0.0',

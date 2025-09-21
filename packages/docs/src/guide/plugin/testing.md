@@ -10,6 +10,9 @@ This guide covers comprehensive testing approaches for Gunshi plugins, demonstra
 > [!IMPORTANT]
 > The code examples in this guide focus on demonstrating testing patterns and techniques. For clarity and brevity, some examples may not include extensive explanations that would normally be present in Gunshi's documentation. The emphasis is on showing practical testing approaches rather than following all documentation style guidelines.
 
+> [!NOTE]
+> Some code examples in this guide include TypeScript file extensions (`.ts`) in `import`/`export` statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+
 ## Table of Contents
 
 [[toc]]
@@ -24,8 +27,7 @@ Let's build a minimal plugin and its corresponding test step by step.
 
 First, create a simple plugin that provides a greeting function:
 
-```typescript
-// src/index.ts
+```ts [src/plugin.ts]
 import { plugin } from 'gunshi/plugin'
 
 export default function myPlugin(options = {}) {
@@ -49,10 +51,9 @@ This minimal plugin:
 
 Now let's write tests for this plugin:
 
-```typescript
-// src/index.test.ts
+```ts [src/plugin.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import myPlugin from './index'
+import myPlugin from './plugin.ts'
 
 describe('plugin initialization', () => {
   test('create plugin with default options', () => {
@@ -105,8 +106,8 @@ These tests verify:
 
 Run the tests with:
 
-```bash
-pnpm test
+```sh
+vitest run
 ```
 
 This approach gives you a working foundation that you can expand as your plugin grows more complex.
@@ -119,9 +120,9 @@ Testing these methods ensures that your plugin behaves correctly when commands u
 
 The following example demonstrates how to test extension methods by creating a minimal mock context manually:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import myPlugin from './index'
+import myPlugin from './plugin.ts'
 
 describe('extension methods', () => {
   test('extension method works', async () => {
@@ -186,8 +187,7 @@ Test helpers solve these problems by providing reusable, type-safe utility funct
 
 Create a `test/helper.ts` file in your plugin root directory with reusable test utilities:
 
-```typescript
-// test/helper.ts
+```ts [test/helper.ts]
 import { vi } from 'vitest'
 import { plugin } from 'gunshi/plugin'
 import type {
@@ -316,11 +316,11 @@ The following example shows a plugin factory that accepts configuration options 
 
 The extension function receives the command context (ctx) and command definition (cmd) and returns an object containing the plugin's functionality:
 
-```typescript
+```ts [src/plugin.ts]
 import { plugin } from 'gunshi/plugin'
 
 // Plugin factory function with optional configuration
-function createMyPlugin(
+export default function myPlugin(
   options: {
     debug?: boolean // Enables debug logging when true
     locale?: string // Sets the plugin's locale (e.g., 'en-US', 'ja-JP')
@@ -349,10 +349,13 @@ function createMyPlugin(
 
 The following tests verify that plugins are created with the correct structure and behavior:
 
-```typescript
+```ts [src/plugin.test.ts]
+import { describe, expect, test, vi } from 'vitest'
+import myPlugin from './plugin.ts'
+
 describe('structure validation', () => {
   test('creates plugin with minimal configuration', () => {
-    const plugin = createMyPlugin({ debug: false, locale: 'en-US' })
+    const plugin = myPlugin({ debug: false, locale: 'en-US' })
 
     // Verify required properties
     expect(plugin.id).toBe('my-plugin')
@@ -396,8 +399,10 @@ These tests ensure that plugin dependencies are properly declared with the corre
 
 #### Plugin Implementation for Dependency Tests
 
-```typescript
-function createPluginWithDependencies() {
+```ts
+import { plugin } from 'gunshi/plugin'
+
+export default function myPluginWithDependencies() {
   return plugin({
     id: 'dependent-plugin',
     name: 'Dependent Plugin',
@@ -416,10 +421,13 @@ function createPluginWithDependencies() {
 
 The following test verifies that dependencies are correctly declared in the plugin metadata:
 
-```typescript
+```ts
+import { describe, expect, test, vi } from 'vitest'
+import myPluginWithDependencies from './plugin.ts'
+
 describe('dependency declaration', () => {
   test('declares dependencies correctly', () => {
-    const plugin = createPluginWithDependencies()
+    const plugin = myPluginWithDependencies()
 
     expect(plugin.dependencies).toBeDefined()
     expect(plugin.dependencies).toContain('plugin-renderer')
@@ -443,9 +451,11 @@ Configuration validation tests verify that plugins properly validate their optio
 
 #### Plugin Implementations for Configuration Tests
 
-```typescript
+```ts [src/plugin.ts]
+import { plugin } from 'gunshi/plugin'
+
 // Plugin that validates configuration at creation time
-function createValidatingPlugin(options: { locale: string; timeout?: number }) {
+export function myValidatingPlugin(options: { locale: string; timeout?: number }) {
   // Validation happens in the factory function before creating the plugin
   // Validate locale format (e.g., 'en-US', 'ja-JP' - ISO language-country format)
   if (options.locale && !options.locale.match(/^[a-z]{2}-[A-Z]{2}$/)) {
@@ -463,7 +473,7 @@ function createValidatingPlugin(options: { locale: string; timeout?: number }) {
 }
 
 // Plugin with strict required options
-function createStrictPlugin(options: { apiKey: string }) {
+export function myStrictPlugin(options: { apiKey: string }) {
   if (!options.apiKey) {
     throw new Error('API key is required')
   }
@@ -480,27 +490,29 @@ function createStrictPlugin(options: { apiKey: string }) {
 
 The following tests verify that plugins properly validate their configuration:
 
-```typescript
+```ts [src/plugin.test.ts]
+import { describe, expect, test, vi } from 'vitest'
+import { myValidatingPlugin, myStrictPlugin, myPlugin } from './plugin.ts'
+
 describe('configuration validation', () => {
   test('validates configuration at creation time', () => {
     // Test that invalid options prevent plugin creation
-    expect(() => createValidatingPlugin({ locale: 'invalid' })).toThrow('Invalid locale format')
-
-    expect(() => createValidatingPlugin({ locale: 'en-US', timeout: -1 })).toThrow(
+    expect(() => myValidatingPlugin({ locale: 'invalid' })).toThrow('Invalid locale format')
+    expect(() => myValidatingPlugin({ locale: 'en-US', timeout: -1 })).toThrow(
       'Timeout must be positive'
     )
   })
 
   test('handles missing optional configuration', () => {
     // Should not throw when optional config is missing
-    const plugin = createMyPlugin({ locale: 'en-US' }) // timeout is optional
+    const plugin = myPlugin({ locale: 'en-US' }) // timeout is optional
     expect(plugin).toBeDefined()
     expect(plugin.id).toBe('my-plugin')
   })
 
   test('plugin factory throws on invalid required options', () => {
     // Missing required option prevents initialization
-    expect(() => createStrictPlugin({ apiKey: '' })).toThrow('API key is required')
+    expect(() => myStrictPlugin({ apiKey: '' })).toThrow('API key is required')
   })
 })
 ```
@@ -519,12 +531,12 @@ These tests verify how plugins handle internal state initialization, including l
 
 #### Plugin Implementation for Initialization Tests
 
-```typescript
+```ts [src/plugin.ts]
 // File cache plugin that loads existing cache during initialization
 import { readFileSync, existsSync, writeFileSync } from 'node:fs'
 import { plugin } from 'gunshi/plugin'
 
-export function createFileCachePlugin(options?: { cacheFile?: string }) {
+export default function fileCachePlugin(options?: { cacheFile?: string }) {
   const cacheFile = options?.cacheFile ?? '.cache.json'
 
   // Initialize cache by loading from file if it exists
@@ -576,10 +588,10 @@ export function createFileCachePlugin(options?: { cacheFile?: string }) {
 
 The following tests demonstrate various initialization scenarios. We mock the file system to test different conditions without creating actual files:
 
-```typescript
+```ts
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { createFileCachePlugin } from './plugins'
 import { readFileSync, existsSync } from 'node:fs'
+import fileCachePlugin from './plugin.ts'
 
 // Mock the fs module to control file system behavior in tests
 // This allows us to simulate different scenarios (missing files, corrupted data, etc.)
@@ -599,7 +611,7 @@ describe('initialization state', () => {
     const mockExistsSync = vi.mocked(existsSync)
     mockExistsSync.mockReturnValue(false)
 
-    const plugin = createFileCachePlugin()
+    const plugin = fileCachePlugin()
 
     // Plugin initializes successfully without cache file
     expect(plugin.id).toBe('file-cache')
@@ -622,7 +634,7 @@ describe('initialization state', () => {
     mockExistsSync.mockReturnValue(true)
     mockReadFileSync.mockReturnValue(JSON.stringify(cacheData))
 
-    const plugin = createFileCachePlugin()
+    const plugin = fileCachePlugin()
 
     // Verify cache was loaded during initialization
     expect(mockExistsSync).toHaveBeenCalledWith('.cache.json')
@@ -639,7 +651,7 @@ describe('initialization state', () => {
     mockExistsSync.mockReturnValue(true)
     mockReadFileSync.mockReturnValue('invalid json {]')
 
-    const plugin = createFileCachePlugin()
+    const plugin = fileCachePlugin()
 
     // Plugin initializes despite corrupted cache
     expect(plugin.id).toBe('file-cache')
@@ -655,7 +667,7 @@ describe('initialization state', () => {
     const mockExistsSync = vi.mocked(existsSync)
     mockExistsSync.mockReturnValue(false)
 
-    const plugin = createFileCachePlugin({ cacheFile: '/tmp/my-cache.json' })
+    const plugin = fileCachePlugin({ cacheFile: '/tmp/my-cache.json' })
 
     expect(mockExistsSync).toHaveBeenCalledWith('/tmp/my-cache.json')
     expect(plugin.id).toBe('file-cache')
@@ -669,7 +681,7 @@ describe('initialization state', () => {
     mockReadFileSync.mockReturnValue('[]')
 
     // No await needed - plugin creation is synchronous
-    const plugin = createFileCachePlugin()
+    const plugin = fileCachePlugin()
 
     expect(plugin).toBeDefined()
     expect(plugin.extension).toBeDefined()
@@ -683,7 +695,7 @@ describe('initialization state', () => {
     mockExistsSync.mockReturnValue(true)
     mockReadFileSync.mockReturnValue('[]') // Empty array
 
-    const plugin = createFileCachePlugin()
+    const plugin = fileCachePlugin()
 
     expect(mockReadFileSync).toHaveBeenCalledWith('.cache.json', 'utf-8')
     expect(plugin.id).toBe('file-cache')
@@ -709,12 +721,12 @@ The `createMockCommandContext` helper simplifies testing by providing a complete
 
 This eliminates boilerplate code and ensures consistency across tests. Here's how to use it to test extension factories:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { expect, test } from 'vitest'
-import { createMockCommandContext } from '../test/helper'
-import myPlugin from './index'
+import { createMockCommandContext } from '../test/helper.ts'
+import myPlugin from './plugin.ts'
 
-import type { MyExtension } from './types'
+import type { MyExtension } from './types.ts'
 
 test('extension factory creates correct extension', async () => {
   // Create plugin instance
@@ -747,12 +759,12 @@ The test helpers provide a complete context that allows you to verify these inte
 
 The following tests demonstrate how to test methods that depend on various context properties:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import { createMockCommandContext } from '../test/helper'
-import myPlugin from './index'
+import { createMockCommandContext } from '../test/helper.ts'
+import myPlugin from './plugin.ts'
 
-import type { MyExtension } from './types'
+import type { MyExtension } from './types.ts'
 
 describe('extension methods', () => {
   test('showVersion displays version correctly', async () => {
@@ -813,10 +825,10 @@ Plugin options affect how the plugin behaves at runtime.
 
 Rather than testing the options directly (which are internal to the plugin factory), test the actual behavior changes that result from different configurations:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import { createMockCommandContext } from '../test/helper'
-import myPlugin from './index'
+import { createMockCommandContext } from '../test/helper.ts'
+import myPlugin from './plugin.ts'
 
 describe('plugin configuration behavior', () => {
   test('plugin uses debug mode when configured', async () => {
@@ -882,10 +894,10 @@ describe('plugin configuration behavior', () => {
 
 When your plugin has dependencies, test the runtime behavior when dependencies are available or missing:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import { createMockCommandContext } from '../test/helper'
-import myPlugin from './index'
+import { createMockCommandContext } from '../test/helper.ts'
+import myPlugin from './plugin.ts'
 
 describe('plugin dependency runtime behavior', () => {
   test('plugin provides fallback when optional dependency is missing', async () => {
@@ -912,7 +924,7 @@ describe('plugin dependency runtime behavior', () => {
 >
 > Circular dependencies are detected by Gunshi at runtime when plugins are loaded. In integration tests with the full CLI:
 >
-> ```typescript
+> ```ts
 > expect(() => cli({ plugins: [pluginA, pluginB] })).toThrow(
 >   'Circular dependency detected: `a -> b -> a`'
 > )
@@ -928,13 +940,13 @@ Testing decorators is crucial to ensure they correctly intercept and modify comm
 
 Here's how to test that decorators properly handle different scenarios:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { expect, test, vi } from 'vitest'
-import { createMockCommandContext } from '../test/helper'
-import decorator from './decorator'
-import myPlugin from './index'
+import { createMockCommandContext } from '../test/helper.ts'
+import decorator from './decorator.ts'
+import myPlugin from './plugin.ts'
 
-import type { MyExtension } from './types'
+import type { MyExtension } from './plugin.ts'
 
 test('decorator intercepts help option', async () => {
   const usage = 'Usage: test [options]'
@@ -985,12 +997,12 @@ This example demonstrates testing a plugin that uses Gunshi's renderer functions
 
 The test verifies both the rendered content and that the plugin correctly interacts with the command context:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { expect, test } from 'vitest'
-import { createMockCommandContext } from '../test/helper'
-import myPlugin from './index'
+import { createMockCommandContext } from '../test/helper.ts'
+import myPlugin from './plugin.ts'
 
-import type { MyExtension } from './types'
+import type { MyExtension } from './types.ts'
 
 test('extension renders header correctly', async () => {
   const header = 'Test Application v1.0.0' // The expected output that will be rendered
@@ -1030,11 +1042,11 @@ Gunshi's plugin system uses four type parameters to ensure complete type safety.
 
 Here's how to test plugins with proper type definitions:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { describe, expect, test, vi } from 'vitest'
 import { plugin } from 'gunshi/plugin'
-import type { LoggerExtension } from './logger'
-import type { MyExtension } from './types'
+import type { LoggerExtension } from './logger.ts'
+import type { MyExtension } from './types.ts'
 
 describe('type-safe plugin', () => {
   test('plugin with typed dependencies', () => {
@@ -1086,10 +1098,10 @@ This test demonstrates how to verify that an async extension factory correctly l
 
 The key aspects are mocking the async configuration loader and awaiting the factory call:
 
-```typescript
+```ts [src/plugin.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import { createMockCommandContext } from '../test/helper'
-import myPlugin from './index'
+import { createMockCommandContext } from '../test/helper.ts'
+import myPlugin from './plugin.ts'
 
 describe('async extension', () => {
   test('extension factory loads configuration', async () => {
@@ -1127,7 +1139,11 @@ Async operations can fail, so plugins should handle initialization errors gracef
 
 This test verifies that the extension provides sensible fallback values when configuration loading fails:
 
-```typescript
+```ts [src/plugin.test.ts]
+import { describe, expect, test, vi } from 'vitest'
+import { createMockCommandContext } from '../test/helper.ts'
+import myPlugin from './plugin.ts'
+
 // Still inside the 'async extension' describe block
 test('extension handles initialization errors gracefully', async () => {
   // Simulate a failed configuration load (file missing, network error, etc.)
@@ -1183,12 +1199,11 @@ The following example demonstrates how to implement and test all aspects of plug
 
 The following plugin demonstrates registering a global option, command, and decorators:
 
-```typescript
-// src/plugins/cli-enhancer-plugin.ts
+```ts [src/plugins/cli-enhancer.ts]
 import { plugin } from 'gunshi/plugin'
 import { define } from 'gunshi'
 
-export const cliEnhancerPlugin = plugin({
+export const cliEnhancer = plugin({
   id: 'cli-enhancer',
   name: 'CLI Enhancer Plugin',
   setup: ctx => {
@@ -1241,13 +1256,12 @@ This plugin provides these features:
 
 Here's how to test all aspects of this plugin setup:
 
-```typescript
-// test/plugins/cli-enhancer-plugin.test.ts
+```ts [src/plugins/cli-enhancer.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import { cliEnhancerPlugin } from '../../src/plugins/cli-enhancer-plugin'
-import { createMockPluginContext, createMockCommandContext } from '../helper'
+import { cliEnhancer } from './cli-enhancer.ts'
+import { createMockPluginContext, createMockCommandContext } from '../../test/helper.ts'
 
-describe('cliEnhancerPlugin setup', () => {
+describe('cliEnhancer plugin setup', () => {
   test('registers global option, command, and decorators', async () => {
     const pluginContext = createMockPluginContext()
 
@@ -1359,8 +1373,7 @@ This allows plugins to perform cross-extension initialization, validate dependen
 
 #### Plugin Implementation Example
 
-```typescript
-// src/plugins/initialization-tracker-plugin.ts
+```ts [src/plugins/initialization-tracker.ts]
 import { plugin } from 'gunshi/plugin'
 
 export interface InitializationTrackerExtension {
@@ -1422,11 +1435,10 @@ This plugin demonstrates:
 
 #### Testing the `onExtension` Callback
 
-```typescript
-// test/plugins/initialization-tracker-plugin.test.ts
+```ts [src/plugins/initialization-tracker.test.ts]
 import { describe, expect, test, vi } from 'vitest'
-import initializationTracker from '../../src/plugins/initialization-tracker-plugin'
-import { createMockCommandContext } from '../helper'
+import initializationTracker from './initialization-tracker.ts'
+import { createMockCommandContext } from '../../test/helper.ts'
 
 describe('onExtension callback', () => {
   test('extension is created but not initialized before onExtension runs', async () => {
@@ -1488,11 +1500,11 @@ This test suite verifies:
 
 Integration tests verify the entire plugin lifecycle with a real CLI instance:
 
-```typescript
+```ts [src/plugins/logging.ts]
 // Example plugin implementation for integration tests
 import { plugin } from 'gunshi/plugin'
 
-function createLoggingPlugin() {
+export function logging() {
   return plugin({
     id: 'logging-plugin',
     name: 'Logging Plugin',
@@ -1538,10 +1550,10 @@ function createLoggingPlugin() {
 
 Now let's write integration tests for this plugin:
 
-```typescript
+```ts [src/plugins/logging.test.ts]
 import { describe, expect, test, vi } from 'vitest'
 import { cli, define } from 'gunshi'
-import { createLoggingPlugin } from './logging-plugin'
+import logging from './logging.ts'
 
 describe('plugin integration', () => {
   test('plugin adds global options to CLI', async () => {
@@ -1598,14 +1610,14 @@ The following example demonstrates a practical scenario with a logger plugin and
 
 First, let's create a simple logger plugin with debug and error methods:
 
-```typescript
+```ts [src/plugins/logger.ts]
 // Simplified logger plugin with just debug and error methods
 export interface LoggerExtension {
   debug: (message: string) => void
   error: (message: string) => void
 }
 
-export function createLoggerPlugin() {
+export default function logger() {
   return plugin<{}, 'logger', [], LoggerExtension>({
     id: 'logger',
     name: 'Logger Plugin',
@@ -1628,14 +1640,14 @@ export function createLoggerPlugin() {
 
 Now let's create a notification plugin that optionally uses the logger plugin:
 
-```typescript
+```ts [src/plugins/notification.ts]
 // Notification plugin that optionally uses logger for output
 export interface NotificationExtension {
   success: (title: string, message?: string) => void
   error: (title: string, message?: string) => void
 }
 
-export function createNotificationPlugin() {
+export default function notification() {
   return plugin<
     { logger?: LoggerExtension },
     'notification',
@@ -1679,12 +1691,11 @@ export function createNotificationPlugin() {
 
 Now let's write tests showing essential plugin interaction patterns:
 
-```typescript
-// plugins/notification.test.ts
+```ts [src/plugins/notification.test.ts]
 import { describe, expect, test, vi, beforeEach } from 'vitest'
-import { createLoggerPlugin } from './logger'
-import { createNotificationPlugin } from './notification'
-import { createMockCommandContext } from '../test/helper'
+import logger from './logger.ts'
+import notification from './notification.ts'
+import { createMockCommandContext } from '../../test/helper.ts'
 
 describe('Plugin Interactions', () => {
   let logSpy: ReturnType<typeof vi.fn>

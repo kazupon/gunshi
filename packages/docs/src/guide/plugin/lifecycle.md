@@ -60,6 +60,8 @@ Plugins are collected from CLI options and prepared for initialization.
 The following code shows how plugins are passed to the CLI function:
 
 ```js
+import { cli } from 'gunshi'
+
 await cli(args, command, {
   plugins: [
     plugin1(), // Collected
@@ -76,6 +78,8 @@ Gunshi uses **topological sorting** to resolve plugin dependencies.
 The following example demonstrates how plugins with dependencies are resolved in the correct order:
 
 ```js
+import { plugin } from 'gunshi/plugin'
+
 // Given these plugins:
 const pluginA = plugin({
   id: 'a',
@@ -108,6 +112,8 @@ The `setup` function of each plugin is called in dependency order.
 This example shows what actions a plugin can perform during setup:
 
 ```js
+import { plugin } from 'gunshi/plugin'
+
 const myPlugin = plugin({
   id: 'my-plugin',
   setup: ctx => {
@@ -179,17 +185,19 @@ The command runner executes with:
 This example illustrates the command execution with decorator wrapping and extension usage:
 
 ```js
+import { define } from 'gunshi'
+
 // If plugins A, B, C add decorators in that order:
 // Execution order: C → B → A → original command → A → B → C
 
-const command = {
+const command = define({
   name: 'build',
   run: ctx => {
     // This is the original command
     ctx.extensions.logger.log('Building project...')
     // Build logic here
   }
-}
+})
 ```
 
 ## Extension Lifecycle in Detail
@@ -308,13 +316,13 @@ export default plugin({
 
 Application Codes:
 
-```js [index.js]
-import { cli } from 'gunshi'
+```js [cli.js]
+import { cli, define } from 'gunshi'
 import logger from './logger.js'
 import lifecycle from './lifecycle.js'
 
 // Command definition
-const command = {
+const command = define({
   name: 'build',
   args: {
     fail: {
@@ -330,7 +338,7 @@ const command = {
       throw new Error('Build failed!')
     }
   }
-}
+})
 
 // Running the CLI with Command Hooks
 await cli(process.argv.slice(2), command, {
@@ -359,7 +367,7 @@ await cli(process.argv.slice(2), command, {
 Run your application with plugin:
 
 ```sh
-node index.js
+node cli.js
 
 logger plugin setup phase started
 1. lifecycle plugin setup phase started

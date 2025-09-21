@@ -145,7 +145,7 @@ Use the entry point when:
 
 - Creating simple, application-specific plugins
 - Building inline plugins within your CLI
-- Want to minimize plugin external dependencies
+- Want to minimize external dependencies
 
 ## Plugin Ecosystem Overview
 
@@ -165,9 +165,7 @@ Gunshi provides several official plugins that cover common CLI needs:
 
 ### Community Plugins
 
-The plugin architecture enables the community to create and share plugins:
-
-TODO: should add community plugin pages and link
+The plugin architecture enables the community to create and share plugins.
 
 ### Custom Plugins
 

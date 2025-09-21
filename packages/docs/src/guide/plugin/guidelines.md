@@ -284,8 +284,8 @@ The following example demonstrates how to implement cleanup mechanisms for manag
 The plugin tracks all created connections in an array and provides a cleanup method that closes them all when the process exits:
 
 ```ts
-import type { Connection } from './types.ts'
 import { createConnection } from './database.ts'
+import type { Connection } from './types.ts'
 
 extension: () => {
   const connections: Connection[] = []
