@@ -1,10 +1,15 @@
-import { defineConfig } from 'vitepress'
+// import { defineConfig } from 'vitepress'
+import path from 'node:path'
+import { URL } from 'node:url'
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import llmstxt from 'vitepress-plugin-llms'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 import typedocSidebar from '../api/typedoc-sidebar.json' with { type: 'json' }
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default withMermaid({
   title: 'Gunshi',
   description: 'Modern JavaScript Command-line library',
   lastUpdated: true,
@@ -47,28 +52,47 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Getting Started', link: '/guide/essentials/getting-started' },
-          {
-            text: 'Declarative Configuration',
-            link: '/guide/essentials/declarative-configuration'
-          },
+          { text: 'Declarative Configuration', link: '/guide/essentials/declarative' },
           { text: 'Type Safe', link: '/guide/essentials/type-safe' },
           { text: 'Composable', link: '/guide/essentials/composable' },
           { text: 'Lazy & Async', link: '/guide/essentials/lazy-async' },
-          { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage-generation' },
-          { text: 'Internationalization', link: '/guide/essentials/internationalization' }
+          { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage' },
+          { text: 'Plugin System', link: '/guide/essentials/plugin-system' }
         ]
       },
       {
         text: 'Advanced',
         collapsed: false,
         items: [
-          { text: 'Custom Usage Generation', link: '/guide/advanced/custom-usage-generation' },
-          { text: 'Documentation Generation', link: '/guide/advanced/documentation-generation' },
+          { text: 'Type System', link: '/guide/advanced/type-system' },
+          { text: 'Command Hooks', link: '/guide/advanced/command-hooks' },
+          { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
+          { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
+          { text: 'Internationalization', link: '/guide/advanced/internationalization' },
+          { text: 'Documentation Generation', link: '/guide/advanced/docs-gen' },
           {
             text: 'Advanced Lazy Loading and Sub-Commands',
             link: '/guide/advanced/advanced-lazy-loading'
+          }
+        ]
+      },
+      {
+        text: 'Plugin',
+        collapsed: false,
+        items: [
+          { text: 'Plugin System Introduction', link: '/guide/plugin/introduction.md' },
+          {
+            text: 'Getting Started with Plugin Development',
+            link: '/guide/plugin/getting-started.md'
           },
-          { text: 'Translation Adapter', link: '/guide/advanced/translation-adapter' }
+          { text: 'Plugin Lifecycle', link: '/guide/plugin/lifecycle.md' },
+          { text: 'Plugin Dependencies', link: '/guide/plugin/dependencies.md' },
+          { text: 'Plugin Decorators', link: '/guide/plugin/decorators.md' },
+          { text: 'Plugin Extensions', link: '/guide/plugin/extensions.md' },
+          { text: 'Plugin Type System', link: '/guide/plugin/type-system.md' },
+          { text: 'Plugin Testing', link: '/guide/plugin/testing.md' },
+          { text: 'Plugin Development Guidelines', link: '/guide/plugin/guidelines.md' },
+          { text: 'Plugin List', link: '/guide/plugin/list.md' }
         ]
       },
       {
@@ -111,6 +135,32 @@ export default defineConfig({
   },
 
   vite: {
+    optimizeDeps: {
+      include: ['@braintree/sanitize-url', 'dayjs', 'debug', 'cytoscape-cose-bilkent', 'cytoscape']
+    },
+    resolve: {
+      alias:
+        process.env.NODE_ENV !== 'production'
+          ? {
+              debug: path.resolve(
+                __dirname,
+                '../../../../node_modules/.pnpm/debug@4.4.1/node_modules/debug/src/browser.js'
+              ),
+              '@braintree/sanitize-url': path.resolve(
+                __dirname,
+                '../../../../node_modules/.pnpm/@braintree+sanitize-url@7.1.1/node_modules/@braintree/sanitize-url/dist/index.js'
+              ),
+              dayjs: path.resolve(
+                __dirname,
+                '../../../../node_modules/.pnpm/dayjs@1.11.18/node_modules/dayjs/esm/index.js'
+              )
+            }
+          : undefined
+    },
+
     plugins: [groupIconVitePlugin(), llmstxt()]
-  }
+  },
+
+  mermaid: { theme: 'forest' },
+  mermaidPlugin: { class: 'mermaid my-class' }
 })

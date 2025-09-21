@@ -1,17 +1,22 @@
 # Documentation Generation
 
-Gunshi provides a powerful feature for automatically generating documentation for your CLI applications. This guide explains how to use the `generate` function to generate documentation programmatically.
+Gunshi provides a powerful feature for automatically generating documentation for your CLI applications.
+
+This guide explains how to use the `generate` function to generate documentation programmatically.
 
 ## Using the `generate` Function
 
-The `generate` function is a convenient way to generate usage documentation for your commands:
+The following example demonstrates how to use the `generate` function to programmatically capture usage information for a command and save it to a documentation file:
 
-```js
+```ts [cli.ts]
+import { define } from 'gunshi'
 import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 
+import type { Command } from 'gunshi'
+
 // Define your command
-const command = {
+const command = define({
   name: 'my-command',
   description: 'A sample command',
   args: {
@@ -29,12 +34,12 @@ const command = {
   run: ctx => {
     // Command implementation
   }
-}
+})
 
 // Generate documentation
 async function main() {
   // Generate the usage information
-  const usageText = await generate(null, command, {
+  const usageText: string = await generate(null, command, {
     name: 'my-cli',
     version: '1.0.0',
     description: 'My CLI tool'
@@ -50,22 +55,47 @@ async function main() {
 await main()
 ```
 
+The `generate` function programmatically captures usage information for your CLI commands and returns it as a string.
+
+This allows you to generate documentation files, create API documentation, or integrate usage information into your build process.
+
+Unlike the `cli` function which executes commands and prints output to the console, `generate` is designed specifically for documentation generation:
+
+- **Silent Mode**: Internally sets `usageSilent: true` to capture output as a string rather than printing to console. When this flag is set, the internal `ctx.log` function is replaced with a no-op function, preventing console output while still returning the generated usage text
+- **No Execution**: Only generates usage text without running command logic
+- **Return Value**: Returns the generated usage text as a string (or empty string if generation fails)
+
 The `generate` function takes three parameters:
 
-- `command`: The command name to generate documentation for, or `null` for the default command
-- `entry`: The command object or lazy command function
-- `opts`: Command options (name, version, description, etc.)
+- `command` (string | null): The sub-command name to generate documentation for. Pass `null` when generating documentation for the entry command or when you don't have sub-commands
+- `entry` (Command | LazyCommand): The command object containing the command definition, or a lazy command that will be loaded to get the command
+- `opts` (CliOptions): Optional configuration including:
+  - `name`: The CLI program name
+  - `version`: Version string to display
+  - `description`: Program description
+  - `subCommands`: Map of sub-commands (if applicable)
+  - `renderHeader`, `renderUsage`: Custom renderer functions
+  - **Note**: The `usageSilent` option is automatically set to `true` internally, so any value you provide will be overridden
+
+Returns a Promise that resolves to the generated usage text as a string.
+
+If no usage is generated (e.g., when renderUsage is not defined), returns an empty string.
 
 ## Generating Documentation for Multiple Commands
 
-For CLIs with sub-commands, you can generate documentation for each command:
+When your CLI has sub-commands, you can iterate through them to generate comprehensive documentation.
 
-```js
+Here's how to generate documentation for each command separately:
+
+```ts [cli.ts]
+import { define } from 'gunshi'
 import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 
+import type { Command, CliOptions } from 'gunshi'
+
 // Define your commands
-const createCommand = {
+const createCommand = define({
   name: 'create',
   description: 'Create a new resource',
   args: {
@@ -79,9 +109,9 @@ const createCommand = {
   run: ctx => {
     // Command implementation
   }
-}
+})
 
-const listCommand = {
+const listCommand = define({
   name: 'list',
   description: 'List all resources',
   args: {
@@ -94,25 +124,26 @@ const listCommand = {
   run: ctx => {
     // Command implementation
   }
-}
+})
 
 // Create a Map of sub-commands
-const subCommands = new Map()
-subCommands.set('create', createCommand)
-subCommands.set('list', listCommand)
+const subCommands = {
+  create: createCommand,
+  list: listCommand
+}
 
 // Define the main command
-const mainCommand = {
+const mainCommand = define({
   name: 'manage',
   description: 'Manage resources',
   run: () => {
     // Main command implementation
   }
-}
+})
 
 // Generate documentation for all commands
 async function main() {
-  const cliOptions = {
+  const cliOptions: CliOptions = {
     name: 'my-cli',
     version: '1.0.0',
     description: 'My CLI tool',
@@ -124,7 +155,7 @@ async function main() {
   await fs.writeFile('docs/cli-main.md', `# CLI Usage\n\n\`\`\`sh\n${mainUsage}\n\`\`\``, 'utf8')
 
   // Generate help for each sub-command
-  for (const [name, _] of subCommands.entries()) {
+  for (const name of Object.keys(subCommands)) {
     const commandUsage = await generate(name, mainCommand, cliOptions)
     await fs.writeFile(
       `docs/cli-${name}.md`,
@@ -144,13 +175,14 @@ await main()
 
 You can combine the generated usage information with additional content to create rich documentation:
 
-```js
+```ts
+import { define } from 'gunshi'
 import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
 
 // Generate rich documentation
 async function main() {
-  const command = {
+  const command = define({
     name: 'data-processor',
     description: 'Process data files',
     args: {
@@ -174,7 +206,7 @@ async function main() {
     run: ctx => {
       // Command implementation
     }
-  }
+  })
 
   // Generate the usage information
   const usageText = await generate(null, command, {
@@ -240,21 +272,30 @@ await main()
 
 You can automate documentation generation as part of your build process:
 
-```js
-// scripts/generate-docs.js
+> [!NOTE]
+> The following example uses Node.js-specific `__dirname` approach. For cross-runtime compatibility:
+>
+> - **Deno**: Use `import.meta.dirname` or `fromFileUrl(import.meta.url)`
+> - **Bun**: Use `import.meta.dir` or Node.js-compatible approach
+
+```ts [scripts/generate-docs.ts]
 import { generate } from 'gunshi/generator'
 import { promises as fs } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
+import type { Command, CliOptions } from 'gunshi'
+
 // Get the directory of the current module
-const rootDir = path.resolve(import.meta.dirname, '..')
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const rootDir = path.resolve(__dirname, '..')
 const docsDir = path.join(rootDir, 'docs')
 
 // Import your commands
-import { mainCommand, subCommands } from '../src/commands.js'
+import { mainCommand, subCommands } from '../src/commands'
 
 async function main() {
-  const cliOptions = {
+  const cliOptions: CliOptions = {
     name: 'my-cli',
     version: '1.0.0',
     description: 'My CLI tool',
@@ -279,7 +320,7 @@ ${mainUsage}
 
   // Add each sub-command
   let fullReference = cliReference
-  for (const [name, _] of subCommands.entries()) {
+  for (const name of Object.keys(subCommands)) {
     const commandUsage = await generate(name, mainCommand, cliOptions)
     fullReference += `### ${name.charAt(0).toUpperCase() + name.slice(1)}
 
@@ -301,10 +342,10 @@ await main()
 
 Then add a script to your `package.json`:
 
-```json
+```json [package.json]
 {
   "scripts": {
-    "docs:generate": "node scripts/generate-docs.js",
+    "docs:generate": "tsx scripts/generate-docs.ts",
     "docs:build": "npm run docs:generate && vitepress build docs"
   }
 }
@@ -312,37 +353,53 @@ Then add a script to your `package.json`:
 
 ## Generating Unix Man Pages
 
-Unix man pages (short for "manual pages") are a traditional form of documentation for command-line tools on Unix-like operating systems. You can use Gunshi's `generate` function to generate man pages for your CLI applications.
+Unix man pages (short for "manual pages") are a traditional form of documentation for command-line tools on Unix-like operating systems.
+
+You can use Gunshi's `generate` function to generate man pages for your CLI applications.
 
 ### Introduction to Man Pages
 
-Man pages follow a specific format and are organized into sections:
+Man pages are the standard documentation format for Unix and Unix-like systems.
 
-- **NAME**: The name of the command and a brief description
-- **SYNOPSIS**: The command syntax
-- **DESCRIPTION**: A detailed description of the command
-- **OPTIONS**: A list of available options
-- **EXAMPLES**: Example usage
-- **SEE ALSO**: Related commands or documentation
-- **AUTHOR**: Information about the author
+They provide comprehensive documentation directly accessible from the command line using the `man` command.
+
+Man pages follow a specific structure with numbered sections (1 for user commands, 2 for system calls, etc.) and standardized formatting conventions.
+
+The most common format for man pages is roff (runoff), though modern tools allow you to write documentation in simpler formats like Markdown and convert them to roff.
 
 ### Generating Man Pages with Gunshi
 
-You can convert Gunshi's usage information to man page format using tools like [marked-man](https://github.com/kapouer/marked-man):
+The following example demonstrates how to generate Unix man page documentation using Gunshi's `generate` function with a custom renderer.
 
-```js
+The custom renderer (`renderManPageUsage`) creates markdown output that can be converted to the man page format (roff) using tools like `marked-man`.
+
+The renderer function structures the output according to standard man page sections:
+
+- **NAME**: Command name and brief description
+- **SYNOPSIS**: Command syntax overview
+- **DESCRIPTION**: Detailed command description
+- **OPTIONS**: Available command-line options with descriptions
+- **EXAMPLES**: Usage examples (references the command's help)
+- **AUTHOR**: Author information
+- **SEE ALSO**: Related documentation and resources
+
+This approach allows you to maintain man pages alongside your CLI code, ensuring they stay synchronized:
+
+```ts [cli.ts]
+import { define } from 'gunshi'
 import { generate } from 'gunshi/generator'
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
-// Define custom usage renderer,
-// This custom usage renderer outputs in the markdown that can be converted to a man page format (roff) using marked-man.
-function renderManPageUsage(ctx) {
-  const lines = []
+import type { CommandContext } from 'gunshi'
+
+// Define custom usage renderer that outputs markdown convertible to man page format (roff) using marked-man
+function renderManPageUsage(ctx: CommandContext) {
+  const lines: string[] = []
 
   // NAME
-  lines.push(`# ${ctx.name}(1) -- ${ctx.description}`, '')
+  lines.push(`# ${ctx.name}(1) -- ${ctx.description || 'CLI tool'}`, '')
 
   // SYNOPSIS
   lines.push('## SYNOPSIS')
@@ -350,7 +407,7 @@ function renderManPageUsage(ctx) {
 
   // DESCRIPTION
   lines.push('## DESCRIPTION')
-  lines.push(ctx.translate('description'), '')
+  lines.push(ctx.description || '', '')
 
   // OPTIONS
   lines.push('## OPTIONS')
@@ -364,13 +421,13 @@ function renderManPageUsage(ctx) {
       value = schema.default ? `[${name}]` : `<${name}>`
     }
     lines.push(`- ${options.join(', ')}${value ? ` ${value}` : ''}`)
-    lines.push(ctx.translate(name))
+    lines.push(`  ${schema.description || ''}`)
     lines.push('')
   }
 
   // EXAMPLES
   lines.push('## EXAMPLES')
-  lines.push(ctx.examples, '')
+  lines.push('See command `--help` for examples', '')
 
   // AUTHOR
   lines.push('## AUTHOR')
@@ -386,7 +443,7 @@ function renderManPageUsage(ctx) {
 }
 
 async function main() {
-  const command = {
+  const command = define({
     name: 'my-tool',
     description: 'A utility for processing data',
     args: {
@@ -423,7 +480,7 @@ $ my-tool --input data.csv --verbose`,
     run: ctx => {
       // Command implementation
     }
-  }
+  })
 
   // Generate the usage with custom renderer
   const usageText = await generate(null, command, {
@@ -434,17 +491,20 @@ $ my-tool --input data.csv --verbose`,
     renderUsage: renderManPageUsage // set custom usage renderer
   })
 
+  // Prerequisites: Install marked-man for converting markdown to man page format
+  // npm install -g marked-man
+  // or add it to your project: npm install --save-dev marked-man
+
   // Write the markdown file
   const mdFile = path.join(process.cwd(), 'my-tool.1.md')
   await fs.writeFile(mdFile, usageText, 'utf8')
 
   // Convert markdown to man page format using marked-man
-  // Note: You need to install `marked-man` first: `npm install -g marked-man`
   try {
-    execSync(`marked-man --input ${mdFile} --output my-tool.1`)
+    execFileSync('marked-man', ['--input', mdFile, '--output', 'my-tool.1'])
     console.log('Man page generated successfully: my-tool.1')
   } catch (error) {
-    console.error('Error generating man page:', error.message)
+    console.error('Error generating man page:', (error as Error).message)
     console.log('Make sure marked-man is installed: npm install -g marked-man')
   }
 }
@@ -477,7 +537,7 @@ Once you've generated a man page, you can install it on Unix-like systems:
 
 3. **Package installation** (for npm packages):
    Add this to your `package.json`:
-   ```json
+   ```json [package.json]
    {
      "man": ["./man/my-tool.1"]
    }
@@ -491,11 +551,24 @@ After installation, users can view your man page using:
 man my-tool
 ```
 
-## Recommended Approach
+With the man page generation complete, let's look at broader guidelines for maintaining and generating documentation effectively.
 
-When generating documentation with Gunshi:
+## Documentation Generation Guidelines
 
-1. **Keep documentation in sync**: Automate documentation generation as part of your build process to ensure it stays up-to-date with your code.
-2. **Enhance with examples**: Combine the auto-generated usage information with hand-written examples and explanations.
-3. **Use custom renderers**: For more control over the format of the generated documentation, use custom renderers as described in [Custom Usage Generation](./custom-usage-generation.md).
-4. **Test your documentation**: Ensure that the generated documentation accurately reflects the behavior of your CLI by including documentation tests in your test suite.
+When working with Gunshi's documentation generation features, consider these important guidelines:
+
+### Keeping Documentation Current
+
+Automating documentation generation as part of your build process ensures that your documentation stays synchronized with your code. This approach prevents documentation drift and maintains consistency across your project.
+
+### Enhancing Generated Content
+
+The auto-generated usage information provides a solid foundation, but combining it with hand-written examples and detailed explanations creates more valuable documentation. Consider adding context-specific examples that demonstrate real-world use cases.
+
+### Leveraging Custom Renderers
+
+For projects requiring specific documentation formats or styling, custom renderers provide fine-grained control over the output. See [Custom Rendering](./custom-rendering.md) for implementation details.
+
+### Documentation Testing
+
+Including documentation tests in your test suite verifies that the generated documentation accurately reflects your CLI's behavior. This practice helps catch discrepancies between implementation and documentation early in the development process.

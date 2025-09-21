@@ -3,7 +3,13 @@
  * @license MIT
  */
 
-import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
+import {
+  ARG_PREFIX,
+  BUILT_IN_KEY_SEPARATOR,
+  BUILT_IN_PREFIX,
+  COMMAND_BUILTIN_RESOURCE_KEYS,
+  COMMON_ARGS
+} from './constants.ts'
 
 import type { Args } from 'gunshi'
 
@@ -42,13 +48,12 @@ export type GenerateNamespacedKey<
 /**
  * Command i18n built-in arguments keys.
  */
-export type CommandBuiltinArgsKeys = keyof (typeof import('./constants.ts'))['COMMON_ARGS']
+export type CommandBuiltinArgsKeys = keyof typeof COMMON_ARGS
 
 /**
  * Command i18n built-in resource keys.
  */
-export type CommandBuiltinResourceKeys =
-  (typeof import('./constants.ts'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
+export type CommandBuiltinResourceKeys = (typeof COMMAND_BUILTIN_RESOURCE_KEYS)[number]
 
 /**
  * Built-in resource keys.

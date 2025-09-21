@@ -91,6 +91,13 @@ When using the global options plugin, your command context is extended via `ctx.
 
 Available extensions:
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> The `Awaitable<T>` type used in the method signatures below is equivalent to `T | Promise<T>`, meaning the methods can return either a value directly or a Promise that resolves to that value.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 - **`showVersion(): string`**: Display the application version. Returns `'unknown'` if no version is specified in the CLI configuration.
 
 - **`showHeader(): Awaitable<string | undefined>`**: Display the application header. Returns `undefined` if no `renderHeader` function is provided in the CLI configuration.
@@ -102,14 +109,14 @@ Available extensions:
 ### Usage Example
 
 ```ts
-import global, { pluginId as globalPluginId } from '@gunshi/plugin-global'
+import global, { pluginId as globalId } from '@gunshi/plugin-global'
 import { cli } from 'gunshi'
 
 const command = {
   name: 'deploy',
   run: async ctx => {
     // Access global extensions
-    const { showVersion, showHeader } = ctx.extensions[globalPluginId]
+    const { showVersion, showHeader } = ctx.extensions[globalId]
 
     // Manually show version if needed
     console.log(`Deploying with CLI version: ${showVersion()}`)
