@@ -269,7 +269,7 @@ const pluginB = plugin({
 import { plugin, cli } from 'gunshi/plugin'
 
 // ✅ Create a common base plugin with shared functionality
-const sharedPlugin = plugin({
+const shared = plugin({
   id: 'shared',
   extension: () => ({
     // Shared state and functionality
@@ -310,7 +310,7 @@ const pluginB = plugin({
 // Usage - no circular dependency!
 await cli(args, command, {
   plugins: [
-    sharedPlugin, // Loads first
+    shared, // Loads first
     pluginA, // Loads second (depends on shared)
     pluginB // Loads third (depends on shared)
   ]
