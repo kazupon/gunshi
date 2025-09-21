@@ -264,4 +264,4 @@ Now that you've created your first plugin, continue with:
 2. [Plugin Dependencies](./dependencies.md) - Build plugin ecosystems
 3. [Plugin Decorators](./decorators.md) - Wrap and enhance functionality
 4. [Plugin Extensions](./extensions.md) - Share functionality between plugins and commands
-5. [Official Plugins](./official-plugins.md) - Real-world examples and inspiration
+5. [Plugin List](./list.md) - Real-world examples and inspiration

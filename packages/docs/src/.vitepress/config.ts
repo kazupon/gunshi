@@ -91,7 +91,8 @@ export default withMermaid({
           { text: 'Plugin Extensions', link: '/guide/plugin/extensions.md' },
           { text: 'Plugin Type System', link: '/guide/plugin/type-system.md' },
           { text: 'Plugin Testing', link: '/guide/plugin/testing.md' },
-          { text: 'Plugin Development Guidelines', link: '/guide/plugin/guidelines.md' }
+          { text: 'Plugin Development Guidelines', link: '/guide/plugin/guidelines.md' },
+          { text: 'Plugin List', link: '/guide/plugin/list.md' }
         ]
       },
       {

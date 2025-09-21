@@ -487,4 +487,4 @@ Understanding the difference between these two decorator types is crucial:
 
 - Learn about [Plugin Extensions](./extensions.md) for plugin communication
 - Understand [Plugin Types](./type-system.md) for type-safe decorators
-- Explore [Official Plugins](./official-plugins.md) for decorator examples
+- Explore [Plugin List](./list.md) for decorator examples

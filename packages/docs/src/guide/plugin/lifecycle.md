@@ -395,4 +395,4 @@ file:///path/to/projects/gunshi/playground/plugins/lifecycle/index.js:19
 - Learn about [Plugin Dependencies](./dependencies.md) for dependency resolution and topological sorting
 - Master [Plugin Decorators](./decorators.md) for LIFO execution patterns
 - Explore [Plugin Extensions](./extensions.md) for context enhancement
-- Study [Official Plugins](./official-plugins.md) to see lifecycle patterns in action
+- Study [Plugin List](./list.md) to see lifecycle patterns in action

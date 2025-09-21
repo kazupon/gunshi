@@ -284,4 +284,4 @@ await cli(args, entry, {
 - [Advanced Development](./advanced.md) - Master complex plugin patterns
 - [Dependencies](./dependencies.md) - Learn about plugin dependency management
 - [Guidelines](./guidelines.md) - Follow proven patterns for plugin development
-- [Official Plugins](./official-plugins.md) - Explore the official plugin ecosystem
+- [Plugin List](./list.md) - Explore the official plugin ecosystem

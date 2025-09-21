@@ -92,7 +92,7 @@ const command = {
 ```
 
 > [!NOTE]
-> For a complete list of official plugins and their features, see the [Official Plugins](../plugin/official-plugins.md) guide.
+> For a complete list of official plugins and their features, see the [Plugin List](../plugin/list.md) guide.
 
 ### Renderer Plugin Extension
 

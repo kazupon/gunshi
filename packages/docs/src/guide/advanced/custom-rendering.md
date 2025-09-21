@@ -424,7 +424,7 @@ The built-in renderer provides complete rendering implementations with improved 
 Unlike decorator plugins, it replaces the default rendering entirely.
 
 > [!TIP]
-> For detailed configuration options and features of the built-in renderer plugin, see the [Official Plugins](../plugin/official-plugins.md) documentation.
+> For detailed features of the built-in renderer plugin, see the [documentation](https://github.com/kazupon/gunshi/blob/main/packages/plugin-renderer/README.md).
 
 ### Creating a Custom Rendering Plugin
 

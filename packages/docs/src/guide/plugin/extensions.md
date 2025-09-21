@@ -287,5 +287,5 @@ export default plugin({
 - Learn about [Plugin Type System](./type-system.md) for advanced type safety
 - Explore [Plugin Testing](./testing.md) strategies
 - Review [Guidelines](./guidelines.md) for extension lifecycle management
-- See [Official Plugins](./official-plugins.md) for real-world extension examples
+- See [Plugin List](./list.md) for real-world extension examples
 - Study the [i18n plugin implementation](https://github.com/kazupon/gunshi/blob/main/packages/plugin-i18n/src/index.ts) for an example of using the `onExtension` hook effectively

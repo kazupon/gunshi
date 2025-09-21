@@ -483,5 +483,5 @@ This example demonstrates:
 
 - Learn about [Type-Safe Dependencies](./type-system.md#plugin-with-dependencies) for compile-time validation
 - Review [Guidelines](./guidelines.md) for production-ready plugins
-- Explore [Official Plugins](./official-plugins.md) to see dependency patterns in action
+- Explore [Plugin List](./list.md) to see dependency patterns in action
 - Understand [Plugin Lifecycle](./lifecycle.md) to see when dependencies are resolved
