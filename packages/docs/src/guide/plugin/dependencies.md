@@ -37,39 +37,39 @@ Consider the following plugin dependency relationships:
 
 ```mermaid
 graph LR
-    A[Logger Plugin] --> B[Auth Plugin]
-    B --> C[API Plugin]
-    D[Cache Plugin] --> B
+    A[Logger Plugin]
+    B[Cache Plugin] --> A
+    C[Auth Plugin] --> A
+    C --> B
+    D[API Plugin] --> C
 
     style A fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
-    style B fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
-    style C fill:#E67E22,stroke:#935014,stroke-width:2px,color:#fff
-    style D fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style B fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
+    style C fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
+    style D fill:#E67E22,stroke:#935014,stroke-width:2px,color:#fff
 ```
 
 In this dependency graph:
 
 - **Logger Plugin** has no dependencies (it's a base plugin)
-- **Auth Plugin** depends on Logger Plugin (needs logging functionality)
-- **Cache Plugin** also depends on Auth Plugin (needs authentication)
+- **Cache Plugin** depends on Logger Plugin (needs logging functionality)
+- **Auth Plugin** depends on both Logger Plugin and Cache Plugin (needs logging and caching)
 - **API Plugin** depends on Auth Plugin (requires authenticated users)
 
 ### Resolution Order
 
 Based on the dependency graph above, Gunshi's topological sorting algorithm determines the following loading order:
 
-**Loading order: Logger → Auth → Cache → API**
+**Loading order: Logger → Cache → Auth → API**
 
 This ensures that:
 
 1. **Logger** loads first (no dependencies)
-2. **Auth** loads after Logger (its dependency is satisfied)
-3. **Cache** loads after Auth (its dependency is satisfied)
+2. **Cache** loads after Logger (its dependency is satisfied)
+3. **Auth** loads after both Logger and Cache (both dependencies are satisfied)
 4. **API** loads last after Auth (its dependency is satisfied)
 
-Note that while Cache and API don't depend on each other, Gunshi maintains the order they appear in your plugin array when resolving plugins with the same dependency level.
-
-Both must load after Auth, their shared dependency.
+Note that Logger and Cache must both be loaded before Auth can initialize, as Auth depends on both of them.
 
 ## Declaring Dependencies
 
