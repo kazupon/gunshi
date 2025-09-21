@@ -279,9 +279,18 @@ await cli(args, entry, {
 
 ## Next Steps
 
-- [Getting Started](./getting-started.md) - Create your first plugin
-- [Plugin Lifecycle](./lifecycle.md) - Understand how plugins integrate with CLI execution
-- [Advanced Development](./advanced.md) - Master complex plugin patterns
-- [Dependencies](./dependencies.md) - Learn about plugin dependency management
-- [Guidelines](./guidelines.md) - Follow proven patterns for plugin development
-- [Plugin List](./list.md) - Explore the official plugin ecosystem
+Now that you understand what plugins are and how they enhance Gunshi CLIs, it's time to start building your own plugins.
+
+The plugin development learning journey follows a progression:
+
+- **[Getting Started](./getting-started.md)** - Create your first plugin with simple examples and learn the basic plugin structure
+- **[Plugin Lifecycle](./lifecycle.md)** - Understand when and how plugins execute during CLI runtime
+- **[Plugin Dependencies](./dependencies.md)** - Build plugin ecosystems with proper dependency management
+- **[Plugin Decorators](./decorators.md)** - Wrap and enhance existing functionality with decorators
+- **[Plugin Extensions](./extensions.md)** - Share features across commands through context extensions
+- **[Plugin Type System](./type-system.md)** - Ensure type safety throughout your plugin implementation
+- **[Plugin Testing](./testing.md)** - Write comprehensive tests for your plugins
+- **[Plugin Development Guidelines](./guidelines.md)** - Follow production-ready patterns and conventions
+- **[Plugin List](./list.md)** - Explore official and community plugins
+
+Start with [Getting Started](./getting-started.md) to create your first plugin and experience the plugin development workflow firsthand.

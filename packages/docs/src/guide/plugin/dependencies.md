@@ -481,7 +481,6 @@ This example demonstrates:
 
 ## Next Steps
 
-- Learn about [Type-Safe Dependencies](./type-system.md#plugin-with-dependencies) for compile-time validation
-- Review [Guidelines](./guidelines.md) for production-ready plugins
-- Explore [Plugin List](./list.md) to see dependency patterns in action
-- Understand [Plugin Lifecycle](./lifecycle.md) to see when dependencies are resolved
+You've learned how to manage plugin dependencies, including topological sorting, optional dependencies, and runtime interaction patterns. This knowledge enables you to build sophisticated plugin ecosystems where plugins collaborate effectively.
+
+Next, dive into [Plugin Decorators](./decorators.md) to learn how plugins can wrap and enhance existing functionality, adding behaviors like authentication, logging, and caching to commands without modifying their core implementation.

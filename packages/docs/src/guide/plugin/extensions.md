@@ -284,8 +284,6 @@ export default plugin({
 
 ## Next Steps
 
-- Learn about [Plugin Type System](./type-system.md) for advanced type safety
-- Explore [Plugin Testing](./testing.md) strategies
-- Review [Guidelines](./guidelines.md) for extension lifecycle management
-- See [Plugin List](./list.md) for real-world extension examples
-- Study the [i18n plugin implementation](https://github.com/kazupon/gunshi/blob/main/packages/plugin-i18n/src/index.ts) for an example of using the `onExtension` hook effectively
+You've mastered extensions—the powerful mechanism for sharing functionality between plugins and commands. With extensions, your plugins can provide APIs, services, and utilities that enhance the entire CLI ecosystem.
+
+Now it's time to ensure your plugins are type-safe. The next chapter, [Plugin Type System](./type-system.md), will show you how to leverage TypeScript's type system to create plugins with compile-time safety and excellent IDE support.

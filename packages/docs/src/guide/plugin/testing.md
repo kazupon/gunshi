@@ -1811,3 +1811,9 @@ Key testing patterns for multiple plugins:
 - **Runtime Discovery**: Plugins discover available extensions through `ctx.extensions` at runtime
 - **Fallback Behavior**: Always provide sensible defaults when optional dependencies are unavailable
 - **Isolation Testing**: Test each plugin combination separately to verify integration boundaries
+
+## Next Steps
+
+You've learned comprehensive testing strategies for your plugins, from unit testing individual components to integration testing with complete CLI applications. With proper tests in place, you can confidently refactor and enhance your plugins.
+
+Now you're ready to follow production-ready patterns. The next chapter, [Plugin Development Guidelines](./guidelines.md), provides proven conventions and patterns for building robust, maintainable plugins that work reliably in production environments.

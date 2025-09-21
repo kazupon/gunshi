@@ -891,3 +891,11 @@ Add documentation scripts to your `package.json`:
 This configuration extracts documentation from your JSDoc comments and TypeScript types, generating comprehensive API documentation without manual maintenance.
 
 The generated documentation includes all exported functions, interfaces, types, and their associated JSDoc descriptions, ensuring consistency between code and documentation.
+
+## Next Steps
+
+Following these guidelines ensures your plugins are production-ready, maintainable, and provide excellent developer experience. You've learned naming conventions, error handling patterns, performance considerations, and documentation strategies.
+
+Now that you understand how to build high-quality plugins, explore the existing ecosystem to see these principles in action and find plugins that can enhance your CLI.
+
+The next chapter on [Plugin List](./list.md) showcases official plugins maintained by the Gunshi team and community contributions.

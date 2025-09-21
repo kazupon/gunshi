@@ -392,7 +392,6 @@ file:///path/to/projects/gunshi/playground/plugins/lifecycle/index.js:19
 
 ## Next Steps
 
-- Learn about [Plugin Dependencies](./dependencies.md) for dependency resolution and topological sorting
-- Master [Plugin Decorators](./decorators.md) for LIFO execution patterns
-- Explore [Plugin Extensions](./extensions.md) for context enhancement
-- Study [Plugin List](./list.md) to see lifecycle patterns in action
+Now that you understand how plugins integrate with the CLI lifecycle—from setup through command execution to cleanup—you're ready to explore how plugins can work together.
+
+The next chapter, [Plugin Dependencies](./dependencies.md), will teach you how to build plugin ecosystems where plugins can depend on and interact with each other, enabling composition patterns for complex CLI applications.

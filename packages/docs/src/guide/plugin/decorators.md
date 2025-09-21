@@ -485,6 +485,6 @@ Understanding the difference between these two decorator types is crucial:
 
 ## Next Steps
 
-- Learn about [Plugin Extensions](./extensions.md) for plugin communication
-- Understand [Plugin Types](./type-system.md) for type-safe decorators
-- Explore [Plugin List](./list.md) for decorator examples
+With decorators, you've learned how to wrap and enhance command behavior and rendering output. This mechanism enables cross-cutting concerns like authentication, logging, and custom formatting without modifying command implementations.
+
+The next chapter, [Plugin Extensions](./extensions.md), will show you how plugins can share functionality with commands through context extensions, creating a communication channel between plugins and the rest of your CLI application.

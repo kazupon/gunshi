@@ -511,7 +511,6 @@ my-cli (my-cli v1.0.0)
 
 ## Next Steps
 
-- Learn about [Plugin Extensions](./extensions.md) for implementing extension factories
-- Explore [Plugin Dependencies](./dependencies.md) for dependency management
-- Study [Plugin List](./list.md) for type implementation examples
-- Review [Guidelines](./guidelines.md) for production-ready plugins
+With a strong foundation in type-safe plugin development, you've learned how to create plugins that provide compile-time guarantees and excellent developer experience through TypeScript's type system.
+
+Before sharing your plugins with others, it's crucial to ensure they work correctly. The next chapter, [Plugin Testing](./testing.md), will guide you through comprehensive testing strategies for plugins, including unit tests, integration tests, and testing plugin interactions.

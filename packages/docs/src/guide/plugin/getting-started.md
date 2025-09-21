@@ -258,10 +258,8 @@ These fundamentals provide a solid foundation for building more complex plugins.
 
 ## Next Steps
 
-Now that you've created your first plugin, continue with:
+You've created your first Gunshi plugin and learned the fundamental concepts: setup functions, global options, sub-command registration, and basic plugin features.
 
-1. [Plugin Lifecycle](./lifecycle.md) - Understand when and how plugins execute
-2. [Plugin Dependencies](./dependencies.md) - Build plugin ecosystems
-3. [Plugin Decorators](./decorators.md) - Wrap and enhance functionality
-4. [Plugin Extensions](./extensions.md) - Share functionality between plugins and commands
-5. [Plugin List](./list.md) - Real-world examples and inspiration
+With these foundations in place, you're ready to understand how plugins integrate with the CLI execution flow.
+
+The next chapter, [Plugin Lifecycle](./lifecycle.md), will show you exactly when and how plugins execute during CLI runtime, giving you the knowledge to build more sophisticated plugins that interact with commands at the right moments.
