@@ -105,7 +105,7 @@ Declare required dependencies using the `dependencies` array:
 import { plugin } from 'gunshi/plugin'
 
 // Simple string dependency
-const authPlugin = plugin({
+const auth = plugin({
   id: 'auth',
   dependencies: ['logger'], // Requires 'logger' plugin
   setup: ctx => {
@@ -114,7 +114,7 @@ const authPlugin = plugin({
 })
 
 // Multiple dependencies
-const apiPlugin = plugin({
+const api = plugin({
   id: 'api',
   dependencies: ['auth', 'cache', 'logger'],
   setup: ctx => {
@@ -145,7 +145,7 @@ Mark dependencies as optional using the object format:
 ```js
 import { plugin } from 'gunshi/plugin'
 
-const enhancedPlugin = plugin({
+const enhanced = plugin({
   id: 'enhanced',
   dependencies: [
     'core', // Required
