@@ -1,9 +1,30 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "automerge": true,
   "extends": ["config:base", ":preserveSemverRanges"],
   "labels": ["deps"],
   "ignoreDeps": ["gunshi019"],
   "major": {
     "automerge": false
-  }
+  },
+  "minimumReleaseAge": "7 days",
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "typescript",
+        "@typescript/native-preview",
+        "eslint",
+        "@eslint/markdown",
+        "@eslint/compat",
+        "@kazupon/eslint-config",
+        "@kazupon/prettier-config",
+        "prettier",
+        "knip",
+        "vitest",
+        "pkg-pr-new",
+        "bumpp"
+      ],
+      "minimumReleaseAge": null
+    }
+  ]
 }
