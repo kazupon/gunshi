@@ -62,9 +62,11 @@ During command execution, extensions go through three distinct phases:
 
 The following diagram illustrates the relationship between `extension` and `onExtension`:
 
+<h5 style="text-align: center; padding: 1em; margin: 1em">Plugin Processing (in dependency order)</h5>
+
 ```mermaid
 graph TD
-    subgraph "Plugin Processing (in dependency order)"
+    subgraph " "
         A1[Plugin A: extension factory] --> A2[Attach to ctx.extensions.A]
         A2 --> A3[Plugin A: onExtension]
         A3 --> B1[Plugin B: extension factory]

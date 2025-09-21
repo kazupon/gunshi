@@ -49,12 +49,12 @@ This approach creates a nested wrapper structure where the first registered deco
 The following diagram illustrates the wrapper structure:
 
 ```mermaid
-graph LR
-    A[User Input] --> B[Decorator A<br/>First registered - Outermost wrapper]
-    B --> C[Decorator B<br/>Second registered]
-    C --> D[Decorator C<br/>Last registered - Innermost wrapper]
-    D --> E[Original Command]
-    E --> F[Result]
+graph TB
+    A["User Input"] --> B["Decorator A<br/>First registered - Outermost wrapper<br/>&nbsp;"]
+    B --> C["Decorator B<br/>Second registered"]
+    C --> D["Decorator C<br/>Last registered - Innermost wrapper<br/>&nbsp;"]
+    D --> E["Original Command"]
+    E --> F["Result"]
 
     style B fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
     style C fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
@@ -314,28 +314,36 @@ When you add your own plugins, they interact with these default plugins in a spe
 
 The following diagram shows how plugins are registered and how the `for` loop builds the decorator chain:
 
-```mermaid
-graph TD
-    subgraph "Plugin Registration Order"
-        R1[1 plugin-global<br/>Command Decorator]
-        R2[2 plugin-renderer<br/>Renderer Decorators]
-        R3[3 custom-plugin-A<br/>Renderer Decorator]
-        R4[4 custom-plugin-B<br/>Renderer Decorator]
-        R1 --> R2 --> R3 --> R4
-    end
+<h5 style="text-align: center; padding: 1em; margin: 1em;">Plugin Registration Order</h5>
 
-    subgraph "Renderer Decorator Chain (for loop builds)"
-        E1[Base Renderer<br/>empty string]
-        E2[plugin-renderer wraps base]
-        E3[custom-A wraps plugin-renderer]
-        E4[custom-B wraps custom-A]
-        E1 --> E2 --> E3 --> E4
-    end
+```mermaid
+graph TB
+    R1["1. plugin-global<br/>Command Decorator"]
+    R2["2. plugin-renderer<br/>Renderer Decorators"]
+    R3["3. custom-plugin-A<br/>Renderer Decorator"]
+    R4["4. custom-plugin-B<br/>Renderer Decorator"]
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
 
     style R1 fill:#9B59B6,stroke:#633974,stroke-width:2px,color:#fff
     style R2 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
     style R3 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
     style R4 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
+```
+
+<h5 style="text-align: center; padding: 1em; margin: 1em">Renderer Decorator Chain (for loop builds)</h5>
+
+```mermaid
+graph TB
+    E1["Base Renderer<br/>empty string<br/>&nbsp;"]
+    E2["plugin-renderer wraps base"]
+    E3["custom-A wraps plugin-renderer"]
+    E4["custom-B wraps custom-A"]
+    E1 --> E2
+    E2 --> E3
+    E3 --> E4
+
     style E1 fill:#468c56,stroke:#2e5936,stroke-width:2px,color:#fff
     style E2 fill:#4A90E2,stroke:#2E5A8E,stroke-width:2px,color:#fff
     style E3 fill:#E67E22,stroke:#A35D18,stroke-width:2px,color:#fff
