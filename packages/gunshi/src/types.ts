@@ -407,7 +407,8 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    *
    * @since v0.27.0
    */
-  extensions: keyof ExtractExtensions<G> extends never ? undefined : ExtractExtensions<G>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
+  extensions: keyof ExtractExtensions<G> extends never ? any : ExtractExtensions<G>
   /**
    * Validation error from argument parsing.
    * This will be set if argument validation fails during CLI execution.
