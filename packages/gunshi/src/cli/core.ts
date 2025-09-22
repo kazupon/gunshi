@@ -80,6 +80,11 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     skipPositional: callMode === 'subCommand' && cliOptions.subCommands!.size > 0 ? 0 : -1
   })
   const omitted = !subCommand
+
+  const resolvedCommand = isLazyCommand<G>(command)
+    ? await resolveLazyCommand<G>(command, name, true)
+    : command
+
   const commandContext = await createCommandContext({
     args,
     explicit,
@@ -90,13 +95,13 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     tokens,
     omitted,
     callMode,
-    command,
+    command: resolvedCommand,
     extensions: getPluginExtensions(resolvedPlugins),
     validationError: error,
     cliOptions: cliOptions
   })
 
-  return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
+  return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
 }
 
 async function applyPlugins<G extends GunshiParamsConstraint>(
@@ -306,13 +311,11 @@ function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextEx
 }
 
 async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  cmd: Command<G> | LazyCommand<G>,
+  cmd: Command<G>,
   ctx: Readonly<CommandContext<G>>,
-  name: string,
   decorators: Readonly<CommandDecorator<G>[]>
 ): Promise<string | undefined> {
-  const resolved = isLazyCommand<G>(cmd) ? await resolveLazyCommand<G>(cmd, name, true) : cmd
-  const baseRunner = resolved.run || NOOP
+  const baseRunner = cmd.run || NOOP
 
   // apply plugin decorators
   const decoratedRunner = decorators.reduceRight(

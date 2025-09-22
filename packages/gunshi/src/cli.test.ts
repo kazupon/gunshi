@@ -317,80 +317,118 @@ describe('execute command', () => {
   })
 })
 
-test('lazy command', async () => {
-  const mockEntry = vi.fn()
-  const entry = {
-    name: 'main',
-    run: mockEntry
-  }
-  const subCommands = new Map()
-
-  // lazy load function style command
-  const mockCommand1: Mocked<CommandRunner> = vi.fn()
-  const command1: LazyCommand = () => {
-    return new Promise<CommandRunner>(resolve => {
-      setTimeout(() => {
-        resolve(mockCommand1)
-      }, 5)
-    })
-  }
-  command1.commandName = 'command1'
-  command1.description = 'command1 description'
-  command1.args = {
-    foo: {
-      type: 'string',
-      short: 'f'
+describe('lazy command', () => {
+  test('basic', async () => {
+    const mockEntry = vi.fn()
+    const entry = {
+      name: 'main',
+      run: mockEntry
     }
-  }
-  subCommands.set(command1.commandName, command1)
+    const subCommands = new Map()
 
-  // lazy load object style command
-  const mockCommand2: Mocked<CommandRunner> = vi.fn()
-  const remoteCommand2: Command = {
-    name: 'command2',
-    description: 'command2 description',
-    args: {
-      bar: {
+    // lazy load function style command
+    const mockCommand1: Mocked<CommandRunner> = vi.fn()
+    const command1: LazyCommand = () => {
+      return new Promise<CommandRunner>(resolve => {
+        setTimeout(() => {
+          resolve(mockCommand1)
+        }, 5)
+      })
+    }
+    command1.commandName = 'command1'
+    command1.description = 'command1 description'
+    command1.args = {
+      foo: {
         type: 'string',
-        short: 'b'
+        short: 'f'
       }
-    },
-    run: mockCommand2
-  }
-  const command2 = lazy(() => {
-    return new Promise<Command>(resolve => {
-      setTimeout(() => {
-        resolve(remoteCommand2)
-      }, 5)
+    }
+    subCommands.set(command1.commandName, command1)
+
+    // lazy load object style command
+    const mockCommand2: Mocked<CommandRunner> = vi.fn()
+    const remoteCommand2: Command = {
+      name: 'command2',
+      description: 'command2 description',
+      args: {
+        bar: {
+          type: 'string',
+          short: 'b'
+        }
+      },
+      run: mockCommand2
+    }
+    const command2 = lazy(() => {
+      return new Promise<Command>(resolve => {
+        setTimeout(() => {
+          resolve(remoteCommand2)
+        }, 5)
+      })
+    }, remoteCommand2)
+    subCommands.set(command2.commandName, command2)
+
+    // regularly load command
+    const command3 = {
+      name: 'command3',
+      description: 'command3 description',
+      options: {
+        qux: {
+          type: 'number',
+          short: 'q'
+        }
+      },
+      run: vi.fn()
+    }
+    subCommands.set(command3.name, command3)
+
+    const options = {
+      subCommands
+    }
+
+    await cli(['command1'], entry, options)
+    await cli(['command2'], entry, options)
+    await cli(['command3'], entry, options)
+
+    expect(mockCommand1).toBeCalledTimes(1)
+    expect(mockCommand2).toBeCalledTimes(1)
+    expect(command3.run).toBeCalledTimes(1)
+  })
+
+  test('command loading', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
+    const configLoader = async () => {
+      return define({
+        description: 'Loaded configured command',
+        args: {
+          verbose: {
+            type: 'boolean',
+            description: 'Enable verbose output',
+            default: false
+          }
+        },
+        run(ctx) {
+          console.log('Run configured command:', ctx.values.verbose)
+        }
+      })
+    }
+    const lazyConfig = lazy(configLoader, {
+      name: 'config',
+      description: 'Load command configuration'
     })
-  }, remoteCommand2)
-  subCommands.set(command2.commandName, command2)
+    const subCommands = { [lazyConfig.commandName!]: lazyConfig }
+    const entry = define({
+      description: 'CLI with dynamic commands',
+      run: () => {}
+    })
+    const options = { name: 'lazy-command-loading', version: '1.0.0', subCommands }
+    const renderedDefaultUsage = await cli(['-h'], entry, options)
+    const renderedConfigUsage = await cli(['config', '-h'], entry, options)
 
-  // regularly load command
-  const command3 = {
-    name: 'command3',
-    description: 'command3 description',
-    options: {
-      qux: {
-        type: 'number',
-        short: 'q'
-      }
-    },
-    run: vi.fn()
-  }
-  subCommands.set(command3.name, command3)
-
-  const options = {
-    subCommands
-  }
-
-  await cli(['command1'], entry, options)
-  await cli(['command2'], entry, options)
-  await cli(['command3'], entry, options)
-
-  expect(mockCommand1).toBeCalledTimes(1)
-  expect(mockCommand2).toBeCalledTimes(1)
-  expect(command3.run).toBeCalledTimes(1)
+    expect(renderedDefaultUsage).toMatchSnapshot('default-command')
+    expect(renderedConfigUsage).toMatchSnapshot('config-command')
+  })
 })
 
 describe('auto generate usage', () => {

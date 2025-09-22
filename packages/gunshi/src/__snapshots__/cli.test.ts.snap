@@ -407,6 +407,38 @@ OPTIONS:
 "
 `;
 
+exports[`lazy command > command loading > config-command 1`] = `
+"lazy-command-loading (lazy-command-loading v1.0.0)
+Loaded configured command
+
+USAGE:
+  lazy-command-loading config <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`lazy command > command loading > default-command 1`] = `
+"lazy-command-loading (lazy-command-loading v1.0.0)
+USAGE:
+  lazy-command-loading [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS>                     CLI with dynamic commands
+  config <OPTIONS>              Load command configuration
+
+For more info, run any command with the \`--help\` flag:
+  lazy-command-loading --help
+  lazy-command-loading config --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
 exports[`usageSilent 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 USAGE:
