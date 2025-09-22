@@ -56,6 +56,7 @@
     "preview:docs": "pnpm -F @gunshi/docs preview",
     "release": "bumpp \"package.json\" \"packages/**/package.json\" \"packages/**/jsr.json\" --commit \"release: v\" --all --push --tag",
     "test": "vitest --typecheck run",
+    "test:core": "vitest --typecheck run packages/gunshi",
     "typecheck:deno": "pnpm -r --if-present typecheck:deno",
     "typecheck:tsc": "tsgo --noEmit --diagnostics"
   },
