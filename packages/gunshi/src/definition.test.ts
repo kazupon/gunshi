@@ -102,7 +102,8 @@ describe('define with type parameters', () => {
         name: { type: 'string' }
       },
       run: async ctx => {
-        expectTypeOf(ctx.extensions).toEqualTypeOf<undefined>()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
         return `Hello, ${ctx.values.name || 'World'}!`
       }
     })

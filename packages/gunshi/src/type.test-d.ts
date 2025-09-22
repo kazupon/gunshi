@@ -61,7 +61,8 @@ test('DefaultGunshiParams', () => {
 
 test('CommandContext extensions', () => {
   // default
-  expectTypeOf<CommandContext['extensions']>().toEqualTypeOf<undefined>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+  expectTypeOf<CommandContext['extensions']>().toEqualTypeOf<any>()
 
   // with extensions only
   type t1 = CommandContext<{ extensions: { foo: Extension1 } }>
