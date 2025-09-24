@@ -4,65 +4,70 @@ import { define, lazy } from './definition.ts'
 
 import type { Args, CommandRunner, GunshiParams } from './types.ts'
 
-test('define', async () => {
-  const command = define({
-    name: 'test',
-    description: 'A test command',
-    args: {
-      foo: {
-        type: 'string',
-        description: 'A string option'
+describe('define', async () => {
+  test('basic', async () => {
+    const command = define({
+      name: 'test',
+      description: 'A test command',
+      args: {
+        foo: {
+          type: 'string',
+          description: 'A string option'
+        }
+      },
+      run: ctx => {
+        // Type assertions
+        // expectTypeOf(ctx.values).toEqualTypeOf<{ foo?: string | undefined }>()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
+
+        // Runtime check to satisfy test requirements
+        expect(typeof ctx.values.foo).toBe('string')
+        // Use the value to avoid unused variable error
+        expect(ctx.values.foo).toBe('bar')
       }
-    },
-    run: ctx => {
-      // Runtime check to satisfy test requirements
-      expect(typeof ctx.values.foo).toBe('string')
-      // Use the value to avoid unused variable error
-      expect(ctx.values.foo).toBe('bar')
-    }
+    })
+
+    await cli(['test', '--foo', 'bar'], command)
   })
 
-  await cli(['test', '--foo', 'bar'], command)
-})
+  test('preserves all specified command properties', () => {
+    const command = define({
+      name: 'complex',
+      description: 'Complex command',
+      args: {
+        flag: { type: 'boolean' as const },
+        value: { type: 'number' }
+      },
+      examples: 'complex --flag\ncomplex --value 42',
+      toKebab: false,
+      run: async _ctx => 'done'
+    })
 
-test('lazy', async () => {
-  const subCommands = new Map()
-  const test = define({
-    name: 'test',
-    description: 'A test command',
-    toKebab: true,
-    args: {
-      foo: {
-        type: 'string',
-        description: 'A string option'
-      }
-    }
+    // Check that all specified properties and types are preserved
+    expect(command.name).toBe('complex')
+    // expectTypeOf<typeof command.name>().not.toBeNullable()
+    expect(command.description).toBe('Complex command')
+    // expectTypeOf<typeof command.description>().not.toBeNullable()
+    expect(command.args).toBeDefined()
+    // expectTypeOf<typeof command.args>().not.toBeNullable()
+    expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
+    // expectTypeOf<typeof command.examples>().not.toBeNullable()
+    expect(command.toKebab).toBe(false)
+    // expectTypeOf<typeof command.toKebab>().not.toBeNullable()
+    expect(typeof command.run).toBe('function')
+    // expectTypeOf<typeof command.run>().not.toBeNullable()
+
+    // Check that all not specified optional properties are undefined
+    expect(command.internal).toBeUndefined()
+    expectTypeOf<typeof command.internal>().toBeNullable()
+    expect(command.entry).toBeUndefined()
+    expectTypeOf<typeof command.entry>().toBeNullable()
+    expect(command.rendering).toBeUndefined()
+    expectTypeOf<typeof command.rendering>().toBeNullable()
   })
-  const mock = vi.fn()
-  const testLazy = lazy(() => {
-    return Promise.resolve(mock)
-  }, test)
-  subCommands.set('test', testLazy)
 
-  expect(testLazy).toBeInstanceOf(Function)
-  expect(testLazy.commandName).toBe(test.name)
-  expect(testLazy.description).toBe(test.description)
-  expect(testLazy.args).toEqual(test.args)
-  expect(testLazy.toKebab).toBe(test.toKebab)
-
-  await cli(
-    ['test', '--foo', 'bar'],
-    {
-      run: _ctx => {}
-    },
-    { subCommands }
-  )
-
-  expect(mock).toHaveBeenCalled()
-})
-
-describe('define with type parameters', () => {
-  test('basic - command with type parameter extension', () => {
+  describe('type parameters', () => {
     type ExtendedContext = {
       auth: {
         user: { id: number; name: string }
@@ -72,111 +77,93 @@ describe('define with type parameters', () => {
         query: (sql: string) => Promise<{ rows: string[] }>
       }
     }
-    const command = define<
-      GunshiParams<{
-        args: { env: { type: 'string'; required: true } }
-        extensions: ExtendedContext
-      }>
-    >({
-      name: 'deploy',
-      description: 'Deploy application',
-      args: {
+
+    test('type inference: command with type parameter extensions', () => {
+      const args = {
         env: { type: 'string', required: true }
-      },
-      run: async ctx => {
-        return `Deploying as ${ctx.extensions.auth.user.name}`
-      }
+      } as const satisfies Args
+      const command = define<GunshiParams<{ args: typeof args; extensions: ExtendedContext }>>({
+        name: 'deploy',
+        description: 'Deploy application',
+        args,
+        run: async ctx => {
+          expectTypeOf(ctx.values).toEqualTypeOf<{ env: string }>()
+          expectTypeOf(ctx.extensions).toEqualTypeOf<ExtendedContext>()
+
+          return `Deploying as ${ctx.extensions.auth.user.name}`
+        }
+      })
+
+      // Check that specified properties and types are preserved
+      expect(command.name).toBe('deploy')
+      // expectTypeOf<typeof command.name>().not.toBeNullable()
+      expect(command.description).toBe('Deploy application')
+      // expectTypeOf<typeof command.description>().not.toBeNullable()
+      expect(command.args).toEqual({ env: { type: 'string', required: true } })
+      // expectTypeOf<typeof command.args>().not.toBeNullable()
+
+      // Check that not specified optional properties are undefined
+      expectTypeOf<typeof command.examples>().toBeNullable()
     })
 
-    // check that command is created properly
-    expect(command.name).toBe('deploy')
-    expect(command.description).toBe('Deploy application')
-    expect(command.args).toEqual({ env: { type: 'string', required: true } })
-  })
+    test('type inference: no args', () => {
+      const command = define<GunshiParams<{ extensions: ExtendedContext }>>({
+        name: 'profile',
+        run: async ctx => {
+          expectTypeOf(ctx.values).toEqualTypeOf<{
+            [x: string]: string | number | boolean | undefined
+          }>()
+          expectTypeOf(ctx.extensions).toEqualTypeOf<ExtendedContext>()
 
-  test('backward compatibility - command without type parameter', () => {
-    const command = define({
-      name: 'hello',
-      description: 'Say hello',
-      args: {
-        name: { type: 'string' }
-      },
-      run: async ctx => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
-        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
-        return `Hello, ${ctx.values.name || 'World'}!`
-      }
+          return `User: ${ctx.extensions.auth.user.name}`
+        }
+      })
+
+      // Check that specified properties and types are preserved
+      expect(command.name).toBe('profile')
+      // expectTypeOf<typeof command.name>().not.toBeNullable()
+
+      // Check that not specified optional properties are undefined
+      expectTypeOf<typeof command.examples>().toBeNullable()
     })
-
-    // all standard properties should be preserved
-    expect(command.name).toBe('hello')
-    expect(command.description).toBe('Say hello')
-    expect(command.args).toEqual({ name: { type: 'string' } })
-    expect(typeof command.run).toBe('function')
-  })
-
-  test('type inference - extension is typed correctly', () => {
-    type AuthExt = {
-      auth: {
-        user: { id: number; name: string }
-        logout: () => Promise<void>
-      }
-    }
-    const command = define<AuthExt>({
-      name: 'profile',
-      run: async ctx => {
-        const userName: string = ctx.extensions.auth.user.name
-        await ctx.extensions.auth.logout()
-        return `User: ${userName}`
-      }
-    })
-
-    expect(command.name).toBe('profile')
-  })
-
-  test('preserves all command properties', () => {
-    const command = define({
-      name: 'complex',
-      description: 'Complex command',
-      args: {
-        flag: { type: 'boolean' },
-        value: { type: 'number' }
-      },
-      examples: 'complex --flag\ncomplex --value 42',
-      toKebab: false,
-      run: async _ctx => 'done'
-    })
-
-    expect(command.name).toBe('complex')
-    expect(command.description).toBe('Complex command')
-    expect(command.args).toBeDefined()
-    expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
-    expect(command.toKebab).toBe(false)
   })
 })
 
-describe('lazy with type parameters', () => {
-  test('basic - lazy command with type parameter', () => {
-    type AuthExt = {
-      auth: {
-        authenticated: boolean
+describe('lazy', () => {
+  test('basic', async () => {
+    const subCommands = new Map()
+    const test = define({
+      name: 'test',
+      description: 'A test command',
+      toKebab: true,
+      args: {
+        foo: {
+          type: 'string',
+          description: 'A string option'
+        }
       }
-    }
-    const loader = vi.fn(async () => {
-      const runner: CommandRunner<{ args: Args; extensions: AuthExt }> = async ctx => {
-        expectTypeOf(ctx.extensions.auth.authenticated).toEqualTypeOf<boolean>()
-        return 'deployed'
-      }
-      return runner
     })
-    const lazyCmd = lazy<AuthExt>(loader, {
-      name: 'lazy-deploy',
-      description: 'Lazy deploy command'
-    })
+    const mock = vi.fn()
+    const testLazy = lazy(() => {
+      return Promise.resolve(mock)
+    }, test)
+    subCommands.set('test', testLazy)
 
-    // check that properties are preserved
-    expect(lazyCmd.commandName).toBe('lazy-deploy')
-    expect(lazyCmd.description).toBe('Lazy deploy command')
+    expect(testLazy).toBeInstanceOf(Function)
+    expect(testLazy.commandName).toBe(test.name)
+    expect(testLazy.description).toBe(test.description)
+    expect(testLazy.args).toEqual(test.args)
+    expect(testLazy.toKebab).toBe(test.toKebab)
+
+    await cli(
+      ['test', '--foo', 'bar'],
+      {
+        run: _ctx => {}
+      },
+      { subCommands }
+    )
+
+    expect(mock).toHaveBeenCalled()
   })
 
   test('preserves all properties', () => {
@@ -200,46 +187,71 @@ describe('lazy with type parameters', () => {
     expect(lazyCmd.internal).toBe(true)
   })
 
-  test('handles type parameters from loaded command', () => {
-    const loader = vi.fn(async () => {
-      interface TestExt {
-        existing: { test: boolean }
+  describe('lazy with type parameters', () => {
+    test('basic - lazy command with type parameter', () => {
+      type AuthExt = {
+        auth: {
+          authenticated: boolean
+        }
       }
-      const runner: CommandRunner<{ extensions: { test: TestExt } }> = async ctx => {
-        expectTypeOf(ctx.extensions.test.existing.test).toEqualTypeOf<boolean>()
-        return 'done'
-      }
-      return runner
-    })
-    const lazyCmd = lazy(loader, {
-      name: 'test'
-    })
+      const loader = vi.fn(async () => {
+        const runner: CommandRunner<{ args: Args; extensions: AuthExt }> = async ctx => {
+          expectTypeOf(ctx.extensions.auth.authenticated).toEqualTypeOf<boolean>()
+          return 'deployed'
+        }
+        return runner
+      })
+      const lazyCmd = lazy<AuthExt>(loader, {
+        name: 'lazy-deploy',
+        description: 'Lazy deploy command'
+      })
 
-    // should work without errors
-    expect(lazyCmd.commandName).toBe('test')
-  })
-
-  test('backward compatibility - lazy command without type parameter', () => {
-    const loader = vi.fn(async () => ({
-      name: 'simple',
-      run: async () => 'done'
-    }))
-    const lazyCmd = lazy(loader, {
-      name: 'simple',
-      description: 'Simple lazy command'
+      // check that properties are preserved
+      expect(lazyCmd.commandName).toBe('lazy-deploy')
+      expect(lazyCmd.description).toBe('Lazy deploy command')
     })
 
-    expect(lazyCmd.commandName).toBe('simple')
-    expect(lazyCmd.description).toBe('Simple lazy command')
-  })
+    test('handles type parameters from loaded command', () => {
+      const loader = vi.fn(async () => {
+        interface TestExt {
+          existing: { test: boolean }
+        }
+        const runner: CommandRunner<{ extensions: { test: TestExt } }> = async ctx => {
+          expectTypeOf(ctx.extensions.test.existing.test).toEqualTypeOf<boolean>()
+          return 'done'
+        }
+        return runner
+      })
+      const lazyCmd = lazy(loader, {
+        name: 'test'
+      })
 
-  test('lazy without definition', () => {
-    const loader = vi.fn(async () => ({
-      name: 'minimal',
-      run: async () => 'done'
-    }))
-    const lazyCmd = lazy(loader)
+      // should work without errors
+      expect(lazyCmd.commandName).toBe('test')
+    })
 
-    expect(typeof lazyCmd).toBe('function')
+    test('backward compatibility - lazy command without type parameter', () => {
+      const loader = vi.fn(async () => ({
+        name: 'simple',
+        run: async () => 'done'
+      }))
+      const lazyCmd = lazy(loader, {
+        name: 'simple',
+        description: 'Simple lazy command'
+      })
+
+      expect(lazyCmd.commandName).toBe('simple')
+      expect(lazyCmd.description).toBe('Simple lazy command')
+    })
+
+    test('lazy without definition', () => {
+      const loader = vi.fn(async () => ({
+        name: 'minimal',
+        run: async () => 'done'
+      }))
+      const lazyCmd = lazy(loader)
+
+      expect(typeof lazyCmd).toBe('function')
+    })
   })
 })

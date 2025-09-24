@@ -63,6 +63,7 @@ test('CommandContext extensions', () => {
   // default
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
   expectTypeOf<CommandContext['extensions']>().toEqualTypeOf<any>()
+  expectTypeOf<CommandContext['args']>().toEqualTypeOf<Args>()
 
   // with extensions only
   type t1 = CommandContext<{ extensions: { foo: Extension1 } }>
@@ -75,6 +76,7 @@ test('CommandContext extensions', () => {
   // with args and extensions
   type t3 = CommandContext<{ args: typeof _args1; extensions: { foo: Extension1 } }>
   expectTypeOf<t3['extensions']>().toEqualTypeOf<{ foo: Extension1 }>()
+  expectTypeOf<t3['args']>().toEqualTypeOf<typeof _args1>()
 })
 
 test('RenderingOptions', () => {
