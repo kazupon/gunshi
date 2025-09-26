@@ -92,9 +92,9 @@
     "mitata": "^1.0.34",
     "pkg-pr-new": "^0.0.54",
     "prettier": "^3.6.2",
+    "tsx": "^4.20.5",
     "typescript": "catalog:",
     "typescript-eslint": "^8.44.1",
-    "tsx": "^4.20.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
   },
