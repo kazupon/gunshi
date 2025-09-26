@@ -49,7 +49,7 @@ importers:
         version: 7.3.0
       '@kazupon/eslint-config':
         specifier: ^0.36.0
-        version: 0.36.0(9d16c1754402140d18aee79745e89b38)
+        version: 0.36.0(3a828997ac58187755e80f999648db25)
       '@kazupon/prettier-config':
         specifier: ^0.1.1
         version: 0.1.1
@@ -81,8 +81,8 @@ importers:
         specifier: ^2.32.0
         version: 2.32.0(@typescript-eslint/parser@8.44.1(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint-import-resolver-typescript@4.4.4)(eslint@9.36.0(jiti@2.6.0))
       eslint-plugin-jsdoc:
-        specifier: ^57.2.1
-        version: 57.2.1(eslint@9.36.0(jiti@2.6.0))
+        specifier: ^59.0.0
+        version: 59.1.0(eslint@9.36.0(jiti@2.6.0))
       eslint-plugin-jsonc:
         specifier: ^2.20.1
         version: 2.20.1(eslint@9.36.0(jiti@2.6.0))
@@ -3086,8 +3086,8 @@ packages:
       '@typescript-eslint/parser':
         optional: true
 
-  eslint-plugin-jsdoc@57.2.1:
-    resolution: {integrity: sha512-HeTWN2VVVu7lzoKqH0uxB3UM3CBS+jMm91mSq3jb12CfWtSfverJDfhYDmRWiMGDzL9NUS/XCWPIWTQLsgjS4Q==}
+  eslint-plugin-jsdoc@59.1.0:
+    resolution: {integrity: sha512-sg9mzjjzfnMynyY4W8FDiQv3i8eFcKVEHDt4Xh7MLskP3QkMt2z6p7FuzSw7jJSKFues6RaK2GWvmkB1FLPxXg==}
     engines: {node: '>=20.11.0'}
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
@@ -5802,7 +5802,7 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.36.0(9d16c1754402140d18aee79745e89b38)':
+  '@kazupon/eslint-config@0.36.0(3a828997ac58187755e80f999648db25)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.36.0(jiti@2.6.0))
       '@eslint/js': 9.36.0
@@ -5819,7 +5819,7 @@ snapshots:
       eslint-config-prettier: 10.1.8(eslint@9.36.0(jiti@2.6.0))
       eslint-import-resolver-typescript: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.36.0(jiti@2.6.0))
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.44.1(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint-import-resolver-typescript@4.4.4)(eslint@9.36.0(jiti@2.6.0))
-      eslint-plugin-jsdoc: 57.2.1(eslint@9.36.0(jiti@2.6.0))
+      eslint-plugin-jsdoc: 59.1.0(eslint@9.36.0(jiti@2.6.0))
       eslint-plugin-jsonc: 2.20.1(eslint@9.36.0(jiti@2.6.0))
       eslint-plugin-markdown-preferences: 0.10.0(@eslint/markdown@7.3.0)(eslint@9.36.0(jiti@2.6.0))
       eslint-plugin-module-interop: 0.3.1(eslint@9.36.0(jiti@2.6.0))
@@ -7680,7 +7680,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-jsdoc@57.2.1(eslint@9.36.0(jiti@2.6.0)):
+  eslint-plugin-jsdoc@59.1.0(eslint@9.36.0(jiti@2.6.0)):
     dependencies:
       '@es-joy/jsdoccomment': 0.58.0
       are-docs-informative: 0.0.2
