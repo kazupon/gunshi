@@ -55,7 +55,7 @@
     "build:docs": "typedoc --excludeInternal",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
-    "typecheck:deno": "deno check ./src"
+    "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "dependencies": {
     "@gunshi/plugin": "workspace:*"
