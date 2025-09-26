@@ -13,7 +13,7 @@ function runCommand(command: string): Promise<string> {
   })
 }
 
-const SCRIPT = `pnpx tsx packages/plugin-completion/examples/basic.node.ts complete --`
+const SCRIPT = `pnpx tsx@4.20.5 packages/plugin-completion/examples/basic.node.ts complete --`
 
 test('no input', async () => {
   const output = await runCommand(`${SCRIPT}`)
