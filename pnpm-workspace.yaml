@@ -15,3 +15,4 @@ catalog:
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - deno
+  - tsx

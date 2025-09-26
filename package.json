@@ -45,7 +45,7 @@
     "fix:eslint": "eslint . --fix",
     "fix:knip": "knip --fix --no-exit-code",
     "fix:prettier": "prettier . --write --experimental-cli",
-    "gen:importmap": "pnpx tsx@4.20.5 scripts/importmap.ts",
+    "gen:importmap": "pnpm exec tsx scripts/importmap.ts",
     "lint": "pnpm run --color \"/^lint:/\"",
     "lint:eslint": "eslint .",
     "lint:jsr": "pnpm -r --if-present lint:jsr",
@@ -94,6 +94,7 @@
     "prettier": "^3.6.2",
     "typescript": "catalog:",
     "typescript-eslint": "^8.44.1",
+    "tsx": "^4.20.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
   },
