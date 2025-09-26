@@ -45,7 +45,7 @@
     "fix:eslint": "eslint . --fix",
     "fix:knip": "knip --fix --no-exit-code",
     "fix:prettier": "prettier . --write --experimental-cli",
-    "gen:importmap": "pnpx tsx scripts/importmap.ts",
+    "gen:importmap": "pnpx tsx@4.20.5 scripts/importmap.ts",
     "lint": "pnpm run --color \"/^lint:/\"",
     "lint:eslint": "eslint .",
     "lint:jsr": "pnpm -r --if-present lint:jsr",
