@@ -106,6 +106,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     '.vscode',
     'tsconfig.json',
     './packages/**/docs/**',
+    './bench/**',
     'pnpm-lock.yaml',
     'playground/**',
     'design/**',
