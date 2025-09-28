@@ -98,16 +98,19 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
         throw new Error('entry command not found.')
       }
 
-      const entryCtx = await createCommandContext(entry, i18nPluginId, i18n)
+      const resolvedEntry = await resolveLazyCommand(entry)
+      const entryCtx = await createCommandContext(resolvedEntry, i18nPluginId, i18n)
       if (i18n) {
-        const ret = await i18n.loadResource(i18n.locale, entryCtx, entry)
+        const ret = await i18n.loadResource(i18n.locale, entryCtx, resolvedEntry)
         if (!ret) {
-          console.warn(`Failed to load i18n resources for command: ${entry.name} (${i18n.locale})`)
+          console.warn(
+            `Failed to load i18n resources for command: ${resolvedEntry.name} (${i18n.locale})`
+          )
         }
       }
       const localizeDescription = localizable(entryCtx, cmd, i18n ? i18n.translate : undefined)
 
-      const args = entry.args || (Object.create(null) as Args)
+      const args = resolvedEntry.args || (Object.create(null) as Args)
       for (const [key, schema] of Object.entries(args)) {
         if (schema.type === 'positional') {
           t.argument(
