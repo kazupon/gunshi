@@ -370,8 +370,8 @@ describe('structure validation', () => {
 
   test('plugin factory creates valid structure', () => {
     // Test multiple instantiations create separate instances
-    const plugin1 = createMyPlugin()
-    const plugin2 = createMyPlugin()
+    const plugin1 = myPlugin()
+    const plugin2 = myPlugin()
 
     expect(plugin1.id).toBe(plugin2.id) // Same ID
 
@@ -382,7 +382,7 @@ describe('structure validation', () => {
   })
 
   test('creates plugin with default options', () => {
-    const plugin = createMyPlugin() // Works with default empty options
+    const plugin = myPlugin() // Works with default empty options
     expect(plugin.id).toBe('my-plugin')
     expect(plugin.name).toBe('My Plugin')
   })
