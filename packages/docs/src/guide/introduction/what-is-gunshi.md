@@ -54,3 +54,11 @@ The Gunshi documentation is organized into three main sections:
 After completing the essentials, you can explore the **Advanced** section based on your specific needs. The chapters there are independent and can be read in any order.
 
 If you're interested in extending Gunshi with plugins, the **Plugin** section provides comprehensive guidance on creating and using plugins.
+
+## Credits
+
+Gunshi project is made possible by the open-source community and the many innovative tools in the JavaScript and TypeScript ecosystem. We extend our gratitude to all contributors and maintainers whose work has laid the foundation for this project.
+
+- [`citty`](https://github.com/unjs/citty), Provided the original inspiration for modern JavaScript command-line library.
+- [`ordana`](https://github.com/sapphi-red/ordana), Inspired documentation generation in Gunshi
+- [`@bomb.sh/tab`](https://github.com/bombshell-dev/tab), Powerd by shell Auto-Completion for the JavaScript Ecosystem
