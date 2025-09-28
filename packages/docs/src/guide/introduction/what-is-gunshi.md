@@ -61,4 +61,4 @@ Gunshi project is made possible by the open-source community and the many innova
 
 - [`citty`](https://github.com/unjs/citty), Provided the original inspiration for modern JavaScript command-line library.
 - [`ordana`](https://github.com/sapphi-red/ordana), Inspired documentation generation in Gunshi
-- [`@bomb.sh/tab`](https://github.com/bombshell-dev/tab), Powerd by shell Auto-Completion for the JavaScript Ecosystem
+- [`@bomb.sh/tab`](https://github.com/bombshell-dev/tab), Powered by shell auto-completion for the JavaScript ecosystem
