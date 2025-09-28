@@ -1,9 +1,9 @@
 import { exec } from 'node:child_process'
 import { describe, expect, test } from 'vitest'
 
-function runCommand(command: string): Promise<string> {
+function runCommand(command: string, env: NodeJS.ProcessEnv = {}): Promise<string> {
   return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
+    exec(command, { env: { ...process.env, ...env } }, (error, stdout, stderr) => {
       if (error) {
         reject(stderr)
       } else {
@@ -116,7 +116,9 @@ describe('positional arguments', () => {
   })
 
   test('multiple positional argument when ending with space', async () => {
-    const output = await runCommand(`G_COMPLETION_TEST_MULTIPLE=1 ${SCRIPT} lint main.ts ""`)
+    const output = await runCommand(`${SCRIPT} lint main.ts ""`, {
+      G_COMPLETION_TEST_MULTIPLE: '1'
+    })
     expect(output).toMatchSnapshot()
   })
 })
@@ -225,9 +227,9 @@ describe('i18n support', () => {
     })
 
     test('multiple positional argument when ending with space', async () => {
-      const output = await runCommand(
-        `G_COMPLETION_TEST_MULTIPLE=1 ${LOCALIZABLE_SCRIPT} lint main.ts ""`
-      )
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint main.ts ""`, {
+        G_COMPLETION_TEST_MULTIPLE: '1'
+      })
       expect(output).toMatchSnapshot()
     })
   })
