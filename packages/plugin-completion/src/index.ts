@@ -12,11 +12,10 @@ import {
   resolveKey,
   resolveLazyCommand
 } from '@gunshi/shared'
-import { Completion } from './bombshell/index.ts'
 import { pluginId } from './types.ts'
 import { createCommandContext, quoteExec } from './utils.ts'
 
-import type { Completion as _Completion } from '@bomb.sh/tab'
+import type { Completion } from '@bomb.sh/tab'
 import type {
   Args,
   Command,
@@ -32,7 +31,7 @@ export * from './types.ts'
 const TERMINATOR = '--'
 
 const NOOP_HANDLER = () => {
-  return [] as _Completion[]
+  return [] as Completion[]
 }
 
 const i18nPluginId = namespacedId('i18n')
@@ -47,7 +46,6 @@ const dependencies = [{ id: i18nPluginId, optional: true }] as const
  */
 export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {
   const config = options.config || {}
-  const completion = new Completion() // TODO: remove
   const t = new RootCommand()
 
   return plugin<Record<typeof i18nPluginId, I18nExtension>, typeof pluginId, typeof dependencies>({
@@ -109,17 +107,6 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
       }
       const localizeDescription = localizable(entryCtx, cmd, i18n ? i18n.translate : undefined)
 
-      // TODO: remove
-      // setup root level completion
-      // const isPositional = hasPositional(await resolveLazyCommand(entry as Command))
-      // const root = ''
-      // completion.addCommand(
-      //   root,
-      //   (await localizeDescription(resolveKey('description', entryCtx))) || entry.description || '',
-      //   isPositional ? [false] : [],
-      //   NOOP_HANDLER
-      // )
-
       const args = entry.args || (Object.create(null) as Args)
       for (const [key, schema] of Object.entries(args)) {
         if (schema.type === 'positional') {
@@ -145,27 +132,15 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
             },
             schema.short
           )
-          // TODO: remove
-          // completion.addOption(
-          //   root,
-          //   `--${key}`,
-          //   (await localizeDescription(resolveArgKey(key, entryCtx))) || schema.description || '',
-          //   toBombshellCompletionHandler(
-          //     config.entry?.args?.[key]?.handler || NOOP_HANDLER,
-          //     i18n ? toLocale(i18n.locale) : undefined
-          //   ),
-          //   schema.short
-          // )
         }
       }
 
-      await handleSubCommands(completion, t, subCommands, i18nPluginId, config.subCommands, i18n)
+      await handleSubCommands(t, subCommands, i18nPluginId, config.subCommands, i18n)
     }
   })
 }
 
 async function handleSubCommands(
-  _completion: Completion, // TODO: remove
   t: RootCommand,
   subCommands: PluginContext['subCommands'],
   i18nPluginId: string,
@@ -191,17 +166,6 @@ async function handleSubCommands(
       name,
       (await localizeDescription(resolveKey('description', ctx))) || resolvedCmd.description || ''
     )
-    // TODO: remove
-    // const isPositional = hasPositional(resolvedCmd)
-    // const commandName = completion.addCommand(
-    //   name,
-    //   (await localizeDescription(resolveKey('description', ctx))) || resolvedCmd.description || '',
-    //   isPositional ? [false] : [],
-    //   toBombshellCompletionHandler(
-    //     configs?.[name]?.handler || NOOP_HANDLER,
-    //     i18n ? toLocale(i18n.locale) : undefined
-    //   )
-    // )
 
     const args = resolvedCmd.args || (Object.create(null) as Args)
     for (const [key, schema] of Object.entries(args)) {
@@ -229,33 +193,7 @@ async function handleSubCommands(
           },
           schema.short
         )
-        // TODO: remove
-        // completion.addOption(
-        //   commandName,
-        //   `--${key}`,
-        //   (await localizeDescription(resolveArgKey(key, ctx))) || schema.description || '',
-        //   toBombshellCompletionHandler(
-        //     configs[commandName]?.args?.[key]?.handler || NOOP_HANDLER,
-        //     i18n ? toLocale(i18n.locale) : undefined
-        //   ),
-        //   schema.short
-        // )
       }
     }
   }
 }
-
-//
-// function hasPositional(cmd: Command | LazyCommand) {
-// return cmd.args && Object.values(cmd.args).some(arg => arg.type === 'positional')
-// }
-//
-// function toLocale(locale: string | Intl.Locale): Intl.Locale {
-// return locale instanceof Intl.Locale ? locale : new Intl.Locale(locale)
-// }
-//
-// function toBombshellCompletionHandler(handler: CompletionHandler, locale?: Intl.Locale): Handler {
-// return (previousArgs, toComplete, endWithSpace) =>
-//     handler({ previousArgs, toComplete, endWithSpace, locale })
-// }
-//
