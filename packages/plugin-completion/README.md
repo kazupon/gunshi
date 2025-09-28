@@ -8,6 +8,8 @@
 
 This plugin provides tab completion functionality for your CLI applications, allowing users to auto-complete commands, options, and arguments in their shell. It generates shell-specific completion scripts and handles runtime completion suggestions.
 
+This completion plugin is powered by [`@bomb.sh/tab`](https://github.com/bombshell-dev/tab)
+
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!WARNING]
@@ -105,6 +107,14 @@ The `complete` command accepts the following shell types:
 - `bash` - Bash shell completion
 - `zsh` - Zsh shell completion
 - `fish` - Fish shell completion
+- `powershell` - PowerShell completion
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> Supported shells comply with [`@bomb.sh/tab`](https://github.com/bombshell-dev/tab)
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Shell Completion Setup
 
@@ -113,6 +123,13 @@ This section provides detailed instructions for setting up shell completions in 
 ### Prerequisites
 
 Shell completion requires Node.js runtime. Ensure your CLI is running with Node.js (not Deno or Bun).
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!WARNING]
+> This package support Node.js runtime only. Deno and Bun support are coming soon.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Setup by Shell
 
@@ -224,6 +241,7 @@ If completions don't work after setup:
    - Bash: `set -x` before sourcing
    - Zsh: `setopt xtrace` before sourcing
    - Fish: `fish --debug=complete`
+   - Powershell: `Set-PSDebug -Trace 1`
 
 ### System-wide Installation
 
@@ -239,6 +257,7 @@ If you need system-wide completions:
 - **Bash**: `/etc/bash_completion.d/` or `/usr/share/bash-completion/completions/`
 - **Zsh**: `/usr/share/zsh/site-functions/` or `/usr/local/share/zsh/site-functions/`
 - **Fish**: `/usr/share/fish/vendor_completions.d/`
+- **PowerShell**: for Moduele, `/usr/local/share/powershell/Modules/`, for system profiles, `$PSHOME\Profile.ps1`
 
 ### Updating Completions
 
@@ -339,9 +358,6 @@ interface CompletionConfig {
 
 ```ts
 type CompletionHandler = (params: {
-  previousArgs: string[] // Previously entered arguments
-  toComplete: string // Current string being completed
-  endWithSpace: boolean // Whether input ends with space
   locale?: Intl.Locale // Current locale (if i18n is enabled)
 }) => CompletionItem[]
 
@@ -384,7 +400,7 @@ See the [API References](./docs/index.md)
 
 This project uses and depends on:
 
-- [`@bombsh/tab`](https://github.com/bombshell-dev/tab), created by [Bombshell](https://github.com/bombshell-dev) - Shell completion library
+- [`@bomb.sh/tab`](https://github.com/bombshell-dev/tab), created by [Bombshell](https://github.com/bombshell-dev) - Shell completion library
 
 Thank you!
 
