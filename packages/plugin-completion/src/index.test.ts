@@ -98,25 +98,25 @@ describe('subcommand', () => {
     expect(output).toMatchSnapshot()
   })
 
-  test.todo('suggest short option with equals sign', async () => {
+  test('suggest short option with equals sign', async () => {
     const output = await runCommand(`${SCRIPT} dev -p=3`)
     expect(output).toMatchSnapshot()
   })
 })
 
 describe('positional arguments', () => {
-  test('suggest multiple positional arguments when ending with space', async () => {
+  test('suggest positional arguments when ending with space', async () => {
     const output = await runCommand(`${SCRIPT} lint ""`)
     expect(output).toMatchSnapshot()
   })
 
-  test('multiple positional arguments when ending with part of the value', async () => {
+  test('positional arguments when ending with part of the value', async () => {
     const output = await runCommand(`${SCRIPT} lint ind`)
     expect(output).toMatchSnapshot()
   })
 
-  test('single positional argument when ending with space', async () => {
-    const output = await runCommand(`${SCRIPT} lint main.ts ""`)
+  test('multiple positional argument when ending with space', async () => {
+    const output = await runCommand(`G_COMPLETION_TEST_MULTIPLE=1 ${SCRIPT} lint main.ts ""`)
     expect(output).toMatchSnapshot()
   })
 })
@@ -207,25 +207,27 @@ describe('i18n support', () => {
       expect(output).toMatchSnapshot()
     })
 
-    test.todo('suggest short option with equals sign', async () => {
+    test('suggest short option with equals sign', async () => {
       const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev -p=3`)
       expect(output).toMatchSnapshot()
     })
   })
 
   describe('positional arguments', () => {
-    test('suggest multiple positional arguments when ending with space', async () => {
+    test('suggest positional arguments when ending with space', async () => {
       const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint ""`)
       expect(output).toMatchSnapshot()
     })
 
-    test('multiple positional arguments when ending with part of the value', async () => {
+    test('positional arguments when ending with part of the value', async () => {
       const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint ind`)
       expect(output).toMatchSnapshot()
     })
 
-    test('single positional argument when ending with space', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint main.ts ""`)
+    test('multiple positional argument when ending with space', async () => {
+      const output = await runCommand(
+        `G_COMPLETION_TEST_MULTIPLE=1 ${LOCALIZABLE_SCRIPT} lint main.ts ""`
+      )
       expect(output).toMatchSnapshot()
     })
   })

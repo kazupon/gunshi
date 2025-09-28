@@ -291,6 +291,9 @@ importers:
 
   packages/plugin-completion:
     dependencies:
+      '@bomb.sh/tab':
+        specifier: ^0.0.4
+        version: 0.0.4
       '@gunshi/plugin':
         specifier: workspace:*
         version: link:../plugin
@@ -702,6 +705,10 @@ packages:
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
+
+  '@bomb.sh/tab@0.0.4':
+    resolution: {integrity: sha512-iIMFJRK1dVjcqYMevdiXZLGnUBThD4MSe+vVW6V/mlNTWcr1dXRstQsrb7i9O2SdXjVfJZpJB+Ac7u7KR/M4Mg==}
+    hasBin: true
 
   '@braintree/sanitize-url@6.0.4':
     resolution: {integrity: sha512-s3jaWicZd0pkP0jf5ysyHUI/RE7MHos6qlToFcGWXVp+ykHOy77OUMrfbgJ9it2C5bow7OIQwYYaHjk9XlBQ2A==}
@@ -5638,6 +5645,10 @@ snapshots:
       '@babel/helper-validator-identifier': 7.27.1
 
   '@bcoe/v8-coverage@1.0.2': {}
+
+  '@bomb.sh/tab@0.0.4':
+    dependencies:
+      mri: 1.2.0
 
   '@braintree/sanitize-url@6.0.4':
     optional: true

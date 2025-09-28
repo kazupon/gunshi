@@ -94,20 +94,20 @@ lint	プロジェクトをリントします
 "
 `;
 
-exports[`i18n support > positional arguments > multiple positional arguments when ending with part of the value 1`] = `
-"index.ts	インデックスファイル
-:4
-"
-`;
-
-exports[`i18n support > positional arguments > single positional argument when ending with space 1`] = `
+exports[`i18n support > positional arguments > multiple positional argument when ending with space 1`] = `
 "main.ts	メインファイル
 index.ts	インデックスファイル
 :4
 "
 `;
 
-exports[`i18n support > positional arguments > suggest multiple positional arguments when ending with space 1`] = `
+exports[`i18n support > positional arguments > positional arguments when ending with part of the value 1`] = `
+"index.ts	インデックスファイル
+:4
+"
+`;
+
+exports[`i18n support > positional arguments > suggest positional arguments when ending with space 1`] = `
 "main.ts	メインファイル
 index.ts	インデックスファイル
 :4
@@ -126,7 +126,7 @@ exports[`i18n support > subcommand > not handle if unknown option 1`] = `
 `;
 
 exports[`i18n support > subcommand > resolve value if long option and value 1`] = `
-"--port=3000	開発サーバーポート
+"3000	開発サーバーポート
 :4
 "
 `;
@@ -163,9 +163,15 @@ exports[`i18n support > subcommand > suggest if user ends with space after \`--p
 "
 `;
 
+exports[`i18n support > subcommand > suggest short option with equals sign 1`] = `
+"3000	開発サーバーポート
+:4
+"
+`;
+
 exports[`i18n support > subcommand > user typed \`--port=\` and hasn't typed a space or value yet 1`] = `
-"--port=3000	開発サーバーポート
---port=8080	代替ポート
+"3000	開発サーバーポート
+8080	代替ポート
 :4
 "
 `;
@@ -178,20 +184,20 @@ lint	Lint project
 "
 `;
 
-exports[`positional arguments > multiple positional arguments when ending with part of the value 1`] = `
-"index.ts	Index file
-:4
-"
-`;
-
-exports[`positional arguments > single positional argument when ending with space 1`] = `
+exports[`positional arguments > multiple positional argument when ending with space 1`] = `
 "main.ts	Main file
 index.ts	Index file
 :4
 "
 `;
 
-exports[`positional arguments > suggest multiple positional arguments when ending with space 1`] = `
+exports[`positional arguments > positional arguments when ending with part of the value 1`] = `
+"index.ts	Index file
+:4
+"
+`;
+
+exports[`positional arguments > suggest positional arguments when ending with space 1`] = `
 "main.ts	Main file
 index.ts	Index file
 :4
@@ -210,7 +216,7 @@ exports[`subcommand > not handle if unknown option 1`] = `
 `;
 
 exports[`subcommand > resolve value if long option and value 1`] = `
-"--port=3000	Development server port
+"3000	Development server port
 :4
 "
 `;
@@ -247,9 +253,15 @@ exports[`subcommand > suggest if user ends with space after \`--port\` 1`] = `
 "
 `;
 
+exports[`subcommand > suggest short option with equals sign 1`] = `
+"3000	Development server port
+:4
+"
+`;
+
 exports[`subcommand > user typed \`--port=\` and hasn't typed a space or value yet 1`] = `
-"--port=3000	Development server port
---port=8080	Alternative port
+"3000	Development server port
+8080	Alternative port
 :4
 "
 `;

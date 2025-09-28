@@ -1,6 +1,8 @@
 import { cli, define } from 'gunshi'
 import completion from '../src/index.ts'
 
+const multiple = !!process.env.G_COMPLETION_TEST_MULTIPLE as true | undefined // type rudly, because it's used in tests
+
 const entry = define({
   // name: 'root',
   args: {
@@ -53,32 +55,36 @@ const lint = define({
   args: {
     files: {
       type: 'positional',
-      description: 'Files to lint'
+      description: 'Files to lint',
+      multiple
     }
   },
-  run: () => {}
+  run: ctx => {
+    console.log('Linting files:', ctx.values)
+  }
 })
-
-const subCommands = new Map<string, ReturnType<typeof define>>()
-subCommands.set('dev', dev)
-subCommands.set('build', build)
-subCommands.set('lint', lint)
 
 await cli(process.argv.slice(2), entry, {
   name: 'vite',
   version: '0.0.0',
   description: 'Vite CLI',
-  subCommands,
+  subCommands: {
+    dev,
+    build,
+    lint
+  },
   plugins: [
     completion({
       config: {
         entry: {
           args: {
             config: {
-              handler: () => [
-                { value: 'vite.config.ts', description: 'Vite config file' },
-                { value: 'vite.config.js', description: 'Vite config file' }
-              ]
+              handler: () => {
+                return [
+                  { value: 'vite.config.ts', description: 'Vite config file' },
+                  { value: 'vite.config.js', description: 'Vite config file' }
+                ]
+              }
             },
             mode: {
               handler: () => [
@@ -98,18 +104,24 @@ await cli(process.argv.slice(2), entry, {
         },
         subCommands: {
           lint: {
-            handler: () => [
-              { value: 'main.ts', description: 'Main file' },
-              { value: 'index.ts', description: 'Index file' }
-            ]
+            args: {
+              files: {
+                handler: () => [
+                  { value: 'main.ts', description: 'Main file' },
+                  { value: 'index.ts', description: 'Index file' }
+                ]
+              }
+            }
           },
           dev: {
             args: {
               port: {
-                handler: () => [
-                  { value: '3000', description: 'Development server port' },
-                  { value: '8080', description: 'Alternative port' }
-                ]
+                handler: () => {
+                  return [
+                    { value: '3000', description: 'Development server port' },
+                    { value: '8080', description: 'Alternative port' }
+                  ]
+                }
               },
               host: {
                 handler: () => [
