@@ -15,7 +15,7 @@ import {
 import { pluginId } from './types.ts'
 import { createCommandContext, quoteExec } from './utils.ts'
 
-import type { Completion } from '@bomb.sh/tab'
+import type { Complete, Completion } from '@bomb.sh/tab'
 import type {
   Args,
   Command,
@@ -89,7 +89,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
      * setup bombshell completion with `onExtension` hook
      */
 
-    onExtension: async (ctx, cmd) => {
+    onExtension: async ctx => {
       const i18n = ctx.extensions[i18nPluginId]
       const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
 
@@ -98,49 +98,82 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
         throw new Error('entry command not found.')
       }
 
-      const resolvedEntry = await resolveLazyCommand(entry)
-      const entryCtx = await createCommandContext(resolvedEntry, i18nPluginId, i18n)
-      if (i18n) {
-        const ret = await i18n.loadResource(i18n.locale, entryCtx, resolvedEntry)
-        if (!ret) {
-          console.warn(
-            `Failed to load i18n resources for command: ${resolvedEntry.name} (${i18n.locale})`
-          )
-        }
-      }
-      const localizeDescription = localizable(entryCtx, cmd, i18n ? i18n.translate : undefined)
-
-      const args = resolvedEntry.args || (Object.create(null) as Args)
-      for (const [key, schema] of Object.entries(args)) {
-        if (schema.type === 'positional') {
-          t.argument(
-            key,
-            function (completion) {
-              const handler = config.entry?.args?.[key]?.handler || NOOP_HANDLER
-              for (const item of handler({ locale: i18n?.locale })) {
-                completion(item.value, item.description || '')
-              }
-            },
-            schema.multiple
-          )
-        } else {
-          t.option(
-            key,
-            (await localizeDescription(resolveArgKey(key, entryCtx))) || schema.description || '',
-            function (completion) {
-              const handler = config.entry?.args?.[key]?.handler || NOOP_HANDLER
-              for (const item of handler({ locale: i18n?.locale })) {
-                completion(item.value, item.description || '')
-              }
-            },
-            schema.short
-          )
-        }
-      }
+      await registerCompletion({
+        name: 'entry',
+        cmd: entry,
+        config,
+        i18nPluginId,
+        i18n,
+        t,
+        isBombshellRoot: true
+      })
 
       await handleSubCommands(t, subCommands, i18nPluginId, config.subCommands, i18n)
     }
   })
+}
+
+async function registerCompletion({
+  name,
+  cmd,
+  config,
+  i18nPluginId,
+  i18n,
+  t,
+  isBombshellRoot = false
+}: {
+  name: string
+  cmd: Command | LazyCommand
+  config: Record<string, CompletionConfig>
+  i18nPluginId: string
+  i18n?: I18nExtension
+  t: RootCommand
+  isBombshellRoot?: boolean
+}) {
+  const resolvedCmd = await resolveLazyCommand(cmd)
+  const ctx = await createCommandContext(resolvedCmd, i18nPluginId, i18n)
+  if (i18n) {
+    const ret = await i18n.loadResource(i18n.locale, ctx, resolvedCmd)
+    if (!ret) {
+      console.warn(`Failed to load i18n resources for command: ${name} (${i18n.locale})`)
+    }
+  }
+  const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
+
+  const commandTab = isBombshellRoot
+    ? t
+    : t.command(
+        name,
+        (await localizeDescription(resolveKey('description', ctx))) || resolvedCmd.description || ''
+      )
+
+  const args = resolvedCmd.args || (Object.create(null) as Args)
+  for (const [key, schema] of Object.entries(args)) {
+    if (schema.type === 'positional') {
+      commandTab.argument(key, resolveCompletionHandler(name, key, config, i18n), schema.multiple)
+    } else {
+      commandTab.option(
+        key,
+        (await localizeDescription(resolveArgKey(key, ctx))) || schema.description || '',
+        resolveCompletionHandler(name, key, config, i18n),
+        schema.short
+      )
+    }
+  }
+}
+
+function resolveCompletionHandler(
+  name: string,
+  optionOrArgKey: string,
+  config: Record<string, CompletionConfig>,
+  i18n?: I18nExtension
+) {
+  return function (complete: Complete) {
+    const handler = config[name]?.args?.[optionOrArgKey]?.handler || NOOP_HANDLER
+    for (const item of handler({ locale: i18n?.locale })) {
+      complete(item.value, item.description || '')
+    }
+  }
 }
 
 async function handleSubCommands(
@@ -154,49 +187,6 @@ async function handleSubCommands(
     if (cmd.internal || cmd.entry || name === 'complete') {
       continue // skip entry / internal command / completion command itself
     }
-
-    const resolvedCmd = await resolveLazyCommand(cmd)
-    const ctx = await createCommandContext(resolvedCmd, i18nPluginId, i18n)
-    if (i18n) {
-      const ret = await i18n.loadResource(i18n.locale, ctx, resolvedCmd)
-      if (!ret) {
-        console.warn(`Failed to load i18n resources for command: ${name} (${i18n.locale})`)
-      }
-    }
-    const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
-
-    const commandTab = t.command(
-      name,
-      (await localizeDescription(resolveKey('description', ctx))) || resolvedCmd.description || ''
-    )
-
-    const args = resolvedCmd.args || (Object.create(null) as Args)
-    for (const [key, schema] of Object.entries(args)) {
-      if (schema.type === 'positional') {
-        commandTab.argument(
-          key,
-          function (completion) {
-            const handler = config[name]?.args?.[key]?.handler || NOOP_HANDLER
-            for (const item of handler({ locale: i18n?.locale })) {
-              completion(item.value, item.description || '')
-            }
-          },
-          schema.multiple
-        )
-        // continue // skip positional arguments on subcommands
-      } else {
-        commandTab.option(
-          key,
-          (await localizeDescription(resolveArgKey(key, ctx))) || schema.description || '',
-          function (completion) {
-            const handler = config[name]?.args?.[key]?.handler || NOOP_HANDLER
-            for (const item of handler({ locale: i18n?.locale })) {
-              completion(item.value, item.description || '')
-            }
-          },
-          schema.short
-        )
-      }
-    }
+    await registerCompletion({ name, cmd, config, i18nPluginId, i18n, t })
   }
 }
