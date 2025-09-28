@@ -16,3 +16,4 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - deno
   - tsx
+  - '@bomb.sh/tab'

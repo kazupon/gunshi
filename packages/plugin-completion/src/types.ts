@@ -5,8 +5,8 @@
 
 import { namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
 
+import type { Completion } from '@bomb.sh/tab'
 import type { GenerateNamespacedKey } from '@gunshi/shared'
-import type { Handler } from './bombshell/index.ts'
 
 /**
  * The unique identifier for the completion plugin.
@@ -24,18 +24,6 @@ export type PluginId = typeof pluginId
  */
 export interface CompletionParams {
   /**
-   * The previous arguments
-   */
-  previousArgs: Parameters<Handler>[0]
-  /**
-   * A value to complete.
-   */
-  toComplete: Parameters<Handler>[1]
-  /**
-   * Whether to end the completion with a space.
-   */
-  endWithSpace: Parameters<Handler>[2]
-  /**
    * The locale to use for i18n.
    */
   locale?: Intl.Locale
@@ -44,7 +32,7 @@ export interface CompletionParams {
 /**
  * The handler for completion.
  */
-export type CompletionHandler = (params: CompletionParams) => ReturnType<Handler>
+export type CompletionHandler = (params: CompletionParams) => Completion[]
 
 /**
  * Extended command context which provides utilities via completion plugin.

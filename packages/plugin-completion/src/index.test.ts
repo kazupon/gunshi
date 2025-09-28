@@ -1,9 +1,9 @@
 import { exec } from 'node:child_process'
 import { describe, expect, test } from 'vitest'
 
-function runCommand(command: string): Promise<string> {
+function runCommand(command: string, env: NodeJS.ProcessEnv = {}): Promise<string> {
   return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
+    exec(command, { env: { ...process.env, ...env } }, (error, stdout, stderr) => {
       if (error) {
         reject(stderr)
       } else {
@@ -98,134 +98,178 @@ describe('subcommand', () => {
     expect(output).toMatchSnapshot()
   })
 
-  test.todo('suggest short option with equals sign', async () => {
+  test('suggest short option with equals sign', async () => {
     const output = await runCommand(`${SCRIPT} dev -p=3`)
     expect(output).toMatchSnapshot()
   })
 })
 
 describe('positional arguments', () => {
-  test('suggest multiple positional arguments when ending with space', async () => {
+  test('suggest positional arguments when ending with space', async () => {
     const output = await runCommand(`${SCRIPT} lint ""`)
     expect(output).toMatchSnapshot()
   })
 
-  test('multiple positional arguments when ending with part of the value', async () => {
+  test('positional arguments when ending with part of the value', async () => {
     const output = await runCommand(`${SCRIPT} lint ind`)
     expect(output).toMatchSnapshot()
   })
 
-  test('single positional argument when ending with space', async () => {
-    const output = await runCommand(`${SCRIPT} lint main.ts ""`)
+  test('multiple positional argument when ending with space', async () => {
+    const output = await runCommand(`${SCRIPT} lint main.ts ""`, {
+      G_COMPLETION_TEST_MULTIPLE: '1'
+    })
     expect(output).toMatchSnapshot()
   })
 })
 
-const LOCALIZABLE_SCRIPT = `MY_LOCALE=ja-JP pnpm exec tsx packages/plugin-completion/examples/i18n.node.ts complete --`
+const LOCALIZABLE_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/i18n.node.ts complete --`
+const I18N_ENV = { MY_LOCALE: 'ja-JP' }
 
 describe('i18n support', () => {
   test('no input', async () => {
-    const output = await runCommand(`${LOCALIZABLE_SCRIPT}`)
+    const output = await runCommand(`${LOCALIZABLE_SCRIPT}`, {
+      ...I18N_ENV
+    })
     expect(output).toMatchSnapshot()
   })
 
   describe('default command', () => {
     test('suggest for inputting', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for long option', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --config`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --config`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest duplicate options', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --config vite.config.js --`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --config vite.config.js --`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest value if option values correctly', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --config vite.config`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} --config vite.config`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for short option', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} -c `)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} -c `, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest duplicate options for short option', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} -c vite.config.js --`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} -c vite.config.js --`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
   })
 
   describe('subcommand', () => {
     test('suggest for command only', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for option inputting', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for long option', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for short option', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev -H`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev -H`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('not handle if unknown option', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --unknown`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --unknown`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('resolve value if long option and value', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port=3`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port=3`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test('suggest if user ends with space after `--port`', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port ""`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port ""`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test(`keep suggesting the --port option if user typed partial but didn't end with space`, async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --po`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --po`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
     test("user typed `--port=` and hasn't typed a space or value yet", async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port=`)
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev --port=`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
-    test.todo('suggest short option with equals sign', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev -p=3`)
+    test('suggest short option with equals sign', async () => {
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} dev -p=3`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
   })
 
   describe('positional arguments', () => {
-    test('suggest multiple positional arguments when ending with space', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint ""`)
+    test('suggest positional arguments when ending with space', async () => {
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint ""`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
-    test('multiple positional arguments when ending with part of the value', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint ind`)
+    test('positional arguments when ending with part of the value', async () => {
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint ind`, {
+        ...I18N_ENV
+      })
       expect(output).toMatchSnapshot()
     })
 
-    test('single positional argument when ending with space', async () => {
-      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint main.ts ""`)
+    test('multiple positional argument when ending with space', async () => {
+      const output = await runCommand(`${LOCALIZABLE_SCRIPT} lint main.ts ""`, {
+        ...I18N_ENV,
+        G_COMPLETION_TEST_MULTIPLE: '1'
+      })
       expect(output).toMatchSnapshot()
     })
   })

@@ -1,12 +1,14 @@
-import i18n, { defineI18n } from '@gunshi/plugin-i18n'
+import i18n, { defineI18n, pluginId as i18nId } from '@gunshi/plugin-i18n'
 import { cli } from 'gunshi'
 import completion from '../src/index.ts'
 
 import type { I18nExtension } from '@gunshi/plugin-i18n'
 
+const multiple = !!process.env.G_COMPLETION_TEST_MULTIPLE as true | undefined // type rudly, because it's used in tests
+
 const entry = defineI18n<{
   extensions: {
-    'g:i18n': I18nExtension
+    [i18nId]: I18nExtension
   }
 }>({
   name: 'root',
@@ -29,7 +31,7 @@ const entry = defineI18n<{
   },
   run: _ctx => {},
   resource: async ctx => {
-    const i18n = ctx.extensions['g:i18n']
+    const i18n = ctx.extensions[i18nId]
     if (i18n.locale.toString() === 'ja-JP') {
       return {
         description: 'ルートコマンド',
@@ -44,7 +46,7 @@ const entry = defineI18n<{
 
 const dev = defineI18n<{
   extensions: {
-    'g:i18n': I18nExtension
+    [i18nId]: I18nExtension
   }
 }>({
   name: 'dev',
@@ -63,7 +65,7 @@ const dev = defineI18n<{
   },
   run: () => {},
   resource: async ctx => {
-    const i18n = ctx.extensions['g:i18n']
+    const i18n = ctx.extensions[i18nId]
     if (i18n.locale.toString() === 'ja-JP') {
       return {
         description: '開発サーバーを起動します',
@@ -77,14 +79,14 @@ const dev = defineI18n<{
 
 const build = defineI18n<{
   extensions: {
-    'g:i18n': I18nExtension
+    [i18nId]: I18nExtension
   }
 }>({
   name: 'build',
   description: 'Build project',
   run: () => {},
   resource: async ctx => {
-    const i18n = ctx.extensions['g:i18n']
+    const i18n = ctx.extensions[i18nId]
     if (i18n.locale.toString() === 'ja-JP') {
       return {
         description: 'プロジェクトをビルドします'
@@ -96,7 +98,7 @@ const build = defineI18n<{
 
 const lint = defineI18n<{
   extensions: {
-    'g:i18n': I18nExtension
+    [i18nId]: I18nExtension
   }
 }>({
   name: 'lint',
@@ -104,12 +106,13 @@ const lint = defineI18n<{
   args: {
     files: {
       type: 'positional',
-      description: 'Files to lint'
+      description: 'Files to lint',
+      multiple
     }
   },
   run: () => {},
   resource: async ctx => {
-    const i18n = ctx.extensions['g:i18n']
+    const i18n = ctx.extensions[i18nId]
     if (i18n.locale.toString() === 'ja-JP') {
       return {
         description: 'プロジェクトをリントします',
@@ -120,17 +123,16 @@ const lint = defineI18n<{
   }
 })
 
-const subCommands = new Map<string, ReturnType<typeof defineI18n>>()
-subCommands.set('dev', dev)
-subCommands.set('build', build)
-subCommands.set('lint', lint)
-
 // @ts-expect-error -- TODO(kazupon): fix type
 await cli(process.argv.slice(2), entry, {
   name: 'vite',
   version: '0.0.0',
   description: 'Vite CLI',
-  subCommands,
+  subCommands: {
+    dev,
+    build,
+    lint
+  },
   plugins: [
     i18n({
       locale: process.env.MY_LOCALE || 'en-US'
@@ -183,16 +185,20 @@ await cli(process.argv.slice(2), entry, {
         },
         subCommands: {
           lint: {
-            handler: ({ locale }) =>
-              locale?.toString() === 'ja-JP'
-                ? [
-                    { value: 'main.ts', description: 'メインファイル' },
-                    { value: 'index.ts', description: 'インデックスファイル' }
-                  ]
-                : [
-                    { value: 'main.ts', description: 'Main file' },
-                    { value: 'index.ts', description: 'Index file' }
-                  ]
+            args: {
+              files: {
+                handler: ({ locale }) =>
+                  locale?.toString() === 'ja-JP'
+                    ? [
+                        { value: 'main.ts', description: 'メインファイル' },
+                        { value: 'index.ts', description: 'インデックスファイル' }
+                      ]
+                    : [
+                        { value: 'main.ts', description: 'Main file' },
+                        { value: 'index.ts', description: 'Index file' }
+                      ]
+              }
+            }
           },
           dev: {
             args: {

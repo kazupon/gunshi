@@ -107,10 +107,6 @@ export default withMermaid({
           {
             text: 'Showcase',
             link: '/showcase'
-          },
-          {
-            text: 'Credits',
-            link: '/credits'
           }
         ]
       }
