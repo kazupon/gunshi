@@ -3,6 +3,7 @@
  *
  * This entry point exports the following APIs and types:
  * - `define`: A function to define a command.
+ * - `defineWithExtensions`: A function to define a command with extensions.
  * - `lazy`: A function to lazily load a command.
  * - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
  *
@@ -39,8 +40,11 @@ import type {
   CommandLoader,
   DefaultGunshiParams,
   ExtendContext,
+  ExtractArgs,
+  ExtractExtensions,
   GunshiParamsConstraint,
-  LazyCommand
+  LazyCommand,
+  Prettify
 } from './types.ts'
 
 export type {
@@ -57,37 +61,63 @@ export type {
 } from './types.ts'
 
 /**
- * Define a {@link Command | command}
+ * Infer command properties excluding for {@link define} function
+ */
+type InferCommandProps<G extends GunshiParamsConstraint = DefaultGunshiParams> = Pick<
+  Command<G>,
+  Exclude<keyof Command<G>, keyof Command<G>>
+>
+
+/**
+ * The result type of the {@link define} function
+ */
+type CommandDefinitionResult<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  C extends Command<G> = Command<G>
+> = Prettify<Pick<C, keyof C> & Partial<Pick<Command<G>, Exclude<keyof Command<G>, keyof C>>>>
+
+/**
+ * Define a {@link Command | command}.
+ *
+ * @example
+ * ```ts
+ * const command = define({
+ *   name: 'test',
+ *   description: 'A test command',
+ *   args: {
+ *     debug: {
+ *       type: 'boolean',
+ *       description: 'Enable debug mode',
+ *       default: false
+ *     }
+ *   },
+ *   run: ctx => {
+ *     if (ctx.values.debug) {
+ *       console.debug('Debug mode is enabled');
+ *     }
+ *   }
+ * })
+ * ```
+ *
+ * @typeParam G - A {@link GunshiParamsConstraint} type
+ * @typeParam A - An {@link Args} type extracted from {@link GunshiParamsConstraint}
+ * @typeParam C - A {@link Command} type inferred from {@link GunshiParamsConstraint}
  *
  * @param definition - A {@link Command | command} definition
  * @returns A defined {@link Command | command}
  */
-export function define<A extends Args>(
-  definition: Command<{ args: A; extensions: {} }>
-): Command<{ args: A; extensions: {} }>
+export function define<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  A extends Args = ExtractArgs<G>,
+  C extends InferCommandProps<G> = InferCommandProps<G>
+>(
+  definition: C & Command<{ args: A; extensions: ExtractExtensions<G> }>
+): CommandDefinitionResult<G, C>
 
 /**
- * Define a {@link Command | command}
+ * Define a {@link Command | command}.
  *
- * @param definition - A {@link Command | command} definition
- * @returns A defined {@link Command | command}
- */
-export function define<E extends ExtendContext>(
-  definition: Command<{ args: Args; extensions: E }>
-): Command<{ args: Args; extensions: E }>
-
-/**
- * Define a {@link Command | command}
- *
- * @param definition - A {@link Command | command} definition
- * @returns A defined {@link Command | command}
- */
-export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  definition: Command<G>
-): Command<G>
-
-/**
- * Define a {@link Command | command}
+ * @typeParam G - A {@link GunshiParamsConstraint} type
  *
  * @param definition - A {@link Command | command} definition
  * @returns A defined {@link Command | command}
@@ -96,6 +126,41 @@ export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   definition: Command<G>
 ): Command<G> {
   return definition
+}
+
+/**
+ * Define a {@link Command | command} with extensions type parameter.
+ *
+ * This helper function allows specifying the extensions type parameter
+ * while inferring the args type from the definition.
+ *
+ * @example
+ * ```ts
+ * type MyExtensions = { logger: { log: (message: string) => void } }
+ *
+ * const command = defineWithExtensions<MyExtensions>()({
+ *   args: { name: { type: 'string' } },
+ *   run: ctx => {
+ *     // ctx.values is inferred as { name?: string }
+ *     // ctx.extensions is MyExtensions
+ *   }
+ * })
+ * ```
+ *
+ * @typeParam E - The extensions type
+ *
+ * @returns A function that takes a command definition via {@link define}
+ *
+ * @since v0.27.0
+ */
+export function defineWithExtensions<E extends ExtendContext = never>() {
+  return <
+    G extends GunshiParamsConstraint = DefaultGunshiParams,
+    A extends Args = ExtractArgs<G>,
+    C extends InferCommandProps<G> = InferCommandProps<G>
+  >(
+    definition: C & Command<{ args: A; extensions: E }>
+  ): CommandDefinitionResult<G, C> => define(definition) as CommandDefinitionResult<G, C>
 }
 
 /**

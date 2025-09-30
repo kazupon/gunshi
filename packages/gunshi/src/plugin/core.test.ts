@@ -2,7 +2,7 @@ import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { createMockCommandContext } from '../../test/utils.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
-import { define } from '../definition.ts'
+import { define, defineWithExtensions } from '../definition.ts'
 import { createPluginContext } from './context.ts'
 import { plugin } from './core.ts'
 
@@ -344,7 +344,7 @@ describe('Plugin Extensions Integration', () => {
     type TestExtension = Awaited<ReturnType<typeof testPlugin.extension.factory>>
 
     // create a command that uses the extension
-    const testCommand = define<{ args: typeof args; extensions: { test: TestExtension } }>({
+    const testCommand = defineWithExtensions<{ test: TestExtension }>()({
       name: 'test-cmd',
       args,
       async run(ctx) {
@@ -415,7 +415,7 @@ describe('Plugin Extensions Integration', () => {
     }
 
     // command using both extensions
-    const multiCommand = define<ExtendContext>({
+    const multiCommand = defineWithExtensions<ExtendContext>()({
       name: 'multi',
       run(ctx) {
         ctx.extensions.logger.log(`User ${ctx.extensions.auth.getUser()} executed command`)
@@ -501,9 +501,9 @@ describe('Plugin Extensions Integration', () => {
       onExtension
     })
 
-    const contextCommand = define<{
+    const contextCommand = defineWithExtensions<{
       ctx: Awaited<ReturnType<typeof contextPlugin.extension.factory>>
-    }>({
+    }>()({
       name: 'ctx-test',
       run(ctx) {
         return String(ctx.extensions.ctx.captured)

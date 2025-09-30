@@ -16,6 +16,11 @@ export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 export type Awaitable<T> = T | Promise<T>
 
 /**
+ * Prettify a type by flattening its structure.
+ */
+export type Prettify<T> = { [K in keyof T]: T[K] } & {}
+
+/**
  * Extend command context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
  *
  * @since v0.27.0

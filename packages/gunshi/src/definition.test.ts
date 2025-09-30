@@ -1,8 +1,8 @@
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
-import { define, lazy } from './definition.ts'
+import { define, defineWithExtensions, lazy } from './definition.ts'
 
-import type { Args, CommandRunner, GunshiParams } from './types.ts'
+import type { Args, Command, CommandContext, CommandRunner } from './types.ts'
 
 describe('define', async () => {
   test('basic', async () => {
@@ -17,7 +17,7 @@ describe('define', async () => {
       },
       run: ctx => {
         // Type assertions
-        // expectTypeOf(ctx.values).toEqualTypeOf<{ foo?: string | undefined }>()
+        expectTypeOf(ctx.values).toEqualTypeOf<{ foo?: string | undefined }>()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
         expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
 
@@ -46,17 +46,17 @@ describe('define', async () => {
 
     // Check that all specified properties and types are preserved
     expect(command.name).toBe('complex')
-    // expectTypeOf<typeof command.name>().not.toBeNullable()
+    expectTypeOf<typeof command.name>().not.toBeNullable()
     expect(command.description).toBe('Complex command')
-    // expectTypeOf<typeof command.description>().not.toBeNullable()
+    expectTypeOf<typeof command.description>().not.toBeNullable()
     expect(command.args).toBeDefined()
-    // expectTypeOf<typeof command.args>().not.toBeNullable()
+    expectTypeOf<typeof command.args>().not.toBeNullable()
     expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
-    // expectTypeOf<typeof command.examples>().not.toBeNullable()
+    expectTypeOf<typeof command.examples>().not.toBeNullable()
     expect(command.toKebab).toBe(false)
-    // expectTypeOf<typeof command.toKebab>().not.toBeNullable()
+    expectTypeOf<typeof command.toKebab>().not.toBeNullable()
     expect(typeof command.run).toBe('function')
-    // expectTypeOf<typeof command.run>().not.toBeNullable()
+    expectTypeOf<typeof command.run>().not.toBeNullable()
 
     // Check that all not specified optional properties are undefined
     expect(command.internal).toBeUndefined()
@@ -67,65 +67,122 @@ describe('define', async () => {
     expectTypeOf<typeof command.rendering>().toBeNullable()
   })
 
-  describe('type parameters', () => {
-    type ExtendedContext = {
-      auth: {
-        user: { id: number; name: string }
-        isAuthenticated: boolean
-      }
-      db: {
-        query: (sql: string) => Promise<{ rows: string[] }>
-      }
-    }
-
-    test('type inference: command with type parameter extensions', () => {
-      const args = {
+  test('pass parameters', () => {
+    const options: Command = {
+      name: 'deploy',
+      description: 'Deploy application',
+      args: {
         env: { type: 'string', required: true }
-      } as const satisfies Args
-      const command = define<GunshiParams<{ args: typeof args; extensions: ExtendedContext }>>({
-        name: 'deploy',
-        description: 'Deploy application',
-        args,
-        run: async ctx => {
-          expectTypeOf(ctx.values).toEqualTypeOf<{ env: string }>()
-          expectTypeOf(ctx.extensions).toEqualTypeOf<ExtendedContext>()
+      },
+      run: (_ctx: CommandContext) => {}
+    }
+    const command = define(options)
 
-          return `Deploying as ${ctx.extensions.auth.user.name}`
+    // Check that specified properties and types are preserved
+    expect(command.name).toBe('deploy')
+    expectTypeOf<typeof command.name>().toBeNullable()
+    expect(command.description).toBe('Deploy application')
+    expectTypeOf<typeof command.description>().toBeNullable()
+    expect(command.args).toEqual({ env: { type: 'string', required: true } })
+    expectTypeOf<typeof command.args>().toBeNullable()
+
+    // Check that not specified optional properties are undefined
+    expectTypeOf<typeof command.examples>().toBeNullable()
+  })
+})
+
+describe('defineWithExtensions', () => {
+  type MyExtensions = { logger: { log: (message: string) => void } }
+
+  test('basic', async () => {
+    const commit = defineWithExtensions<MyExtensions>()({
+      name: 'commit',
+      description: 'Commit changes',
+      args: {
+        message: {
+          type: 'string',
+          required: true
         }
-      })
+      },
+      run: ctx => {
+        // Infer `ctx.values`
+        expectTypeOf(ctx.values).toEqualTypeOf<{ message: string }>()
+        // Infer `ctx.extensions`
+        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
 
-      // Check that specified properties and types are preserved
-      expect(command.name).toBe('deploy')
-      // expectTypeOf<typeof command.name>().not.toBeNullable()
-      expect(command.description).toBe('Deploy application')
-      // expectTypeOf<typeof command.description>().not.toBeNullable()
-      expect(command.args).toEqual({ env: { type: 'string', required: true } })
-      // expectTypeOf<typeof command.args>().not.toBeNullable()
+        ctx.extensions.logger?.log(`Committing with message: ${ctx.values.message}`)
 
-      // Check that not specified optional properties are undefined
-      expectTypeOf<typeof command.examples>().toBeNullable()
+        expect(ctx.values.message).toBe('first commit')
+      }
     })
 
-    test('type inference: no args', () => {
-      const command = define<GunshiParams<{ extensions: ExtendedContext }>>({
-        name: 'profile',
-        run: async ctx => {
-          expectTypeOf(ctx.values).toEqualTypeOf<{
-            [x: string]: string | number | boolean | undefined
-          }>()
-          expectTypeOf(ctx.extensions).toEqualTypeOf<ExtendedContext>()
-
-          return `User: ${ctx.extensions.auth.user.name}`
-        }
-      })
-
-      // Check that specified properties and types are preserved
-      expect(command.name).toBe('profile')
-      // expectTypeOf<typeof command.name>().not.toBeNullable()
-
-      // Check that not specified optional properties are undefined
-      expectTypeOf<typeof command.examples>().toBeNullable()
+    await cli(['commit', '--message', 'first commit'], () => {}, {
+      subCommands: {
+        commit
+      }
     })
+  })
+
+  test('preserves all specified command properties', () => {
+    const command = defineWithExtensions<MyExtensions>()({
+      name: 'complex',
+      description: 'Complex command',
+      args: {
+        flag: { type: 'boolean' as const },
+        value: { type: 'number' }
+      },
+      examples: 'complex --flag\ncomplex --value 42',
+      toKebab: false,
+      run: async _ctx => 'done'
+    })
+
+    // Check that all specified properties and types are preserved
+    expect(command.name).toBe('complex')
+    expectTypeOf<typeof command.name>().not.toBeNullable()
+    expect(command.description).toBe('Complex command')
+    expectTypeOf<typeof command.description>().not.toBeNullable()
+    expect(command.args).toBeDefined()
+    expectTypeOf<typeof command.args>().not.toBeNullable()
+    expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
+    expectTypeOf<typeof command.examples>().not.toBeNullable()
+    expect(command.toKebab).toBe(false)
+    expectTypeOf<typeof command.toKebab>().not.toBeNullable()
+    expect(typeof command.run).toBe('function')
+    expectTypeOf<typeof command.run>().not.toBeNullable()
+
+    // Check that all not specified optional properties are undefined
+    expect(command.internal).toBeUndefined()
+    expectTypeOf<typeof command.internal>().toBeNullable()
+    expect(command.entry).toBeUndefined()
+    expectTypeOf<typeof command.entry>().toBeNullable()
+    expect(command.rendering).toBeUndefined()
+    expectTypeOf<typeof command.rendering>().toBeNullable()
+  })
+
+  test('pass parameters', async () => {
+    const options: Command = {
+      name: 'test',
+      description: 'A test command',
+      args: {
+        foo: {
+          type: 'string',
+          description: 'A string option'
+        }
+      },
+      run: (_ctx: CommandContext) => {}
+    }
+    const command = defineWithExtensions<MyExtensions>()(options)
+
+    // Check that specified properties and types are preserved
+    expect(command.name).toBe('test')
+    expectTypeOf<typeof command.name>().toBeNullable()
+    expect(command.description).toBe('A test command')
+    expectTypeOf<typeof command.description>().toBeNullable()
+    expect(command.args).toEqual({ foo: { type: 'string', description: 'A string option' } })
+    expectTypeOf<typeof command.args>().toBeNullable()
+
+    // Check that not specified optional properties are undefined
+    expectTypeOf<typeof command.examples>().toBeNullable()
   })
 })
 
