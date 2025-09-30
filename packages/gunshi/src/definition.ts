@@ -227,55 +227,6 @@ export function lazy<
 ): LazyCommand<{ args: A; extensions: {} }, D>
 
 /**
- * Define a {@link LazyCommand | lazy command}
- *
- * @param loader - A {@link CommandLoader | command loader}
- * @returns A {@link LazyCommand | lazy command} loader
- */
-export function lazy<E extends ExtendContext>(
-  loader: CommandLoader<{ args: Args; extensions: E }>
-): LazyCommand<{ args: Args; extensions: E }, {}>
-
-/**
- * Define a {@link LazyCommand | lazy command} with definition.
- *
- * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - An optional {@link Command | command} definition
- * @returns A {@link LazyCommand | lazy command} that can be executed later
- */
-export function lazy<
-  E extends ExtendContext,
-  D extends Partial<Command<{ args: Args; extensions: E }>> = Partial<
-    Command<{ args: Args; extensions: E }>
-  >
->(
-  loader: CommandLoader<{ args: Args; extensions: E }>,
-  definition: D
-): LazyCommand<{ args: Args; extensions: E }, D>
-
-/**
- * Define a {@link LazyCommand | lazy command}
- *
- * @param loader - A {@link CommandLoader | command loader}
- * @returns A {@link LazyCommand | lazy command} loader
- */
-export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  loader: CommandLoader<G>
-): LazyCommand<G, {}>
-
-/**
- * Define a {@link LazyCommand | lazy command} with definition.
- *
- * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - An optional {@link Command | command} definition
- * @returns A {@link LazyCommand | lazy command} that can be executed later
- */
-export function lazy<
-  G extends GunshiParamsConstraint = DefaultGunshiParams,
-  D extends Partial<Command<G>> = Partial<Command<G>>
->(loader: CommandLoader<G>, definition: D): LazyCommand<G, D>
-
-/**
  * Define a {@link LazyCommand | lazy command} with or without definition.
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
@@ -306,4 +257,26 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   }
 
   return lazyCommand
+}
+
+/**
+ * Define a {@link LazyCommand | lazy command} with extensions type parameter.
+ *
+ * @typeParam E - The extensions type
+ *
+ * @returns A function that takes a lazy command definition via {@link lazy}
+ *
+ * @since v0.27.0
+ */
+export function lazyWithExtensions<E extends ExtendContext = never>() {
+  return <
+    A extends Args,
+    D extends Partial<Command<{ args: A; extensions: {} }>> = Partial<
+      Command<{ args: A; extensions: {} }>
+    >
+  >(
+    loader: CommandLoader<{ args: A; extensions: E }>,
+    definition?: D
+  ): LazyCommand<{ args: A; extensions: E }, D> =>
+    lazy(loader, definition as D) as LazyCommand<{ args: A; extensions: E }, D>
 }

@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
-import { define, defineWithExtensions, lazy } from './definition.ts'
+import { define, defineWithExtensions, lazy, lazyWithExtensions } from './definition.ts'
 
 import type { DeepWriteable } from '../test/utils.ts'
 import type { Args, Command, CommandContext, CommandRunner } from './types.ts'
@@ -329,72 +329,50 @@ describe('lazy', () => {
     expect(lazyCmd.internal).toBe(true)
     expectTypeOf<typeof lazyCmd.internal>().toEqualTypeOf<true>()
   })
+})
 
-  describe('lazy with type parameters', () => {
-    test('basic - lazy command with type parameter', () => {
-      type AuthExt = {
-        auth: {
-          authenticated: boolean
-        }
-      }
-      const loader = vi.fn(async () => {
-        const runner: CommandRunner<{ args: Args; extensions: AuthExt }> = async ctx => {
-          expectTypeOf(ctx.extensions.auth.authenticated).toEqualTypeOf<boolean>()
-          return 'deployed'
-        }
-        return runner
-      })
-      const lazyCmd = lazy<{ args: Args; extensions: AuthExt }>(loader, {
-        name: 'lazy-deploy',
-        description: 'Lazy deploy command'
-      })
+test('lazyWithExtensions', async () => {
+  type AuthExt = {
+    auth: {
+      authenticated: boolean
+    }
+  }
 
-      // check that properties are preserved
-      expect(lazyCmd.commandName).toBe('lazy-deploy')
-      expect(lazyCmd.description).toBe('Lazy deploy command')
-    })
-
-    test('handles type parameters from loaded command', () => {
-      const loader = vi.fn(async () => {
-        interface TestExt {
-          existing: { test: boolean }
-        }
-        const runner: CommandRunner<{ extensions: { test: TestExt } }> = async ctx => {
-          expectTypeOf(ctx.extensions.test.existing.test).toEqualTypeOf<boolean>()
-          return 'done'
-        }
-        return runner
-      })
-      const lazyCmd = lazy(loader, {
-        name: 'test'
-      })
-
-      // should work without errors
-      expect(lazyCmd.commandName).toBe('test')
-    })
-
-    test('backward compatibility - lazy command without type parameter', () => {
-      const loader = vi.fn(async () => ({
-        name: 'simple',
-        run: async () => 'done'
-      }))
-      const lazyCmd = lazy(loader, {
-        name: 'simple',
-        description: 'Simple lazy command'
-      })
-
-      expect(lazyCmd.commandName).toBe('simple')
-      expect(lazyCmd.description).toBe('Simple lazy command')
-    })
-
-    test('lazy without definition', () => {
-      const loader = vi.fn(async () => ({
-        name: 'minimal',
-        run: async () => 'done'
-      }))
-      const lazyCmd = lazy(loader)
-
-      expect(typeof lazyCmd).toBe('function')
-    })
+  const deploy = define({
+    name: 'deploy',
+    description: 'Deploy application',
+    args: {
+      env: { type: 'string', required: true }
+    }
   })
+
+  const mock = vi.fn()
+  const lazyDeploy = lazyWithExtensions<AuthExt>()(
+    (): CommandRunner<{ args: typeof deploy.args; extensions: AuthExt }> => {
+      return ctx => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ env: string }>()
+        expectTypeOf(ctx.extensions.auth?.authenticated).toEqualTypeOf<boolean>()
+        mock(ctx.values.env)
+        return 'deployed'
+      }
+    },
+    deploy
+  )
+
+  expect(lazyDeploy.commandName).toBe(deploy.name)
+  expectTypeOf<typeof lazyDeploy.commandName>().toEqualTypeOf<string>()
+
+  expect(lazyDeploy.description).toBe(deploy.description)
+  expectTypeOf<typeof lazyDeploy.description>().toEqualTypeOf<string>()
+
+  expect(lazyDeploy.args).toEqual(deploy.args)
+  expectTypeOf<typeof lazyDeploy.args>().toEqualTypeOf<typeof deploy.args>()
+
+  await cli(['deploy', '--env', 'production'], () => {}, {
+    subCommands: {
+      deploy: lazyDeploy
+    }
+  })
+
+  expect(mock).toHaveBeenCalledWith('production')
 })
