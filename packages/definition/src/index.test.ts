@@ -48,7 +48,7 @@ describe('@gunshi/definition', () => {
   })
 
   test('lazy', async () => {
-    const command = lazy(() => ctx => ctx.values.foo, {
+    const command = lazy(() => ctx => String(ctx.values.foo), {
       name: 'lazy-test',
       description: 'A lazy test command',
       args: {

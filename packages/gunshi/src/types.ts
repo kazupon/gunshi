@@ -544,24 +544,32 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
 /**
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
+ *
+ * @typeParam G - The Gunshi parameters constraint
+ * @typeParam D - The partial command definition provided to lazy function
  */
-export type LazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
+export type LazyCommand<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  D extends Partial<Command<G>> = {}
+> = {
   /**
    * Command load function
    */
   (): Awaitable<Command<G> | CommandRunner<G>>
-  /**
-   * Command name
-   */
-  commandName?: string
-} & Omit<Command<G>, 'run' | 'name'>
+} &
+  // If definition has name, commandName is required with that type
+  (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) &
+  // Properties from the definition (if provided inline)
+  Omit<D, 'name' | 'run'> &
+  // Remaining properties from Command (optional)
+  Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>
 
 /**
  * Define a command type.
  */
 export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
   | Command<G>
-  | LazyCommand<G>
+  | LazyCommand<G, {}>
 
 /**
  * Command examples fetcher.

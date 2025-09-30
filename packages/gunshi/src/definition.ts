@@ -164,26 +164,57 @@ export function defineWithExtensions<E extends ExtendContext = never>() {
 }
 
 /**
- * Define a {@link LazyCommand | lazy command}
+ * Define a {@link LazyCommand | lazy command}.
+ *
+ * @example
+ * ```ts
+ * // load command lazily
+ * const test = lazy(() => import('./commands/test'))
+ * ```
+ *
+ * @typeParam A - An {@link Args} type
  *
  * @param loader - A {@link CommandLoader | command loader}
- * @returns A {@link LazyCommand | lazy command} loader
+ * @returns A {@link LazyCommand | lazy command} with loader
  */
 export function lazy<A extends Args>(
   loader: CommandLoader<{ args: A; extensions: {} }>
-): LazyCommand<{ args: A; extensions: {} }>
+): LazyCommand<{ args: A; extensions: {} }, {}>
 
 /**
  * Define a {@link LazyCommand | lazy command} with definition.
+ *
+ * @example
+ * ```ts
+ * const test = define({
+ *   name: 'test',
+ *   description: 'Test command',
+ *   args: {
+ *     debug: {
+ *       type: 'boolean',
+ *       description: 'Enable debug mode',
+ *       default: false
+ *     }
+ *   },
+ * })
+ * ```
+ *
+ * @typeParam A - An {@link Args} type
+ * @typeParam D - A partial {@link Command} definition type
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
  * @param definition - An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<A extends Args>(
+export function lazy<
+  A extends Args,
+  D extends Partial<Command<{ args: A; extensions: {} }>> = Partial<
+    Command<{ args: A; extensions: {} }>
+  >
+>(
   loader: CommandLoader<{ args: A; extensions: {} }>,
-  definition: Command<{ args: A; extensions: {} }>
-): LazyCommand<{ args: A; extensions: {} }>
+  definition: D
+): LazyCommand<{ args: A; extensions: {} }, D>
 
 /**
  * Define a {@link LazyCommand | lazy command}
@@ -193,7 +224,7 @@ export function lazy<A extends Args>(
  */
 export function lazy<E extends ExtendContext>(
   loader: CommandLoader<{ args: Args; extensions: E }>
-): LazyCommand<{ args: Args; extensions: E }>
+): LazyCommand<{ args: Args; extensions: E }, {}>
 
 /**
  * Define a {@link LazyCommand | lazy command} with definition.
@@ -202,10 +233,15 @@ export function lazy<E extends ExtendContext>(
  * @param definition - An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<E extends ExtendContext>(
+export function lazy<
+  E extends ExtendContext,
+  D extends Partial<Command<{ args: Args; extensions: E }>> = Partial<
+    Command<{ args: Args; extensions: E }>
+  >
+>(
   loader: CommandLoader<{ args: Args; extensions: E }>,
-  definition: Command<{ args: Args; extensions: E }>
-): LazyCommand<{ args: Args; extensions: E }>
+  definition: D
+): LazyCommand<{ args: Args; extensions: E }, D>
 
 /**
  * Define a {@link LazyCommand | lazy command}
@@ -215,7 +251,7 @@ export function lazy<E extends ExtendContext>(
  */
 export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>
-): LazyCommand<G>
+): LazyCommand<G, {}>
 
 /**
  * Define a {@link LazyCommand | lazy command} with definition.
@@ -224,10 +260,10 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
  * @param definition - An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  loader: CommandLoader<G>,
-  definition: Command<G>
-): LazyCommand<G>
+export function lazy<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  D extends Partial<Command<G>> = Partial<Command<G>>
+>(loader: CommandLoader<G>, definition: D): LazyCommand<G, D>
 
 /**
  * Define a {@link LazyCommand | lazy command} with or without definition.
@@ -238,9 +274,11 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
  */
 export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>,
-  definition?: Command<G>
-): LazyCommand<G> {
-  const lazyCommand = loader as LazyCommand<G>
+  definition?: Partial<Command<G>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for generic D
+): LazyCommand<G, any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for generic D
+  const lazyCommand = loader as LazyCommand<G, any>
 
   if (definition != null) {
     // copy existing properties
@@ -250,12 +288,11 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
     lazyCommand.examples = definition.examples
     lazyCommand.internal = definition.internal
     lazyCommand.entry = definition.entry
-    // @ts-ignore - resource property is now provided by plugin-i18n
+    lazyCommand.toKebab = definition.toKebab
+    // resource property is now provided by plugin-i18n
     if ('resource' in definition) {
-      // @ts-ignore
       lazyCommand.resource = definition.resource
     }
-    lazyCommand.toKebab = definition.toKebab
   }
 
   return lazyCommand
