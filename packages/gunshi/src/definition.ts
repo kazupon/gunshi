@@ -168,7 +168,7 @@ export function defineWithExtensions<E extends ExtendContext = never>() {
  *
  * @example
  * ```ts
- * // load command lazily
+ * // load command with dynamic importing
  * const test = lazy(() => import('./commands/test'))
  * ```
  *
@@ -186,6 +186,7 @@ export function lazy<A extends Args>(
  *
  * @example
  * ```ts
+ * // define command without command runner
  * const test = define({
  *   name: 'test',
  *   description: 'Test command',
@@ -197,6 +198,15 @@ export function lazy<A extends Args>(
  *     }
  *   },
  * })
+ *
+ * // define load command with command runner and defined command
+ * const lazyTest = lazy((): CommandRunner<{ args: typeof test.args; extensions: {} }> => {
+ *   return ctx => {
+ *     if (ctx.values.debug) {
+ *       console.debug('Debug mode is enabled');
+ *     }
+ *   }
+ * }, test)
  * ```
  *
  * @typeParam A - An {@link Args} type
