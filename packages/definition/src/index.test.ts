@@ -1,8 +1,6 @@
 import { createCommandContext } from 'gunshi/context'
 import { describe, expect, test } from 'vitest'
-import { define, lazy } from './index.ts'
-
-import type { CommandRunner } from './index.ts'
+import { CommandRunner, define, lazy } from './index.ts'
 
 describe('@gunshi/definition', () => {
   test('define', async () => {
@@ -27,7 +25,7 @@ describe('@gunshi/definition', () => {
 
     // test command execution
     const ctx = await createCommandContext({
-      args: command.args!,
+      args: command.args,
       values: { foo: 'bar' },
       explicit: { foo: true },
       positionals: [],
@@ -43,7 +41,7 @@ describe('@gunshi/definition', () => {
         name: 'cmd1'
       }
     })
-    const result = await command.run!(ctx as Parameters<NonNullable<typeof command.run>>[0])
+    const result = await command.run(ctx)
     expect(result).toBe('foo value: bar')
   })
 

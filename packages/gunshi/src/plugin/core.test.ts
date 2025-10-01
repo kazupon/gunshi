@@ -44,8 +44,18 @@ describe('PluginContext#addGlobalOpttion', () => {
   })
 })
 
-type Auth = { token: string; login: () => string }
-type Logger = { log: (msg: string) => void; level: string }
+type Auth = {
+  auth: {
+    token: string
+    login: () => string
+  }
+}
+type Logger = {
+  loggler: {
+    log: (msg: string) => void
+    level: string
+  }
+}
 
 test('PluginContext#decorateHeaderRenderer', async () => {
   const decorators = createDecorators<GunshiParams<{ args: Args; extensions: Auth }>>()

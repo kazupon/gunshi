@@ -41,7 +41,7 @@ bun add @gunshi/definition
 
 ## 🚀 Usage
 
-You can define the gunshi command as JavaScript module with using `define` or `lazy`.
+You can define the gunshi command as JavaScript module with using `define`, `defineWithExtensions`, `lazy` and `lazyWithExtensions`
 
 The bellow example case which is using `define`:
 

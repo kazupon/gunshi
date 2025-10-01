@@ -5,6 +5,7 @@
  * - `define`: A function to define a command.
  * - `defineWithExtensions`: A function to define a command with extensions.
  * - `lazy`: A function to lazily load a command.
+ * - `lazyWithExtensions`: A function to lazily load a command with extensions.
  * - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
  *
  * @example
