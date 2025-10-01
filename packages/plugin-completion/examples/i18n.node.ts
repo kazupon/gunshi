@@ -123,7 +123,6 @@ const lint = defineI18n<{
   }
 })
 
-// @ts-expect-error -- TODO(kazupon): fix type
 await cli(process.argv.slice(2), entry, {
   name: 'vite',
   version: '0.0.0',
