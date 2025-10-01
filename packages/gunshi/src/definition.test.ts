@@ -1,9 +1,9 @@
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
-import { define, defineWithExtensions, lazy, lazyWithExtensions } from './definition.ts'
+import { define, defineWithTypes, lazy, lazyWithExtensions } from './definition.ts'
 
 import type { DeepWriteable } from '../test/utils.ts'
-import type { Args, Command, CommandContext, CommandRunner, RenderingOptions } from './types.ts'
+import type { Args, Command, CommandRunner, GunshiParams } from './types.ts'
 
 describe('define', async () => {
   test('basic', async () => {
@@ -37,7 +37,7 @@ describe('define', async () => {
       name: 'complex',
       description: 'Complex command',
       args: {
-        flag: { type: 'boolean' as const },
+        flag: { type: 'boolean' },
         value: { type: 'number' }
       },
       examples: 'complex --flag\ncomplex --value 42',
@@ -78,7 +78,7 @@ describe('define', async () => {
     >()
 
     /**
-     * Check that all not specified optional properties are undefined
+     * Check that all not specified optional properties are `undefined`
      */
 
     expect(command.internal).toBeUndefined()
@@ -92,18 +92,21 @@ describe('define', async () => {
   })
 
   test('pass parameters', () => {
-    const options: Command = {
+    const args = {
+      env: { type: 'string', required: true }
+    } satisfies Args
+
+    const options: Command<GunshiParams<{ args: typeof args }>> = {
       name: 'deploy',
       description: 'Deploy application',
-      args: {
-        env: { type: 'string', required: true }
-      },
-      run: (_ctx: CommandContext) => {}
-    }
+      args,
+      run: _ctx => {}
+    } satisfies Command<GunshiParams<{ args: typeof args }>>
+
     const command = define(options)
 
     /**
-     * Check that specified properties and types are preserved
+     * Check that specified properties and types are not inferred fully (it is not meant to be strictly typed, include `undefined`)
      */
 
     expect(command.name).toBe('deploy')
@@ -113,83 +116,92 @@ describe('define', async () => {
     expectTypeOf<typeof command.description>().toEqualTypeOf<string | undefined>()
 
     expect(command.args).toEqual({ env: { type: 'string', required: true } })
-    expectTypeOf<typeof command.args>().toEqualTypeOf<Args | undefined>()
+    expectTypeOf<typeof command.args>().toEqualTypeOf<typeof args | undefined>()
 
     /**
-     * Check that not specified optional properties are undefined
+     * Check that not specified optional properties are `undefined`
      */
     expectTypeOf<typeof command.examples>().toBeNullable()
   })
 })
 
-describe('defineWithExtensions', () => {
-  type MyExtensions = { logger: { log: (message: string) => void } }
+describe('defineWithTypes', () => {
+  test('args only', async () => {
+    const args = {
+      count: { type: 'number', required: true }
+    } satisfies Args
+    const command = defineWithTypes<{ args: typeof args }>()({
+      name: 'count',
+      args,
+      run: (ctx): string | void | Promise<string | void> => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
 
-  test('basic', async () => {
-    const commit = defineWithExtensions<MyExtensions>()({
-      name: 'commit',
-      description: 'Commit changes',
-      args: {
-        message: {
-          type: 'string',
-          required: true
-        }
-      },
-      run: ctx => {
-        // Infer `ctx.values`
-        expectTypeOf(ctx.values).toEqualTypeOf<{ message: string }>()
-        // Infer `ctx.extensions`
-        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
-
-        ctx.extensions.logger?.log(`Committing with message: ${ctx.values.message}`)
-
-        expect(ctx.values.message).toBe('first commit')
+        // Runtime check to satisfy test requirements
+        expect(typeof ctx.values.count).toBe('number')
+        expect(ctx.values.count).toBe(5)
       }
     })
 
-    await cli(['commit', '--message', 'first commit'], () => {}, {
-      subCommands: {
-        commit
-      }
-    })
-  })
-
-  test('preserves all specified command properties', () => {
-    const command = defineWithExtensions<MyExtensions>()({
-      name: 'complex',
-      description: 'Complex command',
-      args: {
-        flag: { type: 'boolean' as const },
-        value: { type: 'number' }
-      },
-      examples: 'complex --flag\ncomplex --value 42',
-      toKebab: false,
-      run: (_ctx): string | void | Promise<string | void> => 'done'
-    })
+    await cli(['count', '--count', '5'], command)
 
     /**
-     * Check that all specified properties and types are preserved
+     * Check that specified properties and types are preserved
      */
 
-    expect(command.name).toBe('complex')
+    expect(command.name).toBe('count')
     expectTypeOf<typeof command.name>().toEqualTypeOf<string>()
 
-    expect(command.description).toBe('Complex command')
-    expectTypeOf<typeof command.description>().toEqualTypeOf<string>()
+    expect(command.args).toEqual(args)
+    expectTypeOf<typeof command.args>().toEqualTypeOf<typeof args>()
 
-    const expectArgs = {
-      flag: { type: 'boolean' },
-      value: { type: 'number' }
-    } as const
+    expect(typeof command.run).toBe('function')
+    expectTypeOf<typeof command.run>().toEqualTypeOf<
+      CommandRunner<{
+        args: typeof args
+        extensions: {}
+      }>
+    >()
+
+    /**
+     * Check that not specified optional properties are undefined
+     */
+
+    expectTypeOf<typeof command.description>().toBeNullable()
+    expectTypeOf<typeof command.examples>().toBeNullable()
+  })
+
+  test('extensions only', async () => {
+    type MyExtensions = { logger: { log: (message: string) => void } }
+    const command = defineWithTypes<{ extensions: MyExtensions }>()({
+      name: 'count',
+      args: {
+        count: { type: 'number', required: true }
+      },
+      run: (ctx): string | void | Promise<string | void> => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
+        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
+
+        // Runtime check to satisfy test requirements
+        expect(typeof ctx.values.count).toBe('number')
+        expect(ctx.values.count).toBe(5)
+      }
+    })
+
+    await cli(['count', '--count', '5'], command)
+
+    /**
+     * Check that specified properties and types are preserved
+     */
+
+    expect(command.name).toBe('count')
+    expectTypeOf<typeof command.name>().toEqualTypeOf<string>()
+
+    const expectArgs = { count: { type: 'number', required: true } } as const
     type ExpectArgs = DeepWriteable<typeof expectArgs>
     expect(command.args).toEqual(expectArgs)
     expectTypeOf<typeof command.args>().toEqualTypeOf<ExpectArgs>()
-
-    expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
-    expectTypeOf<typeof command.examples>().toEqualTypeOf<string>()
-
-    expect(command.toKebab).toBe(false)
-    expectTypeOf<typeof command.toKebab>().toEqualTypeOf<false>()
 
     expect(typeof command.run).toBe('function')
     expectTypeOf<typeof command.run>().toEqualTypeOf<
@@ -200,55 +212,56 @@ describe('defineWithExtensions', () => {
     >()
 
     /**
-     * Check that all not specified optional properties are undefined
+     * Check that not specified optional properties are undefined
      */
 
-    expect(command.internal).toBeUndefined()
-    expectTypeOf<typeof command.internal>().toEqualTypeOf<boolean | undefined>()
-
-    expect(command.entry).toBeUndefined()
-    expectTypeOf<typeof command.entry>().toEqualTypeOf<boolean | undefined>()
-
-    expect(command.rendering).toBeUndefined()
-    expectTypeOf<typeof command.rendering>().toEqualTypeOf<
-      | RenderingOptions<{
-          args: ExpectArgs
-          extensions: MyExtensions
-        }>
-      | undefined
-    >()
+    expectTypeOf<typeof command.description>().toBeNullable()
+    expectTypeOf<typeof command.examples>().toBeNullable()
   })
 
-  test('pass parameters', async () => {
-    const options: Command = {
-      name: 'test',
-      description: 'A test command',
-      args: {
-        foo: {
-          type: 'string',
-          description: 'A string option'
-        }
-      },
-      run: (_ctx: CommandContext) => {}
-    }
-    const command = defineWithExtensions<MyExtensions>()(options)
+  test('args and extensions', async () => {
+    type MyExtensions = { logger: { log: (message: string) => void } }
+    const args = {
+      count: { type: 'number', required: true }
+    } satisfies Args
+    const command = defineWithTypes<{ args: typeof args; extensions: MyExtensions }>()({
+      name: 'count',
+      args,
+      run: (ctx): string | void | Promise<string | void> => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
+        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
+
+        // Runtime check to satisfy test requirements
+        expect(typeof ctx.values.count).toBe('number')
+        expect(ctx.values.count).toBe(5)
+      }
+    })
+
+    await cli(['count', '--count', '5'], command)
 
     /**
      * Check that specified properties and types are preserved
      */
 
-    expect(command.name).toBe('test')
-    expectTypeOf<typeof command.name>().toEqualTypeOf<string | undefined>()
+    expect(command.name).toBe('count')
+    expectTypeOf<typeof command.name>().toEqualTypeOf<string>()
 
-    expect(command.description).toBe('A test command')
-    expectTypeOf<typeof command.description>().toEqualTypeOf<string | undefined>()
+    expect(command.args).toEqual(args)
+    expectTypeOf<typeof command.args>().toEqualTypeOf<typeof args>()
 
-    expect(command.args).toEqual({ foo: { type: 'string', description: 'A string option' } })
-    expectTypeOf<typeof command.args>().toEqualTypeOf<Args | undefined>()
+    expect(typeof command.run).toBe('function')
+    expectTypeOf<typeof command.run>().toEqualTypeOf<
+      CommandRunner<{
+        args: typeof args
+        extensions: MyExtensions
+      }>
+    >()
 
     /**
      * Check that not specified optional properties are undefined
      */
+
+    expectTypeOf<typeof command.description>().toBeNullable()
     expectTypeOf<typeof command.examples>().toBeNullable()
   })
 })

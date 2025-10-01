@@ -1,4 +1,4 @@
-import { defineWithExtensions } from '@gunshi/definition'
+import { defineWithTypes } from '@gunshi/definition'
 import global, { pluginId as globalPluginId } from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
 import { describe, expect, test, vi } from 'vitest'
@@ -6,7 +6,7 @@ import { cli } from './index.ts'
 
 import type { GlobalExtension, PluginId } from '@gunshi/plugin-global'
 
-const entry = defineWithExtensions<Record<PluginId, GlobalExtension>>()({
+const entry = defineWithTypes<{ extensions: Record<PluginId, GlobalExtension> }>()({
   name: 'entry',
   args: {
     say: {

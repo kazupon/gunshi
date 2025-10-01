@@ -3,7 +3,7 @@
  *
  * This entry point exports the following APIs and types:
  * - `define`: A function to define a command.
- * - `defineWithExtensions`: A function to define a command with extensions.
+ * - `defineWithTypes`: A function to define a command with specific type parameters.
  * - `lazy`: A function to lazily load a command.
  * - `lazyWithExtensions`: A function to lazily load a command with extensions.
  * - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
@@ -63,6 +63,8 @@ export type {
 
 /**
  * Infer command properties excluding for {@link define} function
+ *
+ * @internal
  */
 type InferCommandProps<G extends GunshiParamsConstraint = DefaultGunshiParams> = Pick<
   Command<G>,
@@ -71,6 +73,8 @@ type InferCommandProps<G extends GunshiParamsConstraint = DefaultGunshiParams> =
 
 /**
  * The result type of the {@link define} function
+ *
+ * @internal
  */
 type CommandDefinitionResult<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
@@ -123,47 +127,29 @@ export function define<
  * @param definition - A {@link Command | command} definition
  * @returns A defined {@link Command | command}
  */
-export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  definition: Command<G>
-): Command<G> {
+export function define(
+  definition: any // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
+): any {
   return definition
 }
 
 /**
- * GunshiParams with specific Args and Extensions
+ * Define a {@link Command | command} with types
  *
- * @typeParam A - The {@link Args} type
- * @typeParam E - The {@link ExtendContext} type
- */
-type GunshiParamsWithExtensions<A extends Args, E extends ExtendContext> = {
-  args: A
-  extensions: E
-}
-
-/**
- * Return type for defineWithExtensions
- *
- * @typeParam E - The {@link ExtendContext} type
- */
-type DefineWithExtensionsReturn<E extends ExtendContext> = <
-  A extends Args,
-  C extends Partial<Command<GunshiParamsWithExtensions<A, E>>> = {}
->(
-  definition: C & Command<GunshiParamsWithExtensions<A, E>>
-) => CommandDefinitionResult<GunshiParamsWithExtensions<A, E>, C>
-
-/**
- * Define a {@link Command | command} with extensions type parameter.
- *
- * This helper function allows specifying the extensions type parameter
- * while inferring the args type from the definition.
+ * This helper function allows specifying the type parameter of {@link GunshiParams}
+ * while inferring the {@link Args} type, {@link ExtendContext} type from the definition.
  *
  * @example
  * ```ts
+ * // Define a command with specific extensions type
  * type MyExtensions = { logger: { log: (message: string) => void } }
  *
- * const command = defineWithExtensions<MyExtensions>()({
- *   args: { name: { type: 'string' } },
+ * const command = defineWithTypes<{ extensions: MyExtensions }>()({
+ *   name: 'greet',
+ *   args: {
+ *     name: { type: 'string' }
+ *   },
  *   run: ctx => {
  *     // ctx.values is inferred as { name?: string }
  *     // ctx.extensions is MyExtensions
@@ -171,20 +157,40 @@ type DefineWithExtensionsReturn<E extends ExtendContext> = <
  * })
  * ```
  *
- * @typeParam E - The extensions type
+ * @typeParam G - A {@link GunshiParams} type
  *
  * @returns A function that takes a command definition via {@link define}
  *
  * @since v0.27.0
  */
-export function defineWithExtensions<
-  E extends ExtendContext = never
->(): DefineWithExtensionsReturn<E> {
-  return <A extends Args, C extends Partial<Command<GunshiParamsWithExtensions<A, E>>> = {}>(
-    definition: C & Command<GunshiParamsWithExtensions<A, E>>
-  ): CommandDefinitionResult<GunshiParamsWithExtensions<A, E>, C> => {
-    return define(definition) as CommandDefinitionResult<GunshiParamsWithExtensions<A, E>, C>
+export function defineWithTypes<G extends GunshiParamsConstraint>() {
+  // Extract extensions from G, with proper defaults
+  type DefaultExtensions = ExtractExtensions<G>
+
+  return <
+    A extends Args,
+    C extends Partial<Command<{ args: A; extensions: DefaultExtensions }>> = {}
+  >(
+    definition: C & Command<{ args: A; extensions: DefaultExtensions }>
+  ): CommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C> => {
+    return define(definition) as CommandDefinitionResult<
+      { args: A; extensions: DefaultExtensions },
+      C
+    >
   }
+}
+
+/**
+ * GunshiParams with specific Args and Extensions
+ *
+ * @typeParam A - The {@link Args} type
+ * @typeParam E - The {@link ExtendContext} type
+ *
+ * @internal
+ */
+type GunshiParamsWithExtensions<A extends Args, E extends ExtendContext> = {
+  args: A
+  extensions: E
 }
 
 /**

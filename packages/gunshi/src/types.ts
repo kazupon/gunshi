@@ -69,8 +69,15 @@ export type DefaultGunshiParams = GunshiParams
  *
  * @since v0.27.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
-export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendContext }
+export type GunshiParamsConstraint =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
+  | GunshiParams<any>
+  | {
+      args: Args
+    }
+  | {
+      extensions: ExtendContext
+    }
 
 /**
  * Type helper to extract args
