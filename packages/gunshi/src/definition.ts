@@ -130,6 +130,29 @@ export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 }
 
 /**
+ * GunshiParams with specific Args and Extensions
+ *
+ * @typeParam A - The {@link Args} type
+ * @typeParam E - The {@link ExtendContext} type
+ */
+type GunshiParamsWithExtensions<A extends Args, E extends ExtendContext> = {
+  args: A
+  extensions: E
+}
+
+/**
+ * Return type for defineWithExtensions
+ *
+ * @typeParam E - The {@link ExtendContext} type
+ */
+type DefineWithExtensionsReturn<E extends ExtendContext> = <
+  A extends Args,
+  C extends Partial<Command<GunshiParamsWithExtensions<A, E>>> = {}
+>(
+  definition: C & Command<GunshiParamsWithExtensions<A, E>>
+) => CommandDefinitionResult<GunshiParamsWithExtensions<A, E>, C>
+
+/**
  * Define a {@link Command | command} with extensions type parameter.
  *
  * This helper function allows specifying the extensions type parameter
@@ -154,14 +177,14 @@ export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
  *
  * @since v0.27.0
  */
-export function defineWithExtensions<E extends ExtendContext = never>() {
-  return <
-    G extends GunshiParamsConstraint = DefaultGunshiParams,
-    A extends Args = ExtractArgs<G>,
-    C extends InferCommandProps<G> = InferCommandProps<G>
-  >(
-    definition: C & Command<{ args: A; extensions: E }>
-  ): CommandDefinitionResult<G, C> => define(definition) as CommandDefinitionResult<G, C>
+export function defineWithExtensions<
+  E extends ExtendContext = never
+>(): DefineWithExtensionsReturn<E> {
+  return <A extends Args, C extends Partial<Command<GunshiParamsWithExtensions<A, E>>> = {}>(
+    definition: C & Command<GunshiParamsWithExtensions<A, E>>
+  ): CommandDefinitionResult<GunshiParamsWithExtensions<A, E>, C> => {
+    return define(definition) as CommandDefinitionResult<GunshiParamsWithExtensions<A, E>, C>
+  }
 }
 
 /**
@@ -261,6 +284,21 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 }
 
 /**
+ * Return type for lazyWithExtensions
+ *
+ * @typeParam E - The {@link ExtendContext} type
+ */
+type LazyWithExtensionsReturn<E extends ExtendContext> = <
+  A extends Args,
+  D extends Partial<Command<GunshiParamsWithExtensions<A, E>>> = Partial<
+    Command<GunshiParamsWithExtensions<A, E>>
+  >
+>(
+  loader: CommandLoader<GunshiParamsWithExtensions<A, E>>,
+  definition?: D
+) => LazyCommand<GunshiParamsWithExtensions<A, E>, D>
+
+/**
  * Define a {@link LazyCommand | lazy command} with extensions type parameter.
  *
  * @typeParam E - The extensions type
@@ -269,15 +307,16 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
  *
  * @since v0.27.0
  */
-export function lazyWithExtensions<E extends ExtendContext = never>() {
+export function lazyWithExtensions<E extends ExtendContext = never>(): LazyWithExtensionsReturn<E> {
   return <
     A extends Args,
-    D extends Partial<Command<{ args: A; extensions: {} }>> = Partial<
-      Command<{ args: A; extensions: {} }>
+    D extends Partial<Command<GunshiParamsWithExtensions<A, E>>> = Partial<
+      Command<GunshiParamsWithExtensions<A, E>>
     >
   >(
-    loader: CommandLoader<{ args: A; extensions: E }>,
+    loader: CommandLoader<GunshiParamsWithExtensions<A, E>>,
     definition?: D
-  ): LazyCommand<{ args: A; extensions: E }, D> =>
-    lazy(loader, definition as D) as LazyCommand<{ args: A; extensions: E }, D>
+  ): LazyCommand<GunshiParamsWithExtensions<A, E>, D> => {
+    return lazy(loader, definition as D) as LazyCommand<GunshiParamsWithExtensions<A, E>, D>
+  }
 }

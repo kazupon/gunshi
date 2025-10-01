@@ -3,7 +3,7 @@ import { cli } from './cli.ts'
 import { define, defineWithExtensions, lazy, lazyWithExtensions } from './definition.ts'
 
 import type { DeepWriteable } from '../test/utils.ts'
-import type { Args, Command, CommandContext, CommandRunner } from './types.ts'
+import type { Args, Command, CommandContext, CommandRunner, RenderingOptions } from './types.ts'
 
 describe('define', async () => {
   test('basic', async () => {
@@ -88,7 +88,7 @@ describe('define', async () => {
     expectTypeOf<typeof command.entry>().toEqualTypeOf<boolean | undefined>()
 
     expect(command.rendering).toBeUndefined()
-    expectTypeOf<typeof command.rendering>().toEqualTypeOf<Command['rendering']>()
+    expectTypeOf<typeof command.rendering>().toEqualTypeOf<Command['rendering'] | undefined>()
   })
 
   test('pass parameters', () => {
@@ -210,7 +210,13 @@ describe('defineWithExtensions', () => {
     expectTypeOf<typeof command.entry>().toEqualTypeOf<boolean | undefined>()
 
     expect(command.rendering).toBeUndefined()
-    expectTypeOf<typeof command.rendering>().toEqualTypeOf<Command['rendering']>()
+    expectTypeOf<typeof command.rendering>().toEqualTypeOf<
+      | RenderingOptions<{
+          args: ExpectArgs
+          extensions: MyExtensions
+        }>
+      | undefined
+    >()
   })
 
   test('pass parameters', async () => {
