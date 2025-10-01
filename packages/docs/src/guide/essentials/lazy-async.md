@@ -30,7 +30,7 @@ The following code shows how to create a lazy-loaded command that only loads its
 import { cli, define, lazy } from 'gunshi'
 import type { CommandRunner, CommandContext } from 'gunshi'
 
-// Step 1: Define the command metadata separately
+// Define the command without command runner separately
 const helloDefinition = define({
   name: 'hello',
   description: 'A greeting command',
@@ -43,11 +43,11 @@ const helloDefinition = define({
   }
 })
 
-// Step 2: Create a loader function that returns the command implementation
+// Create a loader function that returns the command implementation
 const helloLoader = async (): Promise<CommandRunner> => {
-  console.log('Loading hello command...')
+  console.log('Loading hello command runner ...')
 
-  // The actual command logic is defined here
+  // The actual command runner logic is defined here
   const run = (ctx: CommandContext) => {
     console.log(`Hello, ${ctx.values.name}!`)
   }
@@ -55,14 +55,10 @@ const helloLoader = async (): Promise<CommandRunner> => {
   return run // Return the runner function
 }
 
-// Step 3: Combine them using the lazy helper
+// Combine them using the lazy helper
 const lazyHello = lazy(helloLoader, helloDefinition)
 
-if (!lazyHello.commandName) {
-  throw new Error('Command name is required')
-}
-
-// Step 4: Use the lazy command in your CLI
+// Use the lazy command in your CLI
 const subCommands = {
   [lazyHello.commandName]: lazyHello
 }
@@ -86,28 +82,6 @@ In this example, when a user runs `npx tsx cli.ts --help`, Gunshi displays help 
 The `helloLoader` function is never called.
 
 Only when the user runs `npx tsx cli.ts hello` does Gunshi execute the loader and run the command.
-
-> [!NOTE]
-> The `commandName` property on `LazyCommand` can be `undefined` at the TypeScript type level, which is why the example includes a runtime check at lines 55-57. This happens because the `lazy()` function accepts an optional definition parameter - when omitted, there's no guaranteed command name.
->
-> If you're certain the command name exists (i.e., you passed a definition with a `name` property), you can use TypeScript's non-null assertion operator (`!`) to bypass this check:
->
-> ```ts
-> // With runtime check (safer)
-> if (!lazyHello.commandName) {
->   throw new Error('Command name is required')
-> }
-> const subCommands = {
->   [lazyHello.commandName]: lazyHello
-> }
->
-> // With non-null assertion (when you're certain)
-> const subCommands = {
->   [lazyHello.commandName!]: lazyHello // Note the ! operator
-> }
-> ```
->
-> The runtime check approach is recommended when the command definition might come from dynamic sources or when you want extra safety. Use the assertion operator when you've explicitly defined the command name in your code.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
@@ -174,10 +148,9 @@ const deployLoader = async (): Promise<CommandRunner> => {
 const lazyDeploy = lazy(deployLoader, deployDefinition)
 
 // Register all lazy commands
-// Using ! operator since we provided definitions with names
 const subCommands = {
-  [lazyBuild.commandName!]: lazyBuild,
-  [lazyDeploy.commandName!]: lazyDeploy
+  [lazyBuild.commandName]: lazyBuild,
+  [lazyDeploy.commandName]: lazyDeploy
 }
 
 await cli(
@@ -205,15 +178,15 @@ await cli(
 >
 > - Use `.js` extensions in your source code: `await import('./commands/build.js')`
 > - These `.js` imports will correctly resolve to the compiled JavaScript files
-> - Alternatively, configure your bundler (webpack, rollup, esbuild) to handle `.ts` extensions
+> - Alternatively, configure your bundler (rolldown, rollup, esbuild, webpack) to handle `.ts` extensions
 >
-> For standard JavaScript projects, always use `.js` extensions:
+> For standard JavaScript projects, use `.js` extensions:
 >
 > ```ts
 > const { run } = await import('./commands/build.js')
 > ```
 
-With this approach, your bundler (rollup, esbuild, webpack, etc.) will automatically create separate chunks for `./commands/build.ts` and `./commands/deploy.ts`. Users only download and parse the code for commands they actually use.
+With this approach, your bundler (rolldown, rollup, esbuild, webpack, etc.) will automatically create separate chunks for `./commands/build.ts` and `./commands/deploy.ts`. Users only download and parse the code for commands they actually use.
 
 > [!NOTE]
 > On Node.js v23.6.0 and newer, type stripping is enabled by default so erasable TypeScript runs without flags; transformations (e.g., `enum`) still require `--experimental-transform-types`.
@@ -281,16 +254,11 @@ const processDataDefinition = define({
   }
 })
 
-// Extract the args type from the definition
-type ProcessDataArgs = NonNullable<typeof processDataDefinition.args>
-
 const processDataLoader = async (): Promise<
-  CommandRunner<GunshiParams<{ args: ProcessDataArgs }>>
+  CommandRunner<GunshiParams<{ args: typeof processDataDefinition.args }>>
 > => {
   // Return an async runner function
-  const run = async (
-    ctx: CommandContext<GunshiParams<{ args: ProcessDataArgs }>>
-  ): Promise<void> => {
+  return async ctx => {
     // TypeScript knows ctx.values has 'input' (string) and 'output' (string)
     const { input, output } = ctx.values
 
@@ -303,16 +271,13 @@ const processDataLoader = async (): Promise<
 
     console.log(`Successfully processed to ${output}`)
   }
-
-  return run
 }
 
 const lazyProcess = lazy(processDataLoader, processDataDefinition)
 
 // The CLI handles async execution automatically
-// Using ! operator since we provided a definition with name
 const subCommands = {
-  [lazyProcess.commandName!]: lazyProcess
+  [lazyProcess.commandName]: lazyProcess
 }
 
 await cli(
@@ -334,8 +299,6 @@ Gunshi automatically handles the asynchronous execution, including proper error 
 You don't need any special configuration—just return an async function from your loader.
 
 ## Alternative Loader Return Types
-
-<!-- TODO(kazupon): gunshiにバグがあるので治す -->
 
 While the examples above show loaders returning runner functions, loaders can also return full Command objects.
 
@@ -365,18 +328,16 @@ const configLoader = async () => {
   })
 }
 
-const lazyConfig = lazy(configLoader, {
+// Override command meta info with 2nd parameters
+const config = lazy(configLoader, {
   name: 'config',
   description: 'Dynamically configured command'
 })
 
-// Use in CLI
-const subCommands = { [lazyConfig.commandName!]: lazyConfig }
-
 await cli(
   process.argv.slice(2),
   { description: 'CLI with dynamic commands', run: () => {} },
-  { name: 'my-cli', version: '1.0.0', subCommands }
+  { name: 'my-cli', version: '1.0.0', subCommands: { config } }
 )
 ```
 
