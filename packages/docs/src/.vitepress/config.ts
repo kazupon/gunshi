@@ -140,7 +140,7 @@ export default withMermaid({
           ? {
               debug: path.resolve(
                 __dirname,
-                '../../../../node_modules/.pnpm/debug@4.4.1/node_modules/debug/src/browser.js'
+                '../../../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js'
               ),
               '@braintree/sanitize-url': path.resolve(
                 __dirname,
