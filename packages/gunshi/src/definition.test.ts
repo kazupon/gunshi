@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
-import { define, defineWithTypes, lazy, lazyWithExtensions } from './definition.ts'
+import { define, defineWithTypes, lazy, lazyWithTypes } from './definition.ts'
 
 import type { DeepWriteable } from '../test/utils.ts'
 import type { Args, Command, CommandRunner, GunshiParams } from './types.ts'
@@ -350,48 +350,126 @@ describe('lazy', () => {
   })
 })
 
-test('lazyWithExtensions', async () => {
-  type AuthExt = {
-    auth: {
-      authenticated: boolean
-    }
-  }
+describe('lazyWithTypes', () => {
+  test('args only', async () => {
+    const args = {
+      foo: { type: 'string' }
+    } satisfies Args
 
-  const deploy = define({
-    name: 'deploy',
-    description: 'Deploy application',
-    args: {
-      env: { type: 'string', required: true }
-    }
-  })
-
-  const mock = vi.fn()
-  const lazyDeploy = lazyWithExtensions<AuthExt>()(
-    (): CommandRunner<{ args: typeof deploy.args; extensions: AuthExt }> => {
-      return ctx => {
-        expectTypeOf(ctx.values).toEqualTypeOf<{ env: string }>()
-        expectTypeOf(ctx.extensions.auth?.authenticated).toEqualTypeOf<boolean>()
-        mock(ctx.values.env)
-        return 'deployed'
+    const lazyCmd = lazyWithTypes<{ args: typeof args }>()(
+      () => {
+        return ctx => {
+          expectTypeOf(ctx.values).toEqualTypeOf<{ foo?: string | undefined }>()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+          expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
+        }
+      },
+      {
+        name: 'lazy-test',
+        description: 'Test lazy command',
+        args
       }
-    },
-    deploy
-  )
+    )
 
-  expect(lazyDeploy.commandName).toBe(deploy.name)
-  expectTypeOf<typeof lazyDeploy.commandName>().toEqualTypeOf<string>()
+    /**
+     * Check that specified properties and types are preserved
+     */
 
-  expect(lazyDeploy.description).toBe(deploy.description)
-  expectTypeOf<typeof lazyDeploy.description>().toEqualTypeOf<string>()
+    expect(lazyCmd.commandName).toBe('lazy-test')
+    expectTypeOf<typeof lazyCmd.commandName>().toEqualTypeOf<string>()
 
-  expect(lazyDeploy.args).toEqual(deploy.args)
-  expectTypeOf<typeof lazyDeploy.args>().toEqualTypeOf<typeof deploy.args>()
+    expect(lazyCmd.description).toBe('Test lazy command')
+    expectTypeOf<typeof lazyCmd.description>().toEqualTypeOf<string>()
 
-  await cli(['deploy', '--env', 'production'], () => {}, {
-    subCommands: {
-      deploy: lazyDeploy
-    }
+    expect(lazyCmd.args).toEqual(args)
+    expectTypeOf<typeof lazyCmd.args>().toEqualTypeOf<typeof args>()
+
+    /**
+     * Check that not specified optional properties are `undefined`
+     */
+
+    expectTypeOf<typeof lazyCmd.examples>().toBeNullable()
   })
 
-  expect(mock).toHaveBeenCalledWith('production')
+  test('extensions only', async () => {
+    type MyExtensions = { logger: { log: (message: string) => void } }
+    const args = {
+      opt: { type: 'string' }
+    } satisfies Args
+
+    const lazyCmd = lazyWithTypes<{ extensions: MyExtensions }>()(
+      () => {
+        return ctx => {
+          expectTypeOf(ctx.values).toEqualTypeOf<{
+            [x: string]: string | number | boolean | undefined
+          }>()
+          expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
+        }
+      },
+      {
+        name: 'lazy-test',
+        description: 'Test lazy command',
+        args
+      }
+    )
+
+    /**
+     * Check that specified properties and types are preserved
+     */
+
+    expect(lazyCmd.commandName).toBe('lazy-test')
+    expectTypeOf<typeof lazyCmd.commandName>().toEqualTypeOf<string>()
+
+    expect(lazyCmd.description).toBe('Test lazy command')
+    expectTypeOf<typeof lazyCmd.description>().toEqualTypeOf<string>()
+
+    expect(lazyCmd.args).toEqual(args)
+    expectTypeOf<typeof lazyCmd.args>().toEqualTypeOf<typeof args>()
+
+    /**
+     * Check that not specified optional properties are `undefined`
+     */
+
+    expectTypeOf<typeof lazyCmd.examples>().toBeNullable()
+  })
+
+  test('args and extensions', async () => {
+    type MyExtensions = { logger: { log: (message: string) => void } }
+    const args = {
+      opt: { type: 'string' }
+    } satisfies Args
+
+    const lazyCmd = lazyWithTypes<{ args: typeof args; extensions: MyExtensions }>()(
+      () => {
+        return ctx => {
+          expectTypeOf(ctx.values).toEqualTypeOf<{ opt?: string | undefined }>()
+          expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
+        }
+      },
+      {
+        name: 'lazy-test',
+        description: 'Test lazy command',
+        args
+      }
+    )
+
+    /**
+     * Check that specified properties and types are preserved
+     */
+
+    expect(lazyCmd.commandName).toBe('lazy-test')
+    expectTypeOf<typeof lazyCmd.commandName>().toEqualTypeOf<string>()
+
+    expect(lazyCmd.description).toBe('Test lazy command')
+    expectTypeOf<typeof lazyCmd.description>().toEqualTypeOf<string>()
+
+    expect(lazyCmd.args).toEqual(args)
+    expectTypeOf<typeof lazyCmd.args>().toEqualTypeOf<typeof args>()
+
+    /**
+     * Check that not specified optional properties are `undefined`
+     */
+
+    expectTypeOf<typeof lazyCmd.examples>().toBeNullable()
+  })
 })

@@ -86,8 +86,15 @@ export type GunshiParamsConstraint =
  *
  * @internal
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
-export type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
+export type ExtractArgs<G> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
+  G extends GunshiParams<any>
+    ? G['args']
+    : G extends {
+          args: infer A extends Args
+        }
+      ? A
+      : Args
 
 /**
  * Type helper to extract explicitly provided argument flags.
