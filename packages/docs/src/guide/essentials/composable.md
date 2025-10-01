@@ -207,7 +207,7 @@ export default define({
 ### Entry Point
 
 > [!NOTE]
-> Some code examples in this guide include TypeScript file extensions (`.ts`) in import/export statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+> Some code examples in this guide include TypeScript file extensions (`.ts`) in import/export statements. If you use this pattern in your application, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
 
 ```ts [cli.ts]
 import { cli } from 'gunshi'

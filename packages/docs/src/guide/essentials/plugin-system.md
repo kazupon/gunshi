@@ -281,7 +281,7 @@ deploy-cli dep<TAB>  # Completes to: deploy-cli deploy
 ```
 
 > [!TIP]
-> For detailed setup instructions for all supported shells (Bash, Zsh, Fish, PowerShell), including directory creation and configuration steps, see the [@gunshi/plugin-completion README](https://github.com/gunshi/gunshi/tree/main/packages/plugin-completion#shell-completion-setup).
+> For detailed setup instructions for all supported shells (Bash, Zsh, Fish, PowerShell), including directory creation and configuration steps, see the [@gunshi/plugin-completion README](https://github.com/kazupon/gunshi/tree/main/packages/plugin-completion#shell-completion-setup).
 
 #### How It Works
 
