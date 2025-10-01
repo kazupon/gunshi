@@ -40,6 +40,7 @@ import type {
   Command,
   CommandLoader,
   DefaultGunshiParams,
+  ExtendContext,
   ExtractArgs,
   ExtractExtensions,
   GunshiParams,
@@ -135,6 +136,20 @@ export function define(
 }
 
 /**
+ * Return type for defineWithTypes
+ *
+ * @typeParam DefaultExtensions - The {@link ExtendContext} type extracted from G
+ *
+ * @internal
+ */
+type DefineWithTypesReturn<DefaultExtensions extends ExtendContext> = <
+  A extends Args,
+  C extends Partial<Command<{ args: A; extensions: DefaultExtensions }>> = {}
+>(
+  definition: C & Command<{ args: A; extensions: DefaultExtensions }>
+) => CommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C>
+
+/**
  * Define a {@link Command | command} with types
  *
  * This helper function allows specifying the type parameter of {@link GunshiParams}
@@ -163,7 +178,9 @@ export function define(
  *
  * @since v0.27.0
  */
-export function defineWithTypes<G extends GunshiParamsConstraint>() {
+export function defineWithTypes<G extends GunshiParamsConstraint>(): DefineWithTypesReturn<
+  ExtractExtensions<G>
+> {
   // Extract extensions from G, with proper defaults
   type DefaultExtensions = ExtractExtensions<G>
 
@@ -204,7 +221,7 @@ export function lazy<A extends Args>(
  * @example
  * ```ts
  * // define command without command runner
- * const test = define({
+ * const testDefinition = define({
  *   name: 'test',
  *   description: 'Test command',
  *   args: {
@@ -217,13 +234,13 @@ export function lazy<A extends Args>(
  * })
  *
  * // define load command with command runner and defined command
- * const lazyTest = lazy((): CommandRunner<{ args: typeof test.args; extensions: {} }> => {
+ * const test = lazy((): CommandRunner<{ args: typeof testDefinition.args; extensions: {} }> => {
  *   return ctx => {
  *     if (ctx.values.debug) {
  *       console.debug('Debug mode is enabled');
  *     }
  *   }
- * }, test)
+ * }, testDefinition)
  * ```
  *
  * @typeParam A - An {@link Args} type
@@ -277,10 +294,65 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 }
 
 /**
+ * Normalize G to a full GunshiParams type
+ *
+ * @typeParam G - A {@link GunshiParamsConstraint} type
+ *
+ * @internal
+ */
+type NormalizeGunshiParams<G extends GunshiParamsConstraint> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for type inference
+  G extends GunshiParams<any>
+    ? G
+    : G extends { args: infer A; extensions: infer E }
+      ? { args: A; extensions: E }
+      : G extends { args: infer A }
+        ? { args: A; extensions: {} }
+        : G extends { extensions: infer E }
+          ? { args: Args; extensions: E }
+          : DefaultGunshiParams
+
+/**
+ * Return type for lazyWithTypes
+ *
+ * @typeParam FullG - The normalized {@link GunshiParams} type
+ *
+ * @internal
+ */
+type LazyWithTypesReturn<FullG extends GunshiParamsConstraint> = <
+  D extends Partial<Command<FullG>> = {}
+>(
+  loader: CommandLoader<FullG>,
+  definition?: D
+) => LazyCommand<FullG, D>
+
+/**
  * Define a {@link LazyCommand | lazy command} with specific type parameters.
  *
  * This helper function allows specifying the type parameter of {@link GunshiParams}
  * while inferring the {@link Args} type, {@link ExtendContext} type from the definition.
+ *
+ * @example
+ * ```ts
+ * type MyExtensions = { logger: { log: (message: string) => void } }
+ *
+ * const command = lazyWithTypes<{ extensions: MyExtensions }>()(
+ *   () => {
+ *     return ctx => {
+ *       // Command runner implementation
+ *       ctx.extensions.logger?.log('Command executed')
+ *   },
+ *  {
+ *   name: 'lazy-command',
+ *   args: {
+ *     opt: {
+ *       type: 'string',
+ *       description: 'An optional string argument',
+ *       required: false,
+ *     },
+ *   },
+ * )
+ * ```
  *
  * @typeParam G - A {@link GunshiParams} type
  *
@@ -288,25 +360,17 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
  *
  * @since v0.27.0
  */
-export function lazyWithTypes<G extends GunshiParamsConstraint>() {
+export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypesReturn<
+  NormalizeGunshiParams<G>
+> {
   // Helper type to normalize G to a full GunshiParams type
-  type FullG =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for type inference
-    G extends GunshiParams<any>
-      ? G
-      : G extends { args: infer A; extensions: infer E }
-        ? { args: A; extensions: E }
-        : G extends { args: infer A }
-          ? { args: A; extensions: {} }
-          : G extends { extensions: infer E }
-            ? { args: Args; extensions: E }
-            : DefaultGunshiParams
+  type FullGunshiParams = NormalizeGunshiParams<G>
 
-  return <D extends Partial<Command<FullG>> = {}>(
-    loader: CommandLoader<FullG>,
+  return <D extends Partial<Command<FullGunshiParams>> = {}>(
+    loader: CommandLoader<FullGunshiParams>,
     definition?: D
-  ): LazyCommand<FullG, D> => {
+  ): LazyCommand<FullGunshiParams, D> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for type casting
-    return lazy(loader as any, definition as any) as LazyCommand<FullG, D>
+    return lazy(loader as any, definition as any) as LazyCommand<FullGunshiParams, D>
   }
 }
