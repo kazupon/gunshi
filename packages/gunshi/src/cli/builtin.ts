@@ -16,8 +16,23 @@ import type {
   DefaultGunshiParams,
   ExtendContext,
   GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand
 } from '../types.ts'
+
+/**
+ * Run the command.
+ *
+ * @param args - Command line arguments
+ * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options - A {@link CliOptions | CLI options}
+ * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
+ */
+export async function cli<G extends GunshiParamsConstraint>(
+  args: string[],
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  options?: CliOptions<G>
+): Promise<string | undefined>
 
 /**
  * Run the command.
