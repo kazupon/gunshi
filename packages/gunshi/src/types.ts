@@ -36,6 +36,7 @@ export type ExtendContext = Record<string, unknown>
  *
  * @since v0.27.0
  */
+// #region snippet
 export interface GunshiParams<
   P extends {
     args?: Args
@@ -54,6 +55,7 @@ export interface GunshiParams<
    */
   extensions: P extends { extensions: infer E extends ExtendContext } ? E : {}
 }
+// #endregion snippet
 
 /**
  * Default Gunshi parameters.

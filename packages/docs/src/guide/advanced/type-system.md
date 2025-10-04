@@ -6,6 +6,9 @@ This enhancement brings TypeScript's full type-checking capabilities to your CLI
 
 This guide focuses on type safety for command definitions and their arguments. If you're creating custom plugins and need to understand the `plugin` function's type system, refer to the [Plugin Type System](../plugin/type-system.md) guide.
 
+> [!NOTE]
+> Some code examples in this guide include TypeScript file extensions (`.ts`) in `import`/`export` statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+
 ## Overview of v0.27 Type System
 
 The v0.27 release provides comprehensive type safety through:
@@ -18,7 +21,7 @@ The v0.27 release provides comprehensive type safety through:
 
 ## Understanding `GunshiParams`
 
-`GunshiParams` is the core type that unifies type safety for command arguments and plugin extensions. At its simplest, it ensures that your command context has properly typed `values` (from args) and `extensions` (from plugins).
+`GunshiParams` is the core type that provides type safety for command arguments and plugin extensions. At its simplest, it ensures that your command context has properly typed `values` (from args) and `extensions` (from plugins).
 
 Before diving into the implementation details, let's start with a simple example that demonstrates how `GunshiParams` provides type safety for command arguments:
 
@@ -37,38 +40,29 @@ type FullParams = GunshiParams<{
 
 The actual type definition uses TypeScript's conditional types to provide flexibility:
 
-```ts
-interface GunshiParams<
-  P extends {
-    args?: Args
-    extensions?: ExtendContext
-  } = {
-    args: Args
-    extensions: {}
-  }
-> {
-  args: P extends { args: infer A extends Args } ? A : Args
-  extensions: P extends { extensions: infer E extends ExtendContext } ? E : {}
-}
-```
+<<< ../../../../gunshi/src/types.ts#snippet
 
 ## Core Functions: `define` and `lazy`
 
 ### The `define` Function
 
-The `define` function is the primary way to create commands in Gunshi. It provides excellent type inference for command arguments without requiring any explicit type parameters:
+The `define` function is the primary way to create commands in Gunshi. For most use cases, the basic usage with automatic type inference is sufficient. Advanced usage with type parameters is useful when you need explicit type control or are working with complex type definitions.
+
+#### Basic Usage
+
+When your command doesn't use plugin extensions, `define` provides excellent automatic type inference:
 
 ```ts
 import { define } from 'gunshi'
 
 // Standard command definition with automatic type inference
-const serverCommand = define({
+export const serverCommand = define({
   name: 'server',
   description: 'Start the development server',
   args: {
     port: { type: 'number', default: 3000 },
     host: { type: 'string', default: 'localhost' },
-    verbose: { type: 'boolean', short: 'v' }
+    verbose: { type: 'boolean', short: 'V' }
   },
   run: ctx => {
     // ctx.values is automatically inferred as { port?: number; host?: string; verbose?: boolean }
@@ -82,23 +76,22 @@ const serverCommand = define({
 })
 ```
 
+The basic usage covers most scenarios where you're defining commands with inline arguments and don't need to share type definitions across multiple commands.
+
 #### Advanced Usage with Type Parameters
 
-When you need explicit type control, `define` also accepts a `GunshiParams` type parameter:
+When you need explicit type control or are working with pre-defined argument configurations, `define` accepts `GunshiParams` compatible type parameter:
 
-```ts
-import { define, type GunshiParams } from 'gunshi'
+```ts [commands/server.ts]
+import { define } from 'gunshi'
 
 // Define args separately
-const serverArgs = {
-  port: { type: 'number' as const, default: 3000 },
-  host: { type: 'string' as const, default: 'localhost' }
+export const serverArgs = {
+  port: { type: 'number', default: 3000 },
+  host: { type: 'string', default: 'localhost' }
 } as const
 
-// Use type parameter for explicit type control
-type ServerParams = GunshiParams<{ args: typeof serverArgs }>
-
-const serverCommand = define<ServerParams>({
+export const serverCommand = define<{ args: typeof serverArgs }>({
   name: 'server',
   args: serverArgs,
   run: ctx => {
@@ -108,18 +101,24 @@ const serverCommand = define<ServerParams>({
 })
 ```
 
+This advanced approach is particularly useful when you want to reuse argument definitions across multiple commands or need to export types for use in other modules.
+
 ### The `lazy` Function
 
-The `lazy` function enables code-splitting while maintaining type safety. Like `define`, it provides automatic type inference for arguments:
+The `lazy` function enables code-splitting while maintaining type safety. Like `define`, it works well with automatic type inference for most cases. Advanced usage provides explicit type control when needed.
 
-```ts
+#### Basic Usage
+
+For commands without plugin extensions, `lazy` automatically infers types from your definition:
+
+```js
 import { lazy } from 'gunshi'
 
 // Lazy-loaded command with automatic type inference
-const buildCommand = lazy(
+export const buildCommand = lazy(
   async () => {
     // Heavy dependencies can be loaded here when needed
-    const { buildProject } = await import('./build-utils')
+    const { build } = await import('./build.js')
 
     return async ctx => {
       // ctx.values is automatically inferred from args definition below
@@ -130,7 +129,7 @@ const buildCommand = lazy(
         console.log('Minification enabled')
       }
 
-      return buildProject({ target, minify })
+      return build({ target, minify })
     }
   },
   {
@@ -144,28 +143,33 @@ const buildCommand = lazy(
 )
 ```
 
-#### Advanced Usage with Type Parameters
+This basic usage is ideal for most lazy-loaded commands where you want to defer loading dependencies until the command is actually executed.
 
-For explicit type control with lazy loading:
+#### Advanced Usage with Pre-defined Arguments
 
-```ts
-import { lazy, type GunshiParams, type CommandRunner } from 'gunshi'
+When working with pre-defined argument configurations or when you need to explicitly type your command runner, you can structure your lazy command as follows:
 
-const buildArgs = {
-  target: { type: 'string' as const, required: true },
-  minify: { type: 'boolean' as const, default: false }
+```ts [commands/build.ts]
+import { lazy } from 'gunshi'
+
+// Pre-defined arguments
+export const buildArgs = {
+  target: { type: 'enum', required: true, choices: ['dev', 'prod'] },
+  minify: { type: 'boolean', default: false }
 } as const
 
-type BuildParams = GunshiParams<{ args: typeof buildArgs }>
-
-const buildCommand = lazy<BuildParams>(
+// Create the lazy command with explicit typing
+export const buildCommand = lazy<{ args: typeof buildArgs }>(
   async () => {
-    const runner: CommandRunner<BuildParams> = async ctx => {
+    // Heavy dependencies can be loaded here when needed
+    const { bundle } = await import('./utils.ts')
+
+    return async ctx => {
+      // Inference of args values
       const { target, minify } = ctx.values
       // Implementation
-      return { success: true, target }
+      return bundle({ target, minify })
     }
-    return runner
   },
   {
     name: 'build',
@@ -204,29 +208,23 @@ When your command needs to use plugin extensions, use these specialized function
 
 Use `defineWithTypes` when your command needs plugin extensions. It uses a currying approach where you specify the extensions type, and args are automatically inferred:
 
-```ts
+```ts [commands/server.ts]
 import { defineWithTypes } from 'gunshi'
+import type { AuthExtension } from '../plugin.ts'
 
 // Define your extensions type
 type ServerExtensions = {
-  logger: {
-    log: (msg: string) => void
-    error: (msg: string) => void
-  }
-  auth: {
-    isAuthenticated: () => boolean
-    getUser: () => { id: string; name: string }
-  }
+  auth: AuthExtension
 }
 
 // Use defineWithTypes - specify only extensions, args are inferred!
-const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()({
+export const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()({
   name: 'server',
   description: 'Start the development server',
   args: {
     port: { type: 'number', default: 3000 },
     host: { type: 'string', default: 'localhost' },
-    verbose: { type: 'boolean', short: 'v' }
+    verbose: { type: 'boolean', short: 'V' }
   },
   run: ctx => {
     // ctx.values is automatically inferred as { port?: number; host?: string; verbose?: boolean }
@@ -235,15 +233,14 @@ const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()({
     // ctx.extensions is typed as ServerExtensions
     // Optional chaining (?.) is used because plugins may not be installed
     if (!ctx.extensions.auth?.isAuthenticated()) {
-      ctx.extensions.logger?.error('Authentication required')
       throw new Error('Please login first')
     }
 
-    const user = ctx.extensions.auth.getUser()
-    ctx.extensions.logger?.log(`Server started by ${user.name} on ${host}:${port}`)
+    const user = ctx.extensions.auth?.getUser()
+    console.log(`Server started by ${user.name} on ${host}:${port}`)
 
     if (verbose) {
-      ctx.extensions.logger?.log('Verbose mode enabled')
+      console.log('Verbose mode enabled')
     }
   }
 })
@@ -270,8 +267,8 @@ const cmd1 = defineWithTypes<{ extensions: MyExtensions }>()({
 // Your args are defined in a variable, not inline in the define function.
 // Pre-defined args variables need explicit type specification for proper inference
 const myArgs = {
-  port: { type: 'number' as const },
-  host: { type: 'string' as const }
+  port: { type: 'number' },
+  host: { type: 'string' }
 } as const
 
 const cmd2 = defineWithTypes<{ args: typeof myArgs }>()({
@@ -302,23 +299,28 @@ const cmd3 = defineWithTypes<{
 
 The `lazyWithTypes` function maintains type safety for lazy-loaded commands that use plugin extensions:
 
-```ts
+```ts [commands/build.ts]
 import { lazyWithTypes } from 'gunshi'
-import type { CommandRunner } from 'gunshi'
+import type { LoggerExtension } from '../plugin.ts'
+
+export const buildArgs = {
+  target: { type: 'enum', required: true, choices: ['dev', 'prod'] },
+  minify: { type: 'boolean', default: false }
+} as const
 
 // Define extensions for the command
 type BuildExtensions = {
-  logger: {
-    log: (msg: string) => void
-    warn: (msg: string) => void
-  }
+  logger: LoggerExtension
 }
 
 // Use lazyWithTypes with extensions - args are automatically inferred
-const lazyBuildCommand = lazyWithTypes<{ extensions: BuildExtensions }>()(
+export const buildCommand = lazyWithTypes<{
+  args: typeof buildArgs
+  extensions: BuildExtensions
+}>()(
   async () => {
     // Heavy dependencies can be loaded here when needed
-    const runner: CommandRunner<{ extensions: BuildExtensions }> = async ctx => {
+    return async ctx => {
       // ctx.values is automatically inferred from args definition below
       const { target, minify } = ctx.values
 
@@ -328,20 +330,12 @@ const lazyBuildCommand = lazyWithTypes<{ extensions: BuildExtensions }>()(
       if (minify) {
         ctx.extensions.logger?.log('Minification enabled')
       }
-
-      // Your command logic here
-      return { success: true, target }
     }
-
-    return runner
   },
   {
     name: 'build',
     description: 'Build the project',
-    args: {
-      target: { type: 'string', required: true, choices: ['dev', 'prod'] },
-      minify: { type: 'boolean', default: false }
-    }
+    args: buildArgs
   }
 )
 ```
@@ -365,35 +359,28 @@ lazyWithTypes<{ args: typeof buildArgs; extensions: BuildExtensions }>()( ... )
 
 The `cli` function provides type safety for your entry command. The type parameter defines the type for the entry command's context, determining the types of `ctx.values` and `ctx.extensions` that the entry command's runner function receives:
 
-```ts
+```ts [cli.ts]
 import { cli } from 'gunshi'
-import logger from '@your-gunshi/plugin-logger'
+import logger from './plugin.ts'
 
-import type { GunshiParams } from 'gunshi'
-import type { LoggerExtension } from '@your-gunshi/plugin-logger'
+import type { LoggerExtension } from './plugin.ts'
 
-// Entry command type definition with extensions
-type EntryParams = GunshiParams<{
-  args: {
-    verbose: { type: 'boolean'; short: 'v' }
-    output: { type: 'string'; default: 'json' }
-  }
-  extensions: {
-    logger: LoggerExtension
-  }
-}>
+const entryArgs = {
+  verbose: { type: 'boolean', short: 'V' },
+  output: { type: 'string', default: 'json' }
+} as const
 
-await cli<EntryParams>(
+// `cli` function with type-safe `args` and `extensions`
+await cli<{ args: typeof entryArgs; extensions: { logger: LoggerExtension } }>(
   process.argv.slice(2),
   {
     name: 'main',
     description: 'CLI with type-safe extensions',
-    args: {
-      verbose: { type: 'boolean', short: 'v' },
-      output: { type: 'string', default: 'json' }
-    },
+    args: entryArgs,
     run: async ctx => {
-      ctx.extensions.logger?.log('Processing...', ctx.values.verbose)
+      if (ctx.values.verbose) {
+        ctx.extensions.logger?.log(`Processing in verbose mode...`)
+      }
       console.log(`Output format: ${ctx.values.output}`)
     }
   },
@@ -403,55 +390,6 @@ await cli<EntryParams>(
     plugins: [logger()]
   }
 )
-```
-
-## Using Plugin Extensions in Commands
-
-When using plugins in your commands, leverage `defineWithTypes` for type-safe access to plugin extensions:
-
-```ts
-import { defineWithTypes } from 'gunshi'
-import type { FileSystemExtension } from './plugins/filesystem'
-import type { ValidationExtension } from './plugins/validation'
-
-// Define extensions type
-type SyncExtensions = {
-  fs: FileSystemExtension
-  validator: ValidationExtension
-}
-
-// Use defineWithTypes - args are inferred from definition
-const syncCommand = defineWithTypes<{ extensions: SyncExtensions }>()({
-  name: 'sync',
-  description: 'Synchronize files between directories',
-  args: {
-    source: { type: 'string', required: true },
-    destination: { type: 'string', required: true },
-    dryRun: { type: 'boolean', default: false }
-  },
-  run: async ctx => {
-    // ctx.values is automatically inferred
-    // Validate paths and permissions
-    const canWrite = await ctx.extensions.validator?.hasWritePermission(ctx.values.destination)
-    if (!canWrite) {
-      throw new Error(`No write permission for ${ctx.values.destination}`)
-    }
-
-    // Perform file synchronization with type safety
-    const files = await ctx.extensions.fs?.listFiles(ctx.values.source)
-    const changes = await ctx.extensions.fs?.compareDirectories(
-      ctx.values.source,
-      ctx.values.destination
-    )
-
-    if (ctx.values.dryRun) {
-      console.log('Dry run - no changes made:', changes)
-    } else {
-      const result = await ctx.extensions.fs?.sync(ctx.values.source, ctx.values.destination)
-      console.log('Sync complete:', result)
-    }
-  }
-})
 ```
 
 ## Combining Multiple Plugin Types
@@ -499,57 +437,53 @@ Finally, use `defineWithTypes` to create a command that can access all the combi
 
 ```ts
 // Use defineWithTypes with combined extensions
-const internationalCommand = defineWithTypes<{ extensions: CombinedExtensions }>()({
+export default defineWithTypes<{ extensions: CombinedExtensions }>()({
   name: 'greet',
   args: {
     name: { type: 'string', required: true }
   },
   run: async ctx => {
-    // Access i18n plugin for translations
-    const greeting = ctx.extensions[i18nId]?.translate('greeting', {
-      name: ctx.values.name
-    })
+    // Access i18n plugin extension
+    const locale = ctx.extensions[i18nId]?.locale
+    if (locale) {
+      console.log(`Current locale: ${locale.toString()}`)
+    }
 
-    // Access renderer plugin for text localization
+    // Access renderer plugin extension
     const message = ctx.extensions[rendererId]?.text('welcome')
-
-    // Load available commands from renderer
-    const commands = await ctx.extensions[rendererId]?.loadCommands()
-
-    // Display the results
-    console.log(greeting)
-    if (message) console.log(message)
+    if (message) {
+      console.log(message)
+    }
 
     // Access environment properties directly on context (not through extensions)
-    console.log(`Running in ${ctx.env?.name || 'unknown'} environment`)
+    console.log(`Running in ${ctx.env.name || 'unknown'} environment`)
   }
 })
 ```
 
 #### With Custom Plugins
 
-For custom plugins that don't use plugin IDs, combine the extension types directly:
+Custom plugins provide plugin IDs and types. Import both to create fully type-safe command definitions:
 
-```ts
-import { pluginId as loggerId } from './plugins/logger'
-import { pluginId as authId } from './plugins/auth'
-import { pluginId as databaseId } from './plugins/database'
-
+```ts [commands/query.ts]
 import { defineWithTypes } from 'gunshi'
-import type { LoggerExtension, PluginId as LoggerId } from './plugins/logger'
-import type { AuthExtension, PluginId as AuthId } from './plugins/auth'
-import type { DatabaseExtension, PluginId as DatabaseId } from './plugins/database'
+import { pluginId as authId } from '../plugins/auth.ts'
+import { pluginId as databaseId } from '../plugins/database.ts'
+import { pluginId as loggerId } from '../plugins/logger.ts'
+
+import type { AuthExtension, PluginId as AuthId } from '../plugins/auth.ts'
+import type { DatabaseExtension, PluginId as DatabaseId } from '../plugins/database.ts'
+import type { LoggerExtension, PluginId as LoggerId } from '../plugins/logger.ts'
 
 type CombinedExtensions = Record<LoggerId, LoggerExtension> &
   Record<AuthId, AuthExtension> &
   Record<DatabaseId, DatabaseExtension>
 
-const queryCommand = defineWithTypes<{ extensions: CombinedExtensions }>()({
+export default defineWithTypes<{ extensions: CombinedExtensions }>()({
   name: 'query',
   description: 'Query database tables',
   args: {
-    table: { type: 'string', required: true },
-    limit: { type: 'number', default: 10 }
+    table: { type: 'string', required: true }
   },
   run: async ctx => {
     // All extensions and arguments are fully typed
@@ -560,11 +494,9 @@ const queryCommand = defineWithTypes<{ extensions: CombinedExtensions }>()({
       throw new Error(`No read access to table: ${ctx.values.table}`)
     }
 
-    const results = await ctx.extensions[databaseId]?.query(ctx.values.table, {
-      limit: ctx.values.limit
-    })
-
-    return results
+    // Perform the query using the database extension
+    const dataset = await ctx.extensions[databaseId]?.query(ctx.values.table)
+    console.log(`Retrieved records from ${ctx.values.table}`, dataset)
   }
 })
 ```

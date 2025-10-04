@@ -251,7 +251,8 @@ export function lazy<A extends Args>(
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
 export function lazy<
-  A extends Args,
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  A extends ExtractArgs<G> = ExtractArgs<G>,
   D extends Partial<Command<{ args: A; extensions: {} }>> = Partial<
     Command<{ args: A; extensions: {} }>
   >
