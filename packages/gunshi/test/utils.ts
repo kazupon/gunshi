@@ -14,6 +14,8 @@ import type {
 
 type NoExt = Record<never, never>
 
+export type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> }
+
 /**
  *
  * @param utils

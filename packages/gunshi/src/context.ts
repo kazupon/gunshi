@@ -52,7 +52,7 @@ export type ExtractExtensions<E extends Record<string, CommandContextExtension>>
  * Parameters of {@link createCommandContext}
  */
 interface CommandContextParams<
-  G extends GunshiParams | { extensions: ExtendContext },
+  G extends GunshiParams | { args: Args } | { extensions: ExtendContext },
   V extends ArgValues<ExtractArgs<G>>,
   C extends Command<G> | LazyCommand<G> = Command<G>,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>

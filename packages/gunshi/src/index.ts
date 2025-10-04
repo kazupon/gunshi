@@ -26,7 +26,7 @@ export { DefaultTranslation } from '@gunshi/plugin-i18n' // TODO(kazupon): remov
 export { parseArgs, resolveArgs } from 'args-tokens'
 export * from './cli.ts'
 export { ANONYMOUS_COMMAND_NAME } from './constants.ts'
-export { define, lazy } from './definition.ts'
+export { define, defineWithTypes, lazy, lazyWithTypes } from './definition.ts'
 export { plugin } from './plugin/core.ts'
 
 export type { PluginContext } from './plugin/context.ts'

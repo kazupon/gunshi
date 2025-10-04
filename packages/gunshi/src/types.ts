@@ -16,6 +16,11 @@ export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 export type Awaitable<T> = T | Promise<T>
 
 /**
+ * Prettify a type by flattening its structure.
+ */
+export type Prettify<T> = { [K in keyof T]: T[K] } & {}
+
+/**
  * Extend command context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
  *
  * @since v0.27.0
@@ -31,6 +36,7 @@ export type ExtendContext = Record<string, unknown>
  *
  * @since v0.27.0
  */
+// #region snippet
 export interface GunshiParams<
   P extends {
     args?: Args
@@ -49,6 +55,7 @@ export interface GunshiParams<
    */
   extensions: P extends { extensions: infer E extends ExtendContext } ? E : {}
 }
+// #endregion snippet
 
 /**
  * Default Gunshi parameters.
@@ -64,8 +71,15 @@ export type DefaultGunshiParams = GunshiParams
  *
  * @since v0.27.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
-export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendContext }
+export type GunshiParamsConstraint =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
+  | GunshiParams<any>
+  | {
+      args: Args
+    }
+  | {
+      extensions: ExtendContext
+    }
 
 /**
  * Type helper to extract args
@@ -74,8 +88,15 @@ export type GunshiParamsConstraint = GunshiParams<any> | { extensions: ExtendCon
  *
  * @internal
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
-export type ExtractArgs<G> = G extends GunshiParams<any> ? G['args'] : Args
+export type ExtractArgs<G> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
+  G extends GunshiParams<any>
+    ? G['args']
+    : G extends {
+          args: infer A extends Args
+        }
+      ? A
+      : Args
 
 /**
  * Type helper to extract explicitly provided argument flags.
@@ -539,24 +560,32 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
 /**
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
+ *
+ * @typeParam G - The Gunshi parameters constraint
+ * @typeParam D - The partial command definition provided to lazy function
  */
-export type LazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
+export type LazyCommand<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  D extends Partial<Command<G>> = {}
+> = {
   /**
    * Command load function
    */
   (): Awaitable<Command<G> | CommandRunner<G>>
-  /**
-   * Command name
-   */
-  commandName?: string
-} & Omit<Command<G>, 'run' | 'name'>
+} &
+  // If definition has name, commandName is required with that type
+  (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) &
+  // Properties from the definition (if provided inline)
+  Omit<D, 'name' | 'run'> &
+  // Remaining properties from Command (optional)
+  Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>
 
 /**
  * Define a command type.
  */
 export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
   | Command<G>
-  | LazyCommand<G>
+  | LazyCommand<G, {}>
 
 /**
  * Command examples fetcher.

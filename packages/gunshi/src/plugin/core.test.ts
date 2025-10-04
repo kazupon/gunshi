@@ -2,7 +2,7 @@ import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { createMockCommandContext } from '../../test/utils.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
-import { define } from '../definition.ts'
+import { define, defineWithTypes } from '../definition.ts'
 import { createPluginContext } from './context.ts'
 import { plugin } from './core.ts'
 
@@ -44,8 +44,18 @@ describe('PluginContext#addGlobalOpttion', () => {
   })
 })
 
-type Auth = { token: string; login: () => string }
-type Logger = { log: (msg: string) => void; level: string }
+type Auth = {
+  auth: {
+    token: string
+    login: () => string
+  }
+}
+type Logger = {
+  loggler: {
+    log: (msg: string) => void
+    level: string
+  }
+}
 
 test('PluginContext#decorateHeaderRenderer', async () => {
   const decorators = createDecorators<GunshiParams<{ args: Args; extensions: Auth }>>()
@@ -344,7 +354,7 @@ describe('Plugin Extensions Integration', () => {
     type TestExtension = Awaited<ReturnType<typeof testPlugin.extension.factory>>
 
     // create a command that uses the extension
-    const testCommand = define<{ args: typeof args; extensions: { test: TestExtension } }>({
+    const testCommand = defineWithTypes<{ extensions: { test: TestExtension } }>()({
       name: 'test-cmd',
       args,
       async run(ctx) {
@@ -415,7 +425,7 @@ describe('Plugin Extensions Integration', () => {
     }
 
     // command using both extensions
-    const multiCommand = define<ExtendContext>({
+    const multiCommand = defineWithTypes<{ extensions: ExtendContext }>()({
       name: 'multi',
       run(ctx) {
         ctx.extensions.logger.log(`User ${ctx.extensions.auth.getUser()} executed command`)
@@ -501,9 +511,11 @@ describe('Plugin Extensions Integration', () => {
       onExtension
     })
 
-    const contextCommand = define<{
-      ctx: Awaited<ReturnType<typeof contextPlugin.extension.factory>>
-    }>({
+    const contextCommand = defineWithTypes<{
+      extensions: {
+        ctx: Awaited<ReturnType<typeof contextPlugin.extension.factory>>
+      }
+    }>()({
       name: 'ctx-test',
       run(ctx) {
         return String(ctx.extensions.ctx.captured)
