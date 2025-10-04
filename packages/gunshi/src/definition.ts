@@ -142,8 +142,8 @@ export function define(
  *
  * @internal
  */
-type DefineWithTypesReturn<DefaultExtensions extends ExtendContext> = <
-  A extends Args,
+type DefineWithTypesReturn<DefaultExtensions extends ExtendContext, DefaultArgs extends Args> = <
+  A extends DefaultArgs = DefaultArgs,
   C extends Partial<Command<{ args: A; extensions: DefaultExtensions }>> = {}
 >(
   definition: C & Command<{ args: A; extensions: DefaultExtensions }>
@@ -179,13 +179,15 @@ type DefineWithTypesReturn<DefaultExtensions extends ExtendContext> = <
  * @since v0.27.0
  */
 export function defineWithTypes<G extends GunshiParamsConstraint>(): DefineWithTypesReturn<
-  ExtractExtensions<G>
+  ExtractExtensions<G>,
+  ExtractArgs<G>
 > {
   // Extract extensions from G, with proper defaults
   type DefaultExtensions = ExtractExtensions<G>
+  type DefaultArgs = ExtractArgs<G>
 
   return <
-    A extends Args,
+    A extends DefaultArgs = DefaultArgs,
     C extends Partial<Command<{ args: A; extensions: DefaultExtensions }>> = {}
   >(
     definition: C & Command<{ args: A; extensions: DefaultExtensions }>
