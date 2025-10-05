@@ -226,11 +226,10 @@ const basicCommand = define({
   run: ctx => console.log(`test: ${ctx.values.target}`)
 })
 
-const i18nCommand = withI18nResource(basicCommand, async ctx => {
-  const resource = await import(
-    `./path/to/resources/test/${ctx.extensions[i18nId].locale.toString()}.json`,
-    { with: { type: 'json' } }
-  ).then(l => l.default || l)
+const i18nCommand = withI18nResource(basicCommand, async locale => {
+  const resource = await import(`./path/to/resources/test/${locale.toString()}.json`, {
+    with: { type: 'json' }
+  }).then(l => l.default || l)
   return resource
 })
 ```

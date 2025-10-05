@@ -458,9 +458,10 @@ const greetCommand = defineI18nWithTypes<{ extensions: MyExtensions }>()({
 Add i18n resources to existing commands:
 
 ```ts
+import { define } from 'gunshi'
 import { withI18nResource, resolveKey, pluginId as i18nId } from '@gunshi/plugin-i18n'
 
-const existingCommand = {
+const existingCommand = define({
   name: 'app',
   run: ctx => {
     const t = ctx.extensions[i18nId]?.translate
@@ -469,9 +470,9 @@ const existingCommand = {
       console.log(t(messageKey))
     }
   }
-}
+})
 
-const i18nCommand = withI18nResource(existingCommand, async ctx => ({
+const existingLocalizableCommand = withI18nResource(existingCommand, locale => ({
   message: 'Hello from i18n!'
 }))
 ```

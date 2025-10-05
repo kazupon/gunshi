@@ -1,9 +1,9 @@
 import { DeepWriteable } from '@gunshi/shared'
-import { cli } from 'gunshi'
-import { describe, expect, expectTypeOf, test } from 'vitest'
+import { cli, define } from 'gunshi'
+import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
 
-import type { Args, Command, CommandRunner } from '@gunshi/plugin'
+import type { Args, CommandRunner } from '@gunshi/plugin'
 import type { CommandResourceFetcher, I18nCommand } from './types.ts'
 
 describe('defineI18n', () => {
@@ -141,6 +141,8 @@ describe('defineI18n', () => {
 
     type ExpectArgs = DeepWriteable<typeof args>
     expect(command.args).toEqual(args)
+
+    expect(typeof command.resource).toBe('function')
     expectTypeOf<typeof command.resource>().toEqualTypeOf<
       CommandResourceFetcher<{
         args: ExpectArgs
@@ -195,6 +197,8 @@ describe('defineI18nWithTypes', () => {
         extensions: {}
       }>
     >()
+
+    expect(typeof command.resource).toBe('function')
     expectTypeOf<typeof command.resource>().toEqualTypeOf<
       CommandResourceFetcher<{
         args: typeof args
@@ -254,6 +258,8 @@ describe('defineI18nWithTypes', () => {
         extensions: MyExtensions
       }>
     >()
+
+    expect(typeof command.resource).toBe('function')
     expectTypeOf<typeof command.resource>().toEqualTypeOf<
       CommandResourceFetcher<{
         args: ExpectArgs
@@ -310,6 +316,8 @@ describe('defineI18nWithTypes', () => {
         extensions: MyExtensions
       }>
     >()
+
+    expect(typeof command.resource).toBe('function')
     expectTypeOf<typeof command.resource>().toEqualTypeOf<
       CommandResourceFetcher<{
         args: typeof args
@@ -325,25 +333,99 @@ describe('defineI18nWithTypes', () => {
   })
 })
 
-test('withI18nResource', () => {
-  const command: Command = {
-    name: 'test',
-    description: 'Test command',
-    args: {
-      input: { type: 'string' }
-    },
-    run: async () => {}
-  }
-  const resourceFn: CommandResourceFetcher = async () => ({
-    description: 'Test',
-    examples: 'Example usage'
+describe('withI18nResource', () => {
+  test('basic', async () => {
+    const command = define({
+      name: 'test',
+      description: 'Test command',
+      args: {
+        input: { type: 'string' }
+      },
+      run: () => {}
+    })
+
+    const mock = vi.fn()
+    const localizedCommand = withI18nResource(command, () => {
+      mock()
+      return {
+        description: 'テストコマンド',
+        'arg:input': '入力値'
+      }
+    })
+
+    expect(localizedCommand).toBeInstanceOf(Function)
+
+    expect(localizedCommand.name).toBe(test.name)
+    expectTypeOf<typeof localizedCommand.name>().toEqualTypeOf<string>()
+
+    expect(localizedCommand.description).toBe(command.description)
+    expectTypeOf<typeof localizedCommand.description>().toEqualTypeOf<string>()
+
+    expect(localizedCommand.args).toEqual(command.args)
+    expectTypeOf(localizedCommand.args).toEqualTypeOf<typeof command.args>()
+
+    expect(typeof localizedCommand.resource).toBe('function')
+    expectTypeOf<typeof localizedCommand.resource>().toEqualTypeOf<
+      CommandResourceFetcher<{
+        args: typeof localizedCommand.args
+        extensions: {}
+      }>
+    >()
+
+    expectTypeOf<typeof localizedCommand.examples>().toBeNullable()
+
+    await cli(
+      ['test', '--input', 'foo.test.ts'],
+      {
+        run: _ctx => {}
+      },
+      { subCommands: { test: localizedCommand } }
+    )
+
+    expect(mock).toHaveBeenCalled()
   })
 
-  const i18nCommand = withI18nResource(command, resourceFn)
+  test('preserves all properties', () => {
+    const resource: CommandResourceFetcher = () => ({
+      description: 'テストコマンド',
+      'arg:input': '入力値'
+    })
 
-  expect(i18nCommand.name).toBe(command.name)
-  expect(i18nCommand.description).toBe(command.description)
-  expect(i18nCommand.args).toBe(command.args)
-  expect(i18nCommand.run).toBe(command.run)
-  expect(i18nCommand.resource).toBe(resourceFn)
+    const localizedCommand = withI18nResource(
+      {
+        name: 'test',
+        description: 'Test command',
+        args: {
+          input: { type: 'string' }
+        },
+        run: () => {}
+      },
+      resource
+    )
+
+    expect(localizedCommand).toBeInstanceOf(Function)
+
+    expect(localizedCommand.name).toBe('test')
+    expectTypeOf<typeof localizedCommand.name>().toEqualTypeOf<string>()
+
+    expect(localizedCommand.description).toBe('Test command')
+    expectTypeOf<typeof localizedCommand.description>().toEqualTypeOf<string>()
+
+    const expectArgs = {
+      input: { type: 'string' }
+    } as const
+    type ExpectArgs = DeepWriteable<typeof expectArgs>
+    expect(localizedCommand.args).toEqual(expectArgs)
+    expectTypeOf(localizedCommand.args).toEqualTypeOf<ExpectArgs>()
+
+    expect(typeof localizedCommand.resource).toBe('function')
+    expectTypeOf<typeof localizedCommand.resource>().toEqualTypeOf<
+      CommandResourceFetcher<{
+        args: ExpectArgs
+        extensions: {}
+      }>
+    >()
+
+    expectTypeOf<typeof localizedCommand.examples>().toBeNullable()
+  })
 })

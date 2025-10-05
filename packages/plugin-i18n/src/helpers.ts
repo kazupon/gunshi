@@ -33,6 +33,20 @@ type I18nCommandDefinitionResult<
 >
 
 /**
+ * The result type of the {@link withI18nResource} function
+ *
+ * @internal
+ */
+type WithI18nResourceResult<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  C extends Command<G> = Command<G>
+> = Prettify<
+  C & { resource: CommandResourceFetcher<G> } & {
+    [K in Exclude<keyof I18nCommand<G>, keyof C | 'resource'>]?: I18nCommand<G>[K]
+  }
+>
+
+/**
  * Define an i18n-aware {@link I18nCommand | command}.
  *
  * The difference from the `define` function is that you can define a `resource` option that can load a locale.
@@ -204,12 +218,12 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
  * @param resource - A resource fetcher for the command
  * @returns A command with i18n resource support
  */
-export function withI18nResource<G extends GunshiParamsConstraint>(
-  command: Command<G>,
+export function withI18nResource<G extends GunshiParamsConstraint, C extends Command<G>>(
+  command: C,
   resource: CommandResourceFetcher<G>
-): I18nCommand<G> {
+): WithI18nResourceResult<G, C> {
   return {
     ...command,
     resource
-  }
+  } as WithI18nResourceResult<G, C>
 }
