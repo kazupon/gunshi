@@ -192,7 +192,7 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
  *
  * @example
  * ```ts
- * import { define } from '@gunshi/definition'
+ * import { define } from 'gunshi'
  * import { withI18nResource } from '@gunshi/plugin-i18n'
  *
  * const myCommand = define({
@@ -200,14 +200,14 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
  *   args: {
  *     input: { type: 'string', description: 'Input value' }
  *   },
- *   run: async (ctx) => {
+ *   run: ctx => {
  *     console.log(`Input: ${ctx.values.input}`)
  *   }
  * })
  *
- * const i18nCommand = withI18nResource(basicCommand, async ctx => {
+ * const i18nCommand = withI18nResource(basicCommand, async locale => {
  *   const resource = await import(
- *     `./path/to/resources/test/${ctx.extensions['g:i18n'].locale.toString()}.json`,
+ *     `./path/to/resources/test/${locale.toString()}.json`,
  *     { with: { type: 'json' } }
  *   ).then(l => l.default || l)
  *   return resource
