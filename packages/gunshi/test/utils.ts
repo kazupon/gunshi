@@ -14,15 +14,6 @@ import type {
 
 type NoExt = Record<never, never>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): test utility function
-export type DeepWriteable<T> = T extends (...args: any) => any
-  ? T
-  : T extends readonly (infer U)[]
-    ? DeepWriteable<U>[]
-    : T extends object
-      ? { -readonly [P in keyof T]: DeepWriteable<T[P]> }
-      : T
-
 /**
  *
  * @param utils

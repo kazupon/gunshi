@@ -176,7 +176,9 @@ describe('translation adapter', () => {
         }
       })
 
-    const command = defineI18n({
+    const command = defineI18n<{
+      extensions: { [id]: I18nExtension }
+    }>({
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',
@@ -254,7 +256,9 @@ describe('translation adapter', () => {
         }
       })
 
-    const command = defineI18n({
+    const command = defineI18n<{
+      extensions: { [id]: I18nExtension }
+    }>({
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',

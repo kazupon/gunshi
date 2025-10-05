@@ -164,7 +164,10 @@ export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiPara
    */
   description: string
 } & {
-  [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]: string
+  [Arg in GenerateNamespacedKey<
+    KeyOfArgs<RemovedIndex<ExtractArgs<G>>>,
+    typeof ARG_PREFIX
+  >]?: string
 } & { [key: string]: string } // Infer the arguments usage, Define the user resources
 
 /**

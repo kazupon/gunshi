@@ -109,6 +109,7 @@
     "@gunshi/plugin-i18n": "workspace:*",
     "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
+    "@gunshi/shared": "workspace:*",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",

@@ -3,14 +3,36 @@
  * @license MIT
  */
 
-import type { Command, DefaultGunshiParams, GunshiParamsConstraint } from '@gunshi/plugin'
+import type {
+  Args,
+  Command,
+  DefaultGunshiParams,
+  ExtractArgs,
+  ExtractExtensions,
+  GunshiParamsConstraint,
+  Prettify
+} from '@gunshi/plugin'
 import type { CommandResourceFetcher, I18nCommand } from './types.ts'
 
 /**
- * Define an i18n-aware command with type safety
+ * The result type of the {@link defineI18n} function
  *
- * @param command - A command definition with i18n support
- * @returns A defined command with i18n support
+ * @internal
+ */
+type I18nCommandDefinitionResult<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  C = {}
+> = Prettify<
+  Omit<C, 'resource'> &
+    ('resource' extends keyof C
+      ? { resource: CommandResourceFetcher<G> }
+      : { resource?: CommandResourceFetcher<G> | undefined }) & {
+      [K in Exclude<keyof I18nCommand<G>, keyof C | 'resource'>]?: I18nCommand<G>[K]
+    }
+>
+
+/**
+ * Define an i18n-aware {@link I18nCommand | command}.
  *
  * @example
  * ```ts
@@ -30,11 +52,38 @@ import type { CommandResourceFetcher, I18nCommand } from './types.ts'
  *   }
  * })
  * ```
+ *
+ * @typeParam G - A {@link GunshiParamsConstraint} type
+ * @typeParam A - An {@link Args} type extracted from {@link GunshiParamsConstraint}
+ * @typeParam C - The inferred command type
+ *
+ * @param definition - A {@link I18nCommand | command} definition with i18n support
+ * @returns A defined {@link I18nCommand | command} with compatible {@link Command} type
  */
-export function defineI18n<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  command: Command<G> & { resource?: CommandResourceFetcher<G> }
-): I18nCommand<G> {
-  return command
+export function defineI18n<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  A extends Args = ExtractArgs<G>,
+  C = {}
+>(
+  definition: C & { args?: A } & Omit<
+      I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>,
+      'resource' | 'args'
+    > & { resource?: any } // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
+): I18nCommandDefinitionResult<{ args: A; extensions: ExtractExtensions<G> }, C>
+
+/**
+ * Define a {@link I18nCommand | command}.
+ *
+ * @typeParam G - A {@link GunshiParamsConstraint} type
+ *
+ * @param definition - A {@link I18nCommand | command} definition
+ * @returns A defined {@link I18nCommand | command}
+ */
+export function defineI18n(
+  definition: any // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
+): any {
+  return definition
 }
 
 /**

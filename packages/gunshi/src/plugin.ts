@@ -54,10 +54,12 @@ export type {
   DefaultGunshiParams,
   ExtendContext,
   ExtractArgs,
+  ExtractExtensions,
   GunshiParams,
   GunshiParamsConstraint,
   LazyCommand,
   NormalizeToGunshiParams,
+  Prettify,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'

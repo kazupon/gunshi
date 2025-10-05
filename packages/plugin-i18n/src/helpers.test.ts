@@ -1,39 +1,152 @@
-import { describe, expect, test } from 'vitest'
+import { DeepWriteable } from '@gunshi/shared'
+import { cli } from 'gunshi'
+import { describe, expect, expectTypeOf, test } from 'vitest'
 import { defineI18n, withI18nResource } from './helpers.ts'
 
-import type { Command } from '@gunshi/plugin'
-import type { CommandResourceFetcher } from './types.ts'
+import type { Args, Command, CommandRunner } from '@gunshi/plugin'
+import type { CommandResourceFetcher, I18nCommand } from './types.ts'
 
 describe('defineI18n', () => {
-  test('pass through a command object with resource', () => {
-    const resourceFn: CommandResourceFetcher = async () => ({
-      description: 'Test',
-      examples: 'Example usage'
-    })
+  test('basic', async () => {
     const command = defineI18n({
       name: 'test',
-      resource: resourceFn,
-      run: async () => {}
-    })
+      description: 'Test command',
+      args: {
+        input: { type: 'string' }
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ input?: string }>()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
 
-    expect(command.name).toBe('test')
-    expect(command.run).toBeDefined()
-    expect(command.resource).toBe(resourceFn)
+        expect(typeof ctx.values.input).toBe('string')
+        expect(ctx.values.input).toBe('bar')
+      }
+    })
+    await cli(['test', '--input', 'bar'], command)
   })
 
-  test('pass through a command object', () => {
-    const command: Command = {
+  test('preserves all specified command properties', () => {
+    const command = defineI18n({
+      name: 'complex',
+      description: 'Complex command',
+      args: {
+        flag: { type: 'boolean' },
+        value: { type: 'number' }
+      },
+      examples: 'complex --flag\ncomplex --value 42',
+      toKebab: false,
+      run: (_ctx): string | void | Promise<string | void> => 'done'
+    })
+
+    /**
+     * Check that all specified properties and types are preserved
+     */
+
+    expect(command.name).toBe('complex')
+    expectTypeOf<typeof command.name>().toEqualTypeOf<string>()
+
+    expect(command.description).toBe('Complex command')
+    expectTypeOf<typeof command.description>().toEqualTypeOf<string>()
+
+    const expectArgs = {
+      flag: { type: 'boolean' },
+      value: { type: 'number' }
+    } as const
+    type ExpectArgs = DeepWriteable<typeof expectArgs>
+    expect(command.args).toEqual(expectArgs)
+    expectTypeOf<typeof command.args>().toEqualTypeOf<ExpectArgs>()
+
+    expect(typeof command.run).toBe('function')
+    expectTypeOf<typeof command.run>().toEqualTypeOf<
+      CommandRunner<{
+        args: ExpectArgs
+        extensions: {}
+      }>
+    >()
+
+    /**
+     * Check that all not specified optional properties are `undefined`
+     */
+
+    expect(command.internal).toBeUndefined()
+    expectTypeOf<typeof command.internal>().toEqualTypeOf<boolean | undefined>()
+
+    expect(command.resource).toBeUndefined()
+    expectTypeOf<typeof command.resource>().toEqualTypeOf<
+      | CommandResourceFetcher<{
+          args: ExpectArgs
+          extensions: {}
+        }>
+      | undefined
+    >()
+  })
+
+  test('pass through resource', () => {
+    const command = defineI18n({
       name: 'test',
-      description: 'Test command',
-      run: async () => {}
+      args: {
+        flag: { type: 'boolean' },
+        value: { type: 'number' }
+      },
+      resource: async () => ({
+        description: 'Test',
+        examples: 'Example usage'
+      })
+    })
+
+    const expectArgs = {
+      flag: { type: 'boolean' },
+      value: { type: 'number' }
+    } as const
+    type ExpectArgs = DeepWriteable<typeof expectArgs>
+    expect(command.args).toEqual(expectArgs)
+    expectTypeOf<typeof command.resource>().toEqualTypeOf<
+      CommandResourceFetcher<{
+        args: ExpectArgs
+        extensions: {}
+      }>
+    >()
+  })
+
+  test('pass parameters', () => {
+    const args = {
+      env: { type: 'string', required: true }
+    } satisfies Args
+
+    const options: I18nCommand<{ args: typeof args }> = {
+      name: 'deploy',
+      description: 'Deploy application',
+      args,
+      resource: async () => ({
+        description: 'Deploy application',
+        examples: 'Example usage'
+      })
     }
 
-    const i18nCommand = defineI18n(command)
+    const command = defineI18n(options)
 
-    expect(i18nCommand).toBe(command)
-    expect(i18nCommand.name).toBe('test')
-    expect(i18nCommand.run).toBeDefined()
-    expect(i18nCommand.resource).toBeUndefined()
+    /**
+     * Check that specified properties and types are not inferred fully (it is not meant to be strictly typed, include `undefined`)
+     */
+
+    expect(command.name).toBe('deploy')
+    expectTypeOf<typeof command.name>().toEqualTypeOf<string | undefined>()
+
+    expect(command.description).toBe('Deploy application')
+    expectTypeOf<typeof command.description>().toEqualTypeOf<string | undefined>()
+
+    expect(command.args).toEqual({ env: { type: 'string', required: true } })
+    expectTypeOf<typeof command.args>().toEqualTypeOf<typeof args | undefined>()
+
+    type ExpectArgs = DeepWriteable<typeof args>
+    expect(command.args).toEqual(args)
+    expectTypeOf<typeof command.resource>().toEqualTypeOf<
+      CommandResourceFetcher<{
+        args: ExpectArgs
+        extensions: {}
+      }>
+    >()
   })
 })
 
