@@ -158,10 +158,8 @@ describe('defineI18nWithTypes', () => {
     const command = defineI18nWithTypes<{ args: typeof args }>()({
       name: 'count',
       args,
-      resource: ctx => {
-        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
-        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
+      resource: locale => {
+        expectTypeOf(locale).toEqualTypeOf<Intl.Locale>()
         return {
           description: 'Count items',
           examples: 'count --count 5'
@@ -218,9 +216,8 @@ describe('defineI18nWithTypes', () => {
       args: {
         count: { type: 'number', required: true }
       },
-      resource: ctx => {
-        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
-        ctx.extensions.logger?.log('Resource fetched')
+      resource: locale => {
+        expectTypeOf(locale).toEqualTypeOf<Intl.Locale>()
         return {
           description: 'Count items',
           examples: 'count --count 5'

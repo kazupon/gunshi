@@ -35,6 +35,8 @@ type I18nCommandDefinitionResult<
 /**
  * Define an i18n-aware {@link I18nCommand | command}.
  *
+ * The difference from the `define` function is that you can define a `resource` option that can load a locale.
+ *
  * @example
  * ```ts
  * import { defineI18n } from '@gunshi/plugin-i18n'
@@ -44,11 +46,18 @@ type I18nCommandDefinitionResult<
  *   args: {
  *     name: { type: 'string', description: 'Name to greet' }
  *   },
- *   resource: ctx => ({
- *     description: 'Greet someone',
- *     'arg:name': 'The name to greet'
- *   }),
- *   run: async (ctx) => {
+ *   resource: locale => {
+ *     switch (locale.toString()) {
+ *       case 'ja-jP': {
+ *         return {
+ *           'description': '誰かにあいさつ'
+ *           'arg:name': 'あいさつするための名前'
+ *         }
+ *       }
+ *       // other locales ...
+ *     }
+ *   },
+ *   run: ctx => {
  *     console.log(`Hello, ${ctx.values.name}!`)
  *   }
  * })
@@ -69,7 +78,7 @@ export function defineI18n<
   definition: C & { args?: A } & Omit<
       I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>,
       'resource' | 'args'
-    > & { resource?: any } // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
+    > & { resource?: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }> }
 ): I18nCommandDefinitionResult<{ args: A; extensions: ExtractExtensions<G> }, C>
 
 /**
@@ -113,18 +122,27 @@ type DefineI18nWithTypesReturn<
  *
  * @example
  * ```ts
+ * import { defineI18nWithTypes } from '@gunshi/plugin-i18n'
+ *
  * // Define a command with specific extensions type
  * type MyExtensions = { logger: { log: (message: string) => void } }
  *
- * const command = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+ * const greetCommand = defineI18nWithTypes<{ extensions: MyExtensions }>()({
  *   name: 'greet',
  *   args: {
- *     name: { type: 'string' }
+ *     name: { type: 'string', description: 'Name to greet' }
  *   },
- *   resource: ctx => ({
- *     description: 'Greet someone',
- *     'arg:name': 'The name to greet'
- *   }),
+ *   resource: locale => {
+ *     switch (locale.toString()) {
+ *       case 'ja-jP': {
+ *         return {
+ *           'description': '誰かにあいさつ'
+ *           'arg:name': 'あいさつするための名前'
+ *         }
+ *       }
+ *       // other locales ...
+ *     }
+ *   },
  *   run: ctx => {
  *     // ctx.values is inferred as { name?: string }
  *     // ctx.extensions is MyExtensions

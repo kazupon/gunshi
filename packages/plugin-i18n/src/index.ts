@@ -164,7 +164,7 @@ export default function i18n(
         cmd: Command
       ): Promise<boolean> {
         let loaded = false
-        const originalResource = await loadCommandResource(ctx, cmd)
+        const originalResource = await loadCommandResource(toLocale(locale), cmd)
         if (originalResource) {
           const resource = await normalizeResource(originalResource, ctx)
           if (builtInLoadedResources) {
@@ -227,7 +227,7 @@ function toLocaleString(locale: string | Intl.Locale): string {
 }
 
 async function loadCommandResource(
-  ctx: CommandContext,
+  locale: Intl.Locale,
   command: Command | LazyCommand
 ): Promise<CommandResource | undefined> {
   // check if command has i18n resource support
@@ -237,7 +237,7 @@ async function loadCommandResource(
 
   let resource: CommandResource | undefined
   try {
-    resource = await command.resource!(ctx)
+    resource = await command.resource!(locale)
   } catch (error) {
     console.error(`Failed to load resource for command "${command.name}":`, error)
   }

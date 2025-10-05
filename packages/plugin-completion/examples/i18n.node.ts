@@ -1,14 +1,10 @@
-import i18n, { defineI18nWithTypes, pluginId as i18nId } from '@gunshi/plugin-i18n'
+import i18n, { defineI18n } from '@gunshi/plugin-i18n'
 import { cli } from 'gunshi'
 import completion from '../src/index.ts'
 
-import type { I18nExtension, PluginId as I18nId } from '@gunshi/plugin-i18n'
-
 const multiple = !!process.env.G_COMPLETION_TEST_MULTIPLE as true | undefined // type rudly, because it's used in tests
 
-type MyExtensions = Record<I18nId, I18nExtension>
-
-const entry = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+const entry = defineI18n({
   name: 'root',
   args: {
     config: {
@@ -28,9 +24,8 @@ const entry = defineI18nWithTypes<{ extensions: MyExtensions }>()({
     }
   },
   run: _ctx => {},
-  resource: ctx => {
-    const i18n = ctx.extensions[i18nId]
-    if (i18n?.locale.toString() === 'ja-JP') {
+  resource: locale => {
+    if (locale.toString() === 'ja-JP') {
       return {
         description: 'ルートコマンド',
         'arg:config': '設定ファイルを指定します',
@@ -42,7 +37,7 @@ const entry = defineI18nWithTypes<{ extensions: MyExtensions }>()({
   }
 })
 
-const dev = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+const dev = defineI18n({
   name: 'dev',
   description: 'Start dev server',
   args: {
@@ -58,9 +53,8 @@ const dev = defineI18nWithTypes<{ extensions: MyExtensions }>()({
     }
   },
   run: () => {},
-  resource: ctx => {
-    const i18n = ctx.extensions[i18nId]
-    if (i18n?.locale.toString() === 'ja-JP') {
+  resource: locale => {
+    if (locale.toString() === 'ja-JP') {
       return {
         description: '開発サーバーを起動します',
         'arg:host': 'ホスト名を指定します',
@@ -71,13 +65,12 @@ const dev = defineI18nWithTypes<{ extensions: MyExtensions }>()({
   }
 })
 
-const build = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+const build = defineI18n({
   name: 'build',
   description: 'Build project',
   run: () => {},
-  resource: ctx => {
-    const i18n = ctx.extensions[i18nId]
-    if (i18n?.locale.toString() === 'ja-JP') {
+  resource: locale => {
+    if (locale.toString() === 'ja-JP') {
       return {
         description: 'プロジェクトをビルドします'
       }
@@ -86,7 +79,7 @@ const build = defineI18nWithTypes<{ extensions: MyExtensions }>()({
   }
 })
 
-const lint = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+const lint = defineI18n({
   name: 'lint',
   description: 'Lint project',
   args: {
@@ -97,9 +90,8 @@ const lint = defineI18nWithTypes<{ extensions: MyExtensions }>()({
     }
   },
   run: () => {},
-  resource: ctx => {
-    const i18n = ctx.extensions[i18nId]
-    if (i18n?.locale.toString() === 'ja-JP') {
+  resource: locale => {
+    if (locale.toString() === 'ja-JP') {
       return {
         description: 'プロジェクトをリントします',
         'arg:files': 'リントするファイル'

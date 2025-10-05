@@ -7,7 +7,7 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../test/helper.ts'
-import i18n, { defineI18n, pluginId } from './index.ts'
+import i18n, { defineI18n } from './index.ts'
 
 import type { Args, Command, GunshiParams } from '@gunshi/plugin'
 import type {
@@ -168,8 +168,8 @@ describe('translation adapter', () => {
           extensions: { [K in typeof id]: I18nExtension }
         }>
       >()
-      .mockImplementation(ctx => {
-        if (ctx.extensions[pluginId].locale.toString() === loadLocale) {
+      .mockImplementation(locale => {
+        if (locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
@@ -246,8 +246,8 @@ describe('translation adapter', () => {
           extensions: { [K in typeof id]: I18nExtension }
         }>
       >()
-      .mockImplementation(ctx => {
-        if (ctx.extensions[pluginId].locale.toString() === loadLocale) {
+      .mockImplementation(locale => {
+        if (locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')

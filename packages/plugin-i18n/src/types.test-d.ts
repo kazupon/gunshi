@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, test } from 'vitest'
 
-import type { Awaitable, Command, CommandContext, Prettify } from '@gunshi/plugin'
+import type { Awaitable, Command, Prettify } from '@gunshi/plugin'
 import type { CommandResource, CommandResourceFetcher, I18nCommand } from './types.ts'
 
 const _args = {
@@ -45,22 +45,20 @@ describe('CommandResource', () => {
 describe('CommandResourceFetcher', () => {
   test('default', () => {
     type Actual = CommandResourceFetcher
-    type Expected = (ctx: Readonly<CommandContext>) => Awaitable<CommandResource>
+    type Expected = (locale: Intl.Locale) => Awaitable<CommandResource>
     expectTypeOf<Actual>().toEqualTypeOf<Expected>()
   })
 
   test('with args', () => {
     type Actual = CommandResourceFetcher<{ args: typeof _args }>
-    type Expected = (
-      ctx: Readonly<CommandContext<{ args: typeof _args }>>
-    ) => Awaitable<CommandResource<{ args: typeof _args }>>
+    type Expected = (locale: Intl.Locale) => Awaitable<CommandResource<{ args: typeof _args }>>
     expectTypeOf<Actual>().toEqualTypeOf<Expected>()
   })
 
   test('with extensions', () => {
     type Actual = CommandResourceFetcher<{ extensions: typeof _extensions }>
     type Expected = (
-      ctx: Readonly<CommandContext<{ extensions: typeof _extensions }>>
+      locale: Intl.Locale
     ) => Awaitable<CommandResource<{ extensions: typeof _extensions }>>
     expectTypeOf<Actual>().toEqualTypeOf<Expected>()
   })

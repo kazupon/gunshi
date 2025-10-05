@@ -173,11 +173,11 @@ export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiPara
 /**
  * Command resource fetcher.
  *
- * @param ctx - A {@link CommandContext | command context}
+ * @param locale - A {@link Intl.Locale | locale} at the time of command execution.
  * @returns A fetched {@link CommandResource | command resource}.
  */
 export type CommandResourceFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
-  ctx: Readonly<CommandContext<G>>
+  locale: Intl.Locale
 ) => Awaitable<CommandResource<G>>
 
 /**
