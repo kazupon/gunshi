@@ -7,6 +7,7 @@ import type {
   Args,
   Command,
   DefaultGunshiParams,
+  ExtendContext,
   ExtractArgs,
   ExtractExtensions,
   GunshiParamsConstraint,
@@ -43,7 +44,7 @@ type I18nCommandDefinitionResult<
  *   args: {
  *     name: { type: 'string', description: 'Name to greet' }
  *   },
- *   resource: async (ctx) => ({
+ *   resource: ctx => ({
  *     description: 'Greet someone',
  *     'arg:name': 'The name to greet'
  *   }),
@@ -87,11 +88,75 @@ export function defineI18n(
 }
 
 /**
- * Add i18n resource to an existing command
+ * Return type for defineI18nWithTypes
  *
- * @param command - A defined command with `define` function
- * @param resource - A resource fetcher for the command
- * @returns A command with i18n resource support
+ * @typeParam DefaultExtensions - The {@link ExtendContext} type extracted from G
+ * @typeParam DefaultArgs - The {@link Args} type extracted from G
+ *
+ * @internal
+ */
+type DefineI18nWithTypesReturn<
+  DefaultExtensions extends ExtendContext,
+  DefaultArgs extends Args
+> = <A extends DefaultArgs = DefaultArgs, C = {}>(
+  definition: C & { args?: A } & Omit<
+      I18nCommand<{ args: A; extensions: DefaultExtensions }>,
+      'resource' | 'args'
+    > & { resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }> }
+) => I18nCommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C>
+
+/**
+ * Define an i18n-aware {@link I18nCommand | command} with types
+ *
+ * This helper function allows specifying the type parameter of {@link GunshiParams}
+ * while inferring the {@link Args} type, {@link ExtendContext} type from the definition.
+ *
+ * @example
+ * ```ts
+ * // Define a command with specific extensions type
+ * type MyExtensions = { logger: { log: (message: string) => void } }
+ *
+ * const command = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+ *   name: 'greet',
+ *   args: {
+ *     name: { type: 'string' }
+ *   },
+ *   resource: ctx => ({
+ *     description: 'Greet someone',
+ *     'arg:name': 'The name to greet'
+ *   }),
+ *   run: ctx => {
+ *     // ctx.values is inferred as { name?: string }
+ *     // ctx.extensions is MyExtensions
+ *   }
+ * })
+ * ```
+ *
+ * @typeParam G - A {@link GunshiParams} type
+ *
+ * @returns A function that takes a command definition via {@link defineI18n}
+ */
+export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI18nWithTypesReturn<
+  ExtractExtensions<G>,
+  ExtractArgs<G>
+> {
+  // Extract extensions from G, with proper defaults
+  type DefaultExtensions = ExtractExtensions<G>
+  type DefaultArgs = ExtractArgs<G>
+
+  return (<A extends DefaultArgs = DefaultArgs, C = {}>(
+    definition: C & { args?: A } & Omit<
+        I18nCommand<{ args: A; extensions: DefaultExtensions }>,
+        'resource' | 'args'
+      > & { resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }> }
+  ): I18nCommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): defineI18n returns compatible type but TypeScript cannot infer it
+    return defineI18n(definition) as any
+  }) as DefineI18nWithTypesReturn<DefaultExtensions, DefaultArgs>
+}
+
+/**
+ * Add i18n resource to an existing command
  *
  * @example
  * ```ts
@@ -116,6 +181,10 @@ export function defineI18n(
  *   return resource
  * })
  * ```
+ *
+ * @param command - A defined command with {@link define} function
+ * @param resource - A resource fetcher for the command
+ * @returns A command with i18n resource support
  */
 export function withI18nResource<G extends GunshiParamsConstraint>(
   command: Command<G>,

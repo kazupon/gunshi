@@ -1,7 +1,7 @@
 import { DeepWriteable } from '@gunshi/shared'
 import { cli } from 'gunshi'
 import { describe, expect, expectTypeOf, test } from 'vitest'
-import { defineI18n, withI18nResource } from './helpers.ts'
+import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
 
 import type { Args, Command, CommandRunner } from '@gunshi/plugin'
 import type { CommandResourceFetcher, I18nCommand } from './types.ts'
@@ -147,6 +147,184 @@ describe('defineI18n', () => {
         extensions: {}
       }>
     >()
+  })
+})
+
+describe('defineI18nWithTypes', () => {
+  test('args only', async () => {
+    const args = {
+      count: { type: 'number', required: true }
+    } satisfies Args
+    const command = defineI18nWithTypes<{ args: typeof args }>()({
+      name: 'count',
+      args,
+      resource: ctx => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
+        return {
+          description: 'Count items',
+          examples: 'count --count 5'
+        }
+      },
+      run: (ctx): string | void | Promise<string | void> => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+        expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
+
+        // Runtime check to satisfy test requirements
+        expect(typeof ctx.values.count).toBe('number')
+        expect(ctx.values.count).toBe(5)
+      }
+    })
+
+    await cli(['count', '--count', '5'], command)
+
+    /**
+     * Check that specified properties and types are preserved
+     */
+
+    expect(command.name).toBe('count')
+    expectTypeOf<typeof command.name>().toEqualTypeOf<string>()
+
+    expect(command.args).toEqual(args)
+    expectTypeOf<typeof command.args>().toEqualTypeOf<typeof args>()
+
+    expect(typeof command.run).toBe('function')
+    expectTypeOf<typeof command.run>().toEqualTypeOf<
+      CommandRunner<{
+        args: typeof args
+        extensions: {}
+      }>
+    >()
+    expectTypeOf<typeof command.resource>().toEqualTypeOf<
+      CommandResourceFetcher<{
+        args: typeof args
+        extensions: {}
+      }>
+    >()
+
+    /**
+     * Check that not specified optional properties are `undefined`
+     */
+
+    expectTypeOf<typeof command.description>().toBeNullable()
+  })
+
+  test('extensions only', async () => {
+    type MyExtensions = { logger: { log: (message: string) => void } }
+    const command = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+      name: 'count',
+      args: {
+        count: { type: 'number', required: true }
+      },
+      resource: ctx => {
+        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
+        ctx.extensions.logger?.log('Resource fetched')
+        return {
+          description: 'Count items',
+          examples: 'count --count 5'
+        }
+      },
+      run: (ctx): string | void | Promise<string | void> => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
+        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
+
+        // Runtime check to satisfy test requirements
+        expect(typeof ctx.values.count).toBe('number')
+        expect(ctx.values.count).toBe(5)
+      }
+    })
+
+    await cli(['count', '--count', '5'], command)
+
+    /**
+     * Check that specified properties and types are preserved
+     */
+
+    expect(command.name).toBe('count')
+    expectTypeOf<typeof command.name>().toEqualTypeOf<string>()
+
+    const expectArgs = { count: { type: 'number', required: true } } as const
+    type ExpectArgs = DeepWriteable<typeof expectArgs>
+    expect(command.args).toEqual(expectArgs)
+    expectTypeOf<typeof command.args>().toEqualTypeOf<ExpectArgs>()
+
+    expect(typeof command.run).toBe('function')
+    expectTypeOf<typeof command.run>().toEqualTypeOf<
+      CommandRunner<{
+        args: ExpectArgs
+        extensions: MyExtensions
+      }>
+    >()
+    expectTypeOf<typeof command.resource>().toEqualTypeOf<
+      CommandResourceFetcher<{
+        args: ExpectArgs
+        extensions: MyExtensions
+      }>
+    >()
+
+    /**
+     * Check that not specified optional properties are `undefined`
+     */
+
+    expectTypeOf<typeof command.description>().toBeNullable()
+  })
+
+  test('args and extensions', async () => {
+    type MyExtensions = { logger: { log: (message: string) => void } }
+    const args = {
+      count: { type: 'number', required: true }
+    } satisfies Args
+    const resource = () => ({
+      description: 'Count items',
+      examples: 'count --count 5'
+    })
+    const command = defineI18nWithTypes<{ args: typeof args; extensions: MyExtensions }>()({
+      name: 'count',
+      args,
+      resource,
+      run: (ctx): string | void | Promise<string | void> => {
+        expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
+        expectTypeOf(ctx.extensions).toEqualTypeOf<MyExtensions>()
+
+        // Runtime check to satisfy test requirements
+        expect(typeof ctx.values.count).toBe('number')
+        expect(ctx.values.count).toBe(5)
+      }
+    })
+
+    await cli(['count', '--count', '5'], command)
+
+    /**
+     * Check that specified properties and types are preserved
+     */
+
+    expect(command.name).toBe('count')
+    expectTypeOf<typeof command.name>().toEqualTypeOf<string>()
+
+    expect(command.args).toEqual(args)
+    expectTypeOf<typeof command.args>().toEqualTypeOf<typeof args>()
+
+    expect(typeof command.run).toBe('function')
+    expectTypeOf<typeof command.run>().toEqualTypeOf<
+      CommandRunner<{
+        args: typeof args
+        extensions: MyExtensions
+      }>
+    >()
+    expectTypeOf<typeof command.resource>().toEqualTypeOf<
+      CommandResourceFetcher<{
+        args: typeof args
+        extensions: MyExtensions
+      }>
+    >()
+
+    /**
+     * Check that not specified optional properties are `undefined`
+     */
+
+    expectTypeOf<typeof command.description>().toBeNullable()
   })
 })
 

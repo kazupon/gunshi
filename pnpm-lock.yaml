@@ -313,6 +313,9 @@ importers:
       deno:
         specifier: 'catalog:'
         version: 2.5.2
+      gunshi:
+        specifier: workspace:*
+        version: link:../gunshi
       jsr:
         specifier: 'catalog:'
         version: 0.13.5
