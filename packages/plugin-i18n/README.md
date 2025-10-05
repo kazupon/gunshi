@@ -201,7 +201,7 @@ import { resolveKey, resolveArgKey, resolveBuiltInKey } from '@gunshi/plugin-i18
 
 // These helpers automatically add the correct prefixes
 resolveKey('description', ctx.name) // Returns namespaced key for description
-resolveArgKey('verbose', ctx.name) // Returns 'arg:verbose' or 'command:arg:verbose' based on command namepsace
+resolveArgKey('verbose', ctx.name) // Returns 'arg:verbose' or 'command:arg:verbose' based on command namespace
 resolveBuiltInKey('USAGE') // Returns '_:USAGE'
 ```
 
