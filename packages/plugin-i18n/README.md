@@ -192,16 +192,16 @@ const i18nCommand = withI18nResource(basicCommand, async ctx => {
 
 The i18n plugin exports key resolution helper functions that handle the internal key structure, so you don't need to manually prefix your keys:
 
-- `resolveKey(key: string, ctx: CommandContext): string` - Resolves a custom key with command namespace if applicable
-- `resolveArgKey(key: string, ctx: CommandContext): string` - Resolves an argument key with `arg:` prefix and namespace
+- `resolveKey(key: string, name?: string): string` - Resolves a custom key with command namespace if applicable
+- `resolveArgKey(key: string, name?: string): string` - Resolves an argument key with `arg:` prefix and namespace
 - `resolveBuiltInKey(key: string): string` - Resolves a built-in key with `_:` prefix
 
 ```ts
 import { resolveKey, resolveArgKey, resolveBuiltInKey } from '@gunshi/plugin-i18n'
 
 // These helpers automatically add the correct prefixes
-resolveKey('description', ctx) // Returns namespaced key for description
-resolveArgKey('verbose', ctx) // Returns 'arg:verbose' or 'command:arg:verbose' based on context
+resolveKey('description', ctx.name) // Returns namespaced key for description
+resolveArgKey('verbose', ctx.name) // Returns 'arg:verbose' or 'command:arg:verbose' based on command namepsace
 resolveBuiltInKey('USAGE') // Returns '_:USAGE'
 ```
 
@@ -249,16 +249,16 @@ const command = defineI18n({
     const { translate } = ctx.extensions['g:i18n']
 
     // Usage helper for custom keys (prefix with command name)
-    console.log(translate(resolveKey('start', ctx)))
+    console.log(translate(resolveKey('start', ctx.name)))
 
     // Using helpers for explicit control
-    const envKey = resolveArgKey('environment', ctx)
+    const envKey = resolveArgKey('environment', ctx.name)
     console.log(translate(envKey)) // Same as translate('arg:environment')
 
     // Useful when building dynamic keys
     const args = ['environment', 'force']
     for (const arg of args) {
-      const key = resolveArgKey(arg, ctx)
+      const key = resolveArgKey(arg, ctx.name)
       const description = translate(key)
       console.log(`${arg}: ${description}`)
     }
@@ -402,7 +402,7 @@ import { resolveKey, resolveBuiltInKey } from '@gunshi/plugin-i18n'
 const { translate } = ctx.extensions['g:i18n']
 
 // Custom key not found
-translate(resolveKey('nonexistent_key', ctx)) // Returns: ''
+translate(resolveKey('nonexistent_key', ctx.name)) // Returns: ''
 
 // Built-in key not found (if not overridden)
 translate(resolveBuiltInKey('USAGE')) // Returns: 'USAGE'
@@ -473,10 +473,10 @@ const resource = {
 }
 // In your command
 const { translate } = ctx.extensions[i18nId]
-translate(resolveKey('welcome', ctx), { name: 'John' }) // "Welcome, John!"
-translate(resolveKey('items_count', ctx), { count: 5 }) // "You have 5 items"
-translate(resolveKey('file_deleted', ctx), { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
-translate(resolveKey('error_message', ctx), { error: 'File not found' }) // "Error: File not found"
+translate(resolveKey('welcome'), { name: 'John' }) // "Welcome, John!"
+translate(resolveKey('items_count'), { count: 5 }) // "You have 5 items"
+translate(resolveKey('file_deleted'), { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
+translate(resolveKey('error_message'), { error: 'File not found' }) // "Error: File not found"
 ```
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
@@ -658,7 +658,7 @@ const command = defineI18n({
 
     // Use the translation function with Intlify
     const key = count > 1 ? 'greeting_plural' : 'greeting'
-    const message = translate(resolveKey(key, ctx), { name, count })
+    const message = translate(resolveKey(key, ctx.name), { name, count })
 
     console.log(message)
   }

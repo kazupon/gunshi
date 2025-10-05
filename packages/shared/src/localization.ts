@@ -50,7 +50,7 @@ export function localizable<
       return DefaultResource[resKey as keyof typeof DefaultResource] || (key as string)
     }
 
-    const namaspacedArgKey = resolveKey(ARG_PREFIX_AND_KEY_SEPARATOR, ctx)
+    const namaspacedArgKey = resolveKey(ARG_PREFIX_AND_KEY_SEPARATOR, ctx.name)
     if ((key as string).startsWith(namaspacedArgKey)) {
       let argKey = (key as string).slice(namaspacedArgKey.length)
       let negatable = false
@@ -68,9 +68,9 @@ export function localizable<
     }
 
     // if the key is a built-in key 'description' and 'examples', return empty string, because the these keys are resolved by the user.
-    if (key === resolveKey('description', ctx)) {
+    if (key === resolveKey('description', ctx.name)) {
       return ''
-    } else if (key === resolveKey('examples', ctx)) {
+    } else if (key === resolveKey('examples', ctx.name)) {
       return await resolveExamples(ctx, cmd.examples)
     } else {
       return key as string

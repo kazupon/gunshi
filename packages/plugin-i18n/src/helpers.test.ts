@@ -82,14 +82,14 @@ describe('defineI18n', () => {
     >()
   })
 
-  test('pass through resource', () => {
+  test('pass through resource', async () => {
     const command = defineI18n({
       name: 'test',
       args: {
         flag: { type: 'boolean' },
         value: { type: 'number' }
       },
-      resource: async () => ({
+      resource: () => ({
         description: 'Test',
         examples: 'Example usage'
       })
@@ -118,7 +118,7 @@ describe('defineI18n', () => {
       name: 'deploy',
       description: 'Deploy application',
       args,
-      resource: async () => ({
+      resource: () => ({
         description: 'Deploy application',
         examples: 'Example usage'
       })

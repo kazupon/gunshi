@@ -144,7 +144,9 @@ async function registerCompletion({
     ? t
     : t.command(
         name,
-        (await localizeDescription(resolveKey('description', ctx))) || resolvedCmd.description || ''
+        (await localizeDescription(resolveKey('description', ctx.name))) ||
+          resolvedCmd.description ||
+          ''
       )
 
   const args = resolvedCmd.args || (Object.create(null) as Args)
@@ -154,7 +156,7 @@ async function registerCompletion({
     } else {
       commandTab.option(
         key,
-        (await localizeDescription(resolveArgKey(key, ctx))) || schema.description || '',
+        (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || '',
         resolveCompletionHandler(name, key, config, i18n),
         schema.short
       )

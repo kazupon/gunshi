@@ -69,7 +69,6 @@
     "@gunshi/shared": "workspace:*",
     "@types/node": "catalog:",
     "deno": "catalog:",
-    "gunshi": "workspace:*",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
     "publint": "catalog:",

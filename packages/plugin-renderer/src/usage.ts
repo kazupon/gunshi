@@ -306,7 +306,7 @@ async function resolveDescription<
   }>
 >(ctx: CommandContext<G>): Promise<string> {
   return (
-    (await ctx.extensions![pluginId].text(resolveKey('description', ctx as CommandContext))) ||
+    (await ctx.extensions![pluginId].text(resolveKey('description', ctx.name))) ||
     ctx.description ||
     ''
   )
@@ -324,7 +324,7 @@ async function resolveExamples<
     extensions: Extensions
   }>
 >(ctx: CommandContext<G>): Promise<string> {
-  const ret = await ctx.extensions![pluginId].text(resolveKey('examples', ctx as CommandContext))
+  const ret = await ctx.extensions![pluginId].text(resolveKey('examples', ctx.name))
   if (ret) {
     return ret
   }
@@ -503,7 +503,7 @@ async function generateOptionalArgsUsage<
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(async ([key, value]) => {
-      let rawDesc = await ctx.extensions![pluginId].text(resolveArgKey(key, ctx as CommandContext))
+      let rawDesc = await ctx.extensions![pluginId].text(resolveArgKey(key, ctx.name))
       if (!rawDesc && key.startsWith(ARG_NEGATABLE_PREFIX)) {
         const name = resolveNegatableKey(key)
         const schema = ctx.args[name]
@@ -541,7 +541,7 @@ async function generatePositionalArgsUsage<
   const usages = await Promise.all(
     positionals.map(async ([name]) => {
       const desc =
-        (await ctx.extensions![pluginId].text(resolveArgKey(name, ctx as CommandContext))) ||
+        (await ctx.extensions![pluginId].text(resolveArgKey(name, ctx.name))) ||
         (ctx.args[name] as ArgSchema & { description?: string }).description ||
         ''
       const arg = `${name.padEnd(argsMaxLength + ctx.env.middleMargin)} ${desc}`
