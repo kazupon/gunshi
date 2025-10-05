@@ -44,7 +44,7 @@ const greetCommand = defineI18nWithTypes<{ extensions: MyExtensions }>()({
     switch (locale.toString()) {
       case 'ja-JP': {
         return {
-          'description': '誰かにあいさつ'
+          'description': '誰かにあいさつ',
           'arg:name': 'あいさつするための名前'
         }
       }
