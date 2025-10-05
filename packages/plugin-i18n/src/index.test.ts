@@ -7,9 +7,9 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../test/helper.ts'
-import i18n, { defineI18n, pluginId } from './index.ts'
+import i18n, { defineI18n } from './index.ts'
 
-import type { Args, Command, CommandContext, GunshiParams } from '@gunshi/plugin'
+import type { Args, Command, GunshiParams } from '@gunshi/plugin'
 import type {
   CommandResource,
   CommandResourceFetcher,
@@ -168,15 +168,17 @@ describe('translation adapter', () => {
           extensions: { [K in typeof id]: I18nExtension }
         }>
       >()
-      .mockImplementation(ctx => {
-        if (ctx.extensions[pluginId].locale.toString() === loadLocale) {
+      .mockImplementation(locale => {
+        if (locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
         }
       })
 
-    const command = defineI18n({
+    const command = defineI18n<{
+      extensions: { [id]: I18nExtension }
+    }>({
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',
@@ -205,12 +207,10 @@ describe('translation adapter', () => {
 
     const ext = ctx.extensions[id]
     const mf1 = new MessageFormat('ja-JP', jaJPResource['arg:foo'])
-    expect(
-      ext.translate(resolveArgKey<typeof args>('foo', ctx as unknown as CommandContext))
-    ).toEqual(mf1.format())
+    expect(ext.translate(resolveArgKey<typeof args>('foo', ctx.name))).toEqual(mf1.format())
     const mf2 = new MessageFormat('ja-JP', jaJPResource.user)
     expect(
-      ext.translate(resolveKey<{ user: string }>('user', ctx as unknown as CommandContext), {
+      ext.translate(resolveKey<{ user: string }>('user', ctx.name), {
         user: 'kazupon'
       })
     ).toEqual(mf2.format({ user: 'kazupon' }))
@@ -246,15 +246,17 @@ describe('translation adapter', () => {
           extensions: { [K in typeof id]: I18nExtension }
         }>
       >()
-      .mockImplementation(ctx => {
-        if (ctx.extensions[pluginId].locale.toString() === loadLocale) {
+      .mockImplementation(locale => {
+        if (locale.toString() === loadLocale) {
           return Promise.resolve(jaJPResource)
         } else {
           throw new Error('not found')
         }
       })
 
-    const command = defineI18n({
+    const command = defineI18n<{
+      extensions: { [id]: I18nExtension }
+    }>({
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',
@@ -282,11 +284,9 @@ describe('translation adapter', () => {
     })
 
     const ext = ctx.extensions[id]
-    expect(ext.translate(resolveArgKey('foo', ctx as unknown as CommandContext))).toEqual(
-      jaJPResource['arg:foo']
+    expect(ext.translate(resolveArgKey('foo', ctx.name))).toEqual(jaJPResource['arg:foo'])
+    expect(ext.translate(resolveKey('user', ctx.name), { user: 'kazupon' })).toEqual(
+      `こんにちは、kazupon`
     )
-    expect(
-      ext.translate(resolveKey('user', ctx as unknown as CommandContext), { user: 'kazupon' })
-    ).toEqual(`こんにちは、kazupon`)
   })
 })

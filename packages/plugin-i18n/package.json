@@ -75,6 +75,7 @@
     "@gunshi/shared": "workspace:*",
     "@intlify/core": "next",
     "deno": "catalog:",
+    "gunshi": "workspace:*",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
     "messageformat": "4.0.0-12",

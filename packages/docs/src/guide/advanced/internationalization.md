@@ -25,10 +25,13 @@ Here's how to implement basic internationalization using the i18n plugin:
 
 ```ts [cli.ts]
 import { cli } from 'gunshi'
-import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
+import resources from '@gunshi/resources'
+import i18n, { defineI18nWithTypes, pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
+
+import type { I18nExtension } from '@gunshi/plugin-i18n'
 
 // Define a command with i18n support
-const command = defineI18n({
+const command = defineI18nWithTypes<{ extensions: { [i18nId]: I18nExtension } }>()({
   name: 'greeter',
   args: {
     name: {
@@ -44,10 +47,8 @@ const command = defineI18n({
   },
 
   // Define translation resources for the command
-  resource: async ctx => {
-    const locale = ctx.extensions[i18nId].locale.toString()
-
-    if (locale === 'ja-JP') {
+  resource: locale => {
+    if (locale.toString() === 'ja-JP') {
       return {
         description: '挨拶アプリケーション',
         'arg:name': '挨拶する相手の名前',
@@ -74,8 +75,8 @@ const command = defineI18n({
 
     // Use resolveKey for custom keys with proper namespacing
     const greetingKey = formal
-      ? resolveKey('formal_greeting', ctx)
-      : resolveKey('informal_greeting', ctx)
+      ? resolveKey('formal_greeting', ctx.name)
+      : resolveKey('informal_greeting', ctx.name)
 
     const greeting = t(greetingKey)
     console.log(`${greeting}, ${name}!`)
@@ -85,7 +86,7 @@ const command = defineI18n({
     console.log(`\nCurrent locale: ${locale}`)
 
     // Use resolveKey for description as well
-    const descKey = resolveKey('description', ctx)
+    const descKey = resolveKey('description', ctx.name)
     console.log(`Command Description: ${t(descKey)}`)
   }
 })
@@ -97,7 +98,10 @@ await cli(process.argv.slice(2), command, {
   plugins: [
     i18n({
       // Set locale from environment or default to en-US
-      locale: process.env.MY_LANG || 'en-US'
+      locale: process.env.MY_LANG || 'en-US',
+      // Provide built-in translations for common terms.
+      // See the support locales: https://github.com/kazupon/gunshi/tree/main/packages/resources#-supported-locales
+      builtinResources: resources
     })
   ]
 })
@@ -108,7 +112,7 @@ await cli(process.argv.slice(2), command, {
 > [!TIP]
 > **About the helper functions used in this example:**
 >
-> - `defineI18n`: A type-safe helper for creating commands with i18n support. It ensures proper TypeScript inference for translation keys. [Learn more](#definei18n)
+> - `defineI18nWithTypes`: A type-safe helper for creating commands with i18n support. It ensures proper TypeScript inference for translation keys. [Learn more](#defineI18nWithTypes)
 > - `resolveKey`: A utility that handles namespace resolution for custom translation keys in commands and subcommands. Always use this for custom keys to ensure proper namespacing. [Learn more](#resolvekey)
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
@@ -177,10 +181,13 @@ await cli(process.argv.slice(2), command, {
 For better organization, load translations from separate files:
 
 ```ts [cli.ts]
+import i18n, { defineI18nWithTypes, pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
+import resources from '@gunshi/resources'
 import { cli } from 'gunshi'
-import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
 
-const command = defineI18n({
+import type { I18nExtension } from '@gunshi/plugin-i18n'
+
+const command = defineI18nWithTypes<{ extensions: { [i18nId]: I18nExtension } }>()({
   name: 'greeter',
   args: {
     name: { type: 'string', short: 'n' },
@@ -188,10 +195,8 @@ const command = defineI18n({
   },
 
   // Load translations from files
-  resource: async ctx => {
-    const locale = ctx.extensions[i18nId].locale.toString()
-
-    if (locale === 'ja-JP') {
+  resource: locale => {
+    if (locale.toString() === 'ja-JP') {
       // Dynamic import for lazy loading
       const jaJP = await import('./locales/ja-JP.json', {
         with: { type: 'json' }
@@ -212,8 +217,8 @@ const command = defineI18n({
 
     // Always use resolveKey for custom keys
     const greetingKey = formal
-      ? resolveKey('formal_greeting', ctx)
-      : resolveKey('informal_greeting', ctx)
+      ? resolveKey('formal_greeting', ctx.name)
+      : resolveKey('informal_greeting', ctx.name)
 
     const greeting = t(greetingKey)
     console.log(`${greeting}, ${name}!`)
@@ -225,7 +230,8 @@ await cli(process.argv.slice(2), command, {
   version: '1.0.0',
   plugins: [
     i18n({
-      locale: process.env.MY_LANG || 'en-US'
+      locale: process.env.MY_LANG || 'en-US',
+      builtinResources: resources
     })
   ]
 })
@@ -258,27 +264,29 @@ Example locale files:
 The i18n plugin supports message interpolation for dynamic content:
 
 ```ts
-import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
+import i18n, { defineI18nWithTypes, pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
 
-const command = defineI18n({
+import type { I18nExtension } from '@gunshi/plugin-i18n'
+
+const command = defineI18nWithTypes<{ extensions: { [i18nId]: I18nExtension } }>()({
   name: 'deploy',
-  resource: async ctx => ({
-    deploying: 'Deploying {$app} to {$environment}...',
-    success: 'Successfully deployed {$app} to {$environment}!',
-    error: 'Failed to deploy: {$message}'
-  }),
   args: {
     app: { type: 'string', required: true },
     environment: { type: 'string', required: true }
   },
+  resource: () => ({
+    deploying: 'Deploying {$app} to {$environment}...',
+    success: 'Successfully deployed {$app} to {$environment}!',
+    error: 'Failed to deploy: {$message}'
+  }),
   run: ctx => {
     const t = ctx.extensions[i18nId].translate
     const { app, environment } = ctx.values
 
     // Use resolveKey for all custom keys
-    const deployingKey = resolveKey('deploying', ctx)
-    const successKey = resolveKey('success', ctx)
-    const errorKey = resolveKey('error', ctx)
+    const deployingKey = resolveKey('deploying', ctx.name)
+    const successKey = resolveKey('success', ctx.name)
+    const errorKey = resolveKey('error', ctx.name)
 
     console.log(t(deployingKey, { app, environment }))
 
@@ -299,20 +307,20 @@ Note: Interpolation placeholders use the format `{$variableName}` in the i18n pl
 When working with sub-commands, each command has its own namespace for translations:
 
 ```ts [cli.ts]
-import { cli } from 'gunshi'
-import i18n, { pluginId as i18nId, resolveKey, defineI18n } from '@gunshi/plugin-i18n'
+import i18n, { defineI18nWithTypes, pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
 import resources from '@gunshi/resources'
+import { cli } from 'gunshi'
+
+import type { I18nExtension } from '@gunshi/plugin-i18n'
 
 // Sub-command with its own translations
-const createCommand = defineI18n({
+const createCommand = defineI18nWithTypes<{ extensions: { [i18nId]: I18nExtension } }>()({
   name: 'create',
   args: {
     name: { type: 'string', required: true }
   },
-  resource: async ctx => {
-    const locale = ctx.extensions[i18nId].locale.toString()
-
-    return locale === 'ja-JP'
+  resource: locale => {
+    return locale.toString() === 'ja-JP'
       ? {
           description: 'リソースを作成',
           'arg:name': 'リソース名',
@@ -331,8 +339,8 @@ const createCommand = defineI18n({
     const { name } = ctx.values
 
     // For custom keys in subcommands, always use resolveKey helper
-    const creatingKey = resolveKey('creating', ctx)
-    const successKey = resolveKey('success', ctx)
+    const creatingKey = resolveKey('creating', ctx.name)
+    const successKey = resolveKey('success', ctx.name)
 
     console.log(t(creatingKey, { name }))
     console.log(t(successKey))
@@ -340,9 +348,9 @@ const createCommand = defineI18n({
 })
 
 // Main command
-const mainCommand = defineI18n({
+const mainCommand = defineI18nWithTypes<{ extensions: { [i18nId]: I18nExtension } }>()({
   name: 'resource-manager',
-  resource: async ctx => ({
+  resource: () => ({
     description: 'Resource management tool',
     usage_hint: 'Use a sub-command to manage resources'
   }),
@@ -350,7 +358,7 @@ const mainCommand = defineI18n({
     const t = ctx.extensions[i18nId].translate
 
     // Use resolveKey for main command's custom keys too
-    const hintKey = resolveKey('usage_hint', ctx)
+    const hintKey = resolveKey('usage_hint', ctx.name)
     console.log(t(hintKey))
   }
 })
@@ -375,63 +383,110 @@ await cli(process.argv.slice(2), mainCommand, {
 
 The i18n plugin provides helpful utilities for working with translations:
 
-### defineI18n
+### `defineI18n`
 
-Create type-safe commands with i18n support:
+Define an i18n-aware command.
 
 ```ts
-import { defineI18n, resolveKey, pluginId as i18nId } from '@gunshi/plugin-i18n'
+import { defineI18n } from '@gunshi/plugin-i18n'
 
-const command = defineI18n({
-  name: 'app',
-  resource: async ctx => ({
-    welcome: 'Welcome to the app!'
-  }),
+const greetCommand = defineI18n({
+  name: 'greet',
+  description: 'Greet someone',
+  args: {
+    name: {
+      type: 'string',
+      description: 'Name to greet'
+    }
+  },
+  resource: locale => {
+    switch (locale.toString()) {
+      case 'ja-JP': {
+        return {
+          description: '誰かにあいさつ',
+          'arg:name': 'あいさつするための名前'
+        }
+      }
+      // other locales ...
+    }
+  },
   run: ctx => {
-    // TypeScript knows about available translation keys
-    const welcomeKey = resolveKey('welcome', ctx)
-    console.log(ctx.extensions[i18nId].translate(welcomeKey))
+    console.log(`Hello, ${ctx.values.name}!`)
   }
 })
 ```
 
-### withI18nResource
+The difference from the `define` function is that you can define a `resource` option that can load a locale.
+
+### `defineI18nWithTypes`
+
+Define an i18n-aware command with types
+
+This helper function allows specifying the type parameter of `GunshiParams` while inferring the `Args` type, `ExtendContext` type from the definition.
+
+```ts
+import { defineI18nWithTypes } from '@gunshi/plugin-i18n'
+
+// Define a command with specific extensions type
+type MyExtensions = { logger: { log: (message: string) => void } }
+
+const greetCommand = defineI18nWithTypes<{ extensions: MyExtensions }>()({
+  name: 'greet',
+  args: {
+    name: { type: 'string', description: 'Name to greet' }
+  },
+  resource: locale => {
+    switch (locale.toString()) {
+      case 'ja-JP': {
+        return {
+          description: '誰かにあいさつ',
+          'arg:name': 'あいさつするための名前'
+        }
+      }
+      // other locales ...
+    }
+  },
+  run: ctx => {
+    // ctx.values is inferred as { name?: string }
+    // ctx.extensions is MyExtensions
+  }
+})
+```
+
+### `withI18nResource`
 
 Add i18n resources to existing commands:
 
 ```ts
+import { define } from 'gunshi'
 import { withI18nResource, resolveKey, pluginId as i18nId } from '@gunshi/plugin-i18n'
 
-const existingCommand = {
+const existingCommand = define({
   name: 'app',
   run: ctx => {
     const t = ctx.extensions[i18nId]?.translate
     if (t) {
-      const messageKey = resolveKey('message', ctx)
+      const messageKey = resolveKey('message', ctx.name)
       console.log(t(messageKey))
     }
   }
-}
+})
 
-const i18nCommand = withI18nResource(existingCommand, async ctx => ({
+const existingLocalizableCommand = withI18nResource(existingCommand, locale => ({
   message: 'Hello from i18n!'
 }))
 ```
 
-### resolveKey
+### `resolveKey`
 
-The `resolveKey` helper ensures proper namespace handling for custom translation keys:
+The `resolveKey` helper ensures proper command namespace handling for custom translation keys:
 
 ```ts
 import { resolveKey } from '@gunshi/plugin-i18n'
 
 // For a command named 'build'
-const key = resolveKey('starting', ctx)
+const key = resolveKey('starting', ctx.name)
 // Returns: 'build:starting'
-
-// In subcommands, it creates proper namespacing
-const subKey = resolveKey('message', ctx)
-// Returns: 'create:message'
 ```
 
 ## Resource Key Naming Conventions
@@ -589,7 +644,7 @@ Japanese (with proper locale):
 const message = t('welcome')
 
 // ✅ Correct - Always use resolveKey for custom keys
-const welcomeKey = resolveKey('welcome', ctx)
+const welcomeKey = resolveKey('welcome', ctx.name)
 const message = t(welcomeKey)
 ```
 

@@ -22,7 +22,7 @@ Render the validation errors.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `_ctx` | `CommandContext`\<`G`\> | - |
+| `_ctx` | `CommandContext`\<`G`\> | A CommandContext \| command context |
 | `error` | `AggregateError` | An AggregateError of option in `args-token` validation |
 
 ## Returns

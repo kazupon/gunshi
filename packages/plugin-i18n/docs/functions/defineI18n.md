@@ -7,26 +7,32 @@
 # Function: defineI18n()
 
 ```ts
-function defineI18n<G>(command): I18nCommand<G>;
+function defineI18n<G, A, C>(definition): { [K in string | number | symbol]: (Omit<C, "resource"> & ("resource" extends keyof C ? { resource: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }> } : { resource?: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }> }) & { [K in "name" | "entry" | "description" | "run" | "args" | "examples" | "toKebab" | "internal" | "rendering"]?: I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>[K] })[K] };
 ```
 
-Define an i18n-aware command with type safety
+Define an i18n-aware [command](../interfaces/I18nCommand.md).
+
+The difference from the `define` function is that you can define a `resource` option that can load a locale.
 
 ## Type Parameters
 
-| Type Parameter | Default type |
-| ------ | ------ |
-| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` |
+| Type Parameter | Default type | Description |
+| ------ | ------ | ------ |
+| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` | A GunshiParamsConstraint type |
+| `A` *extends* `Args` | `ExtractArgs`\<`G`\> | An Args type extracted from GunshiParamsConstraint |
+| `C` | `object` | The inferred command type |
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `command` | `Command`\<`G`\> & `object` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `definition` | `C` & `object` & `Omit`\<[`I18nCommand`](../interfaces/I18nCommand.md)\<\{ `args`: `A`; `extensions`: `ExtractExtensions`\<`G`\>; \}\>, `"args"` \| `"resource"`\> & `object` | A [command](../interfaces/I18nCommand.md) definition with i18n support |
 
 ## Returns
 
-[`I18nCommand`](../interfaces/I18nCommand.md)\<`G`\>
+\{ \[K in string \| number \| symbol\]: (Omit\<C, "resource"\> & ("resource" extends keyof C ? \{ resource: CommandResourceFetcher\<\{ args: A; extensions: ExtractExtensions\<G\> \}\> \} : \{ resource?: CommandResourceFetcher\<\{ args: A; extensions: ExtractExtensions\<G\> \}\> \}) & \{ \[K in "name" \| "entry" \| "description" \| "run" \| "args" \| "examples" \| "toKebab" \| "internal" \| "rendering"\]?: I18nCommand\<\{ args: A; extensions: ExtractExtensions\<G\> \}\>\[K\] \})\[K\] \}
+
+A defined [command](../interfaces/I18nCommand.md) with compatible Command type
 
 ## Example
 
@@ -38,11 +44,18 @@ const greetCommand = defineI18n({
   args: {
     name: { type: 'string', description: 'Name to greet' }
   },
-  resource: async (ctx) => ({
-    description: 'Greet someone',
-    'arg:name': 'The name to greet'
-  }),
-  run: async (ctx) => {
+  resource: locale => {
+    switch (locale.toString()) {
+      case 'ja-JP': {
+        return {
+          'description': '誰かにあいさつ',
+          'arg:name': 'あいさつするための名前'
+        }
+      }
+      // other locales ...
+    }
+  },
+  run: ctx => {
     console.log(`Hello, ${ctx.values.name}!`)
   }
 })

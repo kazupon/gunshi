@@ -15,3 +15,5 @@ global options plugin
 ## Returns
 
 `PluginWithExtension`\<[`GlobalExtension`](../interfaces/GlobalExtension.md)\>
+
+A defined plugin as global options

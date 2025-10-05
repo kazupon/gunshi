@@ -7,12 +7,12 @@
 # Type Alias: CommandResource\<G\>
 
 ```ts
-type CommandResource<G> = object & { [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]: string } & object;
+type CommandResource<G> = object & { [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]?: string } & object;
 ```
 
 Command resource type for i18n plugin.
 
-## Type declaration
+## Type Declaration
 
 ### description
 
@@ -21,16 +21,6 @@ description: string;
 ```
 
 Command description.
-
-### examples
-
-```ts
-examples: 
-  | string
-| CommandExamplesFetcher<NormalizeToGunshiParams<G>>;
-```
-
-Examples usage.
 
 ## Type Parameters
 

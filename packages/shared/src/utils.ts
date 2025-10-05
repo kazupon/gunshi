@@ -41,14 +41,14 @@ export function resolveBuiltInKey<
  * If the command name is provided, it will be prefixed with the command name (e.g. "cmd1:arg:foo").
  *
  * @param key - The argument key to resolve.
- * @param ctx - The command context.
+ * @param name - The command name.
  * @returns Prefixed argument key.
  */
 export function resolveArgKey<
   A extends Args = DefaultGunshiParams['args'],
   K extends string = KeyOfArgs<RemovedIndex<A>>
->(key: K, ctx?: Readonly<CommandContext>): string {
-  return `${ctx?.name ? `${ctx.name}${BUILT_IN_KEY_SEPARATOR}` : ''}${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
+>(key: K, name?: string): string {
+  return `${name ? `${name}${BUILT_IN_KEY_SEPARATOR}` : ''}${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
 /**
@@ -56,14 +56,14 @@ export function resolveArgKey<
  * Non-built-in keys are not prefixed with any special characters. If the command name is provided, it will be prefixed with the command name (e.g. "cmd1:foo").
  *
  * @param key - The non-built-in key to resolve.
- * @param ctx - The command context.
+ * @param name - The command name.
  * @returns Prefixed non-built-in key.
  */
 export function resolveKey<
   T extends Record<string, string> = {},
   K = keyof T extends string ? keyof T : string
->(key: K, ctx?: Readonly<CommandContext>): string {
-  return `${ctx?.name ? `${ctx.name}${BUILT_IN_KEY_SEPARATOR}` : ''}${key}`
+>(key: K, name?: string): string {
+  return `${name ? `${name}${BUILT_IN_KEY_SEPARATOR}` : ''}${key}`
 }
 
 /**

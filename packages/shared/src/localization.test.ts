@@ -83,15 +83,15 @@ describe('without translation function', () => {
     >(ctx, command1)
 
     // normal argument
-    expect(await localize(resolveArgKey<NonNullable<typeof command1.args>>('foo', ctx))).toEqual(
-      'Foo argument description'
-    )
+    expect(
+      await localize(resolveArgKey<NonNullable<typeof command1.args>>('foo', ctx.name))
+    ).toEqual('Foo argument description')
     // negatable argument
-    expect(await localize(resolveArgKey<NonNullable<typeof command1.args>>('no-bar', ctx))).toEqual(
-      'Negatable of --bar'
-    )
+    expect(
+      await localize(resolveArgKey<NonNullable<typeof command1.args>>('no-bar', ctx.name))
+    ).toEqual('Negatable of --bar')
     // non-existent argument
-    expect(await localize(resolveArgKey('test', ctx))).toEqual('test')
+    expect(await localize(resolveArgKey('test', ctx.name))).toEqual('test')
   })
 
   test('other keys', async () => {

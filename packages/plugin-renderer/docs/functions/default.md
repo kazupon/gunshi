@@ -15,3 +15,5 @@ usage renderer plugin
 ## Returns
 
 `PluginWithExtension`\<[`UsageRendererExtension`](../interfaces/UsageRendererExtension.md)\<`DefaultGunshiParams`\>\>
+
+A defined plugin as usage renderer

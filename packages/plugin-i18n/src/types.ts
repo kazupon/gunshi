@@ -164,17 +164,20 @@ export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiPara
    */
   description: string
 } & {
-  [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]: string
+  [Arg in GenerateNamespacedKey<
+    KeyOfArgs<RemovedIndex<ExtractArgs<G>>>,
+    typeof ARG_PREFIX
+  >]?: string
 } & { [key: string]: string } // Infer the arguments usage, Define the user resources
 
 /**
  * Command resource fetcher.
  *
- * @param ctx - A {@link CommandContext | command context}
+ * @param locale - A {@link Intl.Locale | locale} at the time of command execution.
  * @returns A fetched {@link CommandResource | command resource}.
  */
 export type CommandResourceFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
-  ctx: Readonly<CommandContext<G>>
+  locale: Intl.Locale
 ) => Awaitable<CommandResource<G>>
 
 /**

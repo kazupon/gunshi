@@ -20,4 +20,4 @@ These utilities are available via `CommandContext.extensions['g:renderer']`.
 | Property | Type | Description |
 | ------ | ------ | ------ |
 | <a id="loadcommands"></a> `loadCommands` | \<`G`\>() => `Promise`\<`Command`\<`G`\>[]\> | Load commands |
-| <a id="text"></a> `text` | \<`T`, `O`, `K`\>(`key`, `values?`) => `Promise`\<`string`\> | Render the text message |
+| <a id="text"></a> `text` | \<`A`, `C`, `E`, `K`\>(`key`, `values?`) => `string` | Render the text message |

@@ -2,7 +2,7 @@ import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
 import { define, defineWithTypes, lazy, lazyWithTypes } from './definition.ts'
 
-import type { DeepWriteable } from '../test/utils.ts'
+import type { DeepWriteable } from '@gunshi/shared'
 import type { Args, Command, CommandRunner, GunshiParams } from './types.ts'
 
 describe('define', async () => {

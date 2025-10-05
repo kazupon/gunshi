@@ -7,17 +7,19 @@
 # Function: default()
 
 ```ts
-function default(options): PluginWithExtension<Promise<I18nExtension<DefaultGunshiParams>>>;
+function default(options): PluginWithExtension<I18nExtension<DefaultGunshiParams>>;
 ```
 
 i18n plugin
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `options` | [`I18nPluginOptions`](../interfaces/I18nPluginOptions.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `options` | [`I18nPluginOptions`](../interfaces/I18nPluginOptions.md) | I18n plugin options |
 
 ## Returns
 
-`PluginWithExtension`\<`Promise`\<[`I18nExtension`](../interfaces/I18nExtension.md)\<`DefaultGunshiParams`\>\>\>
+`PluginWithExtension`\<[`I18nExtension`](../interfaces/I18nExtension.md)\<`DefaultGunshiParams`\>\>
+
+A defined plugin as i18n

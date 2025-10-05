@@ -57,6 +57,7 @@
     "release": "bumpp \"package.json\" \"packages/**/package.json\" \"packages/**/jsr.json\" --commit \"release: v\" --all --push --tag",
     "test": "vitest --typecheck run",
     "test:core": "vitest --typecheck run packages/gunshi",
+    "test:plugin-i18n": "vitest --typecheck run packages/plugin-i18n",
     "typecheck:deno": "pnpm -r --if-present typecheck:deno",
     "typecheck:tsc": "tsgo --noEmit --diagnostics"
   },

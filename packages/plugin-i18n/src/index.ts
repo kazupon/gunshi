@@ -164,7 +164,7 @@ export default function i18n(
         cmd: Command
       ): Promise<boolean> {
         let loaded = false
-        const originalResource = await loadCommandResource(ctx, cmd)
+        const originalResource = await loadCommandResource(toLocale(locale), cmd)
         if (originalResource) {
           const resource = await normalizeResource(originalResource, ctx)
           if (builtInLoadedResources) {
@@ -198,11 +198,14 @@ export default function i18n(
       )
 
       const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
-        res[resolveArgKey(key, ctx)] = value
+        res[resolveArgKey(key, ctx.name)] = value
         return res
       }, Object.create(null))
-      defaultCommandResource[resolveKey('description', ctx)] = cmd.description || ''
-      defaultCommandResource[resolveKey('examples', ctx)] = await resolveExamples(ctx, cmd.examples)
+      defaultCommandResource[resolveKey('description', ctx.name)] = cmd.description || ''
+      defaultCommandResource[resolveKey('examples', ctx.name)] = await resolveExamples(
+        ctx,
+        cmd.examples
+      )
       adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
       // load resource for target command
@@ -224,7 +227,7 @@ function toLocaleString(locale: string | Intl.Locale): string {
 }
 
 async function loadCommandResource(
-  ctx: CommandContext,
+  locale: Intl.Locale,
   command: Command | LazyCommand
 ): Promise<CommandResource | undefined> {
   // check if command has i18n resource support
@@ -234,7 +237,7 @@ async function loadCommandResource(
 
   let resource: CommandResource | undefined
   try {
-    resource = await command.resource!(ctx)
+    resource = await command.resource!(locale)
   } catch (error) {
     console.error(`Failed to load resource for command "${command.name}":`, error)
   }
@@ -262,14 +265,14 @@ async function normalizeResource(
   for (const [key, value] of Object.entries(resource as Record<string, string>)) {
     if (key.startsWith(ARG_PREFIX_AND_KEY_SEPARATOR)) {
       // argument key
-      ret[resolveKey(key, ctx)] = value
+      ret[resolveKey(key, ctx.name)] = value
     } else {
       if (key === 'examples') {
         // examples key
-        ret[resolveKey('examples', ctx)] = await resolveExamples(ctx, value)
+        ret[resolveKey('examples', ctx.name)] = await resolveExamples(ctx, value)
       } else {
         // other keys
-        ret[resolveKey(key, ctx)] = value
+        ret[resolveKey(key, ctx.name)] = value
       }
     }
   }
