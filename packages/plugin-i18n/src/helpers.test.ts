@@ -2,6 +2,7 @@ import { DeepWriteable } from '@gunshi/shared'
 import { cli, define } from 'gunshi'
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
+import i18n from './index.ts'
 
 import type { Args, CommandRunner } from '@gunshi/plugin'
 import type { CommandResourceFetcher, I18nCommand } from './types.ts'
@@ -353,9 +354,7 @@ describe('withI18nResource', () => {
       }
     })
 
-    expect(localizedCommand).toBeInstanceOf(Function)
-
-    expect(localizedCommand.name).toBe(test.name)
+    expect(localizedCommand.name).toBe(command.name)
     expectTypeOf<typeof localizedCommand.name>().toEqualTypeOf<string>()
 
     expect(localizedCommand.description).toBe(command.description)
@@ -379,7 +378,10 @@ describe('withI18nResource', () => {
       {
         run: _ctx => {}
       },
-      { subCommands: { test: localizedCommand } }
+      {
+        subCommands: { test: localizedCommand },
+        plugins: [i18n({ locale: 'ja-JP' })]
+      }
     )
 
     expect(mock).toHaveBeenCalled()
@@ -402,8 +404,6 @@ describe('withI18nResource', () => {
       },
       resource
     )
-
-    expect(localizedCommand).toBeInstanceOf(Function)
 
     expect(localizedCommand.name).toBe('test')
     expectTypeOf<typeof localizedCommand.name>().toEqualTypeOf<string>()
