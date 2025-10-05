@@ -12,6 +12,6 @@ i18n plugin options
 
 | Property | Type | Description |
 | ------ | ------ | ------ |
+| <a id="builtinresources"></a> `builtinResources?` | `Record`\<`string`, `Record`\<`BuiltinResourceKeys`, `string`\>\> | Built-in localizable resources |
 | <a id="locale"></a> `locale?` | `string` \| `Locale` | Locale to use for translations |
-| <a id="resources"></a> `resources?` | `Record`\<`string`, `Record`\<`BuiltinResourceKeys`, `string`\>\> | Built-in localizable resources |
 | <a id="translationadapterfactory"></a> `translationAdapterFactory?` | [`TranslationAdapterFactory`](../type-aliases/TranslationAdapterFactory.md) | Translation adapter factory |

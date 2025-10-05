@@ -7,7 +7,7 @@
 # Type Alias: CommandResourceFetcher()\<G\>
 
 ```ts
-type CommandResourceFetcher<G> = (ctx) => Awaitable<CommandResource<G>>;
+type CommandResourceFetcher<G> = (locale) => Awaitable<CommandResource<G>>;
 ```
 
 Command resource fetcher.
@@ -22,7 +22,7 @@ Command resource fetcher.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `ctx` | `Readonly`\<`CommandContext`\<`G`\>\> | A CommandContext \| command context |
+| `locale` | `Intl.Locale` | A Intl.Locale \| locale at the time of command execution. |
 
 ## Returns
 

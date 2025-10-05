@@ -27,6 +27,12 @@ await cli(process.argv.slice(2), entry, {
 })
 ```
 
+## Variables
+
+| Variable | Description |
+| ------ | ------ |
+| [pluginId](variables/pluginId.md) | The unique identifier for usage renderer plugin. |
+
 ## Functions
 
 | Function | Description |
@@ -41,3 +47,9 @@ await cli(process.argv.slice(2), entry, {
 | Interface | Description |
 | ------ | ------ |
 | [UsageRendererExtension](interfaces/UsageRendererExtension.md) | Extended command context which provides utilities via usage renderer plugin. These utilities are available via `CommandContext.extensions['g:renderer']`. |
+
+## Type Aliases
+
+| Type Alias | Description |
+| ------ | ------ |
+| [PluginId](type-aliases/PluginId.md) | Type representing the unique identifier for usage renderer plugin. |

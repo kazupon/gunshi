@@ -62,7 +62,7 @@ type WithI18nResourceResult<
  *   },
  *   resource: locale => {
  *     switch (locale.toString()) {
- *       case 'ja-jP': {
+ *       case 'ja-JP': {
  *         return {
  *           'description': '誰かにあいさつ'
  *           'arg:name': 'あいさつするための名前'
@@ -148,7 +148,7 @@ type DefineI18nWithTypesReturn<
  *   },
  *   resource: locale => {
  *     switch (locale.toString()) {
- *       case 'ja-jP': {
+ *       case 'ja-JP': {
  *         return {
  *           'description': '誰かにあいさつ'
  *           'arg:name': 'あいさつするための名前'

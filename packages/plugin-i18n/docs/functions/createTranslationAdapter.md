@@ -10,12 +10,16 @@
 function createTranslationAdapter(options): TranslationAdapter;
 ```
 
+Create a translation adapter.
+
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) | Options for the translation adapter, see [TranslationAdapterFactoryOptions](../interfaces/TranslationAdapterFactoryOptions.md) |
 
 ## Returns
 
 [`TranslationAdapter`](../interfaces/TranslationAdapter.md)
+
+A translation adapter instance

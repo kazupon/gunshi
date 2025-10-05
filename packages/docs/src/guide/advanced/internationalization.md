@@ -401,7 +401,7 @@ const greetCommand = defineI18n({
   },
   resource: locale => {
     switch (locale.toString()) {
-      case 'ja-jP': {
+      case 'ja-JP': {
         return {
           description: '誰かにあいさつ',
           'arg:name': 'あいさつするための名前'
@@ -437,7 +437,7 @@ const greetCommand = defineI18nWithTypes<{ extensions: MyExtensions }>()({
   },
   resource: locale => {
     switch (locale.toString()) {
-      case 'ja-jP': {
+      case 'ja-JP': {
         return {
           description: '誰かにあいさつ',
           'arg:name': 'あいさつするための名前'

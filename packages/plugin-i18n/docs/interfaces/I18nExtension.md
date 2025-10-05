@@ -19,5 +19,6 @@ These utilities are available via `CommandContext.extensions['g:i18n']`.
 
 | Property | Type | Description |
 | ------ | ------ | ------ |
-| <a id="locale"></a> `locale` | `string` \| `Locale` | Command locale |
-| <a id="translate"></a> `translate` | \<`T`, `O`, `K`\>(`key`, `values?`) => `string` | Translate a message |
+| <a id="loadresource"></a> `loadResource` | (`locale`, `ctx`, `command`) => `Promise`\<`boolean`\> | Load command resources. |
+| <a id="locale"></a> `locale` | `Locale` | Command locale |
+| <a id="translate"></a> `translate` | \<`A`, `C`, `E`, `K`\>(`key`, `values?`) => `string` | Translate a message. |
