@@ -36,6 +36,8 @@ export type PluginId = typeof pluginId
 /**
  * Extended command context which provides utilities via i18n plugin.
  * These utilities are available via `CommandContext.extensions['g:i18n']`.
+ *
+ * @typeParam G - Type parameter extending {@linkcode GunshiParams}
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams> {
@@ -45,6 +47,10 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
   locale: Intl.Locale
   /**
    * Translate a message.
+   *
+   * @typeParam A - The {@linkcode Args} type extracted from G
+   * @typeParam C - The command context type (usually `{}`)
+   * @typeParam E - The extended resource keys type (usually `{}`)
    *
    * @param key - Translation key
    * @param values - Values to interpolate
@@ -64,8 +70,9 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
   /**
    * Load command resources.
    *
-   * @param ctx - Command context
-   * @param command - Command
+   * @param locale - A locale to load resources for
+   * @param ctx - A {@linkcode CommandContext | command context}
+   * @param command - A {@linkcode Command | command} to load resources for
    * @returns Whether the resources were loaded successfully
    */
   loadResource: (
@@ -118,6 +125,7 @@ export interface TranslationAdapterFactoryOptions {
 
 /**
  * Translation adapter.
+ *
  * This adapter is used to custom message formatter like {@link https://github.com/intlify/vue-i18n/blob/master/spec/syntax.ebnf | Intlify message format}, {@link https://github.com/tc39/proposal-intl-messageformat | `Intl.MessageFormat` (MF2)}, and etc.
  * This adapter will support localization with your preferred message format.
  */
@@ -157,6 +165,8 @@ export interface TranslationAdapter<MessageResource = string> {
 
 /**
  * Command resource type for i18n plugin.
+ *
+ * @typeParam G - Type parameter extending {@linkcode GunshiParams}
  */
 export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
   /**
@@ -173,6 +183,8 @@ export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiPara
 /**
  * Command resource fetcher.
  *
+ * @typeParam G - Type parameter extending {@linkcode GunshiParams}
+ *
  * @param locale - A {@link Intl.Locale | locale} at the time of command execution.
  * @returns A fetched {@link CommandResource | command resource}.
  */
@@ -182,6 +194,8 @@ export type CommandResourceFetcher<G extends GunshiParamsConstraint = DefaultGun
 
 /**
  * I18n-aware command interface that extends the base Command with resource support
+ *
+ * @typeParam G - Type parameter extending {@linkcode GunshiParams}
  */
 export interface I18nCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>
   extends Command<G> {

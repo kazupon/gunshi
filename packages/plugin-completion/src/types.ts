@@ -20,7 +20,7 @@ export const pluginId: GenerateNamespacedKey<'completion', typeof PLUGIN_PREFIX>
 export type PluginId = typeof pluginId
 
 /**
- * Parameters for {@link CompletionHandler | the completion handler}.
+ * Parameters for {@linkcode CompletionHandler | the completion handler}.
  */
 export interface CompletionParams {
   /**
@@ -31,6 +31,9 @@ export interface CompletionParams {
 
 /**
  * The handler for completion.
+ *
+ * @param params - The {@linkcode CompletionParams | parameters} for the completion handler.
+ * @returns An array of {@linkcode Completion | completions}.
  */
 export type CompletionHandler = (params: CompletionParams) => Completion[]
 
@@ -45,7 +48,7 @@ export interface CompletionExtension {}
  */
 export interface CompletionConfig {
   /**
-   * The handler for the completion.
+   * The {@linkcode CompletionHandler | handler} for the completion.
    */
   handler?: CompletionHandler
   /**
@@ -63,11 +66,11 @@ export interface CompletionOptions {
    */
   config?: {
     /**
-     * The entry point completion configuration.
+     * The entry point {@linkcode CompletionConfig | completion configuration}.
      */
     entry?: CompletionConfig
     /**
-     * The handlers for subcommands.
+     * The handlers for sub-commands.
      */
     subCommands?: Record<string, CompletionConfig>
   }

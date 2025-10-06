@@ -36,6 +36,8 @@ type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 
 /**
  * Run the command.
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
+ *
  * @param argv - Command line arguments
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}

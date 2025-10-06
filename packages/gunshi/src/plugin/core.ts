@@ -93,6 +93,8 @@ export interface PluginDependency {
 /**
  * Plugin function type
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}.
+ *
  * @since v0.27.0
  */
 export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
@@ -101,6 +103,13 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 
 /**
  * Plugin extension
+ *
+ * @typeParam T - The type of the extension object returned by the plugin extension function.
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContextCore}.
+ *
+ * @param ctx - The {@linkcode CommandContextCore | command context} core
+ * @param cmd - The {@linkcode Command | command} to which the plugin is being applied
+ * @returns An object of type T that represents the extension provided by the plugin
  *
  * @since v0.27.0
  */
@@ -111,6 +120,11 @@ export type PluginExtension<
 
 /**
  * Plugin extension callback, which is called when the plugin is extended with `extension` option.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContext} and {@linkcode Command}.
+ *
+ * @param ctx - The {@linkcode CommandContext | command context}
+ * @param cmd - The {@linkcode Command | command}
  *
  * @since v0.27.0
  */
@@ -186,8 +200,10 @@ export interface PluginOptions<
 /**
  * Gunshi plugin, which is a function that receives a PluginContext.
  *
- * @param ctx - A {@link PluginContext}.
- * @returns An {@link Awaitable} that resolves when the plugin is loaded.
+ * @typeParam E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions.
+ *
+ * @param ctx - A {@linkcode PluginContext}.
+ * @returns An {@linkcode Awaitable} that resolves when the plugin is loaded.
  *
  * @since v0.27.0
  */
@@ -201,7 +217,10 @@ export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['e
 
 /**
  * Plugin return type with extension, which includes the plugin ID, name, dependencies, and extension.
+ *
  * This type is used to define a plugin at `plugin` function.
+ *
+ * @typeParam E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions.
  */
 export interface PluginWithExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
@@ -226,7 +245,10 @@ export interface PluginWithExtension<
 
 /**
  * Plugin return type without extension, which includes the plugin ID, name, and dependencies, but no extension.
+ *
  * This type is used to define a plugin at `plugin` function without extension.
+ *
+ * @typeParam E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions.
  */
 export interface PluginWithoutExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
@@ -248,7 +270,12 @@ export interface PluginWithoutExtension<
 /**
  * Define a plugin with extension compatibility and typed dependency extensions
  *
- * @param options - {@link PluginOptions | plugin options}
+ * @typeParam Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions.
+ * @typeParam Id - A string type to specify the plugin ID.
+ * @typeParam Deps - A readonly array of {@linkcode PluginDependency} or string to specify the plugin dependencies.
+ * @typeParam Extension - A type to specify the shape of the plugin extension object.
+ *
+ * @param options - {@linkcode PluginOptions | plugin options}
  * @returns A defined plugin with extension
  *
  * @since v0.27.0
@@ -299,7 +326,12 @@ export function plugin<
 /**
  * Define a plugin without extension and typed dependency extensions
  *
- * @param options - {@link PluginOptions | plugin options} without extension
+ * @typeParam Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions.
+ * @typeParam Id - A string type to specify the plugin ID.
+ * @typeParam Deps - A readonly array of {@linkcode PluginDependency} or string to specify the plugin dependencies.
+ * @typeParam Extension - A type to specify the shape of the plugin extension object.
+ *
+ * @param options - {@linkcode PluginOptions | plugin options} without extension
  * @returns A defined plugin without extension
  *
  * @since v0.27.0
@@ -349,7 +381,7 @@ export function plugin<
 /**
  * Define a plugin
  *
- * @param options - {@link PluginOptions | plugin options}
+ * @param options - {@linkcode PluginOptions | plugin options}
  * @returns A defined plugin
  *
  * @since v0.27.0

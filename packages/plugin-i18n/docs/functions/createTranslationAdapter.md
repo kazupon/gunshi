@@ -16,7 +16,7 @@ Create a translation adapter.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) | Options for the translation adapter, see [TranslationAdapterFactoryOptions](../interfaces/TranslationAdapterFactoryOptions.md) |
+| `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) | Options for the translation adapter, see [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) |
 
 ## Returns
 

@@ -23,14 +23,14 @@ Add i18n resource to an existing command
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `command` | `C` | A defined command with define function |
-| `resource` | [`CommandResourceFetcher`](../type-aliases/CommandResourceFetcher.md)\<`G`\> | A resource fetcher for the command |
+| `command` | `C` | A defined Command \| command with define function |
+| `resource` | [`CommandResourceFetcher`](../type-aliases/CommandResourceFetcher.md)\<`G`\> | A [resource fetcher](../type-aliases/CommandResourceFetcher.md) for the command |
 
 ## Returns
 
 \{ \[K in string \| number \| symbol\]: (C & \{ resource: CommandResourceFetcher\<G\> \} & \{ \[K in "name" \| "entry" \| "description" \| "run" \| "args" \| "examples" \| "toKebab" \| "internal" \| "rendering"\]?: I18nCommand\<G\>\[K\] \})\[K\] \}
 
-A command with i18n resource support
+A [command](../interfaces/I18nCommand.md) with i18n resource support
 
 ## Example
 

@@ -24,6 +24,6 @@ Command description.
 
 ## Type Parameters
 
-| Type Parameter | Default type |
-| ------ | ------ |
-| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` |
+| Type Parameter | Default type | Description |
+| ------ | ------ | ------ |
+| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` | Type parameter extending `GunshiParams` |

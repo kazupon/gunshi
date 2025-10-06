@@ -6,7 +6,7 @@
 
 # Class: DefaultTranslation
 
-Default implementation of [TranslationAdapter](../interfaces/TranslationAdapter.md).
+Default implementation of [`TranslationAdapter`](../interfaces/TranslationAdapter.md).
 
 ## Implements
 
@@ -26,7 +26,7 @@ Creates a new instance of DefaultTranslation.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) | Options for the translation adapter, see [TranslationAdapterFactoryOptions](../interfaces/TranslationAdapterFactoryOptions.md) |
+| `options` | [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) | Options for the translation adapter, see [`TranslationAdapterFactoryOptions`](../interfaces/TranslationAdapterFactoryOptions.md) |
 
 #### Returns
 

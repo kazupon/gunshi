@@ -24,7 +24,10 @@ import type {
 
 /**
  * Resolve a namespaced key for built-in resources.
+ *
  * Built-in keys are prefixed with "_:".
+ *
+ * @typeParam K - The type of the built-in key to resolve. Defaults to command built-in argument and resource keys.
  *
  * @param key - The built-in key to resolve.
  * @returns Prefixed built-in key.
@@ -37,8 +40,11 @@ export function resolveBuiltInKey<
 
 /**
  * Resolve a namespaced key for argument resources.
+ *
  * Argument keys are prefixed with "arg:".
  * If the command name is provided, it will be prefixed with the command name (e.g. "cmd1:arg:foo").
+ *
+ * @typeParam A - The {@linkcode Args} type extracted from G
  *
  * @param key - The argument key to resolve.
  * @param name - The command name.
@@ -53,7 +59,10 @@ export function resolveArgKey<
 
 /**
  * Resolve a namespaced key for non-built-in resources.
+ *
  * Non-built-in keys are not prefixed with any special characters. If the command name is provided, it will be prefixed with the command name (e.g. "cmd1:foo").
+ *
+ * @typeParam T - The type of the non-built-in key to resolve. Defaults to string.
  *
  * @param key - The non-built-in key to resolve.
  * @param name - The command name.
@@ -69,8 +78,10 @@ export function resolveKey<
 /**
  * Resolve command examples.
  *
- * @param ctx - The command context.
- * @param examples - The examples to resolve, which can be a string or a function that returns a string.
+ * @typeParam G - Type parameter extending {@linkcode GunshiParams}
+ *
+ * @param ctx - A {@linkcode CommandContext | command context}.
+ * @param examples - The examples to resolve, which can be a string or a {@linkcode CommandExamplesFetcher | function} that returns a string.
  * @returns A resolved string of examples.
  */
 export async function resolveExamples<G extends GunshiParamsConstraint = DefaultGunshiParams>(
@@ -87,6 +98,8 @@ export async function resolveExamples<G extends GunshiParamsConstraint = Default
 /**
  * Generate a namespaced key for a plugin.
  *
+ * @typeParam K - The type of the plugin id to generate a namespaced key for.
+ *
  * @param id - A plugin id to generate a namespaced key.
  * @returns A namespaced key for the plugin.
  */
@@ -99,7 +112,7 @@ export function namespacedId<K extends string>(
 /**
  * Generate a short and long option pair for command arguments.
  *
- * @param schema - The argument schema to generate the option pair.
+ * @param schema - The {@linkcode ArgSchema | argument schema} to generate the option pair.
  * @param name - The name of the argument.
  * @param toKebab - Whether to convert the name to kebab-case for display in help text.
  * @returns A string representing the short and long option pair.

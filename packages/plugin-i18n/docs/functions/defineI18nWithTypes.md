@@ -13,7 +13,7 @@ function defineI18nWithTypes<G>(): DefineI18nWithTypesReturn<ExtractExtensions<G
 Define an i18n-aware [command](../interfaces/I18nCommand.md) with types
 
 This helper function allows specifying the type parameter of GunshiParams
-while inferring the Args type, ExtendContext type from the definition.
+while inferring the `Args` type, `ExtendContext` type from the definition.
 
 ## Type Parameters
 
@@ -25,7 +25,7 @@ while inferring the Args type, ExtendContext type from the definition.
 
 `DefineI18nWithTypesReturn`\<`ExtractExtensions`\<`G`\>, `ExtractArgs`\<`G`\>\>
 
-A function that takes a command definition via [defineI18n](defineI18n.md)
+A function that takes a command definition via [`defineI18n`](defineI18n.md)
 
 ## Example
 

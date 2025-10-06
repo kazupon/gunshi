@@ -53,6 +53,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "build:docs": "typedoc --excludeInternal",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
@@ -73,6 +74,8 @@
     "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
     "rollup-plugin-license": "^3.6.0",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "typedoc": "catalog:",
+    "typedoc-plugin-markdown": "catalog:"
   }
 }

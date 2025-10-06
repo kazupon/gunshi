@@ -22,11 +22,21 @@ export type PluginId = typeof pluginId
 /**
  * Extended command context which provides utilities via usage renderer plugin.
  * These utilities are available via `CommandContext.extensions['g:renderer']`.
+ *
+ * @typeParam G - A type extending {@link GunshiParams} to specify the shape of command parameters.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
-   * Render the text message
+   * Render the text message.
+   *
+   * @typeParam A - The type of {@linkcode Args | arguments} defined in the command parameters.
+   * @typeParam C - The type representing the command context.
+   * @typeParam E - The type representing extended resources for localization.
+   *
+   * @param key - The translation key to be resolved.
+   * @param values - An optional record of values to interpolate into the translation string.
+   * @returns The resolved translation string with interpolated values if provided.
    */
   text: <
     A extends Args = G['args'],
@@ -40,7 +50,9 @@ export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGun
   /**
    * Load commands
    *
-   * @returns A list of commands loaded from the usage renderert plugin.
+   * @typeParam G - A type extending {@link GunshiParams} to specify the shape of command parameters.
+   *
+   * @returns A list of commands loaded from the usage renderer plugin.
    */
   loadCommands: <G extends GunshiParams = DefaultGunshiParams>() => Promise<Command<G>[]>
 }

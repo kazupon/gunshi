@@ -19,10 +19,12 @@ import type {
 /**
  * Run the command.
  *
+ * @typeParam A - The type of {@linkcode Args | arguments} defined in the command and cli options.
+ *
  * @param args - Command line arguments
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
- * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
+ * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<
   A extends Args = Args,
@@ -35,6 +37,8 @@ export async function cli<
 
 /**
  * Run the command.
+ *
+ * @typeParam E - An {@linkcode ExtendContext} type to specify the shape of command and cli options.
  *
  * @param args - Command line arguments
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
@@ -53,10 +57,12 @@ export async function cli<
 /**
  * Run the command.
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
+ *
  * @param args - Command line arguments
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
- * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
+ * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   args: string[],
@@ -67,10 +73,12 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 /**
  * Run the command.
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
+ *
  * @param args - Command line arguments
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
- * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
+ * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   args: string[],

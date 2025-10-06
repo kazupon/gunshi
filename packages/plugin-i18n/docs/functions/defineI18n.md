@@ -12,14 +12,14 @@ function defineI18n<G, A, C>(definition): { [K in string | number | symbol]: (Om
 
 Define an i18n-aware [command](../interfaces/I18nCommand.md).
 
-The difference from the `define` function is that you can define a `resource` option that can load a locale.
+The difference from the define function is that you can define a `resource` option that can load a locale.
 
 ## Type Parameters
 
 | Type Parameter | Default type | Description |
 | ------ | ------ | ------ |
-| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` | A GunshiParamsConstraint type |
-| `A` *extends* `Args` | `ExtractArgs`\<`G`\> | An Args type extracted from GunshiParamsConstraint |
+| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` | A `GunshiParamsConstraint` type |
+| `A` *extends* `Args` | `ExtractArgs`\<`G`\> | An `Args` type extracted from `GunshiParamsConstraint` |
 | `C` | `object` | The inferred command type |
 
 ## Parameters
@@ -32,7 +32,7 @@ The difference from the `define` function is that you can define a `resource` op
 
 \{ \[K in string \| number \| symbol\]: (Omit\<C, "resource"\> & ("resource" extends keyof C ? \{ resource: CommandResourceFetcher\<\{ args: A; extensions: ExtractExtensions\<G\> \}\> \} : \{ resource?: CommandResourceFetcher\<\{ args: A; extensions: ExtractExtensions\<G\> \}\> \}) & \{ \[K in "name" \| "entry" \| "description" \| "run" \| "args" \| "examples" \| "toKebab" \| "internal" \| "rendering"\]?: I18nCommand\<\{ args: A; extensions: ExtractExtensions\<G\> \}\>\[K\] \})\[K\] \}
 
-A defined [command](../interfaces/I18nCommand.md) with compatible Command type
+A defined [command](../interfaces/I18nCommand.md) with compatible `Command` type
 
 ## Example
 

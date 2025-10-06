@@ -17,11 +17,13 @@ export type Awaitable<T> = T | Promise<T>
 
 /**
  * Prettify a type by flattening its structure.
+ *
+ * @typeParam T - The type to be prettified.
  */
 export type Prettify<T> = { [K in keyof T]: T[K] } & {}
 
 /**
- * Extend command context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
+ * Extend command context type. This type is used to extend the command context with additional properties at {@linkcode CommandContext.extensions}.
  *
  * @since v0.27.0
  */
@@ -67,7 +69,7 @@ export type DefaultGunshiParams = GunshiParams
 /**
  * Generic constraint for command-related types.
  *
- * This type constraint allows both {@link GunshiParams} and objects with extensions.
+ * This type constraint allows both {@linkcode GunshiParams} and objects with extensions.
  *
  * @since v0.27.0
  */
@@ -84,7 +86,7 @@ export type GunshiParamsConstraint =
 /**
  * Type helper to extract args
  *
- * @typeParam G - The type of {@link GunshiParams} or an object with {@link Args}.
+ * @typeParam G - The type of {@linkcode GunshiParams} or an object with {@linkcode Args}.
  *
  * @internal
  */
@@ -101,7 +103,7 @@ export type ExtractArgs<G> =
 /**
  * Type helper to extract explicitly provided argument flags.
  *
- * @typeParam G - The type of {@link GunshiParams}.
+ * @typeParam G - The type of {@linkcode GunshiParams}.
  *
  * @internal
  */
@@ -131,71 +133,73 @@ export type NormalizeToGunshiParams<G> =
 
 /**
  * Command environment.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command environments.
  */
 export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Current working directory.
    *
-   * @see {@link CliOptions.cwd}
+   * @see {@linkcode CliOptions.cwd}
    */
   cwd: string | undefined
   /**
    * Command name.
    *
-   * @see {@link CliOptions.name}
+   * @see {@linkcode CliOptions.name}
    */
   name: string | undefined
   /**
    * Command description.
    *
-   * @see {@link CliOptions.description}
+   * @see {@linkcode CliOptions.description}
    */
   description: string | undefined
   /**
    * Command version.
    *
-   * @see {@link CliOptions.version}
+   * @see {@linkcode CliOptions.version}
    */
   version: string | undefined
   /**
    * Left margin of the command output.
    *
    * @default 2
-   * @see {@link CliOptions.leftMargin}
+   * @see {@linkcode CliOptions.leftMargin}
    */
   leftMargin: number
   /**
    * Middle margin of the command output.
    *
    * @default 10
-   * @see {@link CliOptions.middleMargin}
+   * @see {@linkcode CliOptions.middleMargin}
    */
   middleMargin: number
   /**
    * Whether to display the usage option type.
    *
    * @default false
-   * @see {@link CliOptions.usageOptionType}
+   * @see {@linkcode CliOptions.usageOptionType}
    */
   usageOptionType: boolean
   /**
    * Whether to display the option value.
    *
    * @default true
-   * @see {@link CliOptions.usageOptionValue}
+   * @see {@linkcode CliOptions.usageOptionValue}
    */
   usageOptionValue: boolean
   /**
    * Whether to display the command usage.
    *
    * @default false
-   * @see {@link CliOptions.usageSilent}
+   * @see {@linkcode CliOptions.usageSilent}
    */
   usageSilent: boolean
   /**
    * Sub commands.
    *
-   * @see {@link CliOptions.subCommands}
+   * @see {@linkcode CliOptions.subCommands}
    */
   subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
   /**
@@ -216,14 +220,14 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
   /**
    * Hook that runs before any command execution
    *
-   * @see {@link CliOptions.onBeforeCommand}
+   * @see {@linkcode CliOptions.onBeforeCommand}
    * @since v0.27.0
    */
   onBeforeCommand: ((ctx: Readonly<CommandContext<G>>) => Awaitable<void>) | undefined
   /**
    * Hook that runs after successful command execution
    *
-   * @see {@link CliOptions.onAfterCommand}
+   * @see {@linkcode CliOptions.onAfterCommand}
    * @since v0.27.0
    */
   onAfterCommand:
@@ -232,14 +236,16 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
   /**
    * Hook that runs when a command throws an error
    *
-   * @see {@link CliOptions.onErrorCommand}
+   * @see {@linkcode CliOptions.onErrorCommand}
    * @since v0.27.0
    */
   onErrorCommand: ((ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>) | undefined
 }
 
 /**
- * CLI options of `cli` function.
+ * CLI options of {@linkcode cli} function.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of cli options.
  */
 export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
@@ -344,27 +350,30 @@ export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
 
 /**
  * Command context.
+ *
  * Command context is the context of the command execution.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  */
 export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
    * Command name, that is the command that is executed.
-   * The command name is same {@link CommandEnvironment.name}.
+   * The command name is same {@linkcode CommandEnvironment.name}.
    */
   name: string | undefined
   /**
    * Command description, that is the description of the command that is executed.
-   * The command description is same {@link CommandEnvironment.description}.
+   * The command description is same {@linkcode CommandEnvironment.description}.
    */
   description: string | undefined
   /**
    * Command environment, that is the environment of the command that is executed.
-   * The command environment is same {@link CommandEnvironment}.
+   * The command environment is same {@linkcode CommandEnvironment}.
    */
   env: Readonly<CommandEnvironment<G>>
   /**
    * Command arguments, that is the arguments of the command that is executed.
-   * The command arguments is same {@link Command.args}.
+   * The command arguments is same {@linkcode Command.args}.
    */
   args: ExtractArgs<G>
 
@@ -380,7 +389,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
 
   /**
    * Command values, that is the values of the command that is executed.
-   * Resolve values with `resolveArgs` from command arguments and {@link Command.args}.
+   * Resolve values with `resolveArgs` from command arguments and {@linkcode Command.args}.
    */
   values: ArgValues<ExtractArgs<G>>
   /**
@@ -412,15 +421,15 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
   callMode: CommandCallMode
   /**
    * Whether to convert the camel-case style argument name to kebab-case.
-   * This context value is set from {@link Command.toKebab} option.
+   * This context value is set from {@linkcode Command.toKebab} option.
    */
   toKebab?: boolean
   /**
    * Output a message.
-   * If {@link CommandEnvironment.usageSilent} is true, the message is not output.
+   * If {@linkcode CommandEnvironment.usageSilent} is true, the message is not output.
    *
-   * @param message - an output message, @see {@link console.log}
-   * @param optionalParams - an optional parameters, @see {@link console.log}
+   * @param message - an output message, @see {@linkcode console.log}
+   * @param optionalParams - an optional parameters, @see {@linkcode console.log}
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic optional parameters
   /**
@@ -440,6 +449,8 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
 /**
  * CommandContextCore type (base type without extensions)
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
+ *
  * @since v0.27.0
  */
 export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<
@@ -448,6 +459,8 @@ export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiP
 
 /**
  * Command context extension
+ *
+ * @typeParam E - A type extending {@linkcode GunshiParams.extensions} to specify the shape of the extension.
  *
  * @since v0.27.0
  */
@@ -470,6 +483,8 @@ export interface CommandContextExtension<
 
 /**
  * Rendering control options
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of render options.
  *
  * @since v0.27.0
  */
@@ -503,6 +518,8 @@ export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGuns
 
 /**
  * Command interface.
+ *
+ * @typeParam G - The Gunshi parameters constraint
  */
 export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**
@@ -531,7 +548,7 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
   run?: CommandRunner<G>
   /**
    * Whether to convert the camel-case style argument name to kebab-case.
-   * If you will set to `true`, All {@link Command.args} names will be converted to kebab-case.
+   * If you will set to `true`, All {@linkcode Command.args} names will be converted to kebab-case.
    */
   toKebab?: boolean
   /**
@@ -559,6 +576,7 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
 
 /**
  * Lazy command interface.
+ *
  * Lazy command that's not loaded until it is executed.
  *
  * @typeParam G - The Gunshi parameters constraint
@@ -582,6 +600,8 @@ export type LazyCommand<
 
 /**
  * Define a command type.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command.
  */
 export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
   | Command<G>
@@ -589,6 +609,8 @@ export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> 
 
 /**
  * Command examples fetcher.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *
  * @param ctx - A {@link CommandContext | command context}
  * @returns A fetched command examples.
@@ -600,6 +622,8 @@ export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGun
 /**
  * Command runner.
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
+ *
  * @param ctx - A {@link CommandContext | command context}
  * @returns void or string (for CLI output)
  */
@@ -609,8 +633,11 @@ export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams
 
 /**
  * Command loader.
+ *
  * A function that returns a command or command runner.
  * This is used to lazily load commands.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner.
  *
  * @returns A command or command runner
  */
@@ -620,7 +647,10 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
 
 /**
  * Command decorator.
+ *
  * A function that wraps a command runner to add or modify its behavior.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *
  * @param baseRunner - The base command runner to decorate
  * @returns The decorated command runner
@@ -633,7 +663,11 @@ export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiPar
 
 /**
  * Renderer decorator type.
+ *
  * A function that wraps a base renderer to add or modify its behavior.
+ *
+ * @typeParam T - The type of the rendered result.
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *
  * @param baseRenderer - The base renderer function to decorate
  * @param ctx - The command context
@@ -649,6 +683,8 @@ export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunsh
 /**
  * Validation errors renderer decorator type.
  * A function that wraps a validation errors renderer to add or modify its behavior.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *
  * @param baseRenderer - The base validation errors renderer function to decorate
  * @param ctx - The command context

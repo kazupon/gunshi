@@ -8,7 +8,7 @@ import type { TranslationAdapter, TranslationAdapterFactoryOptions } from './typ
 /**
  * Create a translation adapter.
  *
- * @param options - Options for the translation adapter, see {@link TranslationAdapterFactoryOptions}
+ * @param options - Options for the translation adapter, see {@linkcode TranslationAdapterFactoryOptions}
  * @returns A translation adapter instance
  */
 export function createTranslationAdapter(
@@ -18,7 +18,7 @@ export function createTranslationAdapter(
 }
 
 /**
- * Default implementation of {@link TranslationAdapter}.
+ * Default implementation of {@linkcode TranslationAdapter}.
  */
 export class DefaultTranslation implements TranslationAdapter {
   #resources: Map<string, Record<string, string>> = new Map()
@@ -27,7 +27,7 @@ export class DefaultTranslation implements TranslationAdapter {
   /**
    * Creates a new instance of DefaultTranslation.
    *
-   * @param options - Options for the translation adapter, see {@link TranslationAdapterFactoryOptions}
+   * @param options - Options for the translation adapter, see {@linkcode TranslationAdapterFactoryOptions}
    */
   constructor(options: TranslationAdapterFactoryOptions) {
     this.#options = options

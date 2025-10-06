@@ -16,6 +16,10 @@ import type { ResolveTranslationKeys, Translation } from './types.ts'
 
 /**
  * Localization function type.
+ *
+ * @typeParam A - The {@linkcode Args} type extracted from Gunshi command.
+ * @typeParam C - Additional context type for command localization.
+ * @typeParam E - Extended resource keys type.
  */
 export interface Localization<
   A extends Args,
@@ -27,7 +31,12 @@ export interface Localization<
 
 /**
  * Create a localizable function for a command.
+ *
  * This function will resolve the translation key based on the command context and the provided translation function.
+ *
+ * @typeParam A - The {@linkcode Args} type extracted from Gunshi command.
+ * @typeParam C - Additional context type for command localization.
+ * @typeParam E - Extended resource keys type.
  *
  * @param ctx - Command context
  * @param cmd - Command

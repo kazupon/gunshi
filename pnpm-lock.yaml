@@ -328,6 +328,12 @@ importers:
       tsdown:
         specifier: 'catalog:'
         version: 0.15.6(@typescript/native-preview@7.0.0-dev.20251005.1)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3)
+      typedoc:
+        specifier: 'catalog:'
+        version: 0.28.13(typescript@5.9.3)
+      typedoc-plugin-markdown:
+        specifier: 'catalog:'
+        version: 4.9.0(typedoc@0.28.13(typescript@5.9.3))
 
   packages/plugin-dryrun:
     dependencies:

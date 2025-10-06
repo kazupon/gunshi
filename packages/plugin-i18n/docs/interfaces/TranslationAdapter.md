@@ -7,6 +7,7 @@
 # Interface: TranslationAdapter\<MessageResource\>
 
 Translation adapter.
+
 This adapter is used to custom message formatter like [Intlify message format](https://github.com/intlify/vue-i18n/blob/master/spec/syntax.ebnf), [\`Intl.MessageFormat\` (MF2)](https://github.com/tc39/proposal-intl-messageformat), and etc.
 This adapter will support localization with your preferred message format.
 

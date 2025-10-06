@@ -43,8 +43,8 @@ export interface GlobalExtension {
 /**
  * Extends the command context for global options plugin.
  *
- * @param ctx - The command context core
- * @returns An {@link GlobalExtension} of global options plugin
+ * @param ctx - The {@linkcode CommandContextCore | command context} core
+ * @returns An {@linkcode GlobalExtension} of global options plugin
  */
 export default function extension(ctx: CommandContextCore<DefaultGunshiParams>): GlobalExtension {
   return {

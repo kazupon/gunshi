@@ -14,9 +14,9 @@ I18n-aware command interface that extends the base Command with resource support
 
 ## Type Parameters
 
-| Type Parameter | Default type |
-| ------ | ------ |
-| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` |
+| Type Parameter | Default type | Description |
+| ------ | ------ | ------ |
+| `G` *extends* `GunshiParamsConstraint` | `DefaultGunshiParams` | Type parameter extending `GunshiParams` |
 
 ## Properties
 

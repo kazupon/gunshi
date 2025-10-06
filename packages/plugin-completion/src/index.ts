@@ -1,4 +1,57 @@
 /**
+ * The entry point of completion plugin
+ *
+ * @example
+ * ```js
+ * import { cli } from 'gunshi'
+ * import completion from '@gunshi/plugin-completion'
+ *
+ * const command = {
+ *   name: 'deploy',
+ *   args: {
+ *     environment: {
+ *       type: 'string',
+ *       short: 'e',
+ *       description: 'Target environment'
+ *     },
+ *     config: {
+ *       type: 'string',
+ *       short: 'c',
+ *       description: 'Config file path'
+ *     }
+ *   },
+ *   run: ctx => {
+ *     console.log(`Deploying to ${ctx.values.environment}`)
+ *   }
+ * }
+ *
+ * await cli(process.argv.slice(2), command, {
+ *   name: 'my-cli',
+ *   version: '1.0.0',
+ *   plugins: [
+ *     completion({
+ *       config: {
+ *         entry: {
+ *           args: {
+ *             config: {
+ *               handler: () => [
+ *                 { value: 'prod.json', description: 'Production config' },
+ *                 { value: 'dev.json', description: 'Development config' },
+ *                 { value: 'test.json', description: 'Test config' }
+ *               ]
+ *             }
+ *           }
+ *         }
+ *       }
+ *     })
+ *   ]
+ * })
+ * ```
+ *
+ * @module
+ */
+
+/**
  * @author kazuya kawaguchi (a.k.a. kazupon)
  * @license MIT
  */
@@ -41,7 +94,7 @@ const dependencies = [{ id: i18nPluginId, optional: true }] as const
 /**
  * completion plugin
  *
- * @param options - Completion options
+ * @param options - A {@linkcode CompletionOptions | Completion options}
  * @returns A defined plugin as completion
  */
 export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {

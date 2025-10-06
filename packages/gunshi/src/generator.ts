@@ -27,15 +27,19 @@ import type {
 
 /**
  * generate options of `generate` function.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CliOptions}.
  */
 export type GenerateOptions<G extends GunshiParams = DefaultGunshiParams> = CliOptions<G>
 
 /**
  * Generate the command usage.
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters.
+ *
  * @param command - usage generate command, if you want to generate the usage of the default command where there are target commands and sub-commands, specify `null`.
- * @param entry - A {@link Command | entry command}
- * @param options - A {@link CliOptions | cli options}
+ * @param entry - A {@linkcode Command | entry command}
+ * @param options - A {@linkcode GenerateOptions | cli options}
  * @returns A rendered usage.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type

@@ -16,7 +16,7 @@ i18n plugin
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `options` | [`I18nPluginOptions`](../interfaces/I18nPluginOptions.md) | I18n plugin options |
+| `options` | [`I18nPluginOptions`](../interfaces/I18nPluginOptions.md) | An [`I18n plugin options`](../interfaces/I18nPluginOptions.md) |
 
 ## Returns
 

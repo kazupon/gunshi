@@ -16,7 +16,7 @@ import type {
 import type { CommandResourceFetcher, I18nCommand } from './types.ts'
 
 /**
- * The result type of the {@link defineI18n} function
+ * The result type of the {@linkcode defineI18n} function
  *
  * @internal
  */
@@ -33,7 +33,7 @@ type I18nCommandDefinitionResult<
 >
 
 /**
- * The result type of the {@link withI18nResource} function
+ * The result type of the {@linkcode withI18nResource} function
  *
  * @internal
  */
@@ -49,7 +49,7 @@ type WithI18nResourceResult<
 /**
  * Define an i18n-aware {@link I18nCommand | command}.
  *
- * The difference from the `define` function is that you can define a `resource` option that can load a locale.
+ * The difference from the {@linkcode define} function is that you can define a `resource` option that can load a locale.
  *
  * @example
  * ```ts
@@ -77,12 +77,12 @@ type WithI18nResourceResult<
  * })
  * ```
  *
- * @typeParam G - A {@link GunshiParamsConstraint} type
- * @typeParam A - An {@link Args} type extracted from {@link GunshiParamsConstraint}
+ * @typeParam G - A {@linkcode GunshiParamsConstraint} type
+ * @typeParam A - An {@linkcode Args} type extracted from {@linkcode GunshiParamsConstraint}
  * @typeParam C - The inferred command type
  *
  * @param definition - A {@link I18nCommand | command} definition with i18n support
- * @returns A defined {@link I18nCommand | command} with compatible {@link Command} type
+ * @returns A defined {@link I18nCommand | command} with compatible {@linkcode Command} type
  */
 export function defineI18n<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
@@ -96,12 +96,10 @@ export function defineI18n<
 ): I18nCommandDefinitionResult<{ args: A; extensions: ExtractExtensions<G> }, C>
 
 /**
- * Define a {@link I18nCommand | command}.
+ * Define an i18n-aware {@link I18nCommand | command}.
  *
- * @typeParam G - A {@link GunshiParamsConstraint} type
- *
- * @param definition - A {@link I18nCommand | command} definition
- * @returns A defined {@link I18nCommand | command}
+ * @param definition - A {@link I18nCommand | command} definition with i18n support
+ * @returns A defined {@link I18nCommand | command} with compatible {@linkcode Command} type
  */
 export function defineI18n(
   definition: any // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
@@ -111,10 +109,10 @@ export function defineI18n(
 }
 
 /**
- * Return type for defineI18nWithTypes
+ * Return type for {@link defineI18nWithTypes}
  *
- * @typeParam DefaultExtensions - The {@link ExtendContext} type extracted from G
- * @typeParam DefaultArgs - The {@link Args} type extracted from G
+ * @typeParam DefaultExtensions - The {@linkcode ExtendContext} type extracted from G
+ * @typeParam DefaultArgs - The {@linkcode Args} type extracted from G
  *
  * @internal
  */
@@ -131,8 +129,8 @@ type DefineI18nWithTypesReturn<
 /**
  * Define an i18n-aware {@link I18nCommand | command} with types
  *
- * This helper function allows specifying the type parameter of {@link GunshiParams}
- * while inferring the {@link Args} type, {@link ExtendContext} type from the definition.
+ * This helper function allows specifying the type parameter of {@linkcode GunshiParams}
+ * while inferring the {@linkcode Args} type, {@linkcode ExtendContext} type from the definition.
  *
  * @example
  * ```ts
@@ -164,9 +162,9 @@ type DefineI18nWithTypesReturn<
  * })
  * ```
  *
- * @typeParam G - A {@link GunshiParams} type
+ * @typeParam G - A {@linkcode GunshiParams} type
  *
- * @returns A function that takes a command definition via {@link defineI18n}
+ * @returns A function that takes a command definition via {@linkcode defineI18n}
  */
 export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI18nWithTypesReturn<
   ExtractExtensions<G>,
@@ -214,9 +212,9 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
  * })
  * ```
  *
- * @param command - A defined command with {@link define} function
- * @param resource - A resource fetcher for the command
- * @returns A command with i18n resource support
+ * @param command - A defined {@link Command | command} with {@linkcode define} function
+ * @param resource - A {@link CommandResourceFetcher | resource fetcher} for the command
+ * @returns A {@link I18nCommand | command} with i18n resource support
  */
 export function withI18nResource<G extends GunshiParamsConstraint, C extends Command<G>>(
   command: C,

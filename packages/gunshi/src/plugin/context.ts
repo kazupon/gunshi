@@ -32,6 +32,8 @@ type ExtractedParams<G extends GunshiParamsConstraint, L extends Record<string, 
 /**
  * Gunshi plugin context interface.
  *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters.
+ *
  * @since v0.27.0
  */
 export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams> {
@@ -53,7 +55,7 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
    * Add a global option.
    *
    * @param name - An option name
-   * @param schema - An {@link ArgSchema} for the option
+   * @param schema - An {@linkcode ArgSchema} for the option
    */
   addGlobalOption(name: string, schema: ArgSchema): void
 
@@ -76,6 +78,8 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
   /**
    * Decorate the header renderer.
    *
+   * @typeParam L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions.
+   *
    * @param decorator - A decorator function that wraps the base header renderer.
    */
   decorateHeaderRenderer<L extends Record<string, unknown> = DefaultGunshiParams['extensions']>(
@@ -88,6 +92,8 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
   /**
    * Decorate the usage renderer.
    *
+   * @typeParam L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions.
+   *
    * @param decorator - A decorator function that wraps the base usage renderer.
    */
   decorateUsageRenderer<L extends Record<string, unknown> = DefaultGunshiParams['extensions']>(
@@ -99,6 +105,8 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
 
   /**
    * Decorate the validation errors renderer.
+   *
+   * @typeParam L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions.
    *
    * @param decorator - A decorator function that wraps the base validation errors renderer.
    */
@@ -117,7 +125,10 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
 
   /**
    * Decorate the command execution.
+   *
    * Decorators are applied in reverse order (last registered is executed first).
+   *
+   * @typeParam L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions.
    *
    * @param decorator - A decorator function that wraps the command runner
    */
@@ -131,9 +142,11 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
 /**
  * Factory function for creating a plugin context.
  *
- * @param decorators - A {@link Decorators} instance.
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters.
+ *
+ * @param decorators - A {@linkcode Decorators} instance.
  * @param initialSubCommands - Initial sub commands map.
- * @returns A new {@link PluginContext} instance.
+ * @returns A new {@linkcode PluginContext} instance.
  */
 export function createPluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   decorators: Decorators<G>,

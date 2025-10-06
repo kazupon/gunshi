@@ -11,9 +11,9 @@ These utilities are available via `CommandContext.extensions['g:i18n']`.
 
 ## Type Parameters
 
-| Type Parameter | Default type |
-| ------ | ------ |
-| `G` *extends* `GunshiParams`\<`any`\> | `DefaultGunshiParams` |
+| Type Parameter | Default type | Description |
+| ------ | ------ | ------ |
+| `G` *extends* `GunshiParams`\<`any`\> | `DefaultGunshiParams` | Type parameter extending `GunshiParams` |
 
 ## Properties
 
