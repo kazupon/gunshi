@@ -18,4 +18,5 @@ minimumReleaseAgeExclude:
   - tsx
   - '@bomb.sh/tab'
   - eslint-plugin-jsdoc
+  - '@typescript/native-preview'
   - lint-staged
