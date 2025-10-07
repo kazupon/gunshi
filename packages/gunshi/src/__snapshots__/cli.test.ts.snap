@@ -1,25 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`auto generate usage > inline function > console 1`] = `
-"USAGE:
-  COMMAND <OPTIONS>
-
-OPTIONS:
-  -h, --help             Display this help message
-  -v, --version          Display this version
-"
-`;
-
-exports[`auto generate usage > inline function > rendered 1`] = `
-"USAGE:
-  COMMAND <OPTIONS>
-
-OPTIONS:
-  -h, --help             Display this help message
-  -v, --version          Display this version
-"
-`;
-
 exports[`auto generate usage > loosely entry command > console 1`] = `
 "USAGE:
   COMMAND <OPTIONS>
@@ -39,6 +19,26 @@ OPTIONS:
   -h, --help               Display this help message
   -v, --version            Display this version
   -f, --foo <foo>
+"
+`;
+
+exports[`auto generate usage > loosely inline command > console 1`] = `
+"USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`auto generate usage > loosely inline command > rendered 1`] = `
+"USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
 "
 `;
 
@@ -100,6 +100,70 @@ OPTIONS:
   -h, --help               Display this help message
   -v, --version            Display this version
   -f, --foo <foo>          The foo option
+"
+`;
+
+exports[`auto generate usage > named entry command + sub commands > command1 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+This is command1 (entry)
+
+USAGE:
+  gunshi command1 <OPTIONS>
+
+OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
+  -f, --foo <foo>          The foo option
+"
+`;
+
+exports[`auto generate usage > named entry command + sub commands > entry 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+USAGE:
+  gunshi [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [entry] <OPTIONS>
+  command1 <OPTIONS>         This is command1 (entry)
+
+For more info, run any command with the \`--help\` flag:
+  gunshi --help
+  gunshi command1 --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`auto generate usage > named entry command + sub commands > explicit entry 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+USAGE:
+  gunshi entry <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`auto generate usage > named entry command > console 1`] = `
+"USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;
+
+exports[`auto generate usage > named entry command > rendered 1`] = `
+"USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
 "
 `;
 

@@ -172,9 +172,18 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
   }
 
   // add entry command to sub commands if there are sub commands
-  if (hasSubCommands && (isLazyCommand(entryCmd) || typeof entryCmd === 'object')) {
-    entryCmd.entry = true
-    subCommands.set(resolveEntryName(entryCmd as LazyCommand<G> | Command<G>), entryCmd)
+  if (hasSubCommands) {
+    if (isLazyCommand(entryCmd) || typeof entryCmd === 'object') {
+      entryCmd.entry = true
+      subCommands.set(resolveEntryName(entryCmd as LazyCommand<G> | Command<G>), entryCmd)
+    } else if (typeof entryCmd === 'function' && entryCmd.name) {
+      // command runner
+      subCommands.set(entryCmd.name, {
+        run: entryCmd as CommandRunner<G>,
+        name: entryCmd.name,
+        entry: true
+      })
+    }
   }
 
   return subCommands
