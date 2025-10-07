@@ -49,6 +49,8 @@ import type {
   Prettify
 } from './types.ts'
 
+export { createCommandContext } from './context.ts'
+
 export type {
   Args,
   ArgSchema,
@@ -61,6 +63,8 @@ export type {
   GunshiParams,
   LazyCommand
 } from './types.ts'
+
+export type { CommandContextParams } from './context.ts'
 
 /**
  * Infer command properties excluding for {@link define} function

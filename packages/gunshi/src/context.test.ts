@@ -60,13 +60,10 @@ test('basic', async () => {
     explicit: { foo: true, bar: true, baz: false, qux: false },
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
-    rest: [],
     argv: ['bar'],
-    tokens: [], // dummy, due to test
     omitted: true,
     callMode: 'entry',
     command,
-    extensions: {},
     cliOptions: {
       cwd: '/path/to/cmd1',
       description: 'this is command line',
@@ -139,18 +136,10 @@ test('default', async () => {
     run: vi.fn()
   }
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
-    rest: [],
     argv: ['bar'],
-    tokens: [], // dummy, due to test
-    command,
-    extensions: {},
-    omitted: false,
-    callMode: 'entry',
-    cliOptions: {}
+    command
   })
 
   /**
@@ -290,18 +279,8 @@ describe('plugin extensions', () => {
       run: async _ctx => 'done'
     }
     const ctx = await createCommandContext({
-      args: {},
-      explicit: {},
-      values: {},
-      positionals: [],
-      rest: [],
-      argv: [],
-      tokens: [],
       command,
-      extensions,
-      omitted: false,
-      callMode: 'entry',
-      cliOptions: {}
+      extensions
     })
 
     expect(ctx.extensions).toEqual(
@@ -346,22 +325,12 @@ describe('plugin extensions', () => {
     }
 
     await createCommandContext({
-      args: {},
-      explicit: {},
-      values: {},
-      positionals: [],
-      rest: [],
-      argv: [],
-      tokens: [],
       command,
       extensions: {
         ext1,
         ext2,
         ext3
-      },
-      omitted: false,
-      callMode: 'entry',
-      cliOptions: {}
+      }
     })
 
     // extensions should be processed in the order they appear in the object

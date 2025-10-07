@@ -27,6 +27,7 @@ export { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT } from './constants.ts'
 export { createCommandContext } from './context.ts'
 export { plugin } from './plugin/core.ts'
 
+export type { CommandContextParams } from './context.ts'
 export type { PluginContext } from './plugin/context.ts'
 export type {
   OnPluginExtension,

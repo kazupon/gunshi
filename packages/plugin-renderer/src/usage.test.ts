@@ -152,14 +152,7 @@ test('basic', async () => {
     run: NOOP
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
-    args: command.args!,
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
+    args: command.args,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -186,14 +179,6 @@ test('no arguments', async () => {
     }
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -234,14 +219,7 @@ test('no required on optional arguments', async () => {
     run: NOOP
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
-    args: command.args!,
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
+    args: command.args,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -328,14 +306,7 @@ test('mixed positionals and optionals', async () => {
   } as Command<GunshiParams<{ args: Args }>>
 
   const ctx = await createCommandContext({
-    args: command.args!,
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
+    args: command.args,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -382,14 +353,7 @@ test('no examples', async () => {
     run: NOOP
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
-    args: command.args!,
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
+    args: command.args,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -437,14 +401,7 @@ test('enable usageOptionType', async () => {
     run: NOOP
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
-    args: command.args!,
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
+    args: command.args,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -466,15 +423,8 @@ test('enable usageOptionType', async () => {
 
 test('sub commands', async () => {
   const ctx = await createCommandContext({
-    args: SHOW.args!,
-    explicit: {},
-    values: {},
+    args: SHOW.args,
     omitted: true,
-    callMode: 'entry',
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
     command: SHOW,
     extensions: {
       [i18nPlugin.id]: i18nPlugin.extension,
@@ -527,14 +477,7 @@ test('kebab-case arguments with toKebab option', async () => {
     run: NOOP
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
-    args: command.args!,
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
+    args: command.args,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -584,14 +527,7 @@ test('kebab-case arguments with Command.toKebab option', async () => {
     run: NOOP
   } as Command<GunshiParams<{ args: Args }>>
   const ctx = await createCommandContext({
-    args: command.args!,
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
+    args: command.args,
     callMode: 'subCommand',
     command,
     extensions: {
@@ -610,15 +546,8 @@ test('kebab-case arguments with Command.toKebab option', async () => {
 
 test('not install i18n plugin', async () => {
   const ctx = await createCommandContext({
-    args: SHOW.args!,
-    explicit: {},
-    values: {},
-    omitted: false,
+    args: SHOW.args,
     callMode: 'subCommand',
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
     command: SHOW,
     extensions: {
       [rendererPlugin.id]: rendererPlugin.extension
@@ -664,16 +593,8 @@ test('internal commands are filtered out', async () => {
   ])
 
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
-    values: {},
     omitted: true,
     callMode: 'subCommand',
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    command: {},
     extensions: {
       [rendererPlugin.id]: rendererPlugin.extension
     },

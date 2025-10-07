@@ -438,21 +438,12 @@ describe('Plugin Extensions Integration', () => {
 
     // create command context directly
     const ctx = await createCommandContext({
-      args: {} as Args,
-      explicit: {},
       values: { user: 'admin', 'log-level': 'debug' },
-      positionals: [],
-      rest: [],
-      argv: [],
-      tokens: [],
       command: multiCommand,
-      extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension },
-      omitted: false,
-      callMode: 'entry',
-      cliOptions: {}
+      extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension }
     })
 
-    const result = await multiCommand.run!(ctx)
+    const result = await multiCommand.run(ctx)
     expect(result).toBe('[debug] User admin executed command; [debug] Admin access granted')
   })
 
@@ -477,17 +468,10 @@ describe('Plugin Extensions Integration', () => {
       },
       explicit: { msg: false, upper: true },
       values: { msg: 'hello', upper: true },
-      positionals: [],
-      rest: [],
-      argv: [],
-      tokens: [],
-      command: regularCommand,
-      omitted: false,
-      callMode: 'entry',
-      cliOptions: {}
+      command: regularCommand
     })
 
-    const result = await regularCommand.run!(ctx)
+    const result = await regularCommand.run(ctx)
     expect(result).toBe('HELLO')
   })
 
@@ -523,22 +507,12 @@ describe('Plugin Extensions Integration', () => {
     })
 
     const ctx = await createCommandContext({
-      args: {} as Args,
-      explicit: {},
-      values: {},
-      positionals: [],
-      rest: [],
-      argv: [],
-      tokens: [],
       command: contextCommand,
       extensions: {
         ctx: contextPlugin.extension
-      },
-      omitted: false,
-      callMode: 'entry',
-      cliOptions: {}
+      }
     })
-    await contextCommand.run!(ctx)
+    await contextCommand.run(ctx)
 
     expect(capturedContext).toHaveBeenCalledWith({
       name: 'ctx-test',
