@@ -674,6 +674,41 @@ describe('auto generate usage', () => {
     expect(renderedCommand1).toMatchSnapshot('command1')
     expect(log()).toBeTruthy()
   })
+
+  test('inline entry command + sub commands', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const command1 = {
+      // `name` property is defined at sub command
+      name: 'command1',
+      description: 'This is command1 (entry)',
+      args: {
+        foo: {
+          type: 'string',
+          description: 'The foo option',
+          short: 'f'
+        }
+      },
+      run: vi.fn()
+    }
+
+    const meta = {
+      name: 'gunshi',
+      description: 'Modern CLI tool',
+      version: '0.0.0'
+    }
+
+    const renderedEntry = await cli(['-h'], () => {}, { ...meta, subCommands: { command1 } })
+    const renderedCommand1 = await cli(['command1', '-h'], () => {}, {
+      ...meta,
+      subCommands: { command1 }
+    })
+
+    expect(renderedEntry).toMatchSnapshot('entry')
+    expect(renderedCommand1).toMatchSnapshot('command1')
+    expect(log()).toBeTruthy()
+  })
 })
 
 describe('custom generate usage', () => {
