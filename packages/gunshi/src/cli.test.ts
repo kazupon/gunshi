@@ -432,10 +432,21 @@ describe('lazy command', () => {
 })
 
 describe('auto generate usage', () => {
-  test('inline function', async () => {
+  test('loosely inline command', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const renderedUsage = await cli(['-h'], vi.fn())
+
+    const message = log()
+    expect(message).toMatchSnapshot('console')
+    expect(renderedUsage).toMatchSnapshot('rendered')
+  })
+
+  test('named entry command', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    function entry() {} // `name` property is already required
+    const renderedUsage = await cli(['-h'], entry)
 
     const message = log()
     expect(message).toMatchSnapshot('console')
@@ -446,6 +457,7 @@ describe('auto generate usage', () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const renderedUsage = await cli(['-h'], {
+      // `name` property is not defined
       description: 'This is a loosely entry command',
       args: {
         foo: {
@@ -467,6 +479,7 @@ describe('auto generate usage', () => {
     const renderedUsage = await cli(
       ['-h'],
       {
+        // `name` property is defined
         name: 'command1',
         description: 'This is command1',
         args: {
@@ -508,6 +521,7 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const entry = {
+      // `name` property is not defined at entry
       description: 'This is entry command',
       args: entryArgs,
       run: vi.fn()
@@ -521,6 +535,7 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const command2 = {
+      // `name` property is defined at sub command
       description: 'This is command2',
       args: command2Args,
       run: vi.fn()
@@ -550,6 +565,7 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const entry = {
+      // `name` property is defined at entry
       name: 'command1',
       description: 'This is command1 (entry)',
       args: entryArgs,
@@ -566,6 +582,7 @@ describe('auto generate usage', () => {
       }
     } satisfies Args
     const command2 = {
+      // `name` property is defined at sub command
       name: 'command2',
       description: 'This is command2',
       args: command2Args,
@@ -614,6 +631,83 @@ describe('auto generate usage', () => {
 
     const message = log()
     expect(message).toMatchSnapshot('console output')
+  })
+
+  test('named entry command + sub commands', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    function entry() {} // `name` property is already required
+
+    const command1 = {
+      // `name` property is defined at sub command
+      name: 'command1',
+      description: 'This is command1 (entry)',
+      args: {
+        foo: {
+          type: 'string',
+          description: 'The foo option',
+          short: 'f'
+        }
+      },
+      run: vi.fn()
+    }
+
+    const meta = {
+      name: 'gunshi',
+      description: 'Modern CLI tool',
+      version: '0.0.0'
+    }
+
+    const renderedEntry = await cli(['-h'], entry, { ...meta, subCommands: { command1 } })
+    const renderedExplicitEntry = await cli(['entry', '-h'], entry, {
+      ...meta,
+      subCommands: { command1 }
+    })
+    const renderedCommand1 = await cli(['command1', '-h'], entry, {
+      ...meta,
+      subCommands: { command1 }
+    })
+
+    expect(renderedEntry).toMatchSnapshot('entry')
+    expect(renderedExplicitEntry).toMatchSnapshot('explicit entry')
+    expect(renderedCommand1).toMatchSnapshot('command1')
+    expect(log()).toBeTruthy()
+  })
+
+  test('inline entry command + sub commands', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const command1 = {
+      // `name` property is defined at sub command
+      name: 'command1',
+      description: 'This is command1 (entry)',
+      args: {
+        foo: {
+          type: 'string',
+          description: 'The foo option',
+          short: 'f'
+        }
+      },
+      run: vi.fn()
+    }
+
+    const meta = {
+      name: 'gunshi',
+      description: 'Modern CLI tool',
+      version: '0.0.0'
+    }
+
+    const renderedEntry = await cli(['-h'], () => {}, { ...meta, subCommands: { command1 } })
+    const renderedCommand1 = await cli(['command1', '-h'], () => {}, {
+      ...meta,
+      subCommands: { command1 }
+    })
+
+    expect(renderedEntry).toMatchSnapshot('entry')
+    expect(renderedCommand1).toMatchSnapshot('command1')
+    expect(log()).toBeTruthy()
   })
 })
 
