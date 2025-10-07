@@ -399,28 +399,27 @@ export function plugin(options: any = {}): any {
     }
   }
 
+  const props = {
+    writable: false,
+    enumerable: true,
+    configurable: true
+  }
   // define the properties
   return Object.defineProperties(pluginFn, {
     id: {
       value: id,
-      writable: false,
-      enumerable: true,
-      configurable: true
+      ...props
     },
     ...(name && {
       name: {
         value: name,
-        writable: false,
-        enumerable: true,
-        configurable: true
+        ...props
       }
     }),
     ...(dependencies && {
       dependencies: {
         value: dependencies,
-        writable: false,
-        enumerable: true,
-        configurable: true
+        ...props
       }
     }),
     ...(extension && {
@@ -430,9 +429,7 @@ export function plugin(options: any = {}): any {
           factory: extension,
           onFactory: onExtension
         },
-        writable: false,
-        enumerable: true,
-        configurable: true
+        ...props
       }
     })
   })
