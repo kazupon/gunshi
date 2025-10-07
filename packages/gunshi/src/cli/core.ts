@@ -180,7 +180,7 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
     } else if (typeof entryCmd === 'function') {
       // for command runner
       const name = entryCmd.name || ANONYMOUS_COMMAND_NAME
-      subCommands.set(entryCmd.name, {
+      subCommands.set(name, {
         run: entryCmd as CommandRunner<G>,
         name,
         entry: true
