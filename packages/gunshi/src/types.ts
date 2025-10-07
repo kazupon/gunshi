@@ -345,6 +345,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
 
 /**
  * Command call mode.
+ *
+ * - `entry`: The command is executed as an entry command.
+ * - `subCommand`: The command is executed as a sub-command.
  */
 export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
 
@@ -426,6 +429,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
   toKebab?: boolean
   /**
    * Output a message.
+   *
    * If {@linkcode CommandEnvironment.usageSilent} is true, the message is not output.
    *
    * @param message - an output message, @see {@linkcode console.log}

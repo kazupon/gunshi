@@ -4,16 +4,6 @@ import { renderValidationErrors } from './validation.ts'
 
 test('basic', async () => {
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
-    omitted: false,
-    callMode: 'entry',
-    command: {},
     cliOptions: {
       cwd: '/path/to/cmd1',
       version: '0.0.0',

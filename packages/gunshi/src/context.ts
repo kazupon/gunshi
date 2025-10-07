@@ -51,7 +51,7 @@ export type ExtractExtensions<E extends Record<string, CommandContextExtension>>
 /**
  * Parameters of {@link createCommandContext}
  */
-interface CommandContextParams<
+export interface CommandContextParams<
   G extends GunshiParams | { args: Args } | { extensions: ExtendContext },
   V extends ArgValues<ExtractArgs<G>>,
   C extends Command<G> | LazyCommand<G> = Command<G>,
@@ -60,45 +60,45 @@ interface CommandContextParams<
   /**
    * An arguments of target command
    */
-  args: ExtractArgs<G>
+  args?: ExtractArgs<G>
 
   /**
    * Explicitly provided arguments
    */
-  explicit: ExtractArgExplicitlyProvided<G>
+  explicit?: ExtractArgExplicitlyProvided<G>
 
   /**
    * A values of target command
    */
-  values: V
+  values?: V
   /**
    * A positionals arguments, which passed to the target command
    */
-  positionals: string[]
+  positionals?: string[]
   /**
    * A rest arguments, which passed to the target command
    */
-  rest: string[]
+  rest?: string[]
   /**
    * Original command line arguments
    */
-  argv: string[]
+  argv?: string[]
   /**
    * Argument tokens that are parsed by the `parseArgs` function
    */
-  tokens: ArgToken[]
+  tokens?: ArgToken[]
   /**
    * Whether the command is omitted
    */
-  omitted: boolean
+  omitted?: boolean
   /**
    * Command call mode.
    */
-  callMode: CommandCallMode
+  callMode?: CommandCallMode
   /**
    * A target command
    */
-  command: C
+  command?: C
   /**
    * Plugin extensions to apply as the command context extension.
    */
@@ -106,7 +106,7 @@ interface CommandContextParams<
   /**
    * A command options, which is spicialized from `cli` function
    */
-  cliOptions: CliOptions<G>
+  cliOptions?: CliOptions<G>
   /**
    * Validation error from argument parsing.
    */
@@ -114,10 +114,10 @@ interface CommandContextParams<
 }
 
 /**
- * Create a {@link CommandContext | command context}
+ * Create a command context.
  *
- * @param param - A {@link CommandContextParams | parameters} to create a {@link CommandContext | command context}
- * @returns A {@link CommandContext | command context}, which is readonly
+ * @param param - A {@link CommandContextParams | parameters} to create a command context.
+ * @returns A {@link CommandContext | command context}, which is readonly.
  */
 export async function createCommandContext<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
@@ -125,19 +125,19 @@ export async function createCommandContext<
   C extends Command<G> | LazyCommand<G> = Command<G>,
   E extends Record<string, CommandContextExtension> = {}
 >({
-  args,
-  explicit,
-  values,
-  positionals,
-  rest,
-  argv,
-  tokens,
-  command,
+  args = {} as ExtractArgs<G>,
+  explicit = {} as ExtractArgExplicitlyProvided<G>,
+  values = {} as V,
+  positionals = [],
+  rest = [],
+  argv = [],
+  tokens = [],
+  command = {} as C,
   extensions = {} as E,
-  cliOptions,
+  cliOptions = {} as CliOptions<G>,
   callMode = 'entry',
   omitted = false,
-  validationError
+  validationError = undefined
 }: CommandContextParams<G, V, C, E>): Promise<
   {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<G>>

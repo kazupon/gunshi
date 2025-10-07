@@ -33,18 +33,9 @@ async function setup() {
   })
 
   const ctx = await createCommandContext({
-    args: command1.args!,
-    values: {},
-    positionals: [],
-    explicit: {},
-    rest: [],
-    argv: [],
-    tokens: [],
-    omitted: false,
+    args: command1.args,
     callMode: 'subCommand',
-    command: command1,
-    extensions: {},
-    cliOptions: {}
+    command: command1
   })
 
   return { ctx, command1 }

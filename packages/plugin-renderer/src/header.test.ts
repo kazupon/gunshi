@@ -14,15 +14,7 @@ const command = {
 
 test('basic', async () => {
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
     omitted: true,
-    callMode: 'entry',
     command,
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -37,15 +29,7 @@ test('basic', async () => {
 
 test('no description', async () => {
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
     omitted: true,
-    callMode: 'entry',
     command,
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -59,15 +43,7 @@ test('no description', async () => {
 
 test('no name & no description', async () => {
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
     omitted: true,
-    callMode: 'entry',
     command,
     cliOptions: { cwd: '/path/to/cmd1' }
   })
@@ -77,15 +53,7 @@ test('no name & no description', async () => {
 
 test('no version', async () => {
   const ctx = await createCommandContext({
-    args: {},
-    explicit: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [], // dummy, due to test
     omitted: true,
-    callMode: 'entry',
     command,
     cliOptions: {
       cwd: '/path/to/cmd1',

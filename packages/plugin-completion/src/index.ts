@@ -57,7 +57,7 @@
  */
 
 import { RootCommand } from '@bomb.sh/tab'
-import { plugin } from '@gunshi/plugin'
+import { createCommandContext, plugin } from '@gunshi/plugin'
 import {
   localizable,
   namespacedId,
@@ -66,12 +66,13 @@ import {
   resolveLazyCommand
 } from '@gunshi/shared'
 import { pluginId } from './types.ts'
-import { createCommandContext, quoteExec } from './utils.ts'
+import { quoteExec } from './utils.ts'
 
 import type { Complete, Completion } from '@bomb.sh/tab'
 import type {
   Args,
   Command,
+  CommandContextExtension,
   LazyCommand,
   PluginContext,
   PluginWithoutExtension
@@ -184,7 +185,19 @@ async function registerCompletion({
   isBombshellRoot?: boolean
 }) {
   const resolvedCmd = await resolveLazyCommand(cmd)
-  const ctx = await createCommandContext(resolvedCmd, i18nPluginId, i18n)
+  const extensions: Record<string, CommandContextExtension> = Object.create(null)
+  if (i18n) {
+    extensions[i18nPluginId] = {
+      key: Symbol(i18nPluginId),
+      factory: () => i18n
+    }
+  }
+  const ctx = await createCommandContext({
+    args: resolvedCmd.args || (Object.create(null) as Args),
+    command: resolvedCmd,
+    callMode: resolvedCmd.entry ? 'entry' : 'subCommand',
+    extensions
+  })
   if (i18n) {
     const ret = await i18n.loadResource(i18n.locale, ctx, resolvedCmd)
     if (!ret) {

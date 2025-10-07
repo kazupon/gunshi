@@ -3,53 +3,6 @@
  * @license MIT
  */
 
-import { CLI_OPTIONS_DEFAULT, createCommandContext as _createCommandContext } from '@gunshi/plugin'
-
-import type {
-  Args,
-  Command,
-  CommandContext,
-  CommandContextExtension,
-  LazyCommand
-} from '@gunshi/plugin'
-import type { I18nExtension } from '@gunshi/plugin-i18n'
-
-/**
- * Create a command context for a given command and specialized with i18n.
- *
- * @param cmd - The command to create a context for
- * @param id - The id of the command
- * @param i18n - The i18n context to use
- * @returns A command context specialized with i18n
- */
-export async function createCommandContext(
-  cmd: Command | LazyCommand,
-  id: string,
-  i18n?: I18nExtension
-): Promise<CommandContext> {
-  const extensions: Record<string, CommandContextExtension> = Object.create(null)
-  if (i18n) {
-    extensions[id] = {
-      key: Symbol(id),
-      factory: () => i18n
-    }
-  }
-  return await _createCommandContext({
-    args: cmd.args || (Object.create(null) as Args),
-    values: Object.create(null),
-    positionals: [],
-    rest: [],
-    argv: [],
-    explicit: Object.create(null),
-    tokens: [],
-    omitted: false,
-    callMode: cmd.entry ? 'entry' : 'subCommand',
-    command: cmd,
-    extensions,
-    cliOptions: CLI_OPTIONS_DEFAULT
-  })
-}
-
 function detectRuntime(): 'bun' | 'deno' | 'node' | 'unknown' {
   // @ts-ignore -- NOTE(kazupon): ignore, because `process` will detect ts compile error on `deno check`
   if (globalThis.process !== undefined && globalThis.process.release?.name === 'node') {
