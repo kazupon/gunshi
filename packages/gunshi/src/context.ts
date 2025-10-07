@@ -117,7 +117,7 @@ export interface CommandContextParams<
  * Create a command context.
  *
  * @param param - A {@link CommandContextParams | parameters} to create a command context.
- * @returns A @link CommandContext | command context}, which is readonly.
+ * @returns A {@link CommandContext | command context}, which is readonly.
  */
 export async function createCommandContext<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
