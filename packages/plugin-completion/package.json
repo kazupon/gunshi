@@ -59,7 +59,7 @@
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "dependencies": {
-    "@bomb.sh/tab": "^0.0.4",
+    "@bomb.sh/tab": "^0.0.5",
     "@gunshi/plugin": "workspace:*"
   },
   "peerDependencies": {
