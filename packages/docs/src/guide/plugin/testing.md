@@ -2,6 +2,9 @@
 
 Testing is crucial for ensuring plugin reliability and maintainability. This guide covers practical testing approaches for Gunshi plugins.
 
+> [!IMPORTANT]
+> The code examples in this guide focus on demonstrating testing patterns and techniques. For clarity and brevity, some examples may not include extensive explanations that would normally be present in Gunshi's documentation. The emphasis is on showing practical testing approaches rather than following all documentation style guidelines.
+
 > [!NOTE]
 > This guide uses [Vitest](https://vitest.dev/) as the testing framework. The concepts can be adapted to other testing frameworks.
 
