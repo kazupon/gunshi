@@ -1,7 +1,7 @@
 {
   "name": "decorating-renderers",
   "private": true,
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.18.2",
   "type": "module",
   "main": "cli.js",
   "scripts": {

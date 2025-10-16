@@ -1,7 +1,7 @@
 {
   "name": "dynamic-command",
   "private": true,
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.18.2",
   "type": "module",
   "scripts": {
     "start": "npx tsx cli.ts"
