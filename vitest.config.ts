@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [viteTsconfigPaths()],
   test: {
     globals: true,
-    exclude: [...defaultExclude, './packages/docs/src/**/*.test.ts'],
+    exclude: [...defaultExclude, './packages/docs/src/**/*.test.ts', './playground/**/*.test.ts'],
     typecheck: {
       tsconfig: './tsconfig.ci.json'
     },
