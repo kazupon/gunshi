@@ -33,6 +33,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
         './scripts/**',
         './bench/**',
         './playground/**',
+        './playground/**',
         './packages/docs/**',
         './packages/**/examples/**',
         './**/test/**',
@@ -44,6 +45,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   jsdoc({
     typescript: 'syntax',
     ignores: [
+      './playground/**',
       './packages/plugin-completion/src/bombshell/*.ts', // NOTE(kazupon): bombshell code is forked, so ignore.
       './packages/plugin-i18n/test/*.ts', // NOTE(kazupon): test codes
       './packages/gunshi/test/*.ts' // NOTE(kazupon): test codes

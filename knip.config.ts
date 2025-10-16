@@ -16,6 +16,12 @@ export default {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts']
     }
   },
-  ignore: ['playground/deno/main.ts', '**/src/**.test-d.ts', 'bench/**', 'design/**/*.ts'],
+  ignore: [
+    'playground/deno/main.ts',
+    '**/src/**.test-d.ts',
+    'bench/**',
+    'design/**/*.ts',
+    'playground/**'
+  ],
   ignoreDependencies: ['lint-staged', 'deno', 'mitata']
 } satisfies KnipConfig
