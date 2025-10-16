@@ -1,0 +1,12 @@
+{
+  "name": "define-with-types",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "type": "module",
+  "scripts": {
+    "start": "node cli.ts"
+  },
+  "dependencies": {
+    "gunshi": "file:../../../../packages/gunshi"
+  }
+}

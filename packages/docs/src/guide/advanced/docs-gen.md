@@ -30,10 +30,8 @@ const command = define({
       short: 'o',
       description: 'Output file'
     }
-  },
-  run: ctx => {
-    // Command implementation
   }
+  // ... and define `run`
 })
 
 // Generate documentation
@@ -105,10 +103,8 @@ const createCommand = define({
       required: true,
       description: 'Name of the resource'
     }
-  },
-  run: ctx => {
-    // Command implementation
   }
+  // ... and define `run`
 })
 
 const listCommand = define({
@@ -120,10 +116,8 @@ const listCommand = define({
       short: 'f',
       description: 'Output format (json, table)'
     }
-  },
-  run: ctx => {
-    // Command implementation
   }
+  // ... and define `run`
 })
 
 // Create a Map of sub-commands
@@ -135,10 +129,8 @@ const subCommands = {
 // Define the main command
 const mainCommand = define({
   name: 'manage',
-  description: 'Manage resources',
-  run: () => {
-    // Main command implementation
-  }
+  description: 'Manage resources'
+  // ... and define `run`
 })
 
 // Generate documentation for all commands
@@ -202,10 +194,8 @@ async function main() {
         short: 'o',
         description: 'Output file path'
       }
-    },
-    run: ctx => {
-      // Command implementation
     }
+    // ... and define `run`
   })
 
   // Generate the usage information
@@ -476,10 +466,8 @@ $ my-tool --input data.csv
 $ my-tool --input data.csv --output result.yaml --format yaml
 
 3. Enable verbose output
-$ my-tool --input data.csv --verbose`,
-    run: ctx => {
-      // Command implementation
-    }
+$ my-tool --input data.csv --verbose`
+    // ... and define `run`
   })
 
   // Generate the usage with custom renderer

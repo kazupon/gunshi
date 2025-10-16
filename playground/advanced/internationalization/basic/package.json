@@ -1,0 +1,14 @@
+{
+  "name": "basic",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "type": "module",
+  "scripts": {
+    "start": "node cli.ts"
+  },
+  "dependencies": {
+    "@gunshi/plugin-i18n": "file:../../../../packages/plugin-i18n",
+    "@gunshi/resources": "file:../../../../packages/resources",
+    "gunshi": "file:../../../../packages/gunshi"
+  }
+}

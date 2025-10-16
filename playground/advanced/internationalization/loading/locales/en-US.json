@@ -1,0 +1,7 @@
+{
+  "description": "Greeting application",
+  "arg:name": "Name to greet",
+  "arg:formal": "Use formal greeting",
+  "informal_greeting": "Hello",
+  "formal_greeting": "Good day"
+}

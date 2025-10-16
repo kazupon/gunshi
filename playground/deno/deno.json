@@ -1,8 +1,0 @@
-{
-  "tasks": {
-    "dev": "deno run --watch main.ts"
-  },
-  "imports": {
-    "@kazupon/gunshi": "jsr:@kazupon/gunshi@^0.18.0"
-  }
-}

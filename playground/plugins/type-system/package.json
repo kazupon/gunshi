@@ -1,0 +1,13 @@
+{
+  "name": "type-system-example",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "type": "module",
+  "main": "cli.ts",
+  "scripts": {
+    "start": "npx tsx cli.ts"
+  },
+  "dependencies": {
+    "gunshi": "file:../../../packages/gunshi"
+  }
+}

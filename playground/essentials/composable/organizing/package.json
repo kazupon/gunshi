@@ -1,0 +1,15 @@
+{
+  "name": "organizing",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "type": "module",
+  "scripts": {
+    "start": "npx tsx src/cli.ts"
+  },
+  "dependencies": {
+    "gunshi": "file:../../../../packages/gunshi"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:"
+  }
+}

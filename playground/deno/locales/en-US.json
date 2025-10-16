@@ -1,6 +1,0 @@
-{
-  "description": "create a new resource",
-  "examples": "# Create a resource example1\n$ deno run index.ts create --name my-resource --type special",
-  "arg:name": "Name of the resource to create",
-  "arg:type": "Type of resource to create (default: \"default\")"
-}

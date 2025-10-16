@@ -1,8 +1,0 @@
-{
-  "description": "国際化対応した挨拶アプリケーション",
-  "examples": "# 基本的な挨拶\n$ node index.js --name John\n\n# 日本語での丁寧な挨拶\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal",
-  "arg:name": "挨拶する名前",
-  "arg:formal": "丁寧な挨拶を使用する",
-  "formal_greeting": "こんにちは",
-  "informal_greeting": "やあ"
-}

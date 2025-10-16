@@ -1,0 +1,7 @@
+{
+  "description": "挨拶アプリケーション",
+  "arg:name": "挨拶する相手の名前",
+  "arg:formal": "丁寧な挨拶を使用する",
+  "informal_greeting": "こんにちは",
+  "formal_greeting": "はじめまして"
+}

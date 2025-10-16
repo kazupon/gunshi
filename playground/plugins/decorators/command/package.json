@@ -1,0 +1,13 @@
+{
+  "name": "command",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "type": "module",
+  "main": "cli.js",
+  "scripts": {
+    "start": "node cli.js"
+  },
+  "dependencies": {
+    "gunshi": "file:../../../../packages/gunshi"
+  }
+}
