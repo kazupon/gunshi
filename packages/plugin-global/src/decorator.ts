@@ -17,9 +17,7 @@ import type { PluginId } from './types.ts'
  */
 const decorator: CommandDecorator<{
   args: DefaultGunshiParams['args']
-  extensions: {
-    [K in PluginId]: GlobalExtension
-  }
+  extensions: Record<PluginId, GlobalExtension>
 }> = baseRunner => async ctx => {
   const {
     values,

@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { createMockCommandContext, hasPrototype } from '../test/utils.ts'
+import { hasPrototype } from '../test/utils.ts'
 import { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 import { createCommandContext } from './context.ts'
 
@@ -500,7 +500,7 @@ describe('CommandContextExtension type', () => {
       })
     }
 
-    const mockCore = await createMockCommandContext()
+    const mockCore = await createCommandContext({})
     const db = await dbExtension.factory(mockCore, {} as Command)
 
     expect(typeof db.query).toBe('function')

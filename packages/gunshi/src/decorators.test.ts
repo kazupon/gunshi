@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { createMockCommandContext } from '../test/utils.ts'
+import { createCommandContext } from './context.ts'
 import { createDecorators } from './decorators.ts'
 
 import type { CommandDecorator } from './types.ts'
@@ -8,7 +8,7 @@ describe('Decorators', () => {
   test('return default header renderer when no decorators', async () => {
     const decorators = createDecorators()
     const renderer = decorators.getHeaderRenderer()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     const result = await renderer(ctx)
 
     expect(result).toBe('')
@@ -17,7 +17,7 @@ describe('Decorators', () => {
   test('return default usage renderer when no decorators', async () => {
     const decorators = createDecorators()
     const renderer = decorators.getUsageRenderer()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     const result = await renderer(ctx)
 
     expect(result).toBe('')
@@ -26,7 +26,7 @@ describe('Decorators', () => {
   test('return default validation errors renderer when no decorators', async () => {
     const decorators = createDecorators()
     const renderer = decorators.getValidationErrorsRenderer()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     const error = new AggregateError([new Error('Test error')], 'Validation errors')
     const result = await renderer(ctx, error)
 
@@ -35,7 +35,7 @@ describe('Decorators', () => {
 
   test('apply single header decorator', async () => {
     const decorators = createDecorators()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     decorators.addHeaderDecorator(async (baseRenderer, cmdCtx) => {
       const result = await baseRenderer(cmdCtx)
       return `[DECORATED] ${result}`
@@ -48,7 +48,7 @@ describe('Decorators', () => {
 
   test('apply multiple decorators in correct order', async () => {
     const decorators = createDecorators()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     decorators.addHeaderDecorator(async (baseRenderer, cmdCtx) => {
       const result = await baseRenderer(cmdCtx)
       return `[A] ${result}`
@@ -66,7 +66,7 @@ describe('Decorators', () => {
 
   test('handle async decorators correctly', async () => {
     const decorators = createDecorators()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     decorators.addUsageDecorator(async (baseRenderer, cmdCtx) => {
       // Simulate async operation
       await new Promise(resolve => setTimeout(resolve, 10))
@@ -81,8 +81,9 @@ describe('Decorators', () => {
 
   test('pass context correctly through decorators', async () => {
     const decorators = createDecorators()
-    const ctx = await createMockCommandContext()
-    ctx.name = 'special-command'
+    const ctx = await createCommandContext({
+      command: { name: 'special-command', run: () => {} }
+    })
     decorators.addHeaderDecorator(async (baseRenderer, cmdCtx) => {
       const result = await baseRenderer(cmdCtx)
       return `[${cmdCtx.name}] ${result} [${cmdCtx.name}]`
@@ -95,7 +96,7 @@ describe('Decorators', () => {
 
   test('handle validation errors decorator with error parameter', async () => {
     const decorators = createDecorators()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     const error = new AggregateError(
       [new Error('Error 1'), new Error('Error 2')],
       'Validation errors'
@@ -112,7 +113,7 @@ describe('Decorators', () => {
 
   test('handle decorator that throws error', async () => {
     const decorators = createDecorators()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     decorators.addHeaderDecorator(async () => {
       throw new Error('Decorator error')
     })
@@ -123,7 +124,7 @@ describe('Decorators', () => {
 
   test('Build empty decorator chain correctly', async () => {
     const decorators = createDecorators()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     // Add and then test all three types
     const headerRenderer = decorators.getHeaderRenderer()
     const usageRenderer = decorators.getUsageRenderer()

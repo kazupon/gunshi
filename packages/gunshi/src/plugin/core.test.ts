@@ -1,5 +1,4 @@
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
-import { createMockCommandContext } from '../../test/utils.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { define, defineWithTypes } from '../definition.ts'
@@ -69,8 +68,7 @@ test('PluginContext#decorateHeaderRenderer', async () => {
   })
 
   const renderer = decorators.getHeaderRenderer()
-  const mockCtx =
-    await createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
+  const mockCtx = await createCommandContext<GunshiParams<{ args: Args; extensions: Auth }>>({})
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[DECORATED] ')
@@ -89,7 +87,7 @@ test('PluginContext#decorateUsageRenderer', async () => {
   })
 
   const renderer = decorators.getUsageRenderer()
-  const mockCtx = await createMockCommandContext<Auth>()
+  const mockCtx = await createCommandContext<GunshiParams<{ args: Args; extensions: Auth }>>({})
   const result = await renderer(mockCtx)
 
   expect(result).toBe('[USAGE] ')
@@ -108,8 +106,7 @@ test('PluginContext#decorateValidationErrorsRenderer', async () => {
   })
 
   const renderer = decorators.getValidationErrorsRenderer()
-  const mockCtx =
-    await createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
+  const mockCtx = await createCommandContext<GunshiParams<{ args: Args; extensions: Auth }>>({})
   const error = new AggregateError([new Error('Test')], 'Validation failed')
   const result = await renderer(mockCtx, error)
 
@@ -129,8 +126,7 @@ test('PluginContext#decorateCommand', async () => {
   })
 
   const runner = decorators.commandDecorators[0]
-  const mockCtx =
-    await createMockCommandContext<GunshiParams<{ args: Args; extensions: Auth }>['extensions']>()
+  const mockCtx = await createCommandContext<GunshiParams<{ args: Args; extensions: Auth }>>({})
   const result = await runner(_ctx => '[TEST]')(mockCtx)
 
   expect(result).toBe('[USAGE] [TEST]')
@@ -196,7 +192,7 @@ describe('plugin function', () => {
   })
 
   test('receives correct context via extension', async () => {
-    const mockCore = await createMockCommandContext()
+    const mockCore = await createCommandContext({})
     const extensionFactory = vi.fn(core => ({
       user: { id: 1, name: 'Test User' },
       getToken: () => core.values.token as string

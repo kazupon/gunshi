@@ -2,7 +2,6 @@ import { namespacedId, resolveArgKey, resolveBuiltInKey, resolveKey } from '@gun
 import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
-import { createMockCommandContext } from '../../gunshi/test/utils.ts'
 import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
@@ -24,7 +23,7 @@ afterEach(() => {
 describe('extension: locale', () => {
   test('create i18n extension with default locale', async () => {
     const plugin = i18n()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     const extension = await plugin.extension.factory(ctx, {} as Command)
 
     expect(extension).toBeDefined()
@@ -34,7 +33,7 @@ describe('extension: locale', () => {
 
   test('create i18n extension with custom locale', async () => {
     const plugin = i18n({ locale: 'ja-JP' })
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     const extension = await plugin.extension.factory(ctx, {} as Command)
 
     expect(extension.locale.toString()).toBe('ja-JP')
@@ -45,7 +44,7 @@ describe('extension: translate', () => {
   describe('translate built-in keys', () => {
     test('default: en-US', async () => {
       const plugin = i18n()
-      const ctx = await createMockCommandContext()
+      const ctx = await createCommandContext({})
       const extension = await plugin.extension.factory(ctx, {} as Command)
 
       expect(extension.translate(resolveBuiltInKey('ARGUMENTS'))).toEqual('ARGUMENTS')
@@ -70,7 +69,7 @@ describe('extension: translate', () => {
         m => m.default || m
       )
       const plugin = i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jaJPResource } })
-      const ctx = await createMockCommandContext()
+      const ctx = await createCommandContext({})
       const extension = await plugin.extension.factory(ctx, {} as Command)
 
       expect(extension.translate(resolveBuiltInKey('ARGUMENTS'))).toEqual('引数')
@@ -100,7 +99,7 @@ describe('extension: translate', () => {
         translate: vi.fn().mockImplementation(key => key)
       } as TranslationAdapter
       const plugin = i18n({ translationAdapterFactory: () => translation })
-      const ctx = await createMockCommandContext()
+      const ctx = await createCommandContext({})
       const extension = await plugin.extension.factory(ctx, {} as Command)
       extension.translate(resolveBuiltInKey('ARGUMENTS'))
       extension.translate('description')
@@ -117,7 +116,7 @@ describe('extension: translate', () => {
         translate: vi.fn().mockImplementation(key => key)
       } as TranslationAdapter
       const plugin = i18n({ translationAdapterFactory: () => translation, locale: 'ja-JP' })
-      const ctx = await createMockCommandContext()
+      const ctx = await createCommandContext({})
       const extension = await plugin.extension.factory(ctx, {} as Command)
       extension.translate(resolveBuiltInKey('ARGUMENTS'))
       extension.translate('examples', { foo: 'bar' })
@@ -129,7 +128,7 @@ describe('extension: translate', () => {
 
   test('handle missing translations gracefully', async () => {
     const plugin = i18n()
-    const ctx = await createMockCommandContext()
+    const ctx = await createCommandContext({})
     const extension = await plugin.extension.factory(ctx, {} as Command)
 
     // test non-existent key

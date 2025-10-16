@@ -21,7 +21,7 @@ import type {
   CliOptions,
   Command,
   DefaultGunshiParams,
-  GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand
 } from './types.ts'
 
@@ -30,7 +30,7 @@ import type {
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CliOptions}.
  */
-export type GenerateOptions<G extends GunshiParams = DefaultGunshiParams> = CliOptions<G>
+export type GenerateOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> = CliOptions<G>
 
 /**
  * Generate the command usage.
@@ -42,8 +42,7 @@ export type GenerateOptions<G extends GunshiParams = DefaultGunshiParams> = CliO
  * @param options - A {@linkcode GenerateOptions | cli options}
  * @returns A rendered usage.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
-export async function generate<G extends GunshiParams<any> = DefaultGunshiParams>(
+export async function generate<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   command: string | null,
   entry: Command<G> | LazyCommand<G>,
   options: GenerateOptions<G> = {}
