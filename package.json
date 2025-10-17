@@ -41,6 +41,7 @@
     "dev": "pnpx @eslint/config-inspector --config eslint.config.ts",
     "dev:docs": "pnpm -F @gunshi/docs dev",
     "dev:eslint": "pnpx @eslint/config-inspector --config eslint.config.ts",
+    "e2e": "vitest run --config vitest.e2e.config.ts",
     "fix": "pnpm run --color \"/^fix:/\"",
     "fix:eslint": "eslint . --fix",
     "fix:knip": "knip --fix --no-exit-code",

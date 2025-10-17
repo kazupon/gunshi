@@ -1,0 +1,14 @@
+mycli (mycli v1.0.0)
+
+Start the development server
+
+USAGE:
+  mycli server <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+  --port [port]           (default: 3000)
+  --host [host]           (default: localhost)
+  -V, --verbose
+

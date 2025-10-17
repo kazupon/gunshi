@@ -61,7 +61,7 @@ const command = define({
     // Define a boolean flag 'verbose'
     verbose: {
       type: 'boolean',
-      short: 'v',
+      short: 'V',
       description: 'Enable verbose output'
     }
   },

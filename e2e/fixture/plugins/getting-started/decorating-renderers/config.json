@@ -1,0 +1,4 @@
+[
+  ["entry", "node cli.js"],
+  ["help", "node cli.js --help"]
+]

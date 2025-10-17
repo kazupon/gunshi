@@ -1,0 +1,4 @@
+[
+  ["basic", "node cli.ts"],
+  ["hello", "node cli.ts hello --name Alice"]
+]

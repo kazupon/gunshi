@@ -49,7 +49,7 @@ importers:
         version: 7.3.0
       '@kazupon/eslint-config':
         specifier: ^0.36.0
-        version: 0.36.0(e88ae274c091538d220ff02510635e1b)
+        version: 0.36.0(7840c7a242a6a9574831ce7672064b04)
       '@kazupon/prettier-config':
         specifier: ^0.1.1
         version: 0.1.1
@@ -536,6 +536,9 @@ importers:
       gunshi:
         specifier: file:../../../../packages/gunshi
         version: link:../../../../packages/gunshi
+      marked-man:
+        specifier: 2.1.0
+        version: 2.1.0
 
   playground/advanced/docs-gen/rich:
     dependencies:
@@ -581,12 +584,6 @@ importers:
       '@gunshi/resources':
         specifier: file:../../../../packages/resources
         version: link:../../../../packages/resources
-      gunshi:
-        specifier: file:../../../../packages/gunshi
-        version: link:../../../../packages/gunshi
-
-  playground/advanced/type-system/cli:
-    dependencies:
       gunshi:
         specifier: file:../../../../packages/gunshi
         version: link:../../../../packages/gunshi
@@ -1586,9 +1583,6 @@ packages:
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
-
-  '@napi-rs/wasm-runtime@1.0.5':
-    resolution: {integrity: sha512-TBr9Cf9onSAS2LQ2+QHx6XcC6h9+RIzJgbqG3++9TUZSH204AwEy5jg3BTQ0VATsyoGj4ee49tN/y6rvaOOtcg==}
 
   '@napi-rs/wasm-runtime@1.0.7':
     resolution: {integrity: sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw==}
@@ -4101,6 +4095,15 @@ packages:
     resolution: {integrity: sha512-MqIQVVkz+uGEHi3TsHx/czcxxCbRIL7sv5K5DnYw/tI+apY54IbPefV/cmgxp6LoJSEx/TqcHdLs/298afG5QQ==}
     engines: {node: '>=6'}
 
+  marked-man@2.1.0:
+    resolution: {integrity: sha512-tHW9cRz3xS05zPolHr6qP5aWguzcfBJvMRjg3RDnONxs5hNxifFv9TyIoX47YTOrco3AVK7EIbh0rWgQ0YonkA==}
+    hasBin: true
+
+  marked@12.0.2:
+    resolution: {integrity: sha512-qXUm7e/YKFoqFPYPa3Ukg9xlI5cyAtGmyEIzMfW//m6kXwCy2Ps9DYf5ioijFKQ8qyuscrHoY04iJGctu2Kg0Q==}
+    engines: {node: '>= 18'}
+    hasBin: true
+
   marked@16.3.0:
     resolution: {integrity: sha512-K3UxuKu6l6bmA5FUwYho8CfJBlsUWAooKtdGgMcERSpF7gcBUrCGsLH7wDaaNOzwq18JzSUDyoEb/YsrqMac3w==}
     engines: {node: '>= 20'}
@@ -4571,6 +4574,11 @@ packages:
   read-package-up@11.0.0:
     resolution: {integrity: sha512-MbgfoNPANMdb4oRBNg5eqLbB2t2r+o5Ua1pNt8BqGp4I0FJZhuVSOj3PaBPni4azWuSzEdNn2evevzVmEk1ohQ==}
     engines: {node: '>=18'}
+
+  read-pkg-up@11.0.0:
+    resolution: {integrity: sha512-LOVbvF1Q0SZdjClSefZ0Nz5z8u+tIE7mV5NibzmE9VYmDe9CaBbAVtz1veOSZbofrdsilxuDAYnFenukZVp8/Q==}
+    engines: {node: '>=18'}
+    deprecated: Renamed to read-package-up
 
   read-pkg@9.0.1:
     resolution: {integrity: sha512-9viLL4/n1BJUCT1NXVTdS1jtm80yDEgR5T4yCelII49Mbj0v1rZdKqj7zCiYdbB0CuCgdrvHcNogAKTFPBocFA==}
@@ -6088,12 +6096,12 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.36.0(e88ae274c091538d220ff02510635e1b)':
+  '@kazupon/eslint-config@0.36.0(7840c7a242a6a9574831ce7672064b04)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.36.0(jiti@2.6.0))
       '@eslint/js': 9.36.0
       '@kazupon/eslint-plugin': 0.6.2(eslint@9.36.0(jiti@2.6.0))
-      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3)
+      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(publint@0.3.13)(typescript@5.9.3)
       '@stylistic/eslint-plugin': 4.4.1(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)
       eslint: 9.36.0(jiti@2.6.0)
       eslint-flat-config-utils: 2.1.4
@@ -6136,9 +6144,9 @@ snapshots:
       '@eslint/core': 0.15.2
       eslint: 9.36.0(jiti@2.6.0)
 
-  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3)':
+  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(publint@0.3.13)(typescript@5.9.3)':
     dependencies:
-      tsdown: 0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3)
+      tsdown: 0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(publint@0.3.13)(typescript@5.9.3)
     optionalDependencies:
       '@vue/reactivity': 3.5.21
     transitivePeerDependencies:
@@ -6171,13 +6179,6 @@ snapshots:
       langium: 3.3.1
 
   '@napi-rs/wasm-runtime@0.2.12':
-    dependencies:
-      '@emnapi/core': 1.5.0
-      '@emnapi/runtime': 1.5.0
-      '@tybys/wasm-util': 0.10.1
-    optional: true
-
-  '@napi-rs/wasm-runtime@1.0.5':
     dependencies:
       '@emnapi/core': 1.5.0
       '@emnapi/runtime': 1.5.0
@@ -6324,7 +6325,7 @@ snapshots:
 
   '@oxc-resolver/binding-wasm32-wasi@11.8.3':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.5
+      '@napi-rs/wasm-runtime': 1.0.7
     optional: true
 
   '@oxc-resolver/binding-win32-arm64-msvc@11.8.3':
@@ -8848,6 +8849,13 @@ snapshots:
 
   markdown-title@1.0.2: {}
 
+  marked-man@2.1.0:
+    dependencies:
+      marked: 12.0.2
+      read-pkg-up: 11.0.0
+
+  marked@12.0.2: {}
+
   marked@16.3.0: {}
 
   math-intrinsics@1.1.0: {}
@@ -9546,6 +9554,12 @@ snapshots:
       read-pkg: 9.0.1
       type-fest: 4.41.0
 
+  read-pkg-up@11.0.0:
+    dependencies:
+      find-up-simple: 1.0.1
+      read-pkg: 9.0.1
+      type-fest: 4.41.0
+
   read-pkg@9.0.1:
     dependencies:
       '@types/normalize-package-data': 2.4.4
@@ -10079,7 +10093,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3):
+  tsdown@0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(publint@0.3.13)(typescript@5.9.3):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14

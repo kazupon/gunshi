@@ -1,0 +1,17 @@
+mycli (mycli v1.0.0)
+
+USAGE:
+  mycli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [entry] <OPTIONS>
+  build <OPTIONS>         Build the project
+
+For more info, run any command with the `--help` flag:
+  mycli --help
+  mycli build --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

@@ -188,7 +188,7 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-Running `node index.js` outputs:
+Running `node cli.js` outputs:
 
 ```sh
 [LOG] Command started: process
@@ -446,11 +446,12 @@ The console output in this example:
 And the final rendered output:
 
 ```sh
-Usage: demo [options]
+USAGE:
+  my-cli <OPTIONS>
 
-Options:
-  --help     Show help
-  --version  Show version
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
 
 📦 Enhanced by Plugin A
 🎨 Styled by Plugin B

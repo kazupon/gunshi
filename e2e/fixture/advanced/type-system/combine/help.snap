@@ -1,0 +1,18 @@
+Database plugin initialized
+An example CLI demonstrating advanced type system with combined plugins (advanced-combine)
+
+USAGE:
+  advanced-combine [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [entry] <OPTIONS>
+  query <OPTIONS>         Query database tables
+
+For more info, run any command with the `--help` flag:
+  advanced-combine --help
+  advanced-combine query --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

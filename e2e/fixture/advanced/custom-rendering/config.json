@@ -1,0 +1,9 @@
+[
+  ["entry", "node cli.js"],
+  ["help", "node cli.js --help"],
+  ["add-task", "node cli.js --add \"Complete the project\""],
+  ["add-fully-option", "node cli.js --add \"Important meeting\" --priority high --due 2023-12-31"],
+  ["list", "node cli.js --list"],
+  ["completion", "node cli.js --complete \"Complete the project\""],
+  ["invalid-error", "node cli.js --add"]
+]

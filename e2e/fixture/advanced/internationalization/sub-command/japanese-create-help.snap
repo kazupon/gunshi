@@ -1,0 +1,12 @@
+resource-cli (resource-cli v1.0.0)
+
+リソースを作成
+
+使い方:
+  resource-cli create <オプション>
+
+オプション:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+  --name <name>          リソース名
+

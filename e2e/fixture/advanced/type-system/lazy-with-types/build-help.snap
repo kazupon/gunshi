@@ -1,0 +1,13 @@
+mycli (mycli v1.0.0)
+
+Build the project
+
+USAGE:
+  mycli build <OPTIONS>
+
+OPTIONS:
+  -h, --help                 Display this help message
+  -v, --version              Display this version
+  --target <target>           (choices: dev | prod)
+  --minify                    (default: false)
+

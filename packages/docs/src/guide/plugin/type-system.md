@@ -486,7 +486,7 @@ await cli(process.argv.slice(2), fetchCommand, {
 When executed, the plugins work together seamlessly:
 
 ```sh
-API_TOKEN=xxx npx tsx index.ts fetch --endpoint /users
+API_TOKEN=xxx npx tsx cli.ts fetch --endpoint /users
 my-cli (my-cli v1.0.0)
 
 [LOG] GET https://api.example.com/users
@@ -501,7 +501,7 @@ my-cli (my-cli v1.0.0)
   }
 ]
 
-API_TOKEN=xxx npx tsx index.ts fetch --endpoint /users/1
+API_TOKEN=xxx npx tsx cli.ts fetch --endpoint /users/1
 my-cli (my-cli v1.0.0)
 
 [LOG] GET https://api.example.com/users/1

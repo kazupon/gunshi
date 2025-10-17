@@ -1,0 +1,11 @@
+i18n-example (i18n-example v1.0.0)
+
+使い方:
+  i18n-example <オプション>
+
+オプション:
+  -h, --help                 Display this help message
+  -v, --version              Display this version
+  -n, --name <name>          挨拶する相手の名前
+  -f, --formal               丁寧な挨拶を使用する
+

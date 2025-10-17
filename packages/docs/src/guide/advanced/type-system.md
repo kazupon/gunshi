@@ -359,7 +359,7 @@ lazyWithTypes<{ args: typeof buildArgs; extensions: BuildExtensions }>()( ... )
 
 The `cli` function provides type safety for your entry command. The type parameter defines the type for the entry command's context, determining the types of `ctx.values` and `ctx.extensions` that the entry command's runner function receives:
 
-```ts [cli.ts]
+```ts
 import { cli } from 'gunshi'
 import logger from './plugin.ts'
 

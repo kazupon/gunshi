@@ -1,0 +1,6 @@
+[
+  ["entry", "node cli.ts"],
+  ["help", "node cli.ts --help"],
+  ["endpoint-users", "API_TOKEN=xxx node cli.ts fetch --endpoint /users"],
+  ["endpoint-users-1", "API_TOKEN=xxx node cli.ts fetch --endpoint /users/1"]
+]

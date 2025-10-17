@@ -1,0 +1,8 @@
+USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+  -d, --debug            Enable debug output
+

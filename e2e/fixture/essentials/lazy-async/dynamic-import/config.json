@@ -1,0 +1,5 @@
+[
+  ["basic", "node cli.ts"],
+  ["build", "node cli.ts build --watch -m"],
+  ["deploy", "node cli.ts deploy --env production"]
+]

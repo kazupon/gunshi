@@ -1,0 +1,7 @@
+my-cli (my-cli v1.0.0)
+
+[LOG] GET https://api.example.com/users/1
+{
+  "id": 1,
+  "name": "Alice"
+}

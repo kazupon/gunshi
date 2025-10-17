@@ -1,0 +1,13 @@
+╔═════════════════════════════════════════╗
+║             TASK MANAGER                ║
+╚═════════════════════════════════════════╝
+A task management utility with custom usage generation
+Version: 1.0.0
+
+
+❌ ERROR:
+═════════
+  • Optional argument '--add' or '-a' should be 'string'
+
+Please correct the above errors and try again.
+Run 'task-manager --help' for usage information.

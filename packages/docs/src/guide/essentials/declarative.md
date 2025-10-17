@@ -74,16 +74,16 @@ const command = {
   // Command examples
   examples: `
 # Basic usage with default values
-$ node greet.js
+$ node cli.js
 
 # Specify a name
-$ node greet.js --name Alice
+$ node cli.js --name Alice
 
 # Use custom greeting and name
-$ node greet.js -n Bob -g "Good morning"
+$ node cli.js -n Bob -g "Good morning"
 
 # Display in uppercase
-$ node greet.js --name Charlie --uppercase
+$ node cli.js --name Charlie --uppercase
 `,
 
   // Command execution function

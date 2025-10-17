@@ -1,0 +1,4 @@
+[
+  ["long", "node cli.js --name Alice --uppercase"],
+  ["short", "node cli.js -n Alice -u"]
+]

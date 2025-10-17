@@ -1,0 +1,17 @@
+resource-cli (resource-cli v1.0.0)
+
+USAGE:
+  resource-cli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [resource-manager] <OPTIONS>
+  create <OPTIONS>
+
+For more info, run any command with the `--help` flag:
+  resource-cli --help
+  resource-cli create --help
+
+OPTIONS:
+  -h, --help
+  -v, --version
+

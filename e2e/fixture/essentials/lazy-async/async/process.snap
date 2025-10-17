@@ -1,0 +1,6 @@
+data-cli (data-cli v1.0.0)
+
+Processing input.txt...
+  Written to output.txt: "SAMPLE DATA FROM INPUT.TXT
+[TRANSFORMED]"
+Successfully processed to output.txt

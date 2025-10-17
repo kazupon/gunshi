@@ -1,0 +1,14 @@
+╔══════════════════════════════╗
+║     My Awesome CLI v1.0      ║
+╚══════════════════════════════╝
+
+USAGE:
+  COMMAND <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+
+
+📚 Documentation: https://example.com/docs
+🐛 Report bugs: https://example.com/issues

@@ -12,6 +12,10 @@ export default plugin({
     // Append timestamp to usage
     ctx.decorateUsageRenderer(async (baseRenderer, ctx) => {
       const usage = await baseRenderer(ctx)
+      // NOTE: Skip timing log in e2e tests to reduce noise
+      if (process.env.GUNSHI_E2E_DISABLE) {
+        return `${usage}\n\nGenerated: xxxx-xx-xxTxx:xx:xx.xxxZ`
+      }
       return `${usage}\n\nGenerated: ${new Date().toISOString()}`
     })
 

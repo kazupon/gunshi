@@ -1,0 +1,4 @@
+[
+  ["entry", "node cli.ts"],
+  ["help", "node cli.ts --help"]
+]

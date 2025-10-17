@@ -1,0 +1,4 @@
+[
+  ["main-help", "node cli.ts --help"],
+  ["sub-command-help", "node cli.ts create --help"]
+]

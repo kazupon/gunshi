@@ -1,0 +1,4 @@
+[
+  ["basic", "node cli.ts"],
+  ["process", "node cli.ts process --input input.txt --output output.txt"]
+]

@@ -1,0 +1,12 @@
+logger plugin setup phase started
+1. lifecycle plugin setup phase started
+2. Setup phase completed
+3. Extension created for: build
+4. All extensions ready
+4.5. onBeforeCommand hook
+5. Command decorator (before)
+6. Actual command execution
+Extension says: Hello from extension
+7. Command decorator (after)
+8. onAfterCommand hook
+9. Extension cleanup

@@ -1,0 +1,12 @@
+resource-cli (resource-cli v1.0.0)
+
+Create a resource
+
+USAGE:
+  resource-cli create <OPTIONS>
+
+OPTIONS:
+  -h, --help
+  -v, --version
+  --name <name>          Resource name
+
