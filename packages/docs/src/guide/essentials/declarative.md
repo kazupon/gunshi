@@ -108,6 +108,9 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/declarative).
+
 This example demonstrates the key components of declarative configuration:
 
 - **Command metadata** (`name`, `description`) identifies your command

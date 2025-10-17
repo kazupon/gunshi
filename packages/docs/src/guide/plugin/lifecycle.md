@@ -364,6 +364,9 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/lifecycle).
+
 Run your application with plugin:
 
 ```sh

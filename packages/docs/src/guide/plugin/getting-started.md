@@ -32,6 +32,9 @@ await cli(process.argv.slice(2), entry, {
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/getting-started/first-minimal).
+
 Run your application with plugin:
 
 ```sh
@@ -91,6 +94,9 @@ await cli(process.argv.slice(2), command, {
   plugins: [debug]
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/getting-started/adding-global).
 
 Run your application with plugin:
 
@@ -165,6 +171,9 @@ await cli(process.argv.slice(2), command, {
   plugins: [tools]
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/getting-started/adding-sub-commands).
 
 Run your application with the new sub-commands:
 

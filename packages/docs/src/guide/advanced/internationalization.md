@@ -107,6 +107,9 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/internationalization/basic).
+
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!TIP]
@@ -236,6 +239,9 @@ await cli(process.argv.slice(2), command, {
   ]
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/internationalization/loading).
 
 Example locale files:
 
@@ -378,6 +384,9 @@ await cli(process.argv.slice(2), mainCommand, {
   ]
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/internationalization/sub-command).
 
 ## Helper Functions
 

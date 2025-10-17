@@ -82,6 +82,9 @@ await cli(
 )
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/command-hooks).
+
 ### Hook Parameters
 
 Each lifecycle hook receives specific parameters that provide context about the command execution.

@@ -115,6 +115,9 @@ await cli(
 )
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/lifo).
+
 When executed, `reduceRight` creates a wrapper structure where Decorator A wraps B, B wraps C, and C wraps the original command:
 
 ```sh
@@ -187,6 +190,9 @@ await cli(process.argv.slice(2), command, {
   plugins: [multi]
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/command).
 
 Running `node cli.js` outputs:
 
@@ -282,6 +288,9 @@ await cli(
   }
 )
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/renderers).
 
 Run with `--help` to see customized output:
 
@@ -410,6 +419,9 @@ await cli(
   }
 )
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/multiple-order).
 
 #### Execution Flow Breakdown
 

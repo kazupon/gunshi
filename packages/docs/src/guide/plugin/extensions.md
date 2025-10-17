@@ -287,6 +287,9 @@ export default plugin({
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/extensions).
+
 ## Next Steps
 
 You've mastered extensions—the powerful mechanism for sharing functionality between plugins and commands. With extensions, your plugins can provide APIs, services, and utilities that enhance the entire CLI ecosystem.

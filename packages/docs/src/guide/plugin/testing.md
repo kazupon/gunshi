@@ -817,6 +817,9 @@ const typedPlugin = plugin<{ logger: LoggerExtension }, 'my-plugin', ['logger'],
 
 This ensures compile-time type safety for dependencies and extensions.
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/testing).
+
 ## Next Steps
 
 Now that you've mastered testing strategies for Gunshi plugins—from unit testing individual components to integration testing with real CLI contexts—you're ready to apply professional development practices.

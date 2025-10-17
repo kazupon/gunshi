@@ -53,6 +53,9 @@ async function main() {
 await main()
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/basic).
+
 The `generate` function programmatically captures usage information for your CLI commands and returns it as a string.
 
 This allows you to generate documentation files, create API documentation, or integrate usage information into your build process.
@@ -163,6 +166,9 @@ async function main() {
 await main()
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/sub-command).
+
 ## Creating Rich Documentation
 
 You can combine the generated usage information with additional content to create rich documentation:
@@ -257,6 +263,9 @@ The CLI is built on top of the data-processor library, which you can also use pr
 // Generate!
 await main()
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/rich).
 
 ## Automating Documentation Generation
 
@@ -500,6 +509,9 @@ $ my-tool --input data.csv --verbose`
 // Generate!
 await main()
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/man)
 
 ### Installing Man Pages
 

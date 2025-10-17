@@ -19,6 +19,9 @@ await cli(process.argv.slice(2), () => {
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/getting-started/hello).
+
 This minimal example demonstrates the core concept of Gunshi.
 
 The `cli` function takes command-line arguments and a function to execute.
@@ -54,6 +57,9 @@ await cli(process.argv.slice(2), ctx => {
   console.log(`Hello, ${name}!`)
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/getting-started/context).
 
 Now you can run:
 
@@ -103,6 +109,9 @@ const command = {
 
 await cli(process.argv.slice(2), command)
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/getting-started/options).
 
 Now you can run:
 

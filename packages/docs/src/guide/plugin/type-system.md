@@ -483,6 +483,9 @@ await cli(process.argv.slice(2), fetchCommand, {
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/type-system).
+
 When executed, the plugins work together seamlessly:
 
 ```sh

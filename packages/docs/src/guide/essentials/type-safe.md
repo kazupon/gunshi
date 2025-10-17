@@ -92,6 +92,9 @@ const command = define({
 await cli(process.argv.slice(2), command)
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/type-safe).
+
 With `define`:
 
 - You don't need to import types like `Command` or `CommandContext`.

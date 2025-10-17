@@ -82,6 +82,9 @@ await cli(process.argv.slice(2), mainCommand, {
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/composable/basic).
+
 This structure provides:
 
 - Full type safety for all commands and sub-commands
@@ -133,6 +136,9 @@ my-cli/
 ├── package.json
 └── tsconfig.json
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/composable/organizing).
 
 This structure provides:
 

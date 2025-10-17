@@ -101,6 +101,9 @@ export const serverCommand = define<{ args: typeof serverArgs }>({
 })
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/define).
+
 This advanced approach is particularly useful when you want to reuse argument definitions across multiple commands or need to export types for use in other modules.
 
 ### The `lazy` Function
@@ -178,6 +181,9 @@ export const buildCommand = lazy<{ args: typeof buildArgs }>(
 )
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/lazy).
+
 ## Plugin Extensions and Architectural Constraints
 
 ### Understanding the Timing Constraint
@@ -245,6 +251,9 @@ export const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()
   }
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/define-with-types).
 
 #### Flexible Type Parameters
 
@@ -339,6 +348,9 @@ export const buildCommand = lazyWithTypes<{
   }
 )
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/lazy-with-types).
 
 #### Flexible Type Parameters
 
@@ -500,6 +512,9 @@ export default defineWithTypes<{ extensions: CombinedExtensions }>()({
   }
 })
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/combine).
 
 Both approaches achieve the same goal: combining multiple plugin extensions with full type safety. Use Record types when working with official plugins that provide plugin IDs, and direct intersection types for custom plugins.
 

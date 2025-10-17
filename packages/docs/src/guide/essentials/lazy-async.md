@@ -77,6 +77,9 @@ await cli(
 )
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/basic).
+
 In this example, when a user runs `npx tsx cli.ts --help`, Gunshi displays help text using only the metadata from `helloDefinition`.
 
 The `helloLoader` function is never called.
@@ -166,6 +169,9 @@ await cli(
   }
 )
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/dynamic-import).
 
 > [!IMPORTANT]
 > The examples above use `.ts` extensions in dynamic import paths (`await import('./commands/build.ts')`). This will work in the following scenarios:
@@ -294,6 +300,9 @@ await cli(
 )
 ```
 
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/async).
+
 Gunshi automatically handles the asynchronous execution, including proper error handling and process exit codes.
 
 You don't need any special configuration—just return an async function from your loader.
@@ -340,6 +349,9 @@ await cli(
   { name: 'my-cli', version: '1.0.0', subCommands: { config } }
 )
 ```
+
+> [!TIP]
+> The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/dynamic-command)
 
 This pattern is particularly useful when command structure depends on runtime configuration or external data sources.
 
