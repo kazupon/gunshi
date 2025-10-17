@@ -130,7 +130,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node-version: [20]
+        node-version: [24]
         os: [ubuntu-latest]
 
     name: E2E Testing on Node.js ${{ matrix.node-version }}
