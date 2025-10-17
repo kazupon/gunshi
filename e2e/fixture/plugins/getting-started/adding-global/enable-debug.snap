@@ -1,0 +1,73 @@
+Debug mode enabled
+Context: [Object: null prototype] {
+  name: 'build',
+  description: undefined,
+  omitted: true,
+  callMode: 'entry',
+  env: [Object: null prototype] {
+    name: undefined,
+    description: undefined,
+    version: undefined,
+    cwd: undefined,
+    usageSilent: false,
+    subCommands: Map(0) {},
+    leftMargin: 2,
+    middleMargin: 10,
+    usageOptionType: false,
+    usageOptionValue: true,
+    renderHeader: [Function: renderer],
+    renderUsage: [Function: renderer],
+    renderValidationErrors: [Function: renderer],
+    plugins: [ [AsyncFunction] ],
+    fallbackToEntry: false
+  },
+  args: [Object: null prototype] {
+    help: [Object: null prototype] {
+      type: 'boolean',
+      short: 'h',
+      description: 'Display this help message'
+    },
+    version: [Object: null prototype] {
+      type: 'boolean',
+      short: 'v',
+      description: 'Display this version'
+    },
+    debug: [Object: null prototype] {
+      type: 'boolean',
+      short: 'd',
+      description: 'Enable debug output'
+    }
+  },
+  explicit: [Object: null prototype] { help: false, version: false, debug: true },
+  values: [Object: null prototype] { debug: true },
+  positionals: [],
+  rest: [],
+  _: [ '--debug' ],
+  tokens: [
+    {
+      kind: 'option',
+      name: 'debug',
+      rawName: '--debug',
+      index: 0,
+      value: undefined,
+      inlineValue: undefined
+    }
+  ],
+  toKebab: undefined,
+  log: [Function: log],
+  validationError: undefined,
+  extensions: [Object: null prototype] {
+    'g:global': {
+      showVersion: [Function: showVersion],
+      showHeader: [AsyncFunction: showHeader],
+      showUsage: [AsyncFunction: showUsage],
+      showValidationErrors: [AsyncFunction: showValidationErrors]
+    },
+    'g:renderer': {
+      text: [AsyncFunction: localize],
+      loadCommands: [AsyncFunction: loadCommands]
+    },
+    debug: [Object: null prototype] {}
+  }
+}
+Building...

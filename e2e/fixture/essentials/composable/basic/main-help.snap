@@ -1,0 +1,19 @@
+my-app (my-app v1.0.0)
+
+USAGE:
+  my-app [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [manage] <OPTIONS>       Manage resources
+  create <OPTIONS>         Create a new resource
+  list <OPTIONS>           List all resources
+
+For more info, run any command with the `--help` flag:
+  my-app --help
+  my-app create --help
+  my-app list --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

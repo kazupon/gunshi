@@ -1,0 +1,7 @@
+[
+  ["basic", "node cli.ts -h"],
+  ["config", "node cli.ts config --verbose"],
+  ["debug-config", "DEBUG=true node cli.ts config"],
+  ["config-help", "node cli.ts config -h"],
+  ["debug-config-help", "DEBUG=true node cli.ts config -h"]
+]

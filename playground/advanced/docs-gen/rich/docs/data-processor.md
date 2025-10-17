@@ -1,3 +1,4 @@
+
 # Data Processor CLI
 
 A command-line utility for processing data files in various formats.
@@ -49,3 +50,4 @@ For more complex scenarios, you can:
 ## API Reference
 
 The CLI is built on top of the data-processor library, which you can also use programmatically.
+  

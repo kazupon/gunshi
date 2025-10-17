@@ -1,15 +1,12 @@
 # my-tool(1) -- A utility for processing data
 
 ## SYNOPSIS
-
 my-tool <OPTIONS>
 
 ## DESCRIPTION
-
 A utility for processing data
 
 ## OPTIONS
-
 - `-h`, `--help`
   Display this help message
 
@@ -29,15 +26,12 @@ A utility for processing data
   Enable verbose output
 
 ## EXAMPLES
-
 See command `--help` for examples
 
 ## AUTHOR
-
 Created by yours
 
 ## SEE ALSO
-
 - man: `man my-tool`
 
 - website: https://my-tools.com/references/cli

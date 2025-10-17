@@ -1,0 +1,11 @@
+i18n-example (i18n-example v1.0.0)
+
+USAGE:
+  i18n-example <OPTIONS>
+
+OPTIONS:
+  -h, --help
+  -v, --version
+  -n, --name <name>          Name to greet
+  -f, --formal               Use formal greeting
+

@@ -1,0 +1,6 @@
+[
+  ["create", "node src/cli.ts create --name resource"],
+  ["list", "node src/cli.ts list --filter active"],
+  ["unknown", "node src/cli.ts unknown --flag value"],
+  ["help", "node src/cli.ts --help"]
+]

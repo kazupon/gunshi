@@ -1,0 +1,6 @@
+[
+  ["entry", "node cli.ts"],
+  ["help", "node cli.ts --help"],
+  ["query-help", "node cli.ts query --help"],
+  ["query", "node cli.ts query --table users"]
+]

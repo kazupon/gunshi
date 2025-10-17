@@ -1,0 +1,7 @@
+Database plugin initialized
+An example CLI demonstrating advanced type system with combined plugins (advanced-combine)
+
+Querying users
+Permission check for read on users: allowed
+Executing query: users
+Retrieved records from users {}

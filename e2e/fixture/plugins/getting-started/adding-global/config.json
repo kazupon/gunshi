@@ -1,0 +1,4 @@
+[
+  ["entry", "node cli.js"],
+  ["enable-debug", "node cli.js --debug"]
+]

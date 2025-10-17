@@ -1,0 +1,9 @@
+[
+  ["entry", "node cli.ts"],
+  ["english-help", "node cli.ts -h"],
+  ["japanese-help", "MY_LANG=ja-JP node cli.ts -h"],
+  ["english-create", "node cli.ts create --name resource1"],
+  ["english-create-help", "node cli.ts create --help"],
+  ["japanese-create", "MY_LANG=ja-JP node cli.ts create --name リソース1"],
+  ["japanese-create-help", "MY_LANG=ja-JP node cli.ts create --help"]
+]

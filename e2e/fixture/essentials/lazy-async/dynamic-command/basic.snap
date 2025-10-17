@@ -1,0 +1,17 @@
+my-cli (my-cli v1.0.0)
+
+USAGE:
+  my-cli [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  <OPTIONS>                     CLI with dynamic commands
+  config <OPTIONS>              Dynamically configured command
+
+For more info, run any command with the `--help` flag:
+  my-cli --help
+  my-cli config --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

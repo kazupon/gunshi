@@ -23,5 +23,5 @@ export default {
     'design/**/*.ts',
     'playground/**'
   ],
-  ignoreDependencies: ['lint-staged', 'deno', 'mitata']
+  ignoreDependencies: ['lint-staged', 'deno', 'mitata', 'gunshi019']
 } satisfies KnipConfig

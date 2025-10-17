@@ -1,0 +1,17 @@
+resource-cli (resource-cli v1.0.0)
+
+使い方:
+  resource-cli [コマンド] <オプション>
+
+コマンド:
+  [resource-manager] <オプション>
+  create <オプション>
+
+詳細は、コマンドと`--help`フラグを実行してください:
+  resource-cli --help
+  resource-cli create --help
+
+オプション:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

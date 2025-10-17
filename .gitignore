@@ -12,6 +12,7 @@ packages/docs/src/.vitepress/dist
 packages/docs/src/.vitepress/cache
 packages/docs/src/api
 generated-docs
+playground/advanced/docs-gen/**/*.md
 importmap.json
 *.log
 *.swp

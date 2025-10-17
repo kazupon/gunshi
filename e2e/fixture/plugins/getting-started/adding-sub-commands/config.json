@@ -1,0 +1,6 @@
+[
+  ["entry", "node cli.js"],
+  ["clean", "node cli.js clean"],
+  ["clean-cache", "node cli.js clean --cache"],
+  ["lint", "node cli.js lint"]
+]

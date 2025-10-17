@@ -1,0 +1,7 @@
+Decorator A: before
+Decorator B: before
+Decorator C: before
+Original command execution
+Decorator C: after
+Decorator B: after
+Decorator A: after

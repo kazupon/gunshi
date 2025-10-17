@@ -1,0 +1,6 @@
+[
+  ["basic", "node cli.js"],
+  ["spacify-name", "node cli.js --name Alice"],
+  ["custom-greeting", "node cli.js -n Bob -g \"Good morning\""],
+  ["uppercase", "node cli.js --name Charlie --uppercase"]
+]

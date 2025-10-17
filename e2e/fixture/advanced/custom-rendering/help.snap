@@ -1,0 +1,24 @@
+╔═════════════════════════════════════════╗
+║             TASK MANAGER                ║
+╚═════════════════════════════════════════╝
+A task management utility with custom usage generation
+Version: 1.0.0
+
+
+📋 COMMAND USAGE
+═══════════════
+
+BASIC USAGE:
+  $ task-manager [options]
+
+OPTIONS:
+  -h, --help          [boolean]  Display this help message
+  -v, --version       [boolean]  Display this version
+  -a, --add           [string]   Add a new task
+  -l, --list          [boolean]  List all tasks
+  -c, --complete      [string]   Mark a task as complete
+  -p, --priority      [string]   Set task priority (low, medium, high)
+  -d, --due           [string]   Set due date in YYYY-MM-DD format
+
+NOTE: This is a demo application with custom usage formatting.
+For more information, visit: https://github.com/kazupon/gunshi

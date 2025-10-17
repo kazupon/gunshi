@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [viteTsconfigPaths()],
   test: {
     globals: true,
+    testTimeout: 60_000,
+    include: ['**/*.test.?(c|m)[jt]s?(x)'],
     exclude: [...defaultExclude, './packages/docs/src/**/*.test.ts', './playground/**/*.test.ts'],
     typecheck: {
       tsconfig: './tsconfig.ci.json'

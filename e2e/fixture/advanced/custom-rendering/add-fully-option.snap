@@ -1,0 +1,10 @@
+╔═════════════════════════════════════════╗
+║             TASK MANAGER                ║
+╚═════════════════════════════════════════╝
+A task management utility with custom usage generation
+Version: 1.0.0
+
+
+Adding task: "Important meeting"
+Priority: high
+Due date: 2023-12-31

@@ -1,0 +1,8 @@
+[
+  ["english", "node cli.ts --name John"],
+  ["english-formal", "node cli.ts --name John --formal"],
+  ["english-help", "node cli.ts -h"],
+  ["japanese-help", "MY_LANG=ja-JP node cli.ts --help"],
+  ["japanese-formal", "MY_LANG=ja-JP node cli.ts --name 田中 --formal"],
+  ["japanese", "MY_LANG=ja-JP node cli.ts --name 田中"]
+]

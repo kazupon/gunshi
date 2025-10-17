@@ -1,0 +1,10 @@
+my-cli (my-cli v1.0.0)
+
+USAGE:
+  my-cli <OPTIONS>
+
+OPTIONS:
+  -h, --help                     Display this help message
+  -v, --version                  Display this version
+  --endpoint <endpoint>          API endpoint to fetch
+

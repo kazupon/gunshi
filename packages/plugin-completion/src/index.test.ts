@@ -1,17 +1,5 @@
-import { exec } from 'node:child_process'
 import { describe, expect, test } from 'vitest'
-
-function runCommand(command: string, env: NodeJS.ProcessEnv = {}): Promise<string> {
-  return new Promise((resolve, reject) => {
-    exec(command, { env: { ...process.env, ...env } }, (error, stdout, stderr) => {
-      if (error) {
-        reject(stderr)
-      } else {
-        resolve(stdout)
-      }
-    })
-  })
-}
+import { runCommand } from '../../../scripts/utils.ts'
 
 const SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/basic.node.ts complete --`
 
@@ -117,7 +105,9 @@ describe('positional arguments', () => {
 
   test('multiple positional argument when ending with space', async () => {
     const output = await runCommand(`${SCRIPT} lint main.ts ""`, {
-      G_COMPLETION_TEST_MULTIPLE: '1'
+      env: {
+        G_COMPLETION_TEST_MULTIPLE: '1'
+      }
     })
     expect(output).toMatchSnapshot()
   })
@@ -127,7 +117,12 @@ const LOCALIZABLE_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/i1
 const I18N_ENV = { MY_LOCALE: 'ja-JP' }
 
 function runLocalizedCommand(command: string, env: NodeJS.ProcessEnv = {}) {
-  return runCommand(command, { ...I18N_ENV, ...env })
+  return runCommand(command, {
+    env: {
+      ...I18N_ENV,
+      ...env
+    }
+  })
 }
 
 describe('i18n support', () => {

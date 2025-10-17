@@ -1,0 +1,6 @@
+[
+  ["entry", "node cli.ts"],
+  ["help", "node cli.ts --help"],
+  ["build-help", "node cli.ts build --help"],
+  ["build", "node cli.ts build --target=dev --minify"]
+]

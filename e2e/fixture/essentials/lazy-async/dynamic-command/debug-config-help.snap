@@ -1,0 +1,11 @@
+my-cli (my-cli v1.0.0)
+
+Config command (debug: true)
+
+USAGE:
+  my-cli config <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

@@ -1,0 +1,13 @@
+🚀 My CLI v1.0.0
+my-cli (my-cli v1.0.0)
+
+USAGE:
+  my-cli <OPTIONS>
+
+OPTIONS:
+  -h, --help                 Display this help message
+  -v, --version              Display this version
+  --output <output>
+
+
+Generated: xxxx-xx-xxTxx:xx:xx.xxxZ

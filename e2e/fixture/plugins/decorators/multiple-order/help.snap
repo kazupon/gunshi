@@ -1,0 +1,11 @@
+[custom-a] Decorating usage
+[custom-b] Decorating usage
+USAGE:
+  my-cli <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+
+📦 Enhanced by Plugin A
+🎨 Styled by Plugin B

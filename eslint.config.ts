@@ -33,7 +33,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
         './scripts/**',
         './bench/**',
         './playground/**',
-        './playground/**',
+        './e2e/**',
         './packages/docs/**',
         './packages/**/examples/**',
         './**/test/**',

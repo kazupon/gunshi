@@ -1,0 +1,13 @@
+1. Logger plugin loaded
+2. Cache plugin loaded (depends on logger)
+3. Auth plugin loaded (depends on logger, cache)
+4. Metrics plugin loaded (depends on logger, optionally cache)
+5. API plugin loaded (depends on auth, metrics)
+
+=== Command execution starts ===
+[LOG] Command running
+[LOG] Checking authentication
+[LOG] Cache get: auth-token
+[LOG] Tracking: api:/users
+[LOG] Cache get: metrics:api:/users
+=== Command execution ends ===

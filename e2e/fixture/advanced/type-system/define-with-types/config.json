@@ -1,0 +1,6 @@
+[
+  ["entry", "node cli.ts"],
+  ["help", "node cli.ts --help"],
+  ["server-help", "node cli.ts server --help"],
+  ["server", "node cli.ts server --host gunshi.dev --port 1978"]
+]
