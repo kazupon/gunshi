@@ -19,7 +19,7 @@ export default plugin({
       await sleep(10)
       const result = await runner(ctx)
       // NOTE: Skip timing log in e2e tests to reduce noise
-      if (process.env.GUNSHI_E2E_DISABLE) {
+      if (process.env.GUNSHI_E2E) {
         return result
       }
       console.log(`[TIME] Execution: ${Date.now() - start}ms`)

@@ -108,7 +108,11 @@ $ my-tool --input data.csv --verbose`
   // Convert markdown to man page format using marked-man
   // Note: You need to install `marked-man` first: `npm install -g marked-man`
   try {
-    execFileSync('marked-man', ['--input', mdFile, '--output', 'my-tool.1'])
+    if (process.env.GUNSHI_E2E) {
+      execFileSync('npx', ['marked-man', '--input', mdFile, '--output', 'my-tool.1'])
+    } else {
+      execFileSync('marked-man', ['--input', mdFile, '--output', 'my-tool.1'])
+    }
     console.log('Man page generated successfully: my-tool.1')
   } catch (error) {
     console.error('Error generating man page:', (error as Error).message)

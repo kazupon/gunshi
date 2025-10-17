@@ -1,1 +1,1 @@
-[["generate", "node cli.ts"]]
+[["generate", "GUNSHI_E2E=true node cli.ts"]]
