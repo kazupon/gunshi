@@ -153,5 +153,8 @@ jobs:
       - name: Building
         run: pnpm build
 
+      - name: Install dependencies (resolve built packages)
+        run: pnpm install --frozen-lockfile
+
       - name: E2E Testing
         run: pnpm e2e
