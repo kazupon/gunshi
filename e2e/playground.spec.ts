@@ -12,9 +12,9 @@ async function getFixtureDirents(fixturePath: string) {
     })
     .map(entry => {
       const base = entry.parentPath.split(fixturePath).pop() || path.sep
-      const splitedBase = base.split(path.sep)
-      splitedBase.shift()
-      return `${splitedBase.join(path.sep)}/${entry.name}`
+      const splitBase = base.split(path.sep)
+      splitBase.shift()
+      return `${splitBase.join(path.sep)}/${entry.name}`
     })
 }
 
