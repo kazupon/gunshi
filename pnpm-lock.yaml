@@ -49,7 +49,7 @@ importers:
         version: 7.3.0
       '@kazupon/eslint-config':
         specifier: ^0.36.0
-        version: 0.36.0(7840c7a242a6a9574831ce7672064b04)
+        version: 0.36.0(e88ae274c091538d220ff02510635e1b)
       '@kazupon/prettier-config':
         specifier: ^0.1.1
         version: 0.1.1
@@ -6088,12 +6088,12 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.36.0(7840c7a242a6a9574831ce7672064b04)':
+  '@kazupon/eslint-config@0.36.0(e88ae274c091538d220ff02510635e1b)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.36.0(jiti@2.6.0))
       '@eslint/js': 9.36.0
       '@kazupon/eslint-plugin': 0.6.2(eslint@9.36.0(jiti@2.6.0))
-      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(publint@0.3.13)(typescript@5.9.3)
+      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3)
       '@stylistic/eslint-plugin': 4.4.1(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.3)
       eslint: 9.36.0(jiti@2.6.0)
       eslint-flat-config-utils: 2.1.4
@@ -6136,9 +6136,9 @@ snapshots:
       '@eslint/core': 0.15.2
       eslint: 9.36.0(jiti@2.6.0)
 
-  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(publint@0.3.13)(typescript@5.9.3)':
+  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3)':
     dependencies:
-      tsdown: 0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(publint@0.3.13)(typescript@5.9.3)
+      tsdown: 0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3)
     optionalDependencies:
       '@vue/reactivity': 3.5.21
     transitivePeerDependencies:
@@ -10079,7 +10079,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(publint@0.3.13)(typescript@5.9.3):
+  tsdown@0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(oxc-resolver@11.8.3)(publint@0.3.13)(typescript@5.9.3):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
