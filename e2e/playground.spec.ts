@@ -11,10 +11,8 @@ async function getFixtureDirents(fixturePath: string) {
       return existsSync(path.join(entry.parentPath, entry.name, 'config.json'))
     })
     .map(entry => {
-      const base = entry.parentPath.split(fixturePath).pop() || path.sep
-      const splitBase = base.split(path.sep)
-      splitBase.shift()
-      return `${splitBase.join(path.sep)}/${entry.name}`
+      const fullPath = path.join(entry.parentPath, entry.name)
+      return path.relative(fixturePath, fullPath)
     })
 }
 
@@ -31,7 +29,10 @@ describe('playground tests', async () => {
       const config = (await import(configPath, { with: { type: 'json' } }).then(
         mod => mod.default || mod
       )) as Array<[string, string]>
-      if (Array.isArray(config) && config.length > 0) {
+      if (!Array.isArray(config)) {
+        throw new TypeError(`Invalid config.json in ${dir}: expected an array`)
+      }
+      if (config.length > 0) {
         for (const [testCase, cmd] of config) {
           // eslint-disable-next-line vitest/valid-title -- NOTE(kazupon): testCase is used as test name
           test(testCase, async () => {

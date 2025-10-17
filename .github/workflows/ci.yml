@@ -133,7 +133,7 @@ jobs:
         node-version: [20]
         os: [ubuntu-latest]
 
-    name: Type Checking on Node.js ${{ matrix.node-version }}
+    name: E2E Testing on Node.js ${{ matrix.node-version }}
     steps:
       - name: Checkout codes
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0

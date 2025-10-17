@@ -14,10 +14,10 @@ export function runCommand(command: string, options?: ExecOptions): Promise<stri
   return new Promise((resolve, reject) => {
     exec(
       command,
-      { ...options, env: { ...process.env, ...options?.env } },
+      { timeout: 30_000, ...options, env: { ...process.env, ...options?.env } },
       (error, stdout, stderr) => {
         if (error) {
-          reject(stderr)
+          reject(new Error(`Command failed: ${command}\n${stderr}\n${error.message}`))
         } else {
           resolve(stdout.toString())
         }
