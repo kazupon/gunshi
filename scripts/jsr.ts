@@ -28,44 +28,49 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
   }
 
   json.dependencies = json.dependencies || {}
+
+  function setVersion(dep: string) {
+    json.dependencies[dep] = version
+  }
+
   switch (pkg) {
     case 'packages/gunshi': {
-      json.dependencies['@gunshi/plugin-global'] = version
-      json.dependencies['@gunshi/plugin-renderer'] = version
-      json.dependencies['@gunshi/plugin-i18n'] = version
+      setVersion('@gunshi/plugin-global')
+      setVersion('@gunshi/plugin-renderer')
+      setVersion('@gunshi/plugin-i18n')
       break
     }
     case 'packages/bone':
     case 'packages/plugin':
     case 'packages/definition': {
-      json.dependencies['gunshi'] = version
+      setVersion('gunshi')
       break
     }
     case 'packages/shared': {
-      json.dependencies['@gunshi/resources'] = version
-      json.dependencies['gunshi'] = version
+      setVersion('@gunshi/resources')
+      setVersion('gunshi')
       break
     }
     case 'packages/plugin-i18n':
     case 'packages/plugin-global': {
-      json.dependencies['@gunshi/plugin'] = version
-      json.dependencies['@gunshi/shared'] = version
+      setVersion('@gunshi/plugin')
+      setVersion('@gunshi/shared')
       break
     }
     case 'packages/plugin-completion': {
-      json.dependencies['@gunshi/plugin'] = version
-      json.dependencies['@gunshi/shared'] = version
-      json.dependencies['@gunshi/plugin-i18n'] = version
+      setVersion('@gunshi/plugin')
+      setVersion('@gunshi/shared')
+      setVersion('@gunshi/plugin-i18n')
       break
     }
     case 'packages/plugin-renderer': {
-      json.dependencies['@gunshi/plugin'] = version
-      json.dependencies['@gunshi/shared'] = version
-      json.dependencies['@gunshi/plugin-i18n'] = version
+      setVersion('@gunshi/plugin')
+      setVersion('@gunshi/shared')
+      setVersion('@gunshi/plugin-i18n')
       break
     }
     case 'packages/plugin-dryrun': {
-      json.dependencies['@gunshi/plugin'] = version
+      setVersion('@gunshi/plugin')
       break
     }
   }
