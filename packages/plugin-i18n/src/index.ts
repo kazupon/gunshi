@@ -225,7 +225,11 @@ export default function i18n(
           if (globalOptionResources.has(globalOption)) {
             const optionResource = globalOptionResources.get(globalOption)!
             const globalOptionKey = resolveArgKey(globalOption, ctx.name)
-            resource[globalOptionKey] = optionResource[localeStr] || optionResource[DEFAULT_LOCALE]
+            resource[globalOptionKey] =
+              optionResource[localeStr] ||
+              optionResource[DEFAULT_LOCALE] ||
+              Object.values(optionResource)[0] ||
+              ''
           }
         }
         adapter.setResource(
