@@ -79,7 +79,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsdoc": "^60.8.3",
+    "eslint-plugin-jsdoc": "^61.0.0",
     "eslint-plugin-jsonc": "^2.21.0",
     "eslint-plugin-markdown-preferences": "^0.10.0",
     "eslint-plugin-module-interop": "^0.3.1",
