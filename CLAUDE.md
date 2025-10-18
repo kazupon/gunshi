@@ -10,7 +10,7 @@ This is a **pnpm workspace monorepo** containing the core library, plugins, util
 
 ## Essential Commands
 
-```bash
+```sh
 # Install dependencies
 pnpm install
 
@@ -120,7 +120,7 @@ The repository contains the following packages:
 
 ### Core Library (`packages/gunshi/src/`)
 
-```
+```sh
 packages/gunshi/src/
 ├── index.ts              # Main entry point, exports public APIs
 ├── bone.ts               # Minimal CLI entry (no plugins)
@@ -158,7 +158,7 @@ packages/gunshi/src/
 
 ### Playground Examples
 
-```
+```sh
 playground/
 ├── essentials/           # Basic CLI examples
 ├── advanced/             # Advanced features (sub-commands, lazy loading)
@@ -265,7 +265,7 @@ When creating plugins:
 
 ### Build Commands
 
-```bash
+```sh
 pnpm build                      # Build all packages
 pnpm build:gunshi               # Build core package only
 pnpm build:plugin:global        # Build specific plugin
