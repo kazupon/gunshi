@@ -12,6 +12,9 @@ export default {
     'packages/plugin-completion': {
       ignore: ['examples/**/*.ts', 'src/bombshell/*.ts']
     },
+    'packages/plugin-i18n': {
+      ignoreDependencies: ['@gunshi/plugin-global']
+    },
     'packages/docs': {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts']
     }

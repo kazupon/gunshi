@@ -71,6 +71,9 @@
     }
   },
   "devDependencies": {
+    "@gunshi/bone": "workspace:*",
+    "@gunshi/plugin-global": "workspace:*",
+    "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
     "@intlify/core": "next",

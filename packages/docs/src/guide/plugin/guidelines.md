@@ -56,8 +56,8 @@ export const pluginId = 'g:i18n' as const
 Follow consistent naming for plugin packages:
 
 - Standalone packages: `gunshi-plugin-{feature}`
-- Scoped packages: `@{org}/gunshi-plugin-{feature}`
-- Example: `gunshi-plugin-logger`, `@mycompany/gunshi-plugin-auth`
+- Scoped packages: `@{org}/gunshi-plugin-{feature}` or `@{org}/gunshi-plugin`
+- Example: `gunshi-plugin-logger`, `@mycompany/gunshi-plugin-auth`, `@feature/gunshi/plugin`
 
 > [!NOTE]
 > Packages following the pattern `@gunshi/plugin-{feature}` (e.g., `@gunshi/plugin-i18n`) are official plugins maintained by the Gunshi team. These are not third-party plugins but are part of the official Gunshi ecosystem. Third-party developers should use their own organization scope or standalone naming as described above.

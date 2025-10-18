@@ -292,8 +292,8 @@ exports[`auto generate usage > strictly sub commands > console output 1`] = `
     gunshi command2 --help
 
 オプション:
-    -h, --help                    Display this help message
-    -v, --version                 Display this version
+    -h, --help                    このヘルプメッセージを表示
+    -v, --version                 このバージョンを表示
     -f, --foo <foo>               The foo option
 
 例:
@@ -354,8 +354,8 @@ exports[`auto generate usage > strictly sub commands > entry 1`] = `
     gunshi command2 --help
 
 オプション:
-    -h, --help                    Display this help message
-    -v, --version                 Display this version
+    -h, --help                    このヘルプメッセージを表示
+    -v, --version                 このバージョンを表示
     -f, --foo <foo>               The foo option
 
 例:

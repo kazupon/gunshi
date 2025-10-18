@@ -393,10 +393,16 @@ importers:
       '@gunshi/plugin':
         specifier: workspace:*
         version: link:../plugin
+    devDependencies:
+      '@gunshi/bone':
+        specifier: workspace:*
+        version: link:../bone
       '@gunshi/plugin-global':
         specifier: workspace:*
         version: link:../plugin-global
-    devDependencies:
+      '@gunshi/plugin-renderer':
+        specifier: workspace:*
+        version: link:../plugin-renderer
       '@gunshi/resources':
         specifier: workspace:*
         version: link:../resources

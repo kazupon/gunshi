@@ -1,3 +1,8 @@
+import { cli } from '@gunshi/bone'
+import { plugin } from '@gunshi/plugin'
+import globals from '@gunshi/plugin-global'
+import renderer from '@gunshi/plugin-renderer'
+import resources from '@gunshi/resources'
 import { namespacedId, resolveArgKey, resolveBuiltInKey, resolveKey } from '@gunshi/shared'
 import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
@@ -6,13 +11,14 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../test/helper.ts'
-import i18n, { defineI18n } from './index.ts'
+import i18n, { defineI18n, pluginId } from './index.ts'
 
 import type { Args, Command, GunshiParams } from '@gunshi/plugin'
 import type {
   CommandResource,
   CommandResourceFetcher,
   I18nExtension,
+  PluginId,
   TranslationAdapter
 } from './types.ts'
 
@@ -129,6 +135,57 @@ describe('extension: translate', () => {
 
     // test non-existent key
     expect(extension.translate('non-existent-key')).toBe('')
+  })
+})
+
+describe('extension: registerGlobalOptionResources', () => {
+  test('register and translate global option resources', async () => {
+    const debugDescriptionEn = 'Enable debug mode'
+    const debugDescriptionJa = 'デバッグモードを有効にする'
+
+    const id = 'debug'
+    const dependencies = [
+      {
+        id: pluginId,
+        optional: true
+      }
+    ] as const
+    const debug = plugin<Record<PluginId, I18nExtension>, typeof id, typeof dependencies>({
+      id,
+      dependencies,
+      setup: async ctx => {
+        ctx.addGlobalOption('debug', {
+          type: 'boolean',
+          description: debugDescriptionEn
+        })
+      },
+      onExtension: ctx => {
+        const i18n = ctx.extensions[pluginId]
+        i18n?.registerGlobalOptionResources('debug', {
+          'en-US': debugDescriptionEn,
+          'ja-JP': debugDescriptionJa
+        })
+      }
+    })
+
+    function entry() {}
+
+    const outputEn = await cli(['-h'], entry, {
+      usageSilent: true,
+      plugins: [i18n({ builtinResources: resources }), debug, renderer(), globals()]
+    })
+    expect(outputEn).toContain(debugDescriptionEn)
+
+    const outputJa = await cli(['-h'], entry, {
+      usageSilent: true,
+      plugins: [
+        i18n({ locale: 'ja-JP', builtinResources: resources }),
+        debug,
+        renderer(),
+        globals()
+      ]
+    })
+    expect(outputJa).toContain(debugDescriptionJa)
   })
 })
 
