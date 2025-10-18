@@ -29,48 +29,43 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
 
   json.dependencies = json.dependencies || {}
 
-  function setVersion(dep: string) {
+  function setDependency(dep: string) {
     json.dependencies[dep] = version
   }
 
   switch (pkg) {
     case 'packages/gunshi': {
-      setVersion('@gunshi/plugin-global')
-      setVersion('@gunshi/plugin-renderer')
-      setVersion('@gunshi/plugin-i18n')
+      setDependency('@gunshi/plugin-global')
+      setDependency('@gunshi/plugin-renderer')
+      setDependency('@gunshi/plugin-i18n')
       break
     }
     case 'packages/bone':
     case 'packages/plugin':
     case 'packages/definition': {
-      setVersion('gunshi')
+      setDependency('gunshi')
       break
     }
     case 'packages/shared': {
-      setVersion('@gunshi/resources')
-      setVersion('gunshi')
+      setDependency('@gunshi/resources')
+      setDependency('gunshi')
       break
     }
     case 'packages/plugin-i18n':
     case 'packages/plugin-global': {
-      setVersion('@gunshi/plugin')
-      setVersion('@gunshi/shared')
+      setDependency('@gunshi/plugin')
+      setDependency('@gunshi/shared')
       break
     }
-    case 'packages/plugin-completion': {
-      setVersion('@gunshi/plugin')
-      setVersion('@gunshi/shared')
-      setVersion('@gunshi/plugin-i18n')
-      break
-    }
+    case 'packages/plugin-completion':
     case 'packages/plugin-renderer': {
-      setVersion('@gunshi/plugin')
-      setVersion('@gunshi/shared')
-      setVersion('@gunshi/plugin-i18n')
+      setDependency('@gunshi/plugin')
+      setDependency('@gunshi/shared')
+      setDependency('@gunshi/plugin-i18n')
       break
     }
     case 'packages/plugin-dryrun': {
-      setVersion('@gunshi/plugin')
+      setDependency('@gunshi/plugin')
       break
     }
   }
