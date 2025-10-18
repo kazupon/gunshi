@@ -37,6 +37,7 @@ import { plugin } from '@gunshi/plugin'
 import {
   ARG_PREFIX_AND_KEY_SEPARATOR,
   BUILT_IN_PREFIX,
+  COMMON_ARGS,
   DefaultResource,
   namespacedId,
   resolveArgKey,
@@ -97,15 +98,51 @@ export default function i18n(
   // store built-in locale resources
   const localeBuiltinResources: Map<string, Record<string, string>> = new Map()
 
-  // loaded built-in resource
-  let builtInLoadedResources: Record<string, string> | undefined
+  // built-in global options
+  const builtinGlobalOptions = Object.keys(COMMON_ARGS)
+
+  // store global option resources
+  const globalOptionResources: Map<string, Record<string, string>> = new Map()
 
   return plugin({
     id,
     name: 'internationalization',
     dependencies: [{ id: namespacedId('global'), optional: true }] as const,
 
-    extension: async () => {
+    extension: async ctx => {
+      function registerGlobalOptionResources(
+        option: string,
+        resources: Record<string, string>
+      ): void {
+        if (globalOptionResources.has(option)) {
+          return
+        }
+
+        globalOptionResources.set(option, resources)
+
+        /**
+         * NOTE(kazupon):
+         * When registering global option resources, we need to set them to the adapter
+         * to make sure they are available for translation immediately.
+         */
+        if (!builtinGlobalOptions.includes(option)) {
+          const globalOptionKey = resolveArgKey(option, ctx.name)
+          const resourceLocaleKeys = Object.keys(resources)
+          for (const resourceLocaleKey of resourceLocaleKeys) {
+            const message = adapter.getMessage(resourceLocaleKey, globalOptionKey)
+            if (!message) {
+              const resource = adapter.getResource(resourceLocaleKey) || Object.create(null)
+              resource[globalOptionKey] = resources[resourceLocaleKey]
+              adapter.setResource(resourceLocaleKey, resource)
+            }
+          }
+        }
+      }
+
+      function getGlobalOptions() {
+        return [...globalOptionResources.keys()]
+      }
+
       // define translate function
       function translate<
         T extends string = CommandBuiltinKeys,
@@ -124,15 +161,6 @@ export default function i18n(
         }
       }
 
-      // define getResource function
-      function getResource(
-        locale: string | Intl.Locale
-      ): Record<BuiltinResourceKeys, string> | undefined {
-        const targetLocale = toLocale(locale)
-        const targetLocaleStr = toLocaleString(targetLocale)
-        return localeBuiltinResources.get(targetLocaleStr)
-      }
-
       // define setResource function
       function setResource(
         locale: string | Intl.Locale,
@@ -143,7 +171,29 @@ export default function i18n(
         if (localeBuiltinResources.has(targetLocaleStr)) {
           return
         }
-        localeBuiltinResources.set(targetLocaleStr, mapResourceWithBuiltinKey(resource))
+        localeBuiltinResources.set(
+          targetLocaleStr,
+          mapResourceWithBuiltinKey(resource, ctx, getGlobalOptions())
+        )
+      }
+
+      // setup built-in global option resources
+      const builtinGlobalOptionResources: Record<string, Record<string, string>> = Object.create(
+        null
+      )
+      for (const globalOption of builtinGlobalOptions) {
+        const resource: Record<string, string> = {}
+        resource[DEFAULT_LOCALE] = (DefaultResource as Record<string, string>)[globalOption]
+        builtinGlobalOptionResources[globalOption] = resource
+      }
+      for (const [locale, resource] of Object.entries(builtinResources)) {
+        for (const globalOption of builtinGlobalOptions) {
+          const globalOptionResource = builtinGlobalOptionResources[globalOption]
+          globalOptionResource[locale] = (resource as Record<string, string>)[globalOption]
+        }
+      }
+      for (const globalOption of builtinGlobalOptions) {
+        registerGlobalOptionResources(globalOption, builtinGlobalOptionResources[globalOption])
       }
 
       // set default locale resources
@@ -154,9 +204,6 @@ export default function i18n(
         setResource(locale, resource)
       }
 
-      // keep built-in locale resources for later use
-      builtInLoadedResources = getResource(locale)
-
       // define loadResource function
       async function loadResource(
         locale: string | Intl.Locale,
@@ -164,24 +211,40 @@ export default function i18n(
         cmd: Command
       ): Promise<boolean> {
         let loaded = false
+
         const originalResource = await loadCommandResource(toLocale(locale), cmd)
         if (originalResource) {
-          const resource = await normalizeResource(originalResource, ctx)
-          if (builtInLoadedResources) {
-            // NOTE(kazupon): setup resource for global opsions
-            resource.help = builtInLoadedResources.help
-            resource.version = builtInLoadedResources.version
-          }
-          adapter.setResource(toLocaleString(locale), resource)
           loaded = true
         }
+
+        const localeStr = toLocaleString(locale)
+        const resource = originalResource
+          ? await normalizeResource(originalResource, ctx)
+          : Object.create(null)
+        for (const globalOption of getGlobalOptions()) {
+          if (globalOptionResources.has(globalOption)) {
+            const optionResource = globalOptionResources.get(globalOption)!
+            const globalOptionKey = resolveArgKey(globalOption, ctx.name)
+            resource[globalOptionKey] =
+              optionResource[localeStr] ||
+              optionResource[DEFAULT_LOCALE] ||
+              Object.values(optionResource)[0] ||
+              ''
+          }
+        }
+        adapter.setResource(
+          localeStr,
+          Object.assign(Object.create(null), adapter.getResource(localeStr), resource)
+        )
+
         return loaded
       }
 
       return {
         locale,
         translate,
-        loadResource
+        loadResource,
+        registerGlobalOptionResources
       }
     },
 
@@ -244,9 +307,13 @@ async function loadCommandResource(
   return resource
 }
 
-function mapResourceWithBuiltinKey(resource: Record<string, string>): Record<string, string> {
+function mapResourceWithBuiltinKey(
+  resource: Record<string, string>,
+  ctx: CommandContext,
+  globalOptions: string[]
+): Record<string, string> {
   return Object.entries(resource).reduce((acc, [key, value]) => {
-    acc[resolveBuiltInKey(key)] = value
+    acc[globalOptions.includes(key) ? resolveArgKey(key, ctx.name) : resolveBuiltInKey(key)] = value
     return acc
   }, Object.create(null))
 }

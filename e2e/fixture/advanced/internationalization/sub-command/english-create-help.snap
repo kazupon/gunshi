@@ -6,7 +6,7 @@ USAGE:
   resource-cli create <OPTIONS>
 
 OPTIONS:
-  -h, --help
-  -v, --version
+  -h, --help             Display this help message
+  -v, --version          Display this version
   --name <name>          Resource name
 

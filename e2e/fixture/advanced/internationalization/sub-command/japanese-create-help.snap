@@ -6,7 +6,7 @@ resource-cli (resource-cli v1.0.0)
   resource-cli create <オプション>
 
 オプション:
-  -h, --help             Display this help message
-  -v, --version          Display this version
+  -h, --help             このヘルプメッセージを表示
+  -v, --version          このバージョンを表示
   --name <name>          リソース名
 

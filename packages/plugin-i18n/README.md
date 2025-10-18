@@ -340,6 +340,7 @@ Available extensions:
 - `locale: Intl.Locale`: The current locale
 - `translate<T>(key: T, values?: Record<string, unknown>): string`: Translation function
 - `loadResource(locale: string | Intl.Locale, ctx: CommandContext, command: Command): Promise<boolean>`: Manually load resources for a specific locale and command
+- `registerGlobalOptionResources: (option: string, resources: Record<string, string>) => void`: Register global option resources. If your global option description needs the localization, you can install resource of it at `extension` or `onExtension` hook
 
 ## 📝 Resource Key Naming Conventions
 

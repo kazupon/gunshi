@@ -15,7 +15,6 @@ import type {
   GunshiParamsConstraint
 } from 'gunshi'
 import type {
-  CommandBuiltinArgsKeys,
   CommandBuiltinResourceKeys,
   GenerateNamespacedKey,
   KeyOfArgs,
@@ -32,9 +31,9 @@ import type {
  * @param key - The built-in key to resolve.
  * @returns Prefixed built-in key.
  */
-export function resolveBuiltInKey<
-  K extends string = CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
->(key: K): GenerateNamespacedKey<K> {
+export function resolveBuiltInKey<K extends string = CommandBuiltinResourceKeys>(
+  key: K
+): GenerateNamespacedKey<K> {
   return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 

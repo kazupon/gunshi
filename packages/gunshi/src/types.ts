@@ -432,8 +432,8 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    *
    * If {@linkcode CommandEnvironment.usageSilent} is true, the message is not output.
    *
-   * @param message - an output message, @see {@linkcode console.log}
-   * @param optionalParams - an optional parameters, @see {@linkcode console.log}
+   * @param message - an output message, see {@linkcode console.log}
+   * @param optionalParams - an optional parameters, see {@linkcode console.log}
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic optional parameters
   /**
