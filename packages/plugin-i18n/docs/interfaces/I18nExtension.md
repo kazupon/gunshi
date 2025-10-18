@@ -21,4 +21,5 @@ These utilities are available via `CommandContext.extensions['g:i18n']`.
 | ------ | ------ | ------ |
 | <a id="loadresource"></a> `loadResource` | (`locale`, `ctx`, `command`) => `Promise`\<`boolean`\> | Load command resources. |
 | <a id="locale"></a> `locale` | `Locale` | Command locale |
+| <a id="registerglobaloptionresources"></a> `registerGlobalOptionResources` | (`option`, `resources`) => `void` | Register global option resources. |
 | <a id="translate"></a> `translate` | \<`A`, `C`, `E`, `K`\>(`key`, `values?`) => `string` | Translate a message. |

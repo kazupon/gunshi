@@ -31,4 +31,4 @@ I18n-aware command interface that extends the base Command with resource support
 | <a id="rendering"></a> `rendering?` | `RenderingOptions`\<`G`\> | Rendering control options **Since** v0.27.0 | `Command.rendering` |
 | <a id="resource"></a> `resource?` | [`CommandResourceFetcher`](../type-aliases/CommandResourceFetcher.md)\<`G`\> | Command resource fetcher for i18n support. This property is specific to i18n-enabled commands. | - |
 | <a id="run"></a> `run?` | `CommandRunner`\<`G`\> | Command runner. it's the command to be executed | `Command.run` |
-| <a id="tokebab"></a> `toKebab?` | `boolean` | Whether to convert the camel-case style argument name to kebab-case. If you will set to `true`, All Command.args names will be converted to kebab-case. | `Command.toKebab` |
+| <a id="tokebab"></a> `toKebab?` | `boolean` | Whether to convert the camel-case style argument name to kebab-case. If you will set to `true`, All `Command.args` names will be converted to kebab-case. | `Command.toKebab` |

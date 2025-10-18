@@ -10,8 +10,7 @@ export default {
     '../gunshi/src/index.ts',
     '../gunshi/src/definition.ts',
     '../gunshi/src/context.ts',
-    // TODO(kazupon): when we will release the plugin, we should uncomment this line
-    // '../gunshi/src/plugin.ts',
+    '../gunshi/src/plugin.ts',
     '../gunshi/src/generator.ts',
     '../gunshi/src/renderer.ts'
   ],

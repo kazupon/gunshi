@@ -18,7 +18,7 @@ Built-in keys are prefixed with "_:".
 
 | Type Parameter | Default type | Description |
 | ------ | ------ | ------ |
-| `K` *extends* `string` | \| `"USAGE"` \| `"COMMAND"` \| `"SUBCOMMAND"` \| `"COMMANDS"` \| `"ARGUMENTS"` \| `"OPTIONS"` \| `"EXAMPLES"` \| `"FORMORE"` \| `"NEGATABLE"` \| `"DEFAULT"` \| `"CHOICES"` \| keyof CommonArgType | The type of the built-in key to resolve. Defaults to command built-in argument and resource keys. |
+| `K` *extends* `string` | \| `"USAGE"` \| `"COMMAND"` \| `"SUBCOMMAND"` \| `"COMMANDS"` \| `"ARGUMENTS"` \| `"OPTIONS"` \| `"EXAMPLES"` \| `"FORMORE"` \| `"NEGATABLE"` \| `"DEFAULT"` \| `"CHOICES"` | The type of the built-in key to resolve. Defaults to command built-in argument and resource keys. |
 
 ## Parameters
 
