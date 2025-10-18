@@ -37,6 +37,7 @@ import { plugin } from '@gunshi/plugin'
 import {
   ARG_PREFIX_AND_KEY_SEPARATOR,
   BUILT_IN_PREFIX,
+  COMMON_ARGS,
   DefaultResource,
   namespacedId,
   resolveArgKey,
@@ -100,12 +101,28 @@ export default function i18n(
   // loaded built-in resource
   let builtInLoadedResources: Record<string, string> | undefined
 
+  const globalOptionResources: Map<string, Record<string, string>> = new Map()
+
   return plugin({
     id,
     name: 'internationalization',
     dependencies: [{ id: namespacedId('global'), optional: true }] as const,
 
-    extension: async () => {
+    extension: async ctx => {
+      function registerGlobalOptionResources(
+        option: string,
+        resources: Record<string, string>
+      ): void {
+        if (globalOptionResources.has(option)) {
+          return
+        }
+        globalOptionResources.set(option, resources)
+      }
+
+      function getGlobalOptions() {
+        return [...globalOptionResources.keys()]
+      }
+
       // define translate function
       function translate<
         T extends string = CommandBuiltinKeys,
@@ -143,7 +160,30 @@ export default function i18n(
         if (localeBuiltinResources.has(targetLocaleStr)) {
           return
         }
-        localeBuiltinResources.set(targetLocaleStr, mapResourceWithBuiltinKey(resource))
+        localeBuiltinResources.set(
+          targetLocaleStr,
+          mapResourceWithBuiltinKey(resource, ctx, getGlobalOptions())
+        )
+      }
+
+      // setup built-in global option resources
+      const buildinGlobalOptions = Object.keys(COMMON_ARGS)
+      const buildinGlobalOptionResources: Record<string, Record<string, string>> = Object.create(
+        null
+      )
+      for (const globalOption of buildinGlobalOptions) {
+        const resource: Record<string, string> = {}
+        resource[DEFAULT_LOCALE] = (DefaultResource as Record<string, string>)[globalOption]
+        buildinGlobalOptionResources[globalOption] = resource
+      }
+      for (const [locale, resource] of Object.entries(builtinResources)) {
+        for (const globalOption of buildinGlobalOptions) {
+          const globalOptionResource = buildinGlobalOptionResources[globalOption]
+          globalOptionResource[locale] = (resource as Record<string, string>)[globalOption]
+        }
+      }
+      for (const globalOption of buildinGlobalOptions) {
+        registerGlobalOptionResources(globalOption, buildinGlobalOptionResources[globalOption])
       }
 
       // set default locale resources
@@ -169,8 +209,14 @@ export default function i18n(
           const resource = await normalizeResource(originalResource, ctx)
           if (builtInLoadedResources) {
             // NOTE(kazupon): setup resource for global opsions
-            resource.help = builtInLoadedResources.help
-            resource.version = builtInLoadedResources.version
+            for (const globalOption of getGlobalOptions()) {
+              if (globalOptionResources.has(globalOption)) {
+                const optionResource = globalOptionResources.get(globalOption)!
+                const globalOptionKey = resolveArgKey(globalOption, ctx.name)
+                resource[globalOptionKey] =
+                  optionResource[toLocaleString(locale)] || builtInLoadedResources[globalOptionKey]
+              }
+            }
           }
           adapter.setResource(toLocaleString(locale), resource)
           loaded = true
@@ -181,7 +227,8 @@ export default function i18n(
       return {
         locale,
         translate,
-        loadResource
+        loadResource,
+        registerGlobalOptionResources
       }
     },
 
@@ -244,9 +291,13 @@ async function loadCommandResource(
   return resource
 }
 
-function mapResourceWithBuiltinKey(resource: Record<string, string>): Record<string, string> {
+function mapResourceWithBuiltinKey(
+  resource: Record<string, string>,
+  ctx: CommandContext,
+  globalOptions: string[]
+): Record<string, string> {
   return Object.entries(resource).reduce((acc, [key, value]) => {
-    acc[resolveBuiltInKey(key)] = value
+    acc[globalOptions.includes(key) ? resolveArgKey(key, ctx.name) : resolveBuiltInKey(key)] = value
     return acc
   }, Object.create(null))
 }

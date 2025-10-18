@@ -60,8 +60,6 @@ describe('extension: translate', () => {
         'For more info, run any command with the `--help` flag'
       )
       expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('Negatable of')
-      expect(extension.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
-      expect(extension.translate(resolveBuiltInKey('version'))).toEqual('Display this version')
     })
 
     test('custom locale: ja-JP', async () => {
@@ -85,8 +83,6 @@ describe('extension: translate', () => {
         '詳細は、コマンドと`--help`フラグを実行してください'
       )
       expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('否定可能な')
-      expect(extension.translate(resolveBuiltInKey('help'))).toEqual('このヘルプメッセージを表示')
-      expect(extension.translate(resolveBuiltInKey('version'))).toEqual('このバージョンを表示')
     })
   })
 

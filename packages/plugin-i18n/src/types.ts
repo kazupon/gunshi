@@ -80,6 +80,13 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
     ctx: CommandContext,
     command: Command
   ) => Promise<boolean>
+  /**
+   * Register global option resources.
+   *
+   * @param option - An option name
+   * @param resources - A map of resources for different locales
+   */
+  registerGlobalOptionResources: (option: string, resources: Record<string, string>) => void
 }
 
 /**

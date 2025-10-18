@@ -12,6 +12,6 @@ For more info, run any command with the `--help` flag:
   resource-cli create --help
 
 OPTIONS:
-  -h, --help
-  -v, --version
+  -h, --help             Display this help message
+  -v, --version          Display this version
 
