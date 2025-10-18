@@ -1,4 +1,5 @@
 // import { defineConfig } from 'vitepress'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { URL } from 'node:url'
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
@@ -23,7 +24,8 @@ export default withMermaid({
     ['meta', { property: 'og:title', content: 'Gunshi | Modern javascript command-line library' }],
     ['meta', { property: 'og:image', content: 'https://gunshi.dev/og-image.png' }],
     ['meta', { property: 'og:site_name', content: 'Gunshi' }],
-    ['meta', { property: 'og:url', content: 'https://gunshi.dev/' }]
+    ['meta', { property: 'og:url', content: 'https://gunshi.dev/' }],
+    ['script', {}, readFileSync(path.resolve(__dirname, './banner.js'), 'utf-8')]
   ],
 
   themeConfig: {

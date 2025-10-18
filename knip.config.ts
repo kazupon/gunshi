@@ -16,7 +16,8 @@ export default {
       ignoreDependencies: ['@gunshi/plugin-global']
     },
     'packages/docs': {
-      entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts']
+      entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts'],
+      ignore: ['src/.vitepress/banner.js']
     }
   },
   ignore: [

@@ -1,5 +1,5 @@
 import Theme from 'vitepress/theme'
-import { h } from 'vue'
+import { defineAsyncComponent, h } from 'vue'
 import HomeSponsors from './components/HomeSponsors.vue'
 import './custom.css'
 // eslint-disable-next-line import/no-unresolved
@@ -9,7 +9,8 @@ export default {
   ...Theme,
   Layout() {
     return h(Theme.Layout, null, {
-      'home-features-after': () => h(HomeSponsors)
+      'home-features-after': () => h(HomeSponsors),
+      'layout-top': () => h(defineAsyncComponent(() => import('./components/Banner.vue')))
     })
   },
   enhanceApp({ _app, _router, _siteData }) {
