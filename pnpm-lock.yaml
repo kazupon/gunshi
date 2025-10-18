@@ -52,7 +52,7 @@ importers:
         version: 7.4.0
       '@kazupon/eslint-config':
         specifier: ^0.36.0
-        version: 0.36.0(5588c421706b0888dd85b41776342871)
+        version: 0.36.0(3f533cd1dfe4e6430f484f1d9ad6cc7b)
       '@kazupon/prettier-config':
         specifier: ^0.1.1
         version: 0.1.1
@@ -90,8 +90,8 @@ importers:
         specifier: ^2.21.0
         version: 2.21.0(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-markdown-preferences:
-        specifier: ^0.10.0
-        version: 0.10.0(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
+        specifier: ^0.36.0
+        version: 0.36.2(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-module-interop:
         specifier: ^0.3.1
         version: 0.3.1(eslint@9.37.0(jiti@2.6.0))
@@ -2030,6 +2030,9 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
+  '@types/katex@0.16.7':
+    resolution: {integrity: sha512-HMwFiRujE5PjrgwHQ25+bsLJgowjGjm5Z8FVSf0N6PwgJrwxH0QxzHYDcKsTfV3wva0vzrpqMTJS2jXPr5BMEQ==}
+
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
 
@@ -3009,6 +3012,10 @@ packages:
     resolution: {integrity: sha512-k1gCAXAsNgLwEL+Y8Wvl+M6oEFj5bgazfZULpS5CneoPPXRaCCW7dm+q21Ky2VEE5X+VeRDBVg1Pcvvsr4TtNQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
 
+  diff-sequences@29.6.3:
+    resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
+    engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+
   diff@8.0.2:
     resolution: {integrity: sha512-sSuxWU5j5SR9QQji/o2qMvqRNYRDOcBTgsJ/DeCf4iSN4gW+gNMXM7wFIP+fdXZxoNiAnHUTGjCr+TSWXdRDKg==}
     engines: {node: '>=0.3.1'}
@@ -3042,6 +3049,10 @@ packages:
 
   electron-to-chromium@1.5.222:
     resolution: {integrity: sha512-gA7psSwSwQRE60CEoLz6JBCQPIxNeuzB2nL8vE03GK/OHxlvykbLyeiumQy1iH5C2f3YbRAZpGCMT12a/9ih9w==}
+
+  emoji-regex-xs@2.0.1:
+    resolution: {integrity: sha512-1QFuh8l7LqUcKe24LsPUNzjrzJQ7pgRwp1QMcZ5MX6mFplk2zQ08NVCM84++1cveaUUYtcCYHmeFEuNg16sU4g==}
+    engines: {node: '>=10.0.0'}
 
   emoji-regex@10.5.0:
     resolution: {integrity: sha512-lb49vf1Xzfx080OKA0o6l8DQQpV+6Vg95zyCJX9VB/BqKYlhG7N4wgROUUHRA+ZPUefLnteQOad7z1kT2bV7bg==}
@@ -3219,11 +3230,11 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  eslint-plugin-markdown-preferences@0.10.0:
-    resolution: {integrity: sha512-IzSEmckf9RbaOWbQk62aAtH2bTlEeIN8fC6qKj6UQ4yGnLKgcpvaYDUTYQYCk+jWszBX1NQtKsMtKOm7XdsS/g==}
+  eslint-plugin-markdown-preferences@0.36.2:
+    resolution: {integrity: sha512-963LF6eYyvlPHnoaRZDy6xcsSVSRMz7mX0S03cKgvLfKUInrFtjHixtbd9KPhMYyVWdPNVqe5TiJaw01hxHoEA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
-      '@eslint/markdown': ^7.1.0
+      '@eslint/markdown': ^7.4.0
       eslint: '>=9.0.0'
 
   eslint-plugin-module-interop@0.3.1:
@@ -4089,6 +4100,9 @@ packages:
   mdast-util-gfm@3.1.0:
     resolution: {integrity: sha512-0ulfdQOM3ysHhCJ1p06l0b0VKlhU0wuQs3thxZQagjcjPrlFRqY215uZGHHJan9GEAXd9MbfPjFJz+qMkVR6zQ==}
 
+  mdast-util-math@3.0.0:
+    resolution: {integrity: sha512-Tl9GBNeG/AhJnQM221bJR2HPvLOSnLE/T9cJI9tlc6zwQk2nPk/4f0cHkOdEixQPC/j8UtKDdITswvLAy1OZ1w==}
+
   mdast-util-phrasing@4.1.0:
     resolution: {integrity: sha512-TqICwyvJJpBwvGAMZjj4J2n0X8QWp21b9l0o7eXyVJ25YNWYbJDVIyD1bZXE6WtV6RmKJVYmQAKWa0zWOABz2w==}
 
@@ -4140,6 +4154,9 @@ packages:
 
   micromark-extension-gfm@3.0.0:
     resolution: {integrity: sha512-vsKArQsicm7t0z2GugkCKtZehqUm31oeGBV/KVSorWSy8ZlNAv7ytjFhvaryUiCUJYqs+NoE6AFhpQvBTM6Q4w==}
+
+  micromark-extension-math@3.1.0:
+    resolution: {integrity: sha512-lvEqd+fHjATVs+2v/8kg9i5Q0AP2k85H0WUOwpIVvUML8BapsMvh1XAogmQjOCsLpoKRCVQqEkQBB3NhVBcsOg==}
 
   micromark-factory-destination@2.0.1:
     resolution: {integrity: sha512-Xe6rDdJlkmbFRExpTOmRj9N3MaWmbAgdpSrBQvCFqhezUn4AHqJHbaEnfbVYYiexVSs//tqOdY/DxhjdCiJnIA==}
@@ -5168,6 +5185,9 @@ packages:
   unist-util-position@5.0.0:
     resolution: {integrity: sha512-fucsC7HjXvkB5R3kTCO7kUjRdrS0BJt3M/FPxmHMBOm8JQi2BsHAHFsy27E0EolP8rp0NzXsJ+jNPyDWvOJZPA==}
 
+  unist-util-remove-position@5.0.0:
+    resolution: {integrity: sha512-Hp5Kh3wLxv0PHj9m2yZhhLt58KzPtEYKQQ4yxfYFEO7EvHwzyDYnduhHnY1mDxoqr7VUwVuHXk9RXKIiYS1N8Q==}
+
   unist-util-remove@4.0.0:
     resolution: {integrity: sha512-b4gokeGId57UVRX/eVKej5gXqGlc9+trkORhFJpu9raqZkZhU0zm8Doi05+HaiBsMEIJowL+2WtQ5ItjsngPXg==}
 
@@ -5861,12 +5881,12 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.36.0(5588c421706b0888dd85b41776342871)':
+  '@kazupon/eslint-config@0.36.0(3f533cd1dfe4e6430f484f1d9ad6cc7b)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.37.0(jiti@2.6.0))
       '@eslint/js': 9.36.0
       '@kazupon/eslint-plugin': 0.6.2(eslint@9.37.0(jiti@2.6.0))
-      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(publint@0.3.14)(typescript@5.9.3)
+      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.8.3)(publint@0.3.14)(typescript@5.9.3)
       '@stylistic/eslint-plugin': 4.4.1(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3)
       eslint: 9.37.0(jiti@2.6.0)
       eslint-flat-config-utils: 2.1.4
@@ -5880,7 +5900,7 @@ snapshots:
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-jsdoc: 60.8.3(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-jsonc: 2.21.0(eslint@9.37.0(jiti@2.6.0))
-      eslint-plugin-markdown-preferences: 0.10.0(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
+      eslint-plugin-markdown-preferences: 0.36.2(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-module-interop: 0.3.1(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-promise: 7.2.1(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-regexp: 2.10.0(eslint@9.37.0(jiti@2.6.0))
@@ -5909,9 +5929,9 @@ snapshots:
       '@eslint/core': 0.15.2
       eslint: 9.37.0(jiti@2.6.0)
 
-  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(publint@0.3.14)(typescript@5.9.3)':
+  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251005.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.8.3)(publint@0.3.14)(typescript@5.9.3)':
     dependencies:
-      tsdown: 0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(publint@0.3.14)(typescript@5.9.3)
+      tsdown: 0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(oxc-resolver@11.8.3)(publint@0.3.14)(typescript@5.9.3)
     optionalDependencies:
       '@vue/reactivity': 3.5.21
     transitivePeerDependencies:
@@ -6471,6 +6491,8 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
+
+  '@types/katex@0.16.7': {}
 
   '@types/linkify-it@5.0.0': {}
 
@@ -7505,6 +7527,8 @@ snapshots:
 
   diff-sequences@27.5.1: {}
 
+  diff-sequences@29.6.3: {}
+
   diff@8.0.2: {}
 
   doctrine@2.1.0:
@@ -7530,6 +7554,8 @@ snapshots:
   eastasianwidth@0.2.0: {}
 
   electron-to-chromium@1.5.222: {}
+
+  emoji-regex-xs@2.0.1: {}
 
   emoji-regex@10.5.0: {}
 
@@ -7795,10 +7821,25 @@ snapshots:
     transitivePeerDependencies:
       - '@eslint/json'
 
-  eslint-plugin-markdown-preferences@0.10.0(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0)):
+  eslint-plugin-markdown-preferences@0.36.2(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0)):
     dependencies:
       '@eslint/markdown': 7.4.0
+      diff-sequences: 29.6.3
+      emoji-regex-xs: 2.0.1
       eslint: 9.37.0(jiti@2.6.0)
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-frontmatter: 2.0.1
+      mdast-util-gfm: 3.1.0
+      mdast-util-math: 3.0.0
+      micromark-extension-frontmatter: 2.0.0
+      micromark-extension-gfm: 3.0.0
+      micromark-extension-math: 3.1.0
+      micromark-factory-space: 2.0.1
+      micromark-util-character: 2.1.1
+      micromark-util-symbol: 2.0.1
+      string-width: 8.1.0
+    transitivePeerDependencies:
+      - supports-color
 
   eslint-plugin-module-interop@0.3.1(eslint@9.37.0(jiti@2.6.0)):
     dependencies:
@@ -8751,6 +8792,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  mdast-util-math@3.0.0:
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      devlop: 1.1.0
+      longest-streak: 3.1.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.2
+      unist-util-remove-position: 5.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   mdast-util-phrasing@4.1.0:
     dependencies:
       '@types/mdast': 4.0.4
@@ -8897,6 +8950,16 @@ snapshots:
       micromark-extension-gfm-tagfilter: 2.0.0
       micromark-extension-gfm-task-list-item: 2.1.0
       micromark-util-combine-extensions: 2.0.1
+      micromark-util-types: 2.0.2
+
+  micromark-extension-math@3.1.0:
+    dependencies:
+      '@types/katex': 0.16.7
+      devlop: 1.1.0
+      katex: 0.16.22
+      micromark-factory-space: 2.0.1
+      micromark-util-character: 2.1.1
+      micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
 
   micromark-factory-destination@2.0.1:
@@ -9923,7 +9986,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(publint@0.3.14)(typescript@5.9.3):
+  tsdown@0.15.5(@typescript/native-preview@7.0.0-dev.20251005.1)(oxc-resolver@11.8.3)(publint@0.3.14)(typescript@5.9.3):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -10108,6 +10171,11 @@ snapshots:
   unist-util-position@5.0.0:
     dependencies:
       '@types/unist': 3.0.3
+
+  unist-util-remove-position@5.0.0:
+    dependencies:
+      '@types/unist': 3.0.3
+      unist-util-visit: 5.0.0
 
   unist-util-remove@4.0.0:
     dependencies:
