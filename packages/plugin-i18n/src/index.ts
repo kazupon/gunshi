@@ -99,7 +99,7 @@ export default function i18n(
   const localeBuiltinResources: Map<string, Record<string, string>> = new Map()
 
   // built-in global options
-  const buildinGlobalOptions = Object.keys(COMMON_ARGS)
+  const builtinGlobalOptions = Object.keys(COMMON_ARGS)
 
   // store global option resources
   const globalOptionResources: Map<string, Record<string, string>> = new Map()
@@ -125,7 +125,7 @@ export default function i18n(
          * When registering global option resources, we need to set them to the adapter
          * to make sure they are available for translation immediately.
          */
-        if (!buildinGlobalOptions.includes(option)) {
+        if (!builtinGlobalOptions.includes(option)) {
           const globalOptionKey = resolveArgKey(option, ctx.name)
           const resourceLocaleKeys = Object.keys(resources)
           for (const resourceLocaleKey of resourceLocaleKeys) {
@@ -178,22 +178,22 @@ export default function i18n(
       }
 
       // setup built-in global option resources
-      const buildinGlobalOptionResources: Record<string, Record<string, string>> = Object.create(
+      const builtinGlobalOptionResources: Record<string, Record<string, string>> = Object.create(
         null
       )
-      for (const globalOption of buildinGlobalOptions) {
+      for (const globalOption of builtinGlobalOptions) {
         const resource: Record<string, string> = {}
         resource[DEFAULT_LOCALE] = (DefaultResource as Record<string, string>)[globalOption]
-        buildinGlobalOptionResources[globalOption] = resource
+        builtinGlobalOptionResources[globalOption] = resource
       }
       for (const [locale, resource] of Object.entries(builtinResources)) {
-        for (const globalOption of buildinGlobalOptions) {
-          const globalOptionResource = buildinGlobalOptionResources[globalOption]
+        for (const globalOption of builtinGlobalOptions) {
+          const globalOptionResource = builtinGlobalOptionResources[globalOption]
           globalOptionResource[locale] = (resource as Record<string, string>)[globalOption]
         }
       }
-      for (const globalOption of buildinGlobalOptions) {
-        registerGlobalOptionResources(globalOption, buildinGlobalOptionResources[globalOption])
+      for (const globalOption of builtinGlobalOptions) {
+        registerGlobalOptionResources(globalOption, builtinGlobalOptionResources[globalOption])
       }
 
       // set default locale resources
@@ -217,6 +217,7 @@ export default function i18n(
           loaded = true
         }
 
+        const localeStr = toLocaleString(locale)
         const resource = originalResource
           ? await normalizeResource(originalResource, ctx)
           : Object.create(null)
@@ -224,12 +225,12 @@ export default function i18n(
           if (globalOptionResources.has(globalOption)) {
             const optionResource = globalOptionResources.get(globalOption)!
             const globalOptionKey = resolveArgKey(globalOption, ctx.name)
-            resource[globalOptionKey] = optionResource[toLocaleString(locale)]
+            resource[globalOptionKey] = optionResource[localeStr] || optionResource[DEFAULT_LOCALE]
           }
         }
         adapter.setResource(
-          toLocaleString(locale),
-          Object.assign(Object.create(null), adapter.getResource(toLocaleString(locale)), resource)
+          localeStr,
+          Object.assign(Object.create(null), adapter.getResource(localeStr), resource)
         )
 
         return loaded
