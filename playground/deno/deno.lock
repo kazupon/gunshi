@@ -1,0 +1,57 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@gunshi/gunshi@0.27.0-beta.2": "0.27.0-beta.2",
+    "npm:@gunshi/plugin-global@0.27.0-beta.2": "0.27.0-beta.2",
+    "npm:@gunshi/plugin-i18n@0.27.0-beta.2": "0.27.0-beta.2_@gunshi+plugin-global@0.27.0-beta.2",
+    "npm:@gunshi/plugin-renderer@0.27.0-beta.2": "0.27.0-beta.2_@gunshi+plugin-i18n@0.27.0-beta.2__@gunshi+plugin-global@0.27.0-beta.2_@gunshi+plugin-global@0.27.0-beta.2",
+    "npm:args-tokens@0.23": "0.23.0"
+  },
+  "jsr": {
+    "@gunshi/gunshi@0.27.0-beta.2": {
+      "integrity": "67c88bc2d8524295b1a1564dd58cefeca0878da87722570a1903c3c43c30d21b",
+      "dependencies": [
+        "npm:@gunshi/plugin-global",
+        "npm:@gunshi/plugin-i18n",
+        "npm:@gunshi/plugin-renderer",
+        "npm:args-tokens"
+      ]
+    }
+  },
+  "npm": {
+    "@gunshi/plugin-global@0.27.0-beta.2": {
+      "integrity": "sha512-izohH7Te4DEtxJovee0P3UssFiMHCCDIJOwmZ7cEH70087f+QyHB5DVgtpVUEu0nn9joMpN5afpn9u1oNEBSAg==",
+      "dependencies": [
+        "@gunshi/plugin"
+      ]
+    },
+    "@gunshi/plugin-i18n@0.27.0-beta.2_@gunshi+plugin-global@0.27.0-beta.2": {
+      "integrity": "sha512-2PqXV90zoKYKhhr4JEykhL4PsP8YlTSkJRUd99/TjPLxQxH+Qm9h8OwthvSsbomIpyda6uFps3rqlmxsQIb9Aw==",
+      "dependencies": [
+        "@gunshi/plugin",
+        "@gunshi/plugin-global"
+      ],
+      "optionalPeers": [
+        "@gunshi/plugin-global"
+      ]
+    },
+    "@gunshi/plugin-renderer@0.27.0-beta.2_@gunshi+plugin-i18n@0.27.0-beta.2__@gunshi+plugin-global@0.27.0-beta.2_@gunshi+plugin-global@0.27.0-beta.2": {
+      "integrity": "sha512-ZaFp6Y/07ids0kbbNiUHEGvzenJMKakeBieD6JFWosLHBRf7OB3JrdW0gVBlB80ixqDgwwc20/EiWslIuYvvbg==",
+      "dependencies": [
+        "@gunshi/plugin",
+        "@gunshi/plugin-i18n"
+      ]
+    },
+    "@gunshi/plugin@0.27.0-beta.2": {
+      "integrity": "sha512-7fxclUW0/Vc+jtv5jPgb1PqP3U1T3s5hjKE/SYFUvjQSXa1QiB2KJXEf4BCzxNnA3jO/uGLAh6aFukEpOeRDsg=="
+    },
+    "args-tokens@0.23.0": {
+      "integrity": "sha512-VZETsQmpEGO7A9adjfIOTyZuxKzurUas9kh1Hm0WGhFq8dOyw50P6OjiTwKyURwnmDabw0DbFjI+BUucJfCtnQ=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@gunshi/gunshi@0.27.0-beta.2"
+    ]
+  }
+}

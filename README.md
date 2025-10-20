@@ -41,7 +41,7 @@ pnpm add gunshi
 yarn add gunshi
 
 ## deno
-deno add jsr:@kazupon/gunshi
+deno add jsr:@gunshi/gunshi
 
 ## bun
 bun add gunshi

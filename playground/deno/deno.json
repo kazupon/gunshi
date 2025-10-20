@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "dev": "deno run --watch cli.ts"
+  },
+  "imports": {
+    "@gunshi/gunshi": "jsr:@gunshi/gunshi@0.27.0-beta.2"
+  }
+}

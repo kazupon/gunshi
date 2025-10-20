@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - playground/**
+  - '!playground/bun'
 catalog:
   typescript: ^5.9.3
   zod: ^4.1.12

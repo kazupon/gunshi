@@ -20,7 +20,7 @@ yarn add gunshi
 
 ```sh [deno]
 # For Deno projects, you can add Gunshi from JSR:
-deno add jsr:@kazupon/gunshi
+deno add jsr:@gunshi/gunshi
 ```
 
 ```sh [bun]

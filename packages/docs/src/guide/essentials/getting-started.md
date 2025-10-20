@@ -202,20 +202,28 @@ await cli(process.argv.slice(2), command)
 
 In Deno, use `Deno.args` to access command-line arguments:
 
-```js
-import { cli } from 'jsr:@gunshi/gunshi'
+```ts [cli.ts]
+import { cli } from '@gunshi/gunshi'
 
-await cli(Deno.args, command)
+function entry() {
+  console.log('Hello, Gunshi with Deno!')
+}
+
+await cli(Deno.args, entry)
 ```
 
 ### Bun
 
 Bun also provides `Bun.argv` similar to Node.js:
 
-```js
+```ts [cli.ts]
 import { cli } from 'gunshi'
 
-await cli(Bun.argv.slice(2), command) // or use process.argv.slice(2) in Bun
+function entry() {
+  console.log('Hello, Gunshi with Bun!')
+}
+
+await cli(Bun.argv.slice(2), entry) // or use process.argv.slice(2) in Bun
 ```
 
 Note that while the argument passing differs slightly between runtimes, the Gunshi API remains consistent across all environments.
