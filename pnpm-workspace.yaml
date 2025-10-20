@@ -21,7 +21,7 @@ minimumReleaseAgeExclude:
   - '@typescript/native-preview'
   - lint-staged
   - '@kazupon/eslint-config'
-  - 'gunshi'
+  - gunshi
   - '@gunshi/bone'
   - '@gunshi/definition'
   - '@gunshi/plugin'
