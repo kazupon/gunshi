@@ -10,7 +10,13 @@ dist
 coverage
 packages/docs/src/.vitepress/dist
 packages/docs/src/.vitepress/cache
-packages/docs/src/api
+packages/docs/src/api/context
+packages/docs/src/api/default
+packages/docs/src/api/definition
+packages/docs/src/api/generator
+packages/docs/src/api/plugin
+packages/docs/src/api/renderer
+packages/docs/src/api/index.md
 generated-docs
 playground/advanced/docs-gen/**/*.md
 importmap.json
