@@ -42,8 +42,12 @@ Extensions enable:
 - **Type Safety**: Define clear contracts between plugins
 - **State Management**: Maintain state across command execution
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > For advanced type safety patterns and type-safe plugin communication, see the [Plugin Type System](./type-system.md) guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Extension Lifecycle
 
@@ -51,8 +55,12 @@ Understanding when and how extensions are created is crucial for effective plugi
 
 ### Lifecycle Phases
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The steps mentioned below (H, I) refer to the complete CLI execution lifecycle documented in the [Plugin Lifecycle](./lifecycle.md) guide. Extensions are involved in the Execution Phase, which occurs after plugins are loaded and configured during the Setup Phase.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 During command execution, extensions go through three distinct phases:
 
@@ -108,13 +116,21 @@ This ensures that:
 - The execution order respects the dependency graph
 - Commands have a fully initialized context with all extensions
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!IMPORTANT]
 > A plugin's `onExtension` callback does NOT have access to extensions from plugins that depend on it, as those are processed later in the sequence.
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 ## Creating Extensions
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!TIP]
 > **It's strongly recommended to define your extension interfaces using TypeScript.** This benefits all users: end users get IDE autocompletion and compile-time error detection when using your extension, plugin users receive type safety guarantees, and other plugin developers can build on top of your plugin with confidence.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### The `extension` Factory
 
@@ -287,8 +303,12 @@ export default plugin({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/extensions).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Next Steps
 

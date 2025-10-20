@@ -107,8 +107,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/internationalization/basic).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
@@ -240,8 +244,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/internationalization/loading).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Example locale files:
 
@@ -385,8 +393,12 @@ await cli(process.argv.slice(2), mainCommand, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/internationalization/sub-command).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Helper Functions
 
@@ -511,6 +523,8 @@ When defining translation resources, follow these conventions:
 
 Example:
 
+<!-- eslint-skip -->
+
 ```js
 {
   // Command metadata (accessed with resolveKey)
@@ -568,16 +582,17 @@ await cli(process.argv.slice(2), command, {
   plugins: [
     i18n({
       // From environment variable
-      locale: process.env.MY_LANG || 'en-US',
-
+      locale: process.env.MY_LANG || 'en-US'
       // Or using Intl.Locale for advanced locale handling
-      locale: new Intl.Locale(process.env.MY_LANG || 'en-US')
+      // locale: new Intl.Locale(process.env.MY_LANG || 'en-US')
     })
   ]
 })
 ```
 
 In Node.js v21 and later, you can also detect locale using the navigator API:
+
+<!-- eslint-skip -->
 
 ```ts
 // In browser or Node.js v21.2.0+ (experimental global navigator), use navigator.language

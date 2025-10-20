@@ -45,15 +45,19 @@
 
 After cloning the repo, run:
 
-    $ pnpm install
+```sh
+pnpm install
+```
 
 ### Commonly used NPM scripts
 
-    # lint source codes
-    $ pnpm lint
+```sh
+# lint source codes
+pnpm lint
 
-    # code format and lint fix
-    $ pnpm fix
+# code format and lint fix
+pnpm fix
+```
 
 There are some other scripts available in the `scripts` section of the `package.json` file.
 

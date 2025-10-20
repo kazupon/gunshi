@@ -87,7 +87,7 @@ Implement the command in a separate file (e.g., `index.ts`):
 ```ts
 // packages/command-a/src/index.ts
 import type { CommandContext } from 'gunshi'
-import meta from './meta'
+import meta from './meta.ts'
 
 export const run = async (ctx: CommandContext<typeof meta.args>) => {
   const { input, output } = ctx.values
@@ -136,7 +136,7 @@ Define your commands using Gunshi's `lazy` function and your custom loader:
 ```ts
 // packages/cli/src/commands.ts
 import { lazy } from 'gunshi/definition'
-import { load } from './loader'
+import { load } from './loader.ts'
 
 // Import command metadata directly - these are bundled with your CLI
 import metaCommandA from 'command-a/meta'
@@ -171,7 +171,7 @@ Set up your CLI entry point to use the lazy-loaded commands:
 ```ts
 // packages/cli/src/index.ts
 import { cli } from 'gunshi'
-import { commands, commandALazy } from './commands'
+import { commands, commandALazy } from './commands.ts'
 
 async function main() {
   // Load package.json for version info
@@ -199,7 +199,7 @@ For CLIs with many sub-commands, you can implement on-demand sub-command loading
 ```ts
 // packages/cli/src/commands.ts
 import { lazy } from 'gunshi/definition'
-import { load } from './loader'
+import { load } from './loader.ts'
 
 // Function to create a lazy command
 function createLazyCommand(name: string) {
@@ -282,7 +282,7 @@ Maintain type safety with TypeScript when implementing advanced lazy loading:
 // packages/cli/src/commands.ts
 import { lazy, define } from 'gunshi/definition'
 import type { CommandRunner } from 'gunshi'
-import { load } from './loader'
+import { load } from './loader.ts'
 
 // Define command metadata with type safety
 const metaCommandA = define({

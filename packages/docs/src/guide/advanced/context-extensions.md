@@ -4,8 +4,12 @@ Plugins in Gunshi extend the command context with additional functionality throu
 
 This guide explains how to leverage these extensions to build more powerful CLI applications.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > This guide assumes familiarity with the basic concepts explained in the [Plugin System](../essentials/plugin-system.md). Context extensions are a core feature of the plugin system, providing the mechanism through which plugins deliver functionality to commands.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Understanding Context Extensions
 
@@ -41,8 +45,12 @@ This namespacing approach prevents collisions between plugins and makes dependen
 
 When a plugin is added to your CLI configuration, its extension becomes available to all commands through this standardized interface:
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > For details on how plugin extensions work, see the [Plugin Extensions](../plugin/extensions.md) guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ```ts
 import { define } from 'gunshi'
@@ -95,8 +103,12 @@ const command = define({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > For a complete list of official plugins and their features, see the [Plugin List](../plugin/list.md) guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Renderer Plugin Extension
 
@@ -122,8 +134,12 @@ const command = define({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The renderer plugin is typically added by the global plugin when used together. For detailed information about the renderer plugin API, see the [Renderer Plugin documentation](https://github.com/kazupon/gunshi/tree/main/packages/plugin-renderer)
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Using Optional Plugin Extensions
 
@@ -155,8 +171,12 @@ const command = define({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > For comprehensive i18n usage including `resolveKey`, `defineI18n`, resource management, and working with subcommands, see the [Internationalization guide](./internationalization.md)
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Extension Techniques
 
@@ -257,11 +277,9 @@ const command = define({
     }
 
     // Enable debug features if available
-    if (ctx.values.debug) {
-      // Check if a hypothetical logger extension exists
-      if (ctx.extensions[loggerId]) {
-        ctx.extensions[loggerId].setLevel('debug')
-      }
+    // Check if a hypothetical logger extension exists
+    if (ctx.values.debug && ctx.extensions[loggerId]) {
+      ctx.extensions[loggerId].setLevel('debug')
     }
 
     // Your command logic here
@@ -293,8 +311,12 @@ const command = define<Record<GlobalId, GlobalExtension>>({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > For comprehensive type parameter usage including `GunshiParams`, combining multiple plugin types with the intersection (`&`), and advanced type safety techniques, see the [Type System guide](./type-system.md)
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Custom Extension Techniques
 
@@ -395,14 +417,20 @@ const command = define({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Learn how to create your own plugins with custom extensions in the [Plugin Development](../plugin/introduction.md) guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Guidelines for Plugin Usage
 
 ### 1. Always Import Plugin IDs
 
 Never hardcode plugin ID strings. Always import and use the exported constants to avoid typos and ensure type safety:
+
+<!-- eslint-skip -->
 
 ```js
 // ✅ Good: Import and use plugin ID constants
@@ -460,8 +488,12 @@ const command = define<Record<GlobalId, GlobalExtension>>({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > For advanced TypeScript techniques including combining multiple plugin types and using `GunshiParams`, see the [Type System guide](./type-system.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Troubleshooting
 

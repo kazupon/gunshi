@@ -4,11 +4,19 @@ This guide provides practical guidelines for developing reliable, maintainable, 
 
 While other sections cover implementation details and APIs, this guide focuses on recommended approaches and techniques for production-ready plugins.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > We recommend developing Gunshi plugins with TypeScript for enhanced type safety, better IDE support, and compile-time error detection. All examples and code snippets in this guide are written in TypeScript. While JavaScript plugins are supported, TypeScript helps prevent runtime errors and provides a superior developer experience through auto-completion and type checking.
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Some code examples in this guide include TypeScript file extensions (`.ts`) in `import`/`export` statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Design Principles
 
@@ -59,8 +67,12 @@ Follow consistent naming for plugin packages:
 - Scoped packages: `@{org}/gunshi-plugin-{feature}` or `@{org}/gunshi-plugin`
 - Example: `gunshi-plugin-logger`, `@mycompany/gunshi-plugin-auth`, `@feature/gunshi/plugin`
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Packages following the pattern `@gunshi/plugin-{feature}` (e.g., `@gunshi/plugin-i18n`) are official plugins maintained by the Gunshi team. These are not third-party plugins but are part of the official Gunshi ecosystem. Third-party developers should use their own organization scope or standalone naming as described above.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Plugin Structure
 
@@ -196,6 +208,8 @@ When errors provide specific context, possible causes, and concrete next steps, 
 
 This example shows how to provide helpful error messages with context and solutions:
 
+<!-- eslint-skip -->
+
 ```ts
 extension: ctx => ({
   connect: async (url: string) => {
@@ -225,6 +239,8 @@ Graceful dependency handling ensures your plugin works across different environm
 Choose the appropriate approach based on your needs.
 
 The following example demonstrates different patterns for handling optional dependencies:
+
+<!-- eslint-skip -->
 
 ```ts
 extension: ctx => {
@@ -283,10 +299,9 @@ The following example demonstrates how to implement cleanup mechanisms for manag
 
 The plugin tracks all created connections in an array and provides a cleanup method that closes them all when the process exits:
 
-```ts
-import { createConnection } from './database.ts'
-import type { Connection } from './types.ts'
+<!-- eslint-skip -->
 
+```ts
 extension: () => {
   const connections: Connection[] = []
 
@@ -314,6 +329,8 @@ onExtension: ctx => {
 
 Your plugin should respond to system signals for graceful shutdown. The following code shows how to register cleanup handlers that disconnect from a database when the process receives termination signals (SIGINT from Ctrl+C or SIGTERM from system shutdown):
 
+<!-- eslint-skip -->
+
 ```ts
 onExtension: ctx => {
   const cleanup = async () => {
@@ -339,6 +356,8 @@ Lazy initialization improves CLI startup time by deferring expensive operations 
 This ensures quick response times for simple commands.
 
 The following example demonstrates how to defer database connection initialization until the first query is executed:
+
+<!-- eslint-skip -->
 
 ```ts
 extension: () => {
@@ -369,17 +388,19 @@ Blocking operations freeze the CLI interface and degrade user experience. Use as
 
 The following examples contrast blocking and non-blocking approaches to file operations and data processing:
 
+<!-- eslint-skip -->
+
 ```ts
 extension: () => ({
   // Bad: Blocks the entire CLI during initialization
   loadConfig: () => {
-    const data = fs.readFileSync('./config.json', 'utf-8') // Blocks!
+    const data = fs.readFileSync('./config.json', 'utf8') // Blocks!
     return JSON.parse(data)
   },
 
   // Good: Non-blocking async operation
   loadConfig: async () => {
-    const data = await fs.promises.readFile('./config.json', 'utf-8')
+    const data = await fs.promises.readFile('./config.json', 'utf8')
     return JSON.parse(data)
   },
 
@@ -403,6 +424,8 @@ extension: () => ({
 Loading heavy dependencies at startup increases CLI initialization time and memory usage. Use dynamic imports to load heavy dependencies only when needed, keeping the initial load minimal for fast command response.
 
 These examples demonstrate how to use dynamic imports to defer loading heavy dependencies:
+
+<!-- eslint-skip -->
 
 ```ts
 // Bad: Module-level import loads dependency at startup
@@ -452,6 +475,8 @@ User input should be validated and sanitized before use.
 
 The following example demonstrates how to validate file paths and extensions to prevent directory traversal attacks and restrict file types:
 
+<!-- eslint-skip -->
+
 ```ts
 extension: () => ({
   readFile: async (path: string) => {
@@ -466,7 +491,7 @@ extension: () => ({
       throw new Error('Unsupported file type')
     }
 
-    return await fs.readFile(path, 'utf-8')
+    return await fs.readFile(path, 'utf8')
   }
 })
 ```
@@ -509,6 +534,8 @@ Prototype pollution occurs when user-controlled data modifies `Object.prototype`
 This vulnerability is particularly dangerous in CLI tools that process configuration files or user-provided options, as attackers can manipulate command behavior through crafted inputs.
 
 Use `Object.create(null)` to create objects without a prototype chain when handling user input:
+
+<!-- eslint-skip -->
 
 ```ts
 extension: () => {
@@ -576,7 +603,7 @@ The following example demonstrates how to test your plugin's extension factory a
 
 ```ts
 import { describe, test, expect, vi } from 'vitest'
-import myPlugin from './index'
+import myPlugin from './plugin.ts'
 
 describe('Plugin Extension', () => {
   test('extension factory creates correct methods', async () => {
@@ -685,6 +712,8 @@ Document all methods and properties exposed through your plugin's extension.
 
 Here's a concise example:
 
+<!-- eslint-skip -->
+
 ```ts
 /**
  * Extended command context utilities available via `CommandContext.extensions['g:i18n']`.
@@ -758,6 +787,8 @@ For more complex generic types, see official plugin implementations.
 
 Document plugin dependencies clearly:
 
+<!-- eslint-skip -->
+
 ```ts
 return plugin<...>({
   id: pluginId,
@@ -775,12 +806,16 @@ In your README, explain:
 
 ### README Template Structure
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Gunshi plans to provide official tooling for plugin authors to automatically generate README templates in future releases. This tooling will help scaffold standard README files with the correct structure, sections, and formatting. Until then, the following template demonstrates the recommended structure for plugin README files.
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 A comprehensive README should follow this structure:
 
-```markdown [README.md]
+```md [README.md]
 # @yourorg/gunshi-plugin-{name}
 
 > Brief description of what your plugin does.
@@ -789,7 +824,7 @@ A comprehensive README should follow this structure:
 
 \`\`\`sh
 
-# npm
+### npm
 
 npm install --save @yourorg/gunshi-plugin-{name}
 \`\`\`
@@ -797,6 +832,8 @@ npm install --save @yourorg/gunshi-plugin-{name}
 For other package managers, see [installation guide](./docs/install.md).
 
 ## Usage
+
+<!-- eslint-disable markdown/no-missing-label-refs, markdown/no-space-in-emphasis -->
 
 \`\`\`ts
 import { cli } from 'gunshi'
@@ -813,6 +850,8 @@ await cli(process.argv.slice(2), command, {
 plugins: [myPlugin({ /* options */ })]
 })
 \`\`\`
+
+<!-- eslint-enable markdown/no-missing-label-refs, markdown/no-space-in-emphasis -->
 
 ## Plugin Options
 

@@ -176,8 +176,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Plugin IDs use namespacing to prevent conflicts and identify ownership. Official Gunshi plugins use the `g:` prefix (e.g., `g:i18n`, `g:completion`). When developing your own plugins, use your organization's namespace (e.g., `myorg:logger`) or scoped package format (e.g., `@company/auth`). For detailed naming conventions and guidelines, see the [Plugin ID Guidelines](../plugin/guidelines.md#plugin-ids).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Key benefits:
 
@@ -187,11 +191,19 @@ Key benefits:
 - Fallback to default locale when translation is missing
 - Plugin functionality is accessible via `ctx.extensions` in your command runners
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The `ctx.extensions` object is how plugins extend your command context with additional functionality. The i18n plugin adds translation capabilities through `ctx.extensions['g:i18n']`. To learn more about working with plugin extensions and best practices for accessing them, see the [Context Extensions guide](../advanced/context-extensions.md).
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > This example demonstrates basic internationalization setup. For comprehensive coverage including external resource files, TypeScript support, dynamic locale switching, and production deployment strategies, see the [Advanced Internationalization Guide](../advanced/internationalization.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Shell Completion
 
@@ -213,8 +225,12 @@ yarn add @gunshi/plugin-completion
 
 :::
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!IMPORTANT]
 > Shell completion currently requires Node.js. The completion feature is not available when running your CLI with Deno or Bun runtimes.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Here's how to add completion support:
 
@@ -280,8 +296,12 @@ source ~/.bashrc
 deploy-cli dep<TAB>  # Completes to: deploy-cli deploy
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > For detailed setup instructions for all supported shells (Bash, Zsh, Fish, PowerShell), including directory creation and configuration steps, see the [@gunshi/plugin-completion README](https://github.com/kazupon/gunshi/tree/main/packages/plugin-completion#shell-completion-setup).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### How It Works
 

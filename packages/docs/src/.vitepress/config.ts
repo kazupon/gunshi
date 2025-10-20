@@ -25,7 +25,7 @@ export default withMermaid({
     ['meta', { property: 'og:image', content: 'https://gunshi.dev/og-image.png' }],
     ['meta', { property: 'og:site_name', content: 'Gunshi' }],
     ['meta', { property: 'og:url', content: 'https://gunshi.dev/' }],
-    ['script', {}, readFileSync(path.resolve(__dirname, './banner.js'), 'utf-8')]
+    ['script', {}, readFileSync(path.resolve(__dirname, './banner.js'), 'utf8')]
   ],
 
   themeConfig: {
@@ -138,8 +138,9 @@ export default withMermaid({
     },
     resolve: {
       alias:
-        process.env.NODE_ENV !== 'production'
-          ? {
+        process.env.NODE_ENV === 'production'
+          ? undefined
+          : {
               debug: path.resolve(
                 __dirname,
                 '../../../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js'
@@ -153,7 +154,6 @@ export default withMermaid({
                 '../../../../node_modules/.pnpm/dayjs@1.11.18/node_modules/dayjs/esm/index.js'
               )
             }
-          : undefined
     },
 
     plugins: [groupIconVitePlugin(), llmstxt()]

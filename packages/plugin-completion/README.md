@@ -90,7 +90,7 @@ await cli(process.argv.slice(2), command, {
 
 The plugin automatically adds a `complete` subcommand to your CLI:
 
-```bash
+```sh
 # Generate shell completion script
 my-cli complete bash > ~/.my-cli-completion.bash
 source ~/.my-cli-completion.bash

@@ -1,7 +1,11 @@
 # Lazy & Async Command Loading
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > This chapter continues using TypeScript for code examples, building upon the type safety concepts introduced in the [previous chapter](./type-safe.md). While all Gunshi features work with JavaScript, the TypeScript examples provide better IDE support and compile-time checking.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 When building CLI applications with many commands or commands that require heavy dependencies, you may encounter slow startup times that frustrate users.
 
@@ -77,8 +81,12 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/basic).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 In this example, when a user runs `npx tsx cli.ts --help`, Gunshi displays help text using only the metadata from `helloDefinition`.
 
@@ -170,8 +178,14 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/dynamic-import).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+<!-- eslint-disable markdown/no-missing-label-refs, markdown-preferences/padding-line-between-blocks -->
 
 > [!IMPORTANT]
 > The examples above use `.ts` extensions in dynamic import paths (`await import('./commands/build.ts')`). This will work in the following scenarios:
@@ -192,10 +206,16 @@ await cli(
 > const { run } = await import('./commands/build.js')
 > ```
 
+<!-- eslint-enable markdown/no-missing-label-refs, markdown-preferences/padding-line-between-blocks -->
+
 With this approach, your bundler (rolldown, rollup, esbuild, webpack, etc.) will automatically create separate chunks for `./commands/build.ts` and `./commands/deploy.ts`. Users only download and parse the code for commands they actually use.
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
 > On Node.js v23.6.0 and newer, type stripping is enabled by default so erasable TypeScript runs without flags; transformations (e.g., `enum`) still require `--experimental-transform-types`.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Async Command Execution
 
@@ -300,8 +320,12 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/async).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Gunshi automatically handles the asynchronous execution, including proper error handling and process exit codes.
 
@@ -350,8 +374,12 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/lazy-async/dynamic-command)
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 This pattern is particularly useful when command structure depends on runtime configuration or external data sources.
 

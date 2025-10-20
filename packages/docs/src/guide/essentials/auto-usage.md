@@ -59,8 +59,12 @@ OPTIONS:
 
 This notation provides immediate visual feedback about what users must provide versus what they can omit, making your CLI more intuitive to use.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Auto-usage generation is powered by the `@gunshi/plugin-renderer` plugin, which is automatically included when you use the standard `cli()` function. This plugin handles all help text rendering and formatting.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Generated Help Output
 
@@ -85,8 +89,12 @@ OPTIONS:
   -u, --uppercase            Convert greeting to uppercase
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The `--help` flag is automatically added - you never need to define it manually.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Help with Arguments and Examples
 
@@ -117,8 +125,12 @@ EXAMPLES:
   $ app --operation delete --path ./temp
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!IMPORTANT]
 > Boolean options automatically receive a negatable version with the `--no-` prefix. This allows users to explicitly disable boolean flags.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Customizing Help Output
 
@@ -175,8 +187,12 @@ OPTIONS:
   -v, --version          Display this version
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The brackets in `[manage]` indicate it's the default command that runs when no sub-command is specified.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Sub-command Specific Help
 

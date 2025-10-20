@@ -45,8 +45,12 @@ export interface LoggerExtension {
 - Exported types allow other plugins and commands to reference your plugin
 - Well-defined interfaces provide IntelliSense and compile-time validation
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Plugin consumers can use these exported interfaces to type their command context's extensions, enabling type-safe access to plugin functionality in their command runners. For detailed usage patterns of type-safe command definitions with plugin extensions, see [Advanced Type System](../advanced/type-system.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## The `plugin` Function Type Parameters
 
@@ -322,7 +326,7 @@ import type { LoggerExtension } from './logger.ts'
 export const apiId = 'api' as const
 
 export interface ApiExtension {
-  request: (url: string): Promise<void> | void
+  request: (url: string) => Promise<void> | void
 }
 
 // Depends on both
@@ -483,8 +487,12 @@ await cli(process.argv.slice(2), fetchCommand, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/type-system).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 When executed, the plugins work together seamlessly:
 

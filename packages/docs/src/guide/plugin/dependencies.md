@@ -96,8 +96,12 @@ dependencies: [
 
 Required dependencies must be present for your plugin to load. If a required dependency is missing, Gunshi will throw an error during initialization.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!WARNING]
 > If you register multiple plugins with the same ID, Gunshi will emit a warning: `Duplicate plugin id detected`. While the plugins will still load, having duplicate IDs can lead to unexpected behavior when accessing extensions or resolving dependencies. Always ensure each plugin has a unique ID.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Declare required dependencies using the `dependencies` array:
 
@@ -474,8 +478,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/dependencies).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Run your application with plugin:
 

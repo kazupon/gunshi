@@ -2,14 +2,26 @@
 
 Testing is crucial for ensuring plugin reliability and maintainability. This guide covers practical testing approaches for Gunshi plugins.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!IMPORTANT]
 > The code examples in this guide focus on demonstrating testing patterns and techniques. For clarity and brevity, some examples may not include extensive explanations that would normally be present in Gunshi's documentation. The emphasis is on showing practical testing approaches rather than following all documentation style guidelines.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
 > This guide uses [Vitest](https://vitest.dev/) as the testing framework. The concepts can be adapted to other testing frameworks.
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Some code examples include TypeScript file extensions (`.ts`) in `import`/`export` statements. If you use this pattern, enable `allowImportingTsExtensions` in your `tsconfig.json`.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Plugin Testing Fundamentals
 
@@ -103,7 +115,7 @@ Plugins should validate configuration during creation:
 import { plugin } from 'gunshi/plugin'
 
 export function myValidatingPlugin(options: { locale: string; timeout?: number }) {
-  if (options.locale && !options.locale.match(/^[a-z]{2}-[A-Z]{2}$/)) {
+  if (options.locale && !/^[a-z]{2}-[A-Z]{2}$/.test(options.locale)) {
     throw new Error('Invalid locale format')
   }
   if (options.timeout !== undefined && options.timeout < 0) {
@@ -817,8 +829,12 @@ const typedPlugin = plugin<{ logger: LoggerExtension }, 'my-plugin', ['logger'],
 
 This ensures compile-time type safety for dependencies and extensions.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/testing).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Next Steps
 

@@ -136,8 +136,12 @@ renderHeader: ctx => {
 }
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The Command Context (`ctx`) is a read-only object that provides access to command metadata, parsed arguments, environment configuration, and plugin extensions. For the complete CommandContext API reference including all properties and types, see the [CommandContext interface documentation](../../api/default/interfaces/CommandContext).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Basic Example
 
@@ -262,6 +266,8 @@ OPTIONS:
 ### Disabling Renderers
 
 Set any renderer to `null` to disable it:
+
+<!-- eslint-skip -->
 
 ```js
 rendering: {
@@ -400,8 +406,12 @@ Plugins provide the most powerful way to customize rendering across your entire 
 
 They can decorate renderers to add consistent behavior across all commands.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Plugin-level rendering has the lowest priority in the rendering hierarchy. Command-level and global-level renderers will override plugin decorators. For detailed information on how renderer decorators work and how to implement them, see the [How Renderer Decorators Work](../plugin/decorators.md#how-renderer-decorators-work) documentation.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Using the Built-in Renderer Plugin
 
@@ -423,12 +433,18 @@ The built-in renderer provides complete rendering implementations with improved 
 
 Unlike decorator plugins, it replaces the default rendering entirely.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > For detailed features of the built-in renderer plugin, see the [documentation](https://github.com/kazupon/gunshi/blob/main/packages/plugin-renderer/README.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Creating a Custom Rendering Plugin
 
 When building rendering plugins, use the decorator pattern to enhance existing output:
+
+<!-- eslint-skip -->
 
 ```js
 import { plugin } from 'gunshi/plugin'
@@ -441,7 +457,9 @@ const color = plugin({
     // Decorate header renderer
     context.decorateHeaderRenderer(async (baseRenderer, ctx) => {
       const output = await baseRenderer(ctx)
-      if (!output) return ''
+      if (!output) {
+        return ''
+      }
 
       return `\x1b[36m${output}\x1b[0m` // Add cyan color
     })
@@ -449,7 +467,9 @@ const color = plugin({
     // Decorate error renderer
     context.decorateValidationErrorsRenderer(async (baseRenderer, ctx, error) => {
       const output = await baseRenderer(ctx, error)
-      if (!output) return ''
+      if (!output) {
+        return ''
+      }
 
       return `\x1b[31m${output}\x1b[0m` // Add red color
     })
@@ -457,12 +477,18 @@ const color = plugin({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!IMPORTANT]
 > Always call `baseRenderer` in your decorators to maintain the plugin chain. This ensures compatibility with other plugins.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Practical Example: Theme Plugin
 
 Here's a complete theme plugin that enhances all rendering aspects:
+
+<!-- eslint-skip -->
 
 ```js
 import { plugin } from 'gunshi/plugin'
@@ -555,7 +581,7 @@ await cli(process.argv.slice(2), command, {
 
 Each plugin transforms the output sequentially:
 
-```
+```sh
 1. Base renderer output:
    "Usage: my-cli [options]"
 
@@ -566,8 +592,12 @@ Each plugin transforms the output sequentially:
    "📖 \x1b[38;5;39mUsage: my-cli [options]\x1b[0m"  (emoji + colored)
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!IMPORTANT]
 > Plugin order significantly affects the final output. Color plugins should typically come before text modification plugins to ensure ANSI codes don't interfere with pattern matching.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Guidelines for Plugin Composition
 
@@ -745,8 +775,12 @@ renderHeader: ctx => {
 }
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > For comprehensive guidance on working with plugin extensions including type safety, composition patterns, and troubleshooting, see the [Context Extensions](./context-extensions.md) guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 For the complete list of available properties and their types, refer to the [CommandContext API reference](../../api/default/interfaces/CommandContext).
 
@@ -903,5 +937,9 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/custom-rendering).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->

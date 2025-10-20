@@ -19,8 +19,12 @@ await cli(process.argv.slice(2), () => {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/getting-started/hello).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 This minimal example demonstrates the core concept of Gunshi.
 
@@ -58,8 +62,12 @@ await cli(process.argv.slice(2), ctx => {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/getting-started/context).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Now you can run:
 
@@ -110,8 +118,12 @@ const command = {
 await cli(process.argv.slice(2), command)
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/getting-started/options).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Now you can run:
 

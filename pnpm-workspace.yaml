@@ -20,3 +20,4 @@ minimumReleaseAgeExclude:
   - eslint-plugin-jsdoc
   - '@typescript/native-preview'
   - lint-staged
+  - '@kazupon/eslint-config'

@@ -53,8 +53,12 @@ async function main() {
 await main()
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/basic).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 The `generate` function programmatically captures usage information for your CLI commands and returns it as a string.
 
@@ -166,8 +170,12 @@ async function main() {
 await main()
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/sub-command).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Creating Rich Documentation
 
@@ -264,18 +272,26 @@ The CLI is built on top of the data-processor library, which you can also use pr
 await main()
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/rich).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Automating Documentation Generation
 
 You can automate documentation generation as part of your build process:
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
 > The following example uses Node.js-specific `__dirname` approach. For cross-runtime compatibility:
 >
 > - **Deno**: Use `import.meta.dirname` or `fromFileUrl(import.meta.url)`
 > - **Bun**: Use `import.meta.dir` or Node.js-compatible approach
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ```ts [scripts/generate-docs.ts]
 import { generate } from 'gunshi/generator'
@@ -291,7 +307,7 @@ const rootDir = path.resolve(__dirname, '..')
 const docsDir = path.join(rootDir, 'docs')
 
 // Import your commands
-import { mainCommand, subCommands } from '../src/commands'
+import { mainCommand, subCommands } from '../src/commands.ts'
 
 async function main() {
   const cliOptions: CliOptions = {
@@ -510,8 +526,12 @@ $ my-tool --input data.csv --verbose`
 await main()
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/docs-gen/man)
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Installing Man Pages
 

@@ -22,8 +22,12 @@ Provides shell completion functionality for bash, zsh, and fish.
 
 ## Community Plugins
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Welcome your plugins! Submit a PR to add your plugin to this list.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Where to Go From Here
 

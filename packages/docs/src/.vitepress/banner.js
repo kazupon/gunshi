@@ -6,6 +6,8 @@
     }
   }
 
+  // eslint-disable-next-line unicorn/prefer-global-this -- NOTE(kazupon): because vitepress setting
   window.__GUNSHI_BANNER_ID__ = 'v0.27-beta'
+  // eslint-disable-next-line unicorn/prefer-global-this -- NOTE(kazupon): because vitepress setting
   restore(`gunshi-banner-dismissed-${window.__GUNSHI_BANNER_ID__}`, 'banner-dismissed')
 })()

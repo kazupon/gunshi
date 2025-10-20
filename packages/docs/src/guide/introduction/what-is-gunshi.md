@@ -44,8 +44,12 @@ The Gunshi documentation is organized into three main sections:
 
 ### Where to Go Next
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Start with the **Setup** guide to install Gunshi in your project, then proceed through the **Essentials** section in order. Each chapter builds upon previous concepts.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 1. **[Setup](./setup.md)** - Install and configure Gunshi in your project
 2. **[Getting Started](../essentials/getting-started.md)** - Create your first CLI application

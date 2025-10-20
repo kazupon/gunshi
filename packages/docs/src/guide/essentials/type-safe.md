@@ -92,8 +92,12 @@ const command = define({
 await cli(process.argv.slice(2), command)
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/type-safe).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 With `define`:
 
@@ -104,8 +108,12 @@ With `define`:
   - Options with a `default` (like `age`) are typed simply as `T`.
   - Boolean flags without a `default` (like `verbose`) are typed as `boolean | undefined`.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > For boolean options that need both positive and negative forms (e.g., `--verbose` and `--no-verbose`), see the [Negatable Boolean Options](./declarative.md#negatable-boolean-options) section in the declarative configuration guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 This approach significantly simplifies creating type-safe CLIs with Gunshi.
 

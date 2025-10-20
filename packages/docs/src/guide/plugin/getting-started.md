@@ -32,8 +32,12 @@ await cli(process.argv.slice(2), entry, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/getting-started/first-minimal).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Run your application with plugin:
 
@@ -95,8 +99,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/getting-started/adding-global).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Run your application with plugin:
 
@@ -172,8 +180,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/getting-started/adding-sub-commands).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Run your application with the new sub-commands:
 
@@ -219,8 +231,12 @@ export default plugin({
 // Commands can then use: ctx.extensions.logger.log('Hello')
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Extensions are the core feature for sharing functionality between plugins and commands. Learn more in [Plugin Extensions](./extensions.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Decorators
 
@@ -234,8 +250,12 @@ ctx.decorateUsageRenderer(async (baseRenderer, ctx) => {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Decorators allow you to wrap commands, renderers, and more. Learn about all decorator types in [Plugin Decorators](./decorators.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Dependencies
 
@@ -251,8 +271,12 @@ export default plugin({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > Dependencies ensure plugins load in the correct order. Learn more in [Plugin Dependencies](./dependencies.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Summary
 

@@ -82,14 +82,20 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/command-hooks).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Hook Parameters
 
 Each lifecycle hook receives specific parameters that provide context about the command execution.
 
 The `CommandContext` parameter is read-only and contains all command metadata, while `onAfterCommand` also receives the command result and `onErrorCommand` receives the thrown error:
+
+<!-- eslint-skip -->
 
 ```ts
 {
@@ -104,8 +110,12 @@ The `CommandContext` parameter is read-only and contains all command metadata, w
 }
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The `CommandContext` object provides comprehensive information about command execution. For the complete CommandContext API reference including all properties and types, see the [CommandContext interface documentation](/api/default/interfaces/CommandContext.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 With an understanding of how hooks work and their parameters, let's explore how they differ from and interact with plugin decorators.
 
@@ -122,8 +132,12 @@ Gunshi provides two distinct mechanisms for controlling command execution:
    - `decorateCommand`: Wraps command runner to add or modify functionality
    - Multiple plugins can chain decorators (decorator pattern)
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The `decorateCommand` method is a powerful plugin API that allows wrapping command execution to add or modify functionality. It enables plugins to implement cross-cutting concerns like authentication, logging, and transaction management. For comprehensive information about how to use decorators in plugins, see the [Plugin Decorators documentation](/guide/plugin/decorators.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Execution Flow
 
@@ -193,13 +207,21 @@ export default plugin({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Plugins don't have CLI-level hooks (`onBeforeCommand`, etc.). Instead, they use the `decorateCommand` method to wrap command execution and add custom logic. This allows plugins to extend and modify command behavior through the decorator pattern.
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 ## Practical Use Cases
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!TIP]
 > The following examples use plugin extensions through `ctx.extensions`. Extensions are how plugins add functionality to the command context, allowing you to access plugin-provided features like logging, metrics, authentication, and database connections. For comprehensive information about working with extensions, including type-safe patterns and best practices, see the [Context Extensions documentation](./context-extensions.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Logging and Monitoring
 

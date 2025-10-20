@@ -82,8 +82,12 @@ await cli(process.argv.slice(2), mainCommand, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/composable/basic).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 This structure provides:
 
@@ -105,8 +109,14 @@ $ npx tsx cli.ts --help
 $ npx tsx cli.ts create --help
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > [`tsx`](https://github.com/privatenumber/tsx) is a TypeScript execution tool that allows you to run TypeScript files directly without compilation. Use it directly with `npx tsx`.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
 > On Node.js v22.6.0, you can run TypeScript with `--experimental-strip-types`:
@@ -117,6 +127,8 @@ $ npx tsx cli.ts create --help
 >
 > From Node.js v23.6.0 and newer, type stripping is enabled by default (no flag needed for erasable TS). Features requiring transformation (e.g., `enum`) still need `--experimental-transform-types`.
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 Each sub-command's help includes its description, available options, and usage examples.
 
 ## Organizing Your Commands
@@ -125,7 +137,7 @@ As your CLI grows, organizing commands in separate files improves maintainabilit
 
 Here's a recommended project structure:
 
-```
+```sh
 my-cli/
 ├── src/
 │   ├── commands/
@@ -137,8 +149,12 @@ my-cli/
 └── tsconfig.json
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/composable/organizing).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 This structure provides:
 
@@ -212,8 +228,12 @@ export default define({
 
 ### Entry Point
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Some code examples in this guide include TypeScript file extensions (`.ts`) in import/export statements. If you use this pattern in your application, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ```ts [cli.ts]
 import { cli } from 'gunshi'

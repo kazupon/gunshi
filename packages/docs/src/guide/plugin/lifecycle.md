@@ -102,8 +102,12 @@ const pluginD = plugin({
 // Resolution order: d → b → c → a
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > For details on plugin dependency resolution, including circular dependency detection, optional dependencies, see [Plugin Dependencies](./dependencies.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Step D: Execute Plugin Setup
 
@@ -152,8 +156,12 @@ Between the setup phase and execution phase, Gunshi processes the command-line a
 - **Step G**: Validate arguments against the command's schema
 - **Step H**: Create the CommandContext object
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > These internal processing steps are handled automatically by Gunshi. Plugin developers don't need to interact with these steps directly.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Execution Phase (Steps H-I)
 
@@ -171,8 +179,12 @@ The CommandContext is created and each plugin's extension is initialized:
 
 This sequential processing ensures extensions from dependencies are available to dependent plugins.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > For detailed information about the extension lifecycle, including execution order guarantees, the relationship between `extension` and `onExtension`, and code examples, see the [Extension Lifecycle](./extensions.md#extension-lifecycle) section in the Plugin Extensions guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Step I: Execute Command
 
@@ -210,8 +222,12 @@ During Step H (Create CommandContext):
 - For each plugin: the `extension` factory is called, then immediately its `onExtension` callback
 - This sequential approach ensures that when a plugin's `onExtension` runs, all previous plugins' extensions are already available through `ctx.extensions`
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > For a detailed visual representation of the extension lifecycle and execution order guarantees, see [Extension Lifecycle](./extensions.md#extension-lifecycle) in the Plugin Extensions guide.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Lifecycle with Command Hooks
 
@@ -219,8 +235,12 @@ Gunshi provides Command hooks (`onBeforeCommand`, `onAfterCommand`, `onErrorComm
 
 The following sequence diagram illustrates how these command hooks interact with plugins during command execution:
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > For details on Command Hooks, including advanced use cases like logging, performance monitoring, validation guards, and transaction management, see [Command Hooks](../advanced/command-hooks.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ```mermaid
 sequenceDiagram
@@ -364,8 +384,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/lifecycle).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Run your application with plugin:
 

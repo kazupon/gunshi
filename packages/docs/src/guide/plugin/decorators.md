@@ -115,8 +115,12 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/lifo).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 When executed, `reduceRight` creates a wrapper structure where Decorator A wraps B, B wraps C, and C wraps the original command:
 
@@ -191,8 +195,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/command).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Running `node cli.js` outputs:
 
@@ -204,8 +212,12 @@ Running `node cli.js` outputs:
 [LOG] Command completed
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > The `@gunshi/plugin-global` plugin uses a command decorator to intercept `--help` and `--version` options, preventing normal command execution and triggering rendering instead.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Renderer Decorators
 
@@ -289,8 +301,12 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/renderers).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Run with `--help` to see customized output:
 
@@ -420,8 +436,12 @@ await cli(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/plugins/decorators/multiple-order).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Execution Flow Breakdown
 
@@ -481,18 +501,30 @@ const afterCustomA = await customADecorator(afterRenderer, ctx) // Adds "Enhance
 const final = await customBDecorator(afterCustomA, ctx) // Adds "Styled by Plugin B"
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > `@gunshi/plugin-global` uses a **command decorator** to handle `--help`/`--version` options, while `@gunshi/plugin-renderer` uses **renderer decorators** to format the output. The base renderer returns an empty string, and `@gunshi/plugin-renderer` provides the actual implementation.
 
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!IMPORTANT]
 > Always call `baseRenderer` in your decorator to maintain the decorator chain. While `@gunshi/plugin-renderer` replaces the empty base renderer with full implementation, your custom decorators should enhance the output from previous decorators in the chain.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Important Considerations
 
 **Always call `baseRenderer` in your decorator to maintain the decorator chain. Skipping it will break other plugins that may depend on the output.**
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Renderer decorators have the lowest priority in Gunshi's rendering system. Command-level and CLI-level renderers will override plugin decorators. See [Rendering Customization](../advanced/custom-rendering.md) for details on renderer priority.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Command vs Renderer Decorators
 

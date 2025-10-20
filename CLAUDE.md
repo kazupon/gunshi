@@ -113,7 +113,7 @@ The repository contains the following packages:
 ### Documentation
 
 - **`packages/docs/`** - Documentation site (VitePress)
-  - Available at: https://gunshi.dev
+  - Available at: [gunshi.dev](https://gunshi.dev)
   - Guides, API references, examples
 
 ## Architecture Overview
@@ -307,6 +307,6 @@ Packages are published to:
 
 ### Documentation
 
-- Documentation site: https://gunshi.dev
+- Documentation site: [gunshi.dev](https://gunshi.dev)
 - API docs are auto-generated from TypeScript types
 - Update documentation when adding new features or changing APIs

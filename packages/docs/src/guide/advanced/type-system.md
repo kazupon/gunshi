@@ -6,8 +6,12 @@ This enhancement brings TypeScript's full type-checking capabilities to your CLI
 
 This guide focuses on type safety for command definitions and their arguments. If you're creating custom plugins and need to understand the `plugin` function's type system, refer to the [Plugin Type System](../plugin/type-system.md) guide.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!NOTE]
 > Some code examples in this guide include TypeScript file extensions (`.ts`) in `import`/`export` statements. If you use this pattern in your plugin, you'll need to enable `allowImportingTsExtensions` in your `tsconfig.json`.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Overview of v0.27 Type System
 
@@ -101,8 +105,12 @@ export const serverCommand = define<{ args: typeof serverArgs }>({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/define).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 This advanced approach is particularly useful when you want to reuse argument definitions across multiple commands or need to export types for use in other modules.
 
@@ -181,8 +189,12 @@ export const buildCommand = lazy<{ args: typeof buildArgs }>(
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/lazy).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Plugin Extensions and Architectural Constraints
 
@@ -252,8 +264,12 @@ export const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/define-with-types).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Flexible Type Parameters
 
@@ -349,12 +365,18 @@ export const buildCommand = lazyWithTypes<{
 )
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/lazy-with-types).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Flexible Type Parameters
 
 Similar to `defineWithTypes`, `lazyWithTypes` supports flexible type parameters:
+
+<!-- eslint-skip -->
 
 ```ts
 // Most common: specify only extensions
@@ -513,8 +535,12 @@ export default defineWithTypes<{ extensions: CombinedExtensions }>()({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/type-system/combine).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Both approaches achieve the same goal: combining multiple plugin extensions with full type safety. Use Record types when working with official plugins that provide plugin IDs, and direct intersection types for custom plugins.
 

@@ -108,8 +108,12 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 > [!TIP]
 > The example fully code is [here](https://github.com/kazupon/gunshi/tree/main/playground/essentials/declarative).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 This example demonstrates the key components of declarative configuration:
 
@@ -134,14 +138,24 @@ Since v0.27.0, commands support additional configuration properties:
 - `internal`: Boolean flag to mark commands as internal (default: `false`). Internal commands are hidden from help usage but remain fully functional. This is useful for debug commands, administrative functions, or implementation details that shouldn't be exposed to end users.
 - `entry`: Boolean flag that marks the main command when subcommands exist (default: `undefined`). This property is typically set automatically by the framework. When used with the `fallbackToEntry` CLI option, it enables fallback behavior for unmatched subcommands.
 - `rendering`: Object to customize how the command displays help, usage, and error messages. This allows fine-grained control over command-level rendering output.
+
+  <!-- eslint-disable markdown/no-missing-label-refs -->
+
   > [!TIP]
   > For detailed information about customizing rendering output including headers, usage text, and validation errors, see the [Rendering Customization guide](../advanced/custom-rendering.md).
+
+  <!-- eslint-enable markdown/no-missing-label-refs -->
 
 ### Command Options
 
 Each option can have the following properties:
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
 - `type`: The data type ('string', 'number', 'boolean', 'positional', 'custom'[, 'enum' if supported])
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 - `short`: A single-character alias for the option (e.g., `-n` as a shorthand for `--name`), making commands quicker to type for frequent use.
   <!-- eslint-disable markdown/no-missing-label-refs -->
   > [!TIP] Multiple boolean short option flags can be grouped together.
