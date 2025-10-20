@@ -28,7 +28,14 @@ Gunshi is designed to simplify the creation of modern command-line interfaces:
 - 🌍 **Internationalization**: Built with global users in mind, featuring locale-aware design, resource management, and multi-language support.
 - 🔌 **Pluggable**: Extensible plugin system with dependency management and lifecycle hooks for modular CLI development.
 
+## 📡 Status
+
+- v0.26.3: stable
+- v0.27: beta
+
 ## 💿 Installation
+
+### Stable
 
 ```sh
 # npm
@@ -45,6 +52,25 @@ deno add jsr:@gunshi/gunshi
 
 ## bun
 bun add gunshi
+```
+
+### v0.27 Beta
+
+```sh
+# npm
+npm install --save gunshi@beta
+
+## pnpm
+pnpm add gunshi@beta
+
+## yarn
+yarn add gunshi@beta
+
+## deno (you can specify version with `@`)
+deno add jsr:@gunshi/gunshi@0.27.2
+
+## bun
+bun add gunshi@beta
 ```
 
 ## 🚀 Usage
