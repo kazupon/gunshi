@@ -150,7 +150,7 @@ await cli(process.argv.slice(2), testCommand, {
 
 Run comprehensive tests:
 
-```bash
+```sh
 # Test help display
 node test-plugin.js test --help
 
@@ -171,8 +171,8 @@ const debugPlugin = plugin({
 
   setup: ctx => {
     console.log('[SETUP] Plugin loaded')
-    console.log('[SETUP] Global options:', Array.from(ctx.globalOptions.keys()))
-    console.log('[SETUP] Sub commands:', Array.from(ctx.subCommands.keys()))
+    console.log('[SETUP] Global options:', [...ctx.globalOptions.keys()])
+    console.log('[SETUP] Sub commands:', [...ctx.subCommands.keys()])
 
     ctx.decorateCommand(baseRunner => async ctx => {
       console.log('[EXECUTE] Before command:', ctx.name)
@@ -689,7 +689,7 @@ const resourcePlugin = plugin({
     const resources: Array<{ dispose: () => void }> = []
 
     const cleanup = () => {
-      resources.forEach(r => r.dispose())
+      for (const r of resources) r.dispose()
       resources.length = 0
     }
 

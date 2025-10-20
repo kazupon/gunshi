@@ -333,7 +333,7 @@ MAJOR.MINOR.PATCH
 
 Maintain a CHANGELOG.md:
 
-```markdown
+```md
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -402,7 +402,7 @@ Automate version management:
 
 ### Publishing Process
 
-```bash
+```sh
 # Login to npm (first time only)
 npm login
 
@@ -447,17 +447,17 @@ jobs:
 
 ### JSR Setup
 
-1. **Create JSR account** at https://jsr.io
+1. **Create JSR account** at <https://jsr.io>
 2. **Configure authentication**:
 
-```bash
+```sh
 # Authenticate with JSR
 deno login
 ```
 
 ### Publishing Process
 
-```bash
+```sh
 # Publish to JSR
 jsr publish
 
@@ -494,7 +494,7 @@ jobs:
 
 ### README.md Template
 
-```markdown
+```md
 # gunshi-plugin-myfeature
 
 > MyFeature plugin for Gunshi CLI framework
@@ -543,7 +543,7 @@ plugins: [myPlugin()]
 
 \`\`\`ts
 myPlugin({
-baseUrl: 'https://api.example.com',
+baseUrl: '<https://api.example.com>',
 timeout: 5000
 })
 \`\`\`
@@ -634,7 +634,7 @@ await cli(process.argv.slice(2), command, {
 
 Always test the published package:
 
-```bash
+```sh
 # Pack locally
 npm pack
 
@@ -648,7 +648,7 @@ npm install ../path/to/gunshi-plugin-myfeature-1.0.0.tgz
 
 Keep dependencies up to date:
 
-```bash
+```sh
 # Check outdated packages
 npm outdated
 
@@ -664,7 +664,7 @@ npm install
 
 Regularly audit for vulnerabilities:
 
-```bash
+```sh
 # Run security audit
 npm audit
 
@@ -683,7 +683,7 @@ When deprecating a plugin:
 }
 ```
 
-```bash
+```sh
 # Deprecate on npm
 npm deprecate gunshi-plugin-old "Please use gunshi-plugin-new instead"
 ```
