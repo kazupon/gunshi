@@ -192,10 +192,14 @@ Gunshi is designed to work seamlessly across multiple JavaScript runtimes. Here'
 
 For Node.js applications, use `process.argv.slice(2)` to pass command-line arguments:
 
-```js
+```js [cli.js]
 import { cli } from 'gunshi'
 
-await cli(process.argv.slice(2), command)
+function entry() {
+  console.log('Hello, Gunshi!')
+}
+
+await cli(process.argv.slice(2), entry)
 ```
 
 ### Deno
