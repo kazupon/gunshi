@@ -66,6 +66,16 @@ export default define({
 })
 ```
 
+About details, See the below official docs sections:
+
+- Essentials:
+  - [Declarative Configuration](https://gunshi.dev/guide/essentials/declarative)
+  - [Type Safe](https://gunshi.dev/guide/essentials/type-safe)
+  - [Composable Sub-commands](https://gunshi.dev/guide/essentials/composable)
+  - [Lazy & Async Command Loading](https://gunshi.dev/guide/essentials/lazy-async)
+- ## Advanced:
+  - [Type System](https://gunshi.dev/guide/advanced/type-system)
+
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
