@@ -1,7 +1,7 @@
 {
   "name": "lazy",
   "private": true,
-  "packageManager": "pnpm@10.18.2",
+  "packageManager": "pnpm@10.18.3",
   "type": "module",
   "scripts": {
     "start": "npx tsx cli.ts"
