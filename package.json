@@ -105,6 +105,8 @@
   },
   "pnpm": {
     "overrides": {
+      "tsdown>rolldown": "1.0.0-beta.40",
+      "tsdown>rolldown-plugin-dts": "0.16.8",
       "vitepress>vite": "npm:rolldown-vite@latest"
     },
     "onlyBuiltDependencies": [
