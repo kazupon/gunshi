@@ -45,24 +45,25 @@ my-cli/
 │   │   ├── src/
 │   │   │   ├── commands.ts  # Command definitions
 │   │   │   ├── loader.ts    # Custom loader
-│   │   │   └── index.ts     # CLI entry point
+│   │   │   └── cli.ts       # CLI entry point
 │   ├── command-a/           # Command A package
 │   │   ├── src/
 │   │   │   ├── meta.ts      # Command metadata
-│   │   │   └── index.ts     # Command implementation
+│   │   │   └── runner.ts    # Command implementation
 │   └── command-b/           # Command B package
 │       ├── src/
 │       │   ├── meta.ts      # Command metadata
-│       │   └── index.ts     # Command implementation
+│       │   └── runner.ts    # Command implementation
 ```
 
 ### 2. Command Metadata
 
 Define command metadata in a separate file (e.g., `meta.ts`):
 
-```ts
-// packages/command-a/src/meta.ts
-export default {
+```ts [packages/command-a/src/meta.ts]
+import { define } from 'gunshi'
+
+export default define({
   name: 'command-a',
   description: 'Performs action A',
   args: {
@@ -77,19 +78,18 @@ export default {
       description: 'Output file'
     }
   }
-}
+})
 ```
 
 ### 3. Command Implementation
 
-Implement the command in a separate file (e.g., `index.ts`):
+Implement the command in a separate file (e.g., `runner.ts`):
 
-```ts
-// packages/command-a/src/index.ts
-import type { CommandContext } from 'gunshi'
+```ts [packages/command-a/src/ruuner.ts]
 import meta from './meta.ts'
+import type { CommandRunner } from 'gunshi'
 
-export const run = async (ctx: CommandContext<typeof meta.args>) => {
+export const run: CommandRunner<{ args: typeof meta.args }> = async ctx => {
   const { input, output } = ctx.values
   console.log(`Processing ${input} to ${output}`)
   // Command implementation...
@@ -100,26 +100,29 @@ export const run = async (ctx: CommandContext<typeof meta.args>) => {
 
 Create a custom loader to dynamically import command implementations:
 
-```ts
-// packages/cli/src/loader.ts
-import type { Args, CommandRunner } from 'gunshi'
+```ts [packages/cli/src/loader.ts]
+import type { CommandRunner, GunshiParamsConstraint } from 'gunshi'
 
-export async function load<A extends Args = Args>(pkg: string): Promise<CommandRunner<A>> {
+export async function load<G extends GunshiParamsConstraint>(
+  pkg: string
+): Promise<CommandRunner<G> | null> {
+  let mod: Promise<CommandRunner<G> | null> | undefined
   // Dynamic import of the command package
   try {
-    const mod = await import(pkg)
-    return mod.default || mod.run
-  } catch (error) {
+    mod = await import(pkg).then(m => m.default || m)
+  } catch (error: unknown) {
     // Handle module not found errors
     if (isErrorModuleNotFound(error)) {
-      console.error(`Command module '${pkg}' not found`)
-      return null
+      mod = Promise.resolve(null)
     }
-    throw error
   }
+  if (mod === undefined) {
+    throw new Error(`Fatal Error: '${pkg}' Command Runner loading failed`)
+  }
+  return mod
 }
 
-function isErrorModuleNotFound(e: unknown): boolean {
+function isErrorModuleNotFound(e: unknown): e is NodeJS.ErrnoException {
   return (
     e instanceof Error &&
     'code' in e &&
@@ -133,9 +136,8 @@ function isErrorModuleNotFound(e: unknown): boolean {
 
 Define your commands using Gunshi's `lazy` function and your custom loader:
 
-```ts
-// packages/cli/src/commands.ts
-import { lazy } from 'gunshi/definition'
+```ts [packages/cli/src/commands.ts]
+import { lazy } from 'gunshi'
 import { load } from './loader.ts'
 
 // Import command metadata directly - these are bundled with your CLI
@@ -152,11 +154,6 @@ export const commandALazy = lazy(
 )
 
 export const commandBLazy = lazy(async () => await load('command-b'), metaCommandB)
-
-// Create a map of commands
-export const commands = new Map()
-commands.set(metaCommandA.name, commandALazy)
-commands.set(metaCommandB.name, commandBLazy)
 ```
 
 This approach ensures that:
@@ -168,22 +165,23 @@ This approach ensures that:
 
 Set up your CLI entry point to use the lazy-loaded commands:
 
-```ts
-// packages/cli/src/index.ts
+```ts [packages/cli/src/cli.ts]
 import { cli } from 'gunshi'
-import { commands, commandALazy } from './commands.ts'
+import { commandALazy, commandBLazy } from './commands.ts'
 
 async function main() {
   // Load package.json for version info
-  const pkgJsonModule = await import('./package.json', { with: { type: 'json' } })
-  const pkgJson = pkgJsonModule.default
+  const { default: pkgJsonModule } = await import('./package.json', { with: { type: 'json' } })
 
   // Run the CLI with lazy-loaded commands
   await cli(process.argv.slice(2), commandALazy, {
     name: 'my-cli',
     version: pkgJson.version,
     description: 'My CLI application',
-    subCommands: commands
+    subCommands: {
+      [commandALazy.commandName]: commandALazy,
+      [commandBLazy.commandName]: commandBLazy
+    }
   })
 }
 
@@ -196,8 +194,7 @@ await main()
 
 For CLIs with many sub-commands, you can implement on-demand sub-command loading:
 
-```ts
-// packages/cli/src/commands.ts
+```ts [packages/cli/src/commands.ts]
 import { lazy } from 'gunshi/definition'
 import { load } from './loader.ts'
 
@@ -225,13 +222,14 @@ export const commands = new Map([
 
 For CLI tools that integrate with package managers (like pnpmc does with pnpm), you can enhance your loader:
 
-```ts
-// packages/cli/src/loader.ts
+```ts [packages/cli/src/loader.ts]
 import { detect, resolveCommand } from 'package-manager-detector'
 import { x } from 'tinyexec'
-import type { Args, CommandContext, CommandRunner } from 'gunshi'
+import type { CommandContext, CommandRunner, GunshiParamsConstraint } from 'gunshi'
 
-export async function load<A extends Args = Args>(pkg: string): Promise<CommandRunner<A>> {
+export async function load<G extends GunshiParamsConstraint>(
+  pkg: string
+): Promise<CommandRunner<G>> {
   // Detect package manager (npm, yarn, pnpm, etc.)
   const pm = await detect()
   if (pm === null) {
@@ -239,7 +237,7 @@ export async function load<A extends Args = Args>(pkg: string): Promise<CommandR
   }
 
   // Return a command runner function
-  async function runner<A extends Args>(ctx: CommandContext<A>): Promise<void> {
+  async function runner<G extends GunshiParamsConstraint>(ctx: CommandContext<G>): Promise<void> {
     // Construct the sub-command
     const subCommand = ctx.env.version ? `${pkg}@${ctx.env.version}` : pkg
 
@@ -278,11 +276,10 @@ When implementing advanced lazy loading, consider these performance optimization
 
 Maintain type safety with TypeScript when implementing advanced lazy loading:
 
-```ts
-// packages/cli/src/commands.ts
-import { lazy, define } from 'gunshi/definition'
-import type { CommandRunner } from 'gunshi'
+```ts [packages/cli/src/commands.ts]
+import { define, lazyWithTypes } from 'gunshi/definition'
 import { load } from './loader.ts'
+import type { CommandRunner } from 'gunshi'
 
 // Define command metadata with type safety
 const metaCommandA = define({
@@ -297,13 +294,11 @@ const metaCommandA = define({
   }
 })
 
-// Type for command arguments
-type CommandAArgs = NonNullable<typeof metaCommandA.args>
-
 // Create type-safe lazy command
-const commandALazy = lazy<CommandAArgs>(async (): Promise<CommandRunner<CommandAArgs>> => {
-  return await load<CommandAArgs>('command-a')
-}, metaCommandA)
+const commandALazy = lazyWithTypes<{ args: typeof metaCommandA.args }>()(
+  async () => await load('command-a'),
+  metaCommandA
+)
 ```
 
 ## Conclusion
