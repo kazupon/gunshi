@@ -3,7 +3,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "name": "@gunshi/plugin-completion",
   "description": "completion plugin for gunshi",
-  "version": "0.27.0-beta.2",
+  "version": "0.27.0-beta.3",
   "license": "MIT",
   "publish": {
     "include": ["src/**/*.ts", "package.json", "jsr.json", "README.md", "CHANGELOG.md", "LICENSE"],
