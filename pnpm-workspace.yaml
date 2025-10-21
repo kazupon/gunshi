@@ -9,7 +9,7 @@ catalog:
   jsr: ^0.13.5
   jsr-exports-lint: ^0.4.1
   publint: ^0.3.14
-  tsdown: ^0.15.6
+  tsdown: 0.15.9
   '@types/node': ^22.18.8
   typedoc: ^0.28.13
   typedoc-plugin-markdown: ^4.9.0
@@ -21,6 +21,9 @@ minimumReleaseAgeExclude:
   - eslint-plugin-jsdoc
   - '@typescript/native-preview'
   - lint-staged
+  - tsdown
+  - rolldown
+  - '@rolldown/pluginutils'
   - '@kazupon/eslint-config'
   - gunshi
   - '@gunshi/bone'
