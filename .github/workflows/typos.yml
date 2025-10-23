@@ -20,4 +20,4 @@ jobs:
           fetch-depth: 0
 
       - name: Spell check
-        uses: crate-ci/typos@0c17dabcee8b8f1957fa917d17393a23e02e1583 # v1.36.3
+        uses: crate-ci/typos@80c8a4945eec0f6d464eaf9e65ed98ef085283d1 # v1.38.1
