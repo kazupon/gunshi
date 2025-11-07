@@ -65,8 +65,8 @@ importers:
         specifier: 7.0.0-dev.20251027.1
         version: 7.0.0-dev.20251027.1
       '@vitest/coverage-v8':
-        specifier: 4.0.5
-        version: 4.0.5(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1))
+        specifier: 4.0.6
+        version: 4.0.6(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1))
       '@vitest/eslint-plugin':
         specifier: ^1.3.16
         version: 1.3.20(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1))
@@ -2275,11 +2275,11 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@4.0.5':
-    resolution: {integrity: sha512-Yn5Dx0UVvllE3uatQw+ftObWtM/TjAOdbd8WvygaR04iyFXdNmtvZ/nJ2/JndyzfPQtbAWw0F+GJY5+lgM/7qg==}
+  '@vitest/coverage-v8@4.0.6':
+    resolution: {integrity: sha512-cv6pFXj9/Otk7q1Ocoj8k3BUVVwnFr3jqcqpwYrU5LkKClU9DpaMEdX+zptx/RyIJS+/VpoxMWmfISXchmVDPQ==}
     peerDependencies:
-      '@vitest/browser': 4.0.5
-      vitest: 4.0.5
+      '@vitest/browser': 4.0.6
+      vitest: 4.0.6
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -2313,6 +2313,9 @@ packages:
   '@vitest/pretty-format@4.0.5':
     resolution: {integrity: sha512-t1T/sSdsYyNc5AZl0EMeD0jW9cpJe2cODP0R++ZQe1kTkpgrwEfxGFR/yCG4w8ZybizbXRTHU7lE8sTDD/QsGw==}
 
+  '@vitest/pretty-format@4.0.6':
+    resolution: {integrity: sha512-4vptgNkLIA1W1Nn5X4x8rLJBzPiJwnPc+awKtfBE5hNMVsoAl/JCCPPzNrbf+L4NKgklsis5Yp2gYa+XAS442g==}
+
   '@vitest/runner@4.0.5':
     resolution: {integrity: sha512-CQVVe+YEeKSiFBD5gBAmRDQglm4PnMBYzeTmt06t5iWtsUN9StQeeKhYCea/oaqBYilf8sARG6fSctUcEL/UmQ==}
 
@@ -2324,6 +2327,9 @@ packages:
 
   '@vitest/utils@4.0.5':
     resolution: {integrity: sha512-V5RndUgCB5/AfNvK9zxGCrRs99IrPYtMTIdUzJMMFs9nrmE5JXExIEfjVtUteyTRiLfCm+dCRMHf/Uu7Mm8/dg==}
+
+  '@vitest/utils@4.0.6':
+    resolution: {integrity: sha512-bG43VS3iYKrMIZXBo+y8Pti0O7uNju3KvNn6DrQWhQQKcLavMB+0NZfO1/QBAEbq0MaQ3QjNsnnXlGQvsh0Z6A==}
 
   '@vue/compiler-core@3.5.21':
     resolution: {integrity: sha512-8i+LZ0vf6ZgII5Z9XmUvrCyEzocvWT+TeR2VBUVlzIH6Tyv57E20mPZ1bCS+tbejgUgmjrEh7q/0F0bibskAmw==}
@@ -6619,10 +6625,10 @@ snapshots:
       vite: rolldown-vite@7.1.20(@types/node@24.5.2)(esbuild@0.25.10)(jiti@2.6.0)(tsx@4.20.6)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.9.3)
 
-  '@vitest/coverage-v8@4.0.5(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitest/coverage-v8@4.0.6(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
-      '@vitest/utils': 4.0.5
+      '@vitest/utils': 4.0.6
       ast-v8-to-istanbul: 0.3.5
       debug: 4.4.3
       istanbul-lib-coverage: 3.2.2
@@ -6668,6 +6674,10 @@ snapshots:
     dependencies:
       tinyrainbow: 3.0.3
 
+  '@vitest/pretty-format@4.0.6':
+    dependencies:
+      tinyrainbow: 3.0.3
+
   '@vitest/runner@4.0.5':
     dependencies:
       '@vitest/utils': 4.0.5
@@ -6684,6 +6694,11 @@ snapshots:
   '@vitest/utils@4.0.5':
     dependencies:
       '@vitest/pretty-format': 4.0.5
+      tinyrainbow: 3.0.3
+
+  '@vitest/utils@4.0.6':
+    dependencies:
+      '@vitest/pretty-format': 4.0.6
       tinyrainbow: 3.0.3
 
   '@vue/compiler-core@3.5.21':
