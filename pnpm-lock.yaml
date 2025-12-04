@@ -54,7 +54,7 @@ importers:
         version: 7.4.0
       '@kazupon/eslint-config':
         specifier: ^0.37.2
-        version: 0.37.2(0eed1a7b85a36c3ac09bc5eace3c4387)
+        version: 0.37.2(0d20c83ecba8450b544b5861add4786c)
       '@kazupon/prettier-config':
         specifier: ^0.2.0
         version: 0.2.0
@@ -92,8 +92,8 @@ importers:
         specifier: ^2.21.0
         version: 2.21.0(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-markdown-preferences:
-        specifier: ^0.36.2
-        version: 0.36.2(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
+        specifier: ^0.37.0
+        version: 0.37.0(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-module-interop:
         specifier: ^0.3.1
         version: 0.3.1(eslint@9.37.0(jiti@2.6.0))
@@ -3301,8 +3301,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  eslint-plugin-markdown-preferences@0.36.2:
-    resolution: {integrity: sha512-963LF6eYyvlPHnoaRZDy6xcsSVSRMz7mX0S03cKgvLfKUInrFtjHixtbd9KPhMYyVWdPNVqe5TiJaw01hxHoEA==}
+  eslint-plugin-markdown-preferences@0.37.0:
+    resolution: {integrity: sha512-QcHxRXwq14PB5WxuFfoax0Pp3rz4UZomoDMlyLBxMdVmVlf938IKJtYPbsXfHQzzC/h7tmeUPPAl6Pu1L3o1HA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
       '@eslint/markdown': ^7.4.0
@@ -5949,7 +5949,7 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.37.2(0eed1a7b85a36c3ac09bc5eace3c4387)':
+  '@kazupon/eslint-config@0.37.2(0d20c83ecba8450b544b5861add4786c)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.37.0(jiti@2.6.0))
       '@eslint/js': 9.37.0
@@ -5968,7 +5968,7 @@ snapshots:
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-jsdoc: 61.1.4(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-jsonc: 2.21.0(eslint@9.37.0(jiti@2.6.0))
-      eslint-plugin-markdown-preferences: 0.36.2(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
+      eslint-plugin-markdown-preferences: 0.37.0(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-module-interop: 0.3.1(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-promise: 7.2.1(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-regexp: 2.10.0(eslint@9.37.0(jiti@2.6.0))
@@ -7885,7 +7885,7 @@ snapshots:
     transitivePeerDependencies:
       - '@eslint/json'
 
-  eslint-plugin-markdown-preferences@0.36.2(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0)):
+  eslint-plugin-markdown-preferences@0.37.0(@eslint/markdown@7.4.0)(eslint@9.37.0(jiti@2.6.0)):
     dependencies:
       '@eslint/markdown': 7.4.0
       diff-sequences: 29.6.3
