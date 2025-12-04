@@ -436,8 +436,8 @@ importers:
         specifier: 'catalog:'
         version: 0.4.1(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20251027.1)(oxc-resolver@11.8.3)(publint@0.3.14)(typescript@5.9.3)(unrun@0.2.1))
       messageformat:
-        specifier: 4.0.0-12
-        version: 4.0.0-12
+        specifier: 4.0.0
+        version: 4.0.0
       publint:
         specifier: 'catalog:'
         version: 0.3.14
@@ -4182,8 +4182,9 @@ packages:
   mermaid@11.12.0:
     resolution: {integrity: sha512-ZudVx73BwrMJfCFmSSJT84y6u5brEoV8DOItdHomNLz32uBjNrelm7mg95X7g+C6UoQH/W6mBLGDEDv73JdxBg==}
 
-  messageformat@4.0.0-12:
-    resolution: {integrity: sha512-14gCLxSsgxafX+1YBoB27Ruv73rjU1mkDTyFG7yQvT2XAiTYaGRUhVwk4jYZda+cHDIBRM+nX1mJ8OqW5JEhzw==}
+  messageformat@4.0.0:
+    resolution: {integrity: sha512-XKmJ/ffTWToWOlHJzt85ZChQgVGC0LHzNWuNK8zuYpNySsB0nIEmytOdSAOW9ETKtkajAUJf520m5gFHHnrTYg==}
+    engines: {node: ^20.19 || ^22.12 || >=24}
 
   micromark-core-commonmark@2.0.3:
     resolution: {integrity: sha512-RDBrHEMSxVFLg6xvnXmb1Ayr2WzLAWjeSATAoxwKYJV94TeNavgoIdA0a9ytzDSVzBy2YKFK+emCPOEibLeCrg==}
@@ -8894,7 +8895,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  messageformat@4.0.0-12: {}
+  messageformat@4.0.0: {}
 
   micromark-core-commonmark@2.0.3:
     dependencies:

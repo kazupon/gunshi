@@ -81,7 +81,7 @@
     "gunshi": "workspace:*",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
-    "messageformat": "4.0.0-12",
+    "messageformat": "4.0.0",
     "publint": "catalog:",
     "tsdown": "catalog:",
     "typedoc": "catalog:",
