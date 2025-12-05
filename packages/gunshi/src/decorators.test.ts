@@ -114,12 +114,12 @@ describe('Decorators', () => {
   test('handle decorator that throws error', async () => {
     const decorators = createDecorators()
     const ctx = await createCommandContext({})
-    decorators.addHeaderDecorator(async () => {
+    decorators.addHeaderDecorator(() => {
       throw new Error('Decorator error')
     })
     const renderer = decorators.getHeaderRenderer()
 
-    await expect(renderer(ctx)).rejects.toThrow('Decorator error')
+    await expect(async () => await renderer(ctx)).rejects.toThrow('Decorator error')
   })
 
   test('Build empty decorator chain correctly', async () => {

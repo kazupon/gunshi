@@ -17,7 +17,7 @@ export function runCommand(command: string, options?: ExecOptions): Promise<stri
       { timeout: 30_000, ...options, env: { ...process.env, ...options?.env } },
       (error, stdout, stderr) => {
         if (error) {
-          reject(new Error(`Command failed: ${command}\n${stderr}\n${error.message}`))
+          reject(new Error(`Command failed: ${command}\n${stderr.toString()}\n${error.message}`))
         } else {
           resolve(stdout.toString())
         }

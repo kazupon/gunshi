@@ -22,7 +22,7 @@ describe('resolveArgKey', () => {
     expect(resolveArgKey<typeof _args>('bar')).toBe('arg:bar')
   })
 
-  test('resolve with command context', async () => {
+  test('resolve with command context', () => {
     expect(resolveArgKey('foo', 'test')).toBe('test:arg:foo')
     // Infer key type from args
     expect(resolveArgKey<typeof _args>('bar', 'test')).toBe('test:arg:bar')
@@ -34,7 +34,7 @@ describe('resolveKey', () => {
     expect(resolveKey('foo')).toBe('foo')
   })
 
-  test('resolve with command context', async () => {
+  test('resolve with command context', () => {
     expect(resolveKey('foo', 'test')).toBe('test:foo')
   })
 })

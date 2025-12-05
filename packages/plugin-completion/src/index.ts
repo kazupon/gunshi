@@ -107,7 +107,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
     name: 'completion',
     dependencies,
 
-    async setup(ctx) {
+    setup(ctx) {
       /**
        * add command for completion script generation
        */
@@ -120,7 +120,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
         rendering: {
           header: null // disable header rendering for completion command
         },
-        run: async cmdCtx => {
+        run: cmdCtx => {
           if (!cmdCtx.env.name) {
             throw new Error('your cli name is not defined.')
           }
@@ -185,7 +185,10 @@ async function registerCompletion({
   isBombshellRoot?: boolean
 }) {
   const resolvedCmd = await resolveLazyCommand(cmd)
-  const extensions: Record<string, CommandContextExtension> = Object.create(null)
+  const extensions: Record<string, CommandContextExtension> = Object.create(null) as Record<
+    string,
+    CommandContextExtension
+  >
   if (i18n) {
     extensions[i18nPluginId] = {
       key: Symbol(i18nPluginId),
@@ -201,7 +204,7 @@ async function registerCompletion({
   if (i18n) {
     const ret = await i18n.loadResource(i18n.locale, ctx, resolvedCmd)
     if (!ret) {
-      console.warn(`Failed to load i18n resources for command: ${name} (${i18n.locale})`)
+      console.warn(`Failed to load i18n resources for command: ${name} (${i18n.locale.toString()})`)
     }
   }
   const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
@@ -249,7 +252,7 @@ async function handleSubCommands(
   subCommands: PluginContext['subCommands'],
   i18nPluginId: string,
   config: Record<string, CompletionConfig> = {},
-  i18n?: I18nExtension | undefined
+  i18n?: I18nExtension
 ) {
   for (const [name, cmd] of subCommands) {
     if (cmd.internal || cmd.entry || name === 'complete') {

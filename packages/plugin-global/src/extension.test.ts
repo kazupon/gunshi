@@ -32,7 +32,7 @@ describe('showVersion', () => {
       }
     })
     const global = ctx.extensions[pluginId]
-    const rendered = await global.showVersion()
+    const rendered = global.showVersion()
 
     expect(rendered).toBe('unknown')
   })
@@ -49,7 +49,7 @@ describe('showVersion', () => {
       }
     })
     const global = ctx.extensions[pluginId]
-    const rendered = await global.showVersion()
+    const rendered = global.showVersion()
 
     expect(rendered).toEqual(version)
   })
@@ -59,7 +59,7 @@ describe('showHeader', () => {
   test('basic', async () => {
     const header = 'Welcome to the Test Application'
     const ctx = await createCommandContext({
-      cliOptions: { renderHeader: async () => header, usageSilent: true },
+      cliOptions: { renderHeader: () => Promise.resolve(header), usageSilent: true },
       extensions: {
         [pluginId]: {
           key: Symbol(pluginId),
@@ -94,7 +94,7 @@ describe('showUsage', () => {
   test('basic', async () => {
     const usage = 'Usage: test-app [options]'
     const ctx = await createCommandContext({
-      cliOptions: { renderUsage: async () => usage, usageSilent: true },
+      cliOptions: { renderUsage: () => Promise.resolve(usage), usageSilent: true },
       extensions: {
         [pluginId]: {
           key: Symbol(pluginId),

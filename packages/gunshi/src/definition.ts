@@ -136,6 +136,7 @@ export function define(
   definition: any // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
 ): any {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- NOTE(kazupon): for implementation
   return definition
 }
 
@@ -377,7 +378,7 @@ export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypes
     loader: CommandLoader<FullGunshiParams>,
     definition?: D
   ): LazyCommand<FullGunshiParams, D> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for type casting
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- for type casting
     return lazy(loader as any, definition as any) as LazyCommand<FullGunshiParams, D>
   }
 }

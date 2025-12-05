@@ -4,14 +4,14 @@ packages:
   - '!playground/bun'
 catalog:
   typescript: ^5.9.3
-  zod: ^4.1.12
-  deno: ^2.5.4
+  zod: ^4.1.13
+  deno: ^2.5.6
   jsr: ^0.13.5
   jsr-exports-lint: ^0.4.1
-  publint: ^0.3.14
+  publint: ^0.3.15
   tsdown: 0.15.12
-  '@types/node': ^24.0.0
-  typedoc: ^0.28.13
+  '@types/node': ^24.10.1
+  typedoc: ^0.28.15
   typedoc-plugin-markdown: ^4.9.0
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:

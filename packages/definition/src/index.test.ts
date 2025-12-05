@@ -21,7 +21,7 @@ describe('@gunshi/definition', () => {
     // check command properties
     expect(command.name).toBe('test')
     expect(command.description).toBe('A test command')
-    expect(command.args!.foo.type).toBe('string')
+    expect(command.args.foo.type).toBe('string')
 
     // test command execution
     const ctx = await createCommandContext({
@@ -35,7 +35,7 @@ describe('@gunshi/definition', () => {
         name: 'cmd1'
       }
     })
-    const result = await command.run(ctx)
+    const result = command.run(ctx)
     expect(result).toBe('foo value: bar')
   })
 

@@ -26,7 +26,7 @@ test('enable version option', async () => {
 test('enable help option', async () => {
   const usage = 'Usage: test [options]'
   const ctx = await createCommandContext({
-    cliOptions: { renderUsage: async () => usage, usageSilent: true },
+    cliOptions: { renderUsage: () => Promise.resolve(usage), usageSilent: true },
     values: { help: true },
     extensions: {
       [pluginId]: {
@@ -48,8 +48,8 @@ test('header rendering', async () => {
   const ctx = await createCommandContext({
     cliOptions: {
       usageSilent: true,
-      renderHeader: async () => header,
-      renderUsage: async () => usage
+      renderHeader: () => Promise.resolve(header),
+      renderUsage: () => Promise.resolve(usage)
     },
     values: { help: true },
     extensions: {

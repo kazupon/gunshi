@@ -109,7 +109,7 @@ export default function i18n(
     name: 'internationalization',
     dependencies: [{ id: namespacedId('global'), optional: true }] as const,
 
-    extension: async ctx => {
+    extension: ctx => {
       function registerGlobalOptionResources(
         option: string,
         resources: Record<string, string>
@@ -131,7 +131,9 @@ export default function i18n(
           for (const resourceLocaleKey of resourceLocaleKeys) {
             const message = adapter.getMessage(resourceLocaleKey, globalOptionKey)
             if (!message) {
-              const resource = adapter.getResource(resourceLocaleKey) || Object.create(null)
+              const resource =
+                adapter.getResource(resourceLocaleKey) ||
+                (Object.create(null) as Record<string, string>)
               resource[globalOptionKey] = resources[resourceLocaleKey]
               adapter.setResource(resourceLocaleKey, resource)
             }
@@ -148,7 +150,10 @@ export default function i18n(
         T extends string = CommandBuiltinKeys,
         O = CommandArgKeys<DefaultGunshiParams['args']>,
         K = CommandBuiltinKeys | O | T
-      >(key: K, values: Record<string, unknown> = Object.create(null)): string {
+      >(
+        key: K,
+        values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
+      ): string {
         const strKey = key as string
         if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
           // handle built-in keys
@@ -180,7 +185,7 @@ export default function i18n(
       // setup built-in global option resources
       const builtinGlobalOptionResources: Record<string, Record<string, string>> = Object.create(
         null
-      )
+      ) as Record<string, Record<string, string>>
       for (const globalOption of builtinGlobalOptions) {
         const resource: Record<string, string> = {}
         resource[DEFAULT_LOCALE] = (DefaultResource as Record<string, string>)[globalOption]
@@ -220,7 +225,7 @@ export default function i18n(
         const localeStr = toLocaleString(locale)
         const resource = originalResource
           ? await normalizeResource(originalResource, ctx)
-          : Object.create(null)
+          : (Object.create(null) as Record<string, string>)
         for (const globalOption of getGlobalOptions()) {
           if (globalOptionResources.has(globalOption)) {
             const optionResource = globalOptionResources.get(globalOption)!
@@ -234,7 +239,11 @@ export default function i18n(
         }
         adapter.setResource(
           localeStr,
-          Object.assign(Object.create(null), adapter.getResource(localeStr), resource)
+          Object.assign(
+            Object.create(null) as Record<string, string>,
+            adapter.getResource(localeStr),
+            resource
+          )
         )
 
         return loaded
@@ -260,10 +269,13 @@ export default function i18n(
         ([key, schema]) => [key, schema.description || ''] as [string, string]
       )
 
-      const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
-        res[resolveArgKey(key, ctx.name)] = value
-        return res
-      }, Object.create(null))
+      const defaultCommandResource = loadedOptionsResources.reduce(
+        (res, [key, value]) => {
+          res[resolveArgKey(key, ctx.name)] = value
+          return res
+        },
+        Object.create(null) as Record<string, string>
+      )
       defaultCommandResource[resolveKey('description', ctx.name)] = cmd.description || ''
       defaultCommandResource[resolveKey('examples', ctx.name)] = await resolveExamples(
         ctx,
@@ -312,10 +324,14 @@ function mapResourceWithBuiltinKey(
   ctx: CommandContext,
   globalOptions: string[]
 ): Record<string, string> {
-  return Object.entries(resource).reduce((acc, [key, value]) => {
-    acc[globalOptions.includes(key) ? resolveArgKey(key, ctx.name) : resolveBuiltInKey(key)] = value
-    return acc
-  }, Object.create(null))
+  return Object.entries(resource).reduce(
+    (acc, [key, value]) => {
+      acc[globalOptions.includes(key) ? resolveArgKey(key, ctx.name) : resolveBuiltInKey(key)] =
+        value
+      return acc
+    },
+    Object.create(null) as Record<string, string>
+  )
 }
 
 function hasI18nResource<G extends GunshiParamsConstraint = DefaultGunshiParams>(
@@ -328,7 +344,7 @@ async function normalizeResource(
   resource: CommandResource,
   ctx: CommandContext
 ): Promise<Record<string, string>> {
-  const ret: Record<string, string> = Object.create(null)
+  const ret: Record<string, string> = Object.create(null) as Record<string, string>
   for (const [key, value] of Object.entries(resource as Record<string, string>)) {
     if (key.startsWith(ARG_PREFIX_AND_KEY_SEPARATOR)) {
       // argument key

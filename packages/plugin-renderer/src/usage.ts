@@ -21,7 +21,6 @@ import type {
   Args,
   Command,
   CommandContext,
-  CommandExamplesFetcher,
   DefaultGunshiParams,
   GunshiParams
 } from '@gunshi/plugin'
@@ -90,7 +89,7 @@ async function renderPositionalArgsSection<
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
   const messages: string[] = []
-  messages.push(`${await ctx.extensions![pluginId].text(resolveBuiltInKey('ARGUMENTS'))}:`)
+  messages.push(`${await ctx.extensions[pluginId].text(resolveBuiltInKey('ARGUMENTS'))}:`)
   messages.push(await generatePositionalArgsUsage(ctx))
   return messages
 }
@@ -108,7 +107,7 @@ async function renderOptionalArgsSection<
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
   const messages: string[] = []
-  messages.push(`${await ctx.extensions![pluginId].text(resolveBuiltInKey('OPTIONS'))}:`)
+  messages.push(`${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}:`)
   messages.push(await generateOptionalArgsUsage(ctx, getOptionalArgsPairs(ctx)))
   return messages
 }
@@ -133,7 +132,7 @@ async function renderExamplesSection<
       .split('\n')
       .map((example: string) => example.padStart(ctx.env.leftMargin + example.length))
     messages.push(
-      `${await ctx.extensions![pluginId].text(resolveBuiltInKey('EXAMPLES'))}:`,
+      `${await ctx.extensions[pluginId].text(resolveBuiltInKey('EXAMPLES'))}:`,
       ...examples
     )
   }
@@ -153,9 +152,7 @@ async function renderUsageSection<
     extensions: Extensions
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
-  const messages: string[] = [
-    `${await ctx.extensions![pluginId].text(resolveBuiltInKey('USAGE'))}:`
-  ]
+  const messages: string[] = [`${await ctx.extensions[pluginId].text(resolveBuiltInKey('USAGE'))}:`]
   const usageStr = await makeUsageSymbols(ctx)
   messages.push(usageStr.padStart(ctx.env.leftMargin + usageStr.length))
   return messages
@@ -170,7 +167,7 @@ async function makeUsageSymbols<
   const messages = [await resolveEntry(ctx)]
   if (ctx.omitted) {
     if (await hasCommands(ctx)) {
-      messages.push(` [${await ctx.extensions![pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
+      messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
     } else {
       messages.push(`${ctx.callMode === 'subCommand' ? ` ${await resolveSubCommand(ctx)}` : ''}`)
     }
@@ -201,7 +198,7 @@ async function renderCommandsSection<
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
   const messages: string[] = [
-    `${await ctx.extensions![pluginId].text(resolveBuiltInKey('COMMANDS'))}:`
+    `${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}:`
   ]
   const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
@@ -220,7 +217,7 @@ async function renderCommandsSection<
   messages.push(
     ...commandsStr,
     '',
-    `${await ctx.extensions![pluginId].text(resolveBuiltInKey('FORMORE'))}:`
+    `${await ctx.extensions[pluginId].text(resolveBuiltInKey('FORMORE'))}:`
   )
   messages.push(
     ...loadedCommands.map(cmd => {
@@ -275,7 +272,7 @@ async function resolveEntry<
     extensions: Extensions
   }>
 >(ctx: CommandContext<G>): Promise<string> {
-  return ctx.env.name || (await ctx.extensions![pluginId].text(resolveBuiltInKey('COMMAND')))
+  return ctx.env.name || (await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMAND')))
 }
 
 /**
@@ -290,7 +287,7 @@ async function resolveSubCommand<
     extensions: Extensions
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string> {
-  return ctx.name || (await ctx.extensions![pluginId].text(resolveBuiltInKey('SUBCOMMAND')))
+  return ctx.name || (await ctx.extensions[pluginId].text(resolveBuiltInKey('SUBCOMMAND')))
 }
 
 /**
@@ -306,7 +303,7 @@ async function resolveDescription<
   }>
 >(ctx: CommandContext<G>): Promise<string> {
   return (
-    (await ctx.extensions![pluginId].text(resolveKey('description', ctx.name))) ||
+    (await ctx.extensions[pluginId].text(resolveKey('description', ctx.name))) ||
     ctx.description ||
     ''
   )
@@ -324,15 +321,12 @@ async function resolveExamples<
     extensions: Extensions
   }>
 >(ctx: CommandContext<G>): Promise<string> {
-  const ret = await ctx.extensions![pluginId].text(resolveKey('examples', ctx.name))
+  const ret = await ctx.extensions[pluginId].text(resolveKey('examples', ctx.name))
   if (ret) {
     return ret
   }
   const command = ctx.env.subCommands?.get(ctx.name || '') as Command<G> | undefined
-  return await _resolvedExamples(
-    ctx,
-    command?.examples as string | CommandExamplesFetcher<G> | undefined
-  )
+  return await _resolvedExamples(ctx, command?.examples)
 }
 
 /**
@@ -396,8 +390,8 @@ async function generateOptionsSymbols<
 >(ctx: CommandContext<G>, args: Args): Promise<string> {
   return hasOptionalArgs(args)
     ? hasAllDefaultOptions(args)
-      ? `[${await ctx.extensions![pluginId].text(resolveBuiltInKey('OPTIONS'))}]`
-      : `<${await ctx.extensions![pluginId].text(resolveBuiltInKey('OPTIONS'))}>`
+      ? `[${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}]`
+      : `<${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}>`
     : ''
 }
 
@@ -410,24 +404,27 @@ async function generateOptionsSymbols<
 function getOptionalArgsPairs<G extends GunshiParams>(
   ctx: CommandContext<G>
 ): Record<string, string> {
-  return Object.entries(ctx.args).reduce((acc, [name, schema]) => {
-    if (schema.type === 'positional') {
+  return Object.entries(ctx.args).reduce(
+    (acc, [name, schema]) => {
+      if (schema.type === 'positional') {
+        return acc
+      }
+      let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
+      if (schema.type !== 'boolean') {
+        // Convert parameter placeholders to kebab-case format when toKebab is enabled
+        const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
+        key = schema.default ? `${key} [${displayName}]` : `${key} <${displayName}>`
+      }
+      acc[name] = key
+      if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {
+        // Convert parameter placeholders to kebab-case format when toKebab is enabled
+        const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
+        acc[`${ARG_NEGATABLE_PREFIX}${name}`] = `--${ARG_NEGATABLE_PREFIX}${displayName}`
+      }
       return acc
-    }
-    let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
-    if (schema.type !== 'boolean') {
-      // Convert parameter placeholders to kebab-case format when toKebab is enabled
-      const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
-      key = schema.default ? `${key} [${displayName}]` : `${key} <${displayName}>`
-    }
-    acc[name] = key
-    if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {
-      // Convert parameter placeholders to kebab-case format when toKebab is enabled
-      const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
-      acc[`${ARG_NEGATABLE_PREFIX}${name}`] = `--${ARG_NEGATABLE_PREFIX}${displayName}`
-    }
-    return acc
-  }, Object.create(null))
+    },
+    Object.create(null) as Record<string, string>
+  )
 }
 
 const resolveNegatableKey = (key: string): string => key.split(ARG_NEGATABLE_PREFIX)[1]
@@ -445,7 +442,7 @@ async function generateDefaultDisplayValue<
     extensions: Extensions
   }>
 >(ctx: Readonly<CommandContext<G>>, schema: ArgSchema): Promise<string> {
-  return `${await ctx.extensions![pluginId].text(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
+  return `${await ctx.extensions[pluginId].text(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
 }
 
 async function resolveDisplayValue<
@@ -471,7 +468,7 @@ async function resolveDisplayValue<
   if (schema.type === 'enum') {
     const _default =
       schema.default === undefined ? '' : await generateDefaultDisplayValue(ctx, schema)
-    const choices = `${await ctx.extensions![pluginId].text(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
+    const choices = `${await ctx.extensions[pluginId].text(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
     return `(${_default ? `${_default}, ${choices}` : choices})`
   }
 
@@ -503,12 +500,12 @@ async function generateOptionalArgsUsage<
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(async ([key, value]) => {
-      let rawDesc = await ctx.extensions![pluginId].text(resolveArgKey(key, ctx.name))
+      let rawDesc = await ctx.extensions[pluginId].text(resolveArgKey(key, ctx.name))
       if (!rawDesc && key.startsWith(ARG_NEGATABLE_PREFIX)) {
         const name = resolveNegatableKey(key)
         const schema = ctx.args[name]
         const optionKey = makeShortLongOptionPair(schema, name, ctx.toKebab)
-        rawDesc = `${await ctx.extensions![pluginId].text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
+        rawDesc = `${await ctx.extensions[pluginId].text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
       const valueDesc = key.startsWith(ARG_NEGATABLE_PREFIX)
@@ -541,7 +538,7 @@ async function generatePositionalArgsUsage<
   const usages = await Promise.all(
     positionals.map(async ([name]) => {
       const desc =
-        (await ctx.extensions![pluginId].text(resolveArgKey(name, ctx.name))) ||
+        (await ctx.extensions[pluginId].text(resolveArgKey(name, ctx.name))) ||
         (ctx.args[name] as ArgSchema & { description?: string }).description ||
         ''
       const arg = `${name.padEnd(argsMaxLength + ctx.env.middleMargin)} ${desc}`

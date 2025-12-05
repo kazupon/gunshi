@@ -26,9 +26,9 @@ describe('playground tests', async () => {
     describe(dir, async () => {
       const targetPath = path.resolve(fixturePath, dir)
       const configPath = path.resolve(targetPath, 'config.json')
-      const config = (await import(configPath, { with: { type: 'json' } }).then(
-        mod => mod.default || mod
-      )) as Array<[string, string]>
+      const config = await import(configPath, { with: { type: 'json' } }).then(
+        (mod: { default: Array<[string, string]> }) => mod.default
+      )
       if (!Array.isArray(config)) {
         throw new TypeError(`Invalid config.json in ${dir}: expected an array`)
       }

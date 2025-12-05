@@ -5,7 +5,7 @@ import { define, defineWithTypes, lazy, lazyWithTypes } from './definition.ts'
 import type { DeepWriteable } from '@gunshi/shared'
 import type { Args, Command, CommandRunner, GunshiParams } from './types.ts'
 
-describe('define', async () => {
+describe('define', () => {
   test('basic', async () => {
     const command = define({
       name: 'test',
@@ -316,8 +316,8 @@ describe('lazy', () => {
   })
 
   test('preserves all properties', () => {
-    const loader = vi.fn(async () => {
-      return async () => 'done'
+    const loader = vi.fn(() => {
+      return () => 'done'
     })
     const lazyCmd = lazy(loader, {
       name: 'lazy-test',
@@ -351,7 +351,7 @@ describe('lazy', () => {
 })
 
 describe('lazyWithTypes', () => {
-  test('args only', async () => {
+  test('args only', () => {
     const args = {
       foo: { type: 'string' }
     } satisfies Args
@@ -391,7 +391,7 @@ describe('lazyWithTypes', () => {
     expectTypeOf<typeof lazyCmd.examples>().toBeNullable()
   })
 
-  test('extensions only', async () => {
+  test('extensions only', () => {
     type MyExtensions = { logger: { log: (message: string) => void } }
     const args = {
       opt: { type: 'string' }
@@ -433,7 +433,7 @@ describe('lazyWithTypes', () => {
     expectTypeOf<typeof lazyCmd.examples>().toBeNullable()
   })
 
-  test('args and extensions', async () => {
+  test('args and extensions', () => {
     type MyExtensions = { logger: { log: (message: string) => void } }
     const args = {
       opt: { type: 'string' }

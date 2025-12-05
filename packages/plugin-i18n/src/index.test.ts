@@ -98,7 +98,7 @@ describe('extension: translate', () => {
         getMessage: vi.fn(),
         setResource: vi.fn(),
         getResource: vi.fn(),
-        translate: vi.fn().mockImplementation(key => key)
+        translate: vi.fn().mockImplementation((key: string) => key)
       } as TranslationAdapter
       const plugin = i18n({ translationAdapterFactory: () => translation })
       const ctx = await createCommandContext({})
@@ -106,7 +106,9 @@ describe('extension: translate', () => {
       extension.translate(resolveBuiltInKey('ARGUMENTS'))
       extension.translate('description')
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
       expect(translation.translate).toHaveBeenCalledTimes(1)
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
       expect(translation.translate).toHaveBeenCalledWith('en-US', 'description', {})
     })
 
@@ -115,7 +117,7 @@ describe('extension: translate', () => {
         getMessage: vi.fn(),
         setResource: vi.fn(),
         getResource: vi.fn(),
-        translate: vi.fn().mockImplementation(key => key)
+        translate: vi.fn().mockImplementation((key: string) => key)
       } as TranslationAdapter
       const plugin = i18n({ translationAdapterFactory: () => translation, locale: 'ja-JP' })
       const ctx = await createCommandContext({})
@@ -123,7 +125,9 @@ describe('extension: translate', () => {
       extension.translate(resolveBuiltInKey('ARGUMENTS'))
       extension.translate('examples', { foo: 'bar' })
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
       expect(translation.translate).toHaveBeenCalledTimes(1)
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
       expect(translation.translate).toHaveBeenCalledWith('ja-JP', 'examples', { foo: 'bar' })
     })
   })
@@ -153,7 +157,7 @@ describe('extension: registerGlobalOptionResources', () => {
     const debug = plugin<Record<PluginId, I18nExtension>, typeof id, typeof dependencies>({
       id,
       dependencies,
-      setup: async ctx => {
+      setup: ctx => {
         ctx.addGlobalOption('debug', {
           type: 'boolean',
           description: debugDescriptionEn

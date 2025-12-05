@@ -26,7 +26,7 @@ export interface Localization<
   C = {}, // for CommandContext
   E extends Record<string, string> = {} // for extended resources
 > {
-  <K = ResolveTranslationKeys<A, C, E>>(key: K, values?: Record<string, unknown>): string
+  <K = ResolveTranslationKeys<A, C, E>>(key: K, values?: Record<string, unknown>): Promise<string>
 }
 
 /**

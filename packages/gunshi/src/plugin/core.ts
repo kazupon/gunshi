@@ -17,7 +17,7 @@ import type {
 import type { PluginContext } from './context.ts'
 
 const NOOP_EXTENSION = () => {
-  return Object.create(null)
+  return Object.create(null) as Record<string, unknown>
 }
 
 /**
@@ -388,8 +388,22 @@ export function plugin<
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for plugin options
 export function plugin(options: any = {}): any {
-  const { id, name, setup, onExtension, dependencies } = options
-  const extension = options.extension || NOOP_EXTENSION
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for implementation
+  const {
+    id,
+    name,
+    setup,
+    onExtension,
+    dependencies
+  }: {
+    id: string
+    name?: string
+    setup?: (ctx: Readonly<PluginContext>) => Awaitable<void>
+    onExtension?: OnPluginExtension
+    dependencies?: ReadonlyArray<string>
+  } = options
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- NOTE(kazupon): for implementation
+  const extension = (options.extension || NOOP_EXTENSION) as PluginExtension
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for plugin function

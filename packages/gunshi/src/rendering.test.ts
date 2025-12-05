@@ -23,7 +23,10 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli([], cmd, { name: 'test-cli', renderHeader: async () => 'Default header' })
+      await cli([], cmd, {
+        name: 'test-cli',
+        renderHeader: () => Promise.resolve('Default header')
+      })
 
       const stdout = log()
       expect(stdout).toBe('Command executed')
@@ -37,7 +40,7 @@ describe('Command rendering options', () => {
         name: 'test',
         description: 'Test command',
         rendering: {
-          header: async ctx => `=== ${ctx.name?.toUpperCase()} ===`
+          header: ctx => Promise.resolve(`=== ${ctx.name?.toUpperCase()} ===`)
         },
         run: ctx => {
           ctx.log('Command executed')
@@ -64,7 +67,10 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli([], cmd, { name: 'test-cli', renderHeader: async () => 'Default header' })
+      await cli([], cmd, {
+        name: 'test-cli',
+        renderHeader: () => Promise.resolve('Default header')
+      })
 
       const stdout = log()
       expect(stdout).toContain('Default header')
@@ -114,7 +120,7 @@ describe('Command rendering options', () => {
           }
         },
         rendering: {
-          usage: async ctx => `Usage: ${ctx.env.name} ${ctx.name} [options]`
+          usage: ctx => Promise.resolve(`Usage: ${ctx.env.name} ${ctx.name} [options]`)
         }
       })
 
@@ -167,8 +173,8 @@ describe('Command rendering options', () => {
           }
         },
         rendering: {
-          validationErrors: async (_ctx, error) => {
-            return `ERROR: ${error.errors.map(e => e.message).join(', ')}`
+          validationErrors: (_ctx, error) => {
+            return Promise.resolve(`ERROR: ${error.errors.map((e: Error) => e.message).join(', ')}`)
           }
         }
       })
@@ -189,7 +195,7 @@ describe('Command rendering options', () => {
         id: 'test-renderer',
         name: 'test-renderer',
         setup: ctx => {
-          ctx.decorateHeaderRenderer(async () => 'Plugin header')
+          ctx.decorateHeaderRenderer(() => Promise.resolve('Plugin header'))
         }
       })
 
@@ -233,7 +239,10 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli(['--help'], cmd, { name: 'test-cli', renderHeader: async () => 'Default header' })
+      await cli(['--help'], cmd, {
+        name: 'test-cli',
+        renderHeader: () => Promise.resolve('Default header')
+      })
 
       const stdout = log()
       expect(stdout).not.toContain('Default header')

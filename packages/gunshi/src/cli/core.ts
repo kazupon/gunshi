@@ -66,11 +66,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const tokens = parseArgs(argv)
   const subCommand = getSubCommand(tokens)
 
-  const {
-    commandName: name,
-    command,
-    callMode
-  } = await resolveCommand(subCommand, entry, cliOptions)
+  const { commandName: name, command, callMode } = resolveCommand(subCommand, entry, cliOptions)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
@@ -237,14 +233,14 @@ const CANNOT_RESOLVE_COMMAND = {
   callMode: 'unexpected'
 } as const satisfies ResolveCommandContext
 
-async function resolveCommand<G extends GunshiParamsConstraint>(
+function resolveCommand<G extends GunshiParamsConstraint>(
   sub: string,
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: InternalCliOptions<G>
-): Promise<ResolveCommandContext<G>> {
+): ResolveCommandContext<G> {
   const omitted = !sub
 
-  async function doResolveCommand(): Promise<ResolveCommandContext<G>> {
+  function doResolveCommand(): ResolveCommandContext<G> {
     if (typeof entry === 'function') {
       // eslint-disable-next-line unicorn/prefer-ternary -- NOTE(kazupon): to keep the human-readable codes
       if ('commandName' in entry && entry.commandName) {
@@ -343,7 +339,7 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
     }
 
     // execute decorated runner
-    const result = await decoratedRunner(ctx as Parameters<typeof baseRunner>[0])
+    const result = await decoratedRunner(ctx)
 
     // execute onAfterCommand hook only on success
     if (ctx.env.onAfterCommand) {
