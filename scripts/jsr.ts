@@ -20,9 +20,8 @@ const args = parseArgs({
   }
 })
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): This is a utility script and we can use `any` here.
-function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, any> {
-  const version: string = json.version
+function updatePkgJson(pkg: string, json: Record<string, unknown>): Record<string, unknown> {
+  const version = json.version as string
   if (!version) {
     throw new Error(`Package ${pkg} does not have a version defined in package.json`)
   }
@@ -30,7 +29,7 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
   json.dependencies = json.dependencies || {}
 
   function setDependency(dep: string) {
-    json.dependencies[dep] = version
+    ;(json.dependencies as Record<string, string>)[dep] = version
   }
 
   switch (pkg) {
@@ -76,12 +75,11 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
 async function main() {
   const { package: pkg } = args.values
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): This is a utility script and we can use `any` here.
-  let json: Record<string, any>
+  let json: Record<string, unknown>
   try {
-    const module = await import(`../${pkg}/package.json`, {
+    const module = (await import(`../${pkg}/package.json`, {
       with: { type: 'json' }
-    })
+    })) as { default: Record<string, unknown> }
     json = module.default || module
   } catch (error) {
     throw new Error(

@@ -101,8 +101,8 @@ test('RenderingOptions', () => {
   // complete RenderingOptions
   const renderingOptions: RenderingOptions = {
     header: null,
-    usage: async ctx => `Usage: ${ctx.name}`,
-    validationErrors: async (_ctx, error) => `Error: ${error.message}`
+    usage: ctx => Promise.resolve(`Usage: ${ctx.name}`),
+    validationErrors: (_ctx, error) => Promise.resolve(`Error: ${error.message}`)
   }
   expectTypeOf(renderingOptions).toMatchTypeOf<RenderingOptions>()
 })
@@ -121,7 +121,7 @@ test('Command with rendering', () => {
     description: 'Test command',
     rendering: {
       header: null,
-      usage: async ctx => `Usage: ${ctx.name}`,
+      usage: ctx => Promise.resolve(`Usage: ${ctx.name}`),
       validationErrors: null
     }
   }

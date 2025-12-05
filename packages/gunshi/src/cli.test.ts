@@ -398,7 +398,7 @@ describe('lazy command', () => {
     const utils = await import('./utils.ts')
     defineMockLog(utils)
 
-    const configLoader = async () => {
+    const configLoader = () => {
       return define({
         description: 'Loaded configured command',
         args: {
@@ -417,7 +417,7 @@ describe('lazy command', () => {
       name: 'config',
       description: 'Load command configuration'
     })
-    const subCommands = { [lazyConfig.commandName!]: lazyConfig }
+    const subCommands = { [lazyConfig.commandName]: lazyConfig }
     const entry = define({
       description: 'CLI with dynamic commands',
       run: () => {}
@@ -968,7 +968,7 @@ test('enum optional argument', async () => {
   )
 })
 
-describe('positional arguments', async () => {
+describe('positional arguments', () => {
   test('basic', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
@@ -1349,7 +1349,7 @@ describe('command decorators', () => {
 
 test('plugins option', async () => {
   const msgs: string[] = []
-  vi.spyOn(console, 'log').mockImplementation(msg => msgs.push(msg))
+  vi.spyOn(console, 'log').mockImplementation((msg: string) => msgs.push(msg))
 
   function logger() {
     return plugin({
@@ -1428,11 +1428,11 @@ describe('command lifecycle hooks', () => {
       [],
       { run: mockCommand },
       {
-        onBeforeCommand: async ctx => {
+        onBeforeCommand: ctx => {
           executionOrder.push('before')
           expect(ctx.name).toBe('(anonymous)')
         },
-        onAfterCommand: async (_ctx, result) => {
+        onAfterCommand: (_ctx, result) => {
           executionOrder.push('after')
           expect(result).toBe('command result')
         }
@@ -1458,13 +1458,13 @@ describe('command lifecycle hooks', () => {
         [],
         { run: mockCommand },
         {
-          onBeforeCommand: async () => {
+          onBeforeCommand: () => {
             executionOrder.push('before')
           },
-          onAfterCommand: async () => {
+          onAfterCommand: () => {
             executionOrder.push('after') // Should not be called
           },
-          onErrorCommand: async (ctx, error) => {
+          onErrorCommand: (ctx, error) => {
             executionOrder.push('error')
             capturedError = error
             expect(ctx.name).toBe('(anonymous)')
@@ -1501,10 +1501,10 @@ describe('command lifecycle hooks', () => {
           ['deploy', deployCommand],
           ['test', testCommand]
         ]),
-        onBeforeCommand: async ctx => {
+        onBeforeCommand: ctx => {
           executionOrder.push(`before-${ctx.name}`)
         },
-        onAfterCommand: async ctx => {
+        onAfterCommand: ctx => {
           executionOrder.push(`after-${ctx.name}`)
         }
       }
@@ -1527,7 +1527,7 @@ describe('command lifecycle hooks', () => {
           }
         },
         {
-          onErrorCommand: async () => {
+          onErrorCommand: () => {
             throw hookError
           }
         }
@@ -1563,10 +1563,10 @@ describe('command lifecycle hooks', () => {
       },
       {
         plugins: [testPlugin],
-        onBeforeCommand: async () => {
+        onBeforeCommand: () => {
           executionOrder.push('hook-before')
         },
-        onAfterCommand: async () => {
+        onAfterCommand: () => {
           executionOrder.push('hook-after')
         }
       }

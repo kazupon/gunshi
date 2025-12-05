@@ -71,7 +71,7 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
     name: 'usage renderer',
     dependencies,
 
-    extension: async (ctx, cmd) => {
+    extension: (ctx, cmd) => {
       const i18n = ctx.extensions[i18nPluginId]
 
       let cachedCommands: Command[] | undefined

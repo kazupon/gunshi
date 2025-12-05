@@ -2,28 +2,34 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import ts from 'typescript'
 
+function messageText(message: string | ts.DiagnosticMessageChain): string {
+  return typeof message === 'string' ? message : message.messageText
+}
+
 async function main() {
   console.log('generate import map ...')
 
+  // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore
   const configPath = ts.findConfigFile('./', ts.sys.fileExists, 'tsconfig.json')
   if (!configPath) {
     throw new Error('not found tsconfig.json')
   }
 
+  // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore
   const configFile = ts.readConfigFile(configPath, ts.sys.readFile)
   if (configFile.error) {
-    throw new Error(`Error reading tsconfig.json: ${configFile.error.messageText}`)
+    throw new Error(`Error reading tsconfig.json: ${messageText(configFile.error.messageText)}`)
   }
 
   const parsedConfig = ts.parseJsonConfigFileContent(
     configFile.config,
     ts.sys,
-    path.dirname(configPath!)
+    path.dirname(configPath)
   )
 
   if (parsedConfig.errors.length > 0) {
     throw new Error(
-      `Error parsing tsconfig.json: ${parsedConfig.errors.map(e => e.messageText).join(', ')}`
+      `Error parsing tsconfig.json: ${parsedConfig.errors.map(e => messageText(e.messageText)).join(', ')}`
     )
   }
 

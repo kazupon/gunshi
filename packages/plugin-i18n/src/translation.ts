@@ -31,9 +31,9 @@ export class DefaultTranslation implements TranslationAdapter {
    */
   constructor(options: TranslationAdapterFactoryOptions) {
     this.#options = options
-    this.#resources.set(options.locale, Object.create(null))
+    this.#resources.set(options.locale, Object.create(null) as Record<string, string>)
     if (options.locale !== options.fallbackLocale) {
-      this.#resources.set(options.fallbackLocale, Object.create(null))
+      this.#resources.set(options.fallbackLocale, Object.create(null) as Record<string, string>)
     }
   }
 
@@ -83,7 +83,7 @@ export class DefaultTranslation implements TranslationAdapter {
   translate(
     locale: string,
     key: string,
-    values: Record<string, unknown> = Object.create(null)
+    values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
   ): string | undefined {
     // Try to get the message from the specified locale
     let message = this.getMessage(locale, key)
@@ -98,6 +98,7 @@ export class DefaultTranslation implements TranslationAdapter {
     }
 
     return message.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string -- NOTE(kazupon): for safety
       return values[name] == null ? '' : values[name].toString()
     })
   }

@@ -204,8 +204,9 @@ export type CommandResourceFetcher<G extends GunshiParamsConstraint = DefaultGun
  *
  * @typeParam G - Type parameter extending {@linkcode GunshiParams}
  */
-export interface I18nCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>
-  extends Command<G> {
+export interface I18nCommand<
+  G extends GunshiParamsConstraint = DefaultGunshiParams
+> extends Command<G> {
   /**
    * Command resource fetcher for i18n support.
    * This property is specific to i18n-enabled commands.

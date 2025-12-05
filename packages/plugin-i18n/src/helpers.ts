@@ -105,6 +105,7 @@ export function defineI18n(
   definition: any // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
 ): any {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- NOTE(kazupon): for implementation
   return definition
 }
 
@@ -180,7 +181,7 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
         'resource' | 'args'
       > & { resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }> }
   ): I18nCommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): defineI18n returns compatible type but TypeScript cannot infer it
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return -- NOTE(kazupon): defineI18n returns compatible type but TypeScript cannot infer it
     return defineI18n(definition) as any
   }) as DefineI18nWithTypesReturn<DefaultExtensions, DefaultArgs>
 }

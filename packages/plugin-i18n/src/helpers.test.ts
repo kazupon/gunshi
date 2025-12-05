@@ -83,7 +83,7 @@ describe('defineI18n', () => {
     >()
   })
 
-  test('pass through resource', async () => {
+  test('pass through resource', () => {
     const command = defineI18n({
       name: 'test',
       args: {

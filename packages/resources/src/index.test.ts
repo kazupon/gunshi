@@ -10,7 +10,7 @@ test('validate keys', async () => {
     .map(file => file.replace('.json', ''))
   for (const locale of locales) {
     const data = await import(`../locales/${locale}.json`, { with: { type: 'json' } }).then(
-      m => m.default || m
+      (m: { default: Record<string, unknown> }) => m.default
     )
     assert.deepEqual(keys, Object.keys(data), `Keys mismatch in locale: ${locale}`)
   }

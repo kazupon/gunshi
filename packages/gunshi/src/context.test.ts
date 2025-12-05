@@ -193,7 +193,7 @@ describe('plugin extensions', () => {
     const dbExtension: CommandContextExtension<DbExtension> = {
       key: Symbol('db'),
       factory: vi.fn((_core: CommandContextCore) => ({
-        query: async (sql: string) => ({ rows: [], sql }),
+        query: (sql: string) => Promise.resolve({ rows: [], sql }),
         connected: true
       }))
     }
@@ -205,7 +205,7 @@ describe('plugin extensions', () => {
     }> = {
       name: 'test-cmd',
       args,
-      run: async ctx => {
+      run: ctx => {
         // access extensions
         return `${ctx.extensions.auth.user.name} - ${ctx.extensions.db.connected}`
       }
@@ -276,7 +276,7 @@ describe('plugin extensions', () => {
     }
     const command: Command<DefaultGunshiParams> = {
       name: 'multi-ext',
-      run: async _ctx => 'done'
+      run: _ctx => 'done'
     }
     const ctx = await createCommandContext({
       command,
@@ -285,8 +285,11 @@ describe('plugin extensions', () => {
 
     expect(ctx.extensions).toEqual(
       expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for test codes
         ext1: expect.objectContaining({ value1: 'test1' }),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for test codes
         ext2: expect.objectContaining({ value2: 'test2' }),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for test codes
         ext3: expect.objectContaining({ value3: 'test3' })
       })
     )
@@ -321,7 +324,7 @@ describe('plugin extensions', () => {
 
     const command: Command<DefaultGunshiParams> = {
       name: 'order-test',
-      run: async _ctx => 'done'
+      run: _ctx => 'done'
     }
 
     await createCommandContext({
@@ -342,7 +345,7 @@ describe('plugin extensions', () => {
     const command: Command<GunshiParams<{ args: typeof args }>> = {
       name: 'simple',
       args,
-      run: async ctx => `Hello, ${ctx.values.name}!`
+      run: ctx => `Hello, ${ctx.values.name}!`
     }
 
     const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
@@ -402,7 +405,7 @@ describe('plugin extensions', () => {
       name: 'context-test',
       description: 'Test command',
       args,
-      run: async _ctx => 'done'
+      run: _ctx => 'done'
     }
 
     await createCommandContext<{ args: typeof args; extensions: { test: TestExtension } }>({
@@ -439,7 +442,7 @@ describe('CommandContextCore type', () => {
     const command: Command<GunshiParams<{ args: typeof args }>> = {
       name: 'readonly-test',
       args,
-      run: async _ctx => 'done'
+      run: _ctx => 'done'
     }
 
     const ctx = await createCommandContext<GunshiParams<{ args: typeof args }>>({
@@ -491,8 +494,8 @@ describe('CommandContextExtension type', () => {
     }> = {
       key: Symbol('db'),
       factory: _core => ({
-        query: async (_sql: string) => {
-          return { rows: [], count: 0 }
+        query: (_sql: string) => {
+          return Promise.resolve({ rows: [], count: 0 })
         },
         transaction: async (fn: () => Promise<void>) => {
           await fn()

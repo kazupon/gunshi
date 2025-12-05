@@ -35,7 +35,7 @@ export function isLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
  */
 export async function resolveLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   cmd: Commandable<G>,
-  name?: string | undefined,
+  name?: string,
   needRunResolving: boolean = false
 ): Promise<Command<G>> {
   let command: Command<G>
@@ -70,7 +70,7 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         command.entry = loaded.entry
         if ('resource' in loaded && loaded.resource) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): type assertion for lazy command
-          ;(command as any).resource = loaded.resource
+          ;(command as { resource: any }).resource = loaded.resource
         }
       } else {
         throw new TypeError(`Cannot resolve command: ${cmd.name || name}`)
@@ -122,6 +122,7 @@ export function deepFreeze<T extends Record<string, any>>( // eslint-disable-lin
   }
 
   for (const key of Object.keys(obj)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for deep freeze
     const value = obj[key]
     if (ignores.includes(key)) {
       continue

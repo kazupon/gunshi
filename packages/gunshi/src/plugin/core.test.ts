@@ -122,7 +122,7 @@ test('PluginContext#decorateCommand', async () => {
 
     expectTypeOf(ctx.extensions).toEqualTypeOf<Auth & Logger>()
 
-    return `[USAGE] ${result}`
+    return `[USAGE] ${result as string}`
   })
 
   const runner = decorators.commandDecorators[0]
@@ -139,7 +139,7 @@ describe('plugin function', () => {
       isEnabled: true
     }))
 
-    const setupFn = vi.fn(async (ctx: PluginContext) => {
+    const setupFn = vi.fn((ctx: PluginContext) => {
       ctx.addGlobalOption('test', { type: 'string' })
     })
 
@@ -170,7 +170,7 @@ describe('plugin function', () => {
   })
 
   test('without extension', async () => {
-    const setupFn = vi.fn(async (ctx: PluginContext) => {
+    const setupFn = vi.fn((ctx: PluginContext) => {
       ctx.addGlobalOption('simple', { type: 'boolean' })
     })
 
@@ -193,7 +193,7 @@ describe('plugin function', () => {
 
   test('receives correct context via extension', async () => {
     const mockCore = await createCommandContext({})
-    const extensionFactory = vi.fn(core => ({
+    const extensionFactory = vi.fn((core: CommandContextCore<GunshiParams>) => ({
       user: { id: 1, name: 'Test User' },
       getToken: () => core.values.token as string
     }))
@@ -202,7 +202,7 @@ describe('plugin function', () => {
       id: 'auth',
       name: 'auth',
       extension: extensionFactory,
-      async setup(ctx) {
+      setup(ctx) {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
           const user = cmdCtx.extensions.auth.user
@@ -220,7 +220,7 @@ describe('plugin function', () => {
           }>()
 
           const result = await baseRunner(ctx)
-          return `[AUTH] ${result}`
+          return `[AUTH] ${result as string}`
         })
       }
     })
@@ -235,11 +235,11 @@ describe('plugin function', () => {
     expect(typeof result.getToken).toBe('function')
   })
 
-  test('not receives correct context via extension', async () => {
+  test('not receives correct context via extension', () => {
     const testPlugin = plugin({
       id: 'auth',
       name: 'auth',
-      setup: async ctx => {
+      setup: ctx => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateUsageRenderer(async (baseRenderer, cmdCtx) => {
           expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{ auth: {} }>()
@@ -260,7 +260,7 @@ describe('plugin function', () => {
 describe('Plugin type with optional properties', () => {
   test('backward compatibility - simple function plugin', async () => {
     const simplePlugin = Object.assign(
-      async (ctx: PluginContext) => {
+      (ctx: PluginContext) => {
         ctx.addGlobalOption('simple', { type: 'string' })
       },
       { id: 'simple' }
@@ -274,9 +274,9 @@ describe('Plugin type with optional properties', () => {
     expect(ctx.globalOptions.has('simple')).toBe(true)
   })
 
-  test('plugin with name and extension properties', async () => {
+  test('plugin with name and extension properties', () => {
     type Extension = { extended: boolean }
-    const pluginFn = async (ctx: PluginContext) => {
+    const pluginFn = (ctx: PluginContext) => {
       ctx.addGlobalOption('extended', { type: 'string' })
     }
     // use Object.defineProperty to add properties
@@ -335,8 +335,8 @@ describe('Plugin Extensions Integration', () => {
         return {
           getValue: () => (core.values['test-opt'] as string) || 'default-value',
           doubled: (n: number) => n * 2,
-          async asyncOp() {
-            return 'async-result'
+          asyncOp() {
+            return Promise.resolve('async-result')
           }
         }
       }
@@ -355,7 +355,7 @@ describe('Plugin Extensions Integration', () => {
       args,
       async run(ctx) {
         const value = ctx.extensions.test.getValue()
-        const doubled = ctx.extensions.test.doubled(ctx.values.num!)
+        const doubled = ctx.extensions.test.doubled(ctx.values.num)
         const asyncResult = await ctx.extensions.test.asyncOp()
         return `${value}:${doubled}:${asyncResult}`
       }
@@ -381,7 +381,7 @@ describe('Plugin Extensions Integration', () => {
     })
 
     // execute command
-    const result = await testCommand.run!(ctx)
+    const result = await testCommand.run(ctx)
     expect(result).toBe('custom:10:async-result')
   })
 
@@ -439,7 +439,7 @@ describe('Plugin Extensions Integration', () => {
       extensions: { auth: authPlugin.extension, logger: loggerPlugin.extension }
     })
 
-    const result = await multiCommand.run(ctx)
+    const result = multiCommand.run(ctx)
     expect(result).toBe('[debug] User admin executed command; [debug] Admin access granted')
   })
 
@@ -467,7 +467,7 @@ describe('Plugin Extensions Integration', () => {
       command: regularCommand
     })
 
-    const result = await regularCommand.run(ctx)
+    const result = regularCommand.run(ctx)
     expect(result).toBe('HELLO')
   })
 
@@ -508,7 +508,7 @@ describe('Plugin Extensions Integration', () => {
         ctx: contextPlugin.extension
       }
     })
-    await contextCommand.run(ctx)
+    contextCommand.run(ctx)
 
     expect(capturedContext).toHaveBeenCalledWith({
       name: 'ctx-test',

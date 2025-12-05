@@ -69,7 +69,7 @@ export function resolveArgKey<
  */
 export function resolveKey<
   T extends Record<string, string> = {},
-  K = keyof T extends string ? keyof T : string
+  K extends string = keyof T extends string ? keyof T : string
 >(key: K, name?: string): string {
   return `${name ? `${name}${BUILT_IN_KEY_SEPARATOR}` : ''}${key}`
 }

@@ -46,7 +46,7 @@ export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGun
   >(
     key: K,
     values?: Record<string, unknown>
-  ) => string
+  ) => Promise<string>
   /**
    * Load commands
    *

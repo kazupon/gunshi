@@ -12,7 +12,7 @@ import type {
   ValidationErrorsDecorator
 } from './types.ts'
 
-const EMPTY_RENDERER = async () => ''
+const EMPTY_RENDERER = () => Promise.resolve('')
 
 /**
  * Interface for managing renderer and command decorators.

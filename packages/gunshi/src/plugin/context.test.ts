@@ -108,7 +108,7 @@ test('PluginContext#decorateCommand', async () => {
 
     expectTypeOf(ctx.extensions).toEqualTypeOf<Auth & Logger>()
 
-    return `[USAGE] ${result}`
+    return `[USAGE] ${result as string}`
   })
 
   const runner = decorators.commandDecorators[0]

@@ -72,7 +72,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   }),
   typescript({
     parserOptions: {
-      tsconfigRootDir: import.meta.dirname
+      tsconfigRootDir: import.meta.dirname,
+      project: true
     },
     rules: {
       '@typescript-eslint/no-empty-object-type': 'off',
@@ -101,6 +102,10 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
       // @ts-ignore
       'unused-imports/no-unused-imports': 'off',
       'import/export': 'off',
+      'import/default': 'off',
+      'import/no-named-as-default': 'off',
+      'import/no-named-as-default-member': 'off',
+      'import/namespace': 'off',
       'import/no-duplicates': 'off',
       'no-unused-labels': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
@@ -157,6 +162,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     './bench/**',
     'pnpm-lock.yaml',
     'playground/**',
+    './packages/docs/**',
     './packages/plugin-*/docs/**/*.md', // NOTE(kazupon): ignore generated docs
     'design/**',
     'CHANGELOG.md',

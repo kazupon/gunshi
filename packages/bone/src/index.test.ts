@@ -30,7 +30,7 @@ const meta = {
   version: '1.0.0'
 }
 
-describe('@gunshi/bone', async () => {
+describe('@gunshi/bone', () => {
   test('combination with @gunshi/definition', async () => {
     const result = await cli(['--say', '`hello world`'], entry, { ...meta })
     expect(result).toEqual('You said: `hello world`')
