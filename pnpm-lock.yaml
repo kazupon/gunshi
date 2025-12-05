@@ -53,8 +53,8 @@ importers:
         specifier: ^7.4.0
         version: 7.4.0
       '@kazupon/eslint-config':
-        specifier: ^0.37.2
-        version: 0.37.2(0d20c83ecba8450b544b5861add4786c)
+        specifier: ^0.41.0
+        version: 0.41.0(afe7ad3ac190c8e2a0a9ca6dda1e3a28)
       '@kazupon/prettier-config':
         specifier: ^0.2.0
         version: 0.2.0
@@ -1153,6 +1153,10 @@ packages:
     resolution: {integrity: sha512-jaS+NJ+hximswBG6pjNX0uEJZkrT0zwpVi3BA3vX22aFGjJjmgSTSmPpZCRKmoBL5VY/M6p0xsSJx7rk7sy5gg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@eslint/js@9.39.1':
+    resolution: {integrity: sha512-S26Stp4zCy88tH94QbBv3XCuzRQiZ9yXofEILmglYTh/Ug/a9/umqvgFtYBAo3Lp0nsI/5/qH1CCrbdK3AP1Tw==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
   '@eslint/markdown@7.4.0':
     resolution: {integrity: sha512-VQykmMjBb4tQoJOXVWXa+oQbQeCZlE7W3rAsOpmtpKLvJd75saZZ04PVVs7+zgMDJGghd4/gyFV6YlvdJFaeNQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -1257,8 +1261,8 @@ packages:
     resolution: {integrity: sha512-f5DRIOZf7wxogefH03RjMPMdBF7ADTWUMoOs9kaJo06EfwF+aFhMZMDZxHg/Xe12hptN9xoZjGso2fdjapBRIA==}
     engines: {node: '>=10'}
 
-  '@kazupon/eslint-config@0.37.2':
-    resolution: {integrity: sha512-JGjzfJ6AZjofUctFbqCGGjxbLRz8pyJS+ZzNaNdsXgaB0IoHL0At2+EdI2HijLUh0/6AooyRmLffGzbDNWBhXQ==}
+  '@kazupon/eslint-config@0.41.0':
+    resolution: {integrity: sha512-l6HKuomHXiMdIgBe+mYYpdiM6dR9GiYDXEv6L53hZFw3uRoUBeDLhXHnCzrP1XUgN7DrZlyXLCh8PkLt2fKEQQ==}
     engines: {node: '>= 20'}
     peerDependencies:
       '@eslint/css': '>=0.13.0'
@@ -1275,6 +1279,7 @@ packages:
       eslint-plugin-jsonc: '>=2.21.0'
       eslint-plugin-markdown-preferences: '>=0.36.2'
       eslint-plugin-module-interop: '>=0.3.0'
+      eslint-plugin-oxlint: '>=1.30.0'
       eslint-plugin-promise: '>=7.2.0'
       eslint-plugin-react: '>=7.37.0'
       eslint-plugin-react-hooks: '>=7.0.0'
@@ -1318,6 +1323,8 @@ packages:
       eslint-plugin-markdown-preferences:
         optional: true
       eslint-plugin-module-interop:
+        optional: true
+      eslint-plugin-oxlint:
         optional: true
       eslint-plugin-promise:
         optional: true
@@ -3594,6 +3601,10 @@ packages:
     resolution: {integrity: sha512-ob/2LcVVaVGCYN+r14cnwnoDPUufjiYgSqRhiFD0Q1iI4Odora5RE8Iv1D24hAz5oMophRGkGz+yuvQmmUMnMw==}
     engines: {node: '>=18'}
 
+  globals@16.5.0:
+    resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
+    engines: {node: '>=18'}
+
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
@@ -5088,28 +5099,6 @@ packages:
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
-  tsdown@0.15.11:
-    resolution: {integrity: sha512-7k2OglWWt6LzvJKwEf1izbGvETvVfPYRBr9JgEYVRnz/R9LeJSp+B51FUMO46wUeEGtZ1jA3E3PtWWLlq3iygA==}
-    engines: {node: '>=20.19.0'}
-    hasBin: true
-    peerDependencies:
-      '@arethetypeswrong/core': ^0.18.1
-      publint: ^0.3.0
-      typescript: ^5.0.0
-      unplugin-lightningcss: ^0.4.0
-      unplugin-unused: ^0.5.0
-    peerDependenciesMeta:
-      '@arethetypeswrong/core':
-        optional: true
-      publint:
-        optional: true
-      typescript:
-        optional: true
-      unplugin-lightningcss:
-        optional: true
-      unplugin-unused:
-        optional: true
-
   tsdown@0.15.12:
     resolution: {integrity: sha512-c8VLlQm8/lFrOAg5VMVeN4NAbejZyVQkzd+ErjuaQgJFI/9MhR9ivr0H/CM7UlOF1+ELlF6YaI7sU/4itgGQ8w==}
     engines: {node: '>=20.19.0'}
@@ -5827,6 +5816,8 @@ snapshots:
 
   '@eslint/js@9.37.0': {}
 
+  '@eslint/js@9.39.1': {}
+
   '@eslint/markdown@7.4.0':
     dependencies:
       '@eslint/core': 0.16.0
@@ -5949,17 +5940,17 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.37.2(0d20c83ecba8450b544b5861add4786c)':
+  '@kazupon/eslint-config@0.41.0(afe7ad3ac190c8e2a0a9ca6dda1e3a28)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.37.0(jiti@2.6.0))
-      '@eslint/js': 9.37.0
+      '@eslint/js': 9.39.1
       '@kazupon/eslint-plugin': 0.6.2(eslint@9.37.0(jiti@2.6.0))
-      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251027.1)(@vue/reactivity@3.5.21)(publint@0.3.14)(typescript@5.9.3)
+      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251027.1)(@vue/reactivity@3.5.21)(publint@0.3.14)(typescript@5.9.3)(unrun@0.2.1)
       '@stylistic/eslint-plugin': 4.4.1(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3)
       eslint: 9.37.0(jiti@2.6.0)
       eslint-flat-config-utils: 2.1.4
       eslint-merge-processors: 2.0.0(eslint@9.37.0(jiti@2.6.0))
-      globals: 16.4.0
+      globals: 16.5.0
     optionalDependencies:
       '@eslint/markdown': 7.4.0
       '@vitest/eslint-plugin': 1.3.20(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3)(vitest@4.0.5(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.6.0)(lightningcss@1.30.2)(tsx@4.20.6)(yaml@2.8.1))
@@ -5989,6 +5980,7 @@ snapshots:
       - typescript
       - unplugin-lightningcss
       - unplugin-unused
+      - unrun
       - vue-tsc
 
   '@kazupon/eslint-plugin@0.6.2(eslint@9.37.0(jiti@2.6.0))':
@@ -5997,9 +5989,9 @@ snapshots:
       '@eslint/core': 0.15.2
       eslint: 9.37.0(jiti@2.6.0)
 
-  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251027.1)(@vue/reactivity@3.5.21)(publint@0.3.14)(typescript@5.9.3)':
+  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251027.1)(@vue/reactivity@3.5.21)(publint@0.3.14)(typescript@5.9.3)(unrun@0.2.1)':
     dependencies:
-      tsdown: 0.15.11(@typescript/native-preview@7.0.0-dev.20251027.1)(publint@0.3.14)(typescript@5.9.3)
+      tsdown: 0.15.12(@typescript/native-preview@7.0.0-dev.20251027.1)(oxc-resolver@11.8.3)(publint@0.3.14)(typescript@5.9.3)(unrun@0.2.1)
     optionalDependencies:
       '@vue/reactivity': 3.5.21
     transitivePeerDependencies:
@@ -6012,6 +6004,7 @@ snapshots:
       - typescript
       - unplugin-lightningcss
       - unplugin-unused
+      - unrun
       - vue-tsc
 
   '@kazupon/prettier-config@0.2.0': {}
@@ -6176,11 +6169,13 @@ snapshots:
   '@oxc-minify/binding-win32-x64-msvc@0.97.0':
     optional: true
 
-  '@oxc-project/runtime@0.95.0': {}
+  '@oxc-project/runtime@0.95.0':
+    optional: true
 
   '@oxc-project/runtime@0.99.0': {}
 
-  '@oxc-project/types@0.95.0': {}
+  '@oxc-project/types@0.95.0':
+    optional: true
 
   '@oxc-project/types@0.99.0': {}
 
@@ -6341,7 +6336,8 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-beta.29': {}
 
-  '@rolldown/pluginutils@1.0.0-beta.45': {}
+  '@rolldown/pluginutils@1.0.0-beta.45':
+    optional: true
 
   '@rolldown/pluginutils@1.0.0-beta.52': {}
 
@@ -8244,6 +8240,8 @@ snapshots:
 
   globals@16.4.0: {}
 
+  globals@16.5.0: {}
+
   globalthis@1.0.4:
     dependencies:
       define-properties: 1.2.1
@@ -9658,6 +9656,7 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.0.0-beta.45
       '@rolldown/binding-win32-ia32-msvc': 1.0.0-beta.45
       '@rolldown/binding-win32-x64-msvc': 1.0.0-beta.45
+    optional: true
 
   rolldown@1.0.0-beta.52:
     dependencies:
@@ -10048,33 +10047,6 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.15.11(@typescript/native-preview@7.0.0-dev.20251027.1)(publint@0.3.14)(typescript@5.9.3):
-    dependencies:
-      ansis: 4.2.0
-      cac: 6.7.14
-      chokidar: 4.0.3
-      debug: 4.4.3
-      diff: 8.0.2
-      empathic: 2.0.0
-      hookable: 5.5.3
-      rolldown: 1.0.0-beta.52
-      rolldown-plugin-dts: 0.18.1(@typescript/native-preview@7.0.0-dev.20251027.1)(oxc-resolver@11.8.3)(rolldown@1.0.0-beta.52)(typescript@5.9.3)
-      semver: 7.7.3
-      tinyexec: 1.0.1
-      tinyglobby: 0.2.15
-      tree-kill: 1.2.2
-      unconfig: 7.3.3
-      unrun: 0.2.1
-    optionalDependencies:
-      publint: 0.3.14
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@ts-macro/tsc'
-      - '@typescript/native-preview'
-      - oxc-resolver
-      - supports-color
-      - vue-tsc
-
   tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20251027.1)(oxc-resolver@11.8.3)(publint@0.3.14)(typescript@5.9.3)(unrun@0.2.1):
     dependencies:
       ansis: 4.2.0
@@ -10292,6 +10264,7 @@ snapshots:
       '@oxc-project/runtime': 0.95.0
       rolldown: 1.0.0-beta.45
       synckit: 0.11.11
+    optional: true
 
   update-browserslist-db@1.1.3(browserslist@4.26.2):
     dependencies:
