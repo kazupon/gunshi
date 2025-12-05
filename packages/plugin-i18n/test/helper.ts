@@ -24,7 +24,7 @@ export function createTranslationAdapterForMessageFormat2(
 class MessageFormat2Translation extends DefaultTranslation {
   #messageFormatCaches: Map<
     string,
-    (values: Record<string, string>, onError: (err: Error) => void) => string | undefined
+    (values: Record<string, unknown>, onError: (err: Error) => void) => string | undefined
   >
 
   #options: TranslationAdapterFactoryOptions
@@ -38,7 +38,7 @@ class MessageFormat2Translation extends DefaultTranslation {
   override translate(
     locale: string,
     key: string,
-    values: Record<string, string>
+    values: Record<string, unknown>
   ): string | undefined {
     // Get the raw message without interpolation
     let message = this.getMessage(locale, key)
@@ -66,7 +66,7 @@ class MessageFormat2Translation extends DefaultTranslation {
     }
 
     const messageFormat = new MessageFormat(locale, message)
-    const format = (values: Record<string, string>, onError: (err: Error) => void) => {
+    const format = (values: Record<string, unknown>, onError: (err: Error) => void) => {
       return messageFormat.format(values, err => {
         onError(err as Error)
       })

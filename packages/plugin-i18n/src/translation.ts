@@ -83,7 +83,7 @@ export class DefaultTranslation implements TranslationAdapter {
   translate(
     locale: string,
     key: string,
-    values: Record<string, string> = Object.create(null) as Record<string, string>
+    values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
   ): string | undefined {
     // Try to get the message from the specified locale
     let message = this.getMessage(locale, key)
@@ -98,7 +98,8 @@ export class DefaultTranslation implements TranslationAdapter {
     }
 
     return message.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
-      return values[name] == null ? '' : values[name]
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string -- NOTE(kazupon): for safety
+      return values[name] == null ? '' : values[name].toString()
     })
   }
 }
