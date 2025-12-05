@@ -19,7 +19,7 @@ Non-built-in keys are not prefixed with any special characters. If the command n
 | Type Parameter | Default type | Description |
 | ------ | ------ | ------ |
 | `T` *extends* `Record`\<`string`, `string`\> | `object` | The type of the non-built-in key to resolve. Defaults to string. |
-| `K` | keyof `T` *extends* `string` ? keyof `any` : `string` | - |
+| `K` *extends* `string` | keyof `T` *extends* `string` ? keyof `any` : `string` | - |
 
 ## Parameters
 

@@ -14,17 +14,27 @@
   },
   "type": "module",
   "scripts": {
-    "build:docs": "pnpm run build:typedoc && pnpm run build:vitepress",
+    "build": "pnpm run build:typedoc && pnpm run build:readme && pnpm run build:vitepress",
     "build:typedoc": "typedoc --excludeInternal",
+    "build:readme": "pnpm run generate",
     "build:vitepress": "vitepress build src",
+    "generate": "node ./scripts/generate.ts",
     "dev": "pnpm run build:typedoc && pnpm run dev:vitepress",
     "dev:vitepress": "vitepress dev src",
     "preview": "vitepress preview src"
   },
   "files": [
-    "src",
-    "!src/.vitepress",
-    "!public"
+    "README.md",
+    "src/api/context",
+    "src/api/default",
+    "src/api/definition",
+    "src/api/generator",
+    "src/api/plugin",
+    "src/api/renderer",
+    "src/guide",
+    "src/release",
+    "src/index.md",
+    "src/showcase.md"
   ],
   "devDependencies": {
     "@vueuse/core": "^14.0.0",

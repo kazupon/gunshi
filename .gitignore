@@ -26,6 +26,7 @@ packages/docs/src/api/plugin
 packages/docs/src/api/renderer
 packages/docs/src/api/index.md
 packages/docs/src/api/typedoc-sidebar.json
+packages/docs/README.md
 generated-docs
 playground/advanced/docs-gen/**/*.md
 importmap.json

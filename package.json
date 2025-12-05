@@ -27,7 +27,7 @@
     "build": "pnpm -r build",
     "build:bone": "pnpm -F @gunshi/plugin build",
     "build:definition": "pnpm -F @gunshi/definition build",
-    "build:docs": "pnpm -r build:docs",
+    "build:docs": "pnpm -F @gunshi/docs build",
     "build:gunshi": "pnpm -F gunshi build",
     "build:plugin": "pnpm -F @gunshi/bone build",
     "build:plugin:completion": "pnpm -F @gunshi/plugin-completion build",

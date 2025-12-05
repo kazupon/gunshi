@@ -7,7 +7,7 @@
 # Function: withI18nResource()
 
 ```ts
-function withI18nResource<G, C>(command, resource): { [K in string | number | symbol]: (C & { resource: CommandResourceFetcher<G> } & { [K in "name" | "entry" | "description" | "run" | "args" | "examples" | "toKebab" | "internal" | "rendering"]?: I18nCommand<G>[K] })[K] };
+function withI18nResource<G, C>(command, resource): { [K in string | number | symbol]: (C & { resource: CommandResourceFetcher<G> } & { [K in "entry" | "name" | "description" | "run" | "args" | "examples" | "toKebab" | "internal" | "rendering"]?: I18nCommand<G>[K] })[K] };
 ```
 
 Add i18n resource to an existing command
@@ -28,7 +28,7 @@ Add i18n resource to an existing command
 
 ## Returns
 
-\{ \[K in string \| number \| symbol\]: (C & \{ resource: CommandResourceFetcher\<G\> \} & \{ \[K in "name" \| "entry" \| "description" \| "run" \| "args" \| "examples" \| "toKebab" \| "internal" \| "rendering"\]?: I18nCommand\<G\>\[K\] \})\[K\] \}
+\{ \[K in string \| number \| symbol\]: (C & \{ resource: CommandResourceFetcher\<G\> \} & \{ \[K in "entry" \| "name" \| "description" \| "run" \| "args" \| "examples" \| "toKebab" \| "internal" \| "rendering"\]?: I18nCommand\<G\>\[K\] \})\[K\] \}
 
 A [command](../interfaces/I18nCommand.md) with i18n resource support
 

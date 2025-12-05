@@ -5,14 +5,13 @@ import { URL } from 'node:url'
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import llmstxt from 'vitepress-plugin-llms'
 import { withMermaid } from 'vitepress-plugin-mermaid'
-import typedocSidebar from '../api/typedoc-sidebar.json' with { type: 'json' }
+import { advanced, essentials, extraTopics, introduction, meta, plugin } from './contents.ts'
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
 // https://vitepress.dev/reference/site-config
 export default withMermaid({
-  title: 'Gunshi',
-  description: 'Modern JavaScript Command-line library',
+  ...meta,
   lastUpdated: true,
   cleanUrls: true,
 
@@ -40,79 +39,7 @@ export default withMermaid({
       { text: 'GitHub', link: 'https://github.com/kazupon/gunshi' }
     ],
 
-    sidebar: [
-      {
-        text: 'Introduction',
-        collapsed: false,
-        items: [
-          { text: "What's Gunshi?", link: '/guide/introduction/what-is-gunshi' },
-          { text: 'Setup', link: '/guide/introduction/setup' }
-        ]
-      },
-      {
-        text: 'Essentials',
-        collapsed: false,
-        items: [
-          { text: 'Getting Started', link: '/guide/essentials/getting-started' },
-          { text: 'Declarative Configuration', link: '/guide/essentials/declarative' },
-          { text: 'Type Safe', link: '/guide/essentials/type-safe' },
-          { text: 'Composable', link: '/guide/essentials/composable' },
-          { text: 'Lazy & Async', link: '/guide/essentials/lazy-async' },
-          { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage' },
-          { text: 'Plugin System', link: '/guide/essentials/plugin-system' }
-        ]
-      },
-      {
-        text: 'Advanced',
-        collapsed: false,
-        items: [
-          { text: 'Type System', link: '/guide/advanced/type-system' },
-          { text: 'Command Hooks', link: '/guide/advanced/command-hooks' },
-          { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
-          { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
-          { text: 'Internationalization', link: '/guide/advanced/internationalization' },
-          { text: 'Documentation Generation', link: '/guide/advanced/docs-gen' },
-          {
-            text: 'Advanced Lazy Loading and Sub-Commands',
-            link: '/guide/advanced/advanced-lazy-loading'
-          }
-        ]
-      },
-      {
-        text: 'Plugin',
-        collapsed: false,
-        items: [
-          { text: 'Plugin System Introduction', link: '/guide/plugin/introduction.md' },
-          {
-            text: 'Getting Started with Plugin Development',
-            link: '/guide/plugin/getting-started.md'
-          },
-          { text: 'Plugin Lifecycle', link: '/guide/plugin/lifecycle.md' },
-          { text: 'Plugin Dependencies', link: '/guide/plugin/dependencies.md' },
-          { text: 'Plugin Decorators', link: '/guide/plugin/decorators.md' },
-          { text: 'Plugin Extensions', link: '/guide/plugin/extensions.md' },
-          { text: 'Plugin Type System', link: '/guide/plugin/type-system.md' },
-          { text: 'Plugin Testing', link: '/guide/plugin/testing.md' },
-          { text: 'Plugin Development Guidelines', link: '/guide/plugin/guidelines.md' },
-          { text: 'Plugin List', link: '/guide/plugin/list.md' }
-        ]
-      },
-      {
-        text: 'API References',
-        collapsed: false,
-        items: typedocSidebar
-      },
-      {
-        text: 'Extra Topics',
-        collapsed: false,
-        items: [
-          {
-            text: 'Showcase',
-            link: '/showcase'
-          }
-        ]
-      }
-    ],
+    sidebar: [introduction, essentials, advanced, plugin, extraTopics],
 
     search: {
       provider: 'local'
