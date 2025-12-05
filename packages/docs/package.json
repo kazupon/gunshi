@@ -1,7 +1,6 @@
 {
   "name": "@gunshi/docs",
   "description": "Documentation for gunshi",
-  "private": true,
   "version": "0.27.0-beta.3",
   "author": {
     "name": "kazuya kawaguchi",
@@ -22,6 +21,11 @@
     "dev:vitepress": "vitepress dev src",
     "preview": "vitepress preview src"
   },
+  "files": [
+    "src",
+    "!src/.vitepress",
+    "!public"
+  ],
   "devDependencies": {
     "@vueuse/core": "^14.0.0",
     "mermaid": "^11.12.0",
