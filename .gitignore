@@ -32,3 +32,4 @@ playground/advanced/docs-gen/**/*.md
 importmap.json
 
 .todo.md
+.notes/**
