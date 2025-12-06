@@ -91,9 +91,8 @@ This command automatically configures:
 - [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for Claude Code
 - [Cursor rules](https://docs.cursor.com/context/rules-for-ai) for Cursor
 
-
 ### Manual Setup
-  
+
 If you prefer manual configuration, install the documentation package as a dev dependency:
 
 ::: code-group
