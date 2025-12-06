@@ -51,6 +51,7 @@
     "src/showcase.md"
   ],
   "dependencies": {
+    "@antfu/install-pkg": "^1.1.0",
     "tinyexec": "^1.0.2"
   },
   "devDependencies": {

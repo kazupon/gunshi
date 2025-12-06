@@ -3,7 +3,9 @@
 import process from 'node:process'
 import path from 'node:path'
 import fs from 'node:fs/promises'
+import readline from 'node:readline'
 import { x } from 'tinyexec'
+import { installPackage } from '@antfu/install-pkg'
 
 const SKILL_NAME = 'use-gunshi-cli'
 
@@ -117,4 +119,35 @@ if (hasCursorEditors) {
     await fs.symlink(relativeTarget, CURSOR_RULES_PATH)
     console.log(`Created Cursor rule symlink at ${CURSOR_RULES_PATH} -> ${relativeTarget}`)
   }
+}
+
+// Ask user if they want to install gunshi and @gunshi/docs
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
+
+const askQuestion = question =>
+  new Promise(resolve => {
+    rl.question(question, answer => {
+      resolve(answer.toLowerCase().trim())
+    })
+  })
+
+const answer = await askQuestion('\nWould you like to install gunshi and @gunshi/docs? (y/N) ')
+rl.close()
+
+if (answer === 'y' || answer === 'yes') {
+  console.log('\nInstalling gunshi and @gunshi/docs...')
+  try {
+    await installPackage(['gunshi', '@gunshi/docs'], { dev: true })
+    console.log('Successfully installed gunshi and @gunshi/docs')
+  } catch (error) {
+    console.error('Failed to install packages:', error.message)
+    process.exit(1)
+  }
+} else {
+  console.log('\nSkipped package installation.')
+  console.log('You can install manually with:')
+  console.log('  npm install -D gunshi @gunshi/docs')
 }
