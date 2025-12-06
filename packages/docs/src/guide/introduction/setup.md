@@ -98,19 +98,19 @@ If you prefer manual configuration, install the documentation package as a dev d
 ::: code-group
 
 ```sh [npm]
-npm install --save-dev @gunshi/docs@beta gunshi@beta
+npm install --save-dev @gunshi/docs@beta
 ```
 
 ```sh [pnpm]
-pnpm add -D @gunshi/docs@beta gunshi@beta
+pnpm add -D @gunshi/docs@beta
 ```
 
 ```sh [yarn]
-yarn add -D @gunshi/docs@beta gunshi@beta
+yarn add -D @gunshi/docs@beta
 ```
 
 ```sh [bun]
-bun add -D @gunshi/docs@beta gunshi@beta
+bun add -D @gunshi/docs@beta
 ```
 
 :::
