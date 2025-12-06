@@ -22,7 +22,7 @@ This adapter will support localization with your preferred message format.
 ### getMessage()
 
 ```ts
-getMessage(locale, key): undefined | MessageResource;
+getMessage(locale, key): MessageResource | undefined;
 ```
 
 Get a message of locale.
@@ -36,7 +36,7 @@ Get a message of locale.
 
 #### Returns
 
-`undefined` \| `MessageResource`
+`MessageResource` \| `undefined`
 
 A message of locale. if message not found, return `undefined`.
 
@@ -45,7 +45,7 @@ A message of locale. if message not found, return `undefined`.
 ### getResource()
 
 ```ts
-getResource(locale): undefined | Record<string, string>;
+getResource(locale): Record<string, string> | undefined;
 ```
 
 Get a resource of locale.
@@ -58,7 +58,7 @@ Get a resource of locale.
 
 #### Returns
 
-`undefined` \| `Record`\<`string`, `string`\>
+`Record`\<`string`, `string`\> \| `undefined`
 
 A resource of locale. if resource not found, return `undefined`.
 
@@ -91,7 +91,7 @@ Set a resource of locale.
 translate(
    locale, 
    key, 
-   values?): undefined | string;
+   values?): string | undefined;
 ```
 
 Translate a message.
@@ -106,6 +106,6 @@ Translate a message.
 
 #### Returns
 
-`undefined` \| `string`
+`string` \| `undefined`
 
 A translated message, if message is not translated, return `undefined`.

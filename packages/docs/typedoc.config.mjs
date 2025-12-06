@@ -1,6 +1,6 @@
 // @ts-check
 
-/** @type {import('typedoc').TypeDocOptions & import('typedoc-plugin-markdown').PluginOptions & { docsRoot?: string } } */
+/** @type {import('typedoc').TypeDocOptions & import('typedoc-plugin-markdown').PluginOptions & { docsRoot?: string, sidebar?: { autoConfiguration?: boolean; format?: 'vitepress' | 'vuepress1' | 'vuepress2'; pretty?: boolean; collapsed?: boolean } } } */
 export default {
   /**
    * typedoc options

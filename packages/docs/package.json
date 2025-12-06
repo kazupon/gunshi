@@ -1,7 +1,6 @@
 {
   "name": "@gunshi/docs",
   "description": "Documentation for gunshi",
-  "private": true,
   "version": "0.27.0-beta.3",
   "author": {
     "name": "kazuya kawaguchi",
@@ -15,18 +14,33 @@
   },
   "type": "module",
   "scripts": {
-    "build:docs": "pnpm run build:typedoc && pnpm run build:vitepress",
+    "build": "pnpm run build:typedoc && pnpm run build:readme && pnpm run build:vitepress",
     "build:typedoc": "typedoc --excludeInternal",
+    "build:readme": "pnpm run generate",
     "build:vitepress": "vitepress build src",
-    "dev": "pnpm run build:typedoc && pnpm run dev:vitepress",
-    "dev:vitepress": "vitepress dev src",
+    "generate": "tsx ./scripts/generate.ts",
+    "dev": "pnpm run build:typedoc && vitepress dev src",
     "preview": "vitepress preview src"
   },
+  "files": [
+    "README.md",
+    "src/api/context",
+    "src/api/default",
+    "src/api/definition",
+    "src/api/generator",
+    "src/api/plugin",
+    "src/api/renderer",
+    "src/guide",
+    "src/release",
+    "src/index.md",
+    "src/showcase.md"
+  ],
   "devDependencies": {
     "@vueuse/core": "^14.0.0",
     "mermaid": "^11.12.0",
     "oxc-minify": "^0.97.0",
     "typedoc": "catalog:",
+    "tsx": "catalog:",
     "typedoc-plugin-markdown": "catalog:",
     "typedoc-vitepress-theme": "^1.1.2",
     "vitepress": "^2.0.0-alpha.12",

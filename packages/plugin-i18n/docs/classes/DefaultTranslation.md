@@ -37,7 +37,7 @@ Creates a new instance of DefaultTranslation.
 ### getMessage()
 
 ```ts
-getMessage(locale, key): undefined | string;
+getMessage(locale, key): string | undefined;
 ```
 
 Get a message of locale.
@@ -51,7 +51,7 @@ Get a message of locale.
 
 #### Returns
 
-`undefined` \| `string`
+`string` \| `undefined`
 
 A message of locale. If message not found, return `undefined`.
 
@@ -64,7 +64,7 @@ A message of locale. If message not found, return `undefined`.
 ### getResource()
 
 ```ts
-getResource(locale): undefined | Record<string, string>;
+getResource(locale): Record<string, string> | undefined;
 ```
 
 Get a resource of locale.
@@ -77,7 +77,7 @@ Get a resource of locale.
 
 #### Returns
 
-`undefined` \| `Record`\<`string`, `string`\>
+`Record`\<`string`, `string`\> \| `undefined`
 
 A resource of locale. If resource not found, return `undefined`.
 
@@ -118,7 +118,7 @@ Set a resource of locale.
 translate(
    locale, 
    key, 
-   values): undefined | string;
+   values): string | undefined;
 ```
 
 Translate a message.
@@ -133,7 +133,7 @@ Translate a message.
 
 #### Returns
 
-`undefined` \| `string`
+`string` \| `undefined`
 
 A translated message, if message is not translated, return `undefined`.
 
