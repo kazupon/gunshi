@@ -18,9 +18,8 @@
     "build:typedoc": "typedoc --excludeInternal",
     "build:readme": "pnpm run generate",
     "build:vitepress": "vitepress build src",
-    "generate": "node ./scripts/generate.ts",
-    "dev": "pnpm run build:typedoc && pnpm run dev:vitepress",
-    "dev:vitepress": "vitepress dev src",
+    "generate": "tsx ./scripts/generate.ts",
+    "dev": "pnpm run build:typedoc && vitepress dev src",
     "preview": "vitepress preview src"
   },
   "files": [
@@ -41,6 +40,7 @@
     "mermaid": "^11.12.0",
     "oxc-minify": "^0.97.0",
     "typedoc": "catalog:",
+    "tsx": "catalog:",
     "typedoc-plugin-markdown": "catalog:",
     "typedoc-vitepress-theme": "^1.1.2",
     "vitepress": "^2.0.0-alpha.12",

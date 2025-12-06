@@ -12,6 +12,7 @@ catalog:
   tsdown: 0.15.12
   '@types/node': ^24.10.1
   typedoc: ^0.28.15
+  tsx: ^4.21.0
   typedoc-plugin-markdown: ^4.9.0
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
