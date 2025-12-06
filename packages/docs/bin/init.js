@@ -38,7 +38,7 @@ const CLAUDE_MD_FILEPATH = path.join(cwd, 'CLAUDE.md')
 
 const [hasClaudeCode, hasCursor, hasCursorCli] = await Promise.all(
   ['claude', 'cursor', 'cursor-agent'].map(cmd =>
-    x('which', [cmd], { throwOnError: true })
+    x('which', [cmd], { throwOnError: false })
       .then(({ stdout }) => stdout.trim().length > 0)
       .catch(() => false)
   )
