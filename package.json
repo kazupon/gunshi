@@ -20,6 +20,25 @@
   "engines": {
     "node": ">= 20"
   },
+  "devEngines": {
+    "runtime": [
+      {
+        "name": "node",
+        "version": ">=20",
+        "onFail": "error"
+      },
+      {
+        "name": "deno",
+        "version": ">=2",
+        "onFail": "warn"
+      },
+      {
+        "name": "bun",
+        "version": ">=1.1",
+        "onFail": "error"
+      }
+    ]
+  },
   "type": "module",
   "scripts": {
     "bench:mitata": "node --expose-gc bench/mitata.js",
