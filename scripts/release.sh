@@ -18,6 +18,9 @@ TAG="beta"
 # Release packages for npm registry
 for PKG in packages/* ; do
   if [[ -d $PKG ]]; then
+    if [[ $PKG == packages/docs ]]; then
+      pnpm run build:docs
+    fi
     pushd $PKG
     if [[ $PKG == packages/gunshi ]]; then
       cp -r ../../assets ./assets
