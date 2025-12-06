@@ -22,6 +22,17 @@
     "dev": "pnpm run build:typedoc && vitepress dev src",
     "preview": "vitepress preview src"
   },
+  "keywords": [
+    "command",
+    "option",
+    "cli",
+    "argument",
+    "args",
+    "argv",
+    "docs",
+    "documentation",
+    "llms"
+  ],
   "files": [
     "README.md",
     "src/api/context",
