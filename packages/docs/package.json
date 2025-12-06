@@ -33,7 +33,11 @@
     "documentation",
     "llms"
   ],
+  "bin": {
+    "gunshi-docs-init": "./bin/init.js"
+  },
   "files": [
+    "bin",
     "README.md",
     "src/api/context",
     "src/api/default",
@@ -46,12 +50,16 @@
     "src/index.md",
     "src/showcase.md"
   ],
+  "dependencies": {
+    "@antfu/install-pkg": "^1.1.0",
+    "tinyexec": "^1.0.2"
+  },
   "devDependencies": {
     "@vueuse/core": "^14.0.0",
     "mermaid": "^11.12.0",
     "oxc-minify": "^0.97.0",
-    "typedoc": "catalog:",
     "tsx": "catalog:",
+    "typedoc": "catalog:",
     "typedoc-plugin-markdown": "catalog:",
     "typedoc-vitepress-theme": "^1.1.2",
     "vitepress": "^2.0.0-alpha.12",
