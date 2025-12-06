@@ -91,9 +91,9 @@ This command automatically configures:
 - [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for Claude Code
 - [Cursor rules](https://docs.cursor.com/context/rules-for-ai) for Cursor
 
-<details>
-<summary>Manual Setup</summary>
 
+### Manual Setup
+  
 If you prefer manual configuration, install the documentation package as a dev dependency:
 
 ::: code-group
@@ -128,8 +128,6 @@ Gunshi is a modern JavaScript command-line library.
 
 For more information, refer to the Gunshi API documentation in `node_modules/@gunshi/docs/**.md`.
 ```
-
-</details>
 
 ## Requirements
 
