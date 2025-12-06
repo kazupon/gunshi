@@ -140,7 +140,10 @@ rl.close()
 if (answer === 'y' || answer === 'yes') {
   console.log('\nInstalling gunshi and @gunshi/docs...')
   try {
-    await installPackage(['gunshi', '@gunshi/docs'], { dev: true })
+    // Install gunshi as a production dependency
+    await installPackage(['gunshi'], { dev: false })
+    // Install @gunshi/docs as a dev dependency (for LLM-assisted development)
+    await installPackage(['@gunshi/docs'], { dev: true })
     console.log('Successfully installed gunshi and @gunshi/docs')
   } catch (error) {
     console.error('Failed to install packages:', error.message)
@@ -149,5 +152,6 @@ if (answer === 'y' || answer === 'yes') {
 } else {
   console.log('\nSkipped package installation.')
   console.log('You can install manually with:')
-  console.log('  npm install -D gunshi @gunshi/docs')
+  console.log('  npm install gunshi')
+  console.log('  npm install -D @gunshi/docs')
 }
