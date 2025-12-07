@@ -51,6 +51,7 @@ The following test file demonstrates basic plugin testing, including initializat
 
 ```ts [src/plugin.test.ts]
 import { createCommandContext } from 'gunshi/plugin'
+import { define } from 'gunshi'
 import { describe, expect, test, vi } from 'vitest'
 import { myPlugin } from './plugin.ts'
 
@@ -65,11 +66,11 @@ describe('plugin initialization', () => {
 
   test('plugin extension factory creates correct methods', async () => {
     const plugin = myPlugin()
-    const mockCommand = {
+    const mockCommand = define({
       name: 'test',
       description: 'Test command',
       run: vi.fn()
-    }
+    })
 
     const mockContext = await createCommandContext({
       command: mockCommand
@@ -152,7 +153,7 @@ describe('configuration validation', () => {
 
   test('plugin uses configuration in extension', async () => {
     const plugin = myValidatingPlugin({ locale: 'ja-JP', timeout: 5000 })
-    const mockCommand = { name: 'test', description: 'Test', run: vi.fn() }
+    const mockCommand = define({ name: 'test', description: 'Test', run: vi.fn() })
 
     const ctx = await createCommandContext({ command: mockCommand })
     const extension = await plugin.extension.factory(ctx, mockCommand)
@@ -215,7 +216,7 @@ import { myPlugin } from './plugin.ts'
 test('extension factory creates correct extension', async () => {
   const plugin = myPlugin({ debug: true })
 
-  const command = { name: 'test', description: 'Test', run: vi.fn() }
+  const command = define({ name: 'test', description: 'Test', run: vi.fn() })
   const ctx = await createCommandContext({
     command,
     values: { verbose: true },
@@ -238,6 +239,7 @@ The following example demonstrates how to test extension methods that interact w
 
 ```ts [src/plugin.test.ts]
 import { createCommandContext } from 'gunshi/plugin'
+import { define } from 'gunshi'
 import { describe, expect, test, vi } from 'vitest'
 import { myPlugin } from './plugin.ts'
 
@@ -245,7 +247,7 @@ describe('extension methods', () => {
   test('showVersion displays version correctly', async () => {
     const plugin = myPlugin()
 
-    const command = { name: 'app', description: 'App', run: vi.fn() }
+    const command = define({ name: 'app', description: 'App', run: vi.fn() })
     const ctx = await createCommandContext({
       command,
       cliOptions: { version: '2.0.0', name: 'test-app' }
@@ -260,7 +262,7 @@ describe('extension methods', () => {
   test('handles missing version', async () => {
     const plugin = myPlugin()
 
-    const command = { name: 'app', description: 'App', run: vi.fn() }
+    const command = define({ name: 'app', description: 'App', run: vi.fn() })
     const ctx = await createCommandContext({
       command,
       cliOptions: { version: undefined, name: 'test-app' }
@@ -290,7 +292,7 @@ describe('async extension', () => {
       timeout: 5000
     })
     const plugin = myPlugin({ loadConfig })
-    const command = { name: 'test', description: 'Test', run: vi.fn() }
+    const command = define({ name: 'test', description: 'Test', run: vi.fn() })
     const ctx = await createCommandContext({ command })
     const extension = await plugin.extension.factory(ctx, command)
 
@@ -305,7 +307,7 @@ describe('async extension', () => {
     const warnMock = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const loadConfig = vi.fn().mockRejectedValue(new Error('Config not found'))
     const plugin = myPlugin({ loadConfig })
-    const command = { name: 'test', description: 'Test', run: vi.fn() }
+    const command = define({ name: 'test', description: 'Test', run: vi.fn() })
     const ctx = await createCommandContext({ command })
     const extension = await plugin.extension.factory(ctx, command)
 
@@ -453,7 +455,7 @@ import { trackerPlugin } from './init-tracker.ts'
 describe('onExtension callback', () => {
   test('extension not initialized before onExtension', async () => {
     const plugin = trackerPlugin()
-    const command = { name: 'test', description: 'Test', run: vi.fn() }
+    const command = define({ name: 'test', description: 'Test', run: vi.fn() })
     const ctx = await createCommandContext({ command })
     const extension = await plugin.extension.factory(ctx, command)
 
@@ -463,7 +465,7 @@ describe('onExtension callback', () => {
 
   test('onExtension initializes extension', async () => {
     const plugin = trackerPlugin()
-    const command = { name: 'deploy', description: 'Deploy', run: vi.fn() }
+    const command = define({ name: 'deploy', description: 'Deploy', run: vi.fn() })
     const ctx = await createCommandContext({ command })
     const extension = await plugin.extension.factory(ctx, command)
     await plugin.extension.onFactory?.(ctx, command)
@@ -695,7 +697,7 @@ import type { LoggingExtension, NotificationExtension } from './plugin.ts'
 
 describe('plugin interactions', () => {
   test('uses logger when available', async () => {
-    const command = { name: 'test', description: 'Test', run: vi.fn() }
+    const command = define({ name: 'test', description: 'Test', run: vi.fn() })
 
     const logging = loggingPlugin()
     const notification = notificationPlugin()
@@ -720,7 +722,7 @@ describe('plugin interactions', () => {
   })
 
   test('falls back when logger missing', async () => {
-    const command = { name: 'test', description: 'Test', run: vi.fn() }
+    const command = define({ name: 'test', description: 'Test', run: vi.fn() })
     const notification = notificationPlugin()
 
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
