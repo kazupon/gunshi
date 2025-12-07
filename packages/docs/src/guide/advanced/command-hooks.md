@@ -52,34 +52,32 @@ The following example demonstrates how to configure lifecycle hooks when initial
 In this setup, we define three hooks that will execute at different stages of the command lifecycle:
 
 ```ts [cli.ts]
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 
-await cli(
-  process.argv.slice(2),
-  {
-    name: 'server',
-    run: () => {
-      console.log('Starting server...')
-    }
-  },
-  {
-    name: 'my-app',
-    version: '1.0.0',
-
-    // Define lifecycle hooks
-    onBeforeCommand: ctx => {
-      console.log(`About to run: ${ctx.name}`)
-    },
-
-    onAfterCommand: (ctx, result) => {
-      console.log(`Command ${ctx.name} completed successfully`)
-    },
-
-    onErrorCommand: (ctx, error) => {
-      console.error(`Command ${ctx.name} failed:`, error)
-    }
+const command = define({
+  name: 'server',
+  run: () => {
+    console.log('Starting server...')
   }
-)
+})
+
+await cli(process.argv.slice(2), command, {
+  name: 'my-app',
+  version: '1.0.0',
+
+  // Define lifecycle hooks
+  onBeforeCommand: ctx => {
+    console.log(`About to run: ${ctx.name}`)
+  },
+
+  onAfterCommand: (ctx, result) => {
+    console.log(`Command ${ctx.name} completed successfully`)
+  },
+
+  onErrorCommand: (ctx, error) => {
+    console.error(`Command ${ctx.name} failed:`, error)
+  }
+})
 ```
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
