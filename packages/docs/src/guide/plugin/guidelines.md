@@ -836,15 +836,15 @@ For other package managers, see [installation guide](./docs/install.md).
 <!-- eslint-disable markdown/no-missing-label-refs, markdown/no-space-in-emphasis -->
 
 \`\`\`ts
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 import myPlugin from '@yourorg/gunshi-plugin-{name}'
 
-const command = {
+const command = define({
 name: 'example',
 run: ctx => {
 ctx.extensions['yourorg:{name}'].someMethod()
 }
-}
+})
 
 await cli(process.argv.slice(2), command, {
 plugins: [myPlugin({ /* options */ })]
