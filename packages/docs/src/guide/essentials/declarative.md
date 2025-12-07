@@ -13,7 +13,9 @@ In that guide, we created a simple greeting command. As your CLI grows with more
 A declaratively configured command in Gunshi follows this structure:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   // Command metadata
   name: 'command-name',
   description: 'Command description',
@@ -30,7 +32,7 @@ const command = {
   run: ctx => {
     // Command implementation
   }
-}
+})
 ```
 
 Let's see how this structure works in practice with a complete example.
@@ -42,10 +44,10 @@ Let's start with a simple example that demonstrates the declarative approach.
 We'll build a greeting command with a few basic options:
 
 ```js [cli.js]
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 
 // Define a command with declarative configuration
-const command = {
+const command = define({
   // Command metadata
   name: 'greet',
   description: 'A greeting command with declarative configuration',
@@ -98,7 +100,7 @@ $ node cli.js --name Charlie --uppercase
 
     console.log(message)
   }
-}
+})
 
 // Run the command with the declarative configuration
 await cli(process.argv.slice(2), command, {
@@ -178,7 +180,9 @@ The _key_ you use for the argument in the `args` object serves as its name for a
 Here's how you define positional arguments in your command configuration:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   args: {
     // ... other options
 
@@ -195,7 +199,7 @@ const command = {
     }
     // ... potentially more positional arguments
   }
-}
+})
 ```
 
 - **Implicitly Required**: Unlike named options which can be optional, positional arguments must always be provided by the user. When you define an argument with `type: 'positional'` in the schema, Gunshi expects it to be present on the command line. If it's missing, a validation error will occur. They cannot be truly optional like named flags.
@@ -214,6 +218,7 @@ Gunshi supports custom argument types with user-defined parsing functions, allow
 To define a custom argument type:
 
 ```js
+import { define } from 'gunshi'
 import { z } from 'zod'
 
 // custom schema with `zod`
@@ -222,7 +227,7 @@ const config = z.object({
   mode: z.string()
 })
 
-const command = {
+const command = define({
   name: 'example',
   description: 'Example command with custom argument types',
   args: {
@@ -264,7 +269,7 @@ const command = {
     console.log('Config:', ctx.values.config) // Parsed JSON object
     console.log('Port:', ctx.values.port) // Validated port number
   }
-}
+})
 ```
 
 Custom type arguments support:
@@ -295,7 +300,9 @@ Gunshi supports automatic conversion of camelCase argument names to kebab-case w
    To apply kebab-case conversion to all arguments in a command, set the `toKebab` property at the command level:
 
    ```js
-   const command = {
+   import { define } from 'gunshi'
+
+   const command = define({
      name: 'example',
      description: 'Example command',
      toKebab: true, // Apply to all arguments
@@ -306,7 +313,7 @@ Gunshi supports automatic conversion of camelCase argument names to kebab-case w
      run: ctx => {
        /* ... */
      }
-   }
+   })
    ```
 
 2. **Argument level**: Apply to specific arguments only
@@ -314,7 +321,9 @@ Gunshi supports automatic conversion of camelCase argument names to kebab-case w
    Alternatively, you can apply kebab-case conversion to specific arguments only by setting it at the argument level:
 
    ```js
-   const command = {
+   import { define } from 'gunshi'
+
+   const command = define({
      name: 'example',
      description: 'Example command',
      args: {
@@ -327,7 +336,7 @@ Gunshi supports automatic conversion of camelCase argument names to kebab-case w
      run: ctx => {
        /* ... */
      }
-   }
+   })
    ```
 
 When `toKebab` is enabled:
@@ -367,7 +376,9 @@ You can define mutually exclusive options using the `conflicts` property.
 This ensures that conflicting options cannot be used together:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   name: 'server',
   description: 'Server configuration',
   args: {
@@ -410,7 +421,7 @@ const command = {
       // Minimal output
     }
   }
-}
+})
 ```
 
 When conflicting options are used together, Gunshi will throw an error:
@@ -430,7 +441,9 @@ This helps users understand how to use your command correctly and is displayed i
 You can provide examples as a simple string:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   name: 'copy',
   description: 'Copy files',
   args: {
@@ -452,7 +465,7 @@ const command = {
   run: ctx => {
     // Implementation
   }
-}
+})
 ```
 
 #### Multiple Examples
@@ -460,7 +473,9 @@ const command = {
 For multiple examples, use a multi-line string with clear formatting:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   name: 'deploy',
   description: 'Deploy application',
   args: {
@@ -496,7 +511,7 @@ deploy --environment production --tag latest --dry-run
   run: ctx => {
     // Implementation
   }
-}
+})
 ```
 
 #### Dynamic Examples
@@ -506,7 +521,9 @@ You can also provide examples as a function that returns a string.
 This is useful when examples need to be generated dynamically or localized:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   name: 'serve',
   description: 'Start development server',
   args: {
@@ -543,7 +560,7 @@ ${appName} -h 192.168.1.100 -p 8080
   run: ctx => {
     console.log(`Server starting on ${ctx.values.host}:${ctx.values.port}`)
   }
-}
+})
 ```
 
 #### Formatted Examples with Descriptions
@@ -551,7 +568,9 @@ ${appName} -h 192.168.1.100 -p 8080
 For better readability, you can include descriptions with your examples:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   name: 'git-flow',
   description: 'Git flow commands',
   args: {
@@ -587,7 +606,7 @@ Notes:
   run: ctx => {
     // Implementation
   }
-}
+})
 ```
 
 #### Async Examples
@@ -597,7 +616,9 @@ For complex CLIs that need to load examples from external files or generate them
 When using the function form, you can return a Promise for async example generation:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   name: 'config',
   description: 'Manage configuration',
   args: {
@@ -627,7 +648,7 @@ config --get "api.key"
   run: ctx => {
     // Implementation
   }
-}
+})
 ```
 
 The examples are displayed when users run the command with `--help` flag, making it easier for them to understand the correct usage.
@@ -658,7 +679,9 @@ The `run` function receives a command context object (`ctx`) with:
 Among the context properties, the `explicit` property deserves special attention as it allows you to determine whether an argument was explicitly provided by the user or if it's using a default value:
 
 ```js
-const command = {
+import { define } from 'gunshi'
+
+const command = define({
   name: 'deploy',
   args: {
     environment: {
@@ -683,7 +706,7 @@ const command = {
       console.log('User explicitly requested force mode')
     }
   }
-}
+})
 ```
 
 This feature is particularly useful for:
