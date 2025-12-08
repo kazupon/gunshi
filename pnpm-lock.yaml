@@ -43,7 +43,7 @@ catalogs:
 overrides:
   tsdown>rolldown: 1.0.0-beta.52
   tsdown>rolldown-plugin-dts: 0.18.1
-  vitepress>vite: npm:rolldown-vite@7.2.8
+  vitepress>vite: npm:rolldown-vite@7.2.9
 
 importers:
 
@@ -5003,8 +5003,8 @@ packages:
       vue-tsc:
         optional: true
 
-  rolldown-vite@7.2.8:
-    resolution: {integrity: sha512-8wKihlF6EDF8grimwd7GPOhLkQkSIgj6Hlcp0CXhtO3HAXeUUqhgZmJmn07OF8e4PbTusMX6Yxmy1BptVRZsdw==}
+  rolldown-vite@7.2.9:
+    resolution: {integrity: sha512-Y+Q1FpIgAkK2RiAdeS1SxcvDsJaru1JUANFo1aiFFtuGCckhltIowoC/JMU740tFZDTJA5vg5CAl1RzHExNR/w==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -7294,10 +7294,10 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-vue@6.0.1(rolldown-vite@7.2.8(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.1(rolldown-vite@7.2.9(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-beta.29
-      vite: rolldown-vite@7.2.8(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: rolldown-vite@7.2.9(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.9.3)
 
   '@vitest/coverage-v8@4.0.14(vitest@4.0.15(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))':
@@ -10131,7 +10131,7 @@ snapshots:
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown-vite@7.2.8(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1):
+  rolldown-vite@7.2.9(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1):
     dependencies:
       '@oxc-project/runtime': 0.99.0
       fdir: 6.5.0(picomatch@4.0.3)
@@ -10902,7 +10902,7 @@ snapshots:
       '@shikijs/transformers': 3.13.0
       '@shikijs/types': 3.13.0
       '@types/markdown-it': 14.1.2
-      '@vitejs/plugin-vue': 6.0.1(rolldown-vite@7.2.8(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.3))
+      '@vitejs/plugin-vue': 6.0.1(rolldown-vite@7.2.9(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1))(vue@3.5.21(typescript@5.9.3))
       '@vue/devtools-api': 8.0.3
       '@vue/shared': 3.5.21
       '@vueuse/core': 13.9.0(vue@3.5.21(typescript@5.9.3))
@@ -10911,7 +10911,7 @@ snapshots:
       mark.js: 8.11.1
       minisearch: 7.2.0
       shiki: 3.13.0
-      vite: rolldown-vite@7.2.8(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
+      vite: rolldown-vite@7.2.9(@types/node@24.10.1)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.9.3)
     optionalDependencies:
       oxc-minify: 0.97.0
