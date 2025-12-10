@@ -57,7 +57,7 @@ importers:
         version: 7.5.1
       '@kazupon/eslint-config':
         specifier: ^0.42.0
-        version: 0.42.0(1c0db62a601694d4934c4a1590fa6059)
+        version: 0.42.0(d87305c34cfcd8251630f5c6f8523cf3)
       '@kazupon/prettier-config':
         specifier: ^0.2.0
         version: 0.2.0
@@ -68,8 +68,8 @@ importers:
         specifier: 7.0.0-dev.20251203.1
         version: 7.0.0-dev.20251203.1
       '@vitest/coverage-v8':
-        specifier: 4.0.14
-        version: 4.0.14(vitest@4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
+        specifier: 4.0.15
+        version: 4.0.15(vitest@4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
       '@vitest/eslint-plugin':
         specifier: ^1.5.2
         version: 1.5.2(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))
@@ -2662,11 +2662,11 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@4.0.14':
-    resolution: {integrity: sha512-EYHLqN/BY6b47qHH7gtMxAg++saoGmsjWmAq9MlXxAz4M0NcHh9iOyKhBZyU4yxZqOd8Xnqp80/5saeitz4Cng==}
+  '@vitest/coverage-v8@4.0.15':
+    resolution: {integrity: sha512-FUJ+1RkpTFW7rQITdgTi93qOCWJobWhBirEPCeXh2SW2wsTlFxy51apDz5gzG+ZEYt/THvWeNmhdAoS9DTwpCw==}
     peerDependencies:
-      '@vitest/browser': 4.0.14
-      vitest: 4.0.14
+      '@vitest/browser': 4.0.15
+      vitest: 4.0.15
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -2698,9 +2698,6 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@4.0.14':
-    resolution: {integrity: sha512-SOYPgujB6TITcJxgd3wmsLl+wZv+fy3av2PpiPpsWPZ6J1ySUYfScfpIt2Yv56ShJXR2MOA6q2KjKHN4EpdyRQ==}
-
   '@vitest/pretty-format@4.0.15':
     resolution: {integrity: sha512-SWdqR8vEv83WtZcrfLNqlqeQXlQLh2iilO1Wk1gv4eiHKjEzvgHb2OVc3mIPyhZE6F+CtfYjNlDJwP5MN6Km7A==}
 
@@ -2712,9 +2709,6 @@ packages:
 
   '@vitest/spy@4.0.15':
     resolution: {integrity: sha512-+EIjOJmnY6mIfdXtE/bnozKEvTC4Uczg19yeZ2vtCz5Yyb0QQ31QWVQ8hswJ3Ysx/K2EqaNsVanjr//2+P3FHw==}
-
-  '@vitest/utils@4.0.14':
-    resolution: {integrity: sha512-hLqXZKAWNg8pI+SQXyXxWCTOpA3MvsqcbVeNgSi8x/CSN2wi26dSzn1wrOhmCmFjEvN9p8/kLFRHa6PI8jHazw==}
 
   '@vitest/utils@4.0.15':
     resolution: {integrity: sha512-HXjPW2w5dxhTD0dLwtYHDnelK3j8sR8cWIaLxr22evTyY6q8pRCjZSmhRWVjBaOVXChQd6AwMzi9pucorXCPZA==}
@@ -6295,12 +6289,12 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.42.0(1c0db62a601694d4934c4a1590fa6059)':
+  '@kazupon/eslint-config@0.42.0(d87305c34cfcd8251630f5c6f8523cf3)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.5.0(eslint@9.39.1(jiti@2.6.1))
       '@eslint/js': 9.39.1
       '@kazupon/eslint-plugin': 0.6.2(eslint@9.39.1(jiti@2.6.1))
-      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251203.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.15.0)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1)
+      '@kazupon/jts-utils': 0.7.1(@typescript/native-preview@7.0.0-dev.20251203.1)(@vue/reactivity@3.5.21)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1)
       '@stylistic/eslint-plugin': 4.4.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
       eslint-flat-config-utils: 2.1.4
@@ -6344,9 +6338,9 @@ snapshots:
       '@eslint/core': 0.15.2
       eslint: 9.39.1(jiti@2.6.1)
 
-  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251203.1)(@vue/reactivity@3.5.21)(oxc-resolver@11.15.0)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1)':
+  '@kazupon/jts-utils@0.7.1(@typescript/native-preview@7.0.0-dev.20251203.1)(@vue/reactivity@3.5.21)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1)':
     dependencies:
-      tsdown: 0.15.12(@typescript/native-preview@7.0.0-dev.20251203.1)(oxc-resolver@11.15.0)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1)
+      tsdown: 0.15.12(@typescript/native-preview@7.0.0-dev.20251203.1)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1)
     optionalDependencies:
       '@vue/reactivity': 3.5.21
     transitivePeerDependencies:
@@ -7292,10 +7286,10 @@ snapshots:
       vite: rolldown-vite@7.2.9(@types/node@24.10.2)(esbuild@0.25.10)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.9.3)
 
-  '@vitest/coverage-v8@4.0.14(vitest@4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))':
+  '@vitest/coverage-v8@4.0.15(vitest@4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
-      '@vitest/utils': 4.0.14
+      '@vitest/utils': 4.0.15
       ast-v8-to-istanbul: 0.3.8
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-report: 3.0.1
@@ -7337,10 +7331,6 @@ snapshots:
     optionalDependencies:
       vite: 7.1.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.1)
 
-  '@vitest/pretty-format@4.0.14':
-    dependencies:
-      tinyrainbow: 3.0.3
-
   '@vitest/pretty-format@4.0.15':
     dependencies:
       tinyrainbow: 3.0.3
@@ -7357,11 +7347,6 @@ snapshots:
       pathe: 2.0.3
 
   '@vitest/spy@4.0.15': {}
-
-  '@vitest/utils@4.0.14':
-    dependencies:
-      '@vitest/pretty-format': 4.0.14
-      tinyrainbow: 3.0.3
 
   '@vitest/utils@4.0.15':
     dependencies:
@@ -10085,7 +10070,7 @@ snapshots:
 
   robust-predicates@3.0.2: {}
 
-  rolldown-plugin-dts@0.18.1(@typescript/native-preview@7.0.0-dev.20251203.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-beta.52)(typescript@5.9.3):
+  rolldown-plugin-dts@0.18.1(@typescript/native-preview@7.0.0-dev.20251203.1)(rolldown@1.0.0-beta.52)(typescript@5.9.3):
     dependencies:
       '@babel/generator': 7.28.5
       '@babel/parser': 7.28.5
@@ -10544,7 +10529,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20251203.1)(oxc-resolver@11.15.0)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1):
+  tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20251203.1)(publint@0.3.16)(typescript@5.9.3)(unrun@0.2.1):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -10554,7 +10539,7 @@ snapshots:
       empathic: 2.0.0
       hookable: 5.5.3
       rolldown: 1.0.0-beta.52
-      rolldown-plugin-dts: 0.18.1(@typescript/native-preview@7.0.0-dev.20251203.1)(oxc-resolver@11.15.0)(rolldown@1.0.0-beta.52)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.18.1(@typescript/native-preview@7.0.0-dev.20251203.1)(rolldown@1.0.0-beta.52)(typescript@5.9.3)
       semver: 7.7.3
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
