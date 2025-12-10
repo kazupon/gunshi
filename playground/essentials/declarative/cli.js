@@ -1,7 +1,7 @@
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 
 // Define a command with declarative configuration
-const command = {
+const command = define({
   // Command metadata
   name: 'greet',
   description: 'A greeting command with declarative configuration',
@@ -54,7 +54,7 @@ $ node greet.js --name Charlie --uppercase
 
     console.log(message)
   }
-}
+})
 
 // Run the command with the declarative configuration
 await cli(process.argv.slice(2), command, {
