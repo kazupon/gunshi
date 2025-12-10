@@ -7,6 +7,10 @@ import readline from 'node:readline'
 import { x } from 'tinyexec'
 import { installPackage } from '@antfu/install-pkg'
 
+const { version } = JSON.parse(
+  await fs.readFile(path.join(import.meta.dirname, '../package.json'), 'utf8')
+)
+
 const SKILL_NAME = 'use-gunshi-cli'
 
 const USE_GUNSHI_PROMPT = `
@@ -141,9 +145,9 @@ if (answer === 'y' || answer === 'yes') {
   console.log('\nInstalling gunshi and @gunshi/docs...')
   try {
     // Install gunshi as a production dependency
-    await installPackage(['gunshi'], { dev: false })
+    await installPackage([`gunshi@${version}`], { dev: false })
     // Install @gunshi/docs as a dev dependency (for LLM-assisted development)
-    await installPackage(['@gunshi/docs'], { dev: true })
+    await installPackage([`@gunshi/docs@${version}`], { dev: true })
     console.log('Successfully installed gunshi and @gunshi/docs')
   } catch (error) {
     console.error('Failed to install packages:', error.message)
