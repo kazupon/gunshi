@@ -37,7 +37,7 @@ pnpm lint
 pnpm fix
 
 # Run type checking
-pnpm typecheck
+pnpm lint:typecheck             # Run all type checks (typecheck:deno, typecheck:tsc)
 pnpm typecheck:deno             # Deno-specific type checking
 pnpm typecheck:tsc              # TypeScript compiler diagnostics
 
@@ -162,7 +162,9 @@ packages/gunshi/src/
 playground/
 ├── essentials/           # Basic CLI examples
 ├── advanced/             # Advanced features (sub-commands, lazy loading)
-└── plugins/              # Plugin usage examples
+├── plugins/              # Plugin usage examples
+├── bun/                  # Bun runtime examples
+└── deno/                 # Deno runtime examples
 ```
 
 ## Plugin System
