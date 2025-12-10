@@ -86,9 +86,9 @@ Hello, Alice!
 Let's add some options to our command:
 
 ```js [cli.js]
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 
-const command = {
+const command = define({
   name: 'greeter',
   description: 'A simple greeting CLI',
   args: {
@@ -113,7 +113,7 @@ const command = {
 
     console.log(greeting)
   }
-}
+})
 
 await cli(process.argv.slice(2), command)
 ```

@@ -153,16 +153,16 @@ MY_LANG=ja-JP node cli.ts --name 田中 --formal
 The `@gunshi/resources` package provides pre-translated resources for common CLI terms:
 
 ```ts
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
 import i18n from '@gunshi/plugin-i18n'
 import resources from '@gunshi/resources'
 
-const command = {
+const command = define({
   name: 'app',
   run: ctx => {
     console.log('Application running')
   }
-}
+})
 
 await cli(process.argv.slice(2), command, {
   name: 'my-app',
