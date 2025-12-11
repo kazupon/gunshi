@@ -552,7 +552,16 @@ async function generatePositionalArgsUsage<
 function generatePositionalSymbols(args: Args): string {
   return hasPositionalArgs(args)
     ? getPositionalArgs(args)
-        .map(([name]) => `<${name}>`)
+        .map(([name, arg]) => {
+          const elements: string[] = []
+          if (!arg.multiple || arg.required) {
+            elements.push(`<${name}>`)
+          }
+          if (arg.multiple) {
+            elements.push(`[<${name}> ...]`)
+          }
+          return elements.join(' ')
+        })
         .join(' ')
     : ''
 }

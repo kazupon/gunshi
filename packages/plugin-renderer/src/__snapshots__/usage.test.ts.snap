@@ -97,6 +97,30 @@ OPTIONS:
 "
 `;
 
+exports[`multiple positional arguments 1`] = `
+"A test command
+
+USAGE:
+  cmd1 test <foo> [<bar> ...]
+
+ARGUMENTS:
+  foo           The foo argument
+  bar           The bar argument
+"
+`;
+
+exports[`multiple positional arguments with required 1`] = `
+"A test command
+
+USAGE:
+  cmd1 test <foo> <bar> [<bar> ...]
+
+ARGUMENTS:
+  foo           The foo argument
+  bar           The bar argument
+"
+`;
+
 exports[`no arguments 1`] = `
 "A test command
 
