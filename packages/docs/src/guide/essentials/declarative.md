@@ -165,7 +165,7 @@ Each option can have the following properties:
   <!-- eslint-enable markdown/no-missing-label-refs -->
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
-- `required`: Set to `true` if the option is required (Note: Positional arguments defined with `type: 'positional'` are implicitly required by the parser).
+- `required`: Set to `true` if the option is required (Note: Positional arguments defined with `type: 'positional'` without `multiple: true` are implicitly required by the parser).
 - `multiple`: Set to `true` if multiple option values are allowed
 - `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'

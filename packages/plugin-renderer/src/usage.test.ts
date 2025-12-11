@@ -323,6 +323,93 @@ test('mixed positionals and optionals', async () => {
   expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
+test('multiple positional arguments', async () => {
+  const command = {
+    args: {
+      foo: {
+        type: 'positional',
+        description: 'The foo argument'
+      },
+      bar: {
+        type: 'positional',
+        description: 'The bar argument',
+        multiple: true
+      }
+    },
+    name: 'test',
+    description: 'A test command',
+    run: NOOP
+  } as Command<GunshiParams<{ args: Args }>>
+
+  const ctx = await createCommandContext({
+    args: command.args!,
+    explicit: {},
+    values: {},
+    positionals: [],
+    rest: [],
+    argv: [],
+    tokens: [], // dummy, due to test
+    omitted: false,
+    callMode: 'subCommand',
+    command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
+})
+
+test('multiple positional arguments with required', async () => {
+  const command = {
+    args: {
+      foo: {
+        type: 'positional',
+        description: 'The foo argument'
+      },
+      bar: {
+        type: 'positional',
+        description: 'The bar argument',
+        multiple: true,
+        required: true
+      }
+    },
+    name: 'test',
+    description: 'A test command',
+    run: NOOP
+  } as Command<GunshiParams<{ args: Args }>>
+
+  const ctx = await createCommandContext({
+    args: command.args!,
+    explicit: {},
+    values: {},
+    positionals: [],
+    rest: [],
+    argv: [],
+    tokens: [], // dummy, due to test
+    omitted: false,
+    callMode: 'subCommand',
+    command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
+})
+
 test('no examples', async () => {
   const command = {
     args: {
