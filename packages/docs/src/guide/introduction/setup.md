@@ -31,33 +31,6 @@ bun add gunshi
 
 :::
 
-### v0.27 Beta
-
-::: code-group
-
-```sh [npm]
-npm install --save gunshi@beta
-```
-
-```sh [pnpm]
-pnpm add gunshi@beta
-```
-
-```sh [yarn]
-yarn add gunshi@beta
-```
-
-```sh [deno]
-## you can specify version with `@`
-deno add jsr:@gunshi/gunshi@0.27.2
-```
-
-```sh [bun]
-bun add gunshi@beta
-```
-
-:::
-
 ## LLM-Assisted Development
 
 Gunshi provides tooling to integrate with AI coding assistants such as [Claude Code](https://claude.ai/code) and [Cursor](https://cursor.com/).
@@ -69,19 +42,19 @@ You can quickly set up LLM-assisted development for your project using the CLI t
 ::: code-group
 
 ```sh [npm]
-npx @gunshi/docs@beta
+npx @gunshi/docs
 ```
 
 ```sh [pnpm]
-pnpm dlx @gunshi/docs@beta
+pnpm dlx @gunshi/docs
 ```
 
 ```sh [yarn]
-yarn dlx @gunshi/docs@beta
+yarn dlx @gunshi/docs
 ```
 
 ```sh [bun]
-bun x @gunshi/docs@beta
+bun x @gunshi/docs
 ```
 
 :::
@@ -98,19 +71,19 @@ If you prefer manual configuration, install the documentation package as a dev d
 ::: code-group
 
 ```sh [npm]
-npm install --save-dev @gunshi/docs@beta
+npm install --save-dev @gunshi/docs
 ```
 
 ```sh [pnpm]
-pnpm add -D @gunshi/docs@beta
+pnpm add -D @gunshi/docs
 ```
 
 ```sh [yarn]
-yarn add -D @gunshi/docs@beta
+yarn add -D @gunshi/docs
 ```
 
 ```sh [bun]
-bun add -D @gunshi/docs@beta
+bun add -D @gunshi/docs
 ```
 
 :::

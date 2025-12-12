@@ -17,7 +17,7 @@ const hide = () => {
 }
 
 // Sync with inlined-scripts/banner.js
-const slug = 'v0.27-beta'
+const slug = 'v0.27'
 
 const bannerDismissed = useLocalStorage<boolean>(`gunshi-banner-dismissed-${slug}`, false)
 
@@ -46,7 +46,7 @@ const dismiss = () => {
 
 <template>
   <div ref="el" class="banner banner-dismissed">
-    <div class="text">v0.27 Beta Release 🎉</div>
+    <div class="text">v0.27 Release 🎉</div>
 
     <button type="button" @click="dismiss">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

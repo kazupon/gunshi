@@ -13,7 +13,7 @@ if [[ ! -z ${NPM_TOKEN} ]] ; then
   npm whoami
 fi
 
-TAG="beta"
+TAG="latest"
 
 # Release packages for npm registry
 for PKG in packages/* ; do
