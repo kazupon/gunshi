@@ -64,4 +64,3 @@ jobs:
         run: ./scripts/release.sh
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
-          NPM_CONFIG_PROVENANCE: true
