@@ -88,3 +88,14 @@ export const extraTopics = {
     }
   ]
 }
+
+export const releaseNotes = {
+  text: 'Release Notes',
+  collapsed: false,
+  items: [
+    {
+      text: 'Gunshi v0.27 Release Notes',
+      link: '/release/v0.27'
+    }
+  ]
+}

@@ -5,7 +5,17 @@ import { URL } from 'node:url'
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import llmstxt from 'vitepress-plugin-llms'
 import { withMermaid } from 'vitepress-plugin-mermaid'
-import { advanced, essentials, extraTopics, introduction, meta, plugin } from './contents.ts'
+import pkgJson from '../../package.json' with { type: 'json' }
+import {
+  advanced,
+  apiReferences,
+  essentials,
+  extraTopics,
+  introduction,
+  meta,
+  plugin,
+  releaseNotes
+} from './contents.ts'
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
@@ -36,10 +46,31 @@ export default withMermaid({
       { text: 'Guide', link: '/guide/introduction/what-is-gunshi' },
       { text: 'API', link: '/api' },
       { text: 'Showcase', link: '/showcase' },
+      {
+        text: `v${pkgJson.version}`,
+        items: [
+          {
+            text: 'v0.27 Release Notes',
+            link: '/release/v0.27'
+          },
+          {
+            items: [
+              {
+                text: 'Changelog',
+                link: 'https://github.com/kazupon/gunshi/blob/main/CHANGELOG.md'
+              },
+              {
+                text: 'Contributing',
+                link: 'https://github.com/kazupon/gunshi/blob/main/CONTRIBUTING.md'
+              }
+            ]
+          }
+        ]
+      },
       { text: 'GitHub', link: 'https://github.com/kazupon/gunshi' }
     ],
 
-    sidebar: [introduction, essentials, advanced, plugin, extraTopics],
+    sidebar: [introduction, essentials, advanced, plugin, apiReferences, extraTopics, releaseNotes],
 
     search: {
       provider: 'local'
