@@ -99,7 +99,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^61.5.0",
     "eslint-plugin-jsonc": "^2.21.0",
-    "eslint-plugin-markdown-preferences": "^0.39.0",
+    "eslint-plugin-markdown-preferences": "^0.40.0",
     "eslint-plugin-module-interop": "^0.3.1",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-regexp": "^2.10.0",
