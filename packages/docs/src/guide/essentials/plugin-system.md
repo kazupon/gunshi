@@ -144,10 +144,9 @@ const resources = {
 const command = defineI18n({
   name: 'greet',
   description: 'Greet someone in their language',
-  // Resource function returns translations for the current locale
-  resource: async ctx => {
-    const locale = ctx.extensions['g:i18n'].locale
-    return resources[locale] || resources['en-US']
+  // Resource function receives locale and returns translations
+  resource: locale => {
+    return resources[locale.toString()] || resources['en-US']
   },
   args: {
     name: {
@@ -333,9 +332,8 @@ const resources = {
 const buildCommand = defineI18n({
   name: 'build',
   description: 'Build the project',
-  resource: async ctx => {
-    const locale = ctx.extensions['g:i18n'].locale
-    return resources[locale] || resources['en-US']
+  resource: locale => {
+    return resources[locale.toString()] || resources['en-US']
   },
   args: {
     mode: {
