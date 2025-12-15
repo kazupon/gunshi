@@ -24,6 +24,8 @@ with a reproduction and we'll reopen it.
 
 We have a couple of templates for starting with a minimal reproduction:
 
+👉 [Reproduction mininal starter](https://stackblitz.com/edit/gunshi-reproduction-starter)
+
 A public GitHub repository is also perfect. 👌
 
 Please ensure that the reproduction is as **minimal** as possible.

@@ -6,6 +6,9 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+
+        Please use a template below to create a minimal reproduction, and provide to us your issue cases
+        👉 [Reproduction mininal starter](https://stackblitz.com/edit/gunshi-reproduction-starter)
   - type: textarea
     id: bug-description
     attributes:
