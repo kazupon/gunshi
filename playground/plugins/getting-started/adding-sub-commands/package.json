@@ -1,7 +1,7 @@
 {
   "name": "adding-sub-commands",
   "private": true,
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.25.0",
   "type": "module",
   "main": "cli.js",
   "scripts": {
