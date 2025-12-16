@@ -268,9 +268,7 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   /**
    * Sub commands.
    */
-  subCommands?:
-    | Record<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
-    | Map<string, Command<any> | LazyCommand<any>> // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
+  subCommands?: Record<string, SubCommandable> | Map<string, SubCommandable>
   /**
    * Left margin of the command output.
    */
@@ -610,6 +608,44 @@ export type LazyCommand<
 export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
   | Command<G>
   | LazyCommand<G, {}>
+
+/**
+ * Sub-command entry type for use in subCommands.
+ *
+ * This type uses a loose structural match to bypass TypeScript's contravariance issues
+ * with function parameters, allowing any Command or LazyCommand to be used as a sub-command.
+ *
+ * @since v0.27.1
+ */
+export interface SubCommandable {
+  /** Command name */
+  name?: string
+  /** Command description */
+  description?: string
+  /** Command arguments - accepts any args structure */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  args?: Args | Record<string, any>
+  /** Command examples */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  examples?: string | ((...args: any[]) => any)
+  /** Command runner */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  run?: (...args: any[]) => any
+  /** Whether to convert camelCase to kebab-case */
+  toKebab?: boolean
+  /** Whether this is an internal command */
+  internal?: boolean
+  /** Whether this is an entry command */
+  entry?: boolean
+  /** Rendering options */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  rendering?: any
+  /** Command name for lazy commands */
+  commandName?: string
+  /** Index signature to allow additional properties */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  [key: string]: any
+}
 
 /**
  * Command examples fetcher.

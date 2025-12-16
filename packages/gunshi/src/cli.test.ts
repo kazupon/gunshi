@@ -914,7 +914,7 @@ test('rest arguments', async () => {
 
 test('negatable options', async () => {
   const args = ['dev', '--bar', '--no-foo']
-  await cli(args, {
+  const entry = define({
     args: {
       foo: {
         type: 'boolean',
@@ -933,6 +933,7 @@ test('negatable options', async () => {
       expect(ctx.values).toEqual({ foo: false, bar: true })
     }
   })
+  await cli(args, entry)
 })
 
 test('enum optional argument', async () => {

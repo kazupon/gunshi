@@ -17,8 +17,26 @@ import type {
   ExtendContext,
   GunshiParams,
   GunshiParamsConstraint,
-  LazyCommand
+  LazyCommand,
+  SubCommandable
 } from '../types.ts'
+
+/**
+ * Run the command.
+ *
+ * This overload accepts any command-like object using a loose structural type.
+ * It bypasses TypeScript contravariance issues with callback properties.
+ *
+ * @param args - Command line arguments
+ * @param entry - A command-like object (command, command runner, or lazy command)
+ * @param options - A {@link CliOptions | CLI options}
+ * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ */
+export async function cli(
+  args: string[],
+  entry: SubCommandable,
+  options?: CliOptions
+): Promise<string | undefined>
 
 /**
  * Run the command.

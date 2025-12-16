@@ -29,8 +29,8 @@ import type {
 } from '../types.ts'
 
 type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 'subCommands'> & {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for subCommands
-  subCommands: Exclude<CliOptions['subCommands'], Record<string, Command<any> | LazyCommand<any>>>
+  // Internal type uses Command<G> | LazyCommand<G> for proper type safety within the implementation
+  subCommands: Map<string, Command<G> | LazyCommand<G>>
 }
 
 /**
@@ -75,7 +75,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const { explicit, values, positionals, rest, error } = resolveArgs(args, tokens, {
     shortGrouping: true,
     toKebab: command.toKebab,
-    skipPositional: callMode === 'subCommand' && cliOptions.subCommands!.size > 0 ? 0 : -1
+    skipPositional: callMode === 'subCommand' && cliOptions.subCommands.size > 0 ? 0 : -1
   })
   const omitted = !subCommand
 
@@ -160,10 +160,16 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
       : isObject(options.subCommands) && Object.keys(options.subCommands).length > 0
     : false
 
-  const subCommands = new Map(options.subCommands instanceof Map ? options.subCommands : [])
+  // NOTE(kazupon): SubCommandable is intentionally loose to accept any command type from user code.
+  // We cast to Command<G> | LazyCommand<G> here since we know the runtime structure is valid.
+  const subCommands = new Map<string, Command<G> | LazyCommand<G>>(
+    options.subCommands instanceof Map
+      ? (options.subCommands as Map<string, Command<G> | LazyCommand<G>>)
+      : []
+  )
   if (!(options.subCommands instanceof Map) && isObject(options.subCommands)) {
     for (const [name, cmd] of Object.entries(options.subCommands)) {
-      subCommands.set(name, cmd)
+      subCommands.set(name, cmd as Command<G> | LazyCommand<G>)
     }
   }
 
@@ -172,7 +178,10 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
     if (isLazyCommand(entryCmd) || typeof entryCmd === 'object') {
       // for command
       entryCmd.entry = true
-      subCommands.set(resolveEntryName(entryCmd as LazyCommand<G> | Command<G>), entryCmd)
+      subCommands.set(
+        resolveEntryName(entryCmd as LazyCommand<G> | Command<G>),
+        entryCmd as Command<G> | LazyCommand<G>
+      )
     } else if (typeof entryCmd === 'function') {
       // for command runner
       const name = entryCmd.name || ANONYMOUS_COMMAND_NAME
