@@ -37,10 +37,8 @@ export function quoteExec(): string {
       // @ts-ignore -- NOTE(kazupon): ignore, because `process` will detect ts compile error on `deno check`
       const processArgs = globalThis.process.argv.slice(1)
       const quotedExecPath = quoteIfNeeded(execPath)
-      // eslint-disable-next-line unicorn/no-array-callback-reference -- NOTE(kazupon): callback should be testable
       const quotedProcessArgs = processArgs.map(quoteIfNeeded)
       // @ts-ignore -- NOTE(kazupon): ignore, because `process` will detect ts compile error on `deno check`
-      // eslint-disable-next-line unicorn/no-array-callback-reference -- NOTE(kazupon): callback should be testable
       const quotedProcessExecArgs = globalThis.process.execArgv.map(quoteIfNeeded)
       return `${quotedExecPath} ${quotedProcessExecArgs.join(' ')} ${quotedProcessArgs[0]}`
     }

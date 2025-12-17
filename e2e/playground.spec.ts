@@ -22,7 +22,6 @@ describe('playground tests', async () => {
   const fixtureDirs = await getFixtureDirents(fixturePath)
 
   for (const dir of fixtureDirs) {
-    // eslint-disable-next-line vitest/valid-title -- NOTE(kazupon): dir is used as describe name
     describe(dir, async () => {
       const targetPath = path.resolve(fixturePath, dir)
       const configPath = path.resolve(targetPath, 'config.json')
@@ -32,9 +31,9 @@ describe('playground tests', async () => {
       if (!Array.isArray(config)) {
         throw new TypeError(`Invalid config.json in ${dir}: expected an array`)
       }
+      // oxlint-disable-next-line vitest/no-conditional-tests -- NOTE(kazupon): ignore
       if (config.length > 0) {
         for (const [testCase, cmd] of config) {
-          // eslint-disable-next-line vitest/valid-title -- NOTE(kazupon): testCase is used as test name
           test(testCase, async () => {
             const output = await runCommand(cmd, {
               cwd: path.resolve(playgroundPath, dir),

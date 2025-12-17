@@ -46,7 +46,7 @@ type ProcessDependency<D, A extends ExtendContext> = D extends string
   ? D extends keyof A
     ? { [K in D]: A[K] }
     : {}
-  : D extends { id: infer ID; optional?: any } // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
+  : D extends { id: infer ID; optional?: any }
     ? ID extends string
       ? ID extends keyof A
         ? D extends { optional: true }
@@ -386,9 +386,7 @@ export function plugin<
  *
  * @since v0.27.0
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for plugin options
 export function plugin(options: any = {}): any {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for implementation
   const {
     id,
     name,
@@ -402,11 +400,11 @@ export function plugin(options: any = {}): any {
     onExtension?: OnPluginExtension
     dependencies?: ReadonlyArray<string>
   } = options
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- NOTE(kazupon): for implementation
+
   const extension = (options.extension || NOOP_EXTENSION) as PluginExtension
 
   // create a wrapper function with properties
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for plugin function
+
   const pluginFn = async (ctx: Readonly<PluginContext<any>>) => {
     if (setup) {
       await setup(ctx)

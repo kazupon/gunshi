@@ -1,1 +1,3 @@
 packages/plugin-**/docs/**
+# avoid conflict with eslint config
+**/package.json

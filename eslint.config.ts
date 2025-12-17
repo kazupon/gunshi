@@ -1,32 +1,19 @@
-import { includeIgnoreFile } from '@eslint/compat'
 import {
   comments,
   defineConfig,
-  imports,
-  javascript,
   jsdoc,
   jsonc,
   markdown,
-  prettier,
-  promise,
   regexp,
-  stylistic,
-  typescript,
-  unicorn,
-  vitest,
   vue,
   yaml
 } from '@kazupon/eslint-config'
-import { globalIgnores } from 'eslint/config'
-import { fileURLToPath, URL } from 'node:url'
-
-import type { Linter } from 'eslint'
-
-const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url))
+import oxlint from 'eslint-plugin-oxlint'
+import tseslint from 'typescript-eslint'
 
 const config: ReturnType<typeof defineConfig> = defineConfig(
-  javascript(),
-  stylistic(),
+  tseslint.configs.base,
+
   comments({
     kazupon: {
       ignores: [
@@ -50,35 +37,17 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
       './packages/gunshi/test/*.ts' // NOTE(kazupon): test codes
     ]
   }),
-  imports({
-    typescript: true,
-    rules: {
-      'import/extensions': ['error', 'always', { ignorePackages: true }]
-    }
-  }),
-  promise(),
   regexp(),
-  unicorn({
-    rules: {
-      'unicorn/prefer-string-replace-all': 'off',
-      'unicorn/consistent-function-scoping': 'off',
-      'unicorn/no-array-push-push': 'off',
-      'unicorn/no-array-reduce': 'off',
-      'unicorn/prevent-abbreviations': 'off',
-      'unicorn/filename-case': 'off',
-      'unicorn/no-null': 'off'
-    }
-  }),
-  typescript({
-    parserOptions: {
-      tsconfigRootDir: import.meta.dirname,
-      project: true
-    },
-    rules: {
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off'
-    }
-  }),
+  // typescript({
+  //   parserOptions: {
+  //     tsconfigRootDir: import.meta.dirname,
+  //     project: true
+  //   },
+  //   rules: {
+  //     '@typescript-eslint/no-empty-object-type': 'off',
+  //     '@typescript-eslint/ban-ts-comment': 'off'
+  //   }
+  // }),
   vue({
     parserOptions: {
       tsconfigRootDir: import.meta.dirname
@@ -108,22 +77,21 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
       'import/no-duplicates': 'off'
     }
   }),
-  vitest(),
-  prettier(),
-  includeIgnoreFile(gitignorePath),
-  globalIgnores([
-    '.vscode',
-    'tsconfig.json',
-    './bench/**',
-    'pnpm-lock.yaml',
-    'playground/**',
-    './packages/docs/**',
-    './packages/plugin-*/docs/**/*.md', // NOTE(kazupon): ignore generated docs
-    'design/**',
-    'CHANGELOG.md',
-    '.github/FUNDING.yml',
-    'design/**'
-  ]) as Linter.Config
+  ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json')
+  // includeIgnoreFile(gitignorePath),
+  // globalIgnores([
+  //   '.vscode',
+  //   'tsconfig.json',
+  //   './bench/**',
+  //   'pnpm-lock.yaml',
+  //   'playground/**',
+  //   './packages/docs/**',
+  //   './packages/plugin-*/docs/**/*.md', // NOTE(kazupon): ignore generated docs
+  //   'design/**',
+  //   'CHANGELOG.md',
+  //   '.github/FUNDING.yml',
+  //   'design/**'
+  // ]) as Linter.Config
 )
 
 export default config

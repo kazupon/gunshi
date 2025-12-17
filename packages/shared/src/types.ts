@@ -20,7 +20,6 @@ type RemoveIndexSignature<T> = {
 /**
  * Make all properties in T deeply writeable (not readonly)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): test utility function
 export type DeepWriteable<T> = T extends (...args: any) => any
   ? T
   : T extends readonly (infer U)[]

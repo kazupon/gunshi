@@ -61,7 +61,7 @@ test('DefaultGunshiParams', () => {
 
 test('CommandContext extensions', () => {
   // default
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+
   expectTypeOf<CommandContext['extensions']>().toEqualTypeOf<any>()
   expectTypeOf<CommandContext['args']>().toEqualTypeOf<Args>()
 

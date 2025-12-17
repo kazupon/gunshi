@@ -106,9 +106,9 @@ describe('extension: translate', () => {
       extension.translate(resolveBuiltInKey('ARGUMENTS'))
       extension.translate('description')
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
+      // oxlint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore for test
       expect(translation.translate).toHaveBeenCalledTimes(1)
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
+      // oxlint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore for test
       expect(translation.translate).toHaveBeenCalledWith('en-US', 'description', {})
     })
 
@@ -125,9 +125,9 @@ describe('extension: translate', () => {
       extension.translate(resolveBuiltInKey('ARGUMENTS'))
       extension.translate('examples', { foo: 'bar' })
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
+      // oxlint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore for test
       expect(translation.translate).toHaveBeenCalledTimes(1)
-      // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): for test codes
+      // oxlint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore for test
       expect(translation.translate).toHaveBeenCalledWith('ja-JP', 'examples', { foo: 'bar' })
     })
   })

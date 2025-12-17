@@ -10,7 +10,6 @@ test('basic', async () => {
       name: 'cmd1'
     }
   })
-  // eslint-disable-next-line unicorn/error-message -- NOTE(kazupon): This is a test
   const error = new AggregateError([
     new Error(`Optional argument '--dependency' or '-d' is required`),
     new Error(`Optional argument '--alias' or '-a' is required`)

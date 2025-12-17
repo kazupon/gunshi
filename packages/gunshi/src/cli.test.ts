@@ -1235,7 +1235,6 @@ describe('custom type arguments', () => {
         description: 'Port number (1024-65535)',
         parse: (value: string) => {
           const port = Number(value)
-          // eslint-disable-next-line unicorn/numeric-separators-style -- NOTE(kazupon): for test codes
           if (Number.isNaN(port) || port < 1024 || port > 65535) {
             throw new TypeError(`Invalid port: ${value}. Must be a number between 1024 and 65535`)
           }

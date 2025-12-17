@@ -87,7 +87,6 @@ const SHOW = {
   run: NOOP
 } as Command<GunshiParams<{ args: Args }>>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): This is a test
 const COMMANDS = new Map<string, Command<any> | LazyCommand<any>>()
 COMMANDS.set('show', SHOW)
 COMMANDS.set('command1', {

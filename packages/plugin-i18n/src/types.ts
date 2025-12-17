@@ -39,7 +39,6 @@ export type PluginId = typeof pluginId
  *
  * @typeParam G - Type parameter extending {@linkcode GunshiParams}
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Command locale

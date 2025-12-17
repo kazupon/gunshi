@@ -17,7 +17,7 @@ describe('defineI18n', () => {
       },
       run: ctx => {
         expectTypeOf(ctx.values).toEqualTypeOf<{ input?: string }>()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+
         expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
 
         expect(typeof ctx.values.input).toBe('string')
@@ -170,7 +170,7 @@ describe('defineI18nWithTypes', () => {
       },
       run: (ctx): string | void | Promise<string | void> => {
         expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+
         expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
 
         // Runtime check to satisfy test requirements

@@ -9,13 +9,13 @@ function messageText(message: string | ts.DiagnosticMessageChain): string {
 async function main() {
   console.log('generate import map ...')
 
-  // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore
+  // oxlint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore
   const configPath = ts.findConfigFile('./', ts.sys.fileExists, 'tsconfig.json')
   if (!configPath) {
     throw new Error('not found tsconfig.json')
   }
 
-  // eslint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore
+  // oxlint-disable-next-line @typescript-eslint/unbound-method -- NOTE(kazupon): ignore
   const configFile = ts.readConfigFile(configPath, ts.sys.readFile)
   if (configFile.error) {
     throw new Error(`Error reading tsconfig.json: ${messageText(configFile.error.messageText)}`)

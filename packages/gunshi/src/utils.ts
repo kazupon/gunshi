@@ -69,7 +69,6 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         command.internal = loaded.internal
         command.entry = loaded.entry
         if ('resource' in loaded && loaded.resource) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): type assertion for lazy command
           ;(command as { resource: any }).resource = loaded.resource
         }
       } else {
@@ -113,7 +112,7 @@ export function log(...args: unknown[]): void {
  * @param ignores - Properties to ignore during freezing
  * @returns A frozen object
  */
-export function deepFreeze<T extends Record<string, any>>( // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type for deepFreeze
+export function deepFreeze<T extends Record<string, any>>(
   obj: T,
   ignores: string[] = []
 ): Readonly<T> {
@@ -122,7 +121,6 @@ export function deepFreeze<T extends Record<string, any>>( // eslint-disable-lin
   }
 
   for (const key of Object.keys(obj)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for deep freeze
     const value = obj[key]
     if (ignores.includes(key)) {
       continue

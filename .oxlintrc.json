@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "import", "promise", "unicorn", "node"],
+  "overrides": [
+    {
+      "files": ["**/*.{test,spec}.{ts,tsx}"],
+      "plugins": ["vitest"]
+    }
+  ],
+  "ignorePatterns": [
+    "**/lib/**",
+    "**/dist/**",
+    ".notes",
+    ".slides",
+    ".claude",
+    ".vscode",
+    "tsconfig.json",
+    "bench/**",
+    ".oxlintrc.json",
+    "pnpm-lock.yaml",
+    "playground/**",
+    "design/**",
+    "./packages/docs/**",
+    "./packages/plugin-*/docs/**/*.md", // NOTE(kazupon): ignore generated docs
+    "CHANGELOG.md",
+    ".github/FUNDING.yml"
+  ]
+}

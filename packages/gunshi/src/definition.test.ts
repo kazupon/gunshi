@@ -19,7 +19,7 @@ describe('define', () => {
       run: ctx => {
         // Type assertions
         expectTypeOf(ctx.values).toEqualTypeOf<{ foo?: string | undefined }>()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+
         expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
 
         // Runtime check to satisfy test requirements
@@ -135,7 +135,7 @@ describe('defineWithTypes', () => {
       args,
       run: (ctx): string | void | Promise<string | void> => {
         expectTypeOf(ctx.values).toEqualTypeOf<{ count: number }>()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+
         expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
 
         // Runtime check to satisfy test requirements
@@ -360,7 +360,7 @@ describe('lazyWithTypes', () => {
       () => {
         return ctx => {
           expectTypeOf(ctx.values).toEqualTypeOf<{ foo?: string | undefined }>()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- default is any
+
           expectTypeOf(ctx.extensions).toEqualTypeOf<any>()
         }
       },

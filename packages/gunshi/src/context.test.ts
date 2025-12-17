@@ -285,11 +285,10 @@ describe('plugin extensions', () => {
 
     expect(ctx.extensions).toEqual(
       expect.objectContaining({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for test codes
         ext1: expect.objectContaining({ value1: 'test1' }),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for test codes
+
         ext2: expect.objectContaining({ value2: 'test2' }),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- NOTE(kazupon): for test codes
+
         ext3: expect.objectContaining({ value3: 'test3' })
       })
     )
@@ -488,7 +487,6 @@ describe('CommandContextExtension type', () => {
 
   test('extension factory can return complex objects', async () => {
     const dbExtension: CommandContextExtension<{
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for test codes
       query: (sql: string) => Promise<any>
       transaction: (fn: () => Promise<void>) => Promise<void>
     }> = {

@@ -98,8 +98,7 @@ export class DefaultTranslation implements TranslationAdapter {
     }
 
     return message.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string -- NOTE(kazupon): for safety
-      return values[name] == null ? '' : values[name].toString()
+      return values[name] == null ? '' : (values as Record<string, string>)[name]
     })
   }
 }

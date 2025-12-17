@@ -295,7 +295,7 @@ describe('Plugin type with optional properties', () => {
     Object.defineProperty(pluginFn, 'extension', {
       value: {
         key: Symbol('extended-plugin'),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for test codes
+
         factory: (_core: any) => ({ extended: true })
       },
       writable: false,

@@ -74,7 +74,6 @@ export type DefaultGunshiParams = GunshiParams
  * @since v0.27.0
  */
 export type GunshiParamsConstraint =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
   | GunshiParams<any>
   | {
       args: Args
@@ -91,7 +90,6 @@ export type GunshiParamsConstraint =
  * @internal
  */
 export type ExtractArgs<G> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
   G extends GunshiParams<any>
     ? G['args']
     : G extends {
@@ -115,7 +113,6 @@ export type ExtractArgExplicitlyProvided<G> = ArgExplicitlyProvided<ExtractArgs<
  * @internal
  */
 export type ExtractExtensions<G> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
   G extends GunshiParams<any> ? G['extensions'] : G extends { extensions: infer E } ? E : {}
 
 /**
@@ -124,7 +121,6 @@ export type ExtractExtensions<G> =
  * @internal
  */
 export type NormalizeToGunshiParams<G> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
   G extends GunshiParams<any>
     ? G
     : G extends { extensions: ExtendContext }
@@ -201,7 +197,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    *
    * @see {@linkcode CliOptions.subCommands}
    */
-  subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
+  subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined
   /**
    * Render function the command usage.
    */
@@ -433,13 +429,12 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    * @param message - an output message, see {@linkcode console.log}
    * @param optionalParams - an optional parameters, see {@linkcode console.log}
    */
-  log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic optional parameters
+  log: (message?: any, ...optionalParams: any[]) => void
   /**
    * Command context extensions.
    *
    * @since v0.27.0
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
   extensions: keyof ExtractExtensions<G> extends never ? any : ExtractExtensions<G>
   /**
    * Validation error from argument parsing.
@@ -618,32 +613,49 @@ export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> 
  * @since v0.27.1
  */
 export interface SubCommandable {
-  /** Command name */
+  /**
+   * see {@link Command.name}
+   */
   name?: string
-  /** Command description */
+  /**
+   * see {@link Command.description}
+   */
   description?: string
-  /** Command arguments - accepts any args structure */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  /**
+   * see {@link Command.args}
+   */
   args?: Args | Record<string, any>
-  /** Command examples */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  /**
+   * see {@link Command.examples}
+   */
   examples?: string | ((...args: any[]) => any)
-  /** Command runner */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  /**
+   * see {@link Command.run}
+   */
   run?: (...args: any[]) => any
-  /** Whether to convert camelCase to kebab-case */
+  /**
+   * see {@link Command.toKebab}
+   */
   toKebab?: boolean
-  /** Whether this is an internal command */
+  /**
+   * see {@link Command.internal}
+   */
   internal?: boolean
-  /** Whether this is an entry command */
+  /**
+   * see {@link Command.entry}
+   */
   entry?: boolean
-  /** Rendering options */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  /**
+   * see {@link Command.rendering}
+   */
   rendering?: any
-  /** Command name for lazy commands */
+  /**
+   * see {@link LazyCommand.commandName}
+   */
   commandName?: string
-  /** Index signature to allow additional properties */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): loose type for subCommands compatibility
+  /**
+   * Index signature to allow additional properties
+   */
   [key: string]: any
 }
 

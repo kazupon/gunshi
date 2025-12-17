@@ -25,7 +25,6 @@ export type PluginId = typeof pluginId
  *
  * @typeParam G - A type extending {@link GunshiParams} to specify the shape of command parameters.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): GunshiParams is a generic type
 export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Render the text message.

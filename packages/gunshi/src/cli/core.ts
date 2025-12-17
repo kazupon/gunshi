@@ -147,7 +147,6 @@ function resolveArguments<G extends GunshiParamsConstraint>(
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): generic type
 const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object'
 
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
@@ -251,7 +250,6 @@ function resolveCommand<G extends GunshiParamsConstraint>(
 
   function doResolveCommand(): ResolveCommandContext<G> {
     if (typeof entry === 'function') {
-      // eslint-disable-next-line unicorn/prefer-ternary -- NOTE(kazupon): to keep the human-readable codes
       if ('commandName' in entry && entry.commandName) {
         // lazy command
         return { commandName: entry.commandName, command: entry, callMode: 'entry' }

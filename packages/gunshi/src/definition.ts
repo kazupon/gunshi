@@ -132,11 +132,7 @@ export function define<
  * @param definition - A {@link Command | command} definition
  * @returns A defined {@link Command | command}
  */
-export function define(
-  definition: any // eslint-disable-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NOTE(kazupon): for implementation
-): any {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- NOTE(kazupon): for implementation
+export function define(definition: any): any {
   return definition
 }
 
@@ -278,9 +274,7 @@ export function lazy<
 export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition?: Partial<Command<G>>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for generic D
 ): LazyCommand<G, any> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for generic D
   const lazyCommand = loader as LazyCommand<G, any>
 
   if (definition != null) {
@@ -309,7 +303,6 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
  * @internal
  */
 type NormalizeGunshiParams<G extends GunshiParamsConstraint> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for type inference
   G extends GunshiParams<any>
     ? G
     : G extends { args: infer A; extensions: infer E }
@@ -378,7 +371,6 @@ export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypes
     loader: CommandLoader<FullGunshiParams>,
     definition?: D
   ): LazyCommand<FullGunshiParams, D> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- for type casting
     return lazy(loader as any, definition as any) as LazyCommand<FullGunshiParams, D>
   }
 }

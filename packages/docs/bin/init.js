@@ -57,7 +57,7 @@ async function hasGunshiInstruction(filePath) {
   try {
     const content = await fs.readFile(filePath, 'utf8')
     // Check for various patterns that indicate Gunshi is already mentioned
-    const gunshiPatterns = [/\bgunshi\b/i, /\@gunshi\//i, /@kazupon\/gunshi/i]
+    const gunshiPatterns = [/\bgunshi\b/i, /@gunshi\//i, /@kazupon\/gunshi/i]
     return gunshiPatterns.some(pattern => pattern.test(content))
   } catch {
     return false
