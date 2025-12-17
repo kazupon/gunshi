@@ -38,16 +38,6 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     ]
   }),
   regexp(),
-  // typescript({
-  //   parserOptions: {
-  //     tsconfigRootDir: import.meta.dirname,
-  //     project: true
-  //   },
-  //   rules: {
-  //     '@typescript-eslint/no-empty-object-type': 'off',
-  //     '@typescript-eslint/ban-ts-comment': 'off'
-  //   }
-  // }),
   vue({
     parserOptions: {
       tsconfigRootDir: import.meta.dirname
@@ -78,20 +68,6 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     }
   }),
   ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json')
-  // includeIgnoreFile(gitignorePath),
-  // globalIgnores([
-  //   '.vscode',
-  //   'tsconfig.json',
-  //   './bench/**',
-  //   'pnpm-lock.yaml',
-  //   'playground/**',
-  //   './packages/docs/**',
-  //   './packages/plugin-*/docs/**/*.md', // NOTE(kazupon): ignore generated docs
-  //   'design/**',
-  //   'CHANGELOG.md',
-  //   '.github/FUNDING.yml',
-  //   'design/**'
-  // ]) as Linter.Config
 )
 
 export default config
