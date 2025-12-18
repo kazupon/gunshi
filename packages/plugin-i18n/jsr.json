@@ -3,7 +3,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "name": "@gunshi/plugin-i18n",
   "description": "i18n plugin for gunshi",
-  "version": "0.27.3",
+  "version": "0.27.4",
   "license": "MIT",
   "publish": {
     "include": ["src/**/*.ts", "package.json", "jsr.json", "README.md", "CHANGELOG.md", "LICENSE"],
