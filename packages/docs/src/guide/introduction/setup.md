@@ -33,7 +33,7 @@ bun add gunshi
 
 ## LLM-Assisted Development
 
-Gunshi provides tooling to integrate with AI coding assistants such as [Claude Code](https://claude.ai/code) and [Cursor](https://cursor.com/).
+Gunshi provides tooling to integrate with AI coding assistants such as [Claude Code](https://claude.ai/code).
 
 ### Automatic Setup (Recommended)
 
@@ -59,10 +59,7 @@ bun x @gunshi/docs
 
 :::
 
-This command automatically configures:
-
-- [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for Claude Code
-- [Cursor rules](https://docs.cursor.com/context/rules-for-ai) for Cursor
+This command automatically configures [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for Claude Code.
 
 ### Manual Setup
 
@@ -90,7 +87,7 @@ bun add -D @gunshi/docs
 
 This package includes guide content and API references as markdown files in [llms.txt](https://llmstxt.org/) format.
 
-Then add the following to your AI agent's configuration file (e.g., `CLAUDE.md` and `.cursor/rules/use-gunshi-cli.md`):
+Then add the following to your AI agent's configuration file (e.g., `CLAUDE.md`):
 
 ```md
 # CLI Development with Gunshi
