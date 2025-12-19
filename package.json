@@ -124,7 +124,7 @@
     "overrides": {
       "tsdown>rolldown": "1.0.0-beta.54",
       "tsdown>rolldown-plugin-dts": "0.18.3",
-      "vitepress>vite": "npm:rolldown-vite@7.2.10"
+      "vitepress>vite": "npm:rolldown-vite@7.2.11"
     },
     "onlyBuiltDependencies": [
       "deno",
