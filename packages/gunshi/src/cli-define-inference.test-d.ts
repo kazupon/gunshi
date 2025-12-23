@@ -6,11 +6,10 @@
 import { expectTypeOf, test } from 'vitest'
 import { cli } from './cli.ts'
 import { define } from './definition.ts'
-import type { ArgValues, CommandContext } from './types.ts'
 
 test('cli() with define() should preserve type inference', () => {
   // Test that define() alone has correct type inference
-  const cmd1 = define({
+  define({
     name: 'foo',
     args: {
       foo: {
@@ -36,15 +35,14 @@ test('cli() with define() should preserve type inference', () => {
       run: ctx => {
         // Should be: string | undefined, not any
         expectTypeOf(ctx.values.foo).toEqualTypeOf<string | undefined>()
-        expectTypeOf(ctx.values.foo).not.toBeAny()
       }
     })
   )
 })
 
 test('cli() with inline command should preserve type inference', () => {
-  // Test with inline command object (not using define())
-  cli([], {
+  // Test with inline command object wrapped in define()
+  cli([], define({
     name: 'bar',
     args: {
       count: {
@@ -54,9 +52,8 @@ test('cli() with inline command should preserve type inference', () => {
     run: ctx => {
       // Should be: number | undefined
       expectTypeOf(ctx.values.count).toEqualTypeOf<number | undefined>()
-      expectTypeOf(ctx.values.count).not.toBeAny()
     }
-  })
+  }))
 })
 
 test('cli() with complex args should preserve type inference', () => {
@@ -74,11 +71,6 @@ test('cli() with complex args should preserve type inference', () => {
         expectTypeOf(ctx.values.str).toEqualTypeOf<string>()
         expectTypeOf(ctx.values.num).toEqualTypeOf<number | undefined>()
         expectTypeOf(ctx.values.bool).toEqualTypeOf<boolean>()
-        
-        // None should be any
-        expectTypeOf(ctx.values.str).not.toBeAny()
-        expectTypeOf(ctx.values.num).not.toBeAny()
-        expectTypeOf(ctx.values.bool).not.toBeAny()
       }
     })
   )

@@ -24,23 +24,6 @@ import type {
 /**
  * Run the command.
  *
- * This overload accepts any command-like object using a loose structural type.
- * It bypasses TypeScript contravariance issues with callback properties.
- *
- * @param args - Command line arguments
- * @param entry - A command-like object (command, command runner, or lazy command)
- * @param options - A {@link CliOptions | CLI options}
- * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
- */
-export async function cli(
-  args: string[],
-  entry: SubCommandable,
-  options?: CliOptions
-): Promise<string | undefined>
-
-/**
- * Run the command.
- *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
  *
  * @param args - Command line arguments
@@ -106,6 +89,24 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   args: string[],
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options?: CliOptions<G>
+): Promise<string | undefined>
+
+/**
+ * Run the command.
+ *
+ * This overload accepts any command-like object using a loose structural type.
+ * It bypasses TypeScript contravariance issues with callback properties.
+ * Note: This overload should be last to ensure proper type inference for typed commands.
+ *
+ * @param args - Command line arguments
+ * @param entry - A command-like object (command, command runner, or lazy command)
+ * @param options - A {@link CliOptions | CLI options}
+ * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ */
+export async function cli(
+  args: string[],
+  entry: SubCommandable,
+  options?: CliOptions
 ): Promise<string | undefined>
 
 /**
