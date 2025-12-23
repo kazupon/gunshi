@@ -96,7 +96,11 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
  *
  * This overload accepts any command-like object using a loose structural type.
  * It bypasses TypeScript contravariance issues with callback properties.
- * Note: This overload should be last to ensure proper type inference for typed commands.
+ *
+ * Note: This overload MUST be last in the overload list. TypeScript checks overloads
+ * in declaration order and selects the first matching one. The SubCommandable type
+ * is intentionally loose and would match any command, so placing it first would
+ * prevent proper type inference for more specific command types.
  *
  * @param args - Command line arguments
  * @param entry - A command-like object (command, command runner, or lazy command)
