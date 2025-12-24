@@ -1,16 +1,16 @@
 packages:
   - packages/*
   - playground/**
-  - '!playground/bun'
+  - "!playground/bun"
 catalog:
   typescript: ^5.9.3
   zod: ^4.2.1
-  deno: ^2.5.6
+  deno: ^2.6.3
   jsr: ^0.13.5
   jsr-exports-lint: ^0.4.1
   publint: ^0.3.16
   tsdown: 0.15.12
-  '@types/node': ^25.0.2
+  "@types/node": ^25.0.3
   typedoc: ^0.28.15
   tsx: ^4.21.0
   typedoc-plugin-markdown: ^4.9.0
@@ -21,23 +21,23 @@ minimumReleaseAgeExclude:
   - knip
   - publint
   - tsx
-  - '@bomb.sh/tab'
+  - "@bomb.sh/tab"
   - eslint-plugin-jsdoc
-  - '@typescript/native-preview'
+  - "@typescript/native-preview"
   - lint-staged
   - tsdown
   - rolldown
-  - '@rolldown/pluginutils'
-  - '@kazupon/eslint-config'
+  - "@rolldown/pluginutils"
+  - "@kazupon/eslint-config"
   - gunshi
-  - '@gunshi/bone'
-  - '@gunshi/docs'
-  - '@gunshi/definition'
-  - '@gunshi/plugin'
-  - '@gunshi/plugin-completion'
-  - '@gunshi/plugin-dryrun'
-  - '@gunshi/plugin-global'
-  - '@gunshi/plugin-i18n'
-  - '@gunshi/plugin-renderer'
-  - '@gunshi/resources'
-  - '@gunshi/shared'
+  - "@gunshi/bone"
+  - "@gunshi/docs"
+  - "@gunshi/definition"
+  - "@gunshi/plugin"
+  - "@gunshi/plugin-completion"
+  - "@gunshi/plugin-dryrun"
+  - "@gunshi/plugin-global"
+  - "@gunshi/plugin-i18n"
+  - "@gunshi/plugin-renderer"
+  - "@gunshi/resources"
+  - "@gunshi/shared"
