@@ -42,18 +42,21 @@ test('cli() with define() should preserve type inference', () => {
 
 test('cli() with inline command should preserve type inference', () => {
   // Test with inline command object wrapped in define()
-  void cli([], define({
-    name: 'bar',
-    args: {
-      count: {
-        type: 'number'
+  void cli(
+    [],
+    define({
+      name: 'bar',
+      args: {
+        count: {
+          type: 'number'
+        }
+      },
+      run: ctx => {
+        // Should be: number | undefined
+        expectTypeOf(ctx.values.count).toEqualTypeOf<number | undefined>()
       }
-    },
-    run: ctx => {
-      // Should be: number | undefined
-      expectTypeOf(ctx.values.count).toEqualTypeOf<number | undefined>()
-    }
-  }))
+    })
+  )
 })
 
 test('cli() with complex args should preserve type inference', () => {
