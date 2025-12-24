@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Linting
-        run: pnpm lint-all
+        run: pnpm lint
 
   test:
     needs:
