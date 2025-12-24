@@ -23,7 +23,7 @@ test('cli() with define() should preserve type inference', () => {
   })
 
   // Test that cli() with define() also has correct type inference
-  cli(
+  void cli(
     [],
     define({
       name: 'foo',
@@ -42,7 +42,7 @@ test('cli() with define() should preserve type inference', () => {
 
 test('cli() with inline command should preserve type inference', () => {
   // Test with inline command object wrapped in define()
-  cli([], define({
+  void cli([], define({
     name: 'bar',
     args: {
       count: {
@@ -57,7 +57,7 @@ test('cli() with inline command should preserve type inference', () => {
 })
 
 test('cli() with complex args should preserve type inference', () => {
-  cli(
+  void cli(
     [],
     define({
       name: 'complex',
