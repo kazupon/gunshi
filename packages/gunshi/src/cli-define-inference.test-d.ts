@@ -7,7 +7,7 @@ import { expectTypeOf, test } from 'vitest'
 import { cli } from './cli.ts'
 import { define } from './definition.ts'
 
-test('cli() with define() should preserve type inference', () => {
+test('cli() with define() should preserve type inference', async () => {
   // Test that define() alone has correct type inference
   define({
     name: 'foo',
@@ -23,7 +23,7 @@ test('cli() with define() should preserve type inference', () => {
   })
 
   // Test that cli() with define() also has correct type inference
-  void cli(
+  await cli(
     [],
     define({
       name: 'foo',
@@ -40,9 +40,9 @@ test('cli() with define() should preserve type inference', () => {
   )
 })
 
-test('cli() with inline command should preserve type inference', () => {
+test('cli() with inline command should preserve type inference', async () => {
   // Test with inline command object wrapped in define()
-  void cli(
+  await cli(
     [],
     define({
       name: 'bar',
@@ -59,8 +59,8 @@ test('cli() with inline command should preserve type inference', () => {
   )
 })
 
-test('cli() with complex args should preserve type inference', () => {
-  void cli(
+test('cli() with complex args should preserve type inference', async () => {
+  await cli(
     [],
     define({
       name: 'complex',
