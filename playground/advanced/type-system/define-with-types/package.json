@@ -1,7 +1,7 @@
 {
   "name": "define-with-types",
   "private": true,
-  "packageManager": "pnpm@10.26.1",
+  "packageManager": "pnpm@10.26.2",
   "type": "module",
   "scripts": {
     "start": "node cli.ts"
