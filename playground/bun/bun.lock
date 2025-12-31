@@ -5,7 +5,7 @@
     "": {
       "name": "bun",
       "dependencies": {
-        "gunshi": "0.27.4",
+        "gunshi": "0.27.5",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -28,7 +28,7 @@
 
     "csstype": ["csstype@3.1.3", "", {}, "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw=="],
 
-    "gunshi": ["gunshi@0.27.4", "", { "dependencies": { "args-tokens": "^0.23.0" } }, "sha512-HDekNK7ada8zuk7WMlXdKgbl8Kuqs2aARAP6V2Ubwc0LmqifPzdsjTZIBNLlPbajrZIJhZsl8A/Wyinioqcz9A=="],
+    "gunshi": ["gunshi@0.27.5", "", { "dependencies": { "args-tokens": "^0.23.0" } }, "sha512-ExdnmI90hQ/eR1wnUc5rVom+K16F1hSpbYrplpt6rrJhXLprVGK9/E63bk7Rju27hAqc3WvpCa8PeY95R165fw=="],
 
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
