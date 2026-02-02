@@ -101,15 +101,13 @@
     "prepack": "pnpm build",
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
-  "dependencies": {
-    "args-tokens": "^0.23.0"
-  },
   "devDependencies": {
     "@gunshi/plugin-global": "workspace:*",
     "@gunshi/plugin-i18n": "workspace:*",
     "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
+    "args-tokens": "^0.23.1",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",

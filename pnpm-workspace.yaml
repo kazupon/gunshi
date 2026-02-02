@@ -21,6 +21,7 @@ minimumReleaseAgeExclude:
   - knip
   - publint
   - tsx
+  - args-tokens
   - "@bomb.sh/tab"
   - eslint-plugin-jsdoc
   - "@typescript/native-preview"

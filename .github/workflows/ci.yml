@@ -95,37 +95,6 @@ jobs:
 
       - name: Building
         run: pnpm build
-
-  typecheck:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [20]
-        os: [ubuntu-latest]
-
-    name: Type Checking on Node.js ${{ matrix.node-version }}
-    steps:
-      - name: Checkout codes
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
-
-      - name: Setup node
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Building
-        run: pnpm build
-
-      - name: Type checking
-        run: pnpm typecheck:deno && pnpm typecheck:tsc -p ./tsconfig.ci.json
-
   e2e:
     runs-on: ${{ matrix.os }}
     strategy:
