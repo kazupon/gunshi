@@ -27,5 +27,13 @@ export default {
     'design/**/*.ts',
     'playground/**'
   ],
-  ignoreDependencies: ['lint-staged', 'deno', 'mitata', 'gunshi019', '@kazupon/prettier-config']
+  ignoreDependencies: [
+    'lint-staged',
+    'deno',
+    'mitata',
+    'gunshi019',
+    '@kazupon/prettier-config',
+    '@kazupon/eslint-plugin',
+    '@typescript/native-preview'
+  ]
 } satisfies KnipConfig

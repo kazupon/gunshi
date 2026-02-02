@@ -1,34 +1,10 @@
-import {
-  comments,
-  defineConfig,
-  jsdoc,
-  jsonc,
-  markdown,
-  regexp,
-  vue,
-  yaml
-} from '@kazupon/eslint-config'
+import { comments, defineConfig, jsdoc, jsonc, markdown, vue, yaml } from '@kazupon/eslint-config'
 import oxlint from 'eslint-plugin-oxlint'
 import tseslint from 'typescript-eslint'
 
 const config: ReturnType<typeof defineConfig> = defineConfig(
   tseslint.configs.base,
-
-  comments({
-    kazupon: {
-      ignores: [
-        './scripts/**',
-        './bench/**',
-        './playground/**',
-        './e2e/**',
-        './packages/docs/**',
-        './packages/**/examples/**',
-        './**/test/**',
-        './**/src/**/*.test.ts',
-        './**/src/**/*.test-d.ts'
-      ]
-    }
-  }),
+  comments({ kazupon: false }),
   jsdoc({
     typescript: 'syntax',
     ignores: [
@@ -37,7 +13,6 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
       './packages/gunshi/test/*.ts' // NOTE(kazupon): test codes
     ]
   }),
-  regexp(),
   vue({
     parserOptions: {
       tsconfigRootDir: import.meta.dirname
@@ -55,17 +30,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     prettier: true
   }),
   markdown({
-    preferences: true,
-    rules: {
-      // @ts-ignore
-      'unused-imports/no-unused-imports': 'off',
-      'import/export': 'off',
-      'import/default': 'off',
-      'import/no-named-as-default': 'off',
-      'import/no-named-as-default-member': 'off',
-      'import/namespace': 'off',
-      'import/no-duplicates': 'off'
-    }
+    preferences: true
   }),
   ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json')
 )
