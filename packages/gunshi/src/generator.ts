@@ -43,13 +43,14 @@ export type GenerateOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
  * @returns A rendered usage.
  */
 export async function generate<G extends GunshiParamsConstraint = DefaultGunshiParams>(
-  command: string | null,
+  command: string | string[] | null,
   entry: Command<G> | LazyCommand<G>,
   options: GenerateOptions<G> = {}
 ): Promise<string> {
   const args = ['-h']
   if (command != null) {
-    args.unshift(command)
+    const parts = Array.isArray(command) ? command : command.split(' ')
+    args.unshift(...parts)
   }
   return (
     (await cli(args, entry, {

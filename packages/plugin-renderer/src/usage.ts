@@ -42,7 +42,7 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
   const messages: string[] = []
 
   // render description section (sub command executed only)
-  if (!ctx.omitted) {
+  if (ctx.callMode === 'subCommand') {
     const description = await resolveDescription(ctx)
     if (description) {
       messages.push(description, '')
@@ -219,13 +219,17 @@ async function renderCommandsSection<
     '',
     `${await ctx.extensions[pluginId].text(resolveBuiltInKey('FORMORE'))}:`
   )
+  const basePath =
+    ctx.commandPath && ctx.commandPath.length > 0
+      ? `${ctx.env.name} ${ctx.commandPath.join(' ')}`
+      : ctx.env.name
   messages.push(
     ...loadedCommands.map(cmd => {
       let commandStr = cmd.entry ? '' : cmd.name || ''
       if (commandStr) {
         commandStr += ' '
       }
-      const commandHelp = `${ctx.env.name} ${commandStr}--help`
+      const commandHelp = `${basePath} ${commandStr}--help`
       return `${commandHelp.padStart(ctx.env.leftMargin + commandHelp.length)}`
     })
   )
@@ -287,6 +291,9 @@ async function resolveSubCommand<
     extensions: Extensions
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string> {
+  if (ctx.commandPath && ctx.commandPath.length > 0) {
+    return ctx.commandPath.join(' ')
+  }
   return ctx.name || (await ctx.extensions[pluginId].text(resolveBuiltInKey('SUBCOMMAND')))
 }
 

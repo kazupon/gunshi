@@ -9,7 +9,7 @@ import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
-import { create, isLazyCommand, resolveLazyCommand } from '../utils.ts'
+import { create, getCommandSubCommands, isLazyCommand, resolveLazyCommand } from '../utils.ts'
 
 import type { Decorators } from '../decorators.ts'
 import type { Plugin, PluginContext } from '../plugin.ts'
@@ -64,20 +64,30 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const cliOptions = normalizeCliOptions(options, decorators, pluginContext)
 
   const tokens = parseArgs(argv)
-  const subCommand = getSubCommand(tokens)
 
-  const { commandName: name, command, callMode } = resolveCommand(subCommand, entry, cliOptions)
+  const resolved = resolveCommandTree(tokens, entry, cliOptions)
+  const { commandName: name, command, callMode, commandPath, depth, levelSubCommands } = resolved
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
 
   const args = resolveArguments(pluginContext, getCommandArgs(command))
+
+  // skipPositional: how many leading positionals to skip (they're consumed as command names)
+  // depth=0 → -1 (no skip), depth=1 → 0 (skip 1, existing behavior), depth=2 → 1 (skip 2), etc.
+  const skipPositional = depth > 0 ? depth - 1 : -1
+
   const { explicit, values, positionals, rest, error } = resolveArgs(args, tokens, {
     shortGrouping: true,
     toKebab: command.toKebab,
-    skipPositional: callMode === 'subCommand' && cliOptions.subCommands.size > 0 ? 0 : -1
+    skipPositional
   })
-  const omitted = !subCommand
+  const omitted = resolved.omitted
+
+  // override subCommands with level-specific sub-commands for rendering
+  if (levelSubCommands) {
+    cliOptions.subCommands = levelSubCommands
+  }
 
   const resolvedCommand = isLazyCommand<G>(command)
     ? await resolveLazyCommand<G>(command, name, true)
@@ -93,6 +103,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     tokens,
     omitted,
     callMode,
+    commandPath,
     command: resolvedCommand,
     extensions: getPluginExtensions(resolvedPlugins),
     validationError: error,
@@ -221,43 +232,52 @@ function normalizeCliOptions<G extends GunshiParamsConstraint>(
   return resolvedOptions
 }
 
-function getSubCommand(tokens: ArgToken[]): string {
-  const firstToken = tokens[0]
-  return firstToken &&
-    firstToken.kind === 'positional' &&
-    firstToken.index === 0 &&
-    firstToken.value
-    ? firstToken.value
-    : ''
+function getPositionalTokens(tokens: ArgToken[]): string[] {
+  return tokens
+    .filter(t => t.kind === 'positional')
+    .map(t => t.value)
+    .filter((v): v is string => !!v)
 }
 
 type ResolveCommandContext<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
   commandName?: string | undefined
   command?: Command<G> | LazyCommand<G> | undefined
   callMode: CommandCallMode
+  commandPath: string[]
+  depth: number
+  omitted: boolean
+  levelSubCommands: Map<string, Command<G> | LazyCommand<G>> | undefined
 }
 
-const CANNOT_RESOLVE_COMMAND = {
-  callMode: 'unexpected'
-} as const satisfies ResolveCommandContext
-
-function resolveCommand<G extends GunshiParamsConstraint>(
-  sub: string,
+function resolveCommandTree<G extends GunshiParamsConstraint>(
+  tokens: ArgToken[],
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: InternalCliOptions<G>
 ): ResolveCommandContext<G> {
-  const omitted = !sub
+  const positionals = getPositionalTokens(tokens)
 
-  function doResolveCommand(): ResolveCommandContext<G> {
+  function resolveAsEntry(): ResolveCommandContext<G> {
     if (typeof entry === 'function') {
       if ('commandName' in entry && entry.commandName) {
         // lazy command
-        return { commandName: entry.commandName, command: entry, callMode: 'entry' }
+        return {
+          commandName: entry.commandName,
+          command: entry,
+          callMode: 'entry',
+          commandPath: [],
+          depth: 0,
+          omitted: options.subCommands.size > 0 && !positionals[0],
+          levelSubCommands: options.subCommands.size > 0 ? options.subCommands : undefined
+        }
       } else {
         // inline command (command runner)
         return {
           command: { run: entry as CommandRunner<G>, entry: true } as Command<G>,
-          callMode: 'entry'
+          callMode: 'entry',
+          commandPath: [],
+          depth: 0,
+          omitted: options.subCommands.size > 0 && !positionals[0],
+          levelSubCommands: options.subCommands.size > 0 ? options.subCommands : undefined
         }
       }
     } else if (typeof entry === 'object') {
@@ -265,39 +285,109 @@ function resolveCommand<G extends GunshiParamsConstraint>(
       return {
         commandName: resolveEntryName(entry),
         command: entry,
-        callMode: 'entry'
+        callMode: 'entry',
+        commandPath: [],
+        depth: 0,
+        omitted: options.subCommands.size > 0 && !positionals[0],
+        levelSubCommands: options.subCommands.size > 0 ? options.subCommands : undefined
       }
     } else {
-      return CANNOT_RESOLVE_COMMAND
+      return {
+        callMode: 'unexpected',
+        commandPath: [],
+        depth: 0,
+        omitted: false,
+        levelSubCommands: undefined
+      }
     }
   }
 
-  if (omitted || options.subCommands?.size === 0) {
-    return doResolveCommand()
+  // no positionals or no top-level subCommands → resolve as entry
+  if (positionals.length === 0 || options.subCommands.size === 0) {
+    return resolveAsEntry()
   }
 
-  const cmd = options.subCommands?.get(sub)
-  if (cmd == null) {
-    if (options.fallbackToEntry) {
-      return doResolveCommand()
+  // walk the command tree
+  let currentSubCommands: Map<string, Command<G> | LazyCommand<G>> = options.subCommands
+  let resolvedCommand: Command<G> | LazyCommand<G> | undefined
+  let resolvedName: string | undefined
+  const commandPath: string[] = []
+  let depth = 0
+
+  for (let i = 0; i < positionals.length; i++) {
+    const token = positionals[i]
+    const cmd = currentSubCommands.get(token)
+
+    if (cmd == null) {
+      if (depth === 0) {
+        // no match at top level
+        if (options.fallbackToEntry) {
+          return resolveAsEntry()
+        }
+        return {
+          commandName: token,
+          callMode: 'unexpected',
+          commandPath: [],
+          depth: 0,
+          omitted: false,
+          levelSubCommands: undefined
+        }
+      }
+      // depth > 0: stop exploring, remaining tokens are positional args
+      break
     }
-    return {
-      commandName: sub,
-      callMode: 'unexpected'
+
+    // resolve command name if missing
+    if (isLazyCommand<G>(cmd) && cmd.commandName == null) {
+      cmd.commandName = token
+    } else if (typeof cmd === 'object' && cmd.name == null) {
+      cmd.name = token
+    }
+
+    resolvedCommand = cmd
+    resolvedName = token
+    commandPath.push(token)
+    depth++
+
+    // check if the matched command has its own nested subCommands
+    const nestedSubCommands = getCommandSubCommands<G>(cmd)
+    if (nestedSubCommands && nestedSubCommands.size > 0) {
+      currentSubCommands = nestedSubCommands
+      // continue to next positional to check for deeper nesting
+    } else {
+      // leaf command, stop exploring
+      break
     }
   }
 
-  // resolve command name, if command has not name on subCommand
-  if (isLazyCommand<G>(cmd) && cmd.commandName == null) {
-    cmd.commandName = sub
-  } else if (typeof cmd === 'object' && cmd.name == null) {
-    cmd.name = sub
+  if (!resolvedCommand) {
+    return resolveAsEntry()
+  }
+
+  // determine omitted: resolved command has children but no more positional matched any child
+  const resolvedSubCommands = getCommandSubCommands<G>(resolvedCommand)
+  const omitted = resolvedSubCommands != null && resolvedSubCommands.size > 0
+
+  // build levelSubCommands for the resolved level
+  let levelSubCommands: Map<string, Command<G> | LazyCommand<G>> | undefined
+  if (omitted && resolvedSubCommands) {
+    levelSubCommands = new Map(resolvedSubCommands)
+    // add the resolved command itself as entry
+    resolvedCommand.entry = true
+    levelSubCommands.set(
+      resolvedName || resolveEntryName(resolvedCommand as Command<G> | LazyCommand<G>),
+      resolvedCommand
+    )
   }
 
   return {
-    commandName: sub,
-    command: cmd,
-    callMode: 'subCommand'
+    commandName: resolvedName,
+    command: resolvedCommand,
+    callMode: depth > 0 ? 'subCommand' : 'entry',
+    commandPath,
+    depth,
+    omitted,
+    levelSubCommands
   }
 }
 

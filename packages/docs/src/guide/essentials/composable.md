@@ -319,6 +319,35 @@ This approach is particularly useful for CLIs that:
 - Want to provide a default action when no sub-command matches
 - Implement dynamic command resolution based on context
 
+## Nested Sub-Commands
+
+Gunshi also supports nested sub-commands for building hierarchical command trees like `git remote add`. You can add a `subCommands` property to any command definition:
+
+```ts [cli.ts]
+import { cli, define } from 'gunshi'
+
+const addCommand = define({
+  name: 'add',
+  description: 'Add a remote',
+  args: { url: { type: 'string', required: true } },
+  run: ctx => console.log(`Adding: ${ctx.values.url}`)
+})
+
+const remoteCommand = define({
+  name: 'remote',
+  description: 'Manage remotes',
+  subCommands: { add: addCommand },
+  run: () => console.log('Use: remote add')
+})
+
+await cli(process.argv.slice(2), entry, {
+  name: 'git',
+  subCommands: { remote: remoteCommand }
+})
+```
+
+For more details on nested sub-commands, including lazy loading, intermediate command handling, and `commandPath`, see the [Nested Sub-Commands](../advanced/nested-sub-commands.md) guide.
+
 ## Next Steps
 
 Throughout this guide, you've learned how to build composable sub-commands that scale from simple to complex CLI applications.

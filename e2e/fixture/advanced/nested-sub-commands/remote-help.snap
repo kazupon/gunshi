@@ -1,0 +1,21 @@
+A Git-like CLI (git v1.0.0)
+
+Manage remotes
+
+USAGE:
+  git [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [remote] <OPTIONS>       Manage remotes
+  add <OPTIONS>            Add a remote
+  remove <OPTIONS>         Remove a remote
+
+For more info, run any command with the `--help` flag:
+  git remote --help
+  git remote add --help
+  git remote remove --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

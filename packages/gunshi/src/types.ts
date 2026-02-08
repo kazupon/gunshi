@@ -417,6 +417,15 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    */
   callMode: CommandCallMode
   /**
+   * The path of nested sub-commands that were resolved to reach the current command.
+   *
+   * For example, if the user runs `git remote add`, `commandPath` would be `['remote', 'add']`.
+   * For the entry command, this is an empty array.
+   *
+   * @since v0.28.0
+   */
+  commandPath: string[]
+  /**
    * Whether to convert the camel-case style argument name to kebab-case.
    * This context value is set from {@linkcode Command.toKebab} option.
    */
@@ -569,6 +578,15 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * @since v0.27.0
    */
   rendering?: RenderingOptions<G>
+  /**
+   * Nested sub-commands for this command.
+   *
+   * Allows building command trees like `git remote add`.
+   * Each key is the sub-command name, and the value is a command or lazy command.
+   *
+   * @since v0.28.0
+   */
+  subCommands?: Record<string, SubCommandable> | Map<string, SubCommandable>
 }
 
 /**
@@ -653,6 +671,13 @@ export interface SubCommandable {
    * see {@link LazyCommand.commandName}
    */
   commandName?: string
+  /**
+   * Nested sub-commands for this command.
+   *
+   * @see {@link Command.subCommands}
+   * @since v0.28.0
+   */
+  subCommands?: Record<string, any> | Map<string, any>
   /**
    * Index signature to allow additional properties
    */

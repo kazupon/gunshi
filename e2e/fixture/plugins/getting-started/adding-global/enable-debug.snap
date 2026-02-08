@@ -2,8 +2,9 @@ Debug mode enabled
 Context: [Object: null prototype] {
   name: 'build',
   description: undefined,
-  omitted: true,
+  omitted: false,
   callMode: 'entry',
+  commandPath: [],
   env: [Object: null prototype] {
     name: undefined,
     description: undefined,

@@ -286,6 +286,9 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
     lazyCommand.internal = definition.internal
     lazyCommand.entry = definition.entry
     lazyCommand.toKebab = definition.toKebab
+    if (definition.subCommands) {
+      lazyCommand.subCommands = definition.subCommands
+    }
     // resource property is now provided by plugin-i18n
     if ('resource' in definition) {
       lazyCommand.resource = definition.resource

@@ -1,0 +1,19 @@
+A Git-like CLI (git v1.0.0)
+
+USAGE:
+  git [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [main] <OPTIONS>         A Git-like CLI demonstrating nested sub-commands
+  branch <OPTIONS>         Manage branches
+  remote <OPTIONS>         Manage remotes
+
+For more info, run any command with the `--help` flag:
+  git --help
+  git branch --help
+  git remote --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

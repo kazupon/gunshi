@@ -252,12 +252,45 @@ async function handleSubCommands(
   subCommands: PluginContext['subCommands'],
   i18nPluginId: string,
   config: Record<string, CompletionConfig> = {},
-  i18n?: I18nExtension
+  i18n?: I18nExtension,
+  parentPath: string = ''
 ) {
   for (const [name, cmd] of subCommands) {
     if (cmd.internal || cmd.entry || name === 'complete') {
       continue // skip entry / internal command / completion command itself
     }
-    await registerCompletion({ name, cmd, config, i18nPluginId, i18n, t })
+    const fullName = parentPath ? `${parentPath} ${name}` : name
+    await registerCompletion({ name: fullName, cmd, config, i18nPluginId, i18n, t })
+
+    // recursively register nested sub-commands
+    const nestedSubCommands = getNestedSubCommands(cmd)
+    if (nestedSubCommands && nestedSubCommands.size > 0) {
+      await handleSubCommands(t, nestedSubCommands, i18nPluginId, config, i18n, fullName)
+    }
   }
+}
+
+function getNestedSubCommands(
+  cmd: Command | LazyCommand
+): Map<string, Command | LazyCommand> | undefined {
+  const subCommands =
+    typeof cmd === 'function' ? (cmd as any).subCommands : (cmd as Command).subCommands
+  if (!subCommands) {
+    return undefined
+  }
+  if (subCommands instanceof Map) {
+    return subCommands.size > 0 ? (subCommands as Map<string, Command | LazyCommand>) : undefined
+  }
+  if (typeof subCommands === 'object') {
+    const entries = Object.entries(subCommands)
+    if (entries.length === 0) {
+      return undefined
+    }
+    const map = new Map<string, Command | LazyCommand>()
+    for (const [name, c] of entries) {
+      map.set(name, c as Command | LazyCommand)
+    }
+    return map
+  }
+  return undefined
 }

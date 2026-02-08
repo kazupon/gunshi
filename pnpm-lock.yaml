@@ -608,6 +608,12 @@ importers:
         specifier: file:../../../../packages/gunshi
         version: link:../../../../packages/gunshi
 
+  playground/advanced/nested-sub-commands:
+    dependencies:
+      gunshi:
+        specifier: file:../../../packages/gunshi
+        version: link:../../../packages/gunshi
+
   playground/advanced/type-system/combine:
     dependencies:
       gunshi:

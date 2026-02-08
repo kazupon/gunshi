@@ -1,0 +1,12 @@
+A Git-like CLI (git v1.0.0)
+
+Add a remote
+
+USAGE:
+  git remote add <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+  --url <url>            Remote URL
+

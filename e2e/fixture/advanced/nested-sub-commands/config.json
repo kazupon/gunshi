@@ -1,0 +1,9 @@
+[
+  ["top-level-help", "node cli.ts --help"],
+  ["remote-help", "node cli.ts remote --help"],
+  ["remote-add-help", "node cli.ts remote add --help"],
+  ["remote-add-exec", "node cli.ts remote add --url https://example.com"],
+  ["remote-remove-exec", "node cli.ts remote remove origin"],
+  ["branch-help", "node cli.ts branch --help"],
+  ["branch-create-exec", "node cli.ts branch create my-feature"]
+]

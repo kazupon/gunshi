@@ -48,6 +48,10 @@ export const advanced = {
     {
       text: 'Advanced Lazy Loading and Sub-Commands',
       link: '/guide/advanced/advanced-lazy-loading'
+    },
+    {
+      text: 'Nested Sub-Commands',
+      link: '/guide/advanced/nested-sub-commands'
     }
   ]
 }

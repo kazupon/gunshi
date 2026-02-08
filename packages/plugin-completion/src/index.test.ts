@@ -113,6 +113,84 @@ describe('positional arguments', () => {
   })
 })
 
+const NESTED_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/nested.node.ts complete --`
+
+describe('nested sub-commands', () => {
+  test('suggest top-level commands', async () => {
+    const output = await runCommand(`${NESTED_SCRIPT}`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest nested sub-commands for remote', async () => {
+    const output = await runCommand(`${NESTED_SCRIPT} remote`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest options for nested remote add', async () => {
+    const output = await runCommand(`${NESTED_SCRIPT} remote add --`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest option value for remote add --url', async () => {
+    const output = await runCommand(`${NESTED_SCRIPT} remote add --url`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest positional for remote remove', async () => {
+    const output = await runCommand(`${NESTED_SCRIPT} remote remove ""`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest options for top-level status', async () => {
+    const output = await runCommand(`${NESTED_SCRIPT} status --`)
+    expect(output).toMatchSnapshot()
+  })
+})
+
+const NESTED_I18N_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/nested-i18n.node.ts complete --`
+const NESTED_I18N_ENV = { MY_LOCALE: 'ja-JP' }
+
+function runNestedLocalizedCommand(command: string, env: NodeJS.ProcessEnv = {}) {
+  return runCommand(command, {
+    env: {
+      ...NESTED_I18N_ENV,
+      ...env
+    }
+  })
+}
+
+describe('nested sub-commands with i18n', () => {
+  test('suggest top-level commands with localized descriptions', async () => {
+    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT}`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest nested sub-commands for remote with localized description', async () => {
+    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest options for nested remote add with localized description', async () => {
+    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote add --`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest localized option value for remote add --url', async () => {
+    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote add --url`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest localized positional for remote remove', async () => {
+    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote remove ""`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest options for top-level status with localized description', async () => {
+    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} status --`)
+    expect(output).toMatchSnapshot()
+  })
+})
+
 const LOCALIZABLE_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/i18n.node.ts complete --`
 const I18N_ENV = { MY_LOCALE: 'ja-JP' }
 
