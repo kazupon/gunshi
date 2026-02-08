@@ -340,6 +340,12 @@ const remoteCommand = define({
   run: () => console.log('Use: remote add')
 })
 
+const entry = define({
+  name: 'main',
+  description: 'Git-like CLI',
+  run: () => console.log('Run --help for available commands')
+})
+
 await cli(process.argv.slice(2), entry, {
   name: 'git',
   subCommands: { remote: remoteCommand }

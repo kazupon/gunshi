@@ -93,9 +93,9 @@ USAGE:
   git remote [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  [remote]          Manage remotes
-  add               Add a remote
-  remove            Remove a remote
+  [remote] <OPTIONS>       Manage remotes
+  add <OPTIONS>            Add a remote
+  remove <OPTIONS>         Remove a remote
 
 For more info, run any command with the `--help` flag:
   git remote --help
