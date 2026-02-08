@@ -1,0 +1,4 @@
+A Git-like CLI (git v1.0.0)
+
+Added remote: https://example.com
+Command path: remote > add

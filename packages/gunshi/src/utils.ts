@@ -46,7 +46,8 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
       args: cmd.args,
       examples: cmd.examples,
       internal: cmd.internal,
-      entry: cmd.entry
+      entry: cmd.entry,
+      subCommands: cmd.subCommands
     }
     if ('resource' in cmd && cmd.resource) {
       baseCommand.resource = cmd.resource
@@ -68,6 +69,7 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         command.examples = loaded.examples
         command.internal = loaded.internal
         command.entry = loaded.entry
+        command.subCommands = loaded.subCommands || cmd.subCommands
         if ('resource' in loaded && loaded.resource) {
           ;(command as { resource: any }).resource = loaded.resource
         }
@@ -103,6 +105,46 @@ export function create<T>(obj: object | null = null): T {
  */
 export function log(...args: unknown[]): void {
   console.log(...args)
+}
+
+/**
+ * Get the sub-commands of a command as a normalized Map.
+ *
+ * @param cmd - A command or lazy command
+ * @returns A Map of sub-commands, or undefined if the command has no sub-commands.
+ */
+export function getCommandSubCommands<G extends GunshiParamsConstraint = DefaultGunshiParams>(
+  cmd: Commandable<G> | Command<G> | LazyCommand<G>
+): Map<string, Command<G> | LazyCommand<G>> | undefined {
+  const subCommands = isLazyCommand<G>(cmd)
+    ? cmd.subCommands
+    : typeof cmd === 'object'
+      ? cmd.subCommands
+      : undefined
+
+  if (!subCommands) {
+    return undefined
+  }
+
+  if (subCommands instanceof Map) {
+    return subCommands.size > 0
+      ? (subCommands as Map<string, Command<G> | LazyCommand<G>>)
+      : undefined
+  }
+
+  if (typeof subCommands === 'object') {
+    const entries = Object.entries(subCommands)
+    if (entries.length === 0) {
+      return undefined
+    }
+    const map = new Map<string, Command<G> | LazyCommand<G>>()
+    for (const [name, cmd] of entries) {
+      map.set(name, cmd as Command<G> | LazyCommand<G>)
+    }
+    return map
+  }
+
+  return undefined
 }
 
 /**

@@ -7,6 +7,8 @@ import { expectTypeOf, test } from 'vitest'
 import { cli } from './cli.ts'
 import { define } from './definition.ts'
 
+import type { Command, CommandContext } from './types.ts'
+
 test('cli() with define() should preserve type inference', async () => {
   // Test that define() alone has correct type inference
   define({
@@ -77,4 +79,21 @@ test('cli() with complex args should preserve type inference', async () => {
       }
     })
   )
+})
+
+test('Command with subCommands property is valid', () => {
+  const cmd: Command = {
+    name: 'remote',
+    description: 'Manage remotes',
+    subCommands: {
+      add: { name: 'add', description: 'Add a remote', run: () => {} }
+    },
+    run: () => {}
+  }
+  expectTypeOf(cmd.subCommands).toEqualTypeOf<Command['subCommands']>()
+})
+
+test('CommandContext has commandPath accessible', () => {
+  type Ctx = CommandContext
+  expectTypeOf<Ctx['commandPath']>().toEqualTypeOf<string[]>()
 })

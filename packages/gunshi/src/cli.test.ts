@@ -1642,3 +1642,361 @@ describe('github issues', () => {
     expect(log()).toMatchSnapshot('console output')
   })
 })
+
+describe('nested sub-commands', () => {
+  test('2-level command execution (git remote add)', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
+    const mockAdd = vi.fn()
+    const mockRemove = vi.fn()
+    const mockRemote = vi.fn()
+
+    const addCommand = define({
+      name: 'add',
+      description: 'Add a remote',
+      args: {
+        url: { type: 'string', required: true }
+      },
+      run: mockAdd
+    })
+
+    const removeCommand = define({
+      name: 'remove',
+      description: 'Remove a remote',
+      run: mockRemove
+    })
+
+    const remoteCommand = define({
+      name: 'remote',
+      description: 'Manage remotes',
+      subCommands: { add: addCommand, remove: removeCommand },
+      run: mockRemote
+    })
+
+    const entry = define({
+      name: 'git',
+      run: vi.fn()
+    })
+
+    await cli(['remote', 'add', '--url', 'origin'], entry, {
+      name: 'git',
+      subCommands: { remote: remoteCommand }
+    })
+
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callMode: 'subCommand',
+        commandPath: ['remote', 'add'],
+        values: { url: 'origin' }
+      })
+    )
+    expect(mockRemote).not.toHaveBeenCalled()
+  })
+
+  test('3-level command execution', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
+    const mockLeaf = vi.fn()
+
+    const leafCommand = define({
+      name: 'leaf',
+      description: 'Leaf command',
+      run: mockLeaf
+    })
+
+    const midCommand = define({
+      name: 'mid',
+      description: 'Middle command',
+      subCommands: { leaf: leafCommand },
+      run: vi.fn()
+    })
+
+    const topCommand = define({
+      name: 'top',
+      description: 'Top command',
+      subCommands: { mid: midCommand },
+      run: vi.fn()
+    })
+
+    await cli(
+      ['top', 'mid', 'leaf'],
+      { run: vi.fn() },
+      {
+        name: 'app',
+        subCommands: { top: topCommand }
+      }
+    )
+
+    expect(mockLeaf).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callMode: 'subCommand',
+        commandPath: ['top', 'mid', 'leaf']
+      })
+    )
+  })
+
+  test('intermediate command with subCommands shows help (omitted mode)', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const addCommand = define({
+      name: 'add',
+      description: 'Add a remote',
+      run: vi.fn()
+    })
+
+    const remoteCommand = define({
+      name: 'remote',
+      description: 'Manage remotes',
+      subCommands: { add: addCommand },
+      run: vi.fn()
+    })
+
+    const entry = define({
+      name: 'git',
+      run: vi.fn()
+    })
+
+    const rendered = await cli(['remote', '-h'], entry, {
+      name: 'git',
+      subCommands: { remote: remoteCommand }
+    })
+
+    expect(rendered).toBeTruthy()
+    expect(log()).toBeTruthy()
+  })
+
+  test('intermediate command with own run() is executed', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
+    const mockRemote = vi.fn()
+
+    const addCommand = define({
+      name: 'add',
+      description: 'Add a remote',
+      run: vi.fn()
+    })
+
+    const remoteCommand = define({
+      name: 'remote',
+      description: 'Manage remotes',
+      subCommands: { add: addCommand },
+      run: mockRemote
+    })
+
+    // invoke 'remote' without specifying a nested sub-command
+    await cli(
+      ['remote'],
+      { run: vi.fn() },
+      {
+        name: 'git',
+        subCommands: { remote: remoteCommand }
+      }
+    )
+
+    expect(mockRemote).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callMode: 'subCommand',
+        omitted: true,
+        commandPath: ['remote']
+      })
+    )
+  })
+
+  test('unknown nested sub-command is treated as positional argument', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
+    const mockAdd = vi.fn()
+
+    const addCommand = define({
+      name: 'add',
+      description: 'Add something',
+      args: {
+        item: { type: 'positional' }
+      },
+      run: mockAdd
+    })
+
+    const topCommand = define({
+      name: 'top',
+      description: 'Top command',
+      subCommands: { add: addCommand },
+      run: vi.fn()
+    })
+
+    // 'top add unknown-thing' -> 'unknown-thing' should be a positional arg for 'add'
+    await cli(
+      ['top', 'add', 'unknown-thing'],
+      { run: vi.fn() },
+      {
+        name: 'app',
+        subCommands: { top: topCommand }
+      }
+    )
+
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: ['top', 'add'],
+        values: { item: 'unknown-thing' }
+      })
+    )
+  })
+
+  test('commandPath is correct for depth=1', async () => {
+    const mockCmd = vi.fn()
+
+    const subCmd = define({
+      name: 'sub',
+      description: 'Sub command',
+      run: mockCmd
+    })
+
+    await cli(
+      ['sub'],
+      { run: vi.fn() },
+      {
+        subCommands: { sub: subCmd }
+      }
+    )
+
+    expect(mockCmd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: ['sub']
+      })
+    )
+  })
+
+  test('commandPath is empty for entry command', async () => {
+    const mockEntry = vi.fn()
+
+    await cli([], { run: mockEntry })
+
+    expect(mockEntry).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: []
+      })
+    )
+  })
+
+  test('nested sub-commands with lazy commands', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
+    const mockAdd = vi.fn()
+
+    const addCommand = lazy(
+      () =>
+        Promise.resolve({
+          name: 'add',
+          description: 'Add a remote',
+          args: { url: { type: 'string' } },
+          run: mockAdd
+        }),
+      {
+        name: 'add',
+        description: 'Add a remote',
+        args: { url: { type: 'string' } }
+      }
+    )
+
+    const remoteCommand = define({
+      name: 'remote',
+      description: 'Manage remotes',
+      subCommands: { add: addCommand },
+      run: vi.fn()
+    })
+
+    await cli(
+      ['remote', 'add', '--url', 'origin'],
+      { run: vi.fn() },
+      {
+        name: 'git',
+        subCommands: { remote: remoteCommand }
+      }
+    )
+
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: ['remote', 'add'],
+        values: { url: 'origin' }
+      })
+    )
+  })
+
+  test('nested sub-commands as Record (not Map)', async () => {
+    const mockAdd = vi.fn()
+
+    const addCommand = define({
+      name: 'add',
+      description: 'Add',
+      run: mockAdd
+    })
+
+    const remoteCommand = define({
+      name: 'remote',
+      description: 'Remote',
+      subCommands: { add: addCommand },
+      run: vi.fn()
+    })
+
+    await cli(
+      ['remote', 'add'],
+      { run: vi.fn() },
+      {
+        subCommands: { remote: remoteCommand }
+      }
+    )
+
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: ['remote', 'add']
+      })
+    )
+  })
+
+  test('lazy command with subCommands metadata', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
+    const mockAdd = vi.fn()
+
+    const addCommand = define({
+      name: 'add',
+      description: 'Add a remote',
+      run: mockAdd
+    })
+
+    const remoteCommand = lazy(
+      () =>
+        Promise.resolve({
+          name: 'remote',
+          description: 'Manage remotes',
+          run: vi.fn()
+        }),
+      {
+        name: 'remote',
+        description: 'Manage remotes',
+        subCommands: { add: addCommand }
+      }
+    )
+
+    await cli(
+      ['remote', 'add'],
+      { run: vi.fn() },
+      {
+        name: 'git',
+        subCommands: { remote: remoteCommand }
+      }
+    )
+
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: ['remote', 'add']
+      })
+    )
+  })
+})

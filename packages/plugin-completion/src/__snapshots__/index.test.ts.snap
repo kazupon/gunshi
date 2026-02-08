@@ -176,6 +176,82 @@ exports[`i18n support > subcommand > user typed \`--port=\` and hasn't typed a s
 "
 `;
 
+exports[`nested sub-commands > suggest nested sub-commands for remote 1`] = `
+"remote	Manage remotes
+:4
+"
+`;
+
+exports[`nested sub-commands > suggest option value for remote add --url 1`] = `
+"--url	Remote URL
+:4
+"
+`;
+
+exports[`nested sub-commands > suggest options for nested remote add 1`] = `
+"--url	Remote URL
+:4
+"
+`;
+
+exports[`nested sub-commands > suggest options for top-level status 1`] = `
+"--short	Short format
+:4
+"
+`;
+
+exports[`nested sub-commands > suggest positional for remote remove 1`] = `
+"origin	Default remote
+upstream	Upstream remote
+:4
+"
+`;
+
+exports[`nested sub-commands > suggest top-level commands 1`] = `
+"remote	Manage remotes
+status	Show status
+:4
+"
+`;
+
+exports[`nested sub-commands with i18n > suggest localized option value for remote add --url 1`] = `
+"--url	リモートURL
+:4
+"
+`;
+
+exports[`nested sub-commands with i18n > suggest localized positional for remote remove 1`] = `
+"origin	デフォルトリモート
+upstream	上流リモート
+:4
+"
+`;
+
+exports[`nested sub-commands with i18n > suggest nested sub-commands for remote with localized description 1`] = `
+"remote	リモートを管理します
+:4
+"
+`;
+
+exports[`nested sub-commands with i18n > suggest options for nested remote add with localized description 1`] = `
+"--url	リモートURL
+:4
+"
+`;
+
+exports[`nested sub-commands with i18n > suggest options for top-level status with localized description 1`] = `
+"--short	短い形式で表示
+:4
+"
+`;
+
+exports[`nested sub-commands with i18n > suggest top-level commands with localized descriptions 1`] = `
+"remote	リモートを管理します
+status	ステータスを表示します
+:4
+"
+`;
+
 exports[`no input 1`] = `
 "dev	Start dev server
 build	Build project

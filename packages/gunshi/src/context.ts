@@ -96,6 +96,10 @@ export interface CommandContextParams<
    */
   callMode?: CommandCallMode
   /**
+   * The path of nested sub-commands resolved to reach the current command.
+   */
+  commandPath?: string[]
+  /**
    * A target command
    */
   command?: C
@@ -136,6 +140,7 @@ export async function createCommandContext<
   extensions = {} as E,
   cliOptions = {} as CliOptions<G>,
   callMode = 'entry',
+  commandPath = [],
   omitted = false,
   validationError = undefined
 }: CommandContextParams<G, V, C, E>): Promise<
@@ -188,6 +193,7 @@ export async function createCommandContext<
     description: command.description,
     omitted,
     callMode,
+    commandPath,
     env,
     args: _args,
     explicit,

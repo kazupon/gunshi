@@ -1,0 +1,12 @@
+{
+  "name": "nested-sub-commands",
+  "private": true,
+  "packageManager": "pnpm@10.28.1",
+  "type": "module",
+  "scripts": {
+    "start": "node cli.ts"
+  },
+  "dependencies": {
+    "gunshi": "file:../../../packages/gunshi"
+  }
+}
