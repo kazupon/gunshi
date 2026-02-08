@@ -1,7 +1,7 @@
 {
   "name": "@gunshi/plugin-dryrun",
   "description": "dryrun option plugin for gunshi",
-  "version": "0.27.6",
+  "version": "0.28.0",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
