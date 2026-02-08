@@ -1645,6 +1645,9 @@ describe('github issues', () => {
 
 describe('nested sub-commands', () => {
   test('2-level command execution (git remote add)', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
     const mockAdd = vi.fn()
     const mockRemove = vi.fn()
     const mockRemote = vi.fn()
@@ -1692,6 +1695,9 @@ describe('nested sub-commands', () => {
   })
 
   test('3-level command execution', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
     const mockLeaf = vi.fn()
 
     const leafCommand = define({
@@ -1763,6 +1769,9 @@ describe('nested sub-commands', () => {
   })
 
   test('intermediate command with own run() is executed', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
     const mockRemote = vi.fn()
 
     const addCommand = define({
@@ -1798,6 +1807,9 @@ describe('nested sub-commands', () => {
   })
 
   test('unknown nested sub-command is treated as positional argument', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
     const mockAdd = vi.fn()
 
     const addCommand = define({
@@ -1871,6 +1883,9 @@ describe('nested sub-commands', () => {
   })
 
   test('nested sub-commands with lazy commands', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
     const mockAdd = vi.fn()
 
     const addCommand = lazy(
@@ -1944,6 +1959,9 @@ describe('nested sub-commands', () => {
   })
 
   test('lazy command with subCommands metadata', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+
     const mockAdd = vi.fn()
 
     const addCommand = define({

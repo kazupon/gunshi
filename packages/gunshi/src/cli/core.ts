@@ -347,8 +347,9 @@ function resolveCommandTree<G extends GunshiParamsConstraint>(
     // resolve command name if missing - shallow copy to avoid mutating user objects
     let resolved: Command<G> | LazyCommand<G> = cmd
     if (typeof cmd === 'function' && (cmd as any).commandName == null) {
-      const copy = Object.assign(() => {}, cmd) as LazyCommand<G>
-      copy.commandName = token
+      const copy = Object.assign((...args: unknown[]) => (cmd as Function)(...args), cmd, {
+        commandName: token
+      }) as unknown as LazyCommand<G>
       resolved = copy
     } else if (typeof cmd === 'object' && cmd.name == null) {
       resolved = Object.assign(create<Command<G>>(), cmd, { name: token }) as Command<G>
@@ -383,9 +384,20 @@ function resolveCommandTree<G extends GunshiParamsConstraint>(
   if (omitted && resolvedSubCommands) {
     levelSubCommands = new Map(resolvedSubCommands)
     // add a shallow copy of the resolved command as entry to avoid mutating the original
-    const entryCopy = Object.assign(create<Command<G>>(), resolvedCommand, {
-      entry: true
-    }) as Command<G> | LazyCommand<G>
+    let entryCopy: Command<G> | LazyCommand<G>
+    if (typeof resolvedCommand === 'function') {
+      // lazy command - create a delegating wrapper to preserve callable nature
+      entryCopy = Object.assign(
+        (...args: unknown[]) => (resolvedCommand as Function)(...args),
+        resolvedCommand,
+        { entry: true }
+      ) as unknown as LazyCommand<G>
+    } else {
+      // command object
+      entryCopy = Object.assign(create<Command<G>>(), resolvedCommand, {
+        entry: true
+      }) as Command<G>
+    }
     levelSubCommands.set(resolvedName || resolveEntryName(entryCopy), entryCopy)
   }
 
