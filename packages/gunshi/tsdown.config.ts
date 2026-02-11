@@ -18,7 +18,7 @@ const config: UserConfig = defineConfig({
   clean: true,
   publint: true,
   dts: {
-    resolve: ['args-tokens']
+    resolve: ['args-tokens', 'args-tokens/utils']
   },
   noExternal: ['@gunshi/plugin-global', '@gunshi/plugin-renderer', '@gunshi/plugin-i18n'],
   hooks: {
