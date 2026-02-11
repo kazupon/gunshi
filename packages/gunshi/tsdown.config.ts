@@ -17,7 +17,9 @@ const config: UserConfig = defineConfig({
   outDir: 'lib',
   clean: true,
   publint: true,
-  dts: true,
+  dts: {
+    resolve: ['args-tokens']
+  },
   noExternal: ['@gunshi/plugin-global', '@gunshi/plugin-renderer', '@gunshi/plugin-i18n'],
   hooks: {
     'build:done': lintJsrExports()
