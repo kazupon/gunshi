@@ -1,7 +1,7 @@
 {
   "name": "@gunshi/definition",
   "description": "utilities for gunshi command definition",
-  "version": "0.28.0",
+  "version": "0.28.1",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"

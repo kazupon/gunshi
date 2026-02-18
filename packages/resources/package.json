@@ -1,7 +1,7 @@
 {
   "name": "@gunshi/resources",
   "description": "built-in localization resources for gunshi",
-  "version": "0.28.0",
+  "version": "0.28.1",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
