@@ -84,6 +84,12 @@
       "require": "./lib/utils.js",
       "default": "./lib/utils.js"
     },
+    "./combinators": {
+      "types": "./lib/combinators.d.ts",
+      "import": "./lib/combinators.js",
+      "require": "./lib/combinators.js",
+      "default": "./lib/combinators.js"
+    },
     "./package.json": "./package.json"
   },
   "types": "lib/index.d.ts",
@@ -107,7 +113,7 @@
     "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
-    "args-tokens": "^0.23.1",
+    "args-tokens": "^0.24.0",
     "deno": "catalog:",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",

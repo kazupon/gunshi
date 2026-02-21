@@ -117,6 +117,14 @@ With `define`:
 
 This approach significantly simplifies creating type-safe CLIs with Gunshi.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!TIP]
+> For even stronger type inference with composable argument schemas, check out [Parser Combinators](../experimentals/parser-combinators.md).
+> Parser combinators provide functional factory functions like `string()`, `integer()`, `withDefault()`, and `required()` that automatically infer precise types without manual annotations. Note that this feature is currently **experimental**.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 ## When to Use `define`
 
 Use the `define` function when:

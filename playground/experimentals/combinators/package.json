@@ -1,0 +1,12 @@
+{
+  "name": "combinators",
+  "private": true,
+  "packageManager": "pnpm@10.28.1",
+  "type": "module",
+  "scripts": {
+    "start": "npx tsx cli.ts"
+  },
+  "dependencies": {
+    "gunshi": "file:../../../packages/gunshi"
+  }
+}

@@ -12,7 +12,8 @@ export default {
     '../gunshi/src/context.ts',
     '../gunshi/src/plugin.ts',
     '../gunshi/src/generator.ts',
-    '../gunshi/src/renderer.ts'
+    '../gunshi/src/renderer.ts',
+    '../gunshi/src/combinators.ts'
   ],
   out: 'src/api',
   plugin: ['typedoc-plugin-markdown', 'typedoc-vitepress-theme'],

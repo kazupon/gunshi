@@ -171,6 +171,14 @@ Each option can have the following properties:
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
 - `conflicts`: Specify mutually exclusive options that cannot be used together
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> For a more type-safe and composable way to define arguments, see [Parser Combinators](../experimentals/parser-combinators.md).
+> Note that this feature is currently **experimental**.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 #### Positional Arguments
 
 To define arguments that are identified by their position rather than a name/flag (like `--name`), set their `type` to `'positional'`.
