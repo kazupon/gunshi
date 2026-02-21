@@ -17,7 +17,8 @@ export default {
     },
     'packages/docs': {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts'],
-      ignore: ['src/.vitepress/banner.js']
+      ignore: ['src/.vitepress/banner.js', 'src/.vitepress/theme/components/GunshiBanner.vue'],
+      ignoreDependencies: ['@vueuse/core']
     }
   },
   ignore: [
