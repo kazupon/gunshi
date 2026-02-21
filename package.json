@@ -86,7 +86,7 @@
   },
   "devDependencies": {
     "@eslint/markdown": "^7.5.1",
-    "@kazupon/eslint-config": "^0.44.0",
+    "@kazupon/eslint-config": "^0.45.0",
     "@kazupon/eslint-plugin": "^0.7.1",
     "@kazupon/prettier-config": "^0.2.0",
     "@types/node": "catalog:",

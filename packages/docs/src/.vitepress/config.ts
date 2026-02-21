@@ -10,6 +10,7 @@ import {
   advanced,
   apiReferences,
   essentials,
+  experimentals,
   extraTopics,
   introduction,
   meta,
@@ -70,7 +71,16 @@ export default withMermaid({
       { text: 'GitHub', link: 'https://github.com/kazupon/gunshi' }
     ],
 
-    sidebar: [introduction, essentials, advanced, plugin, apiReferences, extraTopics, releaseNotes],
+    sidebar: [
+      introduction,
+      essentials,
+      advanced,
+      experimentals,
+      plugin,
+      apiReferences,
+      extraTopics,
+      releaseNotes
+    ],
 
     search: {
       provider: 'local'

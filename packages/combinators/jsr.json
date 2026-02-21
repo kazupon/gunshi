@@ -1,0 +1,21 @@
+{
+  "$id": "https://jsr.io/schema/config-file.v1.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "name": "@gunshi/combinators",
+  "description": "parser combinators for gunshi argument schema",
+  "version": "0.28.2",
+  "license": "MIT",
+  "publish": {
+    "include": ["src/**/*.ts", "package.json", "jsr.json", "README.md", "CHANGELOG.md", "LICENSE"],
+    "exclude": [
+      "src/**/*.test.ts",
+      "src/**/*.test-d.ts",
+      "**/__snapshots__/**",
+      "**/lib/**",
+      "**/dist/**"
+    ]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

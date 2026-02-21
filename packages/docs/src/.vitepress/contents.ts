@@ -56,6 +56,12 @@ export const advanced = {
   ]
 }
 
+export const experimentals = {
+  text: 'Experimentals',
+  collapsed: false,
+  items: [{ text: 'Parser Combinators', link: '/guide/experimentals/parser-combinators' }]
+}
+
 export const plugin = {
   text: 'Plugin',
   collapsed: false,

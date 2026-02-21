@@ -32,6 +32,7 @@ minimumReleaseAgeExclude:
   - "@kazupon/eslint-config"
   - gunshi
   - "@gunshi/bone"
+  - "@gunshi/combinators"
   - "@gunshi/docs"
   - "@gunshi/definition"
   - "@gunshi/plugin"
