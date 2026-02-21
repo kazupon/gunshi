@@ -131,8 +131,8 @@ importers:
         specifier: ^0.11.4
         version: 0.11.4
       pkg-pr-new:
-        specifier: ^0.0.62
-        version: 0.0.62
+        specifier: ^0.0.63
+        version: 0.0.63
       tsx:
         specifier: 'catalog:'
         version: 4.21.0
@@ -833,17 +833,17 @@ importers:
 
 packages:
 
-  '@actions/core@1.11.1':
-    resolution: {integrity: sha512-hXJCSrkwfA46Vd9Z3q4cpEpHB1rL5NG04+/rbqW9d3+CSvtB1tYe8UTpAlixa1vj0m/ULglfEK2UKxMGxCxv5A==}
+  '@actions/core@3.0.0':
+    resolution: {integrity: sha512-zYt6cz+ivnTmiT/ksRVriMBOiuoUpDCJJlZ5KPl2/FRdvwU3f7MPh9qftvbkXJThragzUZieit2nyHUyw53Seg==}
 
-  '@actions/exec@1.1.1':
-    resolution: {integrity: sha512-+sCcHHbVdk93a0XT19ECtO/gIXoxvdsgQLzb2fE2/5sIZmWQuluYyjPQtrtTHdU1YzTZ7bAPN4sITq2xi1679w==}
+  '@actions/exec@3.0.0':
+    resolution: {integrity: sha512-6xH/puSoNBXb72VPlZVm7vQ+svQpFyA96qdDBvhB8eNZOE8LtPf9L4oAsfzK/crCL8YZ+19fKYVnM63Sl+Xzlw==}
 
-  '@actions/http-client@2.2.3':
-    resolution: {integrity: sha512-mx8hyJi/hjFvbPokCg4uRd4ZX78t+YyRPtnKWwIl+RzNaVuFpQHfmlGVfsKEJN8LwTCvL+DfVgAM04XaHkm6bA==}
+  '@actions/http-client@4.0.0':
+    resolution: {integrity: sha512-QuwPsgVMsD6qaPD57GLZi9sqzAZCtiJT8kVBCDpLtxhL5MydQ4gS+DrejtZZPdIYyB1e95uCK9Luyds7ybHI3g==}
 
-  '@actions/io@1.1.3':
-    resolution: {integrity: sha512-wi9JjgKLYS7U/z8PPbco+PvTb/nRWjeoFlJ1Qer83k/3C5PHQi28hiVdeE2kHXmIL99mQFawx8qt/JPjZilJ8Q==}
+  '@actions/io@3.0.2':
+    resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
   '@antfu/install-pkg@1.1.0':
     resolution: {integrity: sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==}
@@ -4891,8 +4891,8 @@ packages:
     engines: {node: '>=0.10'}
     hasBin: true
 
-  pkg-pr-new@0.0.62:
-    resolution: {integrity: sha512-K2jtf1PLCJJFDimQIpasPXDdnRTZSYPy36Ldz+QhMpLz2YN1Wi0ZQkomVt5Wi3NdBZcYuYGXekyFWfJ6fAHYjg==}
+  pkg-pr-new@0.0.63:
+    resolution: {integrity: sha512-N4qfhiahmWVmUTKo//Bvb1FAKV7DwFcOjh8GT/aTh0YFSWRZwZp02afpNSohSs1z1jj0YOjU6Ff62iJ0AuHCfg==}
     hasBin: true
 
   pkg-types@1.3.1:
@@ -5566,6 +5566,10 @@ packages:
     resolution: {integrity: sha512-gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==}
     engines: {node: '>=18.17'}
 
+  undici@6.23.0:
+    resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
+    engines: {node: '>=18.17'}
+
   unicorn-magic@0.1.0:
     resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}
     engines: {node: '>=18'}
@@ -5872,21 +5876,21 @@ packages:
 
 snapshots:
 
-  '@actions/core@1.11.1':
+  '@actions/core@3.0.0':
     dependencies:
-      '@actions/exec': 1.1.1
-      '@actions/http-client': 2.2.3
+      '@actions/exec': 3.0.0
+      '@actions/http-client': 4.0.0
 
-  '@actions/exec@1.1.1':
+  '@actions/exec@3.0.0':
     dependencies:
-      '@actions/io': 1.1.3
+      '@actions/io': 3.0.2
 
-  '@actions/http-client@2.2.3':
+  '@actions/http-client@4.0.0':
     dependencies:
       tunnel: 0.0.6
-      undici: 5.29.0
+      undici: 6.23.0
 
-  '@actions/io@1.1.3': {}
+  '@actions/io@3.0.2': {}
 
   '@antfu/install-pkg@1.1.0':
     dependencies:
@@ -9973,9 +9977,9 @@ snapshots:
 
   pidtree@0.6.0: {}
 
-  pkg-pr-new@0.0.62:
+  pkg-pr-new@0.0.63:
     dependencies:
-      '@actions/core': 1.11.1
+      '@actions/core': 3.0.0
       '@jsdevtools/ez-spawn': 3.0.4
       '@octokit/action': 6.1.0
       ignore: 5.3.2
@@ -10795,6 +10799,8 @@ snapshots:
       '@fastify/busboy': 2.1.1
 
   undici@6.21.3: {}
+
+  undici@6.23.0: {}
 
   unicorn-magic@0.1.0: {}
 
