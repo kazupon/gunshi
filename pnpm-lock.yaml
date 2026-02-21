@@ -665,12 +665,6 @@ importers:
         specifier: file:../../../../packages/gunshi
         version: link:../../../../packages/gunshi
 
-  playground/essentials/combinators:
-    dependencies:
-      gunshi:
-        specifier: file:../../../packages/gunshi
-        version: link:../../../packages/gunshi
-
   playground/essentials/composable/basic:
     dependencies:
       gunshi:
@@ -736,6 +730,12 @@ importers:
         version: link:../../../../packages/gunshi
 
   playground/essentials/type-safe:
+    dependencies:
+      gunshi:
+        specifier: file:../../../packages/gunshi
+        version: link:../../../packages/gunshi
+
+  playground/experimentals/combinators:
     dependencies:
       gunshi:
         specifier: file:../../../packages/gunshi
