@@ -41,6 +41,7 @@ function updatePkgJson(pkg: string, json: Record<string, unknown>): Record<strin
     }
     case 'packages/bone':
     case 'packages/plugin':
+    case 'packages/combinators':
     case 'packages/definition': {
       setDependency('gunshi')
       break
