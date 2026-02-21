@@ -54,7 +54,7 @@ importers:
         version: 7.5.1
       '@kazupon/eslint-config':
         specifier: ^0.45.0
-        version: 0.45.0(3450a4be790674e81cdae684808d8880)
+        version: 0.45.0(d015593360052c12d74de40d3b49e635)
       '@kazupon/eslint-plugin':
         specifier: ^0.7.1
         version: 0.7.1(eslint@9.39.2(jiti@2.6.1))
@@ -92,8 +92,8 @@ importers:
         specifier: ^1.42.0
         version: 1.42.0
       eslint-plugin-regexp:
-        specifier: ^2.10.0
-        version: 2.10.0(eslint@9.39.2(jiti@2.6.1))
+        specifier: ^3.0.0
+        version: 3.0.0(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-unused-imports:
         specifier: ^4.3.0
         version: 4.3.0(@typescript-eslint/eslint-plugin@8.50.1(@typescript-eslint/parser@8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))
@@ -3711,11 +3711,11 @@ packages:
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
 
-  eslint-plugin-regexp@2.10.0:
-    resolution: {integrity: sha512-ovzQT8ESVn5oOe5a7gIDPD5v9bCSjIFJu57sVPDqgPRXicQzOnYfFN21WoQBQF18vrhT5o7UMKFwJQVVjyJ0ng==}
-    engines: {node: ^18 || >=20}
+  eslint-plugin-regexp@3.0.0:
+    resolution: {integrity: sha512-iW7hgAV8NOG6E2dz+VeKpq67YLQ9jaajOKYpoOSic2/q8y9BMdXBKkSR9gcMtbqEhNQzdW41E3wWzvhp8ExYwQ==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     peerDependencies:
-      eslint: '>=8.44.0'
+      eslint: '>=9.38.0'
 
   eslint-plugin-unused-imports@4.3.0:
     resolution: {integrity: sha512-ZFBmXMGBYfHttdRtOG9nFFpmUvMtbHSjsKrS20vdWdbfiVYsO3yA2SGYy9i9XmZJDfMGBflZGBCm70SEnFQtOA==}
@@ -4253,10 +4253,6 @@ packages:
   js-yaml@4.1.1:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
-
-  jsdoc-type-pratt-parser@4.8.0:
-    resolution: {integrity: sha512-iZ8Bdb84lWRuGHamRXFyML07r21pcwBrLkHEuHgEY5UbCouBwv7ECknDRKzsQIXMiqpPymqtIf8TC/shYKB5rw==}
-    engines: {node: '>=12.0.0'}
 
   jsdoc-type-pratt-parser@6.10.0:
     resolution: {integrity: sha512-+LexoTRyYui5iOhJGn13N9ZazL23nAHGkXsa1p/C8yeq79WRfLBag6ZZ0FQG2aRoc9yfo59JT9EYCQonOkHKkQ==}
@@ -6349,7 +6345,7 @@ snapshots:
       string-argv: 0.3.2
       type-detect: 4.1.0
 
-  '@kazupon/eslint-config@0.45.0(3450a4be790674e81cdae684808d8880)':
+  '@kazupon/eslint-config@0.45.0(d015593360052c12d74de40d3b49e635)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.6.0(eslint@9.39.2(jiti@2.6.1))
       '@eslint/js': 9.39.2
@@ -6372,7 +6368,7 @@ snapshots:
       eslint-plugin-module-interop: 0.3.1(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-oxlint: 1.42.0
       eslint-plugin-promise: 7.2.1(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-regexp: 2.10.0(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-regexp: 3.0.0(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-unused-imports: 4.3.0(@typescript-eslint/eslint-plugin@8.50.1(@typescript-eslint/parser@8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-vue: 10.6.2(@stylistic/eslint-plugin@5.8.0(eslint@9.39.2(jiti@2.6.1)))(@typescript-eslint/parser@8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(vue-eslint-parser@9.4.3(eslint@9.39.2(jiti@2.6.1)))
       eslint-plugin-vue-composable: 1.0.0(eslint@9.39.2(jiti@2.6.1))
@@ -7238,7 +7234,7 @@ snapshots:
 
   '@typescript-eslint/utils@8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.2(jiti@2.6.1))
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2(jiti@2.6.1))
       '@typescript-eslint/scope-manager': 8.50.1
       '@typescript-eslint/types': 8.50.1
       '@typescript-eslint/typescript-estree': 8.50.1(typescript@5.9.3)
@@ -8474,13 +8470,13 @@ snapshots:
       eslint: 9.39.2(jiti@2.6.1)
     optional: true
 
-  eslint-plugin-regexp@2.10.0(eslint@9.39.2(jiti@2.6.1)):
+  eslint-plugin-regexp@3.0.0(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.2(jiti@2.6.1))
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2(jiti@2.6.1))
       '@eslint-community/regexpp': 4.12.1
       comment-parser: 1.4.1
       eslint: 9.39.2(jiti@2.6.1)
-      jsdoc-type-pratt-parser: 4.8.0
+      jsdoc-type-pratt-parser: 7.0.0
       refa: 0.12.1
       regexp-ast-analysis: 0.7.1
       scslre: 0.3.0
@@ -9078,8 +9074,6 @@ snapshots:
   js-yaml@4.1.1:
     dependencies:
       argparse: 2.0.1
-
-  jsdoc-type-pratt-parser@4.8.0: {}
 
   jsdoc-type-pratt-parser@6.10.0: {}
 
