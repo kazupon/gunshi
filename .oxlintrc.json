@@ -116,6 +116,7 @@
     "playground/**",
     "design/**",
     "./packages/docs/**",
+    "packages/docs/src/.vitepress/**",
     "./packages/plugin-*/docs/**/*.md", // NOTE(kazupon): ignore generated docs
     "CHANGELOG.md",
     ".github/FUNDING.yml"
