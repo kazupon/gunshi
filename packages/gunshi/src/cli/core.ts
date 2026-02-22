@@ -71,7 +71,17 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     throw new Error(`Command not found: ${name || ''}`)
   }
 
-  const args = resolveArguments(pluginContext, getCommandArgs(command))
+  // override subCommands with level-specific sub-commands for rendering
+  if (levelSubCommands) {
+    cliOptions.subCommands = levelSubCommands
+  }
+
+  // resolve lazy commands before parsing so loader-defined args are available
+  const resolvedCommand = isLazyCommand<G>(command)
+    ? await resolveLazyCommand<G>(command, name, true)
+    : command
+
+  const args = resolveArguments(pluginContext, getCommandArgs(resolvedCommand))
 
   // skipPositional: how many leading positionals to skip (they're consumed as command names)
   // depth=0 → -1 (no skip), depth=1 → 0 (skip 1, existing behavior), depth=2 → 1 (skip 2), etc.
@@ -79,19 +89,10 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 
   const { explicit, values, positionals, rest, error } = resolveArgs(args, tokens, {
     shortGrouping: true,
-    toKebab: command.toKebab,
+    toKebab: resolvedCommand.toKebab,
     skipPositional
   })
   const omitted = resolved.omitted
-
-  // override subCommands with level-specific sub-commands for rendering
-  if (levelSubCommands) {
-    cliOptions.subCommands = levelSubCommands
-  }
-
-  const resolvedCommand = isLazyCommand<G>(command)
-    ? await resolveLazyCommand<G>(command, name, true)
-    : command
 
   const commandContext = await createCommandContext({
     args,
