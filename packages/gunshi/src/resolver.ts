@@ -24,5 +24,8 @@ export async function resolveValue<A extends Args>(
   if (!hook) {
     return values
   }
-  return (await hook({ values, explicit })) ?? values
+  // Pass a frozen shallow copy so hook cannot mutate the original values;
+  // the original is preserved as the fallback when the hook returns undefined.
+  const snapshot = Object.freeze({ ...values }) as ArgValues<A>
+  return (await hook({ values: snapshot, explicit })) ?? values
 }

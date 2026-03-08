@@ -39,7 +39,12 @@ describe('resolveValue', () => {
 
     expect(result).toBe(overridden)
     expect(hook).toHaveBeenCalledOnce()
-    expect(hook).toHaveBeenCalledWith({ values, explicit })
+    // hook receives a frozen snapshot (not the original reference), but with equal values
+    const [calledSources] = hook.mock.calls[0]
+    expect(calledSources.values).toEqual(values)
+    expect(calledSources.values).not.toBe(values)
+    expect(Object.isFrozen(calledSources.values)).toBe(true)
+    expect(calledSources.explicit).toBe(explicit)
   })
 
   test('should fall back to original values when hook returns undefined', async () => {
@@ -61,7 +66,30 @@ describe('resolveValue', () => {
 
     await resolveValue(hook, values, explicitWithPort)
 
-    expect(hook).toHaveBeenCalledWith({ values, explicit: explicitWithPort })
+    const [calledSources] = hook.mock.calls[0]
+    expect(calledSources.values).toEqual(values)
+    expect(calledSources.explicit).toBe(explicitWithPort)
+  })
+
+  test('should return original values when hook mutates snapshot and returns undefined', async () => {
+    const original = { name: 'original', port: 3000, debug: false }
+    const inputValues: ArgValues<TestArgs> = { ...original }
+
+    const hook = vi.fn().mockImplementation((sources: { values: ArgValues<TestArgs> }) => {
+      // Attempt to mutate the snapshot passed to the hook
+      try {
+        ;(sources.values as Record<string, unknown>)['name'] = 'mutated'
+      } catch {
+        // Silently ignore TypeError from frozen object in strict mode
+      }
+      return undefined
+    })
+
+    const result = await resolveValue(hook, inputValues, explicit)
+
+    // Fallback must be the unmodified original
+    expect(result).toBe(inputValues)
+    expect(result.name).toBe('original')
   })
 
   test('should support synchronous hook', async () => {
