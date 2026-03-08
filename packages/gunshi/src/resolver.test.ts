@@ -3,9 +3,10 @@
  * @license MIT
  */
 
+import { ArgResolveError } from 'args-tokens'
 import { describe, expect, test, vi } from 'vitest'
-import { resolveValue } from './resolver.ts'
-import type { Args, ArgValues, ArgExplicitlyProvided } from 'args-tokens'
+import { revalidateError, resolveValue } from './resolver.ts'
+import type { Args, ArgExplicitlyProvided, ArgValues } from 'args-tokens'
 
 type TestArgs = Args & {
   name: { type: 'string' }
@@ -99,5 +100,100 @@ describe('resolveValue', () => {
     const result = await resolveValue(hook, values, explicit)
 
     expect(result).toBe(overridden)
+  })
+})
+
+describe('revalidateError', () => {
+  const requiredArgs = {
+    name: { type: 'string' as const, required: true as const },
+    port: { type: 'number' as const }
+  }
+
+  test('should return undefined when original error is undefined', () => {
+    const result = revalidateError(undefined, requiredArgs, { name: 'foo', port: 3000 })
+    expect(result).toBeUndefined()
+  })
+
+  test('should clear required error when resolved value is now present', () => {
+    const schema = requiredArgs.name
+    const requiredError = new ArgResolveError(
+      "Optional argument '--name' is required",
+      'name',
+      'required',
+      schema
+    )
+    const error = new AggregateError([requiredError])
+
+    // hook filled in the required arg
+    const result = revalidateError(error, requiredArgs, { name: 'from-config', port: 3000 })
+
+    expect(result).toBeUndefined()
+  })
+
+  test('should keep required error when resolved value is still missing', () => {
+    const schema = requiredArgs.name
+    const requiredError = new ArgResolveError(
+      "Optional argument '--name' is required",
+      'name',
+      'required',
+      schema
+    )
+    const error = new AggregateError([requiredError])
+
+    // hook did not fill in the required arg
+    const result = revalidateError(error, requiredArgs, { port: 3000 } as ArgValues<
+      typeof requiredArgs
+    >)
+
+    expect(result).toBeInstanceOf(AggregateError)
+    expect(result!.errors).toHaveLength(1)
+    expect(result!.errors[0]).toBe(requiredError)
+  })
+
+  test('should keep non-required errors (type, conflict) unchanged', () => {
+    const schema = requiredArgs.port
+    const typeError = new ArgResolveError(
+      "Optional argument '--port' should be 'number'",
+      'port',
+      'type',
+      schema
+    )
+    const error = new AggregateError([typeError])
+
+    // values look resolved but the type error should still remain
+    const result = revalidateError(error, requiredArgs, { name: 'foo', port: 3000 })
+
+    expect(result).toBeInstanceOf(AggregateError)
+    expect(result!.errors).toHaveLength(1)
+    expect(result!.errors[0]).toBe(typeError)
+  })
+
+  test('should partially clear errors when only some required args are resolved', () => {
+    const mixedArgs = {
+      name: { type: 'string' as const, required: true as const },
+      config: { type: 'string' as const, required: true as const }
+    }
+    const nameError = new ArgResolveError(
+      "Optional argument '--name' is required",
+      'name',
+      'required',
+      mixedArgs.name
+    )
+    const configError = new ArgResolveError(
+      "Optional argument '--config' is required",
+      'config',
+      'required',
+      mixedArgs.config
+    )
+    const error = new AggregateError([nameError, configError])
+
+    // hook filled in 'name' but not 'config'
+    const result = revalidateError(error, mixedArgs, { name: 'filled' } as ArgValues<
+      typeof mixedArgs
+    >)
+
+    expect(result).toBeInstanceOf(AggregateError)
+    expect(result!.errors).toHaveLength(1)
+    expect(result!.errors[0]).toBe(configError)
   })
 })

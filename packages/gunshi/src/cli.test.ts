@@ -2000,3 +2000,54 @@ describe('nested sub-commands', () => {
     )
   })
 })
+
+describe('onResolveValue hook', () => {
+  test('required arg supplied only by onResolveValue clears validationError', async () => {
+    const mockFn = vi.fn()
+
+    await cli(
+      // no --token on the CLI
+      [],
+      {
+        args: {
+          token: { type: 'string', required: true }
+        },
+        run: mockFn
+      },
+      {
+        onResolveValue: sources => ({
+          ...sources.values,
+          token: 'secret-from-env'
+        })
+      }
+    )
+
+    expect(mockFn).toHaveBeenCalledOnce()
+    const ctx = mockFn.mock.calls[0][0]
+    expect(ctx.values.token).toBe('secret-from-env')
+    // validation error must be cleared because the hook satisfied the requirement
+    expect(ctx.validationError).toBeUndefined()
+  })
+
+  test('validationError remains when onResolveValue does not satisfy required arg', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(
+      [],
+      {
+        args: {
+          token: { type: 'string', required: true }
+        },
+        run: vi.fn()
+      },
+      {
+        // hook returns undefined — falls back to original (still missing token)
+        onResolveValue: () => undefined
+      }
+    )
+
+    // command runner is not invoked; error is rendered instead
+    expect(log()).toMatch(/token/)
+  })
+})

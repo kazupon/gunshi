@@ -9,7 +9,7 @@ import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
-import { resolveValue } from '../resolver.ts'
+import { revalidateError, resolveValue } from '../resolver.ts'
 import { create, getCommandSubCommands, isLazyCommand, resolveLazyCommand } from '../utils.ts'
 
 import type { Decorators } from '../decorators.ts'
@@ -86,6 +86,11 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const omitted = resolved.omitted
 
   const resolvedValues = await resolveValue(options.onResolveValue, values, explicit)
+  // Re-run validation against the hook-resolved values so that required args
+  // filled in by the hook (e.g. from config/env) no longer produce a false error.
+  const resolvedError = options.onResolveValue
+    ? revalidateError(error, args, resolvedValues)
+    : error
 
   // override subCommands with level-specific sub-commands for rendering
   if (levelSubCommands) {
@@ -109,7 +114,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     commandPath,
     command: resolvedCommand,
     extensions: getPluginExtensions(resolvedPlugins),
-    validationError: error,
+    validationError: resolvedError,
     cliOptions: cliOptions
   })
 
