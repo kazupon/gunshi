@@ -2032,6 +2032,7 @@ describe('onResolveValue hook', () => {
   test('validationError remains when onResolveValue does not satisfy required arg', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
+    const runSpy = vi.fn()
 
     await cli(
       [],
@@ -2039,7 +2040,7 @@ describe('onResolveValue hook', () => {
         args: {
           token: { type: 'string', required: true }
         },
-        run: vi.fn()
+        run: runSpy
       },
       {
         // hook returns undefined — falls back to original (still missing token)
@@ -2047,7 +2048,8 @@ describe('onResolveValue hook', () => {
       }
     )
 
-    // command runner is not invoked; error is rendered instead
+    // command runner must not be invoked; error is rendered instead
+    expect(runSpy).not.toHaveBeenCalled()
     expect(log()).toMatch(/token/)
   })
 })
