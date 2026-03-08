@@ -9,6 +9,7 @@ import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
+import { resolveValue } from '../resolver.ts'
 import { create, getCommandSubCommands, isLazyCommand, resolveLazyCommand } from '../utils.ts'
 
 import type { Decorators } from '../decorators.ts'
@@ -84,6 +85,8 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   })
   const omitted = resolved.omitted
 
+  const resolvedValues = await resolveValue(options.onResolveValue, values, explicit)
+
   // override subCommands with level-specific sub-commands for rendering
   if (levelSubCommands) {
     cliOptions.subCommands = levelSubCommands
@@ -96,7 +99,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const commandContext = await createCommandContext({
     args,
     explicit,
-    values,
+    values: resolvedValues,
     positionals,
     rest,
     argv,
