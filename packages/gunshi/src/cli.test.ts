@@ -5,6 +5,7 @@ import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
+import { generate } from './generator.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
 
@@ -1640,6 +1641,62 @@ describe('github issues', () => {
     expect(rendered3).toMatchSnapshot('example3')
 
     expect(log()).toMatchSnapshot('console output')
+  })
+
+  describe('#499 - lazy command args not parsed', () => {
+    const mainCommand = define({
+      description: 'My CLI application',
+      run: () => {}
+    })
+
+    const helloLoader = () => {
+      return define({
+        description: 'Say hello',
+        args: {
+          name: {
+            type: 'string',
+            description: 'The name of the person to say hello to',
+            default: 'World'
+          }
+        },
+        run(ctx) {
+          console.log(`Hello ${ctx.values.name}!`)
+        }
+      })
+    }
+
+    const hello = lazy(helloLoader, {
+      name: 'hello',
+      description: 'Say hello'
+    })
+
+    const cliOptions: CliOptions = {
+      name: 'my-cli',
+      version: '1.0.0',
+      subCommands: { hello }
+    }
+
+    test('lazy sub-command uses default argument values', async () => {
+      using spy = vi.spyOn(console, 'log')
+
+      await cli(['hello'], mainCommand, cliOptions)
+
+      expect(spy).toHaveBeenLastCalledWith('Hello World!')
+    })
+
+    test('lazy sub-command uses argument values', async () => {
+      using spy = vi.spyOn(console, 'log')
+
+      await cli(['hello', '--name', 'Gunshi'], mainCommand, cliOptions)
+
+      expect(spy).toHaveBeenLastCalledWith('Hello Gunshi!')
+    })
+
+    test('lazy sub-command usage includes argument definitions', async () => {
+      const usage = await generate('hello', mainCommand, cliOptions)
+
+      expect(usage).toMatchSnapshot()
+    })
   })
 })
 
