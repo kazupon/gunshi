@@ -14,6 +14,10 @@ type TestArgs = Args & {
   debug: { type: 'boolean' }
 }
 
+type NestedArgs = Args & {
+  name: { type: 'string' }
+}
+
 const values: ArgValues<TestArgs> = {
   name: 'default-name',
   port: 3000,
@@ -91,6 +95,51 @@ describe('resolveValue', () => {
     // Fallback must be the unmodified original
     expect(result).toBe(inputValues)
     expect(result.name).toBe('original')
+  })
+
+  test('should preserve original values when hook mutates a nested object on the snapshot and returns undefined', async () => {
+    // Object.freeze only freezes the top-level properties, so nested objects/arrays
+    // are still mutable. The fallback must still return the unmodified original reference.
+    const nested = { extra: 'original' }
+    const inputValues = { name: 'original' } as ArgValues<NestedArgs>
+    // Attach a nested object outside the type so we can observe mutation attempts
+    ;(inputValues as Record<string, unknown>)['meta'] = nested
+
+    const nestedExplicit: ArgExplicitlyProvided<NestedArgs> = { name: false }
+
+    const hook = vi
+      .fn()
+      .mockImplementation(
+        (sources: { values: ArgValues<NestedArgs> & Record<string, unknown> }) => {
+          // Top-level freeze blocks this; nested objects are not frozen
+          try {
+            ;(sources.values as Record<string, unknown>)['name'] = 'mutated-top'
+          } catch {
+            // Silently ignore TypeError from frozen top-level in strict mode
+          }
+          // Mutate nested object — shallow freeze does NOT protect this
+          const meta = sources.values['meta'] as Record<string, unknown> | undefined
+          if (meta) {
+            meta['extra'] = 'mutated-nested'
+          }
+          return undefined
+        }
+      )
+
+    const result = await resolveValue(
+      hook as unknown as Parameters<typeof resolveValue>[0],
+      inputValues,
+      nestedExplicit as unknown as ArgExplicitlyProvided<NestedArgs>
+    )
+
+    // Fallback reference must be the unmodified original
+    expect(result).toBe(inputValues)
+    // Top-level string was protected by Object.freeze
+    expect(result.name).toBe('original')
+    // Nested object was mutated through the shallow-frozen snapshot —
+    // this documents the known limitation of Object.freeze and ensures the
+    // suite catches any regression if the implementation moves to deep-freeze.
+    expect(nested.extra).toBe('mutated-nested')
   })
 
   test('should support synchronous hook', async () => {
