@@ -239,6 +239,22 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
 }
 
 /**
+ * Value resolution sources for the onResolveValue hook.
+ *
+ * @typeParam A - The Args type from command definition
+ */
+export interface ValueResolutionSources<A extends Args = Args> {
+  /**
+   * Parsed argument values, with defaults from schema filled in for unset keys
+   */
+  values: ArgValues<A>
+  /**
+   * Map of which keys were explicitly provided via command line arguments
+   */
+  explicit: ArgExplicitlyProvided<A>
+}
+
+/**
  * CLI options of {@linkcode cli} function.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of cli options.
@@ -335,6 +351,19 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * @since v0.27.0
    */
   onErrorCommand?: (ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>
+  /**
+   * Hook that runs once after argument parsing and before command execution.
+   *
+   * Receives parsed argv values (with schema defaults filled in) and explicit CLI keys.
+   * The hook is responsible for merging values from any external sources (e.g. config files, env vars).
+   * The returned record becomes the final resolved values for the command context.
+   *
+   * @param sources - Parsed argv values and explicit CLI keys
+   * @returns The final resolved values, or undefined to use parsed argv values as-is
+   */
+  onResolveValue?: (
+    sources: ValueResolutionSources<ExtractArgs<G>>
+  ) => Awaitable<ArgValues<ExtractArgs<G>> | undefined>
 }
 
 /**
