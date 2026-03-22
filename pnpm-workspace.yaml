@@ -9,7 +9,7 @@ catalog:
   jsr: ^0.13.5
   jsr-exports-lint: ^0.4.2
   publint: ^0.3.18
-  tsdown: 0.15.12
+  tsdown: 0.21.3
   "@types/node": ^25.4.0
   typedoc: ^0.28.17
   tsx: ^4.21.0
