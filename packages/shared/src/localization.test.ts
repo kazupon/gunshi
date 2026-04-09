@@ -43,8 +43,8 @@ async function setup() {
 
 test('with translation function', async () => {
   const mockTranslate = vi
-    .fn()
-    .mockImplementation((key: string, _values: Record<string, unknown>): string => {
+    .fn<(key: string, values?: Record<string, unknown>) => string>()
+    .mockImplementation((key: string, _values?: Record<string, unknown>): string => {
       return LANG_RESOURCES[key as keyof typeof LANG_RESOURCES] || key
     })
 

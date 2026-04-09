@@ -17,8 +17,8 @@ Common options shared by all base combinators.
 
 ## Properties
 
-| Property                                | Type      | Description                                                             |
-| --------------------------------------- | --------- | ----------------------------------------------------------------------- |
-| <a id="description"></a> `description?` | `string`  | **`Experimental`** Human-readable description for help text generation. |
-| <a id="required"></a> `required?`       | `boolean` | **`Experimental`** Mark as required.                                    |
-| <a id="short"></a> `short?`             | `string`  | **`Experimental`** Single character short alias.                        |
+| Property                                         | Type      | Description                                                             |
+| ------------------------------------------------ | --------- | ----------------------------------------------------------------------- |
+| <a id="property-description"></a> `description?` | `string`  | **`Experimental`** Human-readable description for help text generation. |
+| <a id="property-required"></a> `required?`       | `boolean` | **`Experimental`** Mark as required.                                    |
+| <a id="property-short"></a> `short?`             | `string`  | **`Experimental`** Single character short alias.                        |

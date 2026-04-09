@@ -134,12 +134,17 @@ test('PluginContext#decorateCommand', async () => {
 
 describe('plugin function', () => {
   test('basic - creates plugin with extension', async () => {
-    const extensionFactory = vi.fn((_core: CommandContextCore<GunshiParams>) => ({
+    const extensionFactory = vi.fn<
+      (_core: CommandContextCore<GunshiParams>) => {
+        getValue: () => 'test-value'
+        isEnabled: boolean
+      }
+    >((_core: CommandContextCore<GunshiParams>) => ({
       getValue: () => 'test-value' as const,
       isEnabled: true
     }))
 
-    const setupFn = vi.fn((ctx: PluginContext) => {
+    const setupFn = vi.fn<(ctx: PluginContext) => void>((ctx: PluginContext) => {
       ctx.addGlobalOption('test', { type: 'string' })
     })
 
@@ -170,7 +175,7 @@ describe('plugin function', () => {
   })
 
   test('without extension', async () => {
-    const setupFn = vi.fn((ctx: PluginContext) => {
+    const setupFn = vi.fn<(ctx: PluginContext) => void>((ctx: PluginContext) => {
       ctx.addGlobalOption('simple', { type: 'boolean' })
     })
 
@@ -193,7 +198,12 @@ describe('plugin function', () => {
 
   test('receives correct context via extension', async () => {
     const mockCore = await createCommandContext({})
-    const extensionFactory = vi.fn((core: CommandContextCore<GunshiParams>) => ({
+    const extensionFactory = vi.fn<
+      (core: CommandContextCore<GunshiParams>) => {
+        user: { id: number; name: string }
+        getToken: () => string
+      }
+    >((core: CommandContextCore<GunshiParams>) => ({
       user: { id: 1, name: 'Test User' },
       getToken: () => core.values.token as string
     }))
@@ -387,7 +397,12 @@ describe('Plugin Extensions Integration', () => {
 
   test('multiple plugins with extensions work together', async () => {
     // auth plugin
-    const authExtension = vi.fn((core: CommandContextCore) => ({
+    const authExtension = vi.fn<
+      (core: CommandContextCore) => {
+        getUser: () => string | number | true
+        isAdmin: () => boolean
+      }
+    >((core: CommandContextCore) => ({
       getUser: () => core.values.user || 'guest',
       isAdmin: () => core.values.user === 'admin'
     }))
@@ -402,7 +417,9 @@ describe('Plugin Extensions Integration', () => {
 
     // logger plugin
     const logs = [] as string[]
-    const loggerExtension = vi.fn((core: CommandContextCore) => ({
+    const loggerExtension = vi.fn<
+      (core: CommandContextCore) => { log: (msg: string) => number; getLogs: () => string[] }
+    >((core: CommandContextCore) => ({
       log: (msg: string) => logs.push(`[${core.values['log-level'] || 'info'}] ${msg}`),
       getLogs: (): string[] => logs
     }))
@@ -472,8 +489,8 @@ describe('Plugin Extensions Integration', () => {
   })
 
   test('extension can access all context properties', async () => {
-    const capturedContext = vi.fn()
-    const onExtension = vi.fn()
+    const capturedContext = vi.fn<(...args: unknown[]) => void>()
+    const onExtension = vi.fn<() => void>()
 
     const contextPlugin = plugin({
       id: 'context',
