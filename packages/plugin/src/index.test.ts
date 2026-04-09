@@ -27,7 +27,7 @@ test('@gunshi/plugin', async () => {
     id: perfPluginId, // need to define a unique id for the plugin
     name: 'Performance Plugin', // optional name
 
-    // extend `CommandContext` with exntension
+    // extend `CommandContext` with extension
     extension: () => ({ start: -1, end: -1 }),
 
     // extend command via setup hook and plugin context
