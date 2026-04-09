@@ -40,7 +40,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Building
-        run: pnpm -r --filter '!@gunshi/docs' build
+        run: pnpm build
 
       - name: Linting
         run: pnpm lint
