@@ -18,14 +18,14 @@ afterEach(() => {
 
 describe('execute command', () => {
   test('entry iniline function', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli([], mockFn)
 
     expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
   })
 
   test('entry command', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli([], {
       run: mockFn
     })
@@ -34,7 +34,7 @@ describe('execute command', () => {
   })
 
   test('entry command with name', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(['dist/'], {
       name: 'publish',
       run: mockFn
@@ -44,7 +44,7 @@ describe('execute command', () => {
   })
 
   test('entry command with arguments', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(['--outDir', 'dist/', 'foo', 'bar'], {
       args: {
         outDir: {
@@ -65,7 +65,7 @@ describe('execute command', () => {
   })
 
   test('entry command without arguments', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(['dist/', 'test/'], {
       run: mockFn
     })
@@ -80,7 +80,7 @@ describe('execute command', () => {
   })
 
   test('entry lazy command name omitted', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(
       [''],
       lazy(() => mockFn, { name: 'lazy' })
@@ -90,7 +90,7 @@ describe('execute command', () => {
   })
 
   test('entry lazy command name as sub-command', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(
       ['laz'],
       lazy(() => mockFn, { name: 'lazy' })
@@ -100,8 +100,8 @@ describe('execute command', () => {
   })
 
   test('entry lazy command on sub-command', async () => {
-    const mockFn = vi.fn()
-    const mockCommand1 = vi.fn()
+    const mockFn = vi.fn<() => void>()
+    const mockCommand1 = vi.fn<() => void>()
     const subCommands = new Map()
     subCommands.set('command1', {
       name: 'command1',
@@ -124,9 +124,9 @@ describe('execute command', () => {
   })
 
   test('entry strictly command + sub commands', async () => {
-    const mockShow = vi.fn()
-    const mockCommand1 = vi.fn()
-    const mockCommand2 = vi.fn()
+    const mockShow = vi.fn<() => void>()
+    const mockCommand1 = vi.fn<() => void>()
+    const mockCommand2 = vi.fn<() => void>()
     const show = {
       name: 'show',
       run: mockShow
@@ -184,9 +184,9 @@ describe('execute command', () => {
   })
 
   test('fallback to entry command', async () => {
-    const mockShow = vi.fn()
-    const mockCommand1 = vi.fn()
-    const mockCommand2 = vi.fn()
+    const mockShow = vi.fn<() => void>()
+    const mockCommand1 = vi.fn<() => void>()
+    const mockCommand2 = vi.fn<() => void>()
     const show = {
       name: 'show',
       run: mockShow
@@ -246,10 +246,10 @@ describe('execute command', () => {
   })
 
   test('entry loose command + sub commands', async () => {
-    const mockAnonymous = vi.fn()
-    const mockShow = vi.fn()
-    const mockCommand1 = vi.fn()
-    const mockCommand2 = vi.fn()
+    const mockAnonymous = vi.fn<() => void>()
+    const mockShow = vi.fn<() => void>()
+    const mockCommand1 = vi.fn<() => void>()
+    const mockCommand2 = vi.fn<() => void>()
     // no name command
     const anonymous = {
       run: mockAnonymous
@@ -284,16 +284,16 @@ describe('execute command', () => {
   test('command not found', async () => {
     const subCommands = new Map()
     subCommands.set('foo', {
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
     await expect(async () => {
-      await cli(['show'], { run: vi.fn() }, { subCommands })
+      await cli(['show'], { run: vi.fn<() => void>() }, { subCommands })
     }).rejects.toThrowError('Command not found: show')
   })
 
   test('not registered entry in sub commands', async () => {
-    const mockEntry = vi.fn()
-    const mockCommand1 = vi.fn()
+    const mockEntry = vi.fn<() => void>()
+    const mockCommand1 = vi.fn<() => void>()
 
     const entry = {
       name: 'main',
@@ -319,7 +319,7 @@ describe('execute command', () => {
 
 describe('lazy command', () => {
   test('basic', async () => {
-    const mockEntry = vi.fn()
+    const mockEntry = vi.fn<() => void>()
     const entry = {
       name: 'main',
       run: mockEntry
@@ -327,7 +327,7 @@ describe('lazy command', () => {
     const subCommands = new Map()
 
     // lazy load function style command
-    const mockCommand1: Mocked<CommandRunner> = vi.fn()
+    const mockCommand1: Mocked<CommandRunner> = vi.fn<() => void>()
     const command1: LazyCommand = () => {
       return new Promise<CommandRunner>(resolve => {
         setTimeout(() => {
@@ -346,7 +346,7 @@ describe('lazy command', () => {
     subCommands.set(command1.commandName, command1)
 
     // lazy load object style command
-    const mockCommand2: Mocked<CommandRunner> = vi.fn()
+    const mockCommand2: Mocked<CommandRunner> = vi.fn<() => void>()
     const remoteCommand2: Command = {
       name: 'command2',
       description: 'command2 description',
@@ -377,7 +377,7 @@ describe('lazy command', () => {
           short: 'q'
         }
       },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     }
     subCommands.set(command3.name, command3)
 
@@ -435,7 +435,7 @@ describe('auto generate usage', () => {
   test('loosely inline command', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
-    const renderedUsage = await cli(['-h'], vi.fn())
+    const renderedUsage = await cli(['-h'], vi.fn<() => void>())
 
     const message = log()
     expect(message).toMatchSnapshot('console')
@@ -465,7 +465,7 @@ describe('auto generate usage', () => {
           short: 'f'
         }
       },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const message = log()
@@ -490,7 +490,7 @@ describe('auto generate usage', () => {
           }
         },
         examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
-        run: vi.fn()
+        run: vi.fn<() => void>()
       },
       {
         name: 'gunshi',
@@ -524,7 +524,7 @@ describe('auto generate usage', () => {
       // `name` property is not defined at entry
       description: 'This is entry command',
       args: entryArgs,
-      run: vi.fn()
+      run: vi.fn<() => void>()
     } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
 
     const command2Args = {
@@ -538,7 +538,7 @@ describe('auto generate usage', () => {
       // `name` property is defined at sub command
       description: 'This is command2',
       args: command2Args,
-      run: vi.fn()
+      run: vi.fn<() => void>()
     } satisfies Command<GunshiParams<{ args: typeof command2Args }>>
 
     const subCommands = new Map()
@@ -570,7 +570,7 @@ describe('auto generate usage', () => {
       description: 'This is command1 (entry)',
       args: entryArgs,
       examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
-      run: vi.fn()
+      run: vi.fn<() => void>()
     } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
 
     const command2Args = {
@@ -650,7 +650,7 @@ describe('auto generate usage', () => {
           short: 'f'
         }
       },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     }
 
     const meta = {
@@ -690,7 +690,7 @@ describe('auto generate usage', () => {
           short: 'f'
         }
       },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     }
 
     const meta = {
@@ -738,7 +738,7 @@ describe('custom generate usage', () => {
     const entry = {
       args: entryOptions,
       name: 'command1',
-      run: vi.fn()
+      run: vi.fn<() => void>()
     } satisfies Command<GunshiParams<{ args: typeof entryOptions }>>
 
     const options = {
@@ -813,7 +813,7 @@ test('usageSilent', async () => {
   const entry = {
     args: entryArgs,
     name: 'command1',
-    run: vi.fn()
+    run: vi.fn<() => void>()
   } satisfies Command<GunshiParams<{ args: typeof entryArgs }>>
 
   const options = {
@@ -833,7 +833,7 @@ test('usageSilent', async () => {
 
 test('_ (rawArgs)', async () => {
   const args = ['--foo', 'bar', '--baz', 'qux']
-  const fn = vi.fn()
+  const fn = vi.fn<() => void>()
   await cli(args, fn)
 
   expect(fn).toHaveBeenCalledWith(expect.objectContaining({ _: args }))
@@ -841,7 +841,7 @@ test('_ (rawArgs)', async () => {
 
 test('tokens', async () => {
   const args = ['--foo', 'bar']
-  const fn = vi.fn()
+  const fn = vi.fn<() => void>()
   await cli(args, fn)
 
   expect(fn).toHaveBeenCalledWith(
@@ -867,7 +867,7 @@ test('tokens', async () => {
 
 test('option grouping', async () => {
   const args = ['-sV']
-  const mockFn = vi.fn()
+  const mockFn = vi.fn<() => void>()
   await cli(args, {
     args: {
       silent: {
@@ -894,7 +894,7 @@ test('option grouping', async () => {
 
 test('rest arguments', async () => {
   const args = ['--foo', 'bar', '--', '--baz', 'qux']
-  const mockFn = vi.fn()
+  const mockFn = vi.fn<() => void>()
   await cli(args, {
     args: {
       foo: {
@@ -947,7 +947,7 @@ test('enum optional argument', async () => {
       choices: ['a', 'b', 'c']
     }
   } satisfies Args
-  const mockFn1 = vi.fn()
+  const mockFn1 = vi.fn<() => void>()
   await cli(['--foo', 'a'], {
     args,
     run: mockFn1
@@ -961,7 +961,7 @@ test('enum optional argument', async () => {
   // failure case
   await cli(['--foo', 'z'], {
     args,
-    run: vi.fn()
+    run: vi.fn<() => void>()
   })
   const stdout = log()
   expect(stdout).toEqual(
@@ -983,7 +983,7 @@ describe('positional arguments', () => {
         type: 'positional'
       }
     } satisfies Args
-    const mockFn1 = vi.fn()
+    const mockFn1 = vi.fn<() => void>()
     await cli(['value1', 'value2'], {
       args,
       run: mockFn1
@@ -997,7 +997,7 @@ describe('positional arguments', () => {
     // failure case
     await cli(['value1'], {
       args,
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
     const stdout = log()
     expect(stdout).toEqual(`Positional argument 'bar' is required`)
@@ -1006,8 +1006,8 @@ describe('positional arguments', () => {
   test('sub commands', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
-    const mockFn1 = vi.fn()
-    const mockFn2 = vi.fn()
+    const mockFn1 = vi.fn<() => void>()
+    const mockFn2 = vi.fn<() => void>()
 
     const subCommands = new Map()
     const command1 = define({
@@ -1043,7 +1043,7 @@ describe('positional arguments', () => {
     await cli(
       ['command1', '-o=option1', 'value1'],
       {
-        run: vi.fn()
+        run: vi.fn<() => void>()
       },
       {
         subCommands
@@ -1059,7 +1059,7 @@ describe('positional arguments', () => {
     await cli(
       ['command2', '-o=1'],
       {
-        run: vi.fn()
+        run: vi.fn<() => void>()
       },
       {
         subCommands
@@ -1079,7 +1079,7 @@ test('multiple option values', async () => {
       choices: ['apple', 'banana', 'orange']
     }
   } satisfies Args
-  const mockFn1 = vi.fn()
+  const mockFn1 = vi.fn<() => void>()
   await cli(['--fruits', 'banana', '-f=orange', 'foo', 'bar', '-f', 'apple'], {
     args,
     run: mockFn1
@@ -1104,7 +1104,7 @@ describe('argument name kebabnize', () => {
       }
     } satisfies Args
 
-    const mockFn1 = vi.fn()
+    const mockFn1 = vi.fn<() => void>()
     await cli(['--foo-bar', 'value1', '--bazQux', 'value2'], {
       args,
       run: mockFn1
@@ -1127,7 +1127,7 @@ describe('argument name kebabnize', () => {
       }
     } satisfies Args
 
-    const mockFn1 = vi.fn()
+    const mockFn1 = vi.fn<() => void>()
     await cli(['--foo-bar', 'value1', '--bazQux', 'value2'], {
       args,
       toKebab: true,
@@ -1153,7 +1153,7 @@ describe('custom type arguments', () => {
       }
     } satisfies Args
 
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(['--tags', 'javascript,typescript,node.js'], {
       args,
       run: mockFn
@@ -1182,7 +1182,7 @@ describe('custom type arguments', () => {
       }
     } satisfies Args
 
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(['--config', '{"debug":true,"port":3000}'], {
       args,
       run: mockFn
@@ -1211,7 +1211,7 @@ describe('custom type arguments', () => {
       }
     } satisfies Args
 
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli([], {
       args,
       run: mockFn
@@ -1245,7 +1245,7 @@ describe('custom type arguments', () => {
 
     await cli(['--port', '80'], {
       args,
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const stdout = log()
@@ -1269,7 +1269,7 @@ describe('custom type arguments', () => {
       }
     } satisfies Args
 
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     await cli(['--points', '1,2', '--points', '3,4', '-p=5,6'], {
       args,
       run: mockFn
@@ -1290,7 +1290,7 @@ describe('custom type arguments', () => {
 
 describe('command decorators', () => {
   test('command decorators in reverse order', async () => {
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     const command = {
       name: 'test',
       run: mockFn
@@ -1334,7 +1334,7 @@ describe('command decorators', () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
 
-    const mockFn = vi.fn()
+    const mockFn = vi.fn<() => void>()
     const command = {
       name: 'test',
       run: mockFn
@@ -1399,7 +1399,7 @@ describe('edge cases', () => {
           description: 'This is a description of description option'
         }
       },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const utils = await import('./utils.ts')
@@ -1419,7 +1419,7 @@ describe('edge cases', () => {
 describe('command lifecycle hooks', () => {
   test('onBeforeCommand and onAfterCommand hooks', async () => {
     const executionOrder: string[] = []
-    const mockCommand = vi.fn().mockImplementation(() => {
+    const mockCommand = vi.fn<() => void>().mockImplementation(() => {
       executionOrder.push('command')
       return 'command result'
     })
@@ -1446,7 +1446,7 @@ describe('command lifecycle hooks', () => {
   test('onErrorCommand hook', async () => {
     const executionOrder: string[] = []
     const testError = new Error('Test error')
-    const mockCommand = vi.fn().mockImplementation(() => {
+    const mockCommand = vi.fn<() => void>().mockImplementation(() => {
       executionOrder.push('command')
       throw testError
     })
@@ -1584,8 +1584,8 @@ describe('command lifecycle hooks', () => {
 })
 
 test('subCommands option with command array', async () => {
-  const mockCommand1 = vi.fn()
-  const mockCommand2 = vi.fn()
+  const mockCommand1 = vi.fn<() => void>()
+  const mockCommand2 = vi.fn<() => void>()
   const subCommands = {
     command1: {
       run: mockCommand1
@@ -1595,10 +1595,10 @@ test('subCommands option with command array', async () => {
     }
   }
 
-  await cli(['command1'], { run: vi.fn() }, { subCommands })
+  await cli(['command1'], { run: vi.fn<() => void>() }, { subCommands })
   expect(mockCommand1).toBeCalled()
 
-  await cli(['command2'], { run: vi.fn() }, { subCommands })
+  await cli(['command2'], { run: vi.fn<() => void>() }, { subCommands })
   expect(mockCommand2).toBeCalled()
 })
 
@@ -1613,27 +1613,27 @@ describe('github issues', () => {
       version: '1.2.3'
     }
 
-    const rendered1 = await cli(['-h'], { run: vi.fn() }, { ...meta })
+    const rendered1 = await cli(['-h'], { run: vi.fn<() => void>() }, { ...meta })
     expect(rendered1).toMatchSnapshot('example1')
 
     const rendered2 = await cli(
       ['-h'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         ...meta,
-        subCommands: new Map([['cmd1', { run: vi.fn() }]])
+        subCommands: new Map([['cmd1', { run: vi.fn<() => void>() }]])
       }
     )
     expect(rendered2).toMatchSnapshot('example2')
 
     const rendered3 = await cli(
       ['-h'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         ...meta,
         subCommands: new Map([
-          ['cmd1', { run: vi.fn() }],
-          ['cmd2', { run: vi.fn() }]
+          ['cmd1', { run: vi.fn<() => void>() }],
+          ['cmd2', { run: vi.fn<() => void>() }]
         ])
       }
     )
@@ -1648,9 +1648,9 @@ describe('nested sub-commands', () => {
     const utils = await import('./utils.ts')
     defineMockLog(utils)
 
-    const mockAdd = vi.fn()
-    const mockRemove = vi.fn()
-    const mockRemote = vi.fn()
+    const mockAdd = vi.fn<() => void>()
+    const mockRemove = vi.fn<() => void>()
+    const mockRemote = vi.fn<() => void>()
 
     const addCommand = define({
       name: 'add',
@@ -1676,7 +1676,7 @@ describe('nested sub-commands', () => {
 
     const entry = define({
       name: 'git',
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     await cli(['remote', 'add', '--url', 'origin'], entry, {
@@ -1698,7 +1698,7 @@ describe('nested sub-commands', () => {
     const utils = await import('./utils.ts')
     defineMockLog(utils)
 
-    const mockLeaf = vi.fn()
+    const mockLeaf = vi.fn<() => void>()
 
     const leafCommand = define({
       name: 'leaf',
@@ -1710,19 +1710,19 @@ describe('nested sub-commands', () => {
       name: 'mid',
       description: 'Middle command',
       subCommands: { leaf: leafCommand },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const topCommand = define({
       name: 'top',
       description: 'Top command',
       subCommands: { mid: midCommand },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     await cli(
       ['top', 'mid', 'leaf'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         name: 'app',
         subCommands: { top: topCommand }
@@ -1744,19 +1744,19 @@ describe('nested sub-commands', () => {
     const addCommand = define({
       name: 'add',
       description: 'Add a remote',
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const remoteCommand = define({
       name: 'remote',
       description: 'Manage remotes',
       subCommands: { add: addCommand },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const entry = define({
       name: 'git',
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const rendered = await cli(['remote', '-h'], entry, {
@@ -1772,12 +1772,12 @@ describe('nested sub-commands', () => {
     const utils = await import('./utils.ts')
     defineMockLog(utils)
 
-    const mockRemote = vi.fn()
+    const mockRemote = vi.fn<() => void>()
 
     const addCommand = define({
       name: 'add',
       description: 'Add a remote',
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     const remoteCommand = define({
@@ -1790,7 +1790,7 @@ describe('nested sub-commands', () => {
     // invoke 'remote' without specifying a nested sub-command
     await cli(
       ['remote'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         name: 'git',
         subCommands: { remote: remoteCommand }
@@ -1810,7 +1810,7 @@ describe('nested sub-commands', () => {
     const utils = await import('./utils.ts')
     defineMockLog(utils)
 
-    const mockAdd = vi.fn()
+    const mockAdd = vi.fn<() => void>()
 
     const addCommand = define({
       name: 'add',
@@ -1825,13 +1825,13 @@ describe('nested sub-commands', () => {
       name: 'top',
       description: 'Top command',
       subCommands: { add: addCommand },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     // 'top add unknown-thing' -> 'unknown-thing' should be a positional arg for 'add'
     await cli(
       ['top', 'add', 'unknown-thing'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         name: 'app',
         subCommands: { top: topCommand }
@@ -1847,7 +1847,7 @@ describe('nested sub-commands', () => {
   })
 
   test('commandPath is correct for depth=1', async () => {
-    const mockCmd = vi.fn()
+    const mockCmd = vi.fn<() => void>()
 
     const subCmd = define({
       name: 'sub',
@@ -1857,7 +1857,7 @@ describe('nested sub-commands', () => {
 
     await cli(
       ['sub'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         subCommands: { sub: subCmd }
       }
@@ -1871,7 +1871,7 @@ describe('nested sub-commands', () => {
   })
 
   test('commandPath is empty for entry command', async () => {
-    const mockEntry = vi.fn()
+    const mockEntry = vi.fn<() => void>()
 
     await cli([], { run: mockEntry })
 
@@ -1886,7 +1886,7 @@ describe('nested sub-commands', () => {
     const utils = await import('./utils.ts')
     defineMockLog(utils)
 
-    const mockAdd = vi.fn()
+    const mockAdd = vi.fn<() => void>()
 
     const addCommand = lazy(
       () =>
@@ -1907,12 +1907,12 @@ describe('nested sub-commands', () => {
       name: 'remote',
       description: 'Manage remotes',
       subCommands: { add: addCommand },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     await cli(
       ['remote', 'add', '--url', 'origin'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         name: 'git',
         subCommands: { remote: remoteCommand }
@@ -1928,7 +1928,7 @@ describe('nested sub-commands', () => {
   })
 
   test('nested sub-commands as Record (not Map)', async () => {
-    const mockAdd = vi.fn()
+    const mockAdd = vi.fn<() => void>()
 
     const addCommand = define({
       name: 'add',
@@ -1940,12 +1940,12 @@ describe('nested sub-commands', () => {
       name: 'remote',
       description: 'Remote',
       subCommands: { add: addCommand },
-      run: vi.fn()
+      run: vi.fn<() => void>()
     })
 
     await cli(
       ['remote', 'add'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         subCommands: { remote: remoteCommand }
       }
@@ -1962,7 +1962,7 @@ describe('nested sub-commands', () => {
     const utils = await import('./utils.ts')
     defineMockLog(utils)
 
-    const mockAdd = vi.fn()
+    const mockAdd = vi.fn<() => void>()
 
     const addCommand = define({
       name: 'add',
@@ -1975,7 +1975,7 @@ describe('nested sub-commands', () => {
         Promise.resolve({
           name: 'remote',
           description: 'Manage remotes',
-          run: vi.fn()
+          run: vi.fn<() => void>()
         }),
       {
         name: 'remote',
@@ -1986,7 +1986,7 @@ describe('nested sub-commands', () => {
 
     await cli(
       ['remote', 'add'],
-      { run: vi.fn() },
+      { run: vi.fn<() => void>() },
       {
         name: 'git',
         subCommands: { remote: remoteCommand }

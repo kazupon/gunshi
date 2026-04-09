@@ -53,7 +53,7 @@ describe('combinators re-export', () => {
 
 describe('define with combinators', () => {
   test('basic combinators with define', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const command = define({
       name: 'test',
       args: {
@@ -74,7 +74,7 @@ describe('define with combinators', () => {
   })
 
   test('required and choice combinators', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const command = define({
       name: 'test',
       args: {
@@ -94,7 +94,7 @@ describe('define with combinators', () => {
   })
 
   test('multiple combinator', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const command = define({
       name: 'test',
       args: {
@@ -113,7 +113,7 @@ describe('define with combinators', () => {
   })
 
   test('map combinator transforms values', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const command = define({
       name: 'test',
       args: {
@@ -132,7 +132,7 @@ describe('define with combinators', () => {
   })
 
   test('custom combinator', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const command = define({
       name: 'test',
       args: {
@@ -160,7 +160,7 @@ describe('define with combinators', () => {
   })
 
   test('default values are used when args not provided', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const command = define({
       name: 'test',
       args: {
@@ -182,7 +182,7 @@ describe('define with combinators', () => {
 
 describe('schema composition with define', () => {
   test('args() helper', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const schema = args({
       verbose: boolean(),
       name: required(string())
@@ -204,7 +204,7 @@ describe('schema composition with define', () => {
   })
 
   test('merge() composes schemas', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const common = args({
       verbose: short(boolean(), 'd')
     })
@@ -229,7 +229,7 @@ describe('schema composition with define', () => {
   })
 
   test('extend() overrides fields', async () => {
-    const log = vi.fn()
+    const log = vi.fn<(...args: unknown[]) => void>()
     const base = args({
       port: withDefault(integer(), 8080)
     })

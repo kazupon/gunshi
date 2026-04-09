@@ -43,17 +43,17 @@ test('basic', async () => {
     description: 'this is cmd1',
     args,
     examples: 'examples',
-    run: vi.fn()
+    run: vi.fn<() => void>()
   } satisfies Command<GunshiParams<{ args: typeof args }>>
 
   const subCommands = new Map<
     string,
     Command<GunshiParams<Args>> | LazyCommand<GunshiParams<Args>>
   >()
-  subCommands.set('cmd2', { name: 'cmd2', run: vi.fn() })
+  subCommands.set('cmd2', { name: 'cmd2', run: vi.fn<() => void>() })
 
-  const mockRenderUsage = vi.fn()
-  const mockRenderValidationErrors = vi.fn()
+  const mockRenderUsage = vi.fn<(...args: unknown[]) => Promise<string>>()
+  const mockRenderValidationErrors = vi.fn<(...args: unknown[]) => Promise<string>>()
 
   const ctx = await createCommandContext({
     args,
@@ -133,7 +133,7 @@ test('basic', async () => {
 
 test('default', async () => {
   const command = {
-    run: vi.fn()
+    run: vi.fn<() => void>()
   }
   const ctx = await createCommandContext({
     values: { foo: 'foo', bar: true, baz: 42 },
@@ -179,7 +179,7 @@ describe('plugin extensions', () => {
     }
     const authExtension: CommandContextExtension<AuthExtension> = {
       key: Symbol('auth'),
-      factory: vi.fn((_core: CommandContextCore) => ({
+      factory: vi.fn<(_core: CommandContextCore) => AuthExtension>((_core: CommandContextCore) => ({
         user: { id: 1, name: 'Test User' },
         isAuthenticated: true,
         getCommandName: () => _core.name!
@@ -192,7 +192,7 @@ describe('plugin extensions', () => {
     }
     const dbExtension: CommandContextExtension<DbExtension> = {
       key: Symbol('db'),
-      factory: vi.fn((_core: CommandContextCore) => ({
+      factory: vi.fn<(_core: CommandContextCore) => DbExtension>((_core: CommandContextCore) => ({
         query: (sql: string) => Promise.resolve({ rows: [], sql }),
         connected: true
       }))

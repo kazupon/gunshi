@@ -18,6 +18,6 @@ A combinator produced by combinator factory functions.
 
 ## Properties
 
-| Property                   | Type             | Description                                                    |
-| -------------------------- | ---------------- | -------------------------------------------------------------- |
-| <a id="parse"></a> `parse` | (`value`) => `T` | The parse function that converts a string to the desired type. |
+| Property                            | Type             | Description                                                    |
+| ----------------------------------- | ---------------- | -------------------------------------------------------------- |
+| <a id="property-parse"></a> `parse` | (`value`) => `T` | The parse function that converts a string to the desired type. |

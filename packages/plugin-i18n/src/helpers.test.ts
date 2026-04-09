@@ -345,7 +345,7 @@ describe('withI18nResource', () => {
       run: () => {}
     })
 
-    const mock = vi.fn()
+    const mock = vi.fn<() => void>()
     const localizedCommand = withI18nResource(command, () => {
       mock()
       return {

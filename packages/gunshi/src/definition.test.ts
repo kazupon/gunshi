@@ -281,7 +281,7 @@ describe('lazy', () => {
       }
     })
 
-    const mock = vi.fn()
+    const mock = vi.fn<() => void>()
     const testLazy = lazy((): CommandRunner<{ args: typeof test.args; extensions: {} }> => {
       return _ctx => {
         expectTypeOf(_ctx.values).toEqualTypeOf<{ foo?: string | undefined }>()
@@ -316,7 +316,7 @@ describe('lazy', () => {
   })
 
   test('preserves all properties', () => {
-    const loader = vi.fn(() => {
+    const loader = vi.fn<() => () => string>(() => {
       return () => 'done'
     })
     const lazyCmd = lazy(loader, {

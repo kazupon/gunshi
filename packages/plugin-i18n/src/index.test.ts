@@ -95,10 +95,10 @@ describe('extension: translate', () => {
   describe('translate non-built-in keys', () => {
     test('default: en-US', async () => {
       const translation = {
-        getMessage: vi.fn(),
-        setResource: vi.fn(),
-        getResource: vi.fn(),
-        translate: vi.fn().mockImplementation((key: string) => key)
+        getMessage: vi.fn<() => void>(),
+        setResource: vi.fn<() => void>(),
+        getResource: vi.fn<() => void>(),
+        translate: vi.fn<(key: string) => string>().mockImplementation((key: string) => key)
       } as TranslationAdapter
       const plugin = i18n({ translationAdapterFactory: () => translation })
       const ctx = await createCommandContext({})
@@ -114,10 +114,10 @@ describe('extension: translate', () => {
 
     test('custom locale: ja-JP', async () => {
       const translation = {
-        getMessage: vi.fn(),
-        setResource: vi.fn(),
-        getResource: vi.fn(),
-        translate: vi.fn().mockImplementation((key: string) => key)
+        getMessage: vi.fn<() => void>(),
+        setResource: vi.fn<() => void>(),
+        getResource: vi.fn<() => void>(),
+        translate: vi.fn<(key: string) => string>().mockImplementation((key: string) => key)
       } as TranslationAdapter
       const plugin = i18n({ translationAdapterFactory: () => translation, locale: 'ja-JP' })
       const ctx = await createCommandContext({})
@@ -238,7 +238,7 @@ describe('translation adapter', () => {
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',
-      run: vi.fn(),
+      run: vi.fn<() => void>(),
       resource: mockResource
     })
 
@@ -316,7 +316,7 @@ describe('translation adapter', () => {
       name: 'cmd1',
       args,
       examples: 'this is an cmd1 example',
-      run: vi.fn(),
+      run: vi.fn<() => void>(),
       resource: mockResource
     })
 
