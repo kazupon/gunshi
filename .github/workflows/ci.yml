@@ -14,6 +14,8 @@ on:
 
 jobs:
   lint:
+    needs:
+      - build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -36,6 +38,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Building
+        run: pnpm build
 
       - name: Linting
         run: pnpm lint
