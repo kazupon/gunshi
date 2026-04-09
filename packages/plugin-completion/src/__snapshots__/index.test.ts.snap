@@ -260,6 +260,31 @@ lint	Lint project
 "
 `;
 
+exports[`no sub-commands > no input 1`] = `
+":4
+"
+`;
+
+exports[`no sub-commands > suggest for inputting 1`] = `
+":4
+"
+`;
+
+exports[`no sub-commands > suggest for long option 1`] = `
+":4
+"
+`;
+
+exports[`no sub-commands > suggest for short option 1`] = `
+":4
+"
+`;
+
+exports[`no sub-commands > suggest value if option values correctly 1`] = `
+":4
+"
+`;
+
 exports[`positional arguments > multiple positional argument when ending with space 1`] = `
 "main.ts	Main file
 index.ts	Index file

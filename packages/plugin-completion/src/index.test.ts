@@ -113,6 +113,35 @@ describe('positional arguments', () => {
   })
 })
 
+const NO_SUBCOMMANDS_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/no-subcommands.node.ts complete --`
+
+describe('no sub-commands', () => {
+  test('no input', async () => {
+    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT}`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest for inputting', async () => {
+    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} --`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest for long option', async () => {
+    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} --config`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest for short option', async () => {
+    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} -c `)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest value if option values correctly', async () => {
+    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} --config prod`)
+    expect(output).toMatchSnapshot()
+  })
+})
+
 const NESTED_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/nested.node.ts complete --`
 
 describe('nested sub-commands', () => {

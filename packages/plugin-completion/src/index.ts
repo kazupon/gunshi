@@ -143,14 +143,12 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
      * setup bombshell completion with `onExtension` hook
      */
 
-    onExtension: async ctx => {
+    onExtension: async (ctx, cmd) => {
       const i18n = ctx.extensions[i18nPluginId]
       const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
 
-      const entry = [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry)
-      if (!entry) {
-        throw new Error('entry command not found.')
-      }
+      const entry =
+        [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry) || (cmd as Command)
 
       await registerCompletion({
         name: 'entry',
