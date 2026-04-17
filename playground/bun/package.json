@@ -7,7 +7,7 @@
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^6.0.0"
   },
   "dependencies": {
     "gunshi": "0.29.4"
