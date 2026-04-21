@@ -111,7 +111,7 @@
     "mitata": "^1.0.34",
     "oxfmt": "^0.45.0",
     "oxlint": "^1.59.0",
-    "oxlint-tsgolint": "^0.20.0",
+    "oxlint-tsgolint": "^0.21.0",
     "pkg-pr-new": "^0.0.66",
     "tsx": "catalog:",
     "typescript": "catalog:",
