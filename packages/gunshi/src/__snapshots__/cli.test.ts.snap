@@ -504,6 +504,20 @@ OPTIONS:
 "
 `;
 
+exports[`github issues > #499 - lazy command args not parsed > lazy sub-command usage includes argument definitions 1`] = `
+"my-cli (my-cli v1.0.0)
+Say hello
+
+USAGE:
+  my-cli hello <OPTIONS>
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+  --name [name]          The name of the person to say hello to (default: World)
+"
+`;
+
 exports[`lazy command > command loading > config-command 1`] = `
 "lazy-command-loading (lazy-command-loading v1.0.0)
 Loaded configured command
@@ -514,6 +528,7 @@ USAGE:
 OPTIONS:
   -h, --help             Display this help message
   -v, --version          Display this version
+  --verbose              Enable verbose output (default: false)
 "
 `;
 
