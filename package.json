@@ -91,7 +91,7 @@
     "@kazupon/prettier-config": "^0.2.0",
     "@types/node": "catalog:",
     "@typescript/native-preview": "7.0.0-dev.20260120.1",
-    "@vitest/coverage-v8": "4.1.4",
+    "@vitest/coverage-v8": "4.1.5",
     "bumpp": "^11.0.1",
     "eslint": "^10.2.0",
     "eslint-plugin-jsdoc": "^62.9.0",
