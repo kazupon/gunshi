@@ -114,7 +114,7 @@ importers:
         version: gunshi@0.19.0
       knip:
         specifier: ^6.3.1
-        version: 6.3.1
+        version: 6.3.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
       lint-staged:
         specifier: ^16.4.0
         version: 16.4.0
@@ -171,13 +171,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   packages/combinators:
     devDependencies:
@@ -192,13 +192,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   packages/definition:
     devDependencies:
@@ -213,13 +213,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   packages/docs:
     dependencies:
@@ -237,8 +237,8 @@ importers:
         specifier: ^11.12.0
         version: 11.12.0
       oxc-minify:
-        specifier: ^0.97.0
-        version: 0.97.0
+        specifier: ^0.127.0
+        version: 0.127.0
       tsx:
         specifier: 'catalog:'
         version: 4.21.0
@@ -253,7 +253,7 @@ importers:
         version: 1.1.2(typedoc-plugin-markdown@4.11.0(typedoc@0.28.18(typescript@6.0.2)))
       vitepress:
         specifier: ^2.0.0-alpha.12
-        version: 2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.97.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
+        version: 2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.127.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
       vitepress-plugin-group-icons:
         specifier: ^1.5.5
         version: 1.6.3(markdown-it@14.1.1)(vite@7.1.7(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2))
@@ -262,7 +262,7 @@ importers:
         version: 1.7.5
       vitepress-plugin-mermaid:
         specifier: ^2.0.17
-        version: 2.0.17(mermaid@11.12.0)(vitepress@2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.97.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))
+        version: 2.0.17(mermaid@11.12.0)(vitepress@2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.127.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))
       vue:
         specifier: ^3.5.14
         version: 3.5.21(typescript@6.0.2)
@@ -295,13 +295,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -319,13 +319,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   packages/plugin-completion:
     dependencies:
@@ -353,7 +353,7 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
@@ -362,7 +362,7 @@ importers:
         version: 3.6.0(picomatch@4.0.3)(rollup@4.52.2)
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
       typedoc:
         specifier: 'catalog:'
         version: 0.28.18(typescript@6.0.2)
@@ -384,13 +384,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   packages/plugin-global:
     dependencies:
@@ -409,13 +409,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
       typedoc:
         specifier: 'catalog:'
         version: 0.28.18(typescript@6.0.2)
@@ -458,7 +458,7 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       messageformat:
         specifier: 4.0.0
         version: 4.0.0
@@ -467,7 +467,7 @@ importers:
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
       typedoc:
         specifier: 'catalog:'
         version: 0.28.18(typescript@6.0.2)
@@ -495,13 +495,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
       typedoc:
         specifier: 'catalog:'
         version: 0.28.18(typescript@6.0.2)
@@ -522,13 +522,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   packages/shared:
     devDependencies:
@@ -546,13 +546,13 @@ importers:
         version: 0.14.3
       jsr-exports-lint:
         specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
+        version: 0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)))
       publint:
         specifier: 'catalog:'
         version: 0.3.18
       tsdown:
         specifier: 'catalog:'
-        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+        version: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   playground/advanced/command-hooks:
     dependencies:
@@ -968,20 +968,11 @@ packages:
   '@docsearch/js@4.2.0':
     resolution: {integrity: sha512-KBHVPO29QiGUFJYeAqxW0oXtGf/aghNmRrIRPT4/28JAefqoCkNn/ZM/jeQ7fHjl0KNM6C+KlLVYjwyz6lNZnA==}
 
-  '@emnapi/core@1.5.0':
-    resolution: {integrity: sha512-sbP8GzB1WDzacS8fgNPpHlp6C9VZe+SJP3F90W9rLemaQj2PzIuTEl1qDOYQf58YIpyjViI24y9aPWCjEzY2cg==}
-
   '@emnapi/core@1.9.2':
     resolution: {integrity: sha512-UC+ZhH3XtczQYfOlu3lNEkdW/p4dsJ1r/bP7H8+rhao3TTTMO1ATq/4DdIi23XuGoFY+Cz0JmCbdVl0hz9jZcA==}
 
-  '@emnapi/runtime@1.5.0':
-    resolution: {integrity: sha512-97/BJ3iXHww3djw6hYIfErCZFee7qCtrneuLa20UXFCOTCfBM2cvQHjWJ2EG0s0MtdNwInarqCTz35i4wWXHsQ==}
-
   '@emnapi/runtime@1.9.2':
     resolution: {integrity: sha512-3U4+MIWHImeyu1wnmVygh5WlgfYDtyf0k8AbLhMFxOipihf6nrWC4syIm/SwEeec0mNSafiiNnMJwbza/Is6Lw==}
-
-  '@emnapi/wasi-threads@1.1.0':
-    resolution: {integrity: sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ==}
 
   '@emnapi/wasi-threads@1.2.1':
     resolution: {integrity: sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==}
@@ -1588,12 +1579,6 @@ packages:
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
 
-  '@napi-rs/wasm-runtime@1.0.7':
-    resolution: {integrity: sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw==}
-
-  '@napi-rs/wasm-runtime@1.1.1':
-    resolution: {integrity: sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==}
-
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
     peerDependencies:
@@ -1672,97 +1657,129 @@ packages:
     resolution: {integrity: sha512-XRO0zi2NIUKq2lUk3T1ecFSld1fMWRKE6naRFGkgkdeosx7IslyUKNv5Dcb5PJTja9tHJoFu0v/7yEpAkrkrTg==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@oxc-minify/binding-android-arm64@0.97.0':
-    resolution: {integrity: sha512-2bv8ZKm53PKJ7+0o7X813um9lRJ/EYjFyf09x2Q7OKfOLiAcWrFoLWmO5PJcCMpf+V2EFTp9UuapHzocuShBgw==}
+  '@oxc-minify/binding-android-arm-eabi@0.127.0':
+    resolution: {integrity: sha512-Nqv7JYcuQIH2faCuZWanGiMH9JDbBGXzeFg1XGX/KHDKcHP5yjWdMgDg0mKicO5Y7IfkpqZgGrsRAA7tnuhgSQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [android]
+
+  '@oxc-minify/binding-android-arm64@0.127.0':
+    resolution: {integrity: sha512-iCszKlx3On+e8occoIpvwFPPfqsb8lZBIpUUMWXiTq+7kT89eJbiT4YPT7v+R6RACKnyyyvtJGRjdXhEFm9Mhg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [android]
 
-  '@oxc-minify/binding-darwin-arm64@0.97.0':
-    resolution: {integrity: sha512-NlFViKlJawMD7GTLlSyG1RaYOLzqpM8pEw7oTzR9Si/kPaScgsB6E+F1d3AFPl7fmOG7iIxvhdI+ftlMZmniVA==}
+  '@oxc-minify/binding-darwin-arm64@0.127.0':
+    resolution: {integrity: sha512-WyrwCZh7ALq3G1ZEvODm+kDAaiBoxSUy7jsu42enGdetN/+kHPrURox1553iJRMmx2phZbpU9GNlkLQfMOR9gQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [darwin]
 
-  '@oxc-minify/binding-darwin-x64@0.97.0':
-    resolution: {integrity: sha512-IVzkLjz/Cv45GV9e3a5cFyRn0k+3b84JKKCLjXNsrZ+4MfRdqtGWMfibz3fq8zzvWBU/oaAoNseyWhl12HACPw==}
+  '@oxc-minify/binding-darwin-x64@0.127.0':
+    resolution: {integrity: sha512-Zkuxqu43BI5+t86kpaAOqfRwv64OwDAYFMijiOsPB9XAxTaebigIyZmzL2yy7DSgNdwVsLnHNrlotFDw+LFsZw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [darwin]
 
-  '@oxc-minify/binding-freebsd-x64@0.97.0':
-    resolution: {integrity: sha512-uMPakX5o7/MuvJ0uvgahDAMBIHFjMQ7ecrOing6zpnhqhJpLH6y2aMbFn9I0IlrCYTWPaEdmskGMUYKi031X4g==}
+  '@oxc-minify/binding-freebsd-x64@0.127.0':
+    resolution: {integrity: sha512-3tyfvXfNJ5NP3vsaM5PnOmnAR7dWM6Qivsnxrrfqx29VxZu99l+08dAAarnyyY+DXkw4qlPLxiygF26S9gqO5w==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [freebsd]
 
-  '@oxc-minify/binding-linux-arm-gnueabihf@0.97.0':
-    resolution: {integrity: sha512-132F111xtBpPQSN0gkWa2fp8bkpCVJzki0HWp+943Sy0c5muAE0OkZM8UYgPbE9VfyinuG2awawiheWk9QFeyA==}
+  '@oxc-minify/binding-linux-arm-gnueabihf@0.127.0':
+    resolution: {integrity: sha512-SvnlsgSzITSXYxqCRLC+sljje7s+bOvoblGVb6eVmtOYbDiYyNMv7n8IgKSSKNZpU/vv5qgfv/fSAHKQm/O+yA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm]
     os: [linux]
 
-  '@oxc-minify/binding-linux-arm-musleabihf@0.97.0':
-    resolution: {integrity: sha512-96flfOczSQNr3EzhPRjRdgfF07pXTdcZdKE1xnmqn1X7t0O5czUI3LEf5BTSU3NJohg1lwpdk8fANNLBIqjqjw==}
+  '@oxc-minify/binding-linux-arm-musleabihf@0.127.0':
+    resolution: {integrity: sha512-RB/g7T3oiibYwpPueO4bfGGwtzHZ6bq5AjoStKCeeo9q2B1iC3kftu/hKi0A+6iFgSiAWi7SfEUV6D9Nx4VLpw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm]
     os: [linux]
 
-  '@oxc-minify/binding-linux-arm64-gnu@0.97.0':
-    resolution: {integrity: sha512-ojC0lP/uZm4yzL+t/Y1iCNkOv3ADe1csHpGP49lG+M8zCyWTNfJZTgBxA9GO/gGoVzBQ0lcytdVbXLx9WtG3NA==}
+  '@oxc-minify/binding-linux-arm64-gnu@0.127.0':
+    resolution: {integrity: sha512-Y1NcLMUWgJ4dH1oryOt/hstvjsYaIk5eePbNOFbkwInvCzguth2jaG6zO0kj74x3UjYyjj1kbWsUQQDflo4gbw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@oxc-minify/binding-linux-arm64-musl@0.97.0':
-    resolution: {integrity: sha512-RU/XPyPoLUZnlu0yKyjhd9RhDtA9br6SfkdDZo+/vKEYZ7H2YQdMrSix1rYQIV9usPN0oBVHN/r0RKclAu2K+Q==}
+  '@oxc-minify/binding-linux-arm64-musl@0.127.0':
+    resolution: {integrity: sha512-EVMGYld+Ca+NeaLymrnWo3rvbNVti9wqqvsnFZLPhrRpd5sL9GFLEUffg8En4GDl6CwtILJspoOVFL/mNDgbWQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@oxc-minify/binding-linux-riscv64-gnu@0.97.0':
-    resolution: {integrity: sha512-YuV2MmzulecouWxVAsTdkHtlLNtBfNG+lbMVgHjQeFgo+bGMD2GcmyVFQ29hsBgemeLXMm7xxn/4/xnQlqKZ5w==}
+  '@oxc-minify/binding-linux-ppc64-gnu@0.127.0':
+    resolution: {integrity: sha512-gRAfy9iqrI2QP6j9XV40iCyelHdY59cYWE0cPn9N/bEBvVTYSks3tacxCZoVb+YsxuoYvag8JyVAaxujBK+j2Q==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-minify/binding-linux-riscv64-gnu@0.127.0':
+    resolution: {integrity: sha512-3C1Oqslf10gFzuaBW5K63Vs72JNeSTFCRpbZKSFkd9F5xrNvtAAowhNEUv6dbetoM0DbsKxwH/1r8mrjyLUK0Q==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [riscv64]
     os: [linux]
     libc: [glibc]
 
-  '@oxc-minify/binding-linux-s390x-gnu@0.97.0':
-    resolution: {integrity: sha512-C8Z3FWEcLfEdf/OEA6gLYBW45skFeQE3fIr/9eqri8ncDoKQ0ArMSrtIkLC3gyJCWNoZZArLUj1eTGiSS1HJNw==}
+  '@oxc-minify/binding-linux-riscv64-musl@0.127.0':
+    resolution: {integrity: sha512-mKuBqbHLZIpiodCpfviUfGkz+xXfLZKL9/GXGuhWDIH6ICbxNmesuD94yB/DTAvqF7Kt0SuV3GeM7Hf+sT2rQQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-minify/binding-linux-s390x-gnu@0.127.0':
+    resolution: {integrity: sha512-MaciI97IVhGD1AVM5yB+jyEoJSk4bg2qu3g5qHQc/dYKgMFx1Wb7GHrTXLYY8cyjTpu2lOKVenoQANAGazuplg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [s390x]
     os: [linux]
     libc: [glibc]
 
-  '@oxc-minify/binding-linux-x64-gnu@0.97.0':
-    resolution: {integrity: sha512-4RMxc/CY+5bWdn/5oYjWKji/q2FVQ6kl9LBeGhbAbS/GlH5T1/uhK8qg7HlYt5Sh3K+z6yxBcgZh+0wF7wnbWg==}
+  '@oxc-minify/binding-linux-x64-gnu@0.127.0':
+    resolution: {integrity: sha512-c8GW3zLzfIbx+k5V0ZO1cqq+LDoLnRlTHf5qWbXLYu+SXgLpnjjK9ig7pMCa1fFnKj29sJRcMP85q0/PxGmGGA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@oxc-minify/binding-linux-x64-musl@0.97.0':
-    resolution: {integrity: sha512-ABrWgMvZLaZhh4aq5hX9aKR4dlE4erB2ypE1ZonTPHa1/uA5r7d0uyQq6gC2AcZsjXziPhdJVdykvY1/Xo5azg==}
+  '@oxc-minify/binding-linux-x64-musl@0.127.0':
+    resolution: {integrity: sha512-bHPjgV3TTfplFVXqgaaEZBtOeyqkuEE+OztqHl4AZ5FUuNwPTjCbn0ir/TsiBuy1F1o5Q4b/UJ86WojFO0qYCQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@oxc-minify/binding-wasm32-wasi@0.97.0':
-    resolution: {integrity: sha512-I8VNYDzmLTOqEIxisGzeE/3MKTNYK0tuc5bENBPLEWzO3wTti8Ol0+o/2ytJJ+9whXUbHibGIUdBlvZnyDqt2g==}
-    engines: {node: '>=14.0.0'}
+  '@oxc-minify/binding-openharmony-arm64@0.127.0':
+    resolution: {integrity: sha512-o7G4W7w32BQrfyc1wEMak0ROu4IdSsfYpnU5woAz3jkXvEEAPJtjFydt8ZdLBwo+QY9zrt6gi6s+e0P6DZOCeQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@oxc-minify/binding-wasm32-wasi@0.127.0':
+    resolution: {integrity: sha512-RaVzU86yyUaRIGNPx+8uNZHy7rUWAA5cpdNSsln9Iu9pQrLZkmAlG6SvbEt6hy9OJ+YCQSqcmrIz3bbwhUXCOA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [wasm32]
 
-  '@oxc-minify/binding-win32-arm64-msvc@0.97.0':
-    resolution: {integrity: sha512-hwoy2tQLQUODXoHGIp3eYs67+jxn6bZ0bU4eZPfpkPYQQBaM5Oxrr/GAT/GRRlIilM4JqPgBBq1+lODPYbtiSQ==}
+  '@oxc-minify/binding-win32-arm64-msvc@0.127.0':
+    resolution: {integrity: sha512-hKck5qLZAYu6ELCfqBI5ZPak3BI3BYSGurQtAwEhQlc65hp0yABOFkC/bWVXE+ZadfqwtL/Q1hwuAmTzB6YIPw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [win32]
 
-  '@oxc-minify/binding-win32-x64-msvc@0.97.0':
-    resolution: {integrity: sha512-BxO9cCEN78P/w4HTLSIEoUsTGN4v9Qr90ZbBJ1N4HqNhx8PRr5jVm31w6j/jcWtBEr1DxlRkXFTDsaiyH8MDww==}
+  '@oxc-minify/binding-win32-ia32-msvc@0.127.0':
+    resolution: {integrity: sha512-bnfY+upjKaALeAYB5+r3WY62qW2vYT0hPU8DNYaqZTw5TMJrNlBk6VU4cvY00pelMdKcARAJznDyQ3KOx8/8HQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ia32]
+    os: [win32]
+
+  '@oxc-minify/binding-win32-x64-msvc@0.127.0':
+    resolution: {integrity: sha512-hWyUPJ4QxHdMc7fwLY9IZMrppZ1IDLYJ9LdTH4kVpen76jyl48hqIDtbSF4Ci6rZYAmj5p9Rq+bjwZ3J+cw+HQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [win32]
@@ -5090,8 +5107,8 @@ packages:
     resolution: {integrity: sha512-qFOyK5PjiWZd+QQIh+1jhdb9LpxTF0qs7Pm8o5QHYZ0M3vKqSqzsZaEB6oWlxZ+q2sJBMI/Ktgd2N5ZwQoRHfg==}
     engines: {node: '>= 0.4'}
 
-  oxc-minify@0.97.0:
-    resolution: {integrity: sha512-QvZwjfhN/YH01EqMGJT0EUTd8QORT5gPlhxLBpOl7B83jDEq8hYVylYbvTUGJRXri0roqUvuuIg6BEDERPhycA==}
+  oxc-minify@0.127.0:
+    resolution: {integrity: sha512-wrimObw3SzDvKccmPezJ3EAYXg3QVwuBZ54RJZ5YcKbwJ3NAl+QB2034Yvawo3m4CidE7D7soFD5/NIqKA1IOQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
   oxc-parser@0.121.0:
@@ -6295,29 +6312,13 @@ snapshots:
 
   '@docsearch/js@4.2.0': {}
 
-  '@emnapi/core@1.5.0':
-    dependencies:
-      '@emnapi/wasi-threads': 1.1.0
-      tslib: 2.8.1
-    optional: true
-
   '@emnapi/core@1.9.2':
     dependencies:
       '@emnapi/wasi-threads': 1.2.1
       tslib: 2.8.1
     optional: true
 
-  '@emnapi/runtime@1.5.0':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
-
   '@emnapi/runtime@1.9.2':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
-
-  '@emnapi/wasi-threads@1.1.0':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -6733,20 +6734,6 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@napi-rs/wasm-runtime@1.0.7':
-    dependencies:
-      '@emnapi/core': 1.5.0
-      '@emnapi/runtime': 1.5.0
-      '@tybys/wasm-util': 0.10.1
-    optional: true
-
-  '@napi-rs/wasm-runtime@1.1.1':
-    dependencies:
-      '@emnapi/core': 1.9.2
-      '@emnapi/runtime': 1.9.2
-      '@tybys/wasm-util': 0.10.1
-    optional: true
-
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
     dependencies:
       '@emnapi/core': 1.9.2
@@ -6840,51 +6827,68 @@ snapshots:
 
   '@ota-meshi/ast-token-store@0.3.0': {}
 
-  '@oxc-minify/binding-android-arm64@0.97.0':
+  '@oxc-minify/binding-android-arm-eabi@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-darwin-arm64@0.97.0':
+  '@oxc-minify/binding-android-arm64@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-darwin-x64@0.97.0':
+  '@oxc-minify/binding-darwin-arm64@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-freebsd-x64@0.97.0':
+  '@oxc-minify/binding-darwin-x64@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-arm-gnueabihf@0.97.0':
+  '@oxc-minify/binding-freebsd-x64@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-arm-musleabihf@0.97.0':
+  '@oxc-minify/binding-linux-arm-gnueabihf@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-arm64-gnu@0.97.0':
+  '@oxc-minify/binding-linux-arm-musleabihf@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-arm64-musl@0.97.0':
+  '@oxc-minify/binding-linux-arm64-gnu@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-riscv64-gnu@0.97.0':
+  '@oxc-minify/binding-linux-arm64-musl@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-s390x-gnu@0.97.0':
+  '@oxc-minify/binding-linux-ppc64-gnu@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-x64-gnu@0.97.0':
+  '@oxc-minify/binding-linux-riscv64-gnu@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-linux-x64-musl@0.97.0':
+  '@oxc-minify/binding-linux-riscv64-musl@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-wasm32-wasi@0.97.0':
+  '@oxc-minify/binding-linux-s390x-gnu@0.127.0':
+    optional: true
+
+  '@oxc-minify/binding-linux-x64-gnu@0.127.0':
+    optional: true
+
+  '@oxc-minify/binding-linux-x64-musl@0.127.0':
+    optional: true
+
+  '@oxc-minify/binding-openharmony-arm64@0.127.0':
+    optional: true
+
+  '@oxc-minify/binding-wasm32-wasi@0.127.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.7
+      '@emnapi/core': 1.9.2
+      '@emnapi/runtime': 1.9.2
+      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
     optional: true
 
-  '@oxc-minify/binding-win32-arm64-msvc@0.97.0':
+  '@oxc-minify/binding-win32-arm64-msvc@0.127.0':
     optional: true
 
-  '@oxc-minify/binding-win32-x64-msvc@0.97.0':
+  '@oxc-minify/binding-win32-ia32-msvc@0.127.0':
+    optional: true
+
+  '@oxc-minify/binding-win32-x64-msvc@0.127.0':
     optional: true
 
   '@oxc-parser/binding-android-arm-eabi@0.121.0':
@@ -6935,9 +6939,12 @@ snapshots:
   '@oxc-parser/binding-openharmony-arm64@0.121.0':
     optional: true
 
-  '@oxc-parser/binding-wasm32-wasi@0.121.0':
+  '@oxc-parser/binding-wasm32-wasi@0.121.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.1
+      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
     optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.121.0':
@@ -7011,9 +7018,12 @@ snapshots:
   '@oxc-resolver/binding-openharmony-arm64@11.19.1':
     optional: true
 
-  '@oxc-resolver/binding-wasm32-wasi@11.19.1':
+  '@oxc-resolver/binding-wasm32-wasi@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.1
+      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
     optional: true
 
   '@oxc-resolver/binding-win32-arm64-msvc@11.19.1':
@@ -8579,9 +8589,9 @@ snapshots:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
-  dts-resolver@2.1.3(oxc-resolver@11.19.1):
+  dts-resolver@2.1.3(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)):
     optionalDependencies:
-      oxc-resolver: 11.19.1
+      oxc-resolver: 11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
 
   dunder-proto@1.0.1:
     dependencies:
@@ -9547,17 +9557,17 @@ snapshots:
 
   jsonc-parser@3.3.1: {}
 
-  jsr-exports-lint@0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))):
+  jsr-exports-lint@0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))):
     dependencies:
       picocolors: 1.1.1
     optionalDependencies:
-      tsdown: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+      tsdown: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
-  jsr-exports-lint@0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))):
+  jsr-exports-lint@0.4.2(tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))):
     dependencies:
       picocolors: 1.1.1
     optionalDependencies:
-      tsdown: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
+      tsdown: 0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
 
   jsr@0.14.3:
     dependencies:
@@ -9576,7 +9586,7 @@ snapshots:
 
   kind-of@6.0.3: {}
 
-  knip@6.3.1:
+  knip@6.3.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2):
     dependencies:
       '@nodelib/fs.walk': 1.2.8
       fast-glob: 3.3.3
@@ -9584,8 +9594,8 @@ snapshots:
       get-tsconfig: 4.13.7
       jiti: 2.6.1
       minimist: 1.2.8
-      oxc-parser: 0.121.0
-      oxc-resolver: 11.19.1
+      oxc-parser: 0.121.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+      oxc-resolver: 11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
       picocolors: 1.1.1
       picomatch: 4.0.3
       smol-toml: 1.6.1
@@ -9593,6 +9603,9 @@ snapshots:
       unbash: 2.2.0
       yaml: 2.8.2
       zod: 4.3.6
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
 
   kolorist@1.8.0: {}
 
@@ -10293,25 +10306,30 @@ snapshots:
       safe-push-apply: 1.0.0
     optional: true
 
-  oxc-minify@0.97.0:
+  oxc-minify@0.127.0:
     optionalDependencies:
-      '@oxc-minify/binding-android-arm64': 0.97.0
-      '@oxc-minify/binding-darwin-arm64': 0.97.0
-      '@oxc-minify/binding-darwin-x64': 0.97.0
-      '@oxc-minify/binding-freebsd-x64': 0.97.0
-      '@oxc-minify/binding-linux-arm-gnueabihf': 0.97.0
-      '@oxc-minify/binding-linux-arm-musleabihf': 0.97.0
-      '@oxc-minify/binding-linux-arm64-gnu': 0.97.0
-      '@oxc-minify/binding-linux-arm64-musl': 0.97.0
-      '@oxc-minify/binding-linux-riscv64-gnu': 0.97.0
-      '@oxc-minify/binding-linux-s390x-gnu': 0.97.0
-      '@oxc-minify/binding-linux-x64-gnu': 0.97.0
-      '@oxc-minify/binding-linux-x64-musl': 0.97.0
-      '@oxc-minify/binding-wasm32-wasi': 0.97.0
-      '@oxc-minify/binding-win32-arm64-msvc': 0.97.0
-      '@oxc-minify/binding-win32-x64-msvc': 0.97.0
+      '@oxc-minify/binding-android-arm-eabi': 0.127.0
+      '@oxc-minify/binding-android-arm64': 0.127.0
+      '@oxc-minify/binding-darwin-arm64': 0.127.0
+      '@oxc-minify/binding-darwin-x64': 0.127.0
+      '@oxc-minify/binding-freebsd-x64': 0.127.0
+      '@oxc-minify/binding-linux-arm-gnueabihf': 0.127.0
+      '@oxc-minify/binding-linux-arm-musleabihf': 0.127.0
+      '@oxc-minify/binding-linux-arm64-gnu': 0.127.0
+      '@oxc-minify/binding-linux-arm64-musl': 0.127.0
+      '@oxc-minify/binding-linux-ppc64-gnu': 0.127.0
+      '@oxc-minify/binding-linux-riscv64-gnu': 0.127.0
+      '@oxc-minify/binding-linux-riscv64-musl': 0.127.0
+      '@oxc-minify/binding-linux-s390x-gnu': 0.127.0
+      '@oxc-minify/binding-linux-x64-gnu': 0.127.0
+      '@oxc-minify/binding-linux-x64-musl': 0.127.0
+      '@oxc-minify/binding-openharmony-arm64': 0.127.0
+      '@oxc-minify/binding-wasm32-wasi': 0.127.0
+      '@oxc-minify/binding-win32-arm64-msvc': 0.127.0
+      '@oxc-minify/binding-win32-ia32-msvc': 0.127.0
+      '@oxc-minify/binding-win32-x64-msvc': 0.127.0
 
-  oxc-parser@0.121.0:
+  oxc-parser@0.121.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2):
     dependencies:
       '@oxc-project/types': 0.121.0
     optionalDependencies:
@@ -10331,12 +10349,15 @@ snapshots:
       '@oxc-parser/binding-linux-x64-gnu': 0.121.0
       '@oxc-parser/binding-linux-x64-musl': 0.121.0
       '@oxc-parser/binding-openharmony-arm64': 0.121.0
-      '@oxc-parser/binding-wasm32-wasi': 0.121.0
+      '@oxc-parser/binding-wasm32-wasi': 0.121.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
       '@oxc-parser/binding-win32-arm64-msvc': 0.121.0
       '@oxc-parser/binding-win32-ia32-msvc': 0.121.0
       '@oxc-parser/binding-win32-x64-msvc': 0.121.0
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
 
-  oxc-resolver@11.19.1:
+  oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2):
     optionalDependencies:
       '@oxc-resolver/binding-android-arm-eabi': 11.19.1
       '@oxc-resolver/binding-android-arm64': 11.19.1
@@ -10354,10 +10375,13 @@ snapshots:
       '@oxc-resolver/binding-linux-x64-gnu': 11.19.1
       '@oxc-resolver/binding-linux-x64-musl': 11.19.1
       '@oxc-resolver/binding-openharmony-arm64': 11.19.1
-      '@oxc-resolver/binding-wasm32-wasi': 11.19.1
+      '@oxc-resolver/binding-wasm32-wasi': 11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
       '@oxc-resolver/binding-win32-arm64-msvc': 11.19.1
       '@oxc-resolver/binding-win32-ia32-msvc': 11.19.1
       '@oxc-resolver/binding-win32-x64-msvc': 11.19.1
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
 
   oxfmt@0.46.0:
     dependencies:
@@ -10658,14 +10682,14 @@ snapshots:
 
   robust-predicates@3.0.2: {}
 
-  rolldown-plugin-dts@0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(rolldown@1.0.0-rc.16)(typescript@5.9.3):
+  rolldown-plugin-dts@0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(rolldown@1.0.0-rc.16)(typescript@5.9.3):
     dependencies:
       '@babel/generator': 7.28.5
       '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
       ast-kit: 2.2.0
       birpc: 4.0.0
-      dts-resolver: 2.1.3(oxc-resolver@11.19.1)
+      dts-resolver: 2.1.3(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
       get-tsconfig: 4.13.0
       obug: 2.1.1
       rolldown: 1.0.0-rc.16
@@ -10675,14 +10699,14 @@ snapshots:
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown-plugin-dts@0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(rolldown@1.0.0-rc.16)(typescript@6.0.2):
+  rolldown-plugin-dts@0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(rolldown@1.0.0-rc.16)(typescript@6.0.2):
     dependencies:
       '@babel/generator': 7.28.5
       '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
       ast-kit: 2.2.0
       birpc: 4.0.0
-      dts-resolver: 2.1.3(oxc-resolver@11.19.1)
+      dts-resolver: 2.1.3(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))
       get-tsconfig: 4.13.0
       obug: 2.1.1
       rolldown: 1.0.0-rc.16
@@ -11165,7 +11189,7 @@ snapshots:
       strip-bom: 3.0.0
     optional: true
 
-  tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)):
+  tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@5.9.3)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -11175,7 +11199,7 @@ snapshots:
       empathic: 2.0.0
       hookable: 5.5.3
       rolldown: 1.0.0-rc.16
-      rolldown-plugin-dts: 0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(rolldown@1.0.0-rc.16)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(rolldown@1.0.0-rc.16)(typescript@5.9.3)
       semver: 7.7.3
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
@@ -11192,7 +11216,7 @@ snapshots:
       - supports-color
       - vue-tsc
 
-  tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)):
+  tsdown@0.15.12(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(publint@0.3.18)(typescript@6.0.2)(unrun@0.2.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -11202,7 +11226,7 @@ snapshots:
       empathic: 2.0.0
       hookable: 5.5.3
       rolldown: 1.0.0-rc.16
-      rolldown-plugin-dts: 0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1)(rolldown@1.0.0-rc.16)(typescript@6.0.2)
+      rolldown-plugin-dts: 0.20.0(@typescript/native-preview@7.0.0-dev.20260120.1)(oxc-resolver@11.19.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2))(rolldown@1.0.0-rc.16)(typescript@6.0.2)
       semver: 7.7.3
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
@@ -11517,14 +11541,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vitepress-plugin-mermaid@2.0.17(mermaid@11.12.0)(vitepress@2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.97.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)):
+  vitepress-plugin-mermaid@2.0.17(mermaid@11.12.0)(vitepress@2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.127.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)):
     dependencies:
       mermaid: 11.12.0
-      vitepress: 2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.97.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
+      vitepress: 2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.127.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
     optionalDependencies:
       '@mermaid-js/mermaid-mindmap': 9.3.0
 
-  vitepress@2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.97.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2):
+  vitepress@2.0.0-alpha.12(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(oxc-minify@0.127.0)(postcss@8.5.6)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2):
     dependencies:
       '@docsearch/css': 4.2.0
       '@docsearch/js': 4.2.0
@@ -11545,7 +11569,7 @@ snapshots:
       vite: rolldown-vite@7.3.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.1)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
       vue: 3.5.21(typescript@6.0.2)
     optionalDependencies:
-      oxc-minify: 0.97.0
+      oxc-minify: 0.127.0
       postcss: 8.5.6
     transitivePeerDependencies:
       - '@emnapi/core'
