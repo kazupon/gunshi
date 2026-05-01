@@ -43,6 +43,9 @@ Gunshi provides three main lifecycle hooks:
 - **`onAfterCommand`**: Executes after successful command completion
 - **`onErrorCommand`**: Executes when a command throws an error
 
+Argument validation failures are also treated as command errors. Gunshi renders the validation
+error message first, then calls `onErrorCommand` and rejects the `cli()` promise.
+
 ## Basic Hook Usage
 
 ### Setting Up Hooks
@@ -116,6 +119,45 @@ The `CommandContext` parameter is read-only and contains all command metadata, w
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
 With an understanding of how hooks work and their parameters, let's explore how they differ from and interact with plugin decorators.
+
+### Handling Argument Validation Errors
+
+When argument validation fails, Gunshi renders the validation error message before calling
+`onErrorCommand`. You can detect this case with `ctx.validationError`:
+
+```ts
+import { cli, define } from 'gunshi'
+
+const command = define({
+  name: 'deploy',
+  args: {
+    id: {
+      type: 'string',
+      required: true
+    }
+  },
+  run: ctx => {
+    console.log(`Deploying ${ctx.values.id}`)
+  }
+})
+
+let validationFailed = false
+
+try {
+  await cli(process.argv.slice(2), command, {
+    onErrorCommand: (ctx, error) => {
+      if (ctx.validationError === error) {
+        validationFailed = true
+        process.exitCode = 2
+      }
+    }
+  })
+} catch (error) {
+  if (!validationFailed) {
+    throw error
+  }
+}
+```
 
 ## Hooks vs Decorators
 

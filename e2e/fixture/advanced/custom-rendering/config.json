@@ -5,5 +5,5 @@
   ["add-fully-option", "node cli.js --add \"Important meeting\" --priority high --due 2023-12-31"],
   ["list", "node cli.js --list"],
   ["completion", "node cli.js --complete \"Complete the project\""],
-  ["invalid-error", "node cli.js --add"]
+  ["invalid-error", "node cli.js --add || true"]
 ]

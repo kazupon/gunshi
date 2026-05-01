@@ -81,3 +81,29 @@ test('base runner execution', async () => {
 
   expect(result).toBe('command executed')
 })
+
+test('throws validation error after showing validation errors', async () => {
+  const validationError = new AggregateError([new Error('missing id')], 'validation failed')
+  const showValidationErrors = vi.fn<(error: AggregateError) => string>(() => 'validation failed')
+  const ctx = await createCommandContext({
+    values: {},
+    validationError,
+    extensions: {
+      [pluginId]: {
+        key: Symbol(pluginId),
+        factory: () => ({
+          showVersion: vi.fn<() => string>(() => '1.0.0'),
+          showHeader: vi.fn<() => string | undefined>(() => undefined),
+          showUsage: vi.fn<() => string | undefined>(() => undefined),
+          showValidationErrors
+        })
+      }
+    }
+  })
+  const baseRunner = vi.fn<() => string>(() => 'command executed')
+
+  await expect(decorator(baseRunner)(ctx)).rejects.toBe(validationError)
+
+  expect(showValidationErrors).toHaveBeenCalledWith(validationError)
+  expect(baseRunner).not.toHaveBeenCalled()
+})

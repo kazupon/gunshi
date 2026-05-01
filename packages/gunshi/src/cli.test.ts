@@ -959,10 +959,12 @@ test('enum optional argument', async () => {
   )
 
   // failure case
-  await cli(['--foo', 'z'], {
-    args,
-    run: vi.fn<() => void>()
-  })
+  await expect(
+    cli(['--foo', 'z'], {
+      args,
+      run: vi.fn<() => void>()
+    })
+  ).rejects.toBeInstanceOf(AggregateError)
   const stdout = log()
   expect(stdout).toEqual(
     `Optional argument '--foo' should be chosen from 'enum' ["a", "b", "c"] values`
@@ -995,10 +997,12 @@ describe('positional arguments', () => {
     )
 
     // failure case
-    await cli(['value1'], {
-      args,
-      run: vi.fn<() => void>()
-    })
+    await expect(
+      cli(['value1'], {
+        args,
+        run: vi.fn<() => void>()
+      })
+    ).rejects.toBeInstanceOf(AggregateError)
     const stdout = log()
     expect(stdout).toEqual(`Positional argument 'bar' is required`)
   })
@@ -1056,15 +1060,17 @@ describe('positional arguments', () => {
     )
 
     // failure case
-    await cli(
-      ['command2', '-o=1'],
-      {
-        run: vi.fn<() => void>()
-      },
-      {
-        subCommands
-      }
-    )
+    await expect(
+      cli(
+        ['command2', '-o=1'],
+        {
+          run: vi.fn<() => void>()
+        },
+        {
+          subCommands
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
     const stdout = log()
     expect(stdout).toEqual(`Positional argument 'bar' is required`)
   })
@@ -1243,10 +1249,12 @@ describe('custom type arguments', () => {
       }
     } satisfies Args
 
-    await cli(['--port', '80'], {
-      args,
-      run: vi.fn<() => void>()
-    })
+    await expect(
+      cli(['--port', '80'], {
+        args,
+        run: vi.fn<() => void>()
+      })
+    ).rejects.toBeInstanceOf(AggregateError)
 
     const stdout = log()
     expect(stdout).toContain('Invalid port: 80. Must be a number between 1024 and 65535')
@@ -1475,6 +1483,46 @@ describe('command lifecycle hooks', () => {
 
     expect(executionOrder).toEqual(['before', 'command', 'error'])
     expect(capturedError).toBe(testError)
+  })
+
+  test('onErrorCommand hook with validation error', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const executionOrder: string[] = []
+    const mockCommand = vi.fn<() => void>()
+    const args = {
+      id: {
+        type: 'string',
+        required: true
+      }
+    } satisfies Args
+
+    let capturedError: Error | undefined
+
+    await expect(
+      cli(
+        [],
+        { args, run: mockCommand },
+        {
+          onBeforeCommand: () => {
+            executionOrder.push('before')
+          },
+          onAfterCommand: () => {
+            executionOrder.push('after')
+          },
+          onErrorCommand: (ctx, error) => {
+            executionOrder.push('error')
+            capturedError = error
+            expect(ctx.validationError).toBe(error)
+          }
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(executionOrder).toEqual(['before', 'error'])
+    expect(mockCommand).not.toHaveBeenCalled()
+    expect(capturedError).toBeInstanceOf(AggregateError)
+    expect(log()).toBe(`Optional argument '--id' is required`)
   })
 
   test('hooks with subcommands', async () => {
