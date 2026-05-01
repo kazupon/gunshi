@@ -48,7 +48,8 @@ const decorator: CommandDecorator<{
 
   // check for validation errors before executing command
   if (validationError) {
-    return await showValidationErrors(validationError)
+    await showValidationErrors(validationError)
+    throw validationError
   }
 
   // normal command execution

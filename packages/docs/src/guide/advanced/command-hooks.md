@@ -43,6 +43,9 @@ Gunshi provides three main lifecycle hooks:
 - **`onAfterCommand`**: Executes after successful command completion
 - **`onErrorCommand`**: Executes when a command throws an error
 
+Argument validation failures are also treated as command errors. Gunshi renders the validation
+error message first, then calls `onErrorCommand` and rejects the `cli()` promise.
+
 ## Basic Hook Usage
 
 ### Setting Up Hooks

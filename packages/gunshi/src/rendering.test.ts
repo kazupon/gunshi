@@ -152,7 +152,7 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli([], cmd, { name: 'test-cli' })
+      await expect(cli([], cmd, { name: 'test-cli' })).rejects.toBeInstanceOf(AggregateError)
 
       const stdout = log()
       expect(stdout).toBe('')
@@ -179,7 +179,7 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli([], cmd, { name: 'test-cli' })
+      await expect(cli([], cmd, { name: 'test-cli' })).rejects.toBeInstanceOf(AggregateError)
 
       const stdout = log()
       expect(stdout).toContain('ERROR: ')
