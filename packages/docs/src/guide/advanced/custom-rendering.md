@@ -308,6 +308,13 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> `renderValidationErrors` only customizes how validation errors are displayed. Validation failures still reject the `cli()` promise and are passed to `onErrorCommand`. Use `onErrorCommand` if your application needs to set a runtime-specific exit code or suppress the default unhandled error output. For an example, see [Handling Argument Validation Errors](./command-hooks.md#handling-argument-validation-errors).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 ### Combined Renderers Example
 
 You can combine all three custom renderers for a completely customized help experience:
