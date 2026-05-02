@@ -1,7 +1,7 @@
 {
   "name": "combinators",
   "private": true,
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.2",
   "type": "module",
   "scripts": {
     "start": "npx tsx cli.ts"

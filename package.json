@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">= 20"
   },
