@@ -330,8 +330,8 @@ importers:
   packages/plugin-completion:
     dependencies:
       '@bomb.sh/tab':
-        specifier: ^0.0.14
-        version: 0.0.14(cac@6.7.14)(citty@0.1.6)
+        specifier: ^0.0.15
+        version: 0.0.15(cac@6.7.14)(citty@0.1.6)
       '@gunshi/plugin':
         specifier: workspace:*
         version: link:../plugin
@@ -894,8 +894,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bomb.sh/tab@0.0.14':
-    resolution: {integrity: sha512-cHMk2LI430MVoX1unTt9oK1iZzQS4CYDz97MSxKLNErW69T43Z2QLFTpdS/3jVOIKrIADWfuxQ+nQNJkNV7E4w==}
+  '@bomb.sh/tab@0.0.15':
+    resolution: {integrity: sha512-Y90ub44TAvbdO9P8mcD/XPyQjFhiR5xmd4Fk7JErmWmEWEUimNnjWiBrVZ16Tj3GA1rLZ+uvCN2V/pzLawv31g==}
     hasBin: true
     peerDependencies:
       cac: ^6.7.14
@@ -6259,7 +6259,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bomb.sh/tab@0.0.14(cac@6.7.14)(citty@0.1.6)':
+  '@bomb.sh/tab@0.0.15(cac@6.7.14)(citty@0.1.6)':
     optionalDependencies:
       cac: 6.7.14
       citty: 0.1.6
