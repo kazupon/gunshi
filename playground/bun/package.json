@@ -10,6 +10,6 @@
     "typescript": "^6.0.0"
   },
   "dependencies": {
-    "gunshi": "0.29.4"
+    "gunshi": "0.29.5"
   }
 }
