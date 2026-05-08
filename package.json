@@ -112,7 +112,7 @@
     "oxfmt": "^0.47.0",
     "oxlint": "^1.59.0",
     "oxlint-tsgolint": "^0.22.0",
-    "pkg-pr-new": "^0.0.70",
+    "pkg-pr-new": "^0.0.71",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "^8.58.1",
