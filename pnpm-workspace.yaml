@@ -5,6 +5,9 @@ packages:
 allowBuilds:
   deno: true
   esbuild: true
+  oxc-resolver: true
+  rolldown: true
+  unrs-resolver: true
 catalog:
   typescript: ^6.0.3
   zod: ^4.4.3

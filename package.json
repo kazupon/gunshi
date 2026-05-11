@@ -119,15 +119,6 @@
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.5"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "deno",
-      "esbuild",
-      "oxc-resolver",
-      "rolldown",
-      "unrs-resolver"
-    ]
-  },
   "lint-staged": {
     "*.ts?(x)": [
       "oxfmt --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
