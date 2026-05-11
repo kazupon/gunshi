@@ -2,16 +2,19 @@ packages:
   - packages/*
   - playground/**
   - "!playground/bun"
+allowBuilds:
+  deno: true
+  esbuild: true
 catalog:
-  typescript: ^6.0.2
-  zod: ^4.3.6
-  deno: ^2.7.11
+  typescript: ^6.0.3
+  zod: ^4.4.3
+  deno: ^2.7.14
   jsr: ^0.14.3
   jsr-exports-lint: ^0.4.2
-  publint: ^0.3.18
+  publint: ^0.3.20
   tsdown: 0.15.12
-  "@types/node": ^25.5.2
-  typedoc: ^0.28.18
+  "@types/node": ^25.6.2
+  typedoc: ^0.28.19
   tsx: ^4.21.0
   typedoc-plugin-markdown: ^4.11.0
 minimumReleaseAge: 1440
@@ -30,16 +33,6 @@ minimumReleaseAgeExclude:
   - rolldown
   - "@rolldown/pluginutils"
   - "@kazupon/eslint-config"
+  - "@oxfmt/*"
   - gunshi
-  - "@gunshi/bone"
-  - "@gunshi/combinators"
-  - "@gunshi/docs"
-  - "@gunshi/definition"
-  - "@gunshi/plugin"
-  - "@gunshi/plugin-completion"
-  - "@gunshi/plugin-dryrun"
-  - "@gunshi/plugin-global"
-  - "@gunshi/plugin-i18n"
-  - "@gunshi/plugin-renderer"
-  - "@gunshi/resources"
-  - "@gunshi/shared"
+  - "@gunshi/*"
