@@ -8,6 +8,21 @@ allowBuilds:
   oxc-resolver: true
   rolldown: true
   unrs-resolver: true
+# Ensure platform-specific optional bindings (e.g. @rolldown/binding-*) are
+# installed across all platforms we publish/run on. Without this, pnpm only
+# resolves the host platform's binding, which breaks CI on Linux when the
+# lockfile was originally generated on macOS.
+supportedArchitectures:
+  os:
+    - darwin
+    - linux
+    - win32
+  cpu:
+    - x64
+    - arm64
+  libc:
+    - glibc
+    - musl
 catalog:
   typescript: ^6.0.3
   zod: ^4.4.3
