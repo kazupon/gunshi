@@ -9,6 +9,7 @@ const config: UserConfig = defineConfig({
   clean: true,
   publint: true,
   dts: true,
+  fixedExtension: false,
   external: ['@gunshi/plugin'],
   hooks: {
     'build:done': lintJsrExports()

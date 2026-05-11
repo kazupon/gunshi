@@ -6,10 +6,14 @@ import type { UserConfig } from 'tsdown'
 const config: UserConfig = defineConfig({
   entry: ['./src/index.ts'],
   outDir: 'lib',
-  clean: true,
   publint: true,
+  fixedExtension: false,
   // dts: true,
-  // NOTE(kazupon): We need to avoid for `deno check` to resolve `args-tokens` as a dependency.
+  // NOTE(kazupon): Inline `args-tokens` types into the bundled `.d.ts` so that
+  // `deno check` does not try to resolve `args-tokens` as a dependency, and to
+  // hide it as a transitive type dependency for consumers. Requires
+  // `rolldown-plugin-dts` <= 0.20 (the `resolve` array API was removed in
+  // 0.21). See `overrides` in pnpm-workspace.yaml.
   dts: {
     resolve: ['args-tokens']
   },

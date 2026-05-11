@@ -12,11 +12,22 @@ catalog:
   jsr: ^0.14.3
   jsr-exports-lint: ^0.4.2
   publint: ^0.3.20
-  tsdown: 0.15.12
+  tsdown: 0.21.0
   "@types/node": ^25.6.2
   typedoc: ^0.28.19
   tsx: ^4.21.0
   typedoc-plugin-markdown: ^4.11.0
+overrides:
+  tsdown>rolldown: 1.0.0
+  # Pin rolldown-plugin-dts to 0.20.0 because `dts.resolve` (array form) was
+  # removed in v0.21.0. We rely on `dts.resolve: ['args-tokens', ...]` in each
+  # package's tsdown.config.ts to inline `args-tokens` types into `.d.ts` so
+  # that consumers don't see `args-tokens` as a transitive type dependency
+  # (the JS side already bundles it via devDependencies). No equivalent API
+  # exists yet in newer versions; tracked at:
+  # https://github.com/sxzz/rolldown-plugin-dts/issues/199
+  tsdown>rolldown-plugin-dts: 0.20.0
+  vitepress>vite: npm:vite@8.0.12
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - deno
@@ -30,8 +41,10 @@ minimumReleaseAgeExclude:
   - "@typescript/native-preview"
   - lint-staged
   - tsdown
+  - vite
   - rolldown
-  - "@rolldown/pluginutils"
+  - yaml
+  - "@rolldown/*"
   - "@kazupon/eslint-config"
   - "@oxfmt/*"
   - gunshi

@@ -6,8 +6,8 @@ import type { UserConfig } from 'tsdown'
 const config: UserConfig = defineConfig({
   entry: ['./src/index.ts'],
   outDir: 'lib',
-  clean: true,
   publint: true,
+  fixedExtension: false,
   dts: true,
   hooks: {
     'build:done': lintJsrExports()

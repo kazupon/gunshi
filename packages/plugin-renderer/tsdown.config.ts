@@ -6,9 +6,9 @@ import type { UserConfig } from 'tsdown'
 const config: UserConfig = defineConfig({
   entry: ['./src/index.ts'],
   outDir: 'lib',
-  clean: true,
   publint: true,
   dts: true,
+  fixedExtension: false,
   noExternal: ['@gunshi/shared'],
   external: ['@gunshi/plugin'],
   hooks: {

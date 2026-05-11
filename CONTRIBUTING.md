@@ -62,3 +62,7 @@ pnpm fix
 There are some other scripts available in the `scripts` section of the `package.json` file.
 
 **Please make sure to have this pass successfully before submitting a PR.** Although the lint will be run against your PR on the CI server, it is better to have it working locally beforehand.
+
+## Notes
+
+For internal notes on build configuration, dependency bundling decisions, and other non-obvious context, see [NOTES.md](./NOTES.md).
