@@ -36,6 +36,10 @@ catalog:
   tsx: ^4.21.0
   typedoc-plugin-markdown: ^4.11.0
 overrides:
+  # Pin rolldown to 1.0.0 (GA). Without this, tsdown@0.21.0 resolves to
+  # rolldown@1.0.0-rc.7, whose `@rolldown/binding-*` optional dependencies
+  # pnpm fails to symlink under `rolldown/node_modules/@rolldown/`, causing
+  # native binding load errors at runtime.
   tsdown>rolldown: 1.0.0
   # Pin rolldown-plugin-dts to 0.20.0 because `dts.resolve` (array form) was
   # removed in v0.21.0. We rely on `dts.resolve: ['args-tokens', ...]` in each
