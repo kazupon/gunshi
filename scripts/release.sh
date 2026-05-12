@@ -46,6 +46,16 @@ for PKG in packages/* ; do
     # workspace context in CI, causing `ERR_PNPM_IGNORED_BUILDS` for esbuild
     # (pulled in transitively by the modified package.json).
     pnpx tsx ./scripts/jsr.ts --package $PKG --tag $TAG
+    # DEBUG: dump pnpm config and cwd state to diagnose CI-only IGNORED_BUILDS
+    echo "::group::DEBUG pnpm install context for $PKG"
+    echo "pwd: $(pwd)"
+    echo "ls workspace root:"
+    ls -la pnpm-workspace.yaml package.json 2>&1 | head -5
+    echo "pnpm config get onlyBuiltDependencies:"
+    pnpm config get onlyBuiltDependencies 2>&1 || true
+    echo "pnpm config list (filtered):"
+    pnpm config list 2>&1 | grep -iE "build|approve|workspace" | head -20 || true
+    echo "::endgroup::"
     pnpm install --no-frozen-lockfile --ignore-scripts
     pushd $PKG
     echo "⚡ Publishing $PKG for jsr registry"
