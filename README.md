@@ -28,10 +28,6 @@ Gunshi is designed to simplify the creation of modern command-line interfaces:
 - 🌍 **Internationalization**: Built with global users in mind, featuring locale-aware design, resource management, and multi-language support.
 - 🔌 **Pluggable**: Extensible plugin system with dependency management and lifecycle hooks for modular CLI development.
 
-## 📡 Status
-
-- v0.27: stable
-
 ## 💿 Installation
 
 ```sh
