@@ -42,7 +42,9 @@ for PKG in packages/* ; do
     fi
     pushd $PKG
     pnpx tsx ../../scripts/jsr.ts --package $PKG --tag $TAG
-    pnpm install --no-frozen-lockfile
+    # `--ignore-scripts` skips esbuild postinstall etc. since JSR publish
+    # does not need the JS to be runnable (it ships TS source directly).
+    pnpm install --no-frozen-lockfile --ignore-scripts
     echo "⚡ Publishing $PKG for jsr registry"
     pnpx jsr publish -c jsr.json --allow-dirty
     popd > /dev/null
