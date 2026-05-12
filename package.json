@@ -84,6 +84,9 @@
     "test:plugin-renderer": "vitest --typecheck run packages/plugin-renderer",
     "typecheck:deno": "pnpm -r --if-present typecheck:deno"
   },
+  "optionalDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "1.0.0"
+  },
   "devDependencies": {
     "@eslint/markdown": "^8.0.1",
     "@kazupon/eslint-config": "^0.45.0",
