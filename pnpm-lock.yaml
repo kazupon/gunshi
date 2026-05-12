@@ -285,8 +285,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       args-tokens:
-        specifier: ^0.24.3
-        version: 0.24.3
+        specifier: ^0.25.0
+        version: 0.25.0
       deno:
         specifier: 'catalog:'
         version: 2.7.14
@@ -2735,9 +2735,9 @@ packages:
     resolution: {integrity: sha512-kWceoEa1zXbcBvgy+BT1ddTLyB7B51u32EhOK/ZMY324nxmQAm767HD+g+9avBEPVmoDjWIYLvsSCQqtbcph/g==}
     engines: {node: '>= 20'}
 
-  args-tokens@0.24.3:
-    resolution: {integrity: sha512-Blg4MQS0dlrkYS9qQWlcvLZcYGufO0vqLzCfT2yxXyczbRF6PgxE1ZxIpuCd9tGB7kbWzWoN/GG+afKktW33Mg==}
-    engines: {node: '>= 20'}
+  args-tokens@0.25.0:
+    resolution: {integrity: sha512-FQzRsnEN/9GISlXp/Qj2HrQ7LM7yS9VvgdTEy/l03OQ+nmjEvMpGDHuaHcZ4U292dUnOd+TW29N0YtLVn7eS8g==}
+    engines: {node: '>= 22'}
 
   array-find-index@1.0.2:
     resolution: {integrity: sha512-M1HQyIXcBGtVywBt8WVdim+lrNaK7VHp99Qt5pSNziXznKHViIBbXWtfRTpEFpF/c4FdfxNAsCCwPp5phBYJtw==}
@@ -6196,7 +6196,7 @@ snapshots:
 
   args-tokens@0.17.1: {}
 
-  args-tokens@0.24.3: {}
+  args-tokens@0.25.0: {}
 
   array-find-index@1.0.2: {}
 
