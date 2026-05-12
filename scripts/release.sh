@@ -42,9 +42,14 @@ for PKG in packages/* ; do
     fi
     pushd $PKG
     pnpx tsx ../../scripts/jsr.ts --package $PKG --tag $TAG
-    # `--ignore-scripts` skips esbuild postinstall etc. since JSR publish
-    # does not need the JS to be runnable (it ships TS source directly).
-    pnpm install --no-frozen-lockfile --ignore-scripts
+    # `--ignore-scripts` skips esbuild postinstall etc. (JSR publish ships TS
+    # source directly, so the JS does not need to be runnable).
+    # `--config.strict-builds=false` bypasses pnpm's `ERR_PNPM_IGNORED_BUILDS`
+    # gate, which fires for packages newly pulled in by the modified
+    # package.json (e.g. esbuild via tsx via tsdown) even when scripts are
+    # ignored, because the workspace-level `onlyBuiltDependencies` is not
+    # honored from this subdirectory install context in CI.
+    pnpm install --no-frozen-lockfile --ignore-scripts --config.strict-builds=false
     echo "⚡ Publishing $PKG for jsr registry"
     pnpx jsr publish -c jsr.json --allow-dirty
     popd > /dev/null
