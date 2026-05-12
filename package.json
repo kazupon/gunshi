@@ -18,13 +18,13 @@
   },
   "packageManager": "pnpm@10.33.3",
   "engines": {
-    "node": ">= 20"
+    "node": ">= 22"
   },
   "devEngines": {
     "runtime": [
       {
         "name": "node",
-        "version": ">=20",
+        "version": ">=22",
         "onFail": "error"
       },
       {
