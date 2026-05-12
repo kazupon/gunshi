@@ -142,7 +142,7 @@ export async function createCommandContext<
   callMode = 'entry',
   commandPath = [],
   omitted = false,
-  validationError = undefined
+  validationError
 }: CommandContextParams<G, V, C, E>): Promise<
   {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<G>>
