@@ -103,7 +103,7 @@ For more information, refer to the Gunshi API documentation in `node_modules/@gu
 Gunshi requires:
 
 - **JavaScript Runtime**:
-  - **Node.js**: v20 or later
+  - **Node.js**: v22 or later
   - **Deno**: v2 or later
   - **Bun**: v1.1 or later
 - **ES Modules**: `"type": "module"` in `package.json` (if using Node.js and Bun)
