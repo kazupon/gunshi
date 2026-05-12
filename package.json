@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git"
   },
-  "packageManager": "pnpm@11.0.9",
+  "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">= 20"
   },
@@ -83,9 +83,6 @@
     "test:plugin-i18n": "vitest --typecheck run packages/plugin-i18n",
     "test:plugin-renderer": "vitest --typecheck run packages/plugin-renderer",
     "typecheck:deno": "pnpm -r --if-present typecheck:deno"
-  },
-  "optionalDependencies": {
-    "@rolldown/binding-linux-x64-gnu": "1.0.0"
   },
   "devDependencies": {
     "@eslint/markdown": "^8.0.1",
