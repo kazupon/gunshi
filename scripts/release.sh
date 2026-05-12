@@ -40,16 +40,14 @@ for PKG in packages/* ; do
     if [[ $PKG == packages/docs ]]; then
       continue
     fi
+    # Run jsr.ts and pnpm install from the workspace root so that pnpm reads
+    # `pnpm-workspace.yaml` (notably `onlyBuiltDependencies`). Running these
+    # from inside `$PKG` makes pnpm treat the install as if outside the
+    # workspace context in CI, causing `ERR_PNPM_IGNORED_BUILDS` for esbuild
+    # (pulled in transitively by the modified package.json).
+    pnpx tsx ./scripts/jsr.ts --package $PKG --tag $TAG
+    pnpm install --no-frozen-lockfile --ignore-scripts
     pushd $PKG
-    pnpx tsx ../../scripts/jsr.ts --package $PKG --tag $TAG
-    # `--ignore-scripts` skips esbuild postinstall etc. (JSR publish ships TS
-    # source directly, so the JS does not need to be runnable).
-    # `--config.strict-builds=false` bypasses pnpm's `ERR_PNPM_IGNORED_BUILDS`
-    # gate, which fires for packages newly pulled in by the modified
-    # package.json (e.g. esbuild via tsx via tsdown) even when scripts are
-    # ignored, because the workspace-level `onlyBuiltDependencies` is not
-    # honored from this subdirectory install context in CI.
-    pnpm install --no-frozen-lockfile --ignore-scripts --config.strict-builds=false
     echo "⚡ Publishing $PKG for jsr registry"
     pnpx jsr publish -c jsr.json --allow-dirty
     popd > /dev/null
