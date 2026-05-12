@@ -40,26 +40,16 @@ for PKG in packages/* ; do
     if [[ $PKG == packages/docs ]]; then
       continue
     fi
-    # Run jsr.ts and pnpm install from the workspace root so that pnpm reads
-    # `pnpm-workspace.yaml` (notably `onlyBuiltDependencies`). Running these
-    # from inside `$PKG` makes pnpm treat the install as if outside the
-    # workspace context in CI, causing `ERR_PNPM_IGNORED_BUILDS` for esbuild
-    # (pulled in transitively by the modified package.json).
-    pnpx tsx ./scripts/jsr.ts --package $PKG --tag $TAG
-    # DEBUG: dump pnpm config and cwd state to diagnose CI-only IGNORED_BUILDS
-    echo "::group::DEBUG pnpm install context for $PKG"
-    echo "pwd: $(pwd)"
-    echo "ls workspace root:"
-    ls -la pnpm-workspace.yaml package.json 2>&1 | head -5
-    echo "pnpm config get onlyBuiltDependencies:"
-    pnpm config get onlyBuiltDependencies 2>&1 || true
-    echo "pnpm config list (filtered):"
-    pnpm config list 2>&1 | grep -iE "build|approve|workspace" | head -20 || true
-    echo "::endgroup::"
+    # Use `pnpm exec` instead of `pnpx`. `pnpx` (= `pnpm dlx`) does a fresh
+    # install of the binary into a temporary context that does NOT inherit the
+    # workspace's `onlyBuiltDependencies`, so esbuild (a transitive dep of tsx
+    # and of jsr) trips `ERR_PNPM_IGNORED_BUILDS`. `pnpm exec` runs the binary
+    # already present in the workspace's node_modules, with no extra install.
+    pnpm exec tsx ./scripts/jsr.ts --package $PKG --tag $TAG
     pnpm install --no-frozen-lockfile --ignore-scripts
     pushd $PKG
     echo "⚡ Publishing $PKG for jsr registry"
-    pnpx jsr publish -c jsr.json --allow-dirty
+    pnpm exec jsr publish -c jsr.json --allow-dirty
     popd > /dev/null
   fi
 done
