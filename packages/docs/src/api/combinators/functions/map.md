@@ -3,7 +3,7 @@
 # Function: map()
 
 ```ts
-function map<T, U>(schema, transform): CombinatorSchema<U>
+function map<T, U>(schema, transform): CombinatorSchema<U>;
 ```
 
 **`Experimental`**
@@ -15,17 +15,17 @@ The original schema is not modified.
 
 ## Type Parameters
 
-| Type Parameter | Description                     |
-| -------------- | ------------------------------- |
-| `T`            | The input schema's parsed type. |
-| `U`            | The transformed type.           |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The input schema's parsed type. |
+| `U` | The transformed type. |
 
 ## Parameters
 
-| Parameter   | Type                                                             | Description                  |
-| ----------- | ---------------------------------------------------------------- | ---------------------------- |
-| `schema`    | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema.  |
-| `transform` | (`value`) => `U`                                                 | The transformation function. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| `transform` | (`value`) => `U` | The transformation function. |
 
 ## Returns
 

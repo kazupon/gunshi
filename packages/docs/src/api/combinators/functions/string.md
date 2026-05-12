@@ -3,7 +3,7 @@
 # Function: string()
 
 ```ts
-function string(opts?): CombinatorSchema<string>
+function string(opts?): CombinatorSchema<string>;
 ```
 
 **`Experimental`**
@@ -12,9 +12,9 @@ Create a string argument schema with optional validation.
 
 ## Parameters
 
-| Parameter | Type                                              | Description         |
-| --------- | ------------------------------------------------- | ------------------- |
-| `opts?`   | [`StringOptions`](../interfaces/StringOptions.md) | Validation options. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `opts?` | [`StringOptions`](../interfaces/StringOptions.md) | Validation options. |
 
 ## Returns
 

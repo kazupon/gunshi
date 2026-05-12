@@ -3,7 +3,7 @@
 # Function: integer()
 
 ```ts
-function integer(opts?): CombinatorSchema<number>
+function integer(opts?): CombinatorSchema<number>;
 ```
 
 **`Experimental`**
@@ -14,9 +14,9 @@ Only accepts integer values (no decimals).
 
 ## Parameters
 
-| Parameter | Type                                                | Description    |
-| --------- | --------------------------------------------------- | -------------- |
-| `opts?`   | [`IntegerOptions`](../interfaces/IntegerOptions.md) | Range options. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `opts?` | [`IntegerOptions`](../interfaces/IntegerOptions.md) | Range options. |
 
 ## Returns
 

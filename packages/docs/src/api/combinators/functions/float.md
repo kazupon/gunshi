@@ -3,7 +3,7 @@
 # Function: float()
 
 ```ts
-function float(opts?): CombinatorSchema<number>
+function float(opts?): CombinatorSchema<number>;
 ```
 
 **`Experimental`**
@@ -14,9 +14,9 @@ Rejects `NaN` and `Infinity` values.
 
 ## Parameters
 
-| Parameter | Type                                            | Description    |
-| --------- | ----------------------------------------------- | -------------- |
-| `opts?`   | [`FloatOptions`](../interfaces/FloatOptions.md) | Range options. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `opts?` | [`FloatOptions`](../interfaces/FloatOptions.md) | Range options. |
 
 ## Returns
 

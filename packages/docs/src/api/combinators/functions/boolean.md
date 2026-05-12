@@ -3,7 +3,7 @@
 # Function: boolean()
 
 ```ts
-function boolean(opts?): CombinatorSchema<boolean>
+function boolean(opts?): CombinatorSchema<boolean>;
 ```
 
 **`Experimental`**
@@ -15,9 +15,9 @@ to the parse function based on the presence or negation of the flag.
 
 ## Parameters
 
-| Parameter | Type                                                | Description      |
-| --------- | --------------------------------------------------- | ---------------- |
-| `opts?`   | [`BooleanOptions`](../interfaces/BooleanOptions.md) | Boolean options. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `opts?` | [`BooleanOptions`](../interfaces/BooleanOptions.md) | Boolean options. |
 
 ## Returns
 

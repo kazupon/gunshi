@@ -5,7 +5,7 @@
 ## Call Signature
 
 ```ts
-function merge<A, B>(a, b): Omit<A, keyof B> & B
+function merge<A, B>(a, b): Omit<A, keyof B> & B;
 ```
 
 **`Experimental`**
@@ -16,17 +16,17 @@ On key conflicts the later schema wins (last-write-wins).
 
 ### Type Parameters
 
-| Type Parameter                                           | Description         |
-| -------------------------------------------------------- | ------------------- |
-| `A` _extends_ [`Args`](../../default/interfaces/Args.md) | First schema type.  |
-| `B` _extends_ [`Args`](../../default/interfaces/Args.md) | Second schema type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `A` *extends* [`Args`](../../default/interfaces/Args.md) | First schema type. |
+| `B` *extends* [`Args`](../../default/interfaces/Args.md) | Second schema type. |
 
 ### Parameters
 
-| Parameter | Type | Description    |
-| --------- | ---- | -------------- |
-| `a`       | `A`  | First schema.  |
-| `b`       | `B`  | Second schema. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `a` | `A` | First schema. |
+| `b` | `B` | Second schema. |
 
 ### Returns
 
@@ -45,7 +45,10 @@ const schema = merge(common, network)
 ## Call Signature
 
 ```ts
-function merge<A, B, C>(a, b, c): Omit<Omit<A, keyof B | keyof C> & Omit<B, keyof C>, never> & C
+function merge<A, B, C>(
+   a, 
+   b, 
+   c): Omit<Omit<A, keyof B | keyof C> & Omit<B, keyof C>, never> & C;
 ```
 
 **`Experimental`**
@@ -54,19 +57,19 @@ Compose multiple [Args](../../default/interfaces/Args.md) schemas into one.
 
 ### Type Parameters
 
-| Type Parameter                                           |
-| -------------------------------------------------------- |
-| `A` _extends_ [`Args`](../../default/interfaces/Args.md) |
-| `B` _extends_ [`Args`](../../default/interfaces/Args.md) |
-| `C` _extends_ [`Args`](../../default/interfaces/Args.md) |
+| Type Parameter |
+| ------ |
+| `A` *extends* [`Args`](../../default/interfaces/Args.md) |
+| `B` *extends* [`Args`](../../default/interfaces/Args.md) |
+| `C` *extends* [`Args`](../../default/interfaces/Args.md) |
 
 ### Parameters
 
-| Parameter | Type | Description    |
-| --------- | ---- | -------------- |
-| `a`       | `A`  | First schema.  |
-| `b`       | `B`  | Second schema. |
-| `c`       | `C`  | Third schema.  |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `a` | `A` | First schema. |
+| `b` | `B` | Second schema. |
+| `c` | `C` | Third schema. |
 
 ### Returns
 
@@ -78,17 +81,13 @@ A merged schema containing all fields.
 
 ```ts
 function merge<A, B, C, D>(
-  a,
-  b,
-  c,
-  d
-): Omit<
-  A,
-  keyof D | Exclude<keyof C, keyof D> | Exclude<keyof B, keyof D | Exclude<keyof C, keyof D>>
-> &
-  Omit<B, keyof D | Exclude<keyof C, keyof D>> &
-  Omit<C, keyof D> &
-  D
+   a, 
+   b, 
+   c, 
+   d): Omit<A, 
+  | keyof D
+  | Exclude<keyof C, keyof D>
+  | Exclude<keyof B, keyof D | Exclude<keyof C, keyof D>>> & Omit<B, keyof D | Exclude<keyof C, keyof D>> & Omit<C, keyof D> & D;
 ```
 
 **`Experimental`**
@@ -97,35 +96,35 @@ Compose multiple [Args](../../default/interfaces/Args.md) schemas into one.
 
 ### Type Parameters
 
-| Type Parameter                                           |
-| -------------------------------------------------------- |
-| `A` _extends_ [`Args`](../../default/interfaces/Args.md) |
-| `B` _extends_ [`Args`](../../default/interfaces/Args.md) |
-| `C` _extends_ [`Args`](../../default/interfaces/Args.md) |
-| `D` _extends_ [`Args`](../../default/interfaces/Args.md) |
+| Type Parameter |
+| ------ |
+| `A` *extends* [`Args`](../../default/interfaces/Args.md) |
+| `B` *extends* [`Args`](../../default/interfaces/Args.md) |
+| `C` *extends* [`Args`](../../default/interfaces/Args.md) |
+| `D` *extends* [`Args`](../../default/interfaces/Args.md) |
 
 ### Parameters
 
-| Parameter | Type | Description    |
-| --------- | ---- | -------------- |
-| `a`       | `A`  | First schema.  |
-| `b`       | `B`  | Second schema. |
-| `c`       | `C`  | Third schema.  |
-| `d`       | `D`  | Fourth schema. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `a` | `A` | First schema. |
+| `b` | `B` | Second schema. |
+| `c` | `C` | Third schema. |
+| `d` | `D` | Fourth schema. |
 
 ### Returns
 
-`Omit`\<`A`,
-\| keyof `D`
-\| `Exclude`\<keyof `C`, keyof `D`\>
-\| `Exclude`\<keyof `B`, keyof `D` \| `Exclude`\<keyof `C`, keyof `D`\>\>\> & `Omit`\<`B`, keyof `D` \| `Exclude`\<keyof `C`, keyof `D`\>\> & `Omit`\<`C`, keyof `D`\> & `D`
+`Omit`\<`A`, 
+  \| keyof `D`
+  \| `Exclude`\<keyof `C`, keyof `D`\>
+  \| `Exclude`\<keyof `B`, keyof `D` \| `Exclude`\<keyof `C`, keyof `D`\>\>\> & `Omit`\<`B`, keyof `D` \| `Exclude`\<keyof `C`, keyof `D`\>\> & `Omit`\<`C`, keyof `D`\> & `D`
 
 A merged schema containing all fields.
 
 ## Call Signature
 
 ```ts
-function merge<T>(...schemas): MergeArgs<T>
+function merge<T>(...schemas): MergeArgs<T>;
 ```
 
 **`Experimental`**
@@ -134,15 +133,15 @@ Compose multiple [Args](../../default/interfaces/Args.md) schemas into one.
 
 ### Type Parameters
 
-| Type Parameter                                             |
-| ---------------------------------------------------------- |
-| `T` _extends_ [`Args`](../../default/interfaces/Args.md)[] |
+| Type Parameter |
+| ------ |
+| `T` *extends* [`Args`](../../default/interfaces/Args.md)[] |
 
 ### Parameters
 
-| Parameter    | Type | Description           |
-| ------------ | ---- | --------------------- |
-| ...`schemas` | `T`  | The schemas to merge. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| ...`schemas` | `T` | The schemas to merge. |
 
 ### Returns
 

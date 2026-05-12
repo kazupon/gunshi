@@ -3,7 +3,7 @@
 # Function: required()
 
 ```ts
-function required<T>(schema): ArgSchema & Combinator<T> & CombinatorRequired
+function required<T>(schema): ArgSchema & Combinator<T> & CombinatorRequired;
 ```
 
 **`Experimental`**
@@ -14,15 +14,15 @@ The original schema is not modified.
 
 ## Type Parameters
 
-| Type Parameter | Description               |
-| -------------- | ------------------------- |
-| `T`            | The schema's parsed type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The schema's parsed type. |
 
 ## Parameters
 
-| Parameter | Type                                                             | Description                 |
-| --------- | ---------------------------------------------------------------- | --------------------------- |
-| `schema`  | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 
 ## Returns
 

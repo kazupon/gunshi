@@ -3,7 +3,7 @@
 # Function: combinator()
 
 ```ts
-function combinator<T>(config): CombinatorSchema<T>
+function combinator<T>(config): CombinatorSchema<T>;
 ```
 
 **`Experimental`**
@@ -18,15 +18,15 @@ The returned schema has `type: 'custom'`.
 
 ## Type Parameters
 
-| Type Parameter | Description            |
-| -------------- | ---------------------- |
-| `T`            | The parsed value type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The parsed value type. |
 
 ## Parameters
 
-| Parameter | Type                                                             | Description                                               |
-| --------- | ---------------------------------------------------------------- | --------------------------------------------------------- |
-| `config`  | [`CombinatorOptions`](../interfaces/CombinatorOptions.md)\<`T`\> | Configuration with a parse function and optional metavar. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `config` | [`CombinatorOptions`](../interfaces/CombinatorOptions.md)\<`T`\> | Configuration with a parse function and optional metavar. |
 
 ## Returns
 
@@ -38,7 +38,7 @@ A combinator schema that resolves to the parse function's return type.
 
 ```ts
 const date = combinator({
-  parse: value => {
+  parse: (value) => {
     const d = new Date(value)
     if (isNaN(d.getTime())) {
       throw new Error('Invalid date format')

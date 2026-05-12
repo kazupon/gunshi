@@ -3,7 +3,7 @@
 # Function: short()
 
 ```ts
-function short<T, S>(schema, alias): ArgSchema & Combinator<T> & CombinatorShort<S>
+function short<T, S>(schema, alias): ArgSchema & Combinator<T> & CombinatorShort<S>;
 ```
 
 **`Experimental`**
@@ -14,17 +14,17 @@ The original schema is not modified.
 
 ## Type Parameters
 
-| Type Parameter         | Description                          |
-| ---------------------- | ------------------------------------ |
-| `T`                    | The schema's parsed type.            |
-| `S` _extends_ `string` | The short alias string literal type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The schema's parsed type. |
+| `S` *extends* `string` | The short alias string literal type. |
 
 ## Parameters
 
-| Parameter | Type                                                             | Description                   |
-| --------- | ---------------------------------------------------------------- | ----------------------------- |
-| `schema`  | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema.   |
-| `alias`   | `S`                                                              | Single character short alias. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| `alias` | `S` | Single character short alias. |
 
 ## Returns
 

@@ -3,7 +3,7 @@
 # Function: extend()
 
 ```ts
-function extend<T, U>(base, overrides): Omit<T, keyof U> & U
+function extend<T, U>(base, overrides): Omit<T, keyof U> & U;
 ```
 
 **`Experimental`**
@@ -15,17 +15,17 @@ intentional overrides rather than general composition.
 
 ## Type Parameters
 
-| Type Parameter                                           | Description            |
-| -------------------------------------------------------- | ---------------------- |
-| `T` _extends_ [`Args`](../../default/interfaces/Args.md) | Base schema type.      |
-| `U` _extends_ [`Args`](../../default/interfaces/Args.md) | Overrides schema type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` *extends* [`Args`](../../default/interfaces/Args.md) | Base schema type. |
+| `U` *extends* [`Args`](../../default/interfaces/Args.md) | Overrides schema type. |
 
 ## Parameters
 
-| Parameter   | Type | Description                |
-| ----------- | ---- | -------------------------- |
-| `base`      | `T`  | The base schema to extend. |
-| `overrides` | `U`  | Fields to override or add. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `base` | `T` | The base schema to extend. |
+| `overrides` | `U` | Fields to override or add. |
 
 ## Returns
 

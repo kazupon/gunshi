@@ -3,7 +3,7 @@
 # Type Alias: CombinatorSchema\<T\>
 
 ```ts
-type CombinatorSchema<T> = ArgSchema & Combinator<T>
+type CombinatorSchema<T> = ArgSchema & Combinator<T>;
 ```
 
 **`Experimental`**
@@ -13,6 +13,6 @@ Any [ArgSchema](../../default/interfaces/ArgSchema.md) with a parse function qua
 
 ## Type Parameters
 
-| Type Parameter | Description            |
-| -------------- | ---------------------- |
-| `T`            | The parsed value type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The parsed value type. |

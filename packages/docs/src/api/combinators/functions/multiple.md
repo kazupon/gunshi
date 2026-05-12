@@ -3,7 +3,7 @@
 # Function: multiple()
 
 ```ts
-function multiple<T>(schema): ArgSchema & Combinator<T> & CombinatorMultiple
+function multiple<T>(schema): ArgSchema & Combinator<T> & CombinatorMultiple;
 ```
 
 **`Experimental`**
@@ -14,15 +14,15 @@ The resolved value becomes an array. The original schema is not modified.
 
 ## Type Parameters
 
-| Type Parameter | Description               |
-| -------------- | ------------------------- |
-| `T`            | The schema's parsed type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The schema's parsed type. |
 
 ## Parameters
 
-| Parameter | Type                                                             | Description                 |
-| --------- | ---------------------------------------------------------------- | --------------------------- |
-| `schema`  | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 
 ## Returns
 

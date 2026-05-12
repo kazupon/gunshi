@@ -3,7 +3,7 @@
 # Function: args()
 
 ```ts
-function args<T>(fields): T
+function args<T>(fields): T;
 ```
 
 **`Experimental`**
@@ -15,15 +15,15 @@ so that `satisfies Args` is not needed.
 
 ## Type Parameters
 
-| Type Parameter                                           | Description            |
-| -------------------------------------------------------- | ---------------------- |
-| `T` _extends_ [`Args`](../../default/interfaces/Args.md) | The exact schema type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` *extends* [`Args`](../../default/interfaces/Args.md) | The exact schema type. |
 
 ## Parameters
 
-| Parameter | Type | Description                 |
-| --------- | ---- | --------------------------- |
-| `fields`  | `T`  | The argument schema object. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `fields` | `T` | The argument schema object. |
 
 ## Returns
 

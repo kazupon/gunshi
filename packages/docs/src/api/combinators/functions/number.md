@@ -3,7 +3,7 @@
 # Function: number()
 
 ```ts
-function number(opts?): CombinatorSchema<number>
+function number(opts?): CombinatorSchema<number>;
 ```
 
 **`Experimental`**
@@ -14,9 +14,9 @@ Accepts any numeric value (integer or float).
 
 ## Parameters
 
-| Parameter | Type                                              | Description    |
-| --------- | ------------------------------------------------- | -------------- |
-| `opts?`   | [`NumberOptions`](../interfaces/NumberOptions.md) | Range options. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `opts?` | [`NumberOptions`](../interfaces/NumberOptions.md) | Range options. |
 
 ## Returns
 

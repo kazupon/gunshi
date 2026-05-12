@@ -3,7 +3,7 @@
 # Function: describe()
 
 ```ts
-function describe<T, D>(schema, text): ArgSchema & Combinator<T> & CombinatorDescribe<D>
+function describe<T, D>(schema, text): ArgSchema & Combinator<T> & CombinatorDescribe<D>;
 ```
 
 **`Experimental`**
@@ -14,17 +14,17 @@ The original schema is not modified.
 
 ## Type Parameters
 
-| Type Parameter         | Description                          |
-| ---------------------- | ------------------------------------ |
-| `T`                    | The schema's parsed type.            |
-| `D` _extends_ `string` | The description string literal type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The schema's parsed type. |
+| `D` *extends* `string` | The description string literal type. |
 
 ## Parameters
 
-| Parameter | Type                                                             | Description                 |
-| --------- | ---------------------------------------------------------------- | --------------------------- |
-| `schema`  | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
-| `text`    | `D`                                                              | Human-readable description. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| `text` | `D` | Human-readable description. |
 
 ## Returns
 

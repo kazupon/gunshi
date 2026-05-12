@@ -3,7 +3,7 @@
 # Function: withDefault()
 
 ```ts
-function withDefault<T>(schema, defaultValue): ArgSchema & Combinator<T> & CombinatorWithDefault<T>
+function withDefault<T>(schema, defaultValue): ArgSchema & Combinator<T> & CombinatorWithDefault<T>;
 ```
 
 **`Experimental`**
@@ -14,16 +14,16 @@ The original schema is not modified.
 
 ## Type Parameters
 
-| Type Parameter                                  | Description               |
-| ----------------------------------------------- | ------------------------- |
-| `T` _extends_ `string` \| `number` \| `boolean` | The schema's parsed type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` *extends* `string` \| `number` \| `boolean` | The schema's parsed type. |
 
 ## Parameters
 
-| Parameter      | Type                                                             | Description                 |
-| -------------- | ---------------------------------------------------------------- | --------------------------- |
-| `schema`       | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
-| `defaultValue` | `T`                                                              | The default value.          |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| `defaultValue` | `T` | The default value. |
 
 ## Returns
 

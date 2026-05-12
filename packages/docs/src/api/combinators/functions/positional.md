@@ -5,7 +5,7 @@
 ## Call Signature
 
 ```ts
-function positional<T>(parser): ArgSchema & Combinator<T> & ArgSchemaPositionalType
+function positional<T>(parser): ArgSchema & Combinator<T> & ArgSchemaPositionalType;
 ```
 
 **`Experimental`**
@@ -17,15 +17,15 @@ With a parser (e.g., `positional(integer())`), resolves to the parser's return t
 
 ### Type Parameters
 
-| Type Parameter | Description                 |
-| -------------- | --------------------------- |
-| `T`            | The parser's resolved type. |
+| Type Parameter | Description |
+| ------ | ------ |
+| `T` | The parser's resolved type. |
 
 ### Parameters
 
-| Parameter | Type                                                             | Description                   |
-| --------- | ---------------------------------------------------------------- | ----------------------------- |
-| `parser`  | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The parser combinator schema. |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `parser` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The parser combinator schema. |
 
 ### Returns
 
@@ -37,15 +37,15 @@ A positional argument schema resolving to the parser's type.
 
 ```ts
 const args = {
-  command: positional(), // resolves to string
-  port: positional(integer()) // resolves to number
+  command: positional(),           // resolves to string
+  port: positional(integer()),     // resolves to number
 }
 ```
 
 ## Call Signature
 
 ```ts
-function positional(parser?): ArgSchema & ArgSchemaPositionalType
+function positional(parser?): ArgSchema & ArgSchemaPositionalType;
 ```
 
 **`Experimental`**
@@ -57,8 +57,8 @@ With a parser (e.g., `positional(integer())`), resolves to the parser's return t
 
 ### Parameters
 
-| Parameter | Type                                          | Description                                           |
-| --------- | --------------------------------------------- | ----------------------------------------------------- |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
 | `parser?` | [`BaseOptions`](../interfaces/BaseOptions.md) | Optional base options (description, short, required). |
 
 ### Returns
@@ -71,7 +71,7 @@ A positional argument schema resolving to string.
 
 ```ts
 const args = {
-  command: positional(), // resolves to string
-  port: positional(integer()) // resolves to number
+  command: positional(),           // resolves to string
+  port: positional(integer()),     // resolves to number
 }
 ```
