@@ -2,12 +2,12 @@ packages:
   - packages/*
   - playground/**
   - "!playground/bun"
-allowBuilds:
-  deno: true
-  esbuild: true
-  oxc-resolver: true
-  rolldown: true
-  unrs-resolver: true
+onlyBuiltDependencies:
+  - deno
+  - esbuild
+  - oxc-resolver
+  - rolldown
+  - unrs-resolver
 # Ensure platform-specific optional bindings (e.g. @rolldown/binding-*) are
 # installed across all platforms we publish/run on. Without this, pnpm only
 # resolves the host platform's binding, which breaks CI on Linux when the
