@@ -13,7 +13,7 @@ This completion plugin is powered by [`@bomb.sh/tab`](https://github.com/bombshe
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!WARNING]
-> This package support Node.js runtime only. Deno and Bun support are coming soon.
+> This package support Node.js and Bun runtime only. Deno support is not available yet.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -116,20 +116,24 @@ The `complete` command accepts the following shell types:
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+### Runtime Support
+
+The plugin supports completion script generation for Node.js, Bun source execution, and Bun single-file executables.
+
+Runtime detection is intentionally conservative:
+
+- **Bun source execution** replays the current Bun executable, `process.execArgv`, and the source entry. This follows Bun's documented argument vector shape, where the launcher is first and the source file is second. See [Bun's `argv` guide](https://bun.com/guides/process/argv) and [single-file executable docs](https://bun.com/docs/bundler/executables).
+- **Bun single-file executables** call the compiled executable itself. Bun does not currently expose a stable runtime flag that says "this process is a compiled executable", so the plugin uses an internal heuristic based on `process.execPath` and Bun virtual entries. This avoids regenerating a completion script that tries to call the original source file from inside a compiled binary. The heuristic is intentionally private; related Bun compile behavior is discussed in [oven-sh/bun#14676](https://github.com/oven-sh/bun/issues/14676) and [oven-sh/bun#13405](https://github.com/oven-sh/bun/issues/13405).
+
+Deno runtime completion script generation is not supported yet.
+
 ## Shell Completion Setup
 
 This section provides detailed instructions for setting up shell completions in different shells. The setup is a one-time process that enables tab completion for your CLI.
 
 ### Prerequisites
 
-Shell completion requires Node.js runtime. Ensure your CLI is running with Node.js (not Deno or Bun).
-
-<!-- eslint-disable markdown/no-missing-label-refs -->
-
-> [!WARNING]
-> This package support Node.js runtime only. Deno and Bun support are coming soon.
-
-<!-- eslint-enable markdown/no-missing-label-refs -->
+Shell completion requires your CLI command to be executable from the generated completion script.
 
 ### Setup by Shell
 

@@ -12,4 +12,4 @@ Parameters for [`the completion handler`](../type-aliases/CompletionHandler.md).
 
 | Property | Type | Description |
 | ------ | ------ | ------ |
-| <a id="locale"></a> `locale?` | `Locale` | The locale to use for i18n. |
+| <a id="property-locale"></a> `locale?` | `Locale` | The locale to use for i18n. |
