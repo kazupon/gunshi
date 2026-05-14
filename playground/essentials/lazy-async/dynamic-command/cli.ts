@@ -15,7 +15,7 @@ const configLoader = async () => {
     run: ctx => {
       console.log(isDebug ? 'Running in DEBUG mode' : 'Running in normal mode')
       if (ctx.values.verbose) {
-        console.log('Verbose:', ctx.values)
+        console.log('Verbose:', ctx.values.verbose)
       }
     }
   })
