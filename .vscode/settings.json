@@ -2,7 +2,6 @@
   "oxc.requireConfig": true,
   "oxc.trace.server": "messages",
   "oxc.typeAware": true,
-  "oxc.fmt.experimental": true,
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always",
@@ -14,7 +13,7 @@
   "files.associations": {
     "*.json": "jsonc"
   },
-  "typescript.referencesCodeLens.enabled": true,
+  "typescript.referencesCodeLens.enabled": false,
   "typescript.tsdk": "node_modules/typescript/lib",
   "deno.enable": false,
   "typescript.experimental.useTsgo": false
