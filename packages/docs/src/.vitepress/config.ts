@@ -117,11 +117,11 @@ export default withMermaid({
               ),
               '@braintree/sanitize-url': path.resolve(
                 __dirname,
-                '../../../../node_modules/.pnpm/@braintree+sanitize-url@7.1.1/node_modules/@braintree/sanitize-url/dist/index.js'
+                '../../../../node_modules/.pnpm/@braintree+sanitize-url@7.1.2/node_modules/@braintree/sanitize-url/dist/index.js'
               ),
               dayjs: path.resolve(
                 __dirname,
-                '../../../../node_modules/.pnpm/dayjs@1.11.18/node_modules/dayjs/esm/index.js'
+                '../../../../node_modules/.pnpm/dayjs@1.11.20/node_modules/dayjs/esm/index.js'
               )
             }
     },

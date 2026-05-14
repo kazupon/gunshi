@@ -34,6 +34,7 @@
     "./context": "./src/context.ts",
     "./generator": "./src/generator.ts",
     "./utils": "./src/utils.ts",
-    "./combinators": "./src/combinators.ts"
+    "./combinators": "./src/combinators.ts",
+    "./agent": "./src/agent.ts"
   }
 }

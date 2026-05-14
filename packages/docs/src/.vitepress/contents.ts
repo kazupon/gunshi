@@ -59,7 +59,13 @@ export const advanced = {
 export const experimentals = {
   text: 'Experimentals',
   collapsed: false,
-  items: [{ text: 'Parser Combinators', link: '/guide/experimentals/parser-combinators' }]
+  items: [
+    { text: 'Parser Combinators', link: '/guide/experimentals/parser-combinators' },
+    {
+      text: 'AI Agent Detection',
+      link: '/guide/advanced/ai-agent-detection'
+    }
+  ]
 }
 
 export const plugin = {

@@ -13,19 +13,25 @@ const config: UserConfig = defineConfig({
     './src/renderer.ts',
     './src/generator.ts',
     './src/utils.ts',
-    './src/combinators.ts'
+    './src/combinators.ts',
+    './src/agent.ts'
   ],
   outDir: 'lib',
   publint: true,
   fixedExtension: false,
-  // NOTE(kazupon): Inline `args-tokens` types into the bundled `.d.ts` to hide
-  // it as a transitive type dependency for consumers. Requires
-  // `rolldown-plugin-dts` <= 0.20 (the `resolve` array API was removed in
-  // 0.21). See `overrides` in pnpm-workspace.yaml.
+  // NOTE(kazupon): Inline `args-tokens` and `std-env` types into the bundled
+  // `.d.ts` to hide them as transitive type dependencies for consumers.
+  // Requires `rolldown-plugin-dts` <= 0.20 (the `resolve` array API was
+  // removed in 0.21). See `overrides` in pnpm-workspace.yaml.
   dts: {
-    resolve: ['args-tokens', 'args-tokens/utils', 'args-tokens/combinators']
+    resolve: ['args-tokens', 'args-tokens/utils', 'args-tokens/combinators', 'std-env']
   },
-  noExternal: ['@gunshi/plugin-global', '@gunshi/plugin-renderer', '@gunshi/plugin-i18n'],
+  noExternal: [
+    '@gunshi/plugin-global',
+    '@gunshi/plugin-renderer',
+    '@gunshi/plugin-i18n',
+    'std-env'
+  ],
   hooks: {
     'build:done': lintJsrExports()
   }
