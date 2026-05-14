@@ -37,6 +37,7 @@
       "gunshi/context": ["./packages/gunshi/src/context.ts"],
       "gunshi/utils": ["./packages/gunshi/src/utils.ts"],
       "gunshi/combinators": ["./packages/gunshi/src/combinators.ts"],
+      "gunshi/agent": ["./packages/gunshi/src/agent.ts"],
       "@gunshi/plugin": ["./packages/plugin/src/index.ts"],
       "@gunshi/bone": ["./packages/bone/src/index.ts"],
       "@gunshi/combinators": ["./packages/combinators/src/index.ts"],

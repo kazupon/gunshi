@@ -90,6 +90,12 @@
       "require": "./lib/combinators.js",
       "default": "./lib/combinators.js"
     },
+    "./agent": {
+      "types": "./lib/agent.d.ts",
+      "import": "./lib/agent.js",
+      "require": "./lib/agent.js",
+      "default": "./lib/agent.js"
+    },
     "./package.json": "./package.json"
   },
   "types": "lib/index.d.ts",
@@ -118,6 +124,7 @@
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
+    "std-env": "^4.1.0",
     "tsdown": "catalog:",
     "zod": "catalog:"
   }
