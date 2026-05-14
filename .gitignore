@@ -22,6 +22,7 @@ packages/docs/src/api/context
 packages/docs/src/api/default
 packages/docs/src/api/definition
 packages/docs/src/api/generator
+packages/docs/src/api/agent
 packages/docs/src/api/plugin
 packages/docs/src/api/renderer
 packages/docs/src/api/index.md
