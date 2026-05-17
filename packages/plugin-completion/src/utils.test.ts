@@ -5,7 +5,6 @@
 
 import { describe, expect, test } from 'vitest'
 import {
-  detectRuntime,
   detectRuntimeFromGlobals,
   joinExecParts,
   resolveBunExecParts,
@@ -26,12 +25,6 @@ function createProcess(overrides: Partial<ProcessLike> = {}): ProcessLike {
     ...overrides
   }
 }
-
-describe('detectRuntime', () => {
-  test('detects the current Node.js test runtime', () => {
-    expect(detectRuntime()).toBe('node')
-  })
-})
 
 describe('detectRuntimeFromGlobals', () => {
   test('prioritizes Bun over Deno and Node-compatible process', () => {

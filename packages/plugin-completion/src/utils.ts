@@ -66,7 +66,7 @@ function getRuntimeGlobals(): RuntimeGlobals {
  *
  * @returns The detected runtime name
  */
-export function detectRuntime(): Runtime {
+function detectRuntime(): Runtime {
   return detectRuntimeFromGlobals(getRuntimeGlobals())
 }
 
