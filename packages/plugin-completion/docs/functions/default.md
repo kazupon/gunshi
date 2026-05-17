@@ -7,7 +7,7 @@
 # Function: default()
 
 ```ts
-function default(options): PluginWithoutExtension;
+function default(options?): PluginWithoutExtension;
 ```
 
 completion plugin

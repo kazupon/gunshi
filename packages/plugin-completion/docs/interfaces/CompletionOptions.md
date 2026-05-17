@@ -12,6 +12,6 @@ Completion plugin options.
 
 | Property | Type | Description |
 | ------ | ------ | ------ |
-| <a id="config"></a> `config?` | `object` | The completion configuration |
+| <a id="property-config"></a> `config?` | `object` | The completion configuration |
 | `config.entry?` | [`CompletionConfig`](CompletionConfig.md) | The entry point [`completion configuration`](CompletionConfig.md). |
 | `config.subCommands?` | `Record`\<`string`, [`CompletionConfig`](CompletionConfig.md)\> | The handlers for sub-commands. |

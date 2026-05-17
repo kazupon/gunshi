@@ -13,7 +13,7 @@ This completion plugin is powered by [`@bomb.sh/tab`](https://github.com/bombshe
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!WARNING]
-> This package support Node.js runtime only. Deno and Bun support are coming soon.
+> This package supports Node.js and Bun runtimes only. Deno support is not available yet.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -122,14 +122,8 @@ This section provides detailed instructions for setting up shell completions in 
 
 ### Prerequisites
 
-Shell completion requires Node.js runtime. Ensure your CLI is running with Node.js (not Deno or Bun).
-
-<!-- eslint-disable markdown/no-missing-label-refs -->
-
-> [!WARNING]
-> This package support Node.js runtime only. Deno and Bun support are coming soon.
-
-<!-- eslint-enable markdown/no-missing-label-refs -->
+Shell completion requires your CLI command to be executable from the generated completion script.
+The plugin currently supports completion script generation for Node.js, Bun source execution, and Bun single-file executables.
 
 ### Setup by Shell
 

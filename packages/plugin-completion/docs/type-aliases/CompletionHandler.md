@@ -4,7 +4,7 @@
 
 [@gunshi/plugin-completion](../index.md) / CompletionHandler
 
-# Type Alias: CompletionHandler()
+# Type Alias: CompletionHandler
 
 ```ts
 type CompletionHandler = (params) => Completion[];
