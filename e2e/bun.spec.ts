@@ -6,6 +6,8 @@ import { runCommand } from '../scripts/utils.ts'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 
+// runCommand uses node:child_process exec, and E2E CI runs on ubuntu-latest,
+// so these command strings intentionally use POSIX shell quoting.
 function shellQuote(value: string): string {
   return `'${value.replaceAll(`'`, `'\\''`)}'`
 }

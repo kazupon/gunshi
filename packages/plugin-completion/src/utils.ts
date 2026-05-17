@@ -62,12 +62,21 @@ function getRuntimeGlobals(): RuntimeGlobals {
 }
 
 /**
+ * Detect the active JavaScript runtime.
+ *
+ * @returns The detected runtime name
+ */
+export function detectRuntime(): Runtime {
+  return detectRuntimeFromGlobals(getRuntimeGlobals())
+}
+
+/**
  * Detect the active JavaScript runtime from globals.
  *
  * @param globals - Runtime globals to inspect
  * @returns The detected runtime name
  */
-export function detectRuntime(globals: RuntimeGlobals = getRuntimeGlobals()): Runtime {
+export function detectRuntimeFromGlobals(globals: RuntimeGlobals): Runtime {
   // Bun and Deno expose Node-compatible globals, so runtime-specific markers
   // must be checked before the Node `process.release` fallback.
   if (globals.Bun !== undefined) {
@@ -214,7 +223,7 @@ export function joinExecParts(parts: string[]): string {
  */
 export function quoteExec(): string {
   const globals = getRuntimeGlobals()
-  const runtime = detectRuntime(globals)
+  const runtime = detectRuntime()
 
   switch (runtime) {
     case 'node': {
@@ -227,7 +236,7 @@ export function quoteExec(): string {
       return joinExecParts(resolveBunExecParts(globals.process!))
     }
     default: {
-      throw new Error('Unsupported your javascript runtime for completion script generation.')
+      throw new Error('Unsupported JavaScript runtime for completion script generation.')
     }
   }
 }

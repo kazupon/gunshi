@@ -6,6 +6,7 @@
 import { describe, expect, test } from 'vitest'
 import {
   detectRuntime,
+  detectRuntimeFromGlobals,
   joinExecParts,
   resolveBunExecParts,
   resolveNodeExecParts,
@@ -27,9 +28,15 @@ function createProcess(overrides: Partial<ProcessLike> = {}): ProcessLike {
 }
 
 describe('detectRuntime', () => {
+  test('detects the current Node.js test runtime', () => {
+    expect(detectRuntime()).toBe('node')
+  })
+})
+
+describe('detectRuntimeFromGlobals', () => {
   test('prioritizes Bun over Deno and Node-compatible process', () => {
     expect(
-      detectRuntime({
+      detectRuntimeFromGlobals({
         Bun: {},
         Deno: {},
         process: createProcess()
@@ -39,7 +46,7 @@ describe('detectRuntime', () => {
 
   test('prioritizes Deno over Node-compatible process', () => {
     expect(
-      detectRuntime({
+      detectRuntimeFromGlobals({
         Deno: {},
         process: createProcess()
       })
@@ -48,7 +55,7 @@ describe('detectRuntime', () => {
 
   test('detects Node from process release name', () => {
     expect(
-      detectRuntime({
+      detectRuntimeFromGlobals({
         process: createProcess()
       })
     ).toBe('node')
