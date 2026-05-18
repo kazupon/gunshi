@@ -36,5 +36,14 @@ export default {
     '@kazupon/prettier-config',
     '@kazupon/eslint-plugin',
     '@typescript/native-preview'
+  ],
+  ignoreBinaries: [
+    // `pnpm view` is a built-in pnpm subcommand, not a separate binary.
+    // Used in .github/workflows/release.yml for idempotency checks.
+    'view',
+    // `jsr` is invoked via `pnpm exec jsr` from each package's local
+    // devDependencies (declared via catalog). Knip does not associate the
+    // workflow's binary mention with any specific workspace package.json.
+    'jsr'
   ]
 } satisfies KnipConfig
