@@ -91,10 +91,19 @@ jobs:
 
   jsr-publish:
     name: Publish to JSR
+    # JSR cannot resolve `workspace:*` directly, so `scripts/jsr.ts` rewrites
+    # each package.json to pin internal deps to the release version. The
+    # subsequent `pnpm install` then has to fetch (for example) `gunshi@0.32.0`
+    # from npm — which only exists once `npm-publish` has finished. Make this
+    # job depend on `npm-publish` and only run after it succeeds (or, for
+    # workflow_dispatch retry, skip the `needs` check via `always()`).
+    needs: [npm-publish]
     if: >-
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' &&
-        (inputs.job == 'all' || inputs.job == 'jsr-publish'))
+      always() && (
+        (github.event_name == 'push' && needs.npm-publish.result == 'success') ||
+        (github.event_name == 'workflow_dispatch' &&
+          (inputs.job == 'all' || inputs.job == 'jsr-publish'))
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: read
