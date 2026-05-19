@@ -1,7 +1,7 @@
 {
   "name": "organizing",
   "private": true,
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@11.1.1",
   "type": "module",
   "scripts": {
     "start": "npx tsx src/cli.ts"
