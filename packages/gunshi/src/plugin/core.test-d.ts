@@ -1,6 +1,7 @@
 import { describe, expectTypeOf, test } from 'vitest'
+import { plugin } from './core.ts'
 
-import type { Args } from '../types.ts'
+import type { Args, CommandContextExtension } from '../types.ts'
 import type {
   ExtractDependencyId,
   InferDependencyExtensions,
@@ -9,7 +10,9 @@ import type {
   PluginDependency,
   PluginExtension,
   PluginFunction,
-  PluginOptions
+  PluginOptions,
+  PluginWithExtension,
+  PluginWithoutExtension
 } from './core.ts'
 
 describe('ExtractDependencyId', () => {
@@ -26,6 +29,129 @@ describe('ExtractDependencyId', () => {
   test('object with id and optional', () => {
     type T = ExtractDependencyId<{ id: 'foo'; optional: true }>
     expectTypeOf<T>().toEqualTypeOf<'foo'>()
+  })
+})
+
+const loggerPluginId = 'logger' as const
+const authPluginId = 'auth' as const
+const apiPluginId = 'api' as const
+const optionalApiPluginId = 'optional-api' as const
+
+type LoggerExtension = {
+  log: (message: string) => void
+}
+
+type AuthExtension = {
+  userId: string
+}
+
+type ApiExtension = {
+  request: (path: string) => Promise<string>
+}
+
+describe('plugin()', () => {
+  test('infers extension return type', () => {
+    const logger = plugin({
+      id: loggerPluginId,
+      name: 'logger',
+      extension: (): LoggerExtension => ({
+        log: (_message: string) => {}
+      })
+    })
+
+    expectTypeOf(logger).toMatchTypeOf<PluginWithExtension<LoggerExtension>>()
+    expectTypeOf(logger.extension).toEqualTypeOf<CommandContextExtension<LoggerExtension>>()
+  })
+
+  test('applies own extension type to setup decorators', () => {
+    plugin({
+      id: loggerPluginId,
+      name: 'logger',
+      extension: (): LoggerExtension => ({
+        log: (_message: string) => {}
+      }),
+      setup: ctx => {
+        ctx.decorateCommand(baseRunner => {
+          return commandCtx => {
+            expectTypeOf(commandCtx.extensions[loggerPluginId]).toEqualTypeOf<LoggerExtension>()
+            // @ts-expect-error unknown plugin extension should not be available
+            commandCtx.extensions.missing
+            return baseRunner(commandCtx)
+          }
+        })
+      }
+    })
+  })
+
+  test('applies dependency extensions to extension factory and setup decorators', () => {
+    plugin<
+      Record<typeof authPluginId, AuthExtension>,
+      typeof apiPluginId,
+      readonly [typeof authPluginId],
+      ApiExtension
+    >({
+      id: apiPluginId,
+      name: 'api',
+      dependencies: [authPluginId] as const,
+      extension: ctx => {
+        expectTypeOf(ctx.extensions[authPluginId]).toEqualTypeOf<AuthExtension>()
+
+        return {
+          request: async (_path: string) => 'ok'
+        }
+      },
+      setup: ctx => {
+        ctx.decorateCommand(baseRunner => {
+          return commandCtx => {
+            expectTypeOf(commandCtx.extensions[authPluginId]).toEqualTypeOf<AuthExtension>()
+            expectTypeOf(commandCtx.extensions[apiPluginId]).toEqualTypeOf<ApiExtension>()
+            return baseRunner(commandCtx)
+          }
+        })
+      }
+    })
+  })
+
+  test('marks optional dependency extensions as possibly undefined', () => {
+    plugin<
+      Record<typeof authPluginId, AuthExtension>,
+      typeof optionalApiPluginId,
+      readonly [{ readonly id: typeof authPluginId; readonly optional: true }],
+      ApiExtension
+    >({
+      id: optionalApiPluginId,
+      name: 'optional api',
+      dependencies: [{ id: authPluginId, optional: true }] as const,
+      extension: ctx => {
+        expectTypeOf(ctx.extensions[authPluginId]).toEqualTypeOf<AuthExtension | undefined>()
+
+        return {
+          request: async (_path: string) => 'ok'
+        }
+      },
+      setup: ctx => {
+        ctx.decorateCommand(baseRunner => {
+          return commandCtx => {
+            expectTypeOf(commandCtx.extensions[authPluginId]).toEqualTypeOf<
+              AuthExtension | undefined
+            >()
+            expectTypeOf(commandCtx.extensions[optionalApiPluginId]).toEqualTypeOf<ApiExtension>()
+            return baseRunner(commandCtx)
+          }
+        })
+      }
+    })
+  })
+
+  test('returns plugin type without extension', () => {
+    const meta = plugin({
+      id: 'meta',
+      name: 'meta',
+      setup: () => {}
+    })
+
+    expectTypeOf(meta).toMatchTypeOf<PluginWithoutExtension>()
+    expectTypeOf(meta.extension).toEqualTypeOf<CommandContextExtension<{}> | undefined>()
   })
 })
 
