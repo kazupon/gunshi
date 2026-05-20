@@ -68,8 +68,8 @@ importers:
         specifier: 7.0.0-dev.20260120.1
         version: 7.0.0-dev.20260120.1
       '@vitest/coverage-v8':
-        specifier: 4.1.5
-        version: 4.1.5(vitest@4.1.5)
+        specifier: 4.1.6
+        version: 4.1.6(vitest@4.1.5)
       bumpp:
         specifier: ^11.1.0
         version: 11.1.0
@@ -147,7 +147,7 @@ importers:
         version: 6.1.1(typescript@6.0.3)(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0))
       vitest:
         specifier: ^4.1.5
-        version: 4.1.5(@types/node@25.6.2)(@vitest/coverage-v8@4.1.5)(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0))
+        version: 4.1.5(@types/node@25.6.2)(@vitest/coverage-v8@4.1.6)(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0))
 
   packages/bone:
     devDependencies:
@@ -449,7 +449,7 @@ importers:
         version: link:../shared
       '@intlify/core':
         specifier: next
-        version: 12.0.0-alpha.3
+        version: 12.0.0-alpha.4
       deno:
         specifier: 'catalog:'
         version: 2.7.14
@@ -1225,21 +1225,21 @@ packages:
   '@iconify/utils@3.1.3':
     resolution: {integrity: sha512-LPKOXPn/zV+zis1oOfGWogaXVpqUybF3ZS6SCZIsz8vg0ivVp9+fVqyYB7xq0aiST/VhUQYGO1qo6uoYSiEJqw==}
 
-  '@intlify/core-base@12.0.0-alpha.3':
-    resolution: {integrity: sha512-LEvBHBUbiOOtIBkp4IIQENVC5Fg2YHsvdXN1+WRIxQ8hzHbHSBiqZ2l68B/yg8sE1a4S7dqhkaAedunShWPH+Q==}
-    engines: {node: '>= 16'}
+  '@intlify/core-base@12.0.0-alpha.4':
+    resolution: {integrity: sha512-7JZiWLP9ScL/DDgT6+t1HebP4IqiA0FmHkd7M17LgjchPdIxWCBJFbFANK9bYAj+ZyzR8urtPK65FxyARjPi3A==}
+    engines: {node: '>= 22'}
 
-  '@intlify/core@12.0.0-alpha.3':
-    resolution: {integrity: sha512-nxkzmsIlE/W8IRYDEu+oiJjBX6cpnREk4s+kQ+rk6yRKTsCoM18cyQCmT5NLcG4PO5w+xn9SDtWmszVgJwXDUw==}
-    engines: {node: '>= 16'}
+  '@intlify/core@12.0.0-alpha.4':
+    resolution: {integrity: sha512-cn7/d5ja6VU/w/uNYyXibuqTNEz5qIaWIoi8QBpEwKSyI9fzdioVJ0+hVaMaWBT+smGKTgWQ85nP8VekiX9JDQ==}
+    engines: {node: '>= 22'}
 
-  '@intlify/message-compiler@12.0.0-alpha.3':
-    resolution: {integrity: sha512-mDDTN3gfYOHhBnpnlby19UHyvMaOnzdlpsIrxUfs44R/vCATfn8pMOkE8PXD2t410xkocEj3FpDcC9XC/0v4Dg==}
-    engines: {node: '>= 16'}
+  '@intlify/message-compiler@12.0.0-alpha.4':
+    resolution: {integrity: sha512-F4yHuJzI2ZXtXTW2B1VhuNULAOjR5bniFSC/Z0rLWRYPO43pVgKLu+FPDoJq13OjTFq4X5hx2s855M4gqPU/pA==}
+    engines: {node: '>= 22'}
 
-  '@intlify/shared@12.0.0-alpha.3':
-    resolution: {integrity: sha512-ryaNYBvxQjyJUmVuBBg+HHUsmGnfxcEUPR0NCeG4/K9N2qtyFE35C80S15IN6iYFE2MGWLN7HfOSyg0MXZIc9w==}
-    engines: {node: '>= 16'}
+  '@intlify/shared@12.0.0-alpha.4':
+    resolution: {integrity: sha512-MfunEN3/yQjD1Q9HnD4Qtvg/qLYnR+tK3mEz/EEvikJO+Hu8ICe7Rqh6uusLSjpWy6ECVt2p5HGXlYA12UBweA==}
+    engines: {node: '>= 22'}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -2585,11 +2585,11 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@4.1.5':
-    resolution: {integrity: sha512-38C0/Ddb7HcRG0Z4/DUem8x57d2p9jYgp18mkaYswEOQBGsI1CG4f/hjm0ZCeaJfWhSZ4k7jgs29V1Zom7Ki9A==}
+  '@vitest/coverage-v8@4.1.6':
+    resolution: {integrity: sha512-36l628fQ/9a/8ihy97eOtEnvWQEdqULQOJtcaxtoNq0G1w3Mxd4szSahOaMM9/NGyZ+hyKcMtIW/WIxq0XQViQ==}
     peerDependencies:
-      '@vitest/browser': 4.1.5
-      vitest: 4.1.5
+      '@vitest/browser': 4.1.6
+      vitest: 4.1.6
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -2611,6 +2611,9 @@ packages:
   '@vitest/pretty-format@4.1.5':
     resolution: {integrity: sha512-7I3q6l5qr03dVfMX2wCo9FxwSJbPdwKjy2uu/YPpU3wfHvIL4QHwVRp57OfGrDFeUJ8/8QdfBKIV12FTtLn00g==}
 
+  '@vitest/pretty-format@4.1.6':
+    resolution: {integrity: sha512-h5SxD/IzNhZYnrSZRsUZQIC+vD0GY8cUvq0iwsmkFKixRCKLLWqCXa/FIQ4S1R+sI+PGoojkHsdNrbZiM9Qpgw==}
+
   '@vitest/runner@4.1.5':
     resolution: {integrity: sha512-2D+o7Pr82IEO46YPpoA/YU0neeyr6FTerQb5Ro7BUnBuv6NQtT/kmVnczngiMEBhzgqz2UZYl5gArejsyERDSQ==}
 
@@ -2622,6 +2625,9 @@ packages:
 
   '@vitest/utils@4.1.5':
     resolution: {integrity: sha512-76wdkrmfXfqGjueGgnb45ITPyUi1ycZ4IHgC2bhPDUfWHklY/q3MdLOAB+TF1e6xfl8NxNY0ZYaPCFNWSsw3Ug==}
+
+  '@vitest/utils@4.1.6':
+    resolution: {integrity: sha512-FxIY+U81R3LGKCxaHHFRQ5+g6/iRgGLmeHWdp2Amj4ljQRrEIWHmZyDfDYBRZlpyqA7qKxtS9DD1dhk8RnRIVQ==}
 
   '@vue/compiler-core@3.5.34':
     resolution: {integrity: sha512-s9cLyK5mLcvZ4Agva5QgRsQyLKvts9WbU9DB6NqiZkkGEdwmcEiylj5Jbwkp680drF/NNCV8OlAJSe+yMLxaJw==}
@@ -5135,22 +5141,22 @@ snapshots:
       '@iconify/types': 2.0.0
       import-meta-resolve: 4.2.0
 
-  '@intlify/core-base@12.0.0-alpha.3':
+  '@intlify/core-base@12.0.0-alpha.4':
     dependencies:
-      '@intlify/message-compiler': 12.0.0-alpha.3
-      '@intlify/shared': 12.0.0-alpha.3
+      '@intlify/message-compiler': 12.0.0-alpha.4
+      '@intlify/shared': 12.0.0-alpha.4
 
-  '@intlify/core@12.0.0-alpha.3':
+  '@intlify/core@12.0.0-alpha.4':
     dependencies:
-      '@intlify/core-base': 12.0.0-alpha.3
-      '@intlify/shared': 12.0.0-alpha.3
+      '@intlify/core-base': 12.0.0-alpha.4
+      '@intlify/shared': 12.0.0-alpha.4
 
-  '@intlify/message-compiler@12.0.0-alpha.3':
+  '@intlify/message-compiler@12.0.0-alpha.4':
     dependencies:
-      '@intlify/shared': 12.0.0-alpha.3
+      '@intlify/shared': 12.0.0-alpha.4
       source-map-js: 1.2.1
 
-  '@intlify/shared@12.0.0-alpha.3': {}
+  '@intlify/shared@12.0.0-alpha.4': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -6058,10 +6064,10 @@ snapshots:
       vite: 8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0)
       vue: 3.5.34(typescript@6.0.3)
 
-  '@vitest/coverage-v8@4.1.5(vitest@4.1.5)':
+  '@vitest/coverage-v8@4.1.6(vitest@4.1.5)':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
-      '@vitest/utils': 4.1.5
+      '@vitest/utils': 4.1.6
       ast-v8-to-istanbul: 1.0.0
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-report: 3.0.1
@@ -6070,7 +6076,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@25.6.2)(@vitest/coverage-v8@4.1.5)(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0))
+      vitest: 4.1.5(@types/node@25.6.2)(@vitest/coverage-v8@4.1.6)(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0))
 
   '@vitest/expect@4.1.5':
     dependencies:
@@ -6093,6 +6099,10 @@ snapshots:
     dependencies:
       tinyrainbow: 3.1.0
 
+  '@vitest/pretty-format@4.1.6':
+    dependencies:
+      tinyrainbow: 3.1.0
+
   '@vitest/runner@4.1.5':
     dependencies:
       '@vitest/utils': 4.1.5
@@ -6110,6 +6120,12 @@ snapshots:
   '@vitest/utils@4.1.5':
     dependencies:
       '@vitest/pretty-format': 4.1.5
+      convert-source-map: 2.0.0
+      tinyrainbow: 3.1.0
+
+  '@vitest/utils@4.1.6':
+    dependencies:
+      '@vitest/pretty-format': 4.1.6
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
@@ -8582,7 +8598,7 @@ snapshots:
       - universal-cookie
       - yaml
 
-  vitest@4.1.5(@types/node@25.6.2)(@vitest/coverage-v8@4.1.5)(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0)):
+  vitest@4.1.5(@types/node@25.6.2)(@vitest/coverage-v8@4.1.6)(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.5
       '@vitest/mocker': 4.1.5(vite@8.0.12(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0))
@@ -8606,7 +8622,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.6.2
-      '@vitest/coverage-v8': 4.1.5(vitest@4.1.5)
+      '@vitest/coverage-v8': 4.1.6(vitest@4.1.5)
     transitivePeerDependencies:
       - msw
 
