@@ -470,7 +470,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
 }
 
 /**
- * CommandContextCore type (base type without extensions)
+ * Readonly command context available to a command context extension factory.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *
