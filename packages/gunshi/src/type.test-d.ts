@@ -5,6 +5,7 @@ import type {
   CommandContext,
   DefaultGunshiParams,
   GunshiParams,
+  MergeGunshiExtensions,
   NormalizeToGunshiParams,
   RenderingOptions
 } from './types.ts'
@@ -72,6 +73,17 @@ test('NormalizeToGunshiParams', () => {
   expectTypeOf<
     NormalizeToGunshiParams<{ args: typeof _args1; extensions: { foo: Extension2 } }>
   >().toEqualTypeOf<GunshiParams<{ args: typeof _args1; extensions: { foo: Extension2 } }>>()
+})
+
+test('MergeGunshiExtensions', () => {
+  expectTypeOf<
+    MergeGunshiExtensions<
+      GunshiParams<{ args: typeof _args1; extensions: { foo: Extension1 } }>,
+      { bar: Extension2 }
+    >
+  >().toEqualTypeOf<
+    GunshiParams<{ args: typeof _args1; extensions: { foo: Extension1 } & { bar: Extension2 } }>
+  >()
 })
 
 test('CommandContext extensions', () => {

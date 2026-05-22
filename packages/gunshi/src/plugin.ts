@@ -59,6 +59,7 @@ export type {
   GunshiParams,
   GunshiParamsConstraint,
   LazyCommand,
+  MergeGunshiExtensions,
   NormalizeToGunshiParams,
   Prettify,
   RendererDecorator,

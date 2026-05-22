@@ -132,6 +132,19 @@ export type NormalizeToGunshiParams<G> =
           : DefaultGunshiParams
 
 /**
+ * Type helper to merge command context extensions into G
+ *
+ * @internal
+ */
+export type MergeGunshiExtensions<
+  G extends GunshiParamsConstraint,
+  E extends ExtendContext
+> = GunshiParams<{
+  args: ExtractArgs<G>
+  extensions: ExtractExtensions<G> & E
+}>
+
+/**
  * Command environment.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command environments.
