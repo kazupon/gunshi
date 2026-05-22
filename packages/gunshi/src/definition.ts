@@ -46,6 +46,7 @@ import type {
   GunshiParams,
   GunshiParamsConstraint,
   LazyCommand,
+  NormalizeToGunshiParams,
   Prettify
 } from './types.ts'
 
@@ -67,24 +68,25 @@ export type {
 export type { CommandContextParams } from './context.ts'
 
 /**
- * Infer command properties excluding for {@link define} function
- *
- * @internal
- */
-type InferCommandProps<G extends GunshiParamsConstraint = DefaultGunshiParams> = Pick<
-  Command<G>,
-  Exclude<keyof Command<G>, keyof Command<G>>
->
-
-/**
  * The result type of the {@link define} function
  *
  * @internal
  */
 type CommandDefinitionResult<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
-  C extends Command<G> = Command<G>
+  C = {}
 > = Prettify<Pick<C, keyof C> & Partial<Pick<Command<G>, Exclude<keyof Command<G>, keyof C>>>>
+
+/**
+ * The command definition accepted by {@link define} helpers.
+ *
+ * @internal
+ */
+type CommandDefinition<
+  A extends Args,
+  E extends ExtendContext,
+  C extends Partial<Command<{ args: A; extensions: E }>>
+> = C & Command<{ args: A; extensions: E }>
 
 /**
  * Define a {@link Command | command}.
@@ -119,10 +121,8 @@ type CommandDefinitionResult<
 export function define<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
   A extends Args = ExtractArgs<G>,
-  C extends InferCommandProps<G> = InferCommandProps<G>
->(
-  definition: C & Command<{ args: A; extensions: ExtractExtensions<G> }>
-): CommandDefinitionResult<G, C>
+  C extends Partial<Command<{ args: A; extensions: ExtractExtensions<G> }>> = {}
+>(definition: CommandDefinition<A, ExtractExtensions<G>, C>): CommandDefinitionResult<G, C>
 
 /**
  * Define a {@link Command | command}.
@@ -147,7 +147,7 @@ type DefineWithTypesReturn<DefaultExtensions extends ExtendContext, DefaultArgs 
   A extends DefaultArgs = DefaultArgs,
   C extends Partial<Command<{ args: A; extensions: DefaultExtensions }>> = {}
 >(
-  definition: C & Command<{ args: A; extensions: DefaultExtensions }>
+  definition: CommandDefinition<A, DefaultExtensions, C>
 ) => CommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C>
 
 /**
@@ -191,7 +191,7 @@ export function defineWithTypes<G extends GunshiParamsConstraint>(): DefineWithT
     A extends DefaultArgs = DefaultArgs,
     C extends Partial<Command<{ args: A; extensions: DefaultExtensions }>> = {}
   >(
-    definition: C & Command<{ args: A; extensions: DefaultExtensions }>
+    definition: CommandDefinition<A, DefaultExtensions, C>
   ): CommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C> => {
     return define(definition) as CommandDefinitionResult<
       { args: A; extensions: DefaultExtensions },
@@ -299,24 +299,6 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 }
 
 /**
- * Normalize G to a full GunshiParams type
- *
- * @typeParam G - A {@link GunshiParamsConstraint} type
- *
- * @internal
- */
-type NormalizeGunshiParams<G extends GunshiParamsConstraint> =
-  G extends GunshiParams<any>
-    ? G
-    : G extends { args: infer A; extensions: infer E }
-      ? { args: A; extensions: E }
-      : G extends { args: infer A }
-        ? { args: A; extensions: {} }
-        : G extends { extensions: infer E }
-          ? { args: Args; extensions: E }
-          : DefaultGunshiParams
-
-/**
  * Return type for lazyWithTypes
  *
  * @typeParam FullG - The normalized {@link GunshiParams} type
@@ -365,10 +347,10 @@ type LazyWithTypesReturn<FullG extends GunshiParamsConstraint> = <
  * @since v0.27.0
  */
 export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypesReturn<
-  NormalizeGunshiParams<G>
+  NormalizeToGunshiParams<G>
 > {
   // Helper type to normalize G to a full GunshiParams type
-  type FullGunshiParams = NormalizeGunshiParams<G>
+  type FullGunshiParams = NormalizeToGunshiParams<G>
 
   return <D extends Partial<Command<FullGunshiParams>> = {}>(
     loader: CommandLoader<FullGunshiParams>,

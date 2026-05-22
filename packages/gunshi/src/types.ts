@@ -123,9 +123,13 @@ export type ExtractExtensions<G> =
 export type NormalizeToGunshiParams<G> =
   G extends GunshiParams<any>
     ? G
-    : G extends { extensions: ExtendContext }
-      ? GunshiParams<{ args: Args; extensions: G['extensions'] }>
-      : DefaultGunshiParams
+    : G extends { args: infer A extends Args; extensions: infer E extends ExtendContext }
+      ? GunshiParams<{ args: A; extensions: E }>
+      : G extends { args: infer A extends Args }
+        ? GunshiParams<{ args: A; extensions: {} }>
+        : G extends { extensions: infer E extends ExtendContext }
+          ? GunshiParams<{ args: Args; extensions: E }>
+          : DefaultGunshiParams
 
 /**
  * Command environment.
