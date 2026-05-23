@@ -123,9 +123,32 @@ export type ExtractExtensions<G> =
 export type NormalizeToGunshiParams<G> =
   G extends GunshiParams<any>
     ? G
-    : G extends { extensions: ExtendContext }
-      ? GunshiParams<{ args: Args; extensions: G['extensions'] }>
-      : DefaultGunshiParams
+    : G extends { args: infer A extends Args; extensions: infer E extends ExtendContext }
+      ? GunshiParams<{ args: A; extensions: E }>
+      : G extends { args: infer A extends Args }
+        ? GunshiParams<{ args: A; extensions: {} }>
+        : G extends { extensions: infer E extends ExtendContext }
+          ? GunshiParams<{ args: Args; extensions: E }>
+          : DefaultGunshiParams
+
+/**
+ * Type helper to merge command context extensions into G
+ *
+ * @internal
+ */
+export type MergeGunshiExtensions<
+  G extends GunshiParamsConstraint,
+  E extends ExtendContext
+> = GunshiParams<{
+  /**
+   * Command argument definitions.
+   */
+  args: ExtractArgs<G>
+  /**
+   * Merged command context extensions.
+   */
+  extensions: ExtractExtensions<G> & E
+}>
 
 /**
  * Command environment.
@@ -453,7 +476,7 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
 }
 
 /**
- * CommandContextCore type (base type without extensions)
+ * Readonly command context available to a command context extension factory.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *

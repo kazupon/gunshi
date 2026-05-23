@@ -44,9 +44,26 @@ import type {
  *
  * @internal
  */
-export type ExtractExtensions<E extends Record<string, CommandContextExtension>> = {
+export type ExtractExtensionValues<E extends Record<string, CommandContextExtension>> = {
   [K in keyof E]: E[K] extends CommandContextExtension<infer T> ? T : never
 }
+
+/**
+ * Return type of {@link createCommandContext}
+ *
+ * @internal
+ */
+type CommandContextResult<
+  G extends GunshiParamsConstraint,
+  E extends Record<string, CommandContextExtension>
+> =
+  {} extends ExtractExtensionValues<E>
+    ? Readonly<CommandContext<G>>
+    : Readonly<
+        CommandContext<
+          GunshiParams<{ args: ExtractArgs<G>; extensions: ExtractExtensionValues<E> }>
+        >
+      >
 
 /**
  * Parameters of {@link createCommandContext}
@@ -143,13 +160,7 @@ export async function createCommandContext<
   commandPath = [],
   omitted = false,
   validationError
-}: CommandContextParams<G, V, C, E>): Promise<
-  {} extends ExtractExtensions<E>
-    ? Readonly<CommandContext<G>>
-    : Readonly<
-        CommandContext<GunshiParams<{ args: ExtractArgs<G>; extensions: ExtractExtensions<E> }>>
-      >
-> {
+}: CommandContextParams<G, V, C, E>): Promise<CommandContextResult<G, E>> {
   /**
    * normailize the options schema and values, to avoid prototype pollution
    */
@@ -228,11 +239,7 @@ export async function createCommandContext<
   }
   const ctx = deepFreeze(core, ['extensions'])
 
-  return ctx as {} extends ExtractExtensions<E>
-    ? Readonly<CommandContext<G>>
-    : Readonly<
-        CommandContext<GunshiParams<{ args: ExtractArgs<G>; extensions: ExtractExtensions<E> }>>
-      >
+  return ctx as CommandContextResult<G, E>
 }
 
 function getCommandName<G extends GunshiParams>(cmd: Command<G> | LazyCommand<G>): string {

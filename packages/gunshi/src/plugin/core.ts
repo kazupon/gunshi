@@ -148,6 +148,56 @@ type MergeExtension<
   : ResolvedDepExt
 
 /**
+ * Extensions resolved from the declared plugin dependencies.
+ *
+ * @internal
+ */
+type DependencyExtensions<
+  Deps extends ReadonlyArray<PluginDependency | string>,
+  Context extends ExtendContext
+> = InferDependencyExtensions<Deps, Context>
+
+/**
+ * Gunshi params available while a plugin extension resolves its dependencies.
+ *
+ * @internal
+ */
+type DependencyParams<
+  Deps extends ReadonlyArray<PluginDependency | string>,
+  Context extends ExtendContext
+> = GunshiParams<{
+  args: Args
+  extensions: DependencyExtensions<Deps, Context>
+}>
+
+/**
+ * Extensions available after applying the current plugin extension.
+ *
+ * @internal
+ */
+type MergedPluginExtensions<
+  Id extends string,
+  Deps extends ReadonlyArray<PluginDependency | string>,
+  Context extends ExtendContext,
+  Ext extends ExtendContext
+> = MergeExtension<Id, DependencyExtensions<Deps, Context>, Ext>
+
+/**
+ * Gunshi params available after applying the current plugin extension.
+ *
+ * @internal
+ */
+type MergedPluginParams<
+  Id extends string,
+  Deps extends ReadonlyArray<PluginDependency | string>,
+  Context extends ExtendContext,
+  Ext extends ExtendContext
+> = GunshiParams<{
+  args: Args
+  extensions: MergedPluginExtensions<Id, Deps, Context, Ext>
+}>
+
+/**
  * Plugin definition options
  *
  * @since v0.27.0
@@ -157,19 +207,14 @@ export interface PluginOptions<
   Id extends string = string, // for plugin id
   Deps extends ReadonlyArray<PluginDependency | string> = (PluginDependency | string)[], // for plugin dependencies
   Ext extends Record<string, unknown> = {}, // for plugin extension type
-  ResolvedDepExt extends GunshiParams = GunshiParams<{
-    args: Args
-    extensions: InferDependencyExtensions<Deps, DepExt>
-  }>,
+  ResolvedDepExt extends GunshiParams = DependencyParams<Deps, DepExt>,
   PluginExt extends PluginExtension<Ext, ResolvedDepExt> = PluginExtension<Ext, ResolvedDepExt>,
-  MergedExt extends GunshiParams = GunshiParams<{
-    args: Args
-    extensions: MergeExtension<
-      Id,
-      InferDependencyExtensions<Deps, DepExt>,
-      Awaited<ReturnType<PluginExt>>
-    >
-  }>
+  MergedExt extends GunshiParams = MergedPluginParams<
+    Id,
+    Deps,
+    DepExt,
+    Awaited<ReturnType<PluginExt>>
+  >
 > {
   /**
    * Plugin unique identifier
@@ -285,38 +330,24 @@ export function plugin<
   Id extends string = string, // for plugin id
   Deps extends ReadonlyArray<PluginDependency | string> = [], // for plugin dependencies
   Extension extends {} = {}, // for plugin extension type
-  ResolvedDepExtensions extends GunshiParams = GunshiParams<{
-    args: Args
-    extensions: InferDependencyExtensions<Deps, Context>
-  }>,
+  ResolvedDepExtensions extends GunshiParams = DependencyParams<Deps, Context>,
   PluginExt extends PluginExtension<Extension, DefaultGunshiParams> = PluginExtension<
     Extension,
     ResolvedDepExtensions
   >,
-  MergedExtensions extends GunshiParams = GunshiParams<{
-    args: Args
-    extensions: MergeExtension<
-      Id,
-      InferDependencyExtensions<Deps, Context>,
-      Awaited<ReturnType<PluginExt>>
-    >
-  }>
+  MergedExtensions extends GunshiParams = MergedPluginParams<
+    Id,
+    Deps,
+    Context,
+    Awaited<ReturnType<PluginExt>>
+  >
 >(options: {
   id: Id
   name?: string
   dependencies?: Deps
   setup?: (
     ctx: Readonly<
-      PluginContext<
-        GunshiParams<{
-          args: Args
-          extensions: MergeExtension<
-            Id,
-            InferDependencyExtensions<Deps, Context>,
-            Awaited<ReturnType<PluginExt>>
-          >
-        }>
-      >
+      PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>
     >
   ) => Awaitable<void>
   extension: PluginExt
@@ -341,38 +372,24 @@ export function plugin<
   Id extends string = string, // for plugin id
   Deps extends ReadonlyArray<PluginDependency | string> = [], // for plugin dependencies
   Extension extends Record<string, unknown> = {}, // for plugin extension type
-  ResolvedDepExtensions extends GunshiParams = GunshiParams<{
-    args: Args
-    extensions: InferDependencyExtensions<Deps, Context>
-  }>,
+  ResolvedDepExtensions extends GunshiParams = DependencyParams<Deps, Context>,
   PluginExt extends PluginExtension<Extension, DefaultGunshiParams> = PluginExtension<
     Extension,
     ResolvedDepExtensions
   >,
-  MergedExtensions extends GunshiParams = GunshiParams<{
-    args: Args
-    extensions: MergeExtension<
-      Id,
-      InferDependencyExtensions<Deps, Context>,
-      Awaited<ReturnType<PluginExt>>
-    >
-  }>
+  MergedExtensions extends GunshiParams = MergedPluginParams<
+    Id,
+    Deps,
+    Context,
+    Awaited<ReturnType<PluginExt>>
+  >
 >(options: {
   id: Id
   name?: string
   dependencies?: Deps
   setup?: (
     ctx: Readonly<
-      PluginContext<
-        GunshiParams<{
-          args: Args
-          extensions: MergeExtension<
-            Id,
-            InferDependencyExtensions<Deps, Context>,
-            Awaited<ReturnType<PluginExt>>
-          >
-        }>
-      >
+      PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>
     >
   ) => Awaitable<void>
   onExtension?: OnPluginExtension<MergedExtensions>
