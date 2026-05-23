@@ -140,7 +140,13 @@ export type MergeGunshiExtensions<
   G extends GunshiParamsConstraint,
   E extends ExtendContext
 > = GunshiParams<{
+  /**
+   * Command argument definitions.
+   */
   args: ExtractArgs<G>
+  /**
+   * Merged command context extensions.
+   */
   extensions: ExtractExtensions<G> & E
 }>
 
