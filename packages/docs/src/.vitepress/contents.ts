@@ -1,3 +1,4 @@
+import { apiOxNav as apiOxSidebar } from '../api-ox/nav.ts'
 import typedocSidebar from '../api/typedoc-sidebar.json' with { type: 'json' }
 
 export const meta = {
@@ -92,6 +93,12 @@ export const apiReferences = {
   text: 'API References',
   collapsed: false,
   items: typedocSidebar
+}
+
+export const apiOxReferences = {
+  text: 'API References (ox-content)',
+  collapsed: false,
+  items: apiOxSidebar
 }
 
 export const extraTopics = {

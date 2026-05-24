@@ -69,5 +69,11 @@ minimumReleaseAgeExclude:
   - "@rolldown/*"
   - "@kazupon/eslint-config"
   - "@oxfmt/*"
+  - "@ox-content/napi"
+  - "@ox-content/binding-darwin-arm64"
+  - "@ox-content/binding-darwin-x64"
+  - "@ox-content/binding-linux-arm64-gnu"
+  - "@ox-content/binding-linux-x64-gnu"
+  - "@ox-content/binding-win32-x64-msvc"
   - gunshi
   - "@gunshi/*"

@@ -9,6 +9,7 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 import pkgJson from '../../package.json' with { type: 'json' }
 import {
   advanced,
+  apiOxReferences,
   apiReferences,
   essentials,
   experimentals,
@@ -48,6 +49,7 @@ export default withMermaid({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/introduction/what-is-gunshi' },
       { text: 'API', link: '/api' },
+      { text: 'API (ox-content)', link: '/api-ox' },
       { text: 'Showcase', link: '/showcase' },
       {
         text: `v${pkgJson.version}`,
@@ -80,6 +82,7 @@ export default withMermaid({
       experimentals,
       plugin,
       apiReferences,
+      apiOxReferences,
       extraTopics,
       releaseNotes
     ],

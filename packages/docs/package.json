@@ -16,10 +16,11 @@
   "scripts": {
     "build": "pnpm run build:typedoc && pnpm run build:readme && pnpm run build:vitepress",
     "build:typedoc": "typedoc --excludeInternal",
+    "build:api-ox": "tsx ./scripts/generate-api-with-ox-content.ts",
     "build:readme": "pnpm run generate",
     "build:vitepress": "vitepress build src",
     "generate": "tsx ./scripts/generate.ts",
-    "dev": "pnpm run build:typedoc && vitepress dev src",
+    "dev": "pnpm run build:typedoc && pnpm run build:api-ox && vitepress dev src",
     "preview": "vitepress preview src"
   },
   "keywords": [
@@ -55,6 +56,7 @@
     "tinyexec": "^1.0.2"
   },
   "devDependencies": {
+    "@ox-content/napi": "2.13.0",
     "@vueuse/core": "^14.0.0",
     "mermaid": "^11.12.0",
     "oxc-minify": "^0.129.0",

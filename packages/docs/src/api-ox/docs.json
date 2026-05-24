@@ -1,0 +1,1763 @@
+{
+  "generatedAt": "2026-05-24T14:08:50.281Z",
+  "modules": [
+    {
+      "entries": [
+        {
+          "description": "A profile that summarizes whether the current process is running on an\nAI coding agent.\n\nThe shape is intentionally minimal so that callers can use it as a UX hint\n(for example, to switch output format) without coupling to specific agent\nnames. To get the type, use `ReturnType<typeof getAgentProfile>`.",
+          "endLine": 46,
+          "file": "packages/gunshi/src/agent.ts",
+          "kind": "interface",
+          "line": 30,
+          "name": "AgentProfile",
+          "signature": "interface AgentProfile"
+        },
+        {
+          "description": "Get the AI coding agent profile of the current process.\n\nThe detection itself is delegated to `std-env`. This function only converts\nthe upstream `agentInfo` into Gunshi's minimal {@link AgentProfile} shape.",
+          "endLine": 75,
+          "examples": [
+            "```js\nimport { getAgentProfile } from 'gunshi/agent'\n\nconst profile = getAgentProfile()\n\nif (profile.isAgent) {\n  // adjust output for AI agent execution\n}\n```"
+          ],
+          "file": "packages/gunshi/src/agent.ts",
+          "kind": "function",
+          "line": 68,
+          "name": "getAgentProfile",
+          "returns": {
+            "description": "An {@link AgentProfile} describing whether the process is running\n  on an AI coding agent and, if so, which agent was detected.",
+            "type": "AgentProfile"
+          },
+          "signature": "export function getAgentProfile(): AgentProfile"
+        }
+      ],
+      "file": "packages/gunshi/src/agent.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Run the command.",
+          "endLine": 36,
+          "file": "packages/gunshi/src/cli/bone.ts",
+          "kind": "function",
+          "line": 29,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<\n  A extends Args = Args,\n  G extends GunshiParams = { args: A; extensions: {} }\n>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options?: CliOptions<G>): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "A - The type of {@linkcode Args | arguments} defined in the command and cli options."
+          }
+        },
+        {
+          "description": "Run the command.",
+          "endLine": 55,
+          "file": "packages/gunshi/src/cli/bone.ts",
+          "kind": "function",
+          "line": 48,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<\n  E extends ExtendContext = ExtendContext,\n  G extends GunshiParams = { args: Args; extensions: E }\n>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options?: CliOptions<G>): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "E - An {@linkcode ExtendContext} type to specify the shape of command and cli options."
+          }
+        },
+        {
+          "description": "Run the command.",
+          "endLine": 71,
+          "file": "packages/gunshi/src/cli/bone.ts",
+          "kind": "function",
+          "line": 67,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<G extends GunshiParams = DefaultGunshiParams>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options?: CliOptions<G>): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+          }
+        },
+        {
+          "description": "Run the command.",
+          "endLine": 89,
+          "file": "packages/gunshi/src/cli/bone.ts",
+          "kind": "function",
+          "line": 83,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "default": "{}",
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<G extends GunshiParams = DefaultGunshiParams>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options: CliOptions<G> = {}): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/cli/bone.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Run the command.",
+          "endLine": 38,
+          "file": "packages/gunshi/src/cli/builtin.ts",
+          "kind": "function",
+          "line": 34,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<G extends GunshiParamsConstraint>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options?: CliOptions<G>): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+          }
+        },
+        {
+          "description": "Run the command.",
+          "endLine": 57,
+          "file": "packages/gunshi/src/cli/builtin.ts",
+          "kind": "function",
+          "line": 50,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<\n  A extends Args = Args,\n  G extends GunshiParams = { args: A; extensions: {} }\n>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options?: CliOptions<G>): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "A - The type of {@linkcode Args | arguments} defined in the command and cli options."
+          }
+        },
+        {
+          "description": "Run the command.",
+          "endLine": 76,
+          "file": "packages/gunshi/src/cli/builtin.ts",
+          "kind": "function",
+          "line": 69,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<\n  E extends ExtendContext = ExtendContext,\n  G extends GunshiParams = { args: Args; extensions: E }\n>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options?: CliOptions<G>): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "E - An {@linkcode ExtendContext} type to specify the shape of command and cli options."
+          }
+        },
+        {
+          "description": "Run the command.",
+          "endLine": 92,
+          "file": "packages/gunshi/src/cli/builtin.ts",
+          "kind": "function",
+          "line": 88,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<G extends GunshiParams = DefaultGunshiParams>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options?: CliOptions<G>): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+          }
+        },
+        {
+          "description": "Run the command.\n\nThis overload accepts any command-like object using a loose structural type.\nIt bypasses TypeScript contravariance issues with callback properties.\n\nNote: This overload MUST be last in the overload list. TypeScript checks overloads\nin declaration order and selects the first matching one. The SubCommandable type\nis intentionally loose and would match any command, so placing it first would\nprevent proper type inference for more specific command types.",
+          "endLine": 114,
+          "file": "packages/gunshi/src/cli/builtin.ts",
+          "kind": "function",
+          "line": 110,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A command-like object (command, command runner, or lazy command)",
+              "name": "entry",
+              "type": "SubCommandable"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli(args: string[], entry: SubCommandable, options?: CliOptions): Promise<string | undefined>"
+        },
+        {
+          "description": "Run the command.",
+          "endLine": 133,
+          "file": "packages/gunshi/src/cli/builtin.ts",
+          "kind": "function",
+          "line": 126,
+          "name": "cli",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "args",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "default": "{}",
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "optional": true,
+              "type": "CliOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cli<G extends GunshiParams = DefaultGunshiParams>(args: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options: CliOptions<G> = {}): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/cli/builtin.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Run the command.",
+          "endLine": 115,
+          "file": "packages/gunshi/src/cli/core.ts",
+          "kind": "function",
+          "line": 47,
+          "name": "cliCore",
+          "params": [
+            {
+              "description": "Command line arguments",
+              "name": "argv",
+              "type": "string[]"
+            },
+            {
+              "description": "A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}",
+              "name": "entry",
+              "type": "Command | CommandRunner | LazyCommand"
+            },
+            {
+              "description": "A {@link CliOptions | CLI options}",
+              "name": "options",
+              "type": "CliOptions"
+            },
+            {
+              "description": "An array of {@link Plugin | plugins} to be applied",
+              "name": "plugins",
+              "type": "Plugin[]"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.",
+            "type": "Promise"
+          },
+          "signature": "export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiParams>(argv: string[], entry: Command<G> | CommandRunner<G> | LazyCommand<G>, options: CliOptions<G>, plugins: Plugin[]): Promise<string | undefined>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/cli/core.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "A no-operation function.",
+          "endLine": 13,
+          "file": "packages/gunshi/src/constants.ts",
+          "kind": "function",
+          "line": 13,
+          "name": "NOOP",
+          "signature": "NOOP()"
+        }
+      ],
+      "file": "packages/gunshi/src/constants.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Extract extension return types from extensions record",
+          "endLine": 49,
+          "file": "packages/gunshi/src/context.ts",
+          "kind": "type",
+          "line": 47,
+          "name": "ExtractExtensionValues",
+          "signature": "export type ExtractExtensionValues<E extends Record<string, CommandContextExtension>> = {\n  [K in keyof E]: E[K] extends CommandContextExtension<infer T> ? T : never\n}",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Return type of {@link createCommandContext}",
+          "endLine": 66,
+          "file": "packages/gunshi/src/context.ts",
+          "kind": "type",
+          "line": 56,
+          "name": "CommandContextResult",
+          "signature": "type CommandContextResult<\n  G extends GunshiParamsConstraint,\n  E extends Record<string, CommandContextExtension>\n> = {} extends ExtractExtensionValues<E>\n    ? Readonly<CommandContext<G>>\n    : Readonly<\n        CommandContext<\n          GunshiParams<{ args: ExtractArgs<G>; extensions: ExtractExtensionValues<E> }>\n        >\n      >",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Parameters of {@link createCommandContext}",
+          "endLine": 135,
+          "file": "packages/gunshi/src/context.ts",
+          "kind": "interface",
+          "line": 71,
+          "name": "CommandContextParams",
+          "signature": "export interface CommandContextParams<\n  G extends GunshiParams | { args: Args } | { extensions: ExtendContext },\n  V extends ArgValues<ExtractArgs<G>>,\n  C extends Command<G> | LazyCommand<G> = Command<G>,\n  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>\n>"
+        },
+        {
+          "description": "Create a command context.",
+          "endLine": 243,
+          "file": "packages/gunshi/src/context.ts",
+          "kind": "function",
+          "line": 143,
+          "name": "createCommandContext",
+          "params": [
+            {
+              "description": "A {@link CommandContextParams | parameters} to create a command context.",
+              "name": "param",
+              "type": "CommandContextParams"
+            }
+          ],
+          "returns": {
+            "description": "A {@link CommandContext | command context}, which is readonly.",
+            "type": "Promise"
+          },
+          "signature": "export async function createCommandContext<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  V extends ArgValues<ExtractArgs<G>> = ArgValues<ExtractArgs<G>>,\n  C extends Command<G> | LazyCommand<G> = Command<G>,\n  E extends Record<string, CommandContextExtension> = {}\n>({\n  args = {} as ExtractArgs<G>,\n  explicit = {} as ExtractArgExplicitlyProvided<G>,\n  values = {} as V,\n  positionals = [],\n  rest = [],\n  argv = [],\n  tokens = [],\n  command = {} as C,\n  extensions = {} as E,\n  cliOptions = {} as CliOptions<G>,\n  callMode = 'entry',\n  commandPath = [],\n  omitted = false,\n  validationError\n}: CommandContextParams<G, V, C, E>): Promise<CommandContextResult<G, E>>"
+        }
+      ],
+      "file": "packages/gunshi/src/context.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Interface for managing renderer and command decorators.\nThis interface defines the contract for decorator management in plugins.",
+          "endLine": 59,
+          "file": "packages/gunshi/src/decorators.ts",
+          "kind": "interface",
+          "line": 23,
+          "name": "Decorators",
+          "signature": "export interface Decorators<G extends GunshiParamsConstraint = DefaultGunshiParams>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Factory function for creating a decorators manager.",
+          "endLine": 149,
+          "file": "packages/gunshi/src/decorators.ts",
+          "kind": "function",
+          "line": 66,
+          "name": "createDecorators",
+          "returns": {
+            "description": "A new decorators manager instance",
+            "type": "Decorators"
+          },
+          "signature": "export function createDecorators<\n  G extends GunshiParamsConstraint = DefaultGunshiParams\n>(): Decorators<G>"
+        }
+      ],
+      "file": "packages/gunshi/src/decorators.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "The result type of the {@link define} function",
+          "endLine": 78,
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "type",
+          "line": 75,
+          "name": "CommandDefinitionResult",
+          "signature": "type CommandDefinitionResult<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  C = {}\n> = Prettify<Pick<C, keyof C> & Partial<Pick<Command<G>, Exclude<keyof Command<G>, keyof C>>>>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "The command definition accepted by {@link define} helpers.",
+          "endLine": 89,
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "type",
+          "line": 85,
+          "name": "CommandDefinition",
+          "signature": "type CommandDefinition<\n  A extends Args,\n  E extends ExtendContext,\n  C extends Partial<Command<{ args: A; extensions: E }>>\n> = C & Command<{ args: A; extensions: E }>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Define a {@link Command | command}.",
+          "endLine": 125,
+          "examples": [
+            "```ts\nconst command = define({\n  name: 'test',\n  description: 'A test command',\n  args: {\n    debug: {\n      type: 'boolean',\n      description: 'Enable debug mode',\n      default: false\n    }\n  },\n  run: ctx => {\n    if (ctx.values.debug) {\n      console.debug('Debug mode is enabled');\n    }\n  }\n})\n```"
+          ],
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "function",
+          "line": 121,
+          "name": "define",
+          "params": [
+            {
+              "description": "A {@link Command | command} definition",
+              "name": "definition",
+              "type": "CommandDefinition"
+            }
+          ],
+          "returns": {
+            "description": "A defined {@link Command | command}",
+            "type": "CommandDefinitionResult"
+          },
+          "signature": "export function define<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  A extends Args = ExtractArgs<G>,\n  C extends Partial<Command<{ args: A; extensions: ExtractExtensions<G> }>> = {}\n>(definition: CommandDefinition<A, ExtractExtensions<G>, C>): CommandDefinitionResult<G, C>",
+          "tags": {
+            "typeParam": "G - A {@link GunshiParamsConstraint} type"
+          }
+        },
+        {
+          "description": "Define a {@link Command | command}.",
+          "endLine": 137,
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "function",
+          "line": 135,
+          "name": "define",
+          "params": [
+            {
+              "description": "A {@link Command | command} definition",
+              "name": "definition",
+              "type": "any"
+            }
+          ],
+          "returns": {
+            "description": "A defined {@link Command | command}",
+            "type": "any"
+          },
+          "signature": "export function define(definition: any): any",
+          "tags": {
+            "typeParam": "G - A {@link GunshiParamsConstraint} type"
+          }
+        },
+        {
+          "description": "Return type for defineWithTypes",
+          "endLine": 151,
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "type",
+          "line": 146,
+          "name": "DefineWithTypesReturn",
+          "signature": "type DefineWithTypesReturn<DefaultExtensions extends ExtendContext, DefaultArgs extends Args> = <\n  A extends DefaultArgs = DefaultArgs,\n  C extends Partial<Command<{ args: A; extensions: DefaultExtensions }>> = {}\n>(\n  definition: CommandDefinition<A, DefaultExtensions, C>\n) => CommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C>",
+          "tags": {
+            "internal": "",
+            "typeParam": "DefaultExtensions - The {@link ExtendContext} type extracted from G"
+          }
+        },
+        {
+          "description": "Define a {@link Command | command} with types\n\nThis helper function allows specifying the type parameter of {@link GunshiParams}\nwhile inferring the {@link Args} type, {@link ExtendContext} type from the definition.",
+          "endLine": 201,
+          "examples": [
+            "```ts\n// Define a command with specific extensions type\ntype MyExtensions = { logger: { log: (message: string) => void } }\n\nconst command = defineWithTypes<{ extensions: MyExtensions }>()({\n  name: 'greet',\n  args: {\n    name: { type: 'string' }\n  },\n  run: ctx => {\n    // ctx.values is inferred as { name?: string }\n    // ctx.extensions is MyExtensions\n  }\n})\n```"
+          ],
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "function",
+          "line": 182,
+          "name": "defineWithTypes",
+          "returns": {
+            "description": "A function that takes a command definition via {@link define}",
+            "type": "DefineWithTypesReturn"
+          },
+          "signature": "export function defineWithTypes<G extends GunshiParamsConstraint>(): DefineWithTypesReturn<\n  ExtractExtensions<G>,\n  ExtractArgs<G>\n>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A {@link GunshiParams} type"
+          }
+        },
+        {
+          "description": "Define a {@link LazyCommand | lazy command}.",
+          "endLine": 219,
+          "examples": [
+            "```ts\n// load command with dynamic importing\nconst test = lazy(() => import('./commands/test'))\n```"
+          ],
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "function",
+          "line": 217,
+          "name": "lazy",
+          "params": [
+            {
+              "description": "A {@link CommandLoader | command loader}",
+              "name": "loader",
+              "type": "CommandLoader"
+            }
+          ],
+          "returns": {
+            "description": "A {@link LazyCommand | lazy command} with loader",
+            "type": "LazyCommand"
+          },
+          "signature": "export function lazy<A extends Args>(loader: CommandLoader<{ args: A; extensions: {} }>): LazyCommand<{ args: A; extensions: {} }, {}>",
+          "tags": {
+            "typeParam": "A - An {@link Args} type"
+          }
+        },
+        {
+          "description": "Define a {@link LazyCommand | lazy command} with definition.",
+          "endLine": 265,
+          "examples": [
+            "```ts\n// define command without command runner\nconst testDefinition = define({\n  name: 'test',\n  description: 'Test command',\n  args: {\n    debug: {\n      type: 'boolean',\n      description: 'Enable debug mode',\n      default: false\n    }\n  },\n})\n\n// define load command with command runner and defined command\nconst test = lazy((): CommandRunner<{ args: typeof testDefinition.args; extensions: {} }> => {\n  return ctx => {\n    if (ctx.values.debug) {\n      console.debug('Debug mode is enabled');\n    }\n  }\n}, testDefinition)\n```"
+          ],
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "function",
+          "line": 256,
+          "name": "lazy",
+          "params": [
+            {
+              "description": "A {@link CommandLoader | command loader} function that returns a command definition",
+              "name": "loader",
+              "type": "CommandLoader"
+            },
+            {
+              "description": "An optional {@link Command | command} definition",
+              "name": "definition",
+              "type": "D"
+            }
+          ],
+          "returns": {
+            "description": "A {@link LazyCommand | lazy command} that can be executed later",
+            "type": "LazyCommand"
+          },
+          "signature": "export function lazy<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  A extends ExtractArgs<G> = ExtractArgs<G>,\n  D extends Partial<Command<{ args: A; extensions: {} }>> = Partial<\n    Command<{ args: A; extensions: {} }>\n  >\n>(loader: CommandLoader<{ args: A; extensions: {} }>, definition: D): LazyCommand<{ args: A; extensions: {} }, D>",
+          "tags": {
+            "typeParam": "A - An {@link Args} type"
+          }
+        },
+        {
+          "description": "Define a {@link LazyCommand | lazy command} with or without definition.",
+          "endLine": 299,
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "function",
+          "line": 274,
+          "name": "lazy",
+          "params": [
+            {
+              "description": "A {@link CommandLoader | command loader} function that returns a command definition",
+              "name": "loader",
+              "type": "CommandLoader"
+            },
+            {
+              "description": "An optional {@link Command | command} definition",
+              "name": "definition",
+              "optional": true,
+              "type": "Partial"
+            }
+          ],
+          "returns": {
+            "description": "A {@link LazyCommand | lazy command} that can be executed later",
+            "type": "LazyCommand"
+          },
+          "signature": "export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(loader: CommandLoader<G>, definition?: Partial<Command<G>>): LazyCommand<G, any>"
+        },
+        {
+          "description": "Return type for lazyWithTypes",
+          "endLine": 313,
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "type",
+          "line": 308,
+          "name": "LazyWithTypesReturn",
+          "signature": "type LazyWithTypesReturn<FullG extends GunshiParamsConstraint> = <\n  D extends Partial<Command<FullG>> = {}\n>(\n  loader: CommandLoader<FullG>,\n  definition?: D\n) => LazyCommand<FullG, D>",
+          "tags": {
+            "internal": "",
+            "typeParam": "FullG - The normalized {@link GunshiParams} type"
+          }
+        },
+        {
+          "description": "Define a {@link LazyCommand | lazy command} with specific type parameters.\n\nThis helper function allows specifying the type parameter of {@link GunshiParams}\nwhile inferring the {@link Args} type, {@link ExtendContext} type from the definition.",
+          "endLine": 361,
+          "examples": [
+            "```ts\ntype MyExtensions = { logger: { log: (message: string) => void } }\n\nconst command = lazyWithTypes<{ extensions: MyExtensions }>()(\n  () => {\n    return ctx => {\n      // Command runner implementation\n      ctx.extensions.logger?.log('Command executed')\n  },\n {\n  name: 'lazy-command',\n  args: {\n    opt: {\n      type: 'string',\n      description: 'An optional string argument',\n      required: false,\n    },\n  },\n)\n```"
+          ],
+          "file": "packages/gunshi/src/definition.ts",
+          "kind": "function",
+          "line": 349,
+          "name": "lazyWithTypes",
+          "returns": {
+            "description": "A function that takes a lazy command definition via {@link lazy}",
+            "type": "LazyWithTypesReturn"
+          },
+          "signature": "export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypesReturn<\n  NormalizeToGunshiParams<G>\n>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A {@link GunshiParams} type"
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/definition.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "generate options of `generate` function.",
+          "endLine": 33,
+          "file": "packages/gunshi/src/generator.ts",
+          "kind": "type",
+          "line": 33,
+          "name": "GenerateOptions",
+          "signature": "export type GenerateOptions<G extends GunshiParamsConstraint = DefaultGunshiParams> = CliOptions<G>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CliOptions}."
+          }
+        },
+        {
+          "description": "Generate the command usage.",
+          "endLine": 62,
+          "file": "packages/gunshi/src/generator.ts",
+          "kind": "function",
+          "line": 45,
+          "name": "generate",
+          "params": [
+            {
+              "description": "usage generate command, if you want to generate the usage of the default command where there are target commands and sub-commands, specify `null`.",
+              "name": "command",
+              "type": "string | string[] | null"
+            },
+            {
+              "description": "A {@linkcode Command | entry command}",
+              "name": "entry",
+              "type": "Command | LazyCommand"
+            },
+            {
+              "default": "{}",
+              "description": "A {@linkcode GenerateOptions | cli options}",
+              "name": "options",
+              "optional": true,
+              "type": "GenerateOptions"
+            }
+          ],
+          "returns": {
+            "description": "A rendered usage.",
+            "type": "Promise"
+          },
+          "signature": "export async function generate<G extends GunshiParamsConstraint = DefaultGunshiParams>(command: string | string[] | null, entry: Command<G> | LazyCommand<G>, options: GenerateOptions<G> = {}): Promise<string>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/generator.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Gunshi plugin context interface.",
+          "endLine": 131,
+          "file": "packages/gunshi/src/plugin/context.ts",
+          "kind": "interface",
+          "line": 28,
+          "name": "PluginContext",
+          "signature": "export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+          }
+        },
+        {
+          "description": "Factory function for creating a plugin context.",
+          "endLine": 238,
+          "file": "packages/gunshi/src/plugin/context.ts",
+          "kind": "function",
+          "line": 142,
+          "name": "createPluginContext",
+          "params": [
+            {
+              "description": "A {@linkcode Decorators} instance.",
+              "name": "decorators",
+              "type": "Decorators"
+            },
+            {
+              "description": "Initial sub commands map.",
+              "name": "initialSubCommands",
+              "optional": true,
+              "type": "Map"
+            }
+          ],
+          "returns": {
+            "description": "A new {@linkcode PluginContext} instance.",
+            "type": "PluginContext"
+          },
+          "signature": "export function createPluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams>(decorators: Decorators<G>, initialSubCommands?: Map<string, Command<G> | LazyCommand<G>>): PluginContext<G>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/plugin/context.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Helper type to extract plugin ID from dependency",
+          "endLine": 32,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 28,
+          "name": "ExtractDependencyId",
+          "signature": "export type ExtractDependencyId<D> = D extends PluginDependency\n  ? D['id']\n  : D extends string\n    ? D\n    : never",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Helper type to check if dependency is optional",
+          "endLine": 43,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 39,
+          "name": "IsOptionalDependency",
+          "signature": "export type IsOptionalDependency<D> = D extends PluginDependency\n  ? D['optional'] extends true\n    ? true\n    : false\n  : false",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Helper type to infer dependency extensions with optional support",
+          "endLine": 74,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 64,
+          "name": "InferDependencyExtensions",
+          "signature": "export type InferDependencyExtensions<\n  D extends ReadonlyArray<PluginDependency | string>,\n  A extends ExtendContext\n> = D extends readonly []\n  ? {}\n  : D extends readonly [infer First, ...infer Rest]\n    ? ProcessDependency<First, A> &\n        (Rest extends ReadonlyArray<PluginDependency | string>\n          ? InferDependencyExtensions<Rest, A>\n          : {})\n    : {}",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Plugin dependency definition",
+          "endLine": 91,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "interface",
+          "line": 81,
+          "name": "PluginDependency",
+          "signature": "export interface PluginDependency",
+          "tags": {
+            "since": "v0.27.0"
+          }
+        },
+        {
+          "description": "Plugin function type",
+          "endLine": 102,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 100,
+          "name": "PluginFunction",
+          "signature": "export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (\n  ctx: Readonly<PluginContext<G>>\n) => Awaitable<void>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}."
+          }
+        },
+        {
+          "description": "Plugin extension",
+          "endLine": 119,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 116,
+          "name": "PluginExtension",
+          "params": [
+            {
+              "description": "The {@linkcode CommandContextCore | command context} core",
+              "name": "ctx",
+              "type": "unknown"
+            },
+            {
+              "description": "The {@linkcode Command | command} to which the plugin is being applied",
+              "name": "cmd",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "An object of type T that represents the extension provided by the plugin",
+            "type": "unknown"
+          },
+          "signature": "export type PluginExtension<\n  T = Record<string, unknown>,\n  G extends GunshiParams = DefaultGunshiParams\n> = (ctx: CommandContextCore<G>, cmd: Command<G>) => Awaitable<T>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "T - The type of the extension object returned by the plugin extension function."
+          }
+        },
+        {
+          "description": "Plugin extension callback, which is called when the plugin is extended with `extension` option.",
+          "endLine": 134,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 131,
+          "name": "OnPluginExtension",
+          "params": [
+            {
+              "description": "The {@linkcode CommandContext | command context}",
+              "name": "ctx",
+              "type": "unknown"
+            },
+            {
+              "description": "The {@linkcode Command | command}",
+              "name": "cmd",
+              "type": "unknown"
+            }
+          ],
+          "signature": "export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>,\n  cmd: Readonly<Command<G>>\n) => Awaitable<void>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContext} and {@linkcode Command}."
+          }
+        },
+        {
+          "description": "Extensions resolved from the declared plugin dependencies.",
+          "endLine": 158,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 155,
+          "name": "DependencyExtensions",
+          "signature": "type DependencyExtensions<\n  Deps extends ReadonlyArray<PluginDependency | string>,\n  Context extends ExtendContext\n> = InferDependencyExtensions<Deps, Context>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Gunshi params available while a plugin extension resolves its dependencies.",
+          "endLine": 171,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 165,
+          "name": "DependencyParams",
+          "signature": "type DependencyParams<\n  Deps extends ReadonlyArray<PluginDependency | string>,\n  Context extends ExtendContext\n> = GunshiParams<{\n  args: Args\n  extensions: DependencyExtensions<Deps, Context>\n}>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Extensions available after applying the current plugin extension.",
+          "endLine": 183,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 178,
+          "name": "MergedPluginExtensions",
+          "signature": "type MergedPluginExtensions<\n  Id extends string,\n  Deps extends ReadonlyArray<PluginDependency | string>,\n  Context extends ExtendContext,\n  Ext extends ExtendContext\n> = MergeExtension<Id, DependencyExtensions<Deps, Context>, Ext>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Gunshi params available after applying the current plugin extension.",
+          "endLine": 198,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 190,
+          "name": "MergedPluginParams",
+          "signature": "type MergedPluginParams<\n  Id extends string,\n  Deps extends ReadonlyArray<PluginDependency | string>,\n  Context extends ExtendContext,\n  Ext extends ExtendContext\n> = GunshiParams<{\n  args: Args\n  extensions: MergedPluginExtensions<Id, Deps, Context, Ext>\n}>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Plugin definition options",
+          "endLine": 243,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "interface",
+          "line": 205,
+          "name": "PluginOptions",
+          "signature": "export interface PluginOptions<\n  DepExt extends ExtendContext = DefaultGunshiParams['extensions'], // for plugin dependency extensions\n  Id extends string = string, // for plugin id\n  Deps extends ReadonlyArray<PluginDependency | string> = (PluginDependency | string)[], // for plugin dependencies\n  Ext extends Record<string, unknown> = {}, // for plugin extension type\n  ResolvedDepExt extends GunshiParams = DependencyParams<Deps, DepExt>,\n  PluginExt extends PluginExtension<Ext, ResolvedDepExt> = PluginExtension<Ext, ResolvedDepExt>,\n  MergedExt extends GunshiParams = MergedPluginParams<\n    Id,\n    Deps,\n    DepExt,\n    Awaited<ReturnType<PluginExt>>\n  >\n>",
+          "tags": {
+            "since": "v0.27.0"
+          }
+        },
+        {
+          "description": "Gunshi plugin, which is a function that receives a PluginContext.",
+          "endLine": 261,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "type",
+          "line": 255,
+          "name": "Plugin",
+          "params": [
+            {
+              "description": "A {@linkcode PluginContext}.",
+              "name": "ctx",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "An {@linkcode Awaitable} that resolves when the plugin is loaded.",
+            "type": "unknown"
+          },
+          "signature": "export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> = PluginFunction & {\n    id: string\n    name?: string\n    dependencies?: (PluginDependency | string)[]\n    extension?: CommandContextExtension<E>\n  }",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+          }
+        },
+        {
+          "description": "Plugin return type with extension, which includes the plugin ID, name, dependencies, and extension.\n\nThis type is used to define a plugin at `plugin` function.",
+          "endLine": 289,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "interface",
+          "line": 270,
+          "name": "PluginWithExtension",
+          "signature": "export interface PluginWithExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>",
+          "tags": {
+            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+          }
+        },
+        {
+          "description": "Plugin return type without extension, which includes the plugin ID, name, and dependencies, but no extension.\n\nThis type is used to define a plugin at `plugin` function without extension.",
+          "endLine": 313,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "interface",
+          "line": 298,
+          "name": "PluginWithoutExtension",
+          "signature": "export interface PluginWithoutExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>",
+          "tags": {
+            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+          }
+        },
+        {
+          "description": "Define a plugin with extension compatibility and typed dependency extensions",
+          "endLine": 355,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "function",
+          "line": 328,
+          "name": "plugin",
+          "params": [
+            {
+              "description": "{@linkcode PluginOptions | plugin options}",
+              "name": "options",
+              "type": "{ ... }"
+            }
+          ],
+          "returns": {
+            "description": "A defined plugin with extension",
+            "type": "PluginWithExtension"
+          },
+          "signature": "export function plugin<\n  Context extends ExtendContext = DefaultGunshiParams['extensions'], // for plugin dependency extensions\n  Id extends string = string, // for plugin id\n  Deps extends ReadonlyArray<PluginDependency | string> = [], // for plugin dependencies\n  Extension extends {} = {}, // for plugin extension type\n  ResolvedDepExtensions extends GunshiParams = DependencyParams<Deps, Context>,\n  PluginExt extends PluginExtension<Extension, DefaultGunshiParams> = PluginExtension<\n    Extension,\n    ResolvedDepExtensions\n  >,\n  MergedExtensions extends GunshiParams = MergedPluginParams<\n    Id,\n    Deps,\n    Context,\n    Awaited<ReturnType<PluginExt>>\n  >\n>(options: {\n  id: Id\n  name?: string\n  dependencies?: Deps\n  setup?: (\n    ctx: Readonly<\n      PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>\n    >\n  ) => Awaitable<void>\n  extension: PluginExt\n  onExtension?: OnPluginExtension<MergedExtensions>\n}): PluginWithExtension<Awaited<ReturnType<PluginExt>>>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+          }
+        },
+        {
+          "description": "Define a plugin without extension and typed dependency extensions",
+          "endLine": 396,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "function",
+          "line": 370,
+          "name": "plugin",
+          "params": [
+            {
+              "description": "{@linkcode PluginOptions | plugin options} without extension",
+              "name": "options",
+              "type": "{ ... }"
+            }
+          ],
+          "returns": {
+            "description": "A defined plugin without extension",
+            "type": "PluginWithoutExtension"
+          },
+          "signature": "export function plugin<\n  Context extends ExtendContext = DefaultGunshiParams['extensions'], // for plugin dependency extensions\n  Id extends string = string, // for plugin id\n  Deps extends ReadonlyArray<PluginDependency | string> = [], // for plugin dependencies\n  Extension extends Record<string, unknown> = {}, // for plugin extension type\n  ResolvedDepExtensions extends GunshiParams = DependencyParams<Deps, Context>,\n  PluginExt extends PluginExtension<Extension, DefaultGunshiParams> = PluginExtension<\n    Extension,\n    ResolvedDepExtensions\n  >,\n  MergedExtensions extends GunshiParams = MergedPluginParams<\n    Id,\n    Deps,\n    Context,\n    Awaited<ReturnType<PluginExt>>\n  >\n>(options: {\n  id: Id\n  name?: string\n  dependencies?: Deps\n  setup?: (\n    ctx: Readonly<\n      PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>\n    >\n  ) => Awaitable<void>\n  onExtension?: OnPluginExtension<MergedExtensions>\n}): PluginWithoutExtension<DefaultGunshiParams['extensions']>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+          }
+        },
+        {
+          "description": "Define a plugin",
+          "endLine": 465,
+          "file": "packages/gunshi/src/plugin/core.ts",
+          "kind": "function",
+          "line": 406,
+          "name": "plugin",
+          "params": [
+            {
+              "default": "{}",
+              "description": "{@linkcode PluginOptions | plugin options}",
+              "name": "options",
+              "optional": true,
+              "type": "any"
+            }
+          ],
+          "returns": {
+            "description": "A defined plugin",
+            "type": "any"
+          },
+          "signature": "export function plugin(options: any = {}): any",
+          "tags": {
+            "since": "v0.27.0"
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/plugin/core.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Resolve plugin dependencies using topological sort",
+          "endLine": 74,
+          "file": "packages/gunshi/src/plugin/dependency.ts",
+          "kind": "function",
+          "line": 15,
+          "name": "resolveDependencies",
+          "params": [
+            {
+              "description": "Array of plugins to resolve",
+              "name": "plugins",
+              "type": "Plugin[]"
+            }
+          ],
+          "returns": {
+            "description": "Array of plugins sorted by dependencies",
+            "type": "Plugin[]"
+          },
+          "signature": "export function resolveDependencies<E extends GunshiParams['extensions']>(plugins: Plugin<E>[]): Plugin<E>[]"
+        }
+      ],
+      "file": "packages/gunshi/src/plugin/dependency.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Awaitable type.",
+          "endLine": 16,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 16,
+          "name": "Awaitable",
+          "signature": "export type Awaitable<T> = T | Promise<T>",
+          "tags": {
+            "typeParam": "T - The type of the value that can be awaited."
+          }
+        },
+        {
+          "description": "Prettify a type by flattening its structure.",
+          "endLine": 23,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 23,
+          "name": "Prettify",
+          "signature": "export type Prettify<T> = { [K in keyof T]: T[K] } & {}",
+          "tags": {
+            "typeParam": "T - The type to be prettified."
+          }
+        },
+        {
+          "description": "Extend command context type. This type is used to extend the command context with additional properties at {@linkcode CommandContext.extensions}.",
+          "endLine": 30,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 30,
+          "name": "ExtendContext",
+          "signature": "export type ExtendContext = Record<string, unknown>",
+          "tags": {
+            "since": "v0.27.0"
+          }
+        },
+        {
+          "description": "Gunshi unified parameter type.\n\nThis type combines both argument definitions and command context extensions.",
+          "endLine": 59,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 42,
+          "name": "GunshiParams",
+          "signature": "export interface GunshiParams<\n  P extends {\n    args?: Args\n    extensions?: ExtendContext\n  } = {\n    args: Args\n    extensions: {}\n  }\n>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "P - The type of parameters, which can include `args` and `extensions`."
+          }
+        },
+        {
+          "description": "Default Gunshi parameters.",
+          "endLine": 67,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 67,
+          "name": "DefaultGunshiParams",
+          "signature": "export type DefaultGunshiParams = GunshiParams",
+          "tags": {
+            "since": "v0.27.0"
+          }
+        },
+        {
+          "description": "Generic constraint for command-related types.\n\nThis type constraint allows both {@linkcode GunshiParams} and objects with extensions.",
+          "endLine": 83,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 76,
+          "name": "GunshiParamsConstraint",
+          "signature": "export type GunshiParamsConstraint = | GunshiParams<any>\n  | {\n      args: Args\n    }\n  | {\n      extensions: ExtendContext\n    }",
+          "tags": {
+            "since": "v0.27.0"
+          }
+        },
+        {
+          "description": "Type helper to extract args",
+          "endLine": 99,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 92,
+          "name": "ExtractArgs",
+          "signature": "export type ExtractArgs<G> = G extends GunshiParams<any>\n    ? G['args']\n    : G extends {\n          args: infer A extends Args\n        }\n      ? A\n      : Args",
+          "tags": {
+            "internal": "",
+            "typeParam": "G - The type of {@linkcode GunshiParams} or an object with {@linkcode Args}."
+          }
+        },
+        {
+          "description": "Type helper to extract explicitly provided argument flags.",
+          "endLine": 108,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 108,
+          "name": "ExtractArgExplicitlyProvided",
+          "signature": "export type ExtractArgExplicitlyProvided<G> = ArgExplicitlyProvided<ExtractArgs<G>>",
+          "tags": {
+            "internal": "",
+            "typeParam": "G - The type of {@linkcode GunshiParams}."
+          }
+        },
+        {
+          "description": "Type helper to extract extensions from G",
+          "endLine": 116,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 115,
+          "name": "ExtractExtensions",
+          "signature": "export type ExtractExtensions<G> = G extends GunshiParams<any> ? G['extensions'] : G extends { extensions: infer E } ? E : {}",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Type helper to normalize G to GunshiParams",
+          "endLine": 132,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 123,
+          "name": "NormalizeToGunshiParams",
+          "signature": "export type NormalizeToGunshiParams<G> = G extends GunshiParams<any>\n    ? G\n    : G extends { args: infer A extends Args; extensions: infer E extends ExtendContext }\n      ? GunshiParams<{ args: A; extensions: E }>\n      : G extends { args: infer A extends Args }\n        ? GunshiParams<{ args: A; extensions: {} }>\n        : G extends { extensions: infer E extends ExtendContext }\n          ? GunshiParams<{ args: Args; extensions: E }>\n          : DefaultGunshiParams",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Type helper to merge command context extensions into G",
+          "endLine": 151,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 139,
+          "name": "MergeGunshiExtensions",
+          "signature": "export type MergeGunshiExtensions<\n  G extends GunshiParamsConstraint,\n  E extends ExtendContext\n> = GunshiParams<{\n  /**\n   * Command argument definitions.\n   */\n  args: ExtractArgs<G>\n  /**\n   * Merged command context extensions.\n   */\n  extensions: ExtractExtensions<G> & E\n}>",
+          "tags": {
+            "internal": ""
+          }
+        },
+        {
+          "description": "Command environment.",
+          "endLine": 262,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 158,
+          "name": "CommandEnvironment",
+          "signature": "export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGunshiParams>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command environments."
+          }
+        },
+        {
+          "description": "CLI options of {@linkcode cli} function.",
+          "endLine": 361,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 269,
+          "name": "CliOptions",
+          "signature": "export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiParams>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of cli options."
+          }
+        },
+        {
+          "description": "Command call mode.\n\n- `entry`: The command is executed as an entry command.\n- `subCommand`: The command is executed as a sub-command.",
+          "endLine": 369,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 369,
+          "name": "CommandCallMode",
+          "signature": "export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'"
+        },
+        {
+          "description": "Command context.\n\nCommand context is the context of the command execution.",
+          "endLine": 476,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 378,
+          "name": "CommandContext",
+          "signature": "export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshiParams>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+          }
+        },
+        {
+          "description": "Readonly command context available to a command context extension factory.",
+          "endLine": 487,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 485,
+          "name": "CommandContextCore",
+          "signature": "export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<\n  CommandContext<G>\n>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+          }
+        },
+        {
+          "description": "Command context extension",
+          "endLine": 511,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 496,
+          "name": "CommandContextExtension",
+          "signature": "export interface CommandContextExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "E - A type extending {@linkcode GunshiParams.extensions} to specify the shape of the extension."
+          }
+        },
+        {
+          "description": "Rendering control options",
+          "endLine": 546,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 520,
+          "name": "RenderingOptions",
+          "signature": "export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGunshiParams>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of render options."
+          }
+        },
+        {
+          "description": "Command interface.",
+          "endLine": 613,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 553,
+          "name": "Command",
+          "signature": "export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>",
+          "tags": {
+            "typeParam": "G - The Gunshi parameters constraint"
+          }
+        },
+        {
+          "description": "Lazy command interface.\n\nLazy command that's not loaded until it is executed.",
+          "endLine": 637,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 623,
+          "name": "LazyCommand",
+          "signature": "export type LazyCommand<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  D extends Partial<Command<G>> = {}\n> = {\n  /**\n   * Command load function\n   */\n  (): Awaitable<Command<G> | CommandRunner<G>>\n} &\n  // If definition has name, commandName is required with that type\n  (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) &\n  // Properties from the definition (if provided inline)\n  Omit<D, 'name' | 'run'> &\n  // Remaining properties from Command (optional)\n  Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>",
+          "tags": {
+            "typeParam": "G - The Gunshi parameters constraint"
+          }
+        },
+        {
+          "description": "Define a command type.",
+          "endLine": 646,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 644,
+          "name": "Commandable",
+          "signature": "export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> = | Command<G>\n  | LazyCommand<G, {}>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command."
+          }
+        },
+        {
+          "description": "Sub-command entry type for use in subCommands.\n\nThis type uses a loose structural match to bypass TypeScript's contravariance issues\nwith function parameters, allowing any Command or LazyCommand to be used as a sub-command.",
+          "endLine": 708,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "interface",
+          "line": 656,
+          "name": "SubCommandable",
+          "signature": "export interface SubCommandable",
+          "tags": {
+            "since": "v0.27.1"
+          }
+        },
+        {
+          "description": "Command examples fetcher.",
+          "endLine": 720,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 718,
+          "name": "CommandExamplesFetcher",
+          "params": [
+            {
+              "description": "A {@link CommandContext | command context}",
+              "name": "ctx",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "A fetched command examples.",
+            "type": "unknown"
+          },
+          "signature": "export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>\n) => Awaitable<string>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+          }
+        },
+        {
+          "description": "Command runner.",
+          "endLine": 732,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 730,
+          "name": "CommandRunner",
+          "params": [
+            {
+              "description": "A {@link CommandContext | command context}",
+              "name": "ctx",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "void or string (for CLI output)",
+            "type": "unknown"
+          },
+          "signature": "export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>\n) => Awaitable<string | void>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+          }
+        },
+        {
+          "description": "Command loader.\n\nA function that returns a command or command runner.\nThis is used to lazily load commands.",
+          "endLine": 746,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 744,
+          "name": "CommandLoader",
+          "returns": {
+            "description": "A command or command runner",
+            "type": "unknown"
+          },
+          "signature": "export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams> = () => Awaitable<\n  Command<G> | CommandRunner<G>\n>",
+          "tags": {
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner."
+          }
+        },
+        {
+          "description": "Command decorator.\n\nA function that wraps a command runner to add or modify its behavior.",
+          "endLine": 762,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 760,
+          "name": "CommandDecorator",
+          "params": [
+            {
+              "description": "The base command runner to decorate",
+              "name": "baseRunner",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "The decorated command runner",
+            "type": "unknown"
+          },
+          "signature": "export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>\n) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+          }
+        },
+        {
+          "description": "Renderer decorator type.\n\nA function that wraps a base renderer to add or modify its behavior.",
+          "endLine": 781,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 778,
+          "name": "RendererDecorator",
+          "params": [
+            {
+              "description": "The base renderer function to decorate",
+              "name": "baseRenderer",
+              "type": "unknown"
+            },
+            {
+              "description": "The command context",
+              "name": "ctx",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "The decorated result",
+            "type": "unknown"
+          },
+          "signature": "export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>,\n  ctx: Readonly<CommandContext<G>>\n) => Promise<T>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "T - The type of the rendered result."
+          }
+        },
+        {
+          "description": "Validation errors renderer decorator type.\nA function that wraps a validation errors renderer to add or modify its behavior.",
+          "endLine": 800,
+          "file": "packages/gunshi/src/types.ts",
+          "kind": "type",
+          "line": 796,
+          "name": "ValidationErrorsDecorator",
+          "params": [
+            {
+              "description": "The base validation errors renderer function to decorate",
+              "name": "baseRenderer",
+              "type": "unknown"
+            },
+            {
+              "description": "The command context",
+              "name": "ctx",
+              "type": "unknown"
+            },
+            {
+              "description": "The aggregate error containing validation errors",
+              "name": "error",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "The decorated result",
+            "type": "unknown"
+          },
+          "signature": "export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>,\n  ctx: Readonly<CommandContext<G>>,\n  error: AggregateError\n) => Promise<string>",
+          "tags": {
+            "since": "v0.27.0",
+            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+          }
+        }
+      ],
+      "file": "packages/gunshi/src/types.ts"
+    },
+    {
+      "entries": [
+        {
+          "description": "Check if the given command is a {@link LazyCommand}.",
+          "endLine": 26,
+          "file": "packages/gunshi/src/utils.ts",
+          "kind": "function",
+          "line": 22,
+          "name": "isLazyCommand",
+          "params": [
+            {
+              "description": "A command to check",
+              "name": "cmd",
+              "type": "unknown"
+            }
+          ],
+          "returns": {
+            "description": "`true` if the command is a {@link LazyCommand}, otherwise `false",
+            "type": "unknown"
+          },
+          "signature": "export function isLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(cmd: unknown): cmd is LazyCommand<G>"
+        },
+        {
+          "description": "Resolve a lazy command to a {@link Command}.",
+          "endLine": 89,
+          "file": "packages/gunshi/src/utils.ts",
+          "kind": "function",
+          "line": 36,
+          "name": "resolveLazyCommand",
+          "params": [
+            {
+              "description": "A {@link Commandable} or {@link LazyCommand} to resolve",
+              "name": "cmd",
+              "type": "Commandable"
+            },
+            {
+              "description": "Optional name of the command, if not provided, it will use the name from the command itself.",
+              "name": "name",
+              "optional": true,
+              "type": "string"
+            },
+            {
+              "default": "false",
+              "description": "Whether to run the resolving function of the lazy command.",
+              "name": "needRunResolving",
+              "optional": true,
+              "type": "boolean"
+            }
+          ],
+          "returns": {
+            "description": "A resolved {@link Command}",
+            "type": "Promise"
+          },
+          "signature": "export async function resolveLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(cmd: Commandable<G>, name?: string, needRunResolving: boolean = false): Promise<Command<G>>"
+        },
+        {
+          "description": "Create an object with the specified prototype. A shorthand for `Object.create`.",
+          "endLine": 99,
+          "file": "packages/gunshi/src/utils.ts",
+          "kind": "function",
+          "line": 97,
+          "name": "create",
+          "params": [
+            {
+              "default": "null",
+              "description": "An object to use as the prototype for the new object. If `null`, it will create an object with no prototype.",
+              "name": "obj",
+              "optional": true,
+              "type": "object | null"
+            }
+          ],
+          "returns": {
+            "description": "A new object with the specified prototype",
+            "type": "T"
+          },
+          "signature": "export function create<T>(obj: object | null = null): T"
+        },
+        {
+          "description": "Log a message to the console.",
+          "endLine": 108,
+          "file": "packages/gunshi/src/utils.ts",
+          "kind": "function",
+          "line": 106,
+          "name": "log",
+          "params": [
+            {
+              "description": "Arguments to log",
+              "name": "args",
+              "type": "unknown[]"
+            }
+          ],
+          "returns": {
+            "description": "",
+            "type": "void"
+          },
+          "signature": "export function log(...args: unknown[]): void"
+        },
+        {
+          "description": "Get the sub-commands of a command as a normalized Map.",
+          "endLine": 148,
+          "file": "packages/gunshi/src/utils.ts",
+          "kind": "function",
+          "line": 116,
+          "name": "getCommandSubCommands",
+          "params": [
+            {
+              "description": "A command or lazy command",
+              "name": "cmd",
+              "type": "Commandable | Command | LazyCommand"
+            }
+          ],
+          "returns": {
+            "description": "A Map of sub-commands, or undefined if the command has no sub-commands.",
+            "type": "Map | undefined"
+          },
+          "signature": "export function getCommandSubCommands<G extends GunshiParamsConstraint = DefaultGunshiParams>(cmd: Commandable<G> | Command<G> | LazyCommand<G>): Map<string, Command<G> | LazyCommand<G>> | undefined"
+        },
+        {
+          "description": "Deep freeze an object, making it immutable.",
+          "endLine": 176,
+          "file": "packages/gunshi/src/utils.ts",
+          "kind": "function",
+          "line": 157,
+          "name": "deepFreeze",
+          "params": [
+            {
+              "description": "The object to freeze",
+              "name": "obj",
+              "type": "T"
+            },
+            {
+              "default": "[]",
+              "description": "Properties to ignore during freezing",
+              "name": "ignores",
+              "optional": true,
+              "type": "string[]"
+            }
+          ],
+          "returns": {
+            "description": "A frozen object",
+            "type": "Readonly"
+          },
+          "signature": "export function deepFreeze<T extends Record<string, any>>(obj: T, ignores: string[] = []): Readonly<T>"
+        }
+      ],
+      "file": "packages/gunshi/src/utils.ts"
+    }
+  ],
+  "summary": {
+    "byKind": {
+      "function": 34,
+      "interface": 16,
+      "type": 38
+    },
+    "deprecated": 0,
+    "entries": 88,
+    "examples": 6,
+    "modules": 14,
+    "params": 73,
+    "returns": 41
+  },
+  "version": 1
+}

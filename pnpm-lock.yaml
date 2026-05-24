@@ -230,6 +230,9 @@ importers:
         specifier: ^1.0.2
         version: 1.1.2
     devDependencies:
+      '@ox-content/napi':
+        specifier: 2.13.0
+        version: 2.13.0
       '@vueuse/core':
         specifier: ^14.0.0
         version: 14.3.0(vue@3.5.34(typescript@6.0.3))
@@ -1388,6 +1391,36 @@ packages:
   '@ota-meshi/ast-token-store@0.3.0':
     resolution: {integrity: sha512-XRO0zi2NIUKq2lUk3T1ecFSld1fMWRKE6naRFGkgkdeosx7IslyUKNv5Dcb5PJTja9tHJoFu0v/7yEpAkrkrTg==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+
+  '@ox-content/binding-darwin-arm64@2.13.0':
+    resolution: {integrity: sha512-OYW8aW651qXVLkQ6mpK1pptYSJVrrHHtjHc9xACDM2+l2rm1mfZva/dCgehfTI0EMIujuaWrdWLsrMfdvINmug==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@ox-content/binding-darwin-x64@2.13.0':
+    resolution: {integrity: sha512-M25v4+ixUpjJTPw8VsXxPIlw1f35FedGV1Z9zFJtb5rYlqAcI3voLpfbzuekBa7xQzyBQeM4yMmufDWw+fs5Xw==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@ox-content/binding-linux-arm64-gnu@2.13.0':
+    resolution: {integrity: sha512-LO3/g6xNEwEWM1TkZj1et4DBqUdQXfcRjrxpmwvXWgomt2a9tDLlIyCtAUbZuW5M0gp9RpilSZiJVL7qZV+maQ==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@ox-content/binding-linux-x64-gnu@2.13.0':
+    resolution: {integrity: sha512-8lZcaoOHN/lUcobJ+WENsbUUEYzaOeEBqYxj8BVjtFajpZ3DzVM5q1mgVrNkI5Tc0qb2ZALwO8KX/Ek9gSWzGA==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@ox-content/binding-win32-x64-msvc@2.13.0':
+    resolution: {integrity: sha512-a2Hq/Ir5FCmQxJroCwjp71F6P1qOBfLYb+ixwEFoS1xsT4346lH1oGQD3kTaoEN1ilYPPVuG9WtqDAH+2MnD5w==}
+    cpu: [x64]
+    os: [win32]
+
+  '@ox-content/napi@2.13.0':
+    resolution: {integrity: sha512-IW6pUFc8oVZOsJu5DorBcIy3VCYf+oE4d/PeDwmJvOXQH8c6MxnFxNZxFeKovEJZbejqnkd04msu9eNRbErdNg==}
 
   '@oxc-minify/binding-android-arm-eabi@0.129.0':
     resolution: {integrity: sha512-GYYEIk/Lov3iaFyZuVvqeYqUefGvwtb068hQz1P7LAsZeO/saPxQDkKhdxWYmWPy/sP4TQ454/RZtbPsxId0+Q==}
@@ -5228,6 +5261,29 @@ snapshots:
     optional: true
 
   '@ota-meshi/ast-token-store@0.3.0': {}
+
+  '@ox-content/binding-darwin-arm64@2.13.0':
+    optional: true
+
+  '@ox-content/binding-darwin-x64@2.13.0':
+    optional: true
+
+  '@ox-content/binding-linux-arm64-gnu@2.13.0':
+    optional: true
+
+  '@ox-content/binding-linux-x64-gnu@2.13.0':
+    optional: true
+
+  '@ox-content/binding-win32-x64-msvc@2.13.0':
+    optional: true
+
+  '@ox-content/napi@2.13.0':
+    optionalDependencies:
+      '@ox-content/binding-darwin-arm64': 2.13.0
+      '@ox-content/binding-darwin-x64': 2.13.0
+      '@ox-content/binding-linux-arm64-gnu': 2.13.0
+      '@ox-content/binding-linux-x64-gnu': 2.13.0
+      '@ox-content/binding-win32-x64-msvc': 2.13.0
 
   '@oxc-minify/binding-android-arm-eabi@0.129.0':
     optional: true
