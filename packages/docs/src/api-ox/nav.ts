@@ -13,58 +13,784 @@ export interface NavItem {
 export const apiOxNav: NavItem[] = [
   {
     title: 'Agent',
-    path: '/api-ox/agent'
+    path: '/api-ox/agent',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/agent/functions',
+        children: [
+          {
+            title: 'getAgentProfile',
+            path: '/api-ox/agent/functions/getAgentProfile'
+          }
+        ]
+      }
+    ]
   },
   {
-    title: 'Bone',
-    path: '/api-ox/bone'
-  },
-  {
-    title: 'Builtin',
-    path: '/api-ox/builtin'
-  },
-  {
-    title: 'Constants',
-    path: '/api-ox/constants'
+    title: 'Combinators',
+    path: '/api-ox/combinators',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/combinators/functions',
+        children: [
+          {
+            title: 'args',
+            path: '/api-ox/combinators/functions/args'
+          },
+          {
+            title: 'boolean',
+            path: '/api-ox/combinators/functions/boolean'
+          },
+          {
+            title: 'choice',
+            path: '/api-ox/combinators/functions/choice'
+          },
+          {
+            title: 'combinator',
+            path: '/api-ox/combinators/functions/combinator'
+          },
+          {
+            title: 'describe',
+            path: '/api-ox/combinators/functions/describe'
+          },
+          {
+            title: 'extend',
+            path: '/api-ox/combinators/functions/extend'
+          },
+          {
+            title: 'float',
+            path: '/api-ox/combinators/functions/float'
+          },
+          {
+            title: 'integer',
+            path: '/api-ox/combinators/functions/integer'
+          },
+          {
+            title: 'map',
+            path: '/api-ox/combinators/functions/map'
+          },
+          {
+            title: 'merge',
+            path: '/api-ox/combinators/functions/merge'
+          },
+          {
+            title: 'merge',
+            path: '/api-ox/combinators/functions/merge'
+          },
+          {
+            title: 'merge',
+            path: '/api-ox/combinators/functions/merge'
+          },
+          {
+            title: 'merge',
+            path: '/api-ox/combinators/functions/merge'
+          },
+          {
+            title: 'multiple',
+            path: '/api-ox/combinators/functions/multiple'
+          },
+          {
+            title: 'number',
+            path: '/api-ox/combinators/functions/number'
+          },
+          {
+            title: 'positional',
+            path: '/api-ox/combinators/functions/positional'
+          },
+          {
+            title: 'positional',
+            path: '/api-ox/combinators/functions/positional'
+          },
+          {
+            title: 'required',
+            path: '/api-ox/combinators/functions/required'
+          },
+          {
+            title: 'short',
+            path: '/api-ox/combinators/functions/short'
+          },
+          {
+            title: 'string',
+            path: '/api-ox/combinators/functions/string'
+          },
+          {
+            title: 'unrequired',
+            path: '/api-ox/combinators/functions/unrequired'
+          },
+          {
+            title: 'withDefault',
+            path: '/api-ox/combinators/functions/withDefault'
+          }
+        ]
+      },
+      {
+        title: 'Interfaces',
+        path: '/api-ox/combinators/interfaces',
+        children: [
+          {
+            title: 'BaseOptions',
+            path: '/api-ox/combinators/interfaces/BaseOptions'
+          },
+          {
+            title: 'BooleanOptions',
+            path: '/api-ox/combinators/interfaces/BooleanOptions'
+          },
+          {
+            title: 'CombinatorOptions',
+            path: '/api-ox/combinators/interfaces/CombinatorOptions'
+          },
+          {
+            title: 'FloatOptions',
+            path: '/api-ox/combinators/interfaces/FloatOptions'
+          },
+          {
+            title: 'IntegerOptions',
+            path: '/api-ox/combinators/interfaces/IntegerOptions'
+          },
+          {
+            title: 'NumberOptions',
+            path: '/api-ox/combinators/interfaces/NumberOptions'
+          },
+          {
+            title: 'StringOptions',
+            path: '/api-ox/combinators/interfaces/StringOptions'
+          }
+        ]
+      },
+      {
+        title: 'Type Aliases',
+        path: '/api-ox/combinators/type-aliases',
+        children: [
+          {
+            title: 'Combinator',
+            path: '/api-ox/combinators/type-aliases/Combinator'
+          },
+          {
+            title: 'CombinatorSchema',
+            path: '/api-ox/combinators/type-aliases/CombinatorSchema'
+          }
+        ]
+      }
+    ]
   },
   {
     title: 'Context',
-    path: '/api-ox/context'
+    path: '/api-ox/context',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/context/functions',
+        children: [
+          {
+            title: 'createCommandContext',
+            path: '/api-ox/context/functions/createCommandContext'
+          }
+        ]
+      },
+      {
+        title: 'Interfaces',
+        path: '/api-ox/context/interfaces',
+        children: [
+          {
+            title: 'CommandContextParams',
+            path: '/api-ox/context/interfaces/CommandContextParams'
+          }
+        ]
+      }
+    ]
   },
   {
-    title: 'Context',
-    path: '/api-ox/context'
-  },
-  {
-    title: 'Core',
-    path: '/api-ox/core'
-  },
-  {
-    title: 'Core',
-    path: '/api-ox/core'
-  },
-  {
-    title: 'Decorators',
-    path: '/api-ox/decorators'
+    title: 'Default',
+    path: '/api-ox/default',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/default/functions',
+        children: [
+          {
+            title: 'parseArgs',
+            path: '/api-ox/default/functions/parseArgs'
+          },
+          {
+            title: 'resolveArgs',
+            path: '/api-ox/default/functions/resolveArgs'
+          },
+          {
+            title: 'cli',
+            path: '/api-ox/default/functions/cli'
+          },
+          {
+            title: 'cli',
+            path: '/api-ox/default/functions/cli'
+          },
+          {
+            title: 'cli',
+            path: '/api-ox/default/functions/cli'
+          },
+          {
+            title: 'cli',
+            path: '/api-ox/default/functions/cli'
+          },
+          {
+            title: 'cli',
+            path: '/api-ox/default/functions/cli'
+          },
+          {
+            title: 'cli',
+            path: '/api-ox/default/functions/cli'
+          },
+          {
+            title: 'createCommandContext',
+            path: '/api-ox/default/functions/createCommandContext'
+          },
+          {
+            title: 'define',
+            path: '/api-ox/default/functions/define'
+          },
+          {
+            title: 'define',
+            path: '/api-ox/default/functions/define'
+          },
+          {
+            title: 'defineWithTypes',
+            path: '/api-ox/default/functions/defineWithTypes'
+          },
+          {
+            title: 'lazy',
+            path: '/api-ox/default/functions/lazy'
+          },
+          {
+            title: 'lazy',
+            path: '/api-ox/default/functions/lazy'
+          },
+          {
+            title: 'lazy',
+            path: '/api-ox/default/functions/lazy'
+          },
+          {
+            title: 'lazyWithTypes',
+            path: '/api-ox/default/functions/lazyWithTypes'
+          },
+          {
+            title: 'plugin',
+            path: '/api-ox/default/functions/plugin'
+          },
+          {
+            title: 'plugin',
+            path: '/api-ox/default/functions/plugin'
+          },
+          {
+            title: 'plugin',
+            path: '/api-ox/default/functions/plugin'
+          }
+        ]
+      },
+      {
+        title: 'Classes',
+        path: '/api-ox/default/classes',
+        children: [
+          {
+            title: 'DefaultTranslation',
+            path: '/api-ox/default/classes/DefaultTranslation'
+          }
+        ]
+      },
+      {
+        title: 'Interfaces',
+        path: '/api-ox/default/interfaces',
+        children: [
+          {
+            title: 'CommandContextParams',
+            path: '/api-ox/default/interfaces/CommandContextParams'
+          },
+          {
+            title: 'PluginContext',
+            path: '/api-ox/default/interfaces/PluginContext'
+          },
+          {
+            title: 'PluginDependency',
+            path: '/api-ox/default/interfaces/PluginDependency'
+          },
+          {
+            title: 'PluginOptions',
+            path: '/api-ox/default/interfaces/PluginOptions'
+          },
+          {
+            title: 'PluginWithExtension',
+            path: '/api-ox/default/interfaces/PluginWithExtension'
+          },
+          {
+            title: 'PluginWithoutExtension',
+            path: '/api-ox/default/interfaces/PluginWithoutExtension'
+          },
+          {
+            title: 'Args',
+            path: '/api-ox/default/interfaces/Args'
+          },
+          {
+            title: 'ArgSchema',
+            path: '/api-ox/default/interfaces/ArgSchema'
+          },
+          {
+            title: 'ArgToken',
+            path: '/api-ox/default/interfaces/ArgToken'
+          },
+          {
+            title: 'GunshiParams',
+            path: '/api-ox/default/interfaces/GunshiParams'
+          },
+          {
+            title: 'CommandEnvironment',
+            path: '/api-ox/default/interfaces/CommandEnvironment'
+          },
+          {
+            title: 'CliOptions',
+            path: '/api-ox/default/interfaces/CliOptions'
+          },
+          {
+            title: 'CommandContext',
+            path: '/api-ox/default/interfaces/CommandContext'
+          },
+          {
+            title: 'CommandContextExtension',
+            path: '/api-ox/default/interfaces/CommandContextExtension'
+          },
+          {
+            title: 'RenderingOptions',
+            path: '/api-ox/default/interfaces/RenderingOptions'
+          },
+          {
+            title: 'Command',
+            path: '/api-ox/default/interfaces/Command'
+          },
+          {
+            title: 'SubCommandable',
+            path: '/api-ox/default/interfaces/SubCommandable'
+          }
+        ]
+      },
+      {
+        title: 'Type Aliases',
+        path: '/api-ox/default/type-aliases',
+        children: [
+          {
+            title: 'OnPluginExtension',
+            path: '/api-ox/default/type-aliases/OnPluginExtension'
+          },
+          {
+            title: 'Plugin',
+            path: '/api-ox/default/type-aliases/Plugin'
+          },
+          {
+            title: 'PluginExtension',
+            path: '/api-ox/default/type-aliases/PluginExtension'
+          },
+          {
+            title: 'PluginFunction',
+            path: '/api-ox/default/type-aliases/PluginFunction'
+          },
+          {
+            title: 'ArgValues',
+            path: '/api-ox/default/type-aliases/ArgValues'
+          },
+          {
+            title: 'Awaitable',
+            path: '/api-ox/default/type-aliases/Awaitable'
+          },
+          {
+            title: 'Prettify',
+            path: '/api-ox/default/type-aliases/Prettify'
+          },
+          {
+            title: 'ExtendContext',
+            path: '/api-ox/default/type-aliases/ExtendContext'
+          },
+          {
+            title: 'DefaultGunshiParams',
+            path: '/api-ox/default/type-aliases/DefaultGunshiParams'
+          },
+          {
+            title: 'GunshiParamsConstraint',
+            path: '/api-ox/default/type-aliases/GunshiParamsConstraint'
+          },
+          {
+            title: 'CommandCallMode',
+            path: '/api-ox/default/type-aliases/CommandCallMode'
+          },
+          {
+            title: 'CommandContextCore',
+            path: '/api-ox/default/type-aliases/CommandContextCore'
+          },
+          {
+            title: 'LazyCommand',
+            path: '/api-ox/default/type-aliases/LazyCommand'
+          },
+          {
+            title: 'Commandable',
+            path: '/api-ox/default/type-aliases/Commandable'
+          },
+          {
+            title: 'CommandExamplesFetcher',
+            path: '/api-ox/default/type-aliases/CommandExamplesFetcher'
+          },
+          {
+            title: 'CommandRunner',
+            path: '/api-ox/default/type-aliases/CommandRunner'
+          },
+          {
+            title: 'CommandLoader',
+            path: '/api-ox/default/type-aliases/CommandLoader'
+          },
+          {
+            title: 'CommandDecorator',
+            path: '/api-ox/default/type-aliases/CommandDecorator'
+          },
+          {
+            title: 'RendererDecorator',
+            path: '/api-ox/default/type-aliases/RendererDecorator'
+          },
+          {
+            title: 'ValidationErrorsDecorator',
+            path: '/api-ox/default/type-aliases/ValidationErrorsDecorator'
+          }
+        ]
+      },
+      {
+        title: 'Variables',
+        path: '/api-ox/default/variables',
+        children: [
+          {
+            title: 'ANONYMOUS_COMMAND_NAME',
+            path: '/api-ox/default/variables/ANONYMOUS_COMMAND_NAME'
+          }
+        ]
+      }
+    ]
   },
   {
     title: 'Definition',
-    path: '/api-ox/definition'
-  },
-  {
-    title: 'Dependency',
-    path: '/api-ox/dependency'
+    path: '/api-ox/definition',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/definition/functions',
+        children: [
+          {
+            title: 'createCommandContext',
+            path: '/api-ox/definition/functions/createCommandContext'
+          },
+          {
+            title: 'define',
+            path: '/api-ox/definition/functions/define'
+          },
+          {
+            title: 'define',
+            path: '/api-ox/definition/functions/define'
+          },
+          {
+            title: 'defineWithTypes',
+            path: '/api-ox/definition/functions/defineWithTypes'
+          },
+          {
+            title: 'lazy',
+            path: '/api-ox/definition/functions/lazy'
+          },
+          {
+            title: 'lazy',
+            path: '/api-ox/definition/functions/lazy'
+          },
+          {
+            title: 'lazy',
+            path: '/api-ox/definition/functions/lazy'
+          },
+          {
+            title: 'lazyWithTypes',
+            path: '/api-ox/definition/functions/lazyWithTypes'
+          }
+        ]
+      },
+      {
+        title: 'Interfaces',
+        path: '/api-ox/definition/interfaces',
+        children: [
+          {
+            title: 'Args',
+            path: '/api-ox/definition/interfaces/Args'
+          },
+          {
+            title: 'ArgSchema',
+            path: '/api-ox/definition/interfaces/ArgSchema'
+          },
+          {
+            title: 'Command',
+            path: '/api-ox/definition/interfaces/Command'
+          },
+          {
+            title: 'GunshiParams',
+            path: '/api-ox/definition/interfaces/GunshiParams'
+          },
+          {
+            title: 'CommandContextParams',
+            path: '/api-ox/definition/interfaces/CommandContextParams'
+          }
+        ]
+      },
+      {
+        title: 'Type Aliases',
+        path: '/api-ox/definition/type-aliases',
+        children: [
+          {
+            title: 'ArgValues',
+            path: '/api-ox/definition/type-aliases/ArgValues'
+          },
+          {
+            title: 'CommandLoader',
+            path: '/api-ox/definition/type-aliases/CommandLoader'
+          },
+          {
+            title: 'CommandRunner',
+            path: '/api-ox/definition/type-aliases/CommandRunner'
+          },
+          {
+            title: 'DefaultGunshiParams',
+            path: '/api-ox/definition/type-aliases/DefaultGunshiParams'
+          },
+          {
+            title: 'ExtendContext',
+            path: '/api-ox/definition/type-aliases/ExtendContext'
+          },
+          {
+            title: 'LazyCommand',
+            path: '/api-ox/definition/type-aliases/LazyCommand'
+          }
+        ]
+      }
+    ]
   },
   {
     title: 'Generator',
-    path: '/api-ox/generator'
+    path: '/api-ox/generator',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/generator/functions',
+        children: [
+          {
+            title: 'generate',
+            path: '/api-ox/generator/functions/generate'
+          }
+        ]
+      },
+      {
+        title: 'Type Aliases',
+        path: '/api-ox/generator/type-aliases',
+        children: [
+          {
+            title: 'GenerateOptions',
+            path: '/api-ox/generator/type-aliases/GenerateOptions'
+          }
+        ]
+      }
+    ]
   },
   {
-    title: 'Types',
-    path: '/api-ox/types'
+    title: 'Plugin',
+    path: '/api-ox/plugin',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/plugin/functions',
+        children: [
+          {
+            title: 'createCommandContext',
+            path: '/api-ox/plugin/functions/createCommandContext'
+          },
+          {
+            title: 'plugin',
+            path: '/api-ox/plugin/functions/plugin'
+          },
+          {
+            title: 'plugin',
+            path: '/api-ox/plugin/functions/plugin'
+          },
+          {
+            title: 'plugin',
+            path: '/api-ox/plugin/functions/plugin'
+          }
+        ]
+      },
+      {
+        title: 'Interfaces',
+        path: '/api-ox/plugin/interfaces',
+        children: [
+          {
+            title: 'CommandContextParams',
+            path: '/api-ox/plugin/interfaces/CommandContextParams'
+          },
+          {
+            title: 'PluginContext',
+            path: '/api-ox/plugin/interfaces/PluginContext'
+          },
+          {
+            title: 'PluginDependency',
+            path: '/api-ox/plugin/interfaces/PluginDependency'
+          },
+          {
+            title: 'PluginOptions',
+            path: '/api-ox/plugin/interfaces/PluginOptions'
+          },
+          {
+            title: 'PluginWithExtension',
+            path: '/api-ox/plugin/interfaces/PluginWithExtension'
+          },
+          {
+            title: 'PluginWithoutExtension',
+            path: '/api-ox/plugin/interfaces/PluginWithoutExtension'
+          },
+          {
+            title: 'Args',
+            path: '/api-ox/plugin/interfaces/Args'
+          },
+          {
+            title: 'ArgSchema',
+            path: '/api-ox/plugin/interfaces/ArgSchema'
+          },
+          {
+            title: 'ArgToken',
+            path: '/api-ox/plugin/interfaces/ArgToken'
+          },
+          {
+            title: 'Command',
+            path: '/api-ox/plugin/interfaces/Command'
+          },
+          {
+            title: 'CommandContext',
+            path: '/api-ox/plugin/interfaces/CommandContext'
+          },
+          {
+            title: 'CommandContextExtension',
+            path: '/api-ox/plugin/interfaces/CommandContextExtension'
+          },
+          {
+            title: 'GunshiParams',
+            path: '/api-ox/plugin/interfaces/GunshiParams'
+          }
+        ]
+      },
+      {
+        title: 'Type Aliases',
+        path: '/api-ox/plugin/type-aliases',
+        children: [
+          {
+            title: 'OnPluginExtension',
+            path: '/api-ox/plugin/type-aliases/OnPluginExtension'
+          },
+          {
+            title: 'Plugin',
+            path: '/api-ox/plugin/type-aliases/Plugin'
+          },
+          {
+            title: 'PluginExtension',
+            path: '/api-ox/plugin/type-aliases/PluginExtension'
+          },
+          {
+            title: 'PluginFunction',
+            path: '/api-ox/plugin/type-aliases/PluginFunction'
+          },
+          {
+            title: 'ArgValues',
+            path: '/api-ox/plugin/type-aliases/ArgValues'
+          },
+          {
+            title: 'Awaitable',
+            path: '/api-ox/plugin/type-aliases/Awaitable'
+          },
+          {
+            title: 'CommandContextCore',
+            path: '/api-ox/plugin/type-aliases/CommandContextCore'
+          },
+          {
+            title: 'CommandDecorator',
+            path: '/api-ox/plugin/type-aliases/CommandDecorator'
+          },
+          {
+            title: 'CommandExamplesFetcher',
+            path: '/api-ox/plugin/type-aliases/CommandExamplesFetcher'
+          },
+          {
+            title: 'CommandRunner',
+            path: '/api-ox/plugin/type-aliases/CommandRunner'
+          },
+          {
+            title: 'DefaultGunshiParams',
+            path: '/api-ox/plugin/type-aliases/DefaultGunshiParams'
+          },
+          {
+            title: 'ExtendContext',
+            path: '/api-ox/plugin/type-aliases/ExtendContext'
+          },
+          {
+            title: 'GunshiParamsConstraint',
+            path: '/api-ox/plugin/type-aliases/GunshiParamsConstraint'
+          },
+          {
+            title: 'LazyCommand',
+            path: '/api-ox/plugin/type-aliases/LazyCommand'
+          },
+          {
+            title: 'Prettify',
+            path: '/api-ox/plugin/type-aliases/Prettify'
+          },
+          {
+            title: 'RendererDecorator',
+            path: '/api-ox/plugin/type-aliases/RendererDecorator'
+          },
+          {
+            title: 'ValidationErrorsDecorator',
+            path: '/api-ox/plugin/type-aliases/ValidationErrorsDecorator'
+          }
+        ]
+      },
+      {
+        title: 'Variables',
+        path: '/api-ox/plugin/variables',
+        children: [
+          {
+            title: 'ANONYMOUS_COMMAND_NAME',
+            path: '/api-ox/plugin/variables/ANONYMOUS_COMMAND_NAME'
+          },
+          {
+            title: 'CLI_OPTIONS_DEFAULT',
+            path: '/api-ox/plugin/variables/CLI_OPTIONS_DEFAULT'
+          }
+        ]
+      }
+    ]
   },
   {
-    title: 'Utils',
-    path: '/api-ox/utils'
+    title: 'Renderer',
+    path: '/api-ox/renderer',
+    children: [
+      {
+        title: 'Functions',
+        path: '/api-ox/renderer/functions',
+        children: [
+          {
+            title: 'renderHeader',
+            path: '/api-ox/renderer/functions/renderHeader'
+          },
+          {
+            title: 'renderUsage',
+            path: '/api-ox/renderer/functions/renderUsage'
+          },
+          {
+            title: 'renderValidationErrors',
+            path: '/api-ox/renderer/functions/renderValidationErrors'
+          }
+        ]
+      }
+    ]
   }
 ] as const
