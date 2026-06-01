@@ -1,49 +1,22 @@
 # Default
 
+gunshi cli entry point.
+
+This entry point exports the bellow APIs and types:
+
+- `cli`: The main CLI function to run the command, included `global options` and `usage renderer` built-in plugins.
+- `define`: A function to define a command.
+- `defineWithTypes`: A function to define a command with specific type parameters.
+- `lazy`: A function to lazily load a command.
+- `lazyWithTypes`: A function to lazily load a command with specific type parameters.
+- `plugin`: A function to create a plugin.
+- `createCommandContext`: A function to create a command context, mainly for testing purposes.
+- `args-tokens` utilities, `parseArgs` and `resolveArgs` for parsing command line arguments.
+- Some basic type definitions, such as `CommandContext`, `Plugin`, `PluginContext`, etc.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/default)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>58</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>19</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>classes</span>
-</span>
-<span class="ox-api-stat">
-  <strong>17</strong>
-  <span>interfaces</span>
-</span>
-<span class="ox-api-stat">
-  <strong>20</strong>
-  <span>types</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>variables</span>
-</span>
-<span class="ox-api-stat">
-  <strong>48</strong>
-  <span>parameters</span>
-</span>
-<span class="ox-api-stat">
-  <strong>141</strong>
-  <span>members</span>
-</span>
-<span class="ox-api-stat">
-  <strong>27</strong>
-  <span>returns</span>
-</span>
-<span class="ox-api-stat">
-  <strong>10</strong>
-  <span>examples</span>
-</span>
-</div>
+_58 symbols · 19 functions · 1 classes · 17 interfaces · 20 types · 1 variables · 48 parameters · 141 members · 27 returns · 10 examples_
 
 ## Functions
 

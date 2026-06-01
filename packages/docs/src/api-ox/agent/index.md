@@ -1,25 +1,10 @@
 # Agent
 
+The entry point for AI agent detection utility.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/agent)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>returns</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>examples</span>
-</span>
-</div>
+_1 symbols · 1 functions · 1 returns · 1 examples_
 
 ## Functions
 

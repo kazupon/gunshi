@@ -1,29 +1,10 @@
 # Generator
 
+The entry for usage generator.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/generator)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>2</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>types</span>
-</span>
-<span class="ox-api-stat">
-  <strong>3</strong>
-  <span>parameters</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>returns</span>
-</span>
-</div>
+_2 symbols · 1 functions · 1 types · 3 parameters · 1 returns_
 
 ## Functions
 

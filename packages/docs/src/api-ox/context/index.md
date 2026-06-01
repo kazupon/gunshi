@@ -1,33 +1,11 @@
 # Context
 
+The entry for gunshi context.
+This module is exported for the purpose of testing the command.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/context)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>2</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>interfaces</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>parameters</span>
-</span>
-<span class="ox-api-stat">
-  <strong>14</strong>
-  <span>members</span>
-</span>
-<span class="ox-api-stat">
-  <strong>1</strong>
-  <span>returns</span>
-</span>
-</div>
+_2 symbols · 1 functions · 1 interfaces · 1 parameters · 14 members · 1 returns_
 
 ## Functions
 

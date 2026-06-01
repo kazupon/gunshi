@@ -1,45 +1,21 @@
 # StringOptions
 
-<div id="stringoptions" class="ox-api-entry ox-api-entry--page">
-<div class="ox-api-entry__prose">
-<p>Options for the <a href="/api-ox/combinators/functions/string.md">string</a> combinator.</p>
-</div>
-<div class="ox-api-entry__section ox-api-entry__section--signature">
-<h4>Signature</h4>
-<pre v-pre><code class="language-typescript">interface StringOptions extends BaseOptions</code></pre>
-</div>
-<p class="ox-api-entry__source"><a class="ox-api-entry__source-link" href="https://github.com/kazupon/gunshi/blob/main/Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts#L57-L70" target="_blank" rel="noopener noreferrer">View source<span class="ox-api-entry__source-icon" aria-hidden="true"></span></a></p>
-<div class="ox-api-entry__section ox-api-entry__section--members">
-<h4>Members</h4>
-<div class="ox-api-entry__member-group">
-<h5>Properties</h5>
-<table class="ox-api-entry__members-table">
-<thead><tr><th>Name</th><th>Kind</th><th>Type</th><th>Description</th></tr></thead>
-<tbody>
-<tr id="property-minlength">
-  <td><code>minLength</code><span class="ox-api-badge">optional</span></td>
-  <td><span class="ox-api-entry__member-kind">property</span></td>
-  <td><code class="ox-api-entry__member-type language-typescript">number</code></td>
-  <td><div class="ox-api-entry__member-description">Minimum string length.</div></td>
-</tr>
-<tr id="property-maxlength">
-  <td><code>maxLength</code><span class="ox-api-badge">optional</span></td>
-  <td><span class="ox-api-entry__member-kind">property</span></td>
-  <td><code class="ox-api-entry__member-type language-typescript">number</code></td>
-  <td><div class="ox-api-entry__member-description">Maximum string length.</div></td>
-</tr>
-<tr id="property-pattern">
-  <td><code>pattern</code><span class="ox-api-badge">optional</span></td>
-  <td><span class="ox-api-entry__member-kind">property</span></td>
-  <td><code class="ox-api-entry__member-type language-typescript">RegExp</code></td>
-  <td><div class="ox-api-entry__member-description">Regular expression pattern the value must match.</div></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="ox-api-entry__section ox-api-entry__section--tags">
-<h4>Tags</h4>
-<ul class="ox-api-entry__tags"><li><span class="ox-api-entry__tag-name">@experimental</span><span class="ox-api-entry__tag-value"></span></li></ul>
-</div>
-</div>
+Options for the [string](/api-ox/combinators/functions/string.md) combinator.
+
+## Signature
+
+```ts
+interface StringOptions extends BaseOptions
+```
+
+## Properties
+
+| Name                     | Kind     | Type     | Description                                      |
+| ------------------------ | -------- | -------- | ------------------------------------------------ |
+| `minLength` _(optional)_ | property | `number` | Minimum string length.                           |
+| `maxLength` _(optional)_ | property | `number` | Maximum string length.                           |
+| `pattern` _(optional)_   | property | `RegExp` | Regular expression pattern the value must match. |
+
+## Tags
+
+- `@experimental`

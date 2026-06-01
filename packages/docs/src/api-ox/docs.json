@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-30T06:20:29.043Z",
+  "generatedAt": "2026-06-01T01:34:06.044Z",
   "summary": {
     "modules": 8,
     "entries": 152,
@@ -20,6 +20,7 @@
   "modules": [
     {
       "file": "default",
+      "description": "gunshi cli entry point.\n\nThis entry point exports the bellow APIs and types:\n- `cli`: The main CLI function to run the command, included `global options` and `usage renderer` built-in plugins.\n- `define`: A function to define a command.\n- `defineWithTypes`: A function to define a command with specific type parameters.\n- `lazy`: A function to lazily load a command.\n- `lazyWithTypes`: A function to lazily load a command with specific type parameters.\n- `plugin`: A function to create a plugin.\n- `createCommandContext`: A function to create a command context, mainly for testing purposes.\n- `args-tokens` utilities, `parseArgs` and `resolveArgs` for parsing command line arguments.\n- Some basic type definitions, such as `CommandContext`, `Plugin`, `PluginContext`, etc.",
       "entries": [
         {
           "name": "DefaultTranslation",
@@ -168,15 +169,19 @@
           "examples": [
             "```js\nimport { parseArgs } from 'args-tokens' // for Node.js and Bun\n// import { parseArgs } from 'jsr:@kazupon/args-tokens' // for Deno\n\nconst tokens = parseArgs(['--foo', 'bar', '-x', '--bar=baz'])\n// do something with using tokens\n// ...\nconsole.log('tokens:', tokens)\n```"
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/parser-D95CJBHr.d.ts",
-          "line": 82,
-          "endLine": 82,
           "signature": "declare function parseArgs(args: string[], options?: ParserOptions): ArgToken[]"
         },
         {
           "name": "resolveArgs",
           "kind": "function",
           "description": "Resolve command line arguments.",
+          "typeParameters": [
+            {
+              "name": "A",
+              "constraint": "Args",
+              "description": "{@link Args | Arguments}, which is an object that defines the command line arguments."
+            }
+          ],
           "params": [
             {
               "name": "args",
@@ -207,18 +212,19 @@
           "examples": [
             "```typescript\n// passed tokens: --port 3000\n\nconst { values, explicit } = resolveArgs({\n  port: {\n    type: 'number',\n    default: 8080\n  },\n  host: {\n    type: 'string',\n    default: 'localhost'\n  }\n}, parsedTokens)\n\nvalues.port // 3000\nvalues.host // 'localhost'\n\nexplicit.port // true (explicitly provided)\nexplicit.host // false (not provided, fallback to default)\n```"
           ],
-          "tags": {
-            "typeParam": "A - {@link Args | Arguments}, which is an object that defines the command line arguments."
-          },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 547,
-          "endLine": 557,
           "signature": "declare function resolveArgs<A extends Args>(args: A, tokens: ArgToken[], {\n  shortGrouping,\n  skipPositional,\n  toKebab\n}?: ResolveArgs): {\n  values: ArgValues<A>;\n  positionals: string[];\n  rest: string[];\n  error: AggregateError | undefined;\n  explicit: ArgExplicitlyProvided<A>;\n}"
         },
         {
           "name": "cli",
           "kind": "function",
           "description": "Run the command.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+            }
+          ],
           "params": [
             {
               "name": "args",
@@ -240,9 +246,6 @@
           "returns": {
             "type": "Promise<string | undefined>",
             "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string."
-          },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
           },
           "file": "packages/gunshi/src/cli/builtin.ts",
           "line": 34,
@@ -253,6 +256,19 @@
           "name": "cli",
           "kind": "function",
           "description": "Run the command.",
+          "typeParameters": [
+            {
+              "name": "A",
+              "constraint": "Args",
+              "default": "Args",
+              "description": "The type of {@linkcode Args | arguments} defined in the command and cli options."
+            },
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "{ args: A; extensions: {} }"
+            }
+          ],
           "params": [
             {
               "name": "args",
@@ -274,9 +290,6 @@
           "returns": {
             "type": "Promise<string | undefined>",
             "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string."
-          },
-          "tags": {
-            "typeParam": "A - The type of {@linkcode Args | arguments} defined in the command and cli options."
           },
           "file": "packages/gunshi/src/cli/builtin.ts",
           "line": 50,
@@ -287,6 +300,19 @@
           "name": "cli",
           "kind": "function",
           "description": "Run the command.",
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "ExtendContext",
+              "default": "ExtendContext",
+              "description": "An {@linkcode ExtendContext} type to specify the shape of command and cli options."
+            },
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "{ args: Args; extensions: E }"
+            }
+          ],
           "params": [
             {
               "name": "args",
@@ -308,9 +334,6 @@
           "returns": {
             "type": "Promise<string | undefined>",
             "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string."
-          },
-          "tags": {
-            "typeParam": "E - An {@linkcode ExtendContext} type to specify the shape of command and cli options."
           },
           "file": "packages/gunshi/src/cli/builtin.ts",
           "line": 69,
@@ -321,6 +344,14 @@
           "name": "cli",
           "kind": "function",
           "description": "Run the command.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+            }
+          ],
           "params": [
             {
               "name": "args",
@@ -342,9 +373,6 @@
           "returns": {
             "type": "Promise<string | undefined>",
             "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string."
-          },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
           },
           "file": "packages/gunshi/src/cli/builtin.ts",
           "line": 88,
@@ -386,6 +414,14 @@
           "name": "cli",
           "kind": "function",
           "description": "Run the command.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
+            }
+          ],
           "params": [
             {
               "name": "args",
@@ -409,9 +445,6 @@
             "type": "Promise<string | undefined>",
             "description": "A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string."
           },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options."
-          },
           "file": "packages/gunshi/src/cli/builtin.ts",
           "line": 126,
           "endLine": 133,
@@ -430,6 +463,28 @@
           "name": "createCommandContext",
           "kind": "function",
           "description": "Create a command context.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>",
+              "default": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "{}"
+            }
+          ],
           "params": [
             {
               "name": "param",
@@ -450,6 +505,26 @@
           "name": "define",
           "kind": "function",
           "description": "Define a {@link Command | command}.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A {@link GunshiParamsConstraint} type"
+            },
+            {
+              "name": "A",
+              "constraint": "Args",
+              "default": "ExtractArgs<G>",
+              "description": "An {@link Args} type extracted from {@link GunshiParamsConstraint}"
+            },
+            {
+              "name": "C",
+              "constraint": "Partial<Command<{ args: A; extensions: ExtractExtensions<G> }>>",
+              "default": "{}",
+              "description": "A {@link Command} type inferred from {@link GunshiParamsConstraint}"
+            }
+          ],
           "params": [
             {
               "name": "definition",
@@ -464,9 +539,6 @@
           "examples": [
             "```ts\nconst command = define({\n  name: 'test',\n  description: 'A test command',\n  args: {\n    debug: {\n      type: 'boolean',\n      description: 'Enable debug mode',\n      default: false\n    }\n  },\n  run: ctx => {\n    if (ctx.values.debug) {\n      console.debug('Debug mode is enabled');\n    }\n  }\n})\n```"
           ],
-          "tags": {
-            "typeParam": "G - A {@link GunshiParamsConstraint} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 121,
           "endLine": 125,
@@ -476,6 +548,12 @@
           "name": "define",
           "kind": "function",
           "description": "Define a {@link Command | command}.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "description": "A {@link GunshiParamsConstraint} type"
+            }
+          ],
           "params": [
             {
               "name": "definition",
@@ -487,9 +565,6 @@
             "type": "any",
             "description": "A defined {@link Command | command}"
           },
-          "tags": {
-            "typeParam": "G - A {@link GunshiParamsConstraint} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 135,
           "endLine": 137,
@@ -499,6 +574,13 @@
           "name": "defineWithTypes",
           "kind": "function",
           "description": "Define a {@link Command | command} with types\n\nThis helper function allows specifying the type parameter of {@link GunshiParams}\nwhile inferring the {@link Args} type, {@link ExtendContext} type from the definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "description": "A {@link GunshiParams} type"
+            }
+          ],
           "returns": {
             "type": "DefineWithTypesReturn<\n  ExtractExtensions<G>,\n  ExtractArgs<G>\n>",
             "description": "A function that takes a command definition via {@link define}"
@@ -507,8 +589,7 @@
             "```ts\n// Define a command with specific extensions type\ntype MyExtensions = { logger: { log: (message: string) => void } }\n\nconst command = defineWithTypes<{ extensions: MyExtensions }>()({\n  name: 'greet',\n  args: {\n    name: { type: 'string' }\n  },\n  run: ctx => {\n    // ctx.values is inferred as { name?: string }\n    // ctx.extensions is MyExtensions\n  }\n})\n```"
           ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A {@link GunshiParams} type"
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/definition.ts",
           "line": 182,
@@ -519,6 +600,13 @@
           "name": "lazy",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command}.",
+          "typeParameters": [
+            {
+              "name": "A",
+              "constraint": "Args",
+              "description": "An {@link Args} type"
+            }
+          ],
           "params": [
             {
               "name": "loader",
@@ -533,9 +621,6 @@
           "examples": [
             "```ts\n// load command with dynamic importing\nconst test = lazy(() => import('./commands/test'))\n```"
           ],
-          "tags": {
-            "typeParam": "A - An {@link Args} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 217,
           "endLine": 219,
@@ -545,6 +630,25 @@
           "name": "lazy",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command} with definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            },
+            {
+              "name": "A",
+              "constraint": "ExtractArgs<G>",
+              "default": "ExtractArgs<G>",
+              "description": "An {@link Args} type"
+            },
+            {
+              "name": "D",
+              "constraint": "Partial<Command<{ args: A; extensions: {} }>>",
+              "default": "Partial<\n    Command<{ args: A; extensions: {} }>\n  >",
+              "description": "A partial {@link Command} definition type"
+            }
+          ],
           "params": [
             {
               "name": "loader",
@@ -564,9 +668,6 @@
           "examples": [
             "```ts\n// define command without command runner\nconst testDefinition = define({\n  name: 'test',\n  description: 'Test command',\n  args: {\n    debug: {\n      type: 'boolean',\n      description: 'Enable debug mode',\n      default: false\n    }\n  },\n})\n\n// define load command with command runner and defined command\nconst test = lazy((): CommandRunner<{ args: typeof testDefinition.args; extensions: {} }> => {\n  return ctx => {\n    if (ctx.values.debug) {\n      console.debug('Debug mode is enabled');\n    }\n  }\n}, testDefinition)\n```"
           ],
-          "tags": {
-            "typeParam": "A - An {@link Args} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 256,
           "endLine": 265,
@@ -576,6 +677,13 @@
           "name": "lazy",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command} with or without definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            }
+          ],
           "params": [
             {
               "name": "loader",
@@ -602,6 +710,13 @@
           "name": "lazyWithTypes",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command} with specific type parameters.\n\nThis helper function allows specifying the type parameter of {@link GunshiParams}\nwhile inferring the {@link Args} type, {@link ExtendContext} type from the definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "description": "A {@link GunshiParams} type"
+            }
+          ],
           "returns": {
             "type": "LazyWithTypesReturn<\n  NormalizeToGunshiParams<G>\n>",
             "description": "A function that takes a lazy command definition via {@link lazy}"
@@ -610,8 +725,7 @@
             "```ts\ntype MyExtensions = { logger: { log: (message: string) => void } }\n\nconst command = lazyWithTypes<{ extensions: MyExtensions }>()(\n  () => {\n    return ctx => {\n      // Command runner implementation\n      ctx.extensions.logger?.log('Command executed')\n  },\n {\n  name: 'lazy-command',\n  args: {\n    opt: {\n      type: 'string',\n      description: 'An optional string argument',\n      required: false,\n    },\n  },\n)\n```"
           ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A {@link GunshiParams} type"
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/definition.ts",
           "line": 349,
@@ -622,6 +736,47 @@
           "name": "plugin",
           "kind": "function",
           "description": "Define a plugin with extension compatibility and typed dependency extensions",
+          "typeParameters": [
+            {
+              "name": "Context",
+              "constraint": "ExtendContext",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+            },
+            {
+              "name": "Id",
+              "constraint": "string",
+              "default": "string",
+              "description": "A string type to specify the plugin ID."
+            },
+            {
+              "name": "Deps",
+              "constraint": "ReadonlyArray<PluginDependency | string>",
+              "default": "[]",
+              "description": "A readonly array of {@linkcode PluginDependency} or string to specify the plugin dependencies."
+            },
+            {
+              "name": "Extension",
+              "constraint": "{}",
+              "default": "{}",
+              "description": "A type to specify the shape of the plugin extension object."
+            },
+            {
+              "name": "ResolvedDepExtensions",
+              "constraint": "GunshiParams",
+              "default": "DependencyParams<Deps, Context>"
+            },
+            {
+              "name": "PluginExt",
+              "constraint": "PluginExtension<Extension, DefaultGunshiParams>",
+              "default": "PluginExtension<\n    Extension,\n    ResolvedDepExtensions\n  >"
+            },
+            {
+              "name": "MergedExtensions",
+              "constraint": "GunshiParams",
+              "default": "MergedPluginParams<\n    Id,\n    Deps,\n    Context,\n    Awaited<ReturnType<PluginExt>>\n  >"
+            }
+          ],
           "params": [
             {
               "name": "options",
@@ -634,8 +789,7 @@
             "description": "A defined plugin with extension"
           },
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 328,
@@ -646,6 +800,47 @@
           "name": "plugin",
           "kind": "function",
           "description": "Define a plugin without extension and typed dependency extensions",
+          "typeParameters": [
+            {
+              "name": "Context",
+              "constraint": "ExtendContext",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+            },
+            {
+              "name": "Id",
+              "constraint": "string",
+              "default": "string",
+              "description": "A string type to specify the plugin ID."
+            },
+            {
+              "name": "Deps",
+              "constraint": "ReadonlyArray<PluginDependency | string>",
+              "default": "[]",
+              "description": "A readonly array of {@linkcode PluginDependency} or string to specify the plugin dependencies."
+            },
+            {
+              "name": "Extension",
+              "constraint": "Record<string, unknown>",
+              "default": "{}",
+              "description": "A type to specify the shape of the plugin extension object."
+            },
+            {
+              "name": "ResolvedDepExtensions",
+              "constraint": "GunshiParams",
+              "default": "DependencyParams<Deps, Context>"
+            },
+            {
+              "name": "PluginExt",
+              "constraint": "PluginExtension<Extension, DefaultGunshiParams>",
+              "default": "PluginExtension<\n    Extension,\n    ResolvedDepExtensions\n  >"
+            },
+            {
+              "name": "MergedExtensions",
+              "constraint": "GunshiParams",
+              "default": "MergedPluginParams<\n    Id,\n    Deps,\n    Context,\n    Awaited<ReturnType<PluginExt>>\n  >"
+            }
+          ],
           "params": [
             {
               "name": "options",
@@ -658,8 +853,7 @@
             "description": "A defined plugin without extension"
           },
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 370,
@@ -695,6 +889,26 @@
           "name": "CommandContextParams",
           "kind": "interface",
           "description": "Parameters of {@link createCommandContext}",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams | { args: Args } | { extensions: ExtendContext }"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "Record<string, CommandContextExtension>"
+            }
+          ],
           "members": [
             {
               "name": "args",
@@ -832,9 +1046,16 @@
           "name": "PluginContext",
           "kind": "interface",
           "description": "Gunshi plugin context interface.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+            "since": "v0.27.0"
           },
           "members": [
             {
@@ -1028,6 +1249,14 @@
           "name": "OnPluginExtension",
           "kind": "type",
           "description": "Plugin extension callback, which is called when the plugin is extended with `extension` option.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContext} and {@linkcode Command}."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -1041,7 +1270,6 @@
             }
           ],
           "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContext} and {@linkcode Command}.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
@@ -1053,6 +1281,14 @@
           "name": "Plugin",
           "kind": "type",
           "description": "Gunshi plugin, which is a function that receives a PluginContext.",
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -1065,7 +1301,6 @@
             "description": "An {@linkcode Awaitable} that resolves when the plugin is loaded."
           },
           "tags": {
-            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
@@ -1108,6 +1343,19 @@
           "name": "PluginExtension",
           "kind": "type",
           "description": "Plugin extension",
+          "typeParameters": [
+            {
+              "name": "T",
+              "default": "Record<string, unknown>",
+              "description": "The type of the extension object returned by the plugin extension function."
+            },
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContextCore}."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -1125,7 +1373,6 @@
             "description": "An object of type T that represents the extension provided by the plugin"
           },
           "tags": {
-            "typeParam": "T - The type of the extension object returned by the plugin extension function.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
@@ -1137,9 +1384,16 @@
           "name": "PluginFunction",
           "kind": "type",
           "description": "Plugin function type",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 100,
@@ -1150,6 +1404,43 @@
           "name": "PluginOptions",
           "kind": "interface",
           "description": "Plugin definition options",
+          "typeParameters": [
+            {
+              "name": "DepExt",
+              "constraint": "ExtendContext",
+              "default": "DefaultGunshiParams['extensions']"
+            },
+            {
+              "name": "Id",
+              "constraint": "string",
+              "default": "string"
+            },
+            {
+              "name": "Deps",
+              "constraint": "ReadonlyArray<PluginDependency | string>",
+              "default": "(PluginDependency | string)[]"
+            },
+            {
+              "name": "Ext",
+              "constraint": "Record<string, unknown>",
+              "default": "{}"
+            },
+            {
+              "name": "ResolvedDepExt",
+              "constraint": "GunshiParams",
+              "default": "DependencyParams<Deps, DepExt>"
+            },
+            {
+              "name": "PluginExt",
+              "constraint": "PluginExtension<Ext, ResolvedDepExt>",
+              "default": "PluginExtension<Ext, ResolvedDepExt>"
+            },
+            {
+              "name": "MergedExt",
+              "constraint": "GunshiParams",
+              "default": "MergedPluginParams<\n    Id,\n    Deps,\n    DepExt,\n    Awaited<ReturnType<PluginExt>>\n  >"
+            }
+          ],
           "tags": {
             "since": "v0.27.0"
           },
@@ -1217,9 +1508,14 @@
           "name": "PluginWithExtension",
           "kind": "interface",
           "description": "Plugin return type with extension, which includes the plugin ID, name, dependencies, and extension.\n\nThis type is used to define a plugin at `plugin` function.",
-          "tags": {
-            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
-          },
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+            }
+          ],
           "members": [
             {
               "name": "id",
@@ -1264,9 +1560,14 @@
           "name": "PluginWithoutExtension",
           "kind": "interface",
           "description": "Plugin return type without extension, which includes the plugin ID, name, and dependencies, but no extension.\n\nThis type is used to define a plugin at `plugin` function without extension.",
-          "tags": {
-            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
-          },
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+            }
+          ],
           "members": [
             {
               "name": "id",
@@ -1303,9 +1604,6 @@
           "name": "Args",
           "kind": "interface",
           "description": "An object that contains {@link ArgSchema | argument schema}.\n\nThis type is used to define the structure and validation rules for command line arguments.",
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 433,
-          "endLine": 435,
           "signature": "interface Args"
         },
         {
@@ -1440,9 +1738,6 @@
               "endLine": 426
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 44,
-          "endLine": 427,
           "signature": "interface ArgSchema"
         },
         {
@@ -1503,30 +1798,30 @@
               "endLine": 51
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/parser-D95CJBHr.d.ts",
-          "line": 26,
-          "endLine": 52,
           "signature": "interface ArgToken"
         },
         {
           "name": "ArgValues",
           "kind": "type",
           "description": "An object that contains the values of the arguments.",
-          "tags": {
-            "typeParam": "T - {@link Args | Arguments} which is an object that defines the command line arguments."
-          },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 441,
-          "endLine": 443,
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "{@link Args | Arguments} which is an object that defines the command line arguments."
+            }
+          ],
           "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : {\n  [option: string]: string | boolean | number | (string | boolean | number)[] | undefined;\n}"
         },
         {
           "name": "Awaitable",
           "kind": "type",
           "description": "Awaitable type.",
-          "tags": {
-            "typeParam": "T - The type of the value that can be awaited."
-          },
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The type of the value that can be awaited."
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 16,
           "endLine": 16,
@@ -1536,9 +1831,12 @@
           "name": "Prettify",
           "kind": "type",
           "description": "Prettify a type by flattening its structure.",
-          "tags": {
-            "typeParam": "T - The type to be prettified."
-          },
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The type to be prettified."
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 23,
           "endLine": 23,
@@ -1560,9 +1858,16 @@
           "name": "GunshiParams",
           "kind": "interface",
           "description": "Gunshi unified parameter type.\n\nThis type combines both argument definitions and command context extensions.",
+          "typeParameters": [
+            {
+              "name": "P",
+              "constraint": "{\n    args?: Args\n    extensions?: ExtendContext\n  }",
+              "default": "{\n    args: Args\n    extensions: {}\n  }",
+              "description": "The type of parameters, which can include `args` and `extensions`."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "P - The type of parameters, which can include `args` and `extensions`."
+            "since": "v0.27.0"
           },
           "members": [
             {
@@ -1615,9 +1920,14 @@
           "name": "CommandEnvironment",
           "kind": "interface",
           "description": "Command environment.",
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command environments."
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command environments."
+            }
+          ],
           "members": [
             {
               "name": "cwd",
@@ -1669,8 +1979,8 @@
               "description": "Left margin of the command output.",
               "type": "number",
               "tags": {
-                "see": "{@linkcode CliOptions.leftMargin}",
-                "default": "2"
+                "default": "2",
+                "see": "{@linkcode CliOptions.leftMargin}"
               },
               "line": 189,
               "endLine": 189
@@ -1693,8 +2003,8 @@
               "description": "Whether to display the usage option type.",
               "type": "boolean",
               "tags": {
-                "see": "{@linkcode CliOptions.usageOptionType}",
-                "default": "false"
+                "default": "false",
+                "see": "{@linkcode CliOptions.usageOptionType}"
               },
               "line": 203,
               "endLine": 203
@@ -1705,8 +2015,8 @@
               "description": "Whether to display the option value.",
               "type": "boolean",
               "tags": {
-                "see": "{@linkcode CliOptions.usageOptionValue}",
-                "default": "true"
+                "default": "true",
+                "see": "{@linkcode CliOptions.usageOptionValue}"
               },
               "line": 210,
               "endLine": 210
@@ -1804,9 +2114,14 @@
           "name": "CliOptions",
           "kind": "interface",
           "description": "CLI options of {@linkcode cli} function.",
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of cli options."
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of cli options."
+            }
+          ],
           "members": [
             {
               "name": "cwd",
@@ -1932,8 +2247,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "default": "false",
-                "since": "v0.27.0"
+                "since": "v0.27.0",
+                "default": "false"
               },
               "line": 331,
               "endLine": 331
@@ -2036,9 +2351,14 @@
           "name": "CommandContext",
           "kind": "interface",
           "description": "Command context.\n\nCommand context is the context of the command execution.",
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "members": [
             {
               "name": "name",
@@ -2206,9 +2526,16 @@
           "name": "CommandContextCore",
           "kind": "type",
           "description": "Readonly command context available to a command context extension factory.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 485,
@@ -2219,9 +2546,16 @@
           "name": "CommandContextExtension",
           "kind": "interface",
           "description": "Command context extension",
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@linkcode GunshiParams.extensions} to specify the shape of the extension."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "E - A type extending {@linkcode GunshiParams.extensions} to specify the shape of the extension."
+            "since": "v0.27.0"
           },
           "members": [
             {
@@ -2262,8 +2596,15 @@
           "name": "RenderingOptions",
           "kind": "interface",
           "description": "Rendering control options",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of render options."
+            }
+          ],
           "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of render options.",
             "since": "v0.27.0"
           },
           "members": [
@@ -2304,9 +2645,14 @@
           "name": "Command",
           "kind": "interface",
           "description": "Command interface.",
-          "tags": {
-            "typeParam": "G - The Gunshi parameters constraint"
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            }
+          ],
           "members": [
             {
               "name": "name",
@@ -2369,8 +2715,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "since": "v0.27.0",
-                "default": "false"
+                "default": "false",
+                "since": "v0.27.0"
               },
               "line": 590,
               "endLine": 590
@@ -2422,9 +2768,20 @@
           "name": "LazyCommand",
           "kind": "type",
           "description": "Lazy command interface.\n\nLazy command that's not loaded until it is executed.",
-          "tags": {
-            "typeParam": "G - The Gunshi parameters constraint"
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            },
+            {
+              "name": "D",
+              "constraint": "Partial<Command<G>>",
+              "default": "{}",
+              "description": "The partial command definition provided to lazy function"
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 623,
           "endLine": 637,
@@ -2434,9 +2791,14 @@
           "name": "Commandable",
           "kind": "type",
           "description": "Define a command type.",
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command."
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command."
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 644,
           "endLine": 646,
@@ -2563,6 +2925,14 @@
           "name": "CommandExamplesFetcher",
           "kind": "type",
           "description": "Command examples fetcher.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -2574,9 +2944,6 @@
             "type": "unknown",
             "description": "A fetched command examples."
           },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
-          },
           "file": "packages/gunshi/src/types.ts",
           "line": 718,
           "endLine": 720,
@@ -2586,6 +2953,14 @@
           "name": "CommandRunner",
           "kind": "type",
           "description": "Command runner.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -2597,9 +2972,6 @@
             "type": "unknown",
             "description": "void or string (for CLI output)"
           },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
-          },
           "file": "packages/gunshi/src/types.ts",
           "line": 730,
           "endLine": 732,
@@ -2609,12 +2981,17 @@
           "name": "CommandLoader",
           "kind": "type",
           "description": "Command loader.\n\nA function that returns a command or command runner.\nThis is used to lazily load commands.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner."
+            }
+          ],
           "returns": {
             "type": "unknown",
             "description": "A command or command runner"
-          },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner."
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 744,
@@ -2625,6 +3002,14 @@
           "name": "CommandDecorator",
           "kind": "type",
           "description": "Command decorator.\n\nA function that wraps a command runner to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "baseRunner",
@@ -2637,8 +3022,7 @@
             "description": "The decorated command runner"
           },
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 760,
@@ -2649,6 +3033,18 @@
           "name": "RendererDecorator",
           "kind": "type",
           "description": "Renderer decorator type.\n\nA function that wraps a base renderer to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The type of the rendered result."
+            },
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "baseRenderer",
@@ -2666,8 +3062,7 @@
             "description": "The decorated result"
           },
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "T - The type of the rendered result."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 778,
@@ -2678,6 +3073,14 @@
           "name": "ValidationErrorsDecorator",
           "kind": "type",
           "description": "Validation errors renderer decorator type.\nA function that wraps a validation errors renderer to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "baseRenderer",
@@ -2700,7 +3103,6 @@
             "description": "The decorated result"
           },
           "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
@@ -2712,11 +3114,34 @@
     },
     {
       "file": "definition",
+      "description": "The entry for gunshi command definition.\n\nThis entry point exports the following APIs and types:\n- `define`: A function to define a command.\n- `defineWithTypes`: A function to define a command with specific type parameters.\n- `lazy`: A function to lazily load a command.\n- `lazyWithTypes`: A function to lazily load a command with specific type parameters.\n- Some basic type definitions, such as `Command`, `LazyCommand`, etc.",
       "entries": [
         {
           "name": "createCommandContext",
           "kind": "function",
           "description": "Create a command context.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>",
+              "default": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "{}"
+            }
+          ],
           "params": [
             {
               "name": "param",
@@ -2737,9 +3162,6 @@
           "name": "Args",
           "kind": "interface",
           "description": "An object that contains {@link ArgSchema | argument schema}.\n\nThis type is used to define the structure and validation rules for command line arguments.",
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 433,
-          "endLine": 435,
           "signature": "interface Args"
         },
         {
@@ -2874,30 +3296,32 @@
               "endLine": 426
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 44,
-          "endLine": 427,
           "signature": "interface ArgSchema"
         },
         {
           "name": "ArgValues",
           "kind": "type",
           "description": "An object that contains the values of the arguments.",
-          "tags": {
-            "typeParam": "T - {@link Args | Arguments} which is an object that defines the command line arguments."
-          },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 441,
-          "endLine": 443,
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "{@link Args | Arguments} which is an object that defines the command line arguments."
+            }
+          ],
           "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : {\n  [option: string]: string | boolean | number | (string | boolean | number)[] | undefined;\n}"
         },
         {
           "name": "Command",
           "kind": "interface",
           "description": "Command interface.",
-          "tags": {
-            "typeParam": "G - The Gunshi parameters constraint"
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            }
+          ],
           "members": [
             {
               "name": "name",
@@ -2973,8 +3397,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "since": "v0.27.0",
-                "default": "undefined"
+                "default": "undefined",
+                "since": "v0.27.0"
               },
               "line": 597,
               "endLine": 597
@@ -3013,12 +3437,17 @@
           "name": "CommandLoader",
           "kind": "type",
           "description": "Command loader.\n\nA function that returns a command or command runner.\nThis is used to lazily load commands.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner."
+            }
+          ],
           "returns": {
             "type": "unknown",
             "description": "A command or command runner"
-          },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner."
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 744,
@@ -3029,6 +3458,14 @@
           "name": "CommandRunner",
           "kind": "type",
           "description": "Command runner.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -3039,9 +3476,6 @@
           "returns": {
             "type": "unknown",
             "description": "void or string (for CLI output)"
-          },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 730,
@@ -3076,9 +3510,16 @@
           "name": "GunshiParams",
           "kind": "interface",
           "description": "Gunshi unified parameter type.\n\nThis type combines both argument definitions and command context extensions.",
+          "typeParameters": [
+            {
+              "name": "P",
+              "constraint": "{\n    args?: Args\n    extensions?: ExtendContext\n  }",
+              "default": "{\n    args: Args\n    extensions: {}\n  }",
+              "description": "The type of parameters, which can include `args` and `extensions`."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "P - The type of parameters, which can include `args` and `extensions`."
+            "since": "v0.27.0"
           },
           "members": [
             {
@@ -3107,9 +3548,20 @@
           "name": "LazyCommand",
           "kind": "type",
           "description": "Lazy command interface.\n\nLazy command that's not loaded until it is executed.",
-          "tags": {
-            "typeParam": "G - The Gunshi parameters constraint"
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            },
+            {
+              "name": "D",
+              "constraint": "Partial<Command<G>>",
+              "default": "{}",
+              "description": "The partial command definition provided to lazy function"
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 623,
           "endLine": 637,
@@ -3119,6 +3571,26 @@
           "name": "CommandContextParams",
           "kind": "interface",
           "description": "Parameters of {@link createCommandContext}",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams | { args: Args } | { extensions: ExtendContext }"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "Record<string, CommandContextExtension>"
+            }
+          ],
           "members": [
             {
               "name": "args",
@@ -3256,6 +3728,26 @@
           "name": "define",
           "kind": "function",
           "description": "Define a {@link Command | command}.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A {@link GunshiParamsConstraint} type"
+            },
+            {
+              "name": "A",
+              "constraint": "Args",
+              "default": "ExtractArgs<G>",
+              "description": "An {@link Args} type extracted from {@link GunshiParamsConstraint}"
+            },
+            {
+              "name": "C",
+              "constraint": "Partial<Command<{ args: A; extensions: ExtractExtensions<G> }>>",
+              "default": "{}",
+              "description": "A {@link Command} type inferred from {@link GunshiParamsConstraint}"
+            }
+          ],
           "params": [
             {
               "name": "definition",
@@ -3270,9 +3762,6 @@
           "examples": [
             "```ts\nconst command = define({\n  name: 'test',\n  description: 'A test command',\n  args: {\n    debug: {\n      type: 'boolean',\n      description: 'Enable debug mode',\n      default: false\n    }\n  },\n  run: ctx => {\n    if (ctx.values.debug) {\n      console.debug('Debug mode is enabled');\n    }\n  }\n})\n```"
           ],
-          "tags": {
-            "typeParam": "G - A {@link GunshiParamsConstraint} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 121,
           "endLine": 125,
@@ -3282,6 +3771,12 @@
           "name": "define",
           "kind": "function",
           "description": "Define a {@link Command | command}.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "description": "A {@link GunshiParamsConstraint} type"
+            }
+          ],
           "params": [
             {
               "name": "definition",
@@ -3293,9 +3788,6 @@
             "type": "any",
             "description": "A defined {@link Command | command}"
           },
-          "tags": {
-            "typeParam": "G - A {@link GunshiParamsConstraint} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 135,
           "endLine": 137,
@@ -3305,6 +3797,13 @@
           "name": "defineWithTypes",
           "kind": "function",
           "description": "Define a {@link Command | command} with types\n\nThis helper function allows specifying the type parameter of {@link GunshiParams}\nwhile inferring the {@link Args} type, {@link ExtendContext} type from the definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "description": "A {@link GunshiParams} type"
+            }
+          ],
           "returns": {
             "type": "DefineWithTypesReturn<\n  ExtractExtensions<G>,\n  ExtractArgs<G>\n>",
             "description": "A function that takes a command definition via {@link define}"
@@ -3313,8 +3812,7 @@
             "```ts\n// Define a command with specific extensions type\ntype MyExtensions = { logger: { log: (message: string) => void } }\n\nconst command = defineWithTypes<{ extensions: MyExtensions }>()({\n  name: 'greet',\n  args: {\n    name: { type: 'string' }\n  },\n  run: ctx => {\n    // ctx.values is inferred as { name?: string }\n    // ctx.extensions is MyExtensions\n  }\n})\n```"
           ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A {@link GunshiParams} type"
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/definition.ts",
           "line": 182,
@@ -3325,6 +3823,13 @@
           "name": "lazy",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command}.",
+          "typeParameters": [
+            {
+              "name": "A",
+              "constraint": "Args",
+              "description": "An {@link Args} type"
+            }
+          ],
           "params": [
             {
               "name": "loader",
@@ -3339,9 +3844,6 @@
           "examples": [
             "```ts\n// load command with dynamic importing\nconst test = lazy(() => import('./commands/test'))\n```"
           ],
-          "tags": {
-            "typeParam": "A - An {@link Args} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 217,
           "endLine": 219,
@@ -3351,6 +3853,25 @@
           "name": "lazy",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command} with definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            },
+            {
+              "name": "A",
+              "constraint": "ExtractArgs<G>",
+              "default": "ExtractArgs<G>",
+              "description": "An {@link Args} type"
+            },
+            {
+              "name": "D",
+              "constraint": "Partial<Command<{ args: A; extensions: {} }>>",
+              "default": "Partial<\n    Command<{ args: A; extensions: {} }>\n  >",
+              "description": "A partial {@link Command} definition type"
+            }
+          ],
           "params": [
             {
               "name": "loader",
@@ -3370,9 +3891,6 @@
           "examples": [
             "```ts\n// define command without command runner\nconst testDefinition = define({\n  name: 'test',\n  description: 'Test command',\n  args: {\n    debug: {\n      type: 'boolean',\n      description: 'Enable debug mode',\n      default: false\n    }\n  },\n})\n\n// define load command with command runner and defined command\nconst test = lazy((): CommandRunner<{ args: typeof testDefinition.args; extensions: {} }> => {\n  return ctx => {\n    if (ctx.values.debug) {\n      console.debug('Debug mode is enabled');\n    }\n  }\n}, testDefinition)\n```"
           ],
-          "tags": {
-            "typeParam": "A - An {@link Args} type"
-          },
           "file": "packages/gunshi/src/definition.ts",
           "line": 256,
           "endLine": 265,
@@ -3382,6 +3900,13 @@
           "name": "lazy",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command} with or without definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            }
+          ],
           "params": [
             {
               "name": "loader",
@@ -3408,6 +3933,13 @@
           "name": "lazyWithTypes",
           "kind": "function",
           "description": "Define a {@link LazyCommand | lazy command} with specific type parameters.\n\nThis helper function allows specifying the type parameter of {@link GunshiParams}\nwhile inferring the {@link Args} type, {@link ExtendContext} type from the definition.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "description": "A {@link GunshiParams} type"
+            }
+          ],
           "returns": {
             "type": "LazyWithTypesReturn<\n  NormalizeToGunshiParams<G>\n>",
             "description": "A function that takes a lazy command definition via {@link lazy}"
@@ -3416,8 +3948,7 @@
             "```ts\ntype MyExtensions = { logger: { log: (message: string) => void } }\n\nconst command = lazyWithTypes<{ extensions: MyExtensions }>()(\n  () => {\n    return ctx => {\n      // Command runner implementation\n      ctx.extensions.logger?.log('Command executed')\n  },\n {\n  name: 'lazy-command',\n  args: {\n    opt: {\n      type: 'string',\n      description: 'An optional string argument',\n      required: false,\n    },\n  },\n)\n```"
           ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A {@link GunshiParams} type"
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/definition.ts",
           "line": 349,
@@ -3428,11 +3959,32 @@
     },
     {
       "file": "context",
+      "description": "The entry for gunshi context.\nThis module is exported for the purpose of testing the command.",
       "entries": [
         {
           "name": "CommandContextParams",
           "kind": "interface",
           "description": "Parameters of {@link createCommandContext}",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams | { args: Args } | { extensions: ExtendContext }"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "Record<string, CommandContextExtension>"
+            }
+          ],
           "members": [
             {
               "name": "args",
@@ -3570,6 +4122,28 @@
           "name": "createCommandContext",
           "kind": "function",
           "description": "Create a command context.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>",
+              "default": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "{}"
+            }
+          ],
           "params": [
             {
               "name": "param",
@@ -3590,6 +4164,7 @@
     },
     {
       "file": "plugin",
+      "description": "The entry point for Gunshi plugin module.",
       "entries": [
         {
           "name": "ANONYMOUS_COMMAND_NAME",
@@ -3613,6 +4188,28 @@
           "name": "createCommandContext",
           "kind": "function",
           "description": "Create a command context.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>",
+              "default": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "{}"
+            }
+          ],
           "params": [
             {
               "name": "param",
@@ -3633,6 +4230,47 @@
           "name": "plugin",
           "kind": "function",
           "description": "Define a plugin with extension compatibility and typed dependency extensions",
+          "typeParameters": [
+            {
+              "name": "Context",
+              "constraint": "ExtendContext",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+            },
+            {
+              "name": "Id",
+              "constraint": "string",
+              "default": "string",
+              "description": "A string type to specify the plugin ID."
+            },
+            {
+              "name": "Deps",
+              "constraint": "ReadonlyArray<PluginDependency | string>",
+              "default": "[]",
+              "description": "A readonly array of {@linkcode PluginDependency} or string to specify the plugin dependencies."
+            },
+            {
+              "name": "Extension",
+              "constraint": "{}",
+              "default": "{}",
+              "description": "A type to specify the shape of the plugin extension object."
+            },
+            {
+              "name": "ResolvedDepExtensions",
+              "constraint": "GunshiParams",
+              "default": "DependencyParams<Deps, Context>"
+            },
+            {
+              "name": "PluginExt",
+              "constraint": "PluginExtension<Extension, DefaultGunshiParams>",
+              "default": "PluginExtension<\n    Extension,\n    ResolvedDepExtensions\n  >"
+            },
+            {
+              "name": "MergedExtensions",
+              "constraint": "GunshiParams",
+              "default": "MergedPluginParams<\n    Id,\n    Deps,\n    Context,\n    Awaited<ReturnType<PluginExt>>\n  >"
+            }
+          ],
           "params": [
             {
               "name": "options",
@@ -3645,8 +4283,7 @@
             "description": "A defined plugin with extension"
           },
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 328,
@@ -3657,6 +4294,47 @@
           "name": "plugin",
           "kind": "function",
           "description": "Define a plugin without extension and typed dependency extensions",
+          "typeParameters": [
+            {
+              "name": "Context",
+              "constraint": "ExtendContext",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions."
+            },
+            {
+              "name": "Id",
+              "constraint": "string",
+              "default": "string",
+              "description": "A string type to specify the plugin ID."
+            },
+            {
+              "name": "Deps",
+              "constraint": "ReadonlyArray<PluginDependency | string>",
+              "default": "[]",
+              "description": "A readonly array of {@linkcode PluginDependency} or string to specify the plugin dependencies."
+            },
+            {
+              "name": "Extension",
+              "constraint": "Record<string, unknown>",
+              "default": "{}",
+              "description": "A type to specify the shape of the plugin extension object."
+            },
+            {
+              "name": "ResolvedDepExtensions",
+              "constraint": "GunshiParams",
+              "default": "DependencyParams<Deps, Context>"
+            },
+            {
+              "name": "PluginExt",
+              "constraint": "PluginExtension<Extension, DefaultGunshiParams>",
+              "default": "PluginExtension<\n    Extension,\n    ResolvedDepExtensions\n  >"
+            },
+            {
+              "name": "MergedExtensions",
+              "constraint": "GunshiParams",
+              "default": "MergedPluginParams<\n    Id,\n    Deps,\n    Context,\n    Awaited<ReturnType<PluginExt>>\n  >"
+            }
+          ],
           "params": [
             {
               "name": "options",
@@ -3669,7 +4347,6 @@
             "description": "A defined plugin without extension"
           },
           "tags": {
-            "typeParam": "Context - A type extending {@linkcode ExtendContext} to specify the shape of plugin dependency extensions.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
@@ -3706,6 +4383,26 @@
           "name": "CommandContextParams",
           "kind": "interface",
           "description": "Parameters of {@link createCommandContext}",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams | { args: Args } | { extensions: ExtendContext }"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "Record<string, CommandContextExtension>"
+            }
+          ],
           "members": [
             {
               "name": "args",
@@ -3843,9 +4540,16 @@
           "name": "PluginContext",
           "kind": "interface",
           "description": "Gunshi plugin context interface.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+            "since": "v0.27.0"
           },
           "members": [
             {
@@ -4039,6 +4743,14 @@
           "name": "OnPluginExtension",
           "kind": "type",
           "description": "Plugin extension callback, which is called when the plugin is extended with `extension` option.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContext} and {@linkcode Command}."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -4052,8 +4764,7 @@
             }
           ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContext} and {@linkcode Command}."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 131,
@@ -4064,6 +4775,14 @@
           "name": "Plugin",
           "kind": "type",
           "description": "Gunshi plugin, which is a function that receives a PluginContext.",
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -4076,7 +4795,6 @@
             "description": "An {@linkcode Awaitable} that resolves when the plugin is loaded."
           },
           "tags": {
-            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
@@ -4119,6 +4837,19 @@
           "name": "PluginExtension",
           "kind": "type",
           "description": "Plugin extension",
+          "typeParameters": [
+            {
+              "name": "T",
+              "default": "Record<string, unknown>",
+              "description": "The type of the extension object returned by the plugin extension function."
+            },
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CommandContextCore}."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -4136,8 +4867,7 @@
             "description": "An object of type T that represents the extension provided by the plugin"
           },
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "T - The type of the extension object returned by the plugin extension function."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 116,
@@ -4148,8 +4878,15 @@
           "name": "PluginFunction",
           "kind": "type",
           "description": "Plugin function type",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}."
+            }
+          ],
           "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
@@ -4161,6 +4898,43 @@
           "name": "PluginOptions",
           "kind": "interface",
           "description": "Plugin definition options",
+          "typeParameters": [
+            {
+              "name": "DepExt",
+              "constraint": "ExtendContext",
+              "default": "DefaultGunshiParams['extensions']"
+            },
+            {
+              "name": "Id",
+              "constraint": "string",
+              "default": "string"
+            },
+            {
+              "name": "Deps",
+              "constraint": "ReadonlyArray<PluginDependency | string>",
+              "default": "(PluginDependency | string)[]"
+            },
+            {
+              "name": "Ext",
+              "constraint": "Record<string, unknown>",
+              "default": "{}"
+            },
+            {
+              "name": "ResolvedDepExt",
+              "constraint": "GunshiParams",
+              "default": "DependencyParams<Deps, DepExt>"
+            },
+            {
+              "name": "PluginExt",
+              "constraint": "PluginExtension<Ext, ResolvedDepExt>",
+              "default": "PluginExtension<Ext, ResolvedDepExt>"
+            },
+            {
+              "name": "MergedExt",
+              "constraint": "GunshiParams",
+              "default": "MergedPluginParams<\n    Id,\n    Deps,\n    DepExt,\n    Awaited<ReturnType<PluginExt>>\n  >"
+            }
+          ],
           "tags": {
             "since": "v0.27.0"
           },
@@ -4228,9 +5002,14 @@
           "name": "PluginWithExtension",
           "kind": "interface",
           "description": "Plugin return type with extension, which includes the plugin ID, name, dependencies, and extension.\n\nThis type is used to define a plugin at `plugin` function.",
-          "tags": {
-            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
-          },
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+            }
+          ],
           "members": [
             {
               "name": "id",
@@ -4275,9 +5054,14 @@
           "name": "PluginWithoutExtension",
           "kind": "interface",
           "description": "Plugin return type without extension, which includes the plugin ID, name, and dependencies, but no extension.\n\nThis type is used to define a plugin at `plugin` function without extension.",
-          "tags": {
-            "typeParam": "E - A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
-          },
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@link GunshiParams} to specify the shape of {@linkcode CommandContext}'s extensions."
+            }
+          ],
           "members": [
             {
               "name": "id",
@@ -4314,9 +5098,6 @@
           "name": "Args",
           "kind": "interface",
           "description": "An object that contains {@link ArgSchema | argument schema}.\n\nThis type is used to define the structure and validation rules for command line arguments.",
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 433,
-          "endLine": 435,
           "signature": "interface Args"
         },
         {
@@ -4451,9 +5232,6 @@
               "endLine": 426
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 44,
-          "endLine": 427,
           "signature": "interface ArgSchema"
         },
         {
@@ -4514,30 +5292,30 @@
               "endLine": 51
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/parser-D95CJBHr.d.ts",
-          "line": 26,
-          "endLine": 52,
           "signature": "interface ArgToken"
         },
         {
           "name": "ArgValues",
           "kind": "type",
           "description": "An object that contains the values of the arguments.",
-          "tags": {
-            "typeParam": "T - {@link Args | Arguments} which is an object that defines the command line arguments."
-          },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts",
-          "line": 441,
-          "endLine": 443,
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "{@link Args | Arguments} which is an object that defines the command line arguments."
+            }
+          ],
           "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : {\n  [option: string]: string | boolean | number | (string | boolean | number)[] | undefined;\n}"
         },
         {
           "name": "Awaitable",
           "kind": "type",
           "description": "Awaitable type.",
-          "tags": {
-            "typeParam": "T - The type of the value that can be awaited."
-          },
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The type of the value that can be awaited."
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 16,
           "endLine": 16,
@@ -4547,9 +5325,14 @@
           "name": "Command",
           "kind": "interface",
           "description": "Command interface.",
-          "tags": {
-            "typeParam": "G - The Gunshi parameters constraint"
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            }
+          ],
           "members": [
             {
               "name": "name",
@@ -4612,8 +5395,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "since": "v0.27.0",
-                "default": "false"
+                "default": "false",
+                "since": "v0.27.0"
               },
               "line": 590,
               "endLine": 590
@@ -4665,9 +5448,14 @@
           "name": "CommandContext",
           "kind": "interface",
           "description": "Command context.\n\nCommand context is the context of the command execution.",
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "members": [
             {
               "name": "name",
@@ -4835,8 +5623,15 @@
           "name": "CommandContextCore",
           "kind": "type",
           "description": "Readonly command context available to a command context extension factory.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
@@ -4848,8 +5643,15 @@
           "name": "CommandContextExtension",
           "kind": "interface",
           "description": "Command context extension",
+          "typeParameters": [
+            {
+              "name": "E",
+              "constraint": "GunshiParams['extensions']",
+              "default": "DefaultGunshiParams['extensions']",
+              "description": "A type extending {@linkcode GunshiParams.extensions} to specify the shape of the extension."
+            }
+          ],
           "tags": {
-            "typeParam": "E - A type extending {@linkcode GunshiParams.extensions} to specify the shape of the extension.",
             "since": "v0.27.0"
           },
           "members": [
@@ -4891,6 +5693,14 @@
           "name": "CommandDecorator",
           "kind": "type",
           "description": "Command decorator.\n\nA function that wraps a command runner to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "baseRunner",
@@ -4903,7 +5713,6 @@
             "description": "The decorated command runner"
           },
           "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
@@ -4915,6 +5724,14 @@
           "name": "CommandExamplesFetcher",
           "kind": "type",
           "description": "Command examples fetcher.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -4926,9 +5743,6 @@
             "type": "unknown",
             "description": "A fetched command examples."
           },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
-          },
           "file": "packages/gunshi/src/types.ts",
           "line": 718,
           "endLine": 720,
@@ -4938,6 +5752,14 @@
           "name": "CommandRunner",
           "kind": "type",
           "description": "Command runner.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -4948,9 +5770,6 @@
           "returns": {
             "type": "unknown",
             "description": "void or string (for CLI output)"
-          },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 730,
@@ -4985,9 +5804,16 @@
           "name": "GunshiParams",
           "kind": "interface",
           "description": "Gunshi unified parameter type.\n\nThis type combines both argument definitions and command context extensions.",
+          "typeParameters": [
+            {
+              "name": "P",
+              "constraint": "{\n    args?: Args\n    extensions?: ExtendContext\n  }",
+              "default": "{\n    args: Args\n    extensions: {}\n  }",
+              "description": "The type of parameters, which can include `args` and `extensions`."
+            }
+          ],
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "P - The type of parameters, which can include `args` and `extensions`."
+            "since": "v0.27.0"
           },
           "members": [
             {
@@ -5028,9 +5854,20 @@
           "name": "LazyCommand",
           "kind": "type",
           "description": "Lazy command interface.\n\nLazy command that's not loaded until it is executed.",
-          "tags": {
-            "typeParam": "G - The Gunshi parameters constraint"
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            },
+            {
+              "name": "D",
+              "constraint": "Partial<Command<G>>",
+              "default": "{}",
+              "description": "The partial command definition provided to lazy function"
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 623,
           "endLine": 637,
@@ -5040,9 +5877,12 @@
           "name": "Prettify",
           "kind": "type",
           "description": "Prettify a type by flattening its structure.",
-          "tags": {
-            "typeParam": "T - The type to be prettified."
-          },
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The type to be prettified."
+            }
+          ],
           "file": "packages/gunshi/src/types.ts",
           "line": 23,
           "endLine": 23,
@@ -5052,6 +5892,18 @@
           "name": "RendererDecorator",
           "kind": "type",
           "description": "Renderer decorator type.\n\nA function that wraps a base renderer to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The type of the rendered result."
+            },
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "baseRenderer",
@@ -5069,7 +5921,6 @@
             "description": "The decorated result"
           },
           "tags": {
-            "typeParam": "T - The type of the rendered result.",
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
@@ -5081,6 +5932,14 @@
           "name": "ValidationErrorsDecorator",
           "kind": "type",
           "description": "Validation errors renderer decorator type.\nA function that wraps a validation errors renderer to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
           "params": [
             {
               "name": "baseRenderer",
@@ -5103,8 +5962,7 @@
             "description": "The decorated result"
           },
           "tags": {
-            "since": "v0.27.0",
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 796,
@@ -5115,14 +5973,20 @@
     },
     {
       "file": "generator",
+      "description": "The entry for usage generator.",
       "entries": [
         {
           "name": "GenerateOptions",
           "kind": "type",
           "description": "generate options of `generate` function.",
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CliOptions}."
-          },
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of {@linkcode CliOptions}."
+            }
+          ],
           "file": "packages/gunshi/src/generator.ts",
           "line": 33,
           "endLine": 33,
@@ -5132,6 +5996,14 @@
           "name": "generate",
           "kind": "function",
           "description": "Generate the command usage.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
+            }
+          ],
           "params": [
             {
               "name": "command",
@@ -5155,9 +6027,6 @@
             "type": "Promise<string>",
             "description": "A rendered usage."
           },
-          "tags": {
-            "typeParam": "G - A type extending {@linkcode GunshiParams} to specify the shape of command parameters."
-          },
           "file": "packages/gunshi/src/generator.ts",
           "line": 45,
           "endLine": 62,
@@ -5167,11 +6036,19 @@
     },
     {
       "file": "renderer",
+      "description": "The entry point for Gunshi renderer.",
       "entries": [
         {
           "name": "renderHeader",
           "kind": "function",
           "description": "Render the header.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams"
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -5192,6 +6069,13 @@
           "name": "renderUsage",
           "kind": "function",
           "description": "Render the usage.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams"
+            }
+          ],
           "params": [
             {
               "name": "ctx",
@@ -5212,6 +6096,13 @@
           "name": "renderValidationErrors",
           "kind": "function",
           "description": "Render the validation errors.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParams",
+              "default": "DefaultGunshiParams"
+            }
+          ],
           "params": [
             {
               "name": "_ctx",
@@ -5237,11 +6128,19 @@
     },
     {
       "file": "combinators",
+      "description": "Parser combinator entry point.\n\nThis entry point exports composable combinator factory functions for building\ntype-safe argument schemas. These combinators produce {@link ArgSchema} objects\nthat can be used anywhere regular argument schemas are accepted.",
       "entries": [
         {
           "name": "args",
           "kind": "function",
           "description": "Type-safe schema factory.\n\nReturns the input unchanged at runtime, but provides type inference\nso that `satisfies Args` is not needed.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "constraint": "Args",
+              "description": "The exact schema type."
+            }
+          ],
           "params": [
             {
               "name": "fields",
@@ -5257,12 +6156,8 @@
             "```ts\nconst common = args({\n  verbose: boolean(),\n  help: short(boolean(), 'h')\n})\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The exact schema type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 554,
-          "endLine": 554,
           "signature": "declare function args<T extends Args>(fields: T): T"
         },
         {
@@ -5287,15 +6182,19 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 216,
-          "endLine": 216,
           "signature": "declare function boolean(opts?: BooleanOptions): CombinatorSchema<boolean>"
         },
         {
           "name": "choice",
           "kind": "function",
           "description": "Create an enum-like argument schema with literal type inference.\n\nUses `const T` generic to infer literal union types from the values array.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "constraint": "readonly string[]",
+              "description": "The readonly array of allowed string values."
+            }
+          ],
           "params": [
             {
               "name": "values",
@@ -5317,18 +6216,20 @@
             "```ts\nconst args = {\n  level: choice(['debug', 'info', 'warn', 'error'] as const)\n}\n// typeof values.level === 'debug' | 'info' | 'warn' | 'error'\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The readonly array of allowed string values."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 286,
-          "endLine": 286,
           "signature": "declare function choice<const T extends readonly string[]>(values: T, opts?: BaseOptions): CombinatorSchema<T[number]>"
         },
         {
           "name": "combinator",
           "kind": "function",
           "description": "Create a custom argument schema with a user-defined parse function.\n\nThis is the most general custom combinator. Use it when none of the built-in\nbase combinators ({@link string}, {@link number}, {@link integer},\n{@link float}, {@link boolean}, {@link choice}) fit your needs.\n\nThe returned schema has `type: 'custom'`.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The parsed value type."
+            }
+          ],
           "params": [
             {
               "name": "config",
@@ -5344,18 +6245,25 @@
             "```ts\nconst date = combinator({\n  parse: (value) => {\n    const d = new Date(value)\n    if (isNaN(d.getTime())) {\n      throw new Error('Invalid date format')\n    }\n    return d\n  },\n  metavar: 'date'\n})\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The parsed value type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 339,
-          "endLine": 339,
           "signature": "declare function combinator<T>(config: CombinatorOptions<T>): CombinatorSchema<T>"
         },
         {
           "name": "describe",
           "kind": "function",
           "description": "Set a description on a combinator schema for help text generation.\n\nThe original schema is not modified.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The schema's parsed type."
+            },
+            {
+              "name": "D",
+              "constraint": "string",
+              "description": "The description string literal type."
+            }
+          ],
           "params": [
             {
               "name": "schema",
@@ -5376,18 +6284,26 @@
             "```ts\nconst args = {\n  port: describe(integer(), 'Port number to listen on')\n}\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The schema's parsed type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 498,
-          "endLine": 498,
           "signature": "declare function describe<T, D extends string>(schema: CombinatorSchema<T>, text: D): CombinatorSchema<T> & CombinatorDescribe<D>"
         },
         {
           "name": "extend",
           "kind": "function",
           "description": "Extend a schema by overriding or adding fields.\n\nEquivalent to `merge(base, overrides)` but communicates the intent of\nintentional overrides rather than general composition.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "constraint": "Args",
+              "description": "Base schema type."
+            },
+            {
+              "name": "U",
+              "constraint": "Args",
+              "description": "Overrides schema type."
+            }
+          ],
           "params": [
             {
               "name": "base",
@@ -5408,12 +6324,8 @@
             "```ts\nconst base = args({ port: withDefault(integer(), 8080) })\nconst strict = extend(base, { port: required(integer({ min: 1, max: 65535 })) })\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - Base schema type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 630,
-          "endLine": 630,
           "signature": "declare function extend<T extends Args, U extends Args>(base: T, overrides: U): Omit<T, keyof U> & U"
         },
         {
@@ -5436,9 +6348,6 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 185,
-          "endLine": 185,
           "signature": "declare function float(opts?: FloatOptions): CombinatorSchema<number>"
         },
         {
@@ -5461,15 +6370,22 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 152,
-          "endLine": 152,
           "signature": "declare function integer(opts?: IntegerOptions): CombinatorSchema<number>"
         },
         {
           "name": "map",
           "kind": "function",
           "description": "Transform the output of a combinator schema.\n\nCreates a new schema that applies `transform` to the result of `schema.parse`.\nThe original schema is not modified.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The input schema's parsed type."
+            },
+            {
+              "name": "U",
+              "description": "The transformed type."
+            }
+          ],
           "params": [
             {
               "name": "schema",
@@ -5488,18 +6404,26 @@
           },
           "examples": ["```ts\nconst args = {\n  doubled: map(integer(), n => n * 2)\n}\n```"],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The input schema's parsed type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 362,
-          "endLine": 362,
           "signature": "declare function map<T, U>(schema: CombinatorSchema<T>, transform: (value: T) => U): CombinatorSchema<U>"
         },
         {
           "name": "merge",
           "kind": "function",
           "description": "Compose multiple {@link Args} schemas into one.\n\nOn key conflicts the later schema wins (last-write-wins).",
+          "typeParameters": [
+            {
+              "name": "A",
+              "constraint": "Args",
+              "description": "First schema type."
+            },
+            {
+              "name": "B",
+              "constraint": "Args",
+              "description": "Second schema type."
+            }
+          ],
           "params": [
             {
               "name": "a",
@@ -5520,18 +6444,28 @@
             "```ts\nconst common = args({ verbose: boolean() })\nconst network = args({ host: required(string()), port: withDefault(integer(), 8080) })\nconst schema = merge(common, network)\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "A - First schema type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 576,
-          "endLine": 576,
           "signature": "declare function merge<A extends Args, B extends Args>(a: A, b: B): Omit<A, keyof B> & B"
         },
         {
           "name": "merge",
           "kind": "function",
           "description": "Compose multiple {@link Args} schemas into one.",
+          "typeParameters": [
+            {
+              "name": "A",
+              "constraint": "Args"
+            },
+            {
+              "name": "B",
+              "constraint": "Args"
+            },
+            {
+              "name": "C",
+              "constraint": "Args"
+            }
+          ],
           "params": [
             {
               "name": "a",
@@ -5556,15 +6490,30 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 587,
-          "endLine": 587,
           "signature": "declare function merge<A extends Args, B extends Args, C extends Args>(a: A, b: B, c: C): Omit<Omit<A, keyof B | keyof C> & Omit<B, keyof C>, never> & C"
         },
         {
           "name": "merge",
           "kind": "function",
           "description": "Compose multiple {@link Args} schemas into one.",
+          "typeParameters": [
+            {
+              "name": "A",
+              "constraint": "Args"
+            },
+            {
+              "name": "B",
+              "constraint": "Args"
+            },
+            {
+              "name": "C",
+              "constraint": "Args"
+            },
+            {
+              "name": "D",
+              "constraint": "Args"
+            }
+          ],
           "params": [
             {
               "name": "a",
@@ -5594,15 +6543,18 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 599,
-          "endLine": 599,
           "signature": "declare function merge<A extends Args, B extends Args, C extends Args, D extends Args>(a: A, b: B, c: C, d: D): MergeArgs<[A, B, C, D]>"
         },
         {
           "name": "merge",
           "kind": "function",
           "description": "Compose multiple {@link Args} schemas into one.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "constraint": "Args[]"
+            }
+          ],
           "params": [
             {
               "name": "schemas",
@@ -5617,15 +6569,18 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 608,
-          "endLine": 608,
           "signature": "declare function merge<T extends Args[]>(...schemas: T): MergeArgs<T>"
         },
         {
           "name": "multiple",
           "kind": "function",
           "description": "Mark a combinator schema as accepting multiple values.\n\nThe resolved value becomes an array. The original schema is not modified.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The schema's parsed type."
+            }
+          ],
           "params": [
             {
               "name": "schema",
@@ -5641,12 +6596,8 @@
             "```ts\nconst args = {\n  tags: multiple(string())\n}\n// typeof values.tags === string[]\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The schema's parsed type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 415,
-          "endLine": 415,
           "signature": "declare function multiple<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorMultiple"
         },
         {
@@ -5669,15 +6620,18 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 119,
-          "endLine": 119,
           "signature": "declare function number(opts?: NumberOptions): CombinatorSchema<number>"
         },
         {
           "name": "positional",
           "kind": "function",
           "description": "Create a positional argument schema.\n\nWithout a parser, resolves to string.\nWith a parser (e.g., `positional(integer())`), resolves to the parser's return type.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The parser's resolved type."
+            }
+          ],
           "params": [
             {
               "name": "parser",
@@ -5693,12 +6647,8 @@
             "```ts\nconst args = {\n  command: positional(),           // resolves to string\n  port: positional(integer()),     // resolves to number\n}\n```"
           ],
           "tags": {
-            "typeParam": "T - The parser's resolved type.",
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 244,
-          "endLine": 244,
           "signature": "declare function positional<T>(parser: CombinatorSchema<T>): CombinatorSchema<T> & ArgSchemaPositionalType"
         },
         {
@@ -5723,15 +6673,18 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 264,
-          "endLine": 264,
           "signature": "declare function positional(parser?: BaseOptions): ArgSchema & ArgSchemaPositionalType"
         },
         {
           "name": "required",
           "kind": "function",
           "description": "Mark a combinator schema as required.\n\nThe original schema is not modified.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The schema's parsed type."
+            }
+          ],
           "params": [
             {
               "name": "schema",
@@ -5745,18 +6698,25 @@
           },
           "examples": ["```ts\nconst args = {\n  name: required(string())\n}\n```"],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The schema's parsed type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 441,
-          "endLine": 441,
           "signature": "declare function required<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorRequired"
         },
         {
           "name": "short",
           "kind": "function",
           "description": "Set a short alias on a combinator schema.\n\nThe original schema is not modified.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The schema's parsed type."
+            },
+            {
+              "name": "S",
+              "constraint": "string",
+              "description": "The short alias string literal type."
+            }
+          ],
           "params": [
             {
               "name": "schema",
@@ -5777,12 +6737,8 @@
             "```ts\nconst args = {\n  verbose: short(boolean(), 'v')\n}\n// Usage: -v or --verbose\n```"
           ],
           "tags": {
-            "typeParam": "T - The schema's parsed type.",
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 470,
-          "endLine": 470,
           "signature": "declare function short<T, S extends string>(schema: CombinatorSchema<T>, alias: S): CombinatorSchema<T> & CombinatorShort<S>"
         },
         {
@@ -5807,15 +6763,18 @@
           "tags": {
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 86,
-          "endLine": 86,
           "signature": "declare function string(opts?: StringOptions): CombinatorSchema<string>"
         },
         {
           "name": "unrequired",
           "kind": "function",
           "description": "Mark a combinator schema as not required.\n\nUseful for overriding a base combinator that was created with `required: true`.\nThe original schema is not modified.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The schema's parsed type."
+            }
+          ],
           "params": [
             {
               "name": "schema",
@@ -5831,18 +6790,21 @@
             "```ts\nconst args = {\n  name: unrequired(string({ required: true }))\n}\n```"
           ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The schema's parsed type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 525,
-          "endLine": 525,
           "signature": "declare function unrequired<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorUnrequired"
         },
         {
           "name": "withDefault",
           "kind": "function",
           "description": "Set a default value on a combinator schema.\n\nThe original schema is not modified.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "constraint": "string | boolean | number",
+              "description": "The schema's parsed type."
+            }
+          ],
           "params": [
             {
               "name": "schema",
@@ -5863,12 +6825,8 @@
             "```ts\nconst args = {\n  port: withDefault(integer({ min: 1, max: 65535 }), 8080)\n}\n```"
           ],
           "tags": {
-            "typeParam": "T - The schema's parsed type.",
             "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 389,
-          "endLine": 389,
           "signature": "declare function withDefault<T extends string | boolean | number>(schema: CombinatorSchema<T>, defaultValue: T): CombinatorSchema<T> & CombinatorWithDefault<T>"
         },
         {
@@ -5907,9 +6865,6 @@
               "endLine": 50
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 38,
-          "endLine": 51,
           "signature": "interface BaseOptions"
         },
         {
@@ -5930,17 +6885,19 @@
               "endLine": 195
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 191,
-          "endLine": 196,
           "signature": "interface BooleanOptions extends BaseOptions"
         },
         {
           "name": "Combinator",
           "kind": "type",
           "description": "A combinator produced by combinator factory functions.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The parsed value type."
+            }
+          ],
           "tags": {
-            "typeParam": "T - The parsed value type.",
             "experimental": ""
           },
           "members": [
@@ -5964,18 +6921,20 @@
               "endLine": 22
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 15,
-          "endLine": 23,
           "signature": "type Combinator<T> = {\n  /**\n   * The parse function that converts a string to the desired type.\n   *\n   * @param value - The input string value.\n   * @returns The parsed value of type T.\n   */\n  parse: (value: string) => T;\n}"
         },
         {
           "name": "CombinatorOptions",
           "kind": "interface",
           "description": "Options for the {@link combinator} factory function.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The parsed value type."
+            }
+          ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The parsed value type."
+            "experimental": ""
           },
           "members": [
             {
@@ -6010,22 +6969,21 @@
               "endLine": 307
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 294,
-          "endLine": 308,
           "signature": "interface CombinatorOptions<T> extends BaseOptions"
         },
         {
           "name": "CombinatorSchema",
           "kind": "type",
           "description": "A schema produced by combinator factory functions.\nAny {@link ArgSchema} with a parse function qualifies.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The parsed value type."
+            }
+          ],
           "tags": {
-            "experimental": "",
-            "typeParam": "T - The parsed value type."
+            "experimental": ""
           },
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 32,
-          "endLine": 32,
           "signature": "type CombinatorSchema<T> = ArgSchema & Combinator<T>"
         },
         {
@@ -6055,9 +7013,6 @@
               "endLine": 166
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 158,
-          "endLine": 167,
           "signature": "interface FloatOptions extends BaseOptions"
         },
         {
@@ -6087,9 +7042,6 @@
               "endLine": 133
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 125,
-          "endLine": 134,
           "signature": "interface IntegerOptions extends BaseOptions"
         },
         {
@@ -6119,9 +7071,6 @@
               "endLine": 100
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 92,
-          "endLine": 101,
           "signature": "interface NumberOptions extends BaseOptions"
         },
         {
@@ -6160,15 +7109,13 @@
               "endLine": 69
             }
           ],
-          "file": "Users/kazuya.kawaguchi/Projects/my/gunshi/node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts",
-          "line": 57,
-          "endLine": 70,
           "signature": "interface StringOptions extends BaseOptions"
         }
       ]
     },
     {
       "file": "agent",
+      "description": "The entry point for AI agent detection utility.",
       "entries": [
         {
           "name": "getAgentProfile",

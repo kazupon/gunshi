@@ -1,25 +1,10 @@
 # Renderer
 
+The entry point for Gunshi renderer.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/renderer)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>3</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>3</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>4</strong>
-  <span>parameters</span>
-</span>
-<span class="ox-api-stat">
-  <strong>3</strong>
-  <span>returns</span>
-</span>
-</div>
+_3 symbols · 3 functions · 4 parameters · 3 returns_
 
 ## Functions
 

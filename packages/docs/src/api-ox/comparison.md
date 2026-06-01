@@ -1,6 +1,6 @@
 # ox-content API docs comparison
 
-Generated at: 2026-05-30T06:20:29.043Z
+Generated at: 2026-06-01T01:34:06.044Z
 
 ## Inputs
 
@@ -15,11 +15,11 @@ Generated at: 2026-05-30T06:20:29.043Z
   - `renderer`: `../gunshi/src/renderer.ts`
   - `combinators`: `../gunshi/src/combinators.ts`
   - `agent`: `../gunshi/src/agent.ts`
-- ox-content npm package: `@ox-content/napi@2.27.0`
-- ox-content package path: `node_modules/.pnpm/@ox-content+napi@2.27.0/node_modules/@ox-content/napi/package.json`
+- ox-content npm package: `@ox-content/napi@2.36.0`
+- ox-content package path: `node_modules/.pnpm/@ox-content+napi@2.36.0/node_modules/@ox-content/napi/package.json`
 - export graph entrypoints: 8
 - export graph source modules: 20
-- postprocess: generated `<details>` blocks and `<pre><code>` blocks are written with `v-pre`, and braces/newlines inside raw HTML code blocks are entity-escaped, so VitePress/Vue does not parse API signatures and code examples as template HTML.
+- render style: `renderStyle: "markdown"` emits pure native Markdown (fenced code blocks, tables, Markdown links) with no raw HTML, so no VitePress/Vue postprocess (`v-pre` / brace escaping) is required and inline `{@link}` links are transformed to clean URLs by VitePress.
 
 ## Summary
 
@@ -101,20 +101,20 @@ Diagnostics reported by `extractDocsFromEntryPoints` for exports it could not tu
   - variable `/api-ox/default/variables/ANONYMOUS_COMMAND_NAME` from `packages/gunshi/src/constants.ts` via `default`
   - variable `/api-ox/plugin/variables/ANONYMOUS_COMMAND_NAME` from `packages/gunshi/src/constants.ts` via `plugin`
 - `Args`
-  - interface `/api-ox/default/interfaces/Args` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `default`
-  - interface `/api-ox/definition/interfaces/Args` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `definition`
-  - interface `/api-ox/plugin/interfaces/Args` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `plugin`
+  - interface `/api-ox/default/interfaces/Args` from ``via`default`
+  - interface `/api-ox/definition/interfaces/Args` from ``via`definition`
+  - interface `/api-ox/plugin/interfaces/Args` from ``via`plugin`
 - `ArgSchema`
-  - interface `/api-ox/default/interfaces/ArgSchema` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `default`
-  - interface `/api-ox/definition/interfaces/ArgSchema` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `definition`
-  - interface `/api-ox/plugin/interfaces/ArgSchema` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `plugin`
+  - interface `/api-ox/default/interfaces/ArgSchema` from ``via`default`
+  - interface `/api-ox/definition/interfaces/ArgSchema` from ``via`definition`
+  - interface `/api-ox/plugin/interfaces/ArgSchema` from ``via`plugin`
 - `ArgToken`
-  - interface `/api-ox/default/interfaces/ArgToken` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/parser-D95CJBHr.d.ts` via `default`
-  - interface `/api-ox/plugin/interfaces/ArgToken` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/parser-D95CJBHr.d.ts` via `plugin`
+  - interface `/api-ox/default/interfaces/ArgToken` from ``via`default`
+  - interface `/api-ox/plugin/interfaces/ArgToken` from ``via`plugin`
 - `ArgValues`
-  - type `/api-ox/default/type-aliases/ArgValues` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `default`
-  - type `/api-ox/definition/type-aliases/ArgValues` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `definition`
-  - type `/api-ox/plugin/type-aliases/ArgValues` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/resolver.d.ts` via `plugin`
+  - type `/api-ox/default/type-aliases/ArgValues` from ``via`default`
+  - type `/api-ox/definition/type-aliases/ArgValues` from ``via`definition`
+  - type `/api-ox/plugin/type-aliases/ArgValues` from ``via`plugin`
 - `Awaitable`
   - type `/api-ox/default/type-aliases/Awaitable` from `packages/gunshi/src/types.ts` via `default`
   - type `/api-ox/plugin/type-aliases/Awaitable` from `packages/gunshi/src/types.ts` via `plugin`
@@ -199,10 +199,10 @@ Diagnostics reported by `extractDocsFromEntryPoints` for exports it could not tu
   - function `/api-ox/default/functions/lazyWithTypes` from `packages/gunshi/src/definition.ts` via `default`
   - function `/api-ox/definition/functions/lazyWithTypes` from `packages/gunshi/src/definition.ts` via `definition`
 - `merge`
-  - function `/api-ox/combinators/functions/merge` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts` via `combinators`
-  - function `/api-ox/combinators/functions/merge` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts` via `combinators`
-  - function `/api-ox/combinators/functions/merge` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts` via `combinators`
-  - function `/api-ox/combinators/functions/merge` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts` via `combinators`
+  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
+  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
+  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
+  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
 - `OnPluginExtension`
   - type `/api-ox/default/type-aliases/OnPluginExtension` from `packages/gunshi/src/plugin/core.ts` via `default`
   - type `/api-ox/plugin/type-aliases/OnPluginExtension` from `packages/gunshi/src/plugin/core.ts` via `plugin`
@@ -238,8 +238,8 @@ Diagnostics reported by `extractDocsFromEntryPoints` for exports it could not tu
   - interface `/api-ox/default/interfaces/PluginWithoutExtension` from `packages/gunshi/src/plugin/core.ts` via `default`
   - interface `/api-ox/plugin/interfaces/PluginWithoutExtension` from `packages/gunshi/src/plugin/core.ts` via `plugin`
 - `positional`
-  - function `/api-ox/combinators/functions/positional` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts` via `combinators`
-  - function `/api-ox/combinators/functions/positional` from `node_modules/.pnpm/args-tokens@0.25.0/node_modules/args-tokens/lib/combinators.d.ts` via `combinators`
+  - function `/api-ox/combinators/functions/positional` from ``via`combinators`
+  - function `/api-ox/combinators/functions/positional` from ``via`combinators`
 - `Prettify`
   - type `/api-ox/default/type-aliases/Prettify` from `packages/gunshi/src/types.ts` via `default`
   - type `/api-ox/plugin/type-aliases/Prettify` from `packages/gunshi/src/types.ts` via `plugin`
@@ -406,11 +406,12 @@ ox-content entrypoint output uses entrypoint file names. A collision here means 
 ## Migration Notes
 
 - This comparison uses `@ox-content/napi` with `pathStrategy: "typedoc"`, so each symbol is emitted as its own nested page (`{module}/{category}/{Name}.md`) matching TypeDoc's `/api/default/functions/cli` layout, with a per-module `index.md`.
-- Navigation is generated via `generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })`, producing a deep `module -> category -> symbol` sidebar tree (`NavItem.children`) instead of the previous flat entrypoint list.
+- Navigation is generated via `generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })`, producing a deep `module -> category -> symbol` tree. ox-content's nav is framework-agnostic (`{ title, path, children }`), so this script normalizes it to the VitePress sidebar shape (`{ text, link, items }`) on the consumer side (see .notes/029): module nodes link to their index, category nodes are link-less collapsible headers (no category index page exists, matching TypeDoc), and leaf symbol nodes link to their per-symbol pages.
 - `linkStyle: "markdown"` is used so VitePress' dead-link checker resolves the generated links; with `cleanUrls: true` they are still served as clean URLs at runtime.
 - `externalDocs: true` (with `externalPackageSources` overrides) resolves external package re-exports into documentation entries, so `args-tokens` (`parseArgs`, `resolveArgs`, combinators, `kebabnize`), `@gunshi/plugin-renderer` (`renderHeader`, `renderUsage`, `renderValidationErrors`) and `@gunshi/plugin-i18n` (`DefaultTranslation`) now appear as docs entries. This brings missing-by-name down to 0.
 - `{@link}` / `{@linkcode}` inline tags are resolved by the renderer: known symbols become internal links (e.g. `{@linkcode Command | entry command}` -> a link to the `Command` page), and unresolvable symbols (not part of gunshi's public API, e.g. `TranslationAdapter`) fall back to inline code. No raw `{@link}` tags remain in the generated pages.
 - Overloads are unified into a single page/anchor per symbol (`cli`, `define`, `lazy`, `plugin`), so duplicate anchors are gone. The "Symbol entries" count above still counts overloads and cross-entrypoint re-exports separately, but each `{module}/{category}/{Name}.md` page is unique.
 - Members are exposed/rendered for documented class/interface/type/enum entries, so pages such as `Command` include member data; `enum` symbols now get `enumerations/{Name}` pages.
 - `internal: false` is passed to entrypoint extraction to match TypeDoc `--excludeInternal`.
-- Remaining differences: symbol duplication across entrypoints (`Command` appears under `default`, `definition`, `plugin` — the same multi-module re-export behavior TypeDoc has); and the `<details>` / `<div>` based card layout, which differs from TypeDoc's table/breadcrumb layout. Raw ox-content Markdown still uses HTML `<details>` and `<pre><code>` blocks; this output minimally postprocesses them with `v-pre` and code-block brace/newline escaping so VitePress/Vue does not parse API signatures as template HTML.
+- `renderStyle: "markdown"` (ox-content v2.29.0+) emits pure native Markdown — tables for params/members, fenced code blocks for signatures/examples, and Markdown links — with no raw HTML. This makes every inline `{@link}` / `{@linkcode}` a Markdown link that VitePress transforms to a clean URL and dead-link-checks (fixing the broken raw-HTML `.md` links), and removes the need for the previous `v-pre` / brace-escaping postprocess. The layout is now table/heading based, close to TypeDoc.
+- Remaining difference: symbol duplication across entrypoints (`Command` appears under `default`, `definition`, `plugin` — the same multi-module re-export behavior TypeDoc has).

@@ -1,45 +1,10 @@
 # Plugin
 
+The entry point for Gunshi plugin module.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/plugin)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>36</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>4</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>13</strong>
-  <span>interfaces</span>
-</span>
-<span class="ox-api-stat">
-  <strong>17</strong>
-  <span>types</span>
-</span>
-<span class="ox-api-stat">
-  <strong>2</strong>
-  <span>variables</span>
-</span>
-<span class="ox-api-stat">
-  <strong>17</strong>
-  <span>parameters</span>
-</span>
-<span class="ox-api-stat">
-  <strong>88</strong>
-  <span>members</span>
-</span>
-<span class="ox-api-stat">
-  <strong>11</strong>
-  <span>returns</span>
-</span>
-<span class="ox-api-stat">
-  <strong>3</strong>
-  <span>examples</span>
-</span>
-</div>
+_36 symbols · 4 functions · 13 interfaces · 17 types · 2 variables · 17 parameters · 88 members · 11 returns · 3 examples_
 
 ## Functions
 

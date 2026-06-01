@@ -1,41 +1,14 @@
 # Combinators
 
+Parser combinator entry point.
+
+This entry point exports composable combinator factory functions for building
+type-safe argument schemas. These combinators produce [ArgSchema](/api-ox/default/interfaces/ArgSchema.md) objects
+that can be used anywhere regular argument schemas are accepted.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/combinators)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>31</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>22</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>7</strong>
-  <span>interfaces</span>
-</span>
-<span class="ox-api-stat">
-  <strong>2</strong>
-  <span>types</span>
-</span>
-<span class="ox-api-stat">
-  <strong>34</strong>
-  <span>parameters</span>
-</span>
-<span class="ox-api-stat">
-  <strong>16</strong>
-  <span>members</span>
-</span>
-<span class="ox-api-stat">
-  <strong>22</strong>
-  <span>returns</span>
-</span>
-<span class="ox-api-stat">
-  <strong>19</strong>
-  <span>examples</span>
-</span>
-</div>
+_31 symbols · 22 functions · 7 interfaces · 2 types · 34 parameters · 16 members · 22 returns · 19 examples_
 
 ## Functions
 

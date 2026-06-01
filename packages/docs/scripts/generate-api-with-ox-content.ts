@@ -19,6 +19,9 @@ type OxExtractionOptions = {
   // Optional explicit `specifier -> source/declaration file` overrides used
   // before the resolver's package exports/types resolution.
   externalPackageSources?: OxExternalPackageSource[]
+  // v2.34.0+: opt in to TSDoc-style type-parameter docs (`@typeParam` / `<T>`
+  // table). Off by default.
+  typeParameters?: boolean
 }
 
 type OxGraphOptions = {
@@ -43,6 +46,10 @@ type OxContentNapi = {
       linkStyle?: 'markdown' | 'clean'
       basePath?: string
       pathStrategy?: 'flat' | 'typedoc'
+      // v2.29.0+: `markdown` emits pure native Markdown (tables, fenced code
+      // blocks, Markdown links) with no raw HTML; `html` (default) keeps the
+      // themed `<details>` / `ox-api-*` card output.
+      renderStyle?: 'html' | 'markdown'
     }
   ) => Record<string, string>
   generateDocsNavCode: (navItems: OxNavItem[], exportName?: string) => string
@@ -79,9 +86,20 @@ type OxEntrypointDocsModule = {
   name: string
   file: string
   sourcePath: string
+  // v2.32.0+: module-level description from the entry file's `@module` /
+  // leading JSDoc comment.
+  description?: string
   entries: OxDocEntry[]
   exports: OxPublicExport[]
   diagnostics?: OxDocsDiagnostic[]
+}
+
+// v2.34.0+: structured type parameter (`@typeParam` / `<T>` table).
+type OxTypeParam = {
+  name: string
+  constraint?: string
+  default?: string
+  description: string
 }
 
 type OxDocsDiagnostic = {
@@ -140,6 +158,7 @@ type OxDocEntry = {
   endLine: number
   signature?: string
   members?: OxDocMember[]
+  typeParameters?: OxTypeParam[]
 }
 
 type OxDocMember = {
@@ -170,13 +189,28 @@ type OxMarkdownEntry = Omit<OxDocEntry, 'tags'> & {
 
 type OxMarkdownModule = {
   file: string
+  // v2.32.0+: module-level `@module` description carried through to the
+  // generated module index page.
+  description?: string
   entries: OxMarkdownEntry[]
 }
 
+// ox-content's framework-agnostic nav metadata shape (`generateDocsNavMetadataFromDocs`).
 type OxNavItem = {
   title: string
   path: string
   children?: OxNavItem[]
+}
+
+// VitePress-native sidebar item shape (`text` / `link` / `items`). ox-content
+// deliberately stays framework-agnostic, so the VitePress-specific mapping is
+// done here on the consumer side rather than expected from ox-content (see
+// .notes/029).
+type VitePressNavItem = {
+  text: string
+  link?: string
+  collapsed?: boolean
+  items?: VitePressNavItem[]
 }
 
 type TypeDocSymbol = {
@@ -366,21 +400,61 @@ function toMarkdownEntry(entry: OxDocEntry): OxMarkdownEntry {
   }
 }
 
-function makeVitePressCompatible(markdown: string): string {
-  const compatible = markdown
-    .replaceAll('<details ', '<details v-pre ')
-    .replace(
-      /<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g,
-      (_, attributes: string, code: string) => {
-        const escapedCode = code
-          .replaceAll('{', '&#123;')
-          .replaceAll('}', '&#125;')
-          .replaceAll('\n', '&#10;')
-        return `<pre v-pre><code${attributes}>${escapedCode}</code></pre>`
-      }
-    )
+function ensureTrailingSlash(value: string): string {
+  return value.endsWith('/') ? value : `${value}/`
+}
 
-  return `${compatible.trimEnd()}\n`
+// Normalize ox-content's framework-agnostic nav (`{ title, path, children }`)
+// into VitePress sidebar items (`{ text, link, items }`). This VitePress-
+// specific glue intentionally lives on the consumer side rather than in
+// ox-content (see .notes/029), and mirrors what TypeDoc's
+// `typedoc-vitepress-theme` emits as `typedoc-sidebar.json`:
+//   - module nodes (top level) keep a `link` to the generated module index
+//     page (`{module}/index.md`); a trailing slash matches the clean directory
+//     URL VitePress serves for an index page.
+//   - category nodes (Functions / Interfaces / Type Aliases / ...) drop `link`:
+//     no `{module}/{category}/index.md` page is generated, and TypeDoc emits
+//     these as link-less collapsible headers.
+//   - leaf symbol nodes keep a `link` to their per-symbol page (clean URL, no
+//     `.md`, served as-is under `cleanUrls: true`).
+function toVitePressNav(items: OxNavItem[], depth = 0): VitePressNavItem[] {
+  return items.map(item => {
+    const children = item.children ?? []
+    const isGroup = children.length > 0
+    const isCategory = isGroup && depth > 0
+    const node: VitePressNavItem = { text: item.title }
+    if (!isCategory) {
+      node.link = isGroup ? ensureTrailingSlash(item.path) : item.path
+    }
+    if (isGroup) {
+      node.collapsed = true
+      node.items = toVitePressNav(children, depth + 1)
+    }
+    return node
+  })
+}
+
+// Serialize the normalized VitePress sidebar to a `nav.ts` module. Mirrors the
+// shape VitePress' `sidebar` expects so it can be imported directly into
+// `.vitepress/contents.ts` with no further adaptation.
+function renderNavModule(navItems: VitePressNavItem[]): string {
+  return `/**
+ * Auto-generated API documentation navigation (VitePress sidebar shape).
+ *
+ * Generated by packages/docs/scripts/generate-api-with-ox-content.ts: ox-content
+ * nav metadata, normalized to VitePress \`{ text, link, items }\` on the consumer
+ * side (see .notes/029). Do not edit manually.
+ */
+
+export interface NavItem {
+  text: string
+  link?: string
+  collapsed?: boolean
+  items?: NavItem[]
+}
+
+export const apiOxNav: NavItem[] = ${JSON.stringify(navItems, undefined, 2)}
+`
 }
 
 function groupBy<T>(items: T[], key: (item: T) => string): Map<string, T[]> {
@@ -615,7 +689,7 @@ ${entryPoints.map(entryPoint => `  - \`${entryPoint.name ?? stem(entryPoint.path
 - ox-content package path: \`${toPosix(path.relative(repoRoot, oxContentPackage.path))}\`
 - export graph entrypoints: ${exportGraph.entrypoints.length}
 - export graph source modules: ${exportGraph.modules.length}
-- postprocess: generated \`<details>\` blocks and \`<pre><code>\` blocks are written with \`v-pre\`, and braces/newlines inside raw HTML code blocks are entity-escaped, so VitePress/Vue does not parse API signatures and code examples as template HTML.
+- render style: \`renderStyle: "markdown"\` emits pure native Markdown (fenced code blocks, tables, Markdown links) with no raw HTML, so no VitePress/Vue postprocess (\`v-pre\` / brace escaping) is required and inline \`{@link}\` links are transformed to clean URLs by VitePress.
 
 ## Summary
 
@@ -695,14 +769,15 @@ ${generatedFiles.map(file => `- \`${file}\``).join('\n')}
 ## Migration Notes
 
 - This comparison uses \`@ox-content/napi\` with \`pathStrategy: "typedoc"\`, so each symbol is emitted as its own nested page (\`{module}/{category}/{Name}.md\`) matching TypeDoc's \`/api/default/functions/cli\` layout, with a per-module \`index.md\`.
-- Navigation is generated via \`generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })\`, producing a deep \`module -> category -> symbol\` sidebar tree (\`NavItem.children\`) instead of the previous flat entrypoint list.
+- Navigation is generated via \`generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })\`, producing a deep \`module -> category -> symbol\` tree. ox-content's nav is framework-agnostic (\`{ title, path, children }\`), so this script normalizes it to the VitePress sidebar shape (\`{ text, link, items }\`) on the consumer side (see .notes/029): module nodes link to their index, category nodes are link-less collapsible headers (no category index page exists, matching TypeDoc), and leaf symbol nodes link to their per-symbol pages.
 - \`linkStyle: "markdown"\` is used so VitePress' dead-link checker resolves the generated links; with \`cleanUrls: true\` they are still served as clean URLs at runtime.
 - \`externalDocs: true\` (with \`externalPackageSources\` overrides) resolves external package re-exports into documentation entries, so \`args-tokens\` (\`parseArgs\`, \`resolveArgs\`, combinators, \`kebabnize\`), \`@gunshi/plugin-renderer\` (\`renderHeader\`, \`renderUsage\`, \`renderValidationErrors\`) and \`@gunshi/plugin-i18n\` (\`DefaultTranslation\`) now appear as docs entries. This brings missing-by-name down to 0.
 - \`{@link}\` / \`{@linkcode}\` inline tags are resolved by the renderer: known symbols become internal links (e.g. \`{@linkcode Command | entry command}\` -> a link to the \`Command\` page), and unresolvable symbols (not part of gunshi's public API, e.g. \`TranslationAdapter\`) fall back to inline code. No raw \`{@link}\` tags remain in the generated pages.
 - Overloads are unified into a single page/anchor per symbol (\`cli\`, \`define\`, \`lazy\`, \`plugin\`), so duplicate anchors are gone. The "Symbol entries" count above still counts overloads and cross-entrypoint re-exports separately, but each \`{module}/{category}/{Name}.md\` page is unique.
 - Members are exposed/rendered for documented class/interface/type/enum entries, so pages such as \`Command\` include member data; \`enum\` symbols now get \`enumerations/{Name}\` pages.
 - \`internal: false\` is passed to entrypoint extraction to match TypeDoc \`--excludeInternal\`.
-- Remaining differences: symbol duplication across entrypoints (\`Command\` appears under \`default\`, \`definition\`, \`plugin\` — the same multi-module re-export behavior TypeDoc has); and the \`<details>\` / \`<div>\` based card layout, which differs from TypeDoc's table/breadcrumb layout. Raw ox-content Markdown still uses HTML \`<details>\` and \`<pre><code>\` blocks; this output minimally postprocesses them with \`v-pre\` and code-block brace/newline escaping so VitePress/Vue does not parse API signatures as template HTML.
+- \`renderStyle: "markdown"\` (ox-content v2.29.0+) emits pure native Markdown — tables for params/members, fenced code blocks for signatures/examples, and Markdown links — with no raw HTML. This makes every inline \`{@link}\` / \`{@linkcode}\` a Markdown link that VitePress transforms to a clean URL and dead-link-checks (fixing the broken raw-HTML \`.md\` links), and removes the need for the previous \`v-pre\` / brace-escaping postprocess. The layout is now table/heading based, close to TypeDoc.
+- Remaining difference: symbol duplication across entrypoints (\`Command\` appears under \`default\`, \`definition\`, \`plugin\` — the same multi-module re-export behavior TypeDoc has).
 `
 }
 
@@ -724,12 +799,18 @@ async function main() {
     // bundled `.d.ts` (JSDoc preserved) and `@gunshi/plugin-*` workspace
     // packages resolve to `packages/*/src` via tsconfig path aliases.
     externalDocs: true,
-    externalPackageSources
+    externalPackageSources,
+    // v2.34.0+: opt in to TSDoc-style type-parameter docs so generics get a
+    // "Type Parameters" table (constraints + defaults), matching TypeDoc.
+    typeParameters: true
   }
   const exportGraph = napi.buildExportGraph(entryPoints, extractionOptions)
   const entrypointModules = napi.extractDocsFromEntryPoints(entryPoints, extractionOptions)
   const modules: OxMarkdownModule[] = entrypointModules.map(module => ({
     file: module.file,
+    // v2.32.0+: carry the module-level `@module` description through to the
+    // generated module index page (instead of falling back to a symbol blurb).
+    description: module.description,
     entries: module.entries.map(toMarkdownEntry)
   }))
 
@@ -738,16 +819,26 @@ async function main() {
     githubUrl,
     basePath: apiOxBasePath,
     pathStrategy: 'typedoc',
+    // v2.29.0+: emit pure native Markdown (tables, fenced code blocks, Markdown
+    // links) instead of the themed raw-HTML `<details>` cards. This makes every
+    // link — inline `{@link}` and navigation — a Markdown link that VitePress
+    // transforms to a clean URL and dead-link-checks, fixing the broken inline
+    // `.md` links that raw HTML produced (see .notes/028). It also removes the
+    // need for the `v-pre` / brace-escaping postprocess.
+    renderStyle: 'markdown',
     // Use markdown-style links (relative `.md`) so VitePress' dead-link checker
     // resolves module index pages. With `cleanUrls: true` these are still served
     // as clean URLs at runtime. (`linkStyle: "clean"` emits absolute
     // directory-index links like `/api-ox/agent` that the checker rejects.)
     linkStyle: 'markdown'
   })
+  // ox-content emits framework-agnostic nav metadata; normalize it to the
+  // VitePress sidebar shape on the consumer side (see .notes/029).
   const navItems = napi.generateDocsNavMetadataFromDocs(modules, {
     basePath: apiOxBasePath,
     pathStrategy: 'typedoc'
   })
+  const vitepressNav = toVitePressNav(navItems)
   const oxSymbols = buildOxSymbols(modules)
   // Under the typedoc strategy each symbol gets its own page, so a collision
   // means two symbols (same module/kind/name) would write the same file.
@@ -768,7 +859,10 @@ async function main() {
     // typedoc strategy emits nested paths (e.g. `default/functions/cli.md`),
     // so ensure the parent directory exists before writing.
     await fs.mkdir(path.dirname(target), { recursive: true })
-    await fs.writeFile(target, makeVitePressCompatible(content), 'utf8')
+    // `renderStyle: 'markdown'` emits pure Markdown (fenced code blocks, tables,
+    // Markdown links) with no raw HTML, so no VitePress/Vue postprocess is
+    // needed; just normalize the trailing newline.
+    await fs.writeFile(target, `${content.trimEnd()}\n`, 'utf8')
   }
 
   await fs.writeFile(
@@ -776,11 +870,7 @@ async function main() {
     napi.generateDocsDataJson(modules, generatedAt),
     'utf8'
   )
-  await fs.writeFile(
-    path.join(outDir, 'nav.ts'),
-    napi.generateDocsNavCode(navItems, 'apiOxNav'),
-    'utf8'
-  )
+  await fs.writeFile(path.join(outDir, 'nav.ts'), renderNavModule(vitepressNav), 'utf8')
 
   const generatedFiles = (await walkFiles(outDir))
     .map(file => toPosix(path.relative(outDir, file)))

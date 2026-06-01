@@ -1,41 +1,18 @@
 # Definition
 
+The entry for gunshi command definition.
+
+This entry point exports the following APIs and types:
+
+- `define`: A function to define a command.
+- `defineWithTypes`: A function to define a command with specific type parameters.
+- `lazy`: A function to lazily load a command.
+- `lazyWithTypes`: A function to lazily load a command with specific type parameters.
+- Some basic type definitions, such as `Command`, `LazyCommand`, etc.
+
 **[Source](https://github.com/kazupon/gunshi/blob/main/definition)**
 
-<div class="ox-api-stats" aria-label="API reference summary">
-<span class="ox-api-stat">
-  <strong>19</strong>
-  <span>symbols</span>
-</span>
-<span class="ox-api-stat">
-  <strong>8</strong>
-  <span>functions</span>
-</span>
-<span class="ox-api-stat">
-  <strong>5</strong>
-  <span>interfaces</span>
-</span>
-<span class="ox-api-stat">
-  <strong>6</strong>
-  <span>types</span>
-</span>
-<span class="ox-api-stat">
-  <strong>9</strong>
-  <span>parameters</span>
-</span>
-<span class="ox-api-stat">
-  <strong>38</strong>
-  <span>members</span>
-</span>
-<span class="ox-api-stat">
-  <strong>10</strong>
-  <span>returns</span>
-</span>
-<span class="ox-api-stat">
-  <strong>8</strong>
-  <span>examples</span>
-</span>
-</div>
+_19 symbols · 8 functions · 5 interfaces · 6 types · 9 parameters · 38 members · 10 returns · 8 examples_
 
 ## Functions
 
