@@ -1,4 +1,7 @@
-# boolean
+# Function: boolean()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a boolean argument schema.
 
@@ -13,13 +16,13 @@ declare function boolean(opts?: BooleanOptions): CombinatorSchema<boolean>
 
 ## Parameters
 
-| Name   | Type             | Description                   |
-| ------ | ---------------- | ----------------------------- |
-| `opts` | `BooleanOptions` | Boolean options. _(optional)_ |
+| Name   | Type                                                                 | Description                   |
+| ------ | -------------------------------------------------------------------- | ----------------------------- |
+| `opts` | [`BooleanOptions`](/api-ox/combinators/interfaces/BooleanOptions.md) | Boolean options. _(optional)_ |
 
 ## Returns
 
-`CombinatorSchema<boolean>` — A combinator schema for boolean flags.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<[`boolean`](/api-ox/combinators/functions/boolean.md)\> — A combinator schema for boolean flags.
 
 ## Examples
 
@@ -29,7 +32,3 @@ const args = {
 }
 // Usage: --color (true), --no-color (false)
 ```
-
-## Tags
-
-- `@experimental`

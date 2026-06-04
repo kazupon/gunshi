@@ -1,4 +1,7 @@
-# multiple
+# Function: multiple()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Mark a combinator schema as accepting multiple values.
 
@@ -18,13 +21,13 @@ declare function multiple<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> &
 
 ## Parameters
 
-| Name     | Type                  | Description                 |
-| -------- | --------------------- | --------------------------- |
-| `schema` | `CombinatorSchema<T>` | The base combinator schema. |
+| Name     | Type                                                                              | Description                 |
+| -------- | --------------------------------------------------------------------------------- | --------------------------- |
+| `schema` | [`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 
 ## Returns
 
-`CombinatorSchema<T> & CombinatorMultiple` — A new schema with `multiple: true`.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorMultiple` — A new schema with `multiple: true`.
 
 ## Examples
 
@@ -34,7 +37,3 @@ const args = {
 }
 // typeof values.tags === string[]
 ```
-
-## Tags
-
-- `@experimental`

@@ -1,4 +1,4 @@
-# ArgValues
+# Type Alias: ArgValues\<T\>
 
 An object that contains the values of the arguments.
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-01T01:34:06.044Z",
+  "generatedAt": "2026-06-04T02:09:22.317Z",
   "summary": {
     "modules": 8,
     "entries": 152,
@@ -14,13 +14,14 @@
     "members": 297,
     "params": 116,
     "returns": 76,
-    "examples": 41,
+    "examples": 49,
     "deprecated": 0
   },
   "modules": [
     {
       "file": "default",
       "description": "gunshi cli entry point.\n\nThis entry point exports the bellow APIs and types:\n- `cli`: The main CLI function to run the command, included `global options` and `usage renderer` built-in plugins.\n- `define`: A function to define a command.\n- `defineWithTypes`: A function to define a command with specific type parameters.\n- `lazy`: A function to lazily load a command.\n- `lazyWithTypes`: A function to lazily load a command with specific type parameters.\n- `plugin`: A function to create a plugin.\n- `createCommandContext`: A function to create a command context, mainly for testing purposes.\n- `args-tokens` utilities, `parseArgs` and `resolveArgs` for parsing command line arguments.\n- Some basic type definitions, such as `CommandContext`, `Plugin`, `PluginContext`, etc.",
+      "examples": ["```js\nimport { cli } from 'gunshi'\n```"],
       "entries": [
         {
           "name": "DefaultTranslation",
@@ -2027,8 +2028,8 @@
               "description": "Whether to display the command usage.",
               "type": "boolean",
               "tags": {
-                "see": "{@linkcode CliOptions.usageSilent}",
-                "default": "false"
+                "default": "false",
+                "see": "{@linkcode CliOptions.usageSilent}"
               },
               "line": 217,
               "endLine": 217
@@ -2074,8 +2075,8 @@
               "description": "Hook that runs before any command execution",
               "type": "unknown | undefined",
               "tags": {
-                "since": "v0.27.0",
-                "see": "{@linkcode CliOptions.onBeforeCommand}"
+                "see": "{@linkcode CliOptions.onBeforeCommand}",
+                "since": "v0.27.0"
               },
               "line": 245,
               "endLine": 245
@@ -2098,8 +2099,8 @@
               "description": "Hook that runs when a command throws an error",
               "type": "unknown | undefined",
               "tags": {
-                "since": "v0.27.0",
-                "see": "{@linkcode CliOptions.onErrorCommand}"
+                "see": "{@linkcode CliOptions.onErrorCommand}",
+                "since": "v0.27.0"
               },
               "line": 261,
               "endLine": 261
@@ -2715,8 +2716,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "default": "false",
-                "since": "v0.27.0"
+                "since": "v0.27.0",
+                "default": "false"
               },
               "line": 590,
               "endLine": 590
@@ -2728,8 +2729,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "since": "v0.27.0",
-                "default": "undefined"
+                "default": "undefined",
+                "since": "v0.27.0"
               },
               "line": 597,
               "endLine": 597
@@ -3115,6 +3116,9 @@
     {
       "file": "definition",
       "description": "The entry for gunshi command definition.\n\nThis entry point exports the following APIs and types:\n- `define`: A function to define a command.\n- `defineWithTypes`: A function to define a command with specific type parameters.\n- `lazy`: A function to lazily load a command.\n- `lazyWithTypes`: A function to lazily load a command with specific type parameters.\n- Some basic type definitions, such as `Command`, `LazyCommand`, etc.",
+      "examples": [
+        "```js\nimport { define } from 'gunshi/definition'\n\nexport default define({\n  name: 'say',\n  args: {\n    say: {\n      type: 'string',\n      description: 'say something',\n      default: 'hello!'\n    }\n  },\n  run: ctx => {\n    return `You said: ${ctx.values.say}`\n  }\n})\n```"
+      ],
       "entries": [
         {
           "name": "createCommandContext",
@@ -3384,8 +3388,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "since": "v0.27.0",
-                "default": "false"
+                "default": "false",
+                "since": "v0.27.0"
               },
               "line": 590,
               "endLine": 590
@@ -3397,8 +3401,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "default": "undefined",
-                "since": "v0.27.0"
+                "since": "v0.27.0",
+                "default": "undefined"
               },
               "line": 597,
               "endLine": 597
@@ -3960,6 +3964,7 @@
     {
       "file": "context",
       "description": "The entry for gunshi context.\nThis module is exported for the purpose of testing the command.",
+      "examples": ["```js\nimport { createCommandContext } from 'gunshi/context'\n```"],
       "entries": [
         {
           "name": "CommandContextParams",
@@ -4165,6 +4170,9 @@
     {
       "file": "plugin",
       "description": "The entry point for Gunshi plugin module.",
+      "examples": [
+        "```js\nimport { plugin } from 'gunshi/plugin'\n\nexport default yourPlugin() {\n  return plugin({\n    id: 'your-plugin-id',\n    setup: (ctx) => {\n      // your plugin setup logic here\n    },\n  })\n}\n```"
+      ],
       "entries": [
         {
           "name": "ANONYMOUS_COMMAND_NAME",
@@ -5408,8 +5416,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "default": "undefined",
-                "since": "v0.27.0"
+                "since": "v0.27.0",
+                "default": "undefined"
               },
               "line": 597,
               "endLine": 597
@@ -5974,6 +5982,7 @@
     {
       "file": "generator",
       "description": "The entry for usage generator.",
+      "examples": ["```js\nimport { generate } from 'gunshi/generator'\n```"],
       "entries": [
         {
           "name": "GenerateOptions",
@@ -6037,6 +6046,9 @@
     {
       "file": "renderer",
       "description": "The entry point for Gunshi renderer.",
+      "examples": [
+        "```js\nimport { renderHeader, renderUsage, renderValidationErrors } from 'gunshi/renderer'\n```"
+      ],
       "entries": [
         {
           "name": "renderHeader",
@@ -6129,6 +6141,12 @@
     {
       "file": "combinators",
       "description": "Parser combinator entry point.\n\nThis entry point exports composable combinator factory functions for building\ntype-safe argument schemas. These combinators produce {@link ArgSchema} objects\nthat can be used anywhere regular argument schemas are accepted.",
+      "examples": [
+        "```ts\nimport { string, integer, boolean, required, withDefault, short } from 'gunshi/combinators'\nimport { define, cli } from 'gunshi'\n\nconst command = define({\n  name: 'serve',\n  args: {\n    host: withDefault(string(), 'localhost'),\n    port: withDefault(integer({ min: 1, max: 65535 }), 8080),\n    verbose: short(boolean(), 'v')\n  },\n  run: ctx => {\n    console.log(`Listening on ${ctx.values.host}:${ctx.values.port}`)\n  }\n})\n```"
+      ],
+      "tags": {
+        "experimental": "This module is experimental and may change in future versions."
+      },
       "entries": [
         {
           "name": "args",
@@ -7116,6 +7134,12 @@
     {
       "file": "agent",
       "description": "The entry point for AI agent detection utility.",
+      "examples": ["```js\nimport { getAgentProfile } from 'gunshi/agent'\n```"],
+      "tags": {
+        "author": "kazuya kawaguchi (a.k.a. kazupon)",
+        "experimental": "The `gunshi/agent` entry point is experimental. The agent detection rules\nare delegated to {@link https://github.com/unjs/std-env | std-env} and may\nchange as the upstream detector list evolves.",
+        "license": "MIT"
+      },
       "entries": [
         {
           "name": "getAgentProfile",

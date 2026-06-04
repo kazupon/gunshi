@@ -1,4 +1,7 @@
-# CombinatorOptions
+# Interface: CombinatorOptions\<T\>
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Options for the [combinator](/api-ox/combinators/functions/combinator.md) factory function.
 
@@ -16,11 +19,13 @@ interface CombinatorOptions<T> extends BaseOptions
 
 ## Properties
 
-| Name                   | Kind     | Type                   | Description                                                                                         |
-| ---------------------- | -------- | ---------------------- | --------------------------------------------------------------------------------------------------- |
-| `parse`                | property | `(value: string) => T` | The parse function that converts a string to the desired type. Returns: The parsed value of type T. |
-| `metavar` _(optional)_ | property | `string`               | Display name hint for help text generation.                                                         |
+| Name                   | Type                                                                   | Description                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `metavar` _(optional)_ | [`string`](/api-ox/combinators/functions/string.md)                    | Display name hint for help text generation.                                                         |
+| `parse`                | (`value`: [`string`](/api-ox/combinators/functions/string.md)) =\> `T` | The parse function that converts a string to the desired type. Returns: The parsed value of type T. |
 
-## Tags
+### parse Parameters
 
-- `@experimental`
+| Name    | Type      | Description             |
+| ------- | --------- | ----------------------- |
+| `value` | `unknown` | The input string value. |

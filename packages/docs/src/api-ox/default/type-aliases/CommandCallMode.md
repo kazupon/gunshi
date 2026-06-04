@@ -1,4 +1,4 @@
-# CommandCallMode
+# Type Alias: CommandCallMode
 
 Command call mode.
 

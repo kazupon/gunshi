@@ -1,4 +1,4 @@
-# CommandLoader
+# Type Alias: CommandLoader\<G\>
 
 Command loader.
 
@@ -17,9 +17,9 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
 
 ## Type Parameters
 
-| Name                                                           | Description                                                                                                                               |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context and command runner. |
+| Name                                                                                                                                                                            | Description                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context and command runner. |
 
 ## Returns
 

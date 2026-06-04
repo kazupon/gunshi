@@ -1,6 +1,10 @@
-# OnPluginExtension
+# Type Alias: OnPluginExtension\<G\>
 
 Plugin extension callback, which is called when the plugin is extended with `extension` option.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -15,9 +19,9 @@ export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
 
 ## Type Parameters
 
-| Name                                                 | Description                                                                                                                                                                                                                    |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `G` _extends_ `GunshiParams` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContext`](/api-ox/default/interfaces/CommandContext.md) and [`Command`](/api-ox/default/interfaces/Command.md). |
+| Name                                                                                                                                                      | Description                                                                                                                                                                                                                    |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `G` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContext`](/api-ox/default/interfaces/CommandContext.md) and [`Command`](/api-ox/default/interfaces/Command.md). |
 
 ## Parameters
 
@@ -25,7 +29,3 @@ export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
 | ----- | --------- | --------------------------------------------------------------------- |
 | `ctx` | `unknown` | The [`command context`](/api-ox/default/interfaces/CommandContext.md) |
 | `cmd` | `unknown` | The [`command`](/api-ox/default/interfaces/Command.md)                |
-
-## Tags
-
-- `@since` — v0.27.0

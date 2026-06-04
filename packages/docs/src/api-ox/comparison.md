@@ -1,6 +1,6 @@
 # ox-content API docs comparison
 
-Generated at: 2026-06-01T01:34:06.044Z
+Generated at: 2026-06-04T02:09:22.317Z
 
 ## Inputs
 
@@ -15,11 +15,14 @@ Generated at: 2026-06-01T01:34:06.044Z
   - `renderer`: `../gunshi/src/renderer.ts`
   - `combinators`: `../gunshi/src/combinators.ts`
   - `agent`: `../gunshi/src/agent.ts`
-- ox-content npm package: `@ox-content/napi@2.36.0`
-- ox-content package path: `node_modules/.pnpm/@ox-content+napi@2.36.0/node_modules/@ox-content/napi/package.json`
+- ox-content npm package: `@ox-content/napi@2.49.0`
+- ox-content package path: `node_modules/.pnpm/@ox-content+napi@2.49.0/node_modules/@ox-content/napi/package.json`
 - export graph entrypoints: 8
 - export graph source modules: 20
-- render style: `renderStyle: "markdown"` emits pure native Markdown (fenced code blocks, tables, Markdown links) with no raw HTML, so no VitePress/Vue postprocess (`v-pre` / brace escaping) is required and inline `{@link}` links are transformed to clean URLs by VitePress.
+- render style: `renderStyle: "markdown"` emits pure native Markdown (fenced code blocks, tables, Markdown links) with no raw HTML; this script only normalizes generic angle brackets in headings for VitePress/Vue compatibility.
+- display formats: `indexFormat`, `parametersFormat`, property/member formats, and `enumMembersFormat` are set to `"table"` to mirror the current TypeDoc configuration; `typeDeclarationFormat` is left as `"none"` because the TypeDoc config does not set it.
+- stats summaries: `renderStats: false` omits ox-content's `_N symbols · ..._` summary lines for TypeDoc-like output.
+- group order: `groupOrder: ["Variables","Functions","Class"]` mirrors `packages/docs/typedoc.config.mjs` for module index and nav group order.
 
 ## Summary
 
@@ -27,7 +30,7 @@ Generated at: 2026-06-01T01:34:06.044Z
 | -------------------------------------------- | --------------: | -------------------: |
 | Symbol entries                               |              82 |                  152 |
 | Unique symbol names                          |              82 |                   82 |
-| Markdown pages                               |              91 |                  142 |
+| Markdown pages                               |              91 |                   91 |
 | Missing TypeDoc symbols by name              |               - |                    0 |
 | Extra ox-content symbols by name             |               - |                    0 |
 | Public exports without extracted docs        |               - |                   10 |
@@ -42,16 +45,16 @@ ox-content kind counts: class: 1, function: 59, interface: 43, type: 46, variabl
 
 ## URL Samples
 
-| Symbol                   | Current TypeDoc URL                                | ox-content typedoc URL                                                                                                                                                                                         |
-| ------------------------ | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cli`                    | `/api/default/functions/cli.md`                    | `/api-ox/default/functions/cli`<br>`/api-ox/default/functions/cli`<br>`/api-ox/default/functions/cli`<br>`/api-ox/default/functions/cli`<br>`/api-ox/default/functions/cli`<br>`/api-ox/default/functions/cli` |
-| `define`                 | `/api/definition/functions/define.md`              | `/api-ox/default/functions/define`<br>`/api-ox/default/functions/define`<br>`/api-ox/definition/functions/define`<br>`/api-ox/definition/functions/define`                                                     |
-| `Command`                | `/api/default/interfaces/Command.md`               | `/api-ox/default/interfaces/Command`<br>`/api-ox/definition/interfaces/Command`<br>`/api-ox/plugin/interfaces/Command`                                                                                         |
-| `Plugin`                 | `/api/default/type-aliases/Plugin.md`              | `/api-ox/default/type-aliases/Plugin`<br>`/api-ox/plugin/type-aliases/Plugin`                                                                                                                                  |
-| `DefaultTranslation`     | `/api/default/classes/DefaultTranslation.md`       | `/api-ox/default/classes/DefaultTranslation`                                                                                                                                                                   |
-| `ANONYMOUS_COMMAND_NAME` | `/api/default/variables/ANONYMOUS_COMMAND_NAME.md` | `/api-ox/default/variables/ANONYMOUS_COMMAND_NAME`<br>`/api-ox/plugin/variables/ANONYMOUS_COMMAND_NAME`                                                                                                        |
-| `CLI_OPTIONS_DEFAULT`    | `/api/plugin/variables/CLI_OPTIONS_DEFAULT.md`     | `/api-ox/plugin/variables/CLI_OPTIONS_DEFAULT`                                                                                                                                                                 |
-| `string`                 | `/api/combinators/functions/string.md`             | `/api-ox/combinators/functions/string`                                                                                                                                                                         |
+| Symbol                   | Current TypeDoc URL                                | ox-content typedoc URL                             |
+| ------------------------ | -------------------------------------------------- | -------------------------------------------------- |
+| `cli`                    | `/api/default/functions/cli.md`                    | `/api-ox/default/functions/cli`                    |
+| `define`                 | `/api/definition/functions/define.md`              | `/api-ox/definition/functions/define`              |
+| `Command`                | `/api/default/interfaces/Command.md`               | `/api-ox/default/interfaces/Command`               |
+| `Plugin`                 | `/api/default/type-aliases/Plugin.md`              | `/api-ox/default/type-aliases/Plugin`              |
+| `DefaultTranslation`     | `/api/default/classes/DefaultTranslation.md`       | `/api-ox/default/classes/DefaultTranslation`       |
+| `ANONYMOUS_COMMAND_NAME` | `/api/default/variables/ANONYMOUS_COMMAND_NAME.md` | `/api-ox/default/variables/ANONYMOUS_COMMAND_NAME` |
+| `CLI_OPTIONS_DEFAULT`    | `/api/plugin/variables/CLI_OPTIONS_DEFAULT.md`     | `/api-ox/plugin/variables/CLI_OPTIONS_DEFAULT`     |
+| `string`                 | `/api/combinators/functions/string.md`             | `/api-ox/combinators/functions/string`             |
 
 ## Missing Current TypeDoc Symbols
 
@@ -61,7 +64,7 @@ These symbols exist in current TypeDoc pages but were not present by symbol name
 
 ## Extra ox-content Symbols
 
-These symbols appear in ox-content entrypoint extraction but do not have a current TypeDoc symbol page by the same name.
+These generated ox-content symbol pages do not have a current TypeDoc symbol page by the same name.
 
 - none
 
@@ -293,11 +296,6 @@ ox-content entrypoint output uses entrypoint file names. A collision here means 
 - `context/interfaces/CommandContextParams.md`
 - `default/classes/DefaultTranslation.md`
 - `default/functions/cli.md`
-- `default/functions/createCommandContext.md`
-- `default/functions/define.md`
-- `default/functions/defineWithTypes.md`
-- `default/functions/lazy.md`
-- `default/functions/lazyWithTypes.md`
 - `default/functions/parseArgs.md`
 - `default/functions/plugin.md`
 - `default/functions/resolveArgs.md`
@@ -309,7 +307,6 @@ ox-content entrypoint output uses entrypoint file names. A collision here means 
 - `default/interfaces/Command.md`
 - `default/interfaces/CommandContext.md`
 - `default/interfaces/CommandContextExtension.md`
-- `default/interfaces/CommandContextParams.md`
 - `default/interfaces/CommandEnvironment.md`
 - `default/interfaces/GunshiParams.md`
 - `default/interfaces/PluginContext.md`
@@ -340,63 +337,18 @@ ox-content entrypoint output uses entrypoint file names. A collision here means 
 - `default/type-aliases/RendererDecorator.md`
 - `default/type-aliases/ValidationErrorsDecorator.md`
 - `default/variables/ANONYMOUS_COMMAND_NAME.md`
-- `definition/functions/createCommandContext.md`
 - `definition/functions/define.md`
 - `definition/functions/defineWithTypes.md`
 - `definition/functions/lazy.md`
 - `definition/functions/lazyWithTypes.md`
 - `definition/index.md`
-- `definition/interfaces/ArgSchema.md`
-- `definition/interfaces/Args.md`
-- `definition/interfaces/Command.md`
-- `definition/interfaces/CommandContextParams.md`
-- `definition/interfaces/GunshiParams.md`
-- `definition/type-aliases/ArgValues.md`
-- `definition/type-aliases/CommandLoader.md`
-- `definition/type-aliases/CommandRunner.md`
-- `definition/type-aliases/DefaultGunshiParams.md`
-- `definition/type-aliases/ExtendContext.md`
-- `definition/type-aliases/LazyCommand.md`
 - `docs.json`
 - `generator/functions/generate.md`
 - `generator/index.md`
 - `generator/type-aliases/GenerateOptions.md`
 - `index.md`
 - `nav.ts`
-- `plugin/functions/createCommandContext.md`
-- `plugin/functions/plugin.md`
 - `plugin/index.md`
-- `plugin/interfaces/ArgSchema.md`
-- `plugin/interfaces/ArgToken.md`
-- `plugin/interfaces/Args.md`
-- `plugin/interfaces/Command.md`
-- `plugin/interfaces/CommandContext.md`
-- `plugin/interfaces/CommandContextExtension.md`
-- `plugin/interfaces/CommandContextParams.md`
-- `plugin/interfaces/GunshiParams.md`
-- `plugin/interfaces/PluginContext.md`
-- `plugin/interfaces/PluginDependency.md`
-- `plugin/interfaces/PluginOptions.md`
-- `plugin/interfaces/PluginWithExtension.md`
-- `plugin/interfaces/PluginWithoutExtension.md`
-- `plugin/type-aliases/ArgValues.md`
-- `plugin/type-aliases/Awaitable.md`
-- `plugin/type-aliases/CommandContextCore.md`
-- `plugin/type-aliases/CommandDecorator.md`
-- `plugin/type-aliases/CommandExamplesFetcher.md`
-- `plugin/type-aliases/CommandRunner.md`
-- `plugin/type-aliases/DefaultGunshiParams.md`
-- `plugin/type-aliases/ExtendContext.md`
-- `plugin/type-aliases/GunshiParamsConstraint.md`
-- `plugin/type-aliases/LazyCommand.md`
-- `plugin/type-aliases/OnPluginExtension.md`
-- `plugin/type-aliases/Plugin.md`
-- `plugin/type-aliases/PluginExtension.md`
-- `plugin/type-aliases/PluginFunction.md`
-- `plugin/type-aliases/Prettify.md`
-- `plugin/type-aliases/RendererDecorator.md`
-- `plugin/type-aliases/ValidationErrorsDecorator.md`
-- `plugin/variables/ANONYMOUS_COMMAND_NAME.md`
 - `plugin/variables/CLI_OPTIONS_DEFAULT.md`
 - `renderer/functions/renderHeader.md`
 - `renderer/functions/renderUsage.md`
@@ -406,12 +358,22 @@ ox-content entrypoint output uses entrypoint file names. A collision here means 
 ## Migration Notes
 
 - This comparison uses `@ox-content/napi` with `pathStrategy: "typedoc"`, so each symbol is emitted as its own nested page (`{module}/{category}/{Name}.md`) matching TypeDoc's `/api/default/functions/cli` layout, with a per-module `index.md`.
-- Navigation is generated via `generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })`, producing a deep `module -> category -> symbol` tree. ox-content's nav is framework-agnostic (`{ title, path, children }`), so this script normalizes it to the VitePress sidebar shape (`{ text, link, items }`) on the consumer side (see .notes/029): module nodes link to their index, category nodes are link-less collapsible headers (no category index page exists, matching TypeDoc), and leaf symbol nodes link to their per-symbol pages.
+- Navigation is generated via `generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })`, producing a deep `module -> category -> symbol` tree. ox-content's nav is framework-agnostic (`{ title, path, children }`), so this script only normalizes it to the VitePress sidebar shape (`{ text, link, items }`) on the consumer side (see .notes/029): module nodes link to their index, category nodes are link-less collapsible headers (no category index page exists, matching TypeDoc), and leaf symbol nodes link to their per-symbol pages. Leaf symbol dedupe and alphabetical ordering are handled upstream by ox-content v2.47.0+.
 - `linkStyle: "markdown"` is used so VitePress' dead-link checker resolves the generated links; with `cleanUrls: true` they are still served as clean URLs at runtime.
+- v2.40.0 display format options are used to render module indexes, parameters, properties, type-alias properties, and enum members as tables, matching the active `typedoc-plugin-markdown` settings.
+- v2.42.0 module-level examples are passed through and rendered on module index pages such as `combinators/index.md`.
+- v2.43.0 renders `@experimental` / `@deprecated` as GitHub Alert blocks and includes the declaration kind in TypeDoc-style symbol H1 titles.
+- v2.44.0 renders `@since` / `@version` as `## Since` sections instead of generic tags, and this script passes `sourcePath` through so the TypeDoc path strategy has the canonical source metadata available.
+- v2.45.0 renders all overload call signatures on typedoc symbol pages; this script carries `hasBody` through so implementation signatures can be omitted when public overloads exist.
+- v2.45.0 `renderStats: false` is used so root/module indexes no longer emit ox-content stats summary lines.
+- v2.46.0 `groupOrder` is used for both Markdown and nav generation so module index sections and sidebar groups follow the current TypeDoc ordering.
+- v2.47.0 sorts/dedupes TypeDoc nav leaf entries and sorts class/interface/type members alphabetically, so this script no longer postprocesses nav leaves or member order.
+- v2.48.0 omits the redundant `Kind` column from named member tables, bringing interface/class/type member tables closer to TypeDoc output.
+- v2.49.0 links known symbols inside type annotations, so Type Parameter constraints/defaults and Type cells can navigate to matching API pages like TypeDoc. Remaining caveat: primitive names that collide with public API exports (for example `string` / `boolean` combinators) can be over-linked.
 - `externalDocs: true` (with `externalPackageSources` overrides) resolves external package re-exports into documentation entries, so `args-tokens` (`parseArgs`, `resolveArgs`, combinators, `kebabnize`), `@gunshi/plugin-renderer` (`renderHeader`, `renderUsage`, `renderValidationErrors`) and `@gunshi/plugin-i18n` (`DefaultTranslation`) now appear as docs entries. This brings missing-by-name down to 0.
 - `{@link}` / `{@linkcode}` inline tags are resolved by the renderer: known symbols become internal links (e.g. `{@linkcode Command | entry command}` -> a link to the `Command` page), and unresolvable symbols (not part of gunshi's public API, e.g. `TranslationAdapter`) fall back to inline code. No raw `{@link}` tags remain in the generated pages.
-- Overloads are unified into a single page/anchor per symbol (`cli`, `define`, `lazy`, `plugin`), so duplicate anchors are gone. The "Symbol entries" count above still counts overloads and cross-entrypoint re-exports separately, but each `{module}/{category}/{Name}.md` page is unique.
+- Overloads are unified into a single page/anchor per symbol (`cli`, `define`, `lazy`, `plugin`) and v2.45.0 renders each public overload as a call signature instead of letting the implementation `any` signature overwrite the page. The "Symbol entries" count above still counts overloads and cross-entrypoint re-exports separately, but each `{module}/{category}/{Name}.md` page is unique.
 - Members are exposed/rendered for documented class/interface/type/enum entries, so pages such as `Command` include member data; `enum` symbols now get `enumerations/{Name}` pages.
 - `internal: false` is passed to entrypoint extraction to match TypeDoc `--excludeInternal`.
-- `renderStyle: "markdown"` (ox-content v2.29.0+) emits pure native Markdown — tables for params/members, fenced code blocks for signatures/examples, and Markdown links — with no raw HTML. This makes every inline `{@link}` / `{@linkcode}` a Markdown link that VitePress transforms to a clean URL and dead-link-checks (fixing the broken raw-HTML `.md` links), and removes the need for the previous `v-pre` / brace-escaping postprocess. The layout is now table/heading based, close to TypeDoc.
-- Remaining difference: symbol duplication across entrypoints (`Command` appears under `default`, `definition`, `plugin` — the same multi-module re-export behavior TypeDoc has).
+- `renderStyle: "markdown"` (ox-content v2.29.0+) emits pure native Markdown — tables for params/members, fenced code blocks for signatures/examples, and Markdown links — with no raw HTML. This makes every inline `{@link}` / `{@linkcode}` a Markdown link that VitePress transforms to a clean URL and dead-link-checks (fixing the broken raw-HTML `.md` links), and removes the need for the previous `v-pre` / brace-escaping postprocess. The only remaining local normalization is escaping generic angle brackets in headings (e.g. `Command\<G\>`) so Vue does not parse them as HTML.
+- Remaining differences are limited to module-index framing details tracked in .notes/035: breadcrumb and module Source link.

@@ -1,6 +1,10 @@
-# PluginFunction
+# Type Alias: PluginFunction\<G\>
 
 Plugin function type
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -14,10 +18,6 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 
 ## Type Parameters
 
-| Name                                                 | Description                                                                                                                                                  |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `G` _extends_ `GunshiParams` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the [`PluginContext`](/api-ox/default/interfaces/PluginContext.md). |
-
-## Tags
-
-- `@since` — v0.27.0
+| Name                                                                                                                                                      | Description                                                                                                                                                  |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `G` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the [`PluginContext`](/api-ox/default/interfaces/PluginContext.md). |

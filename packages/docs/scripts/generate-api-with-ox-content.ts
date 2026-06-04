@@ -31,6 +31,8 @@ type OxGraphOptions = {
   externalPackageSources?: OxExternalPackageSource[]
 }
 
+type OxMarkdownDisplayFormat = 'none' | 'list' | 'table'
+
 type OxContentNapi = {
   buildExportGraph: (entryPoints: OxEntryPointSpec[], options?: OxGraphOptions) => OxExportGraph
   extractDocsFromEntryPoints: (
@@ -50,13 +52,27 @@ type OxContentNapi = {
       // blocks, Markdown links) with no raw HTML; `html` (default) keeps the
       // themed `<details>` / `ox-api-*` card output.
       renderStyle?: 'html' | 'markdown'
+      // v2.40.0+: TypeDoc-compatible display formats. `none` keeps the
+      // renderer default; with `renderStyle: "markdown"` it behaves like list.
+      indexFormat?: OxMarkdownDisplayFormat
+      parametersFormat?: OxMarkdownDisplayFormat
+      interfacePropertiesFormat?: OxMarkdownDisplayFormat
+      classPropertiesFormat?: OxMarkdownDisplayFormat
+      typeAliasPropertiesFormat?: OxMarkdownDisplayFormat
+      enumMembersFormat?: OxMarkdownDisplayFormat
+      propertyMembersFormat?: OxMarkdownDisplayFormat
+      typeDeclarationFormat?: OxMarkdownDisplayFormat
+      // v2.45.0+: allow TypeDoc-like output without ox-content stats summaries.
+      renderStats?: boolean
+      // v2.46.0+: TypeDoc-style group order for module index sections.
+      groupOrder?: string[]
     }
   ) => Record<string, string>
   generateDocsNavCode: (navItems: OxNavItem[], exportName?: string) => string
   generateDocsNavMetadata: (files: string[], basePath?: string) => OxNavItem[]
   generateDocsNavMetadataFromDocs: (
     docs: OxMarkdownModule[],
-    options?: { basePath?: string; pathStrategy?: 'flat' | 'typedoc' }
+    options?: { basePath?: string; pathStrategy?: 'flat' | 'typedoc'; groupOrder?: string[] }
   ) => OxNavItem[]
 }
 
@@ -89,6 +105,10 @@ type OxEntrypointDocsModule = {
   // v2.32.0+: module-level description from the entry file's `@module` /
   // leading JSDoc comment.
   description?: string
+  // v2.42.0+: module-level examples and custom JSDoc tags from the entry
+  // file's `@module` / leading JSDoc comment.
+  examples?: string[]
+  tags?: OxMarkdownTag[]
   entries: OxDocEntry[]
   exports: OxPublicExport[]
   diagnostics?: OxDocsDiagnostic[]
@@ -157,6 +177,9 @@ type OxDocEntry = {
   line: number
   endLine: number
   signature?: string
+  // v2.45.0+: implementation declarations are marked so grouped overload pages
+  // can omit the body-carrying `any` signature and render public call signatures.
+  hasBody?: boolean
   members?: OxDocMember[]
   typeParameters?: OxTypeParam[]
 }
@@ -192,6 +215,12 @@ type OxMarkdownModule = {
   // v2.32.0+: module-level `@module` description carried through to the
   // generated module index page.
   description?: string
+  // v2.44.0 NAPI type exposes sourcePath so TypeDoc path strategy can keep a
+  // re-exported symbol's canonical page under its defining module.
+  sourcePath?: string
+  // v2.42.0+: module-level `@example` and custom JSDoc tags.
+  examples?: string[]
+  tags?: OxMarkdownTag[]
   entries: OxMarkdownEntry[]
 }
 
@@ -247,6 +276,10 @@ const outDir = path.resolve(docsRoot, 'src/api-ox')
 const tsconfigPath = path.resolve(repoRoot, 'tsconfig.json')
 const githubUrl = 'https://github.com/kazupon/gunshi'
 const apiOxBasePath = '/api-ox'
+// Mirror packages/docs/typedoc.config.mjs. ox-content v2.46.0 places unlisted
+// groups alphabetically after the listed groups when no `*` is provided, which
+// matches the current TypeDoc module index order used by gunshi.
+const apiOxGroupOrder = ['Variables', 'Functions', 'Class']
 
 const entryPoints: OxEntryPointSpec[] = [
   { path: '../gunshi/src/index.ts', name: 'default' },
@@ -400,6 +433,28 @@ function toMarkdownEntry(entry: OxDocEntry): OxMarkdownEntry {
   }
 }
 
+function escapeHeadingAngleBrackets(markdown: string): string {
+  let inCodeFence = false
+
+  return markdown
+    .split('\n')
+    .map(line => {
+      if (line.startsWith('```')) {
+        inCodeFence = !inCodeFence
+        return line
+      }
+
+      if (inCodeFence || !/^#{1,6}\s/.test(line)) {
+        return line
+      }
+
+      // VitePress/Vue treats raw `<T>` in headings as HTML. TypeDoc escapes
+      // generic parameters in headings (`Command\<G\>`), so mirror that shape.
+      return line.replace(/(?<!\\)([<>])/g, '\\$1')
+    })
+    .join('\n')
+}
+
 function ensureTrailingSlash(value: string): string {
   return value.endsWith('/') ? value : `${value}/`
 }
@@ -417,6 +472,7 @@ function ensureTrailingSlash(value: string): string {
 //     these as link-less collapsible headers.
 //   - leaf symbol nodes keep a `link` to their per-symbol page (clean URL, no
 //     `.md`, served as-is under `cleanUrls: true`).
+//   - leaf symbol order/deduplication is provided by ox-content v2.47.0+.
 function toVitePressNav(items: OxNavItem[], depth = 0): VitePressNavItem[] {
   return items.map(item => {
     const children = item.children ?? []
@@ -521,6 +577,37 @@ function buildOxSymbols(modules: OxMarkdownModule[]): OxSymbol[] {
       }
     })
   )
+}
+
+function buildOxPageSymbols(generatedFiles: string[]): OxSymbol[] {
+  return generatedFiles.flatMap(file => {
+    if (!file.endsWith('.md')) {
+      return []
+    }
+
+    const parts = file.split('/')
+    const moduleName = parts[0]
+    const kindDirectory = parts[1]
+    const name = stripMarkdownExtension(path.basename(file))
+    const kind = kindByTypeDocDirectory[kindDirectory]
+
+    if (!moduleName || !kind) {
+      return []
+    }
+
+    return [
+      {
+        name,
+        kind,
+        module: moduleName,
+        sourceFile: 'generated page',
+        outputFile: file,
+        url: `${apiOxBasePath}/${stripMarkdownExtension(file)}`,
+        internal: false,
+        memberCount: 0
+      }
+    ]
+  })
 }
 
 function findUndocumentedExports(modules: OxEntrypointDocsModule[]): UndocumentedExport[] {
@@ -659,14 +746,15 @@ function createComparisonReport(
   entrypointModules: OxEntrypointDocsModule[],
   typeDocSymbols: TypeDocSymbol[],
   oxSymbols: OxSymbol[],
+  oxPageSymbols: OxSymbol[],
   generatedFiles: string[],
   collisions: Array<[string, string[]]>,
   currentPageCount: number
 ): string {
   const typeDocNameSet = new Set(typeDocSymbols.map(symbol => symbol.name))
-  const oxNameSet = new Set(oxSymbols.map(symbol => symbol.name))
-  const missingByName = typeDocSymbols.filter(symbol => !oxNameSet.has(symbol.name))
-  const extraByName = oxSymbols.filter(symbol => !typeDocNameSet.has(symbol.name))
+  const oxPageNameSet = new Set(oxPageSymbols.map(symbol => symbol.name))
+  const missingByName = typeDocSymbols.filter(symbol => !oxPageNameSet.has(symbol.name))
+  const extraByName = oxPageSymbols.filter(symbol => !typeDocNameSet.has(symbol.name))
   const internalOxSymbols = oxSymbols.filter(symbol => symbol.internal)
   const documentedMemberCount = oxSymbols.reduce((total, symbol) => total + symbol.memberCount, 0)
   const undocumentedExports = findUndocumentedExports(entrypointModules)
@@ -689,14 +777,17 @@ ${entryPoints.map(entryPoint => `  - \`${entryPoint.name ?? stem(entryPoint.path
 - ox-content package path: \`${toPosix(path.relative(repoRoot, oxContentPackage.path))}\`
 - export graph entrypoints: ${exportGraph.entrypoints.length}
 - export graph source modules: ${exportGraph.modules.length}
-- render style: \`renderStyle: "markdown"\` emits pure native Markdown (fenced code blocks, tables, Markdown links) with no raw HTML, so no VitePress/Vue postprocess (\`v-pre\` / brace escaping) is required and inline \`{@link}\` links are transformed to clean URLs by VitePress.
+- render style: \`renderStyle: "markdown"\` emits pure native Markdown (fenced code blocks, tables, Markdown links) with no raw HTML; this script only normalizes generic angle brackets in headings for VitePress/Vue compatibility.
+- display formats: \`indexFormat\`, \`parametersFormat\`, property/member formats, and \`enumMembersFormat\` are set to \`"table"\` to mirror the current TypeDoc configuration; \`typeDeclarationFormat\` is left as \`"none"\` because the TypeDoc config does not set it.
+- stats summaries: \`renderStats: false\` omits ox-content's \`_N symbols · ..._\` summary lines for TypeDoc-like output.
+- group order: \`groupOrder: ${JSON.stringify(apiOxGroupOrder)}\` mirrors \`packages/docs/typedoc.config.mjs\` for module index and nav group order.
 
 ## Summary
 
 | Metric | Current TypeDoc | ox-content (typedoc) |
 |---|---:|---:|
 | Symbol entries | ${typeDocSymbols.length} | ${oxSymbols.length} |
-| Unique symbol names | ${typeDocNameSet.size} | ${oxNameSet.size} |
+| Unique symbol names | ${typeDocNameSet.size} | ${oxPageNameSet.size} |
 | Markdown pages | ${currentPageCount} | ${generatedFiles.filter(file => file.endsWith('.md')).length} |
 | Missing TypeDoc symbols by name | - | ${missingByName.length} |
 | Extra ox-content symbols by name | - | ${extraByName.length} |
@@ -712,7 +803,7 @@ ox-content kind counts: ${formatCountByKind(oxSymbols)}
 
 ## URL Samples
 
-${formatUrlSamples(typeDocSymbols, oxSymbols)}
+${formatUrlSamples(typeDocSymbols, oxPageSymbols)}
 
 ## Missing Current TypeDoc Symbols
 
@@ -722,7 +813,7 @@ ${formatSymbolList(missingByName)}
 
 ## Extra ox-content Symbols
 
-These symbols appear in ox-content entrypoint extraction but do not have a current TypeDoc symbol page by the same name.
+These generated ox-content symbol pages do not have a current TypeDoc symbol page by the same name.
 
 ${formatOxSymbolList(extraByName)}
 
@@ -769,15 +860,25 @@ ${generatedFiles.map(file => `- \`${file}\``).join('\n')}
 ## Migration Notes
 
 - This comparison uses \`@ox-content/napi\` with \`pathStrategy: "typedoc"\`, so each symbol is emitted as its own nested page (\`{module}/{category}/{Name}.md\`) matching TypeDoc's \`/api/default/functions/cli\` layout, with a per-module \`index.md\`.
-- Navigation is generated via \`generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })\`, producing a deep \`module -> category -> symbol\` tree. ox-content's nav is framework-agnostic (\`{ title, path, children }\`), so this script normalizes it to the VitePress sidebar shape (\`{ text, link, items }\`) on the consumer side (see .notes/029): module nodes link to their index, category nodes are link-less collapsible headers (no category index page exists, matching TypeDoc), and leaf symbol nodes link to their per-symbol pages.
+- Navigation is generated via \`generateDocsNavMetadataFromDocs(..., { pathStrategy: "typedoc" })\`, producing a deep \`module -> category -> symbol\` tree. ox-content's nav is framework-agnostic (\`{ title, path, children }\`), so this script only normalizes it to the VitePress sidebar shape (\`{ text, link, items }\`) on the consumer side (see .notes/029): module nodes link to their index, category nodes are link-less collapsible headers (no category index page exists, matching TypeDoc), and leaf symbol nodes link to their per-symbol pages. Leaf symbol dedupe and alphabetical ordering are handled upstream by ox-content v2.47.0+.
 - \`linkStyle: "markdown"\` is used so VitePress' dead-link checker resolves the generated links; with \`cleanUrls: true\` they are still served as clean URLs at runtime.
+- v2.40.0 display format options are used to render module indexes, parameters, properties, type-alias properties, and enum members as tables, matching the active \`typedoc-plugin-markdown\` settings.
+- v2.42.0 module-level examples are passed through and rendered on module index pages such as \`combinators/index.md\`.
+- v2.43.0 renders \`@experimental\` / \`@deprecated\` as GitHub Alert blocks and includes the declaration kind in TypeDoc-style symbol H1 titles.
+- v2.44.0 renders \`@since\` / \`@version\` as \`## Since\` sections instead of generic tags, and this script passes \`sourcePath\` through so the TypeDoc path strategy has the canonical source metadata available.
+- v2.45.0 renders all overload call signatures on typedoc symbol pages; this script carries \`hasBody\` through so implementation signatures can be omitted when public overloads exist.
+- v2.45.0 \`renderStats: false\` is used so root/module indexes no longer emit ox-content stats summary lines.
+- v2.46.0 \`groupOrder\` is used for both Markdown and nav generation so module index sections and sidebar groups follow the current TypeDoc ordering.
+- v2.47.0 sorts/dedupes TypeDoc nav leaf entries and sorts class/interface/type members alphabetically, so this script no longer postprocesses nav leaves or member order.
+- v2.48.0 omits the redundant \`Kind\` column from named member tables, bringing interface/class/type member tables closer to TypeDoc output.
+- v2.49.0 links known symbols inside type annotations, so Type Parameter constraints/defaults and Type cells can navigate to matching API pages like TypeDoc. Remaining caveat: primitive names that collide with public API exports (for example \`string\` / \`boolean\` combinators) can be over-linked.
 - \`externalDocs: true\` (with \`externalPackageSources\` overrides) resolves external package re-exports into documentation entries, so \`args-tokens\` (\`parseArgs\`, \`resolveArgs\`, combinators, \`kebabnize\`), \`@gunshi/plugin-renderer\` (\`renderHeader\`, \`renderUsage\`, \`renderValidationErrors\`) and \`@gunshi/plugin-i18n\` (\`DefaultTranslation\`) now appear as docs entries. This brings missing-by-name down to 0.
 - \`{@link}\` / \`{@linkcode}\` inline tags are resolved by the renderer: known symbols become internal links (e.g. \`{@linkcode Command | entry command}\` -> a link to the \`Command\` page), and unresolvable symbols (not part of gunshi's public API, e.g. \`TranslationAdapter\`) fall back to inline code. No raw \`{@link}\` tags remain in the generated pages.
-- Overloads are unified into a single page/anchor per symbol (\`cli\`, \`define\`, \`lazy\`, \`plugin\`), so duplicate anchors are gone. The "Symbol entries" count above still counts overloads and cross-entrypoint re-exports separately, but each \`{module}/{category}/{Name}.md\` page is unique.
+- Overloads are unified into a single page/anchor per symbol (\`cli\`, \`define\`, \`lazy\`, \`plugin\`) and v2.45.0 renders each public overload as a call signature instead of letting the implementation \`any\` signature overwrite the page. The "Symbol entries" count above still counts overloads and cross-entrypoint re-exports separately, but each \`{module}/{category}/{Name}.md\` page is unique.
 - Members are exposed/rendered for documented class/interface/type/enum entries, so pages such as \`Command\` include member data; \`enum\` symbols now get \`enumerations/{Name}\` pages.
 - \`internal: false\` is passed to entrypoint extraction to match TypeDoc \`--excludeInternal\`.
-- \`renderStyle: "markdown"\` (ox-content v2.29.0+) emits pure native Markdown — tables for params/members, fenced code blocks for signatures/examples, and Markdown links — with no raw HTML. This makes every inline \`{@link}\` / \`{@linkcode}\` a Markdown link that VitePress transforms to a clean URL and dead-link-checks (fixing the broken raw-HTML \`.md\` links), and removes the need for the previous \`v-pre\` / brace-escaping postprocess. The layout is now table/heading based, close to TypeDoc.
-- Remaining difference: symbol duplication across entrypoints (\`Command\` appears under \`default\`, \`definition\`, \`plugin\` — the same multi-module re-export behavior TypeDoc has).
+- \`renderStyle: "markdown"\` (ox-content v2.29.0+) emits pure native Markdown — tables for params/members, fenced code blocks for signatures/examples, and Markdown links — with no raw HTML. This makes every inline \`{@link}\` / \`{@linkcode}\` a Markdown link that VitePress transforms to a clean URL and dead-link-checks (fixing the broken raw-HTML \`.md\` links), and removes the need for the previous \`v-pre\` / brace-escaping postprocess. The only remaining local normalization is escaping generic angle brackets in headings (e.g. \`Command\\<G\\>\`) so Vue does not parse them as HTML.
+- Remaining differences are limited to module-index framing details tracked in .notes/035: breadcrumb and module Source link.
 `
 }
 
@@ -811,6 +912,13 @@ async function main() {
     // v2.32.0+: carry the module-level `@module` description through to the
     // generated module index page (instead of falling back to a symbol blurb).
     description: module.description,
+    // v2.44.0 type metadata: keep the source path available to the typedoc path
+    // strategy/canonical ownership logic.
+    sourcePath: module.sourcePath,
+    // v2.42.0+: carry module-level examples and tags so the renderer can emit
+    // `## Example` and lifecycle alerts/sections on `{module}/index.md`.
+    examples: module.examples,
+    tags: module.tags,
     entries: module.entries.map(toMarkdownEntry)
   }))
 
@@ -830,13 +938,32 @@ async function main() {
     // resolves module index pages. With `cleanUrls: true` these are still served
     // as clean URLs at runtime. (`linkStyle: "clean"` emits absolute
     // directory-index links like `/api-ox/agent` that the checker rejects.)
-    linkStyle: 'markdown'
+    linkStyle: 'markdown',
+    // v2.40.0+: mirror the TypeDoc + typedoc-plugin-markdown display settings
+    // used by packages/docs/typedoc.config.mjs so the ox-content output has the
+    // same dense table layout for indexes, parameters, and member groups.
+    indexFormat: 'table',
+    parametersFormat: 'table',
+    interfacePropertiesFormat: 'table',
+    classPropertiesFormat: 'table',
+    propertyMembersFormat: 'table',
+    typeAliasPropertiesFormat: 'table',
+    enumMembersFormat: 'table',
+    // gunshi's TypeDoc config does not set this option, so keep ox-content's
+    // default sentinel. For renderStyle: 'markdown', v2.40.0 treats it as list.
+    typeDeclarationFormat: 'none',
+    // v2.45.0+: TypeDoc does not emit ox-content's `_N symbols · ..._` summary
+    // lines, so disable them for the comparison output.
+    renderStats: false,
+    // v2.46.0+: keep module index section order aligned with TypeDoc.
+    groupOrder: apiOxGroupOrder
   })
   // ox-content emits framework-agnostic nav metadata; normalize it to the
   // VitePress sidebar shape on the consumer side (see .notes/029).
   const navItems = napi.generateDocsNavMetadataFromDocs(modules, {
     basePath: apiOxBasePath,
-    pathStrategy: 'typedoc'
+    pathStrategy: 'typedoc',
+    groupOrder: apiOxGroupOrder
   })
   const vitepressNav = toVitePressNav(navItems)
   const oxSymbols = buildOxSymbols(modules)
@@ -860,9 +987,9 @@ async function main() {
     // so ensure the parent directory exists before writing.
     await fs.mkdir(path.dirname(target), { recursive: true })
     // `renderStyle: 'markdown'` emits pure Markdown (fenced code blocks, tables,
-    // Markdown links) with no raw HTML, so no VitePress/Vue postprocess is
-    // needed; just normalize the trailing newline.
-    await fs.writeFile(target, `${content.trimEnd()}\n`, 'utf8')
+    // Markdown links) with no raw HTML. Keep a small VitePress-compatible
+    // heading normalization for TypeDoc-style generic H1s (`Foo\<T\>`).
+    await fs.writeFile(target, `${escapeHeadingAngleBrackets(content).trimEnd()}\n`, 'utf8')
   }
 
   await fs.writeFile(
@@ -875,6 +1002,7 @@ async function main() {
   const generatedFiles = (await walkFiles(outDir))
     .map(file => toPosix(path.relative(outDir, file)))
     .sort()
+  const oxPageSymbols = buildOxPageSymbols(generatedFiles)
   const report = createComparisonReport(
     generatedAt,
     oxContentPackage,
@@ -882,6 +1010,7 @@ async function main() {
     entrypointModules,
     typeDocSymbols,
     oxSymbols,
+    oxPageSymbols,
     generatedFiles,
     collisions,
     currentPageCount

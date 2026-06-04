@@ -1,4 +1,7 @@
-# unrequired
+# Function: unrequired()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Mark a combinator schema as not required.
 
@@ -21,13 +24,13 @@ declare function unrequired<T>(
 
 ## Parameters
 
-| Name     | Type                  | Description                 |
-| -------- | --------------------- | --------------------------- |
-| `schema` | `CombinatorSchema<T>` | The base combinator schema. |
+| Name     | Type                                                                              | Description                 |
+| -------- | --------------------------------------------------------------------------------- | --------------------------- |
+| `schema` | [`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 
 ## Returns
 
-`CombinatorSchema<T> & CombinatorUnrequired` — A new schema with `required: false`.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorUnrequired` — A new schema with `required: false`.
 
 ## Examples
 
@@ -36,7 +39,3 @@ const args = {
   name: unrequired(string({ required: true }))
 }
 ```
-
-## Tags
-
-- `@experimental`

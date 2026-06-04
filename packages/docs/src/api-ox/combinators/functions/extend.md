@@ -1,4 +1,7 @@
-# extend
+# Function: extend()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Extend a schema by overriding or adding fields.
 
@@ -13,10 +16,10 @@ declare function extend<T extends Args, U extends Args>(base: T, overrides: U): 
 
 ## Type Parameters
 
-| Name                 | Description            |
-| -------------------- | ---------------------- |
-| `T` _extends_ `Args` | Base schema type.      |
-| `U` _extends_ `Args` | Overrides schema type. |
+| Name                                                       | Description            |
+| ---------------------------------------------------------- | ---------------------- |
+| `T` _extends_ [`Args`](/api-ox/default/interfaces/Args.md) | Base schema type.      |
+| `U` _extends_ [`Args`](/api-ox/default/interfaces/Args.md) | Overrides schema type. |
 
 ## Parameters
 
@@ -35,7 +38,3 @@ declare function extend<T extends Args, U extends Args>(base: T, overrides: U): 
 const base = args({ port: withDefault(integer(), 8080) })
 const strict = extend(base, { port: required(integer({ min: 1, max: 65535 })) })
 ```
-
-## Tags
-
-- `@experimental`

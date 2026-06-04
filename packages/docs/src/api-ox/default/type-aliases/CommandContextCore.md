@@ -1,6 +1,10 @@
-# CommandContextCore
+# Type Alias: CommandContextCore\<G\>
 
 Readonly command context available to a command context extension factory.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -14,10 +18,6 @@ export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiP
 
 ## Type Parameters
 
-| Name                                                           | Description                                                                                                            |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |
-
-## Tags
-
-- `@since` — v0.27.0
+| Name                                                                                                                                                                            | Description                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |

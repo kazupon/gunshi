@@ -1,4 +1,7 @@
-# Combinator
+# Type Alias: Combinator\<T\>
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 A combinator produced by combinator factory functions.
 
@@ -24,10 +27,12 @@ type Combinator<T> = {
 
 ## Properties
 
-| Name    | Kind     | Type                   | Description                                                                                         |
-| ------- | -------- | ---------------------- | --------------------------------------------------------------------------------------------------- |
-| `parse` | property | `(value: string) => T` | The parse function that converts a string to the desired type. Returns: The parsed value of type T. |
+| Name    | Type                                                                   | Description                                                                                         |
+| ------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `parse` | (`value`: [`string`](/api-ox/combinators/functions/string.md)) =\> `T` | The parse function that converts a string to the desired type. Returns: The parsed value of type T. |
 
-## Tags
+### parse Parameters
 
-- `@experimental`
+| Name    | Type      | Description             |
+| ------- | --------- | ----------------------- |
+| `value` | `unknown` | The input string value. |

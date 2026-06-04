@@ -1,4 +1,4 @@
-# ANONYMOUS_COMMAND_NAME
+# Variable: ANONYMOUS_COMMAND_NAME
 
 ## Signature
 

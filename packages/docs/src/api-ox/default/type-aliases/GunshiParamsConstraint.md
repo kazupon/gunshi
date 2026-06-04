@@ -1,8 +1,12 @@
-# GunshiParamsConstraint
+# Type Alias: GunshiParamsConstraint
 
 Generic constraint for command-related types.
 
 This type constraint allows both [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) and objects with extensions.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -18,7 +22,3 @@ export type GunshiParamsConstraint =
 ```
 
 [View source](https://github.com/kazupon/gunshi/blob/main/packages/gunshi/src/types.ts#L76-L83)
-
-## Tags
-
-- `@since` — v0.27.0

@@ -1,9 +1,13 @@
-# lazyWithTypes
+# Function: lazyWithTypes()
 
-Define a [lazy command](/api-ox/definition/type-aliases/LazyCommand.md) with specific type parameters.
+Define a [lazy command](/api-ox/default/type-aliases/LazyCommand.md) with specific type parameters.
 
-This helper function allows specifying the type parameter of [GunshiParams](/api-ox/definition/interfaces/GunshiParams.md)
-while inferring the [Args](/api-ox/definition/interfaces/Args.md) type, [ExtendContext](/api-ox/definition/type-aliases/ExtendContext.md) type from the definition.
+This helper function allows specifying the type parameter of [GunshiParams](/api-ox/default/interfaces/GunshiParams.md)
+while inferring the [Args](/api-ox/default/interfaces/Args.md) type, [ExtendContext](/api-ox/default/type-aliases/ExtendContext.md) type from the definition.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -17,9 +21,9 @@ export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypes
 
 ## Type Parameters
 
-| Name                                   | Description                                                          |
-| -------------------------------------- | -------------------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` | A [GunshiParams](/api-ox/definition/interfaces/GunshiParams.md) type |
+| Name                                                                                             | Description                                                       |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) | A [GunshiParams](/api-ox/default/interfaces/GunshiParams.md) type |
 
 ## Returns
 
@@ -47,7 +51,3 @@ const command = lazyWithTypes<{ extensions: MyExtensions }>()(
   },
 )
 ```
-
-## Tags
-
-- `@since` — v0.27.0

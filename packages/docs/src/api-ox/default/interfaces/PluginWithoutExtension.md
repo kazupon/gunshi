@@ -1,4 +1,4 @@
-# PluginWithoutExtension
+# Interface: PluginWithoutExtension\<E\>
 
 Plugin return type without extension, which includes the plugin ID, name, and dependencies, but no extension.
 
@@ -16,14 +16,14 @@ export interface PluginWithoutExtension<
 
 ## Type Parameters
 
-| Name                                                                             | Description                                                                                                                                                                        |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `E` _extends_ `GunshiParams['extensions']` = `DefaultGunshiParams['extensions']` | A type extending [GunshiParams](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContext`](/api-ox/default/interfaces/CommandContext.md)'s extensions. |
+| Name                                                                                                                                                                                      | Description                                                                                                                                                                        |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `E` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md)\['extensions'\] = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md)\['extensions'\] | A type extending [GunshiParams](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContext`](/api-ox/default/interfaces/CommandContext.md)'s extensions. |
 
 ## Properties
 
-| Name                        | Kind     | Type        | Description         |
-| --------------------------- | -------- | ----------- | ------------------- |
-| `id`                        | property | `string`    | Plugin identifier   |
-| `name`                      | property | `string`    | Plugin name         |
-| `dependencies` _(optional)_ | property | `unknown[]` | Plugin dependencies |
+| Name                        | Type                                                | Description         |
+| --------------------------- | --------------------------------------------------- | ------------------- |
+| `dependencies` _(optional)_ | `unknown[]`                                         | Plugin dependencies |
+| `id`                        | [`string`](/api-ox/combinators/functions/string.md) | Plugin identifier   |
+| `name`                      | [`string`](/api-ox/combinators/functions/string.md) | Plugin name         |

@@ -1,4 +1,4 @@
-# renderValidationErrors
+# Function: renderValidationErrors()
 
 Render the validation errors.
 
@@ -15,17 +15,17 @@ declare function renderValidationErrors<G extends GunshiParams = DefaultGunshiPa
 
 ## Type Parameters
 
-| Name                                                 | Description |
-| ---------------------------------------------------- | ----------- |
-| `G` _extends_ `GunshiParams` = `DefaultGunshiParams` |             |
+| Name                                                                                                                                                      | Description |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `G` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) |             |
 
 ## Parameters
 
-| Name    | Type                | Description                                                       |
-| ------- | ------------------- | ----------------------------------------------------------------- |
-| `_ctx`  | `CommandContext<G>` | A [command context](/api-ox/default/interfaces/CommandContext.md) |
-| `error` | `AggregateError`    | An AggregateError of option in `args-token` validation            |
+| Name    | Type                                                                    | Description                                                       |
+| ------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `_ctx`  | [`CommandContext`](/api-ox/default/interfaces/CommandContext.md)\<`G`\> | A [command context](/api-ox/default/interfaces/CommandContext.md) |
+| `error` | `AggregateError`                                                        | An AggregateError of option in `args-token` validation            |
 
 ## Returns
 
-`Promise<string>` — A rendered validation error.
+`Promise`\<[`string`](/api-ox/combinators/functions/string.md)\> — A rendered validation error.

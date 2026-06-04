@@ -16,6 +16,7 @@ coverage
 .claude
 
 design/.*
+packages/docs/.bench
 packages/docs/src/.vitepress/dist
 packages/docs/src/.vitepress/cache
 packages/docs/src/api/context

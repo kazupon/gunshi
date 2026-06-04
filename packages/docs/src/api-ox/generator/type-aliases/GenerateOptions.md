@@ -1,4 +1,4 @@
-# GenerateOptions
+# Type Alias: GenerateOptions\<G\>
 
 generate options of `generate` function.
 
@@ -12,6 +12,6 @@ export type GenerateOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
 
 ## Type Parameters
 
-| Name                                                           | Description                                                                                                                                                     |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CliOptions`](/api-ox/default/interfaces/CliOptions.md). |
+| Name                                                                                                                                                                            | Description                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CliOptions`](/api-ox/default/interfaces/CliOptions.md). |

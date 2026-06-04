@@ -1,4 +1,4 @@
-# CommandEnvironment
+# Interface: CommandEnvironment\<G\>
 
 Command environment.
 
@@ -12,27 +12,27 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
 
 ## Type Parameters
 
-| Name                                                           | Description                                                                                                                 |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command environments. |
+| Name                                                                                                                                                                            | Description                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command environments. |
 
 ## Properties
 
-| Name                     | Kind     | Type                                                         | Description                                              |
-| ------------------------ | -------- | ------------------------------------------------------------ | -------------------------------------------------------- |
-| `cwd`                    | property | `string \| undefined`                                        | Current working directory.                               |
-| `name`                   | property | `string \| undefined`                                        | Command name.                                            |
-| `description`            | property | `string \| undefined`                                        | Command description.                                     |
-| `version`                | property | `string \| undefined`                                        | Command version.                                         |
-| `leftMargin`             | property | `number`                                                     | Left margin of the command output.                       |
-| `middleMargin`           | property | `number`                                                     | Middle margin of the command output.                     |
-| `usageOptionType`        | property | `boolean`                                                    | Whether to display the usage option type.                |
-| `usageOptionValue`       | property | `boolean`                                                    | Whether to display the option value.                     |
-| `usageSilent`            | property | `boolean`                                                    | Whether to display the command usage.                    |
-| `subCommands`            | property | `Map<string, Command<any> \| LazyCommand<any>> \| undefined` | Sub commands.                                            |
-| `renderUsage`            | property | `unknown \| null \| undefined`                               | Render function the command usage.                       |
-| `renderHeader`           | property | `unknown \| null \| undefined`                               | Render function the header section in the command usage. |
-| `renderValidationErrors` | property | `unknown \| null \| undefined`                               | Render function the validation errors.                   |
-| `onBeforeCommand`        | property | `unknown \| undefined`                                       | Hook that runs before any command execution              |
-| `onAfterCommand`         | property | `unknown \| undefined`                                       | Hook that runs after successful command execution        |
-| `onErrorCommand`         | property | `unknown \| undefined`                                       | Hook that runs when a command throws an error            |
+| Name                     | Type                                                                                                                                                                                                              | Description                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `cwd`                    | [`string`](/api-ox/combinators/functions/string.md) \| `undefined`                                                                                                                                                | Current working directory.                                          |
+| `description`            | [`string`](/api-ox/combinators/functions/string.md) \| `undefined`                                                                                                                                                | Command description.                                                |
+| `leftMargin`             | [`number`](/api-ox/combinators/functions/number.md)                                                                                                                                                               | Left margin of the command output.                                  |
+| `middleMargin`           | [`number`](/api-ox/combinators/functions/number.md)                                                                                                                                                               | Middle margin of the command output.                                |
+| `name`                   | [`string`](/api-ox/combinators/functions/string.md) \| `undefined`                                                                                                                                                | Command name.                                                       |
+| `onAfterCommand`         | `unknown \| undefined`                                                                                                                                                                                            | Hook that runs after successful command execution **Since** v0.27.0 |
+| `onBeforeCommand`        | `unknown \| undefined`                                                                                                                                                                                            | Hook that runs before any command execution **Since** v0.27.0       |
+| `onErrorCommand`         | `unknown \| undefined`                                                                                                                                                                                            | Hook that runs when a command throws an error **Since** v0.27.0     |
+| `renderHeader`           | `unknown \| null \| undefined`                                                                                                                                                                                    | Render function the header section in the command usage.            |
+| `renderUsage`            | `unknown \| null \| undefined`                                                                                                                                                                                    | Render function the command usage.                                  |
+| `renderValidationErrors` | `unknown \| null \| undefined`                                                                                                                                                                                    | Render function the validation errors.                              |
+| `subCommands`            | `Map`\<[`string`](/api-ox/combinators/functions/string.md), [`Command`](/api-ox/default/interfaces/Command.md)\<`any`\> \| [`LazyCommand`](/api-ox/default/type-aliases/LazyCommand.md)\<`any`\>\> \| `undefined` | Sub commands.                                                       |
+| `usageOptionType`        | [`boolean`](/api-ox/combinators/functions/boolean.md)                                                                                                                                                             | Whether to display the usage option type.                           |
+| `usageOptionValue`       | [`boolean`](/api-ox/combinators/functions/boolean.md)                                                                                                                                                             | Whether to display the option value.                                |
+| `usageSilent`            | [`boolean`](/api-ox/combinators/functions/boolean.md)                                                                                                                                                             | Whether to display the command usage.                               |
+| `version`                | [`string`](/api-ox/combinators/functions/string.md) \| `undefined`                                                                                                                                                | Command version.                                                    |

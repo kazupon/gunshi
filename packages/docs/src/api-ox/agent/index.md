@@ -1,11 +1,20 @@
-# Agent
+# agent
+
+> [!WARNING]
+> The `gunshi/agent` entry point is experimental. The agent detection rules are delegated to [std-env](https://github.com/unjs/std-env) and may change as the upstream detector list evolves.
 
 The entry point for AI agent detection utility.
 
-**[Source](https://github.com/kazupon/gunshi/blob/main/agent)**
+## Example
 
-_1 symbols · 1 functions · 1 returns · 1 examples_
+```js
+import { getAgentProfile } from 'gunshi/agent'
+```
+
+**[Source](https://github.com/kazupon/gunshi/blob/main/agent)**
 
 ## Functions
 
-- [`getAgentProfile`](/api-ox/agent/functions/getAgentProfile.md) `function` `getAgentProfile(): AgentProfile` - Get the AI coding agent profile of the current process. The detection itself is delegat…
+| Function                                                      | Description                                             |
+| ------------------------------------------------------------- | ------------------------------------------------------- |
+| [getAgentProfile](/api-ox/agent/functions/getAgentProfile.md) | Get the AI coding agent profile of the current process. |

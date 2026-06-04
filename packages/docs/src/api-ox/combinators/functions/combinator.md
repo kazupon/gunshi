@@ -1,4 +1,7 @@
-# combinator
+# Function: combinator()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a custom argument schema with a user-defined parse function.
 
@@ -22,13 +25,13 @@ declare function combinator<T>(config: CombinatorOptions<T>): CombinatorSchema<T
 
 ## Parameters
 
-| Name     | Type                   | Description                                               |
-| -------- | ---------------------- | --------------------------------------------------------- |
-| `config` | `CombinatorOptions<T>` | Configuration with a parse function and optional metavar. |
+| Name     | Type                                                                              | Description                                               |
+| -------- | --------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `config` | [`CombinatorOptions`](/api-ox/combinators/interfaces/CombinatorOptions.md)\<`T`\> | Configuration with a parse function and optional metavar. |
 
 ## Returns
 
-`CombinatorSchema<T>` — A combinator schema that resolves to the parse function's return type.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> — A combinator schema that resolves to the parse function's return type.
 
 ## Examples
 
@@ -44,7 +47,3 @@ const date = combinator({
   metavar: 'date'
 })
 ```
-
-## Tags
-
-- `@experimental`

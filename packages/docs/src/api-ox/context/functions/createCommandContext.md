@@ -1,4 +1,4 @@
-# createCommandContext
+# Function: createCommandContext()
 
 Create a command context.
 
@@ -32,18 +32,18 @@ export async function createCommandContext<
 
 ## Type Parameters
 
-| Name                                                                    | Description |
-| ----------------------------------------------------------------------- | ----------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams`          |             |
-| `V` _extends_ `ArgValues<ExtractArgs<G>>` = `ArgValues<ExtractArgs<G>>` |             |
-| `C` _extends_ `Command<G> \| LazyCommand<G>` = `Command<G>`             |             |
-| `E` _extends_ `Record<string, CommandContextExtension>` = `{}`          |             |
+| Name                                                                                                                                                                                                       | Description |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md)                            |             |
+| `V` _extends_ [`ArgValues`](/api-ox/default/type-aliases/ArgValues.md)\<`ExtractArgs`\<`G`\>\> = [`ArgValues`](/api-ox/default/type-aliases/ArgValues.md)\<`ExtractArgs`\<`G`\>\>                          |             |
+| `C` _extends_ [`Command`](/api-ox/default/interfaces/Command.md)\<`G`\> \| [`LazyCommand`](/api-ox/default/type-aliases/LazyCommand.md)\<`G`\> = [`Command`](/api-ox/default/interfaces/Command.md)\<`G`\> |             |
+| `E` _extends_ `Record`\<[`string`](/api-ox/combinators/functions/string.md), [`CommandContextExtension`](/api-ox/default/interfaces/CommandContextExtension.md)\> = `{}`                                   |             |
 
 ## Parameters
 
-| Name    | Type                               | Description                                                                                     |
-| ------- | ---------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `param` | `CommandContextParams<G, V, C, E>` | A [parameters](/api-ox/context/interfaces/CommandContextParams.md) to create a command context. |
+| Name    | Type                                                                                               | Description                                                                                     |
+| ------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `param` | [`CommandContextParams`](/api-ox/context/interfaces/CommandContextParams.md)\<`G`, `V`, `C`, `E`\> | A [parameters](/api-ox/context/interfaces/CommandContextParams.md) to create a command context. |
 
 ## Returns
 

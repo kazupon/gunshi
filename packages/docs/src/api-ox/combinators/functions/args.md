@@ -1,4 +1,7 @@
-# args
+# Function: args()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Type-safe schema factory.
 
@@ -13,9 +16,9 @@ declare function args<T extends Args>(fields: T): T
 
 ## Type Parameters
 
-| Name                 | Description            |
-| -------------------- | ---------------------- |
-| `T` _extends_ `Args` | The exact schema type. |
+| Name                                                       | Description            |
+| ---------------------------------------------------------- | ---------------------- |
+| `T` _extends_ [`Args`](/api-ox/default/interfaces/Args.md) | The exact schema type. |
 
 ## Parameters
 
@@ -35,7 +38,3 @@ const common = args({
   help: short(boolean(), 'h')
 })
 ```
-
-## Tags
-
-- `@experimental`

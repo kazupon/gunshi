@@ -1,4 +1,4 @@
-# Args
+# Interface: Args
 
 An object that contains [argument schema](/api-ox/default/interfaces/ArgSchema.md).
 

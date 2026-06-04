@@ -1,4 +1,7 @@
-# CombinatorSchema
+# Type Alias: CombinatorSchema\<T\>
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 A schema produced by combinator factory functions.
 Any [ArgSchema](/api-ox/default/interfaces/ArgSchema.md) with a parse function qualifies.
@@ -14,7 +17,3 @@ type CombinatorSchema<T> = ArgSchema & Combinator<T>
 | Name | Description            |
 | ---- | ---------------------- |
 | `T`  | The parsed value type. |
-
-## Tags
-
-- `@experimental`

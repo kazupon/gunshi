@@ -1,6 +1,10 @@
-# PluginDependency
+# Interface: PluginDependency
 
 Plugin dependency definition
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -12,11 +16,7 @@ export interface PluginDependency
 
 ## Properties
 
-| Name                    | Kind     | Type      | Description                                                                                            |
-| ----------------------- | -------- | --------- | ------------------------------------------------------------------------------------------------------ |
-| `id`                    | property | `string`  | Dependency plugin id                                                                                   |
-| `optional` _(optional)_ | property | `boolean` | Optional dependency flag. If `true`, the plugin will not throw an error if the dependency is not found |
-
-## Tags
-
-- `@since` — v0.27.0
+| Name                    | Type                                                  | Description                                                                                            |
+| ----------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `id`                    | [`string`](/api-ox/combinators/functions/string.md)   | Dependency plugin id                                                                                   |
+| `optional` _(optional)_ | [`boolean`](/api-ox/combinators/functions/boolean.md) | Optional dependency flag. If `true`, the plugin will not throw an error if the dependency is not found |

@@ -15,7 +15,7 @@ export interface NavItem {
 
 export const apiOxNav: NavItem[] = [
   {
-    text: 'Agent',
+    text: 'agent',
     link: '/api-ox/agent/',
     collapsed: true,
     items: [
@@ -32,7 +32,7 @@ export const apiOxNav: NavItem[] = [
     ]
   },
   {
-    text: 'Combinators',
+    text: 'combinators',
     link: '/api-ox/combinators/',
     collapsed: true,
     items: [
@@ -81,28 +81,12 @@ export const apiOxNav: NavItem[] = [
             link: '/api-ox/combinators/functions/merge'
           },
           {
-            text: 'merge',
-            link: '/api-ox/combinators/functions/merge'
-          },
-          {
-            text: 'merge',
-            link: '/api-ox/combinators/functions/merge'
-          },
-          {
-            text: 'merge',
-            link: '/api-ox/combinators/functions/merge'
-          },
-          {
             text: 'multiple',
             link: '/api-ox/combinators/functions/multiple'
           },
           {
             text: 'number',
             link: '/api-ox/combinators/functions/number'
-          },
-          {
-            text: 'positional',
-            link: '/api-ox/combinators/functions/positional'
           },
           {
             text: 'positional',
@@ -181,7 +165,7 @@ export const apiOxNav: NavItem[] = [
     ]
   },
   {
-    text: 'Context',
+    text: 'context',
     link: '/api-ox/context/',
     collapsed: true,
     items: [
@@ -208,89 +192,39 @@ export const apiOxNav: NavItem[] = [
     ]
   },
   {
-    text: 'Default',
+    text: 'default',
     link: '/api-ox/default/',
     collapsed: true,
     items: [
+      {
+        text: 'Variables',
+        collapsed: true,
+        items: [
+          {
+            text: 'ANONYMOUS_COMMAND_NAME',
+            link: '/api-ox/default/variables/ANONYMOUS_COMMAND_NAME'
+          }
+        ]
+      },
       {
         text: 'Functions',
         collapsed: true,
         items: [
           {
+            text: 'cli',
+            link: '/api-ox/default/functions/cli'
+          },
+          {
             text: 'parseArgs',
             link: '/api-ox/default/functions/parseArgs'
           },
           {
+            text: 'plugin',
+            link: '/api-ox/default/functions/plugin'
+          },
+          {
             text: 'resolveArgs',
             link: '/api-ox/default/functions/resolveArgs'
-          },
-          {
-            text: 'cli',
-            link: '/api-ox/default/functions/cli'
-          },
-          {
-            text: 'cli',
-            link: '/api-ox/default/functions/cli'
-          },
-          {
-            text: 'cli',
-            link: '/api-ox/default/functions/cli'
-          },
-          {
-            text: 'cli',
-            link: '/api-ox/default/functions/cli'
-          },
-          {
-            text: 'cli',
-            link: '/api-ox/default/functions/cli'
-          },
-          {
-            text: 'cli',
-            link: '/api-ox/default/functions/cli'
-          },
-          {
-            text: 'createCommandContext',
-            link: '/api-ox/default/functions/createCommandContext'
-          },
-          {
-            text: 'define',
-            link: '/api-ox/default/functions/define'
-          },
-          {
-            text: 'define',
-            link: '/api-ox/default/functions/define'
-          },
-          {
-            text: 'defineWithTypes',
-            link: '/api-ox/default/functions/defineWithTypes'
-          },
-          {
-            text: 'lazy',
-            link: '/api-ox/default/functions/lazy'
-          },
-          {
-            text: 'lazy',
-            link: '/api-ox/default/functions/lazy'
-          },
-          {
-            text: 'lazy',
-            link: '/api-ox/default/functions/lazy'
-          },
-          {
-            text: 'lazyWithTypes',
-            link: '/api-ox/default/functions/lazyWithTypes'
-          },
-          {
-            text: 'plugin',
-            link: '/api-ox/default/functions/plugin'
-          },
-          {
-            text: 'plugin',
-            link: '/api-ox/default/functions/plugin'
-          },
-          {
-            text: 'plugin',
-            link: '/api-ox/default/functions/plugin'
           }
         ]
       },
@@ -309,8 +243,40 @@ export const apiOxNav: NavItem[] = [
         collapsed: true,
         items: [
           {
-            text: 'CommandContextParams',
-            link: '/api-ox/default/interfaces/CommandContextParams'
+            text: 'Args',
+            link: '/api-ox/default/interfaces/Args'
+          },
+          {
+            text: 'ArgSchema',
+            link: '/api-ox/default/interfaces/ArgSchema'
+          },
+          {
+            text: 'ArgToken',
+            link: '/api-ox/default/interfaces/ArgToken'
+          },
+          {
+            text: 'CliOptions',
+            link: '/api-ox/default/interfaces/CliOptions'
+          },
+          {
+            text: 'Command',
+            link: '/api-ox/default/interfaces/Command'
+          },
+          {
+            text: 'CommandContext',
+            link: '/api-ox/default/interfaces/CommandContext'
+          },
+          {
+            text: 'CommandContextExtension',
+            link: '/api-ox/default/interfaces/CommandContextExtension'
+          },
+          {
+            text: 'CommandEnvironment',
+            link: '/api-ox/default/interfaces/CommandEnvironment'
+          },
+          {
+            text: 'GunshiParams',
+            link: '/api-ox/default/interfaces/GunshiParams'
           },
           {
             text: 'PluginContext',
@@ -333,44 +299,8 @@ export const apiOxNav: NavItem[] = [
             link: '/api-ox/default/interfaces/PluginWithoutExtension'
           },
           {
-            text: 'Args',
-            link: '/api-ox/default/interfaces/Args'
-          },
-          {
-            text: 'ArgSchema',
-            link: '/api-ox/default/interfaces/ArgSchema'
-          },
-          {
-            text: 'ArgToken',
-            link: '/api-ox/default/interfaces/ArgToken'
-          },
-          {
-            text: 'GunshiParams',
-            link: '/api-ox/default/interfaces/GunshiParams'
-          },
-          {
-            text: 'CommandEnvironment',
-            link: '/api-ox/default/interfaces/CommandEnvironment'
-          },
-          {
-            text: 'CliOptions',
-            link: '/api-ox/default/interfaces/CliOptions'
-          },
-          {
-            text: 'CommandContext',
-            link: '/api-ox/default/interfaces/CommandContext'
-          },
-          {
-            text: 'CommandContextExtension',
-            link: '/api-ox/default/interfaces/CommandContextExtension'
-          },
-          {
             text: 'RenderingOptions',
             link: '/api-ox/default/interfaces/RenderingOptions'
-          },
-          {
-            text: 'Command',
-            link: '/api-ox/default/interfaces/Command'
           },
           {
             text: 'SubCommandable',
@@ -382,6 +312,58 @@ export const apiOxNav: NavItem[] = [
         text: 'Type Aliases',
         collapsed: true,
         items: [
+          {
+            text: 'ArgValues',
+            link: '/api-ox/default/type-aliases/ArgValues'
+          },
+          {
+            text: 'Awaitable',
+            link: '/api-ox/default/type-aliases/Awaitable'
+          },
+          {
+            text: 'Commandable',
+            link: '/api-ox/default/type-aliases/Commandable'
+          },
+          {
+            text: 'CommandCallMode',
+            link: '/api-ox/default/type-aliases/CommandCallMode'
+          },
+          {
+            text: 'CommandContextCore',
+            link: '/api-ox/default/type-aliases/CommandContextCore'
+          },
+          {
+            text: 'CommandDecorator',
+            link: '/api-ox/default/type-aliases/CommandDecorator'
+          },
+          {
+            text: 'CommandExamplesFetcher',
+            link: '/api-ox/default/type-aliases/CommandExamplesFetcher'
+          },
+          {
+            text: 'CommandLoader',
+            link: '/api-ox/default/type-aliases/CommandLoader'
+          },
+          {
+            text: 'CommandRunner',
+            link: '/api-ox/default/type-aliases/CommandRunner'
+          },
+          {
+            text: 'DefaultGunshiParams',
+            link: '/api-ox/default/type-aliases/DefaultGunshiParams'
+          },
+          {
+            text: 'ExtendContext',
+            link: '/api-ox/default/type-aliases/ExtendContext'
+          },
+          {
+            text: 'GunshiParamsConstraint',
+            link: '/api-ox/default/type-aliases/GunshiParamsConstraint'
+          },
+          {
+            text: 'LazyCommand',
+            link: '/api-ox/default/type-aliases/LazyCommand'
+          },
           {
             text: 'OnPluginExtension',
             link: '/api-ox/default/type-aliases/OnPluginExtension'
@@ -399,60 +381,8 @@ export const apiOxNav: NavItem[] = [
             link: '/api-ox/default/type-aliases/PluginFunction'
           },
           {
-            text: 'ArgValues',
-            link: '/api-ox/default/type-aliases/ArgValues'
-          },
-          {
-            text: 'Awaitable',
-            link: '/api-ox/default/type-aliases/Awaitable'
-          },
-          {
             text: 'Prettify',
             link: '/api-ox/default/type-aliases/Prettify'
-          },
-          {
-            text: 'ExtendContext',
-            link: '/api-ox/default/type-aliases/ExtendContext'
-          },
-          {
-            text: 'DefaultGunshiParams',
-            link: '/api-ox/default/type-aliases/DefaultGunshiParams'
-          },
-          {
-            text: 'GunshiParamsConstraint',
-            link: '/api-ox/default/type-aliases/GunshiParamsConstraint'
-          },
-          {
-            text: 'CommandCallMode',
-            link: '/api-ox/default/type-aliases/CommandCallMode'
-          },
-          {
-            text: 'CommandContextCore',
-            link: '/api-ox/default/type-aliases/CommandContextCore'
-          },
-          {
-            text: 'LazyCommand',
-            link: '/api-ox/default/type-aliases/LazyCommand'
-          },
-          {
-            text: 'Commandable',
-            link: '/api-ox/default/type-aliases/Commandable'
-          },
-          {
-            text: 'CommandExamplesFetcher',
-            link: '/api-ox/default/type-aliases/CommandExamplesFetcher'
-          },
-          {
-            text: 'CommandRunner',
-            link: '/api-ox/default/type-aliases/CommandRunner'
-          },
-          {
-            text: 'CommandLoader',
-            link: '/api-ox/default/type-aliases/CommandLoader'
-          },
-          {
-            text: 'CommandDecorator',
-            link: '/api-ox/default/type-aliases/CommandDecorator'
           },
           {
             text: 'RendererDecorator',
@@ -463,21 +393,11 @@ export const apiOxNav: NavItem[] = [
             link: '/api-ox/default/type-aliases/ValidationErrorsDecorator'
           }
         ]
-      },
-      {
-        text: 'Variables',
-        collapsed: true,
-        items: [
-          {
-            text: 'ANONYMOUS_COMMAND_NAME',
-            link: '/api-ox/default/variables/ANONYMOUS_COMMAND_NAME'
-          }
-        ]
       }
     ]
   },
   {
-    text: 'Definition',
+    text: 'definition',
     link: '/api-ox/definition/',
     collapsed: true,
     items: [
@@ -485,14 +405,6 @@ export const apiOxNav: NavItem[] = [
         text: 'Functions',
         collapsed: true,
         items: [
-          {
-            text: 'createCommandContext',
-            link: '/api-ox/definition/functions/createCommandContext'
-          },
-          {
-            text: 'define',
-            link: '/api-ox/definition/functions/define'
-          },
           {
             text: 'define',
             link: '/api-ox/definition/functions/define'
@@ -506,79 +418,15 @@ export const apiOxNav: NavItem[] = [
             link: '/api-ox/definition/functions/lazy'
           },
           {
-            text: 'lazy',
-            link: '/api-ox/definition/functions/lazy'
-          },
-          {
-            text: 'lazy',
-            link: '/api-ox/definition/functions/lazy'
-          },
-          {
             text: 'lazyWithTypes',
             link: '/api-ox/definition/functions/lazyWithTypes'
-          }
-        ]
-      },
-      {
-        text: 'Interfaces',
-        collapsed: true,
-        items: [
-          {
-            text: 'Args',
-            link: '/api-ox/definition/interfaces/Args'
-          },
-          {
-            text: 'ArgSchema',
-            link: '/api-ox/definition/interfaces/ArgSchema'
-          },
-          {
-            text: 'Command',
-            link: '/api-ox/definition/interfaces/Command'
-          },
-          {
-            text: 'GunshiParams',
-            link: '/api-ox/definition/interfaces/GunshiParams'
-          },
-          {
-            text: 'CommandContextParams',
-            link: '/api-ox/definition/interfaces/CommandContextParams'
-          }
-        ]
-      },
-      {
-        text: 'Type Aliases',
-        collapsed: true,
-        items: [
-          {
-            text: 'ArgValues',
-            link: '/api-ox/definition/type-aliases/ArgValues'
-          },
-          {
-            text: 'CommandLoader',
-            link: '/api-ox/definition/type-aliases/CommandLoader'
-          },
-          {
-            text: 'CommandRunner',
-            link: '/api-ox/definition/type-aliases/CommandRunner'
-          },
-          {
-            text: 'DefaultGunshiParams',
-            link: '/api-ox/definition/type-aliases/DefaultGunshiParams'
-          },
-          {
-            text: 'ExtendContext',
-            link: '/api-ox/definition/type-aliases/ExtendContext'
-          },
-          {
-            text: 'LazyCommand',
-            link: '/api-ox/definition/type-aliases/LazyCommand'
           }
         ]
       }
     ]
   },
   {
-    text: 'Generator',
+    text: 'generator',
     link: '/api-ox/generator/',
     collapsed: true,
     items: [
@@ -605,172 +453,14 @@ export const apiOxNav: NavItem[] = [
     ]
   },
   {
-    text: 'Plugin',
+    text: 'plugin',
     link: '/api-ox/plugin/',
     collapsed: true,
     items: [
       {
-        text: 'Functions',
-        collapsed: true,
-        items: [
-          {
-            text: 'createCommandContext',
-            link: '/api-ox/plugin/functions/createCommandContext'
-          },
-          {
-            text: 'plugin',
-            link: '/api-ox/plugin/functions/plugin'
-          },
-          {
-            text: 'plugin',
-            link: '/api-ox/plugin/functions/plugin'
-          },
-          {
-            text: 'plugin',
-            link: '/api-ox/plugin/functions/plugin'
-          }
-        ]
-      },
-      {
-        text: 'Interfaces',
-        collapsed: true,
-        items: [
-          {
-            text: 'CommandContextParams',
-            link: '/api-ox/plugin/interfaces/CommandContextParams'
-          },
-          {
-            text: 'PluginContext',
-            link: '/api-ox/plugin/interfaces/PluginContext'
-          },
-          {
-            text: 'PluginDependency',
-            link: '/api-ox/plugin/interfaces/PluginDependency'
-          },
-          {
-            text: 'PluginOptions',
-            link: '/api-ox/plugin/interfaces/PluginOptions'
-          },
-          {
-            text: 'PluginWithExtension',
-            link: '/api-ox/plugin/interfaces/PluginWithExtension'
-          },
-          {
-            text: 'PluginWithoutExtension',
-            link: '/api-ox/plugin/interfaces/PluginWithoutExtension'
-          },
-          {
-            text: 'Args',
-            link: '/api-ox/plugin/interfaces/Args'
-          },
-          {
-            text: 'ArgSchema',
-            link: '/api-ox/plugin/interfaces/ArgSchema'
-          },
-          {
-            text: 'ArgToken',
-            link: '/api-ox/plugin/interfaces/ArgToken'
-          },
-          {
-            text: 'Command',
-            link: '/api-ox/plugin/interfaces/Command'
-          },
-          {
-            text: 'CommandContext',
-            link: '/api-ox/plugin/interfaces/CommandContext'
-          },
-          {
-            text: 'CommandContextExtension',
-            link: '/api-ox/plugin/interfaces/CommandContextExtension'
-          },
-          {
-            text: 'GunshiParams',
-            link: '/api-ox/plugin/interfaces/GunshiParams'
-          }
-        ]
-      },
-      {
-        text: 'Type Aliases',
-        collapsed: true,
-        items: [
-          {
-            text: 'OnPluginExtension',
-            link: '/api-ox/plugin/type-aliases/OnPluginExtension'
-          },
-          {
-            text: 'Plugin',
-            link: '/api-ox/plugin/type-aliases/Plugin'
-          },
-          {
-            text: 'PluginExtension',
-            link: '/api-ox/plugin/type-aliases/PluginExtension'
-          },
-          {
-            text: 'PluginFunction',
-            link: '/api-ox/plugin/type-aliases/PluginFunction'
-          },
-          {
-            text: 'ArgValues',
-            link: '/api-ox/plugin/type-aliases/ArgValues'
-          },
-          {
-            text: 'Awaitable',
-            link: '/api-ox/plugin/type-aliases/Awaitable'
-          },
-          {
-            text: 'CommandContextCore',
-            link: '/api-ox/plugin/type-aliases/CommandContextCore'
-          },
-          {
-            text: 'CommandDecorator',
-            link: '/api-ox/plugin/type-aliases/CommandDecorator'
-          },
-          {
-            text: 'CommandExamplesFetcher',
-            link: '/api-ox/plugin/type-aliases/CommandExamplesFetcher'
-          },
-          {
-            text: 'CommandRunner',
-            link: '/api-ox/plugin/type-aliases/CommandRunner'
-          },
-          {
-            text: 'DefaultGunshiParams',
-            link: '/api-ox/plugin/type-aliases/DefaultGunshiParams'
-          },
-          {
-            text: 'ExtendContext',
-            link: '/api-ox/plugin/type-aliases/ExtendContext'
-          },
-          {
-            text: 'GunshiParamsConstraint',
-            link: '/api-ox/plugin/type-aliases/GunshiParamsConstraint'
-          },
-          {
-            text: 'LazyCommand',
-            link: '/api-ox/plugin/type-aliases/LazyCommand'
-          },
-          {
-            text: 'Prettify',
-            link: '/api-ox/plugin/type-aliases/Prettify'
-          },
-          {
-            text: 'RendererDecorator',
-            link: '/api-ox/plugin/type-aliases/RendererDecorator'
-          },
-          {
-            text: 'ValidationErrorsDecorator',
-            link: '/api-ox/plugin/type-aliases/ValidationErrorsDecorator'
-          }
-        ]
-      },
-      {
         text: 'Variables',
         collapsed: true,
         items: [
-          {
-            text: 'ANONYMOUS_COMMAND_NAME',
-            link: '/api-ox/plugin/variables/ANONYMOUS_COMMAND_NAME'
-          },
           {
             text: 'CLI_OPTIONS_DEFAULT',
             link: '/api-ox/plugin/variables/CLI_OPTIONS_DEFAULT'
@@ -780,7 +470,7 @@ export const apiOxNav: NavItem[] = [
     ]
   },
   {
-    text: 'Renderer',
+    text: 'renderer',
     link: '/api-ox/renderer/',
     collapsed: true,
     items: [

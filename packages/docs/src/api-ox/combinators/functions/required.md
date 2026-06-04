@@ -1,4 +1,7 @@
-# required
+# Function: required()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Mark a combinator schema as required.
 
@@ -18,13 +21,13 @@ declare function required<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> &
 
 ## Parameters
 
-| Name     | Type                  | Description                 |
-| -------- | --------------------- | --------------------------- |
-| `schema` | `CombinatorSchema<T>` | The base combinator schema. |
+| Name     | Type                                                                              | Description                 |
+| -------- | --------------------------------------------------------------------------------- | --------------------------- |
+| `schema` | [`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 
 ## Returns
 
-`CombinatorSchema<T> & CombinatorRequired` — A new schema with `required: true`.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorRequired` — A new schema with `required: true`.
 
 ## Examples
 
@@ -33,7 +36,3 @@ const args = {
   name: required(string())
 }
 ```
-
-## Tags
-
-- `@experimental`

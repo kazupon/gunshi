@@ -1,4 +1,4 @@
-# CLI_OPTIONS_DEFAULT
+# Variable: CLI_OPTIONS_DEFAULT
 
 ## Signature
 

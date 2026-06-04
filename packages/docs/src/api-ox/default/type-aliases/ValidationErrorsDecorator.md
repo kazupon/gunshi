@@ -1,7 +1,11 @@
-# ValidationErrorsDecorator
+# Type Alias: ValidationErrorsDecorator\<G\>
 
 Validation errors renderer decorator type.
 A function that wraps a validation errors renderer to add or modify its behavior.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -17,9 +21,9 @@ export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = Default
 
 ## Type Parameters
 
-| Name                                                           | Description                                                                                                            |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |
+| Name                                                                                                                                                                            | Description                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |
 
 ## Parameters
 
@@ -32,7 +36,3 @@ export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = Default
 ## Returns
 
 `unknown` — The decorated result
-
-## Tags
-
-- `@since` — v0.27.0

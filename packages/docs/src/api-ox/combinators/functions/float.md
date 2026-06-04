@@ -1,4 +1,7 @@
-# float
+# Function: float()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a floating-point argument schema with optional range validation.
 
@@ -12,13 +15,13 @@ declare function float(opts?: FloatOptions): CombinatorSchema<number>
 
 ## Parameters
 
-| Name   | Type           | Description                 |
-| ------ | -------------- | --------------------------- |
-| `opts` | `FloatOptions` | Range options. _(optional)_ |
+| Name   | Type                                                             | Description                 |
+| ------ | ---------------------------------------------------------------- | --------------------------- |
+| `opts` | [`FloatOptions`](/api-ox/combinators/interfaces/FloatOptions.md) | Range options. _(optional)_ |
 
 ## Returns
 
-`CombinatorSchema<number>` — A combinator schema that resolves to number (float).
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<[`number`](/api-ox/combinators/functions/number.md)\> — A combinator schema that resolves to number (float).
 
 ## Examples
 
@@ -27,7 +30,3 @@ const args = {
   ratio: float({ min: 0, max: 1 })
 }
 ```
-
-## Tags
-
-- `@experimental`

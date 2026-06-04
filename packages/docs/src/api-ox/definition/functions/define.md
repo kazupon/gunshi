@@ -1,27 +1,54 @@
-# define
+# Function: define()
 
-Define a [command](/api-ox/definition/interfaces/Command.md).
+Define a [command](/api-ox/default/interfaces/Command.md).
 
 ## Signature
 
 ```ts
-export function define(definition: any): any
+export function define<
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  A extends Args = ExtractArgs<G>,
+  C extends Partial<Command<{ args: A; extensions: ExtractExtensions<G> }>> = {}
+>(definition: CommandDefinition<A, ExtractExtensions<G>, C>): CommandDefinitionResult<G, C>
 ```
 
-[View source](https://github.com/kazupon/gunshi/blob/main/packages/gunshi/src/definition.ts#L135-L137)
+[View source](https://github.com/kazupon/gunshi/blob/main/packages/gunshi/src/definition.ts#L121-L125)
 
 ## Type Parameters
 
-| Name | Description                                                                             |
-| ---- | --------------------------------------------------------------------------------------- |
-| `G`  | A [GunshiParamsConstraint](/api-ox/default/type-aliases/GunshiParamsConstraint.md) type |
+| Name                                                                                                                                                                                       | Description                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md)            | A [GunshiParamsConstraint](/api-ox/default/type-aliases/GunshiParamsConstraint.md) type                                                                |
+| `A` _extends_ [`Args`](/api-ox/default/interfaces/Args.md) = `ExtractArgs<G>`                                                                                                              | An [Args](/api-ox/default/interfaces/Args.md) type extracted from [GunshiParamsConstraint](/api-ox/default/type-aliases/GunshiParamsConstraint.md)     |
+| `C` _extends_ `Partial`\<[`Command`](/api-ox/default/interfaces/Command.md)\<{ [`args`](/api-ox/combinators/functions/args.md): `A`; `extensions`: `ExtractExtensions`\<`G`\> }\>\> = `{}` | A [Command](/api-ox/default/interfaces/Command.md) type inferred from [GunshiParamsConstraint](/api-ox/default/type-aliases/GunshiParamsConstraint.md) |
 
 ## Parameters
 
-| Name         | Type  | Description                                                      |
-| ------------ | ----- | ---------------------------------------------------------------- |
-| `definition` | `any` | A [command](/api-ox/definition/interfaces/Command.md) definition |
+| Name         | Type                                            | Description                                                   |
+| ------------ | ----------------------------------------------- | ------------------------------------------------------------- |
+| `definition` | `CommandDefinition<A, ExtractExtensions<G>, C>` | A [command](/api-ox/default/interfaces/Command.md) definition |
 
 ## Returns
 
-`any` — A defined [command](/api-ox/definition/interfaces/Command.md)
+`CommandDefinitionResult<G, C>` — A defined [command](/api-ox/default/interfaces/Command.md)
+
+## Examples
+
+```ts
+const command = define({
+  name: 'test',
+  description: 'A test command',
+  args: {
+    debug: {
+      type: 'boolean',
+      description: 'Enable debug mode',
+      default: false
+    }
+  },
+  run: ctx => {
+    if (ctx.values.debug) {
+      console.debug('Debug mode is enabled')
+    }
+  }
+})
+```

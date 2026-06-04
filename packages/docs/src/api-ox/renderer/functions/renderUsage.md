@@ -1,4 +1,4 @@
-# renderUsage
+# Function: renderUsage()
 
 Render the usage.
 
@@ -14,16 +14,16 @@ declare function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
 
 ## Type Parameters
 
-| Name                                                 | Description |
-| ---------------------------------------------------- | ----------- |
-| `G` _extends_ `GunshiParams` = `DefaultGunshiParams` |             |
+| Name                                                                                                                                                      | Description |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `G` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) |             |
 
 ## Parameters
 
-| Name  | Type                          | Description                                                       |
-| ----- | ----------------------------- | ----------------------------------------------------------------- |
-| `ctx` | `Readonly<CommandContext<G>>` | A [command context](/api-ox/default/interfaces/CommandContext.md) |
+| Name  | Type                                                                                  | Description                                                       |
+| ----- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `ctx` | `Readonly`\<[`CommandContext`](/api-ox/default/interfaces/CommandContext.md)\<`G`\>\> | A [command context](/api-ox/default/interfaces/CommandContext.md) |
 
 ## Returns
 
-`Promise<string>` — A rendered usage.
+`Promise`\<[`string`](/api-ox/combinators/functions/string.md)\> — A rendered usage.

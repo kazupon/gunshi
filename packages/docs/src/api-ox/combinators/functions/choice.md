@@ -1,4 +1,7 @@
-# choice
+# Function: choice()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create an enum-like argument schema with literal type inference.
 
@@ -15,20 +18,20 @@ declare function choice<const T extends readonly string[]>(
 
 ## Type Parameters
 
-| Name                              | Description                                  |
-| --------------------------------- | -------------------------------------------- |
-| `T` _extends_ `readonly string[]` | The readonly array of allowed string values. |
+| Name                                                                             | Description                                  |
+| -------------------------------------------------------------------------------- | -------------------------------------------- |
+| `T` _extends_ `readonly` [`string`](/api-ox/combinators/functions/string.md)\[\] | The readonly array of allowed string values. |
 
 ## Parameters
 
-| Name     | Type          | Description                                                 |
-| -------- | ------------- | ----------------------------------------------------------- |
-| `values` | `T`           | Allowed values.                                             |
-| `opts`   | `BaseOptions` | Common options (description, short, required). _(optional)_ |
+| Name     | Type                                                           | Description                                                 |
+| -------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
+| `values` | `T`                                                            | Allowed values.                                             |
+| `opts`   | [`BaseOptions`](/api-ox/combinators/interfaces/BaseOptions.md) | Common options (description, short, required). _(optional)_ |
 
 ## Returns
 
-`CombinatorSchema<T[number]>` — A combinator schema that resolves to a union of the allowed values.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\[[`number`](/api-ox/combinators/functions/number.md)\]\> — A combinator schema that resolves to a union of the allowed values.
 
 ## Examples
 
@@ -38,7 +41,3 @@ const args = {
 }
 // typeof values.level === 'debug' | 'info' | 'warn' | 'error'
 ```
-
-## Tags
-
-- `@experimental`

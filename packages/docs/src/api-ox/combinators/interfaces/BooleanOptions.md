@@ -1,4 +1,7 @@
-# BooleanOptions
+# Interface: BooleanOptions
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Options for the [boolean](/api-ox/combinators/functions/boolean.md) combinator.
 
@@ -10,10 +13,6 @@ interface BooleanOptions extends BaseOptions
 
 ## Properties
 
-| Name                     | Kind     | Type      | Description                          |
-| ------------------------ | -------- | --------- | ------------------------------------ |
-| `negatable` _(optional)_ | property | `boolean` | Enable negation with `--no-` prefix. |
-
-## Tags
-
-- `@experimental`
+| Name                     | Type                                                  | Description                          |
+| ------------------------ | ----------------------------------------------------- | ------------------------------------ |
+| `negatable` _(optional)_ | [`boolean`](/api-ox/combinators/functions/boolean.md) | Enable negation with `--no-` prefix. |

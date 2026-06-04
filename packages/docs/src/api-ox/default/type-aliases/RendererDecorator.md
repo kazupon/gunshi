@@ -1,8 +1,12 @@
-# RendererDecorator
+# Type Alias: RendererDecorator\<T, G\>
 
 Renderer decorator type.
 
 A function that wraps a base renderer to add or modify its behavior.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -17,10 +21,10 @@ export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunsh
 
 ## Type Parameters
 
-| Name                                                           | Description                                                                                                            |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `T`                                                            | The type of the rendered result.                                                                                       |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |
+| Name                                                                                                                                                                            | Description                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `T`                                                                                                                                                                             | The type of the rendered result.                                                                                       |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |
 
 ## Parameters
 
@@ -32,7 +36,3 @@ export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunsh
 ## Returns
 
 `unknown` — The decorated result
-
-## Tags
-
-- `@since` — v0.27.0

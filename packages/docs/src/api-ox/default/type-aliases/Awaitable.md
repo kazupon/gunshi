@@ -1,4 +1,4 @@
-# Awaitable
+# Type Alias: Awaitable\<T\>
 
 Awaitable type.
 

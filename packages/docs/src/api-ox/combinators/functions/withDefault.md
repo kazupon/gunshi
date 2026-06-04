@@ -1,4 +1,7 @@
-# withDefault
+# Function: withDefault()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Set a default value on a combinator schema.
 
@@ -15,20 +18,20 @@ declare function withDefault<T extends string | boolean | number>(
 
 ## Type Parameters
 
-| Name                                        | Description               |
-| ------------------------------------------- | ------------------------- |
-| `T` _extends_ `string \| boolean \| number` | The schema's parsed type. |
+| Name                                                                                                                                                                              | Description               |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `T` _extends_ [`string`](/api-ox/combinators/functions/string.md) \| [`boolean`](/api-ox/combinators/functions/boolean.md) \| [`number`](/api-ox/combinators/functions/number.md) | The schema's parsed type. |
 
 ## Parameters
 
-| Name           | Type                  | Description                 |
-| -------------- | --------------------- | --------------------------- |
-| `schema`       | `CombinatorSchema<T>` | The base combinator schema. |
-| `defaultValue` | `T`                   | The default value.          |
+| Name           | Type                                                                              | Description                 |
+| -------------- | --------------------------------------------------------------------------------- | --------------------------- |
+| `schema`       | [`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| `defaultValue` | `T`                                                                               | The default value.          |
 
 ## Returns
 
-`CombinatorSchema<T> & CombinatorWithDefault<T>` — A new schema with the default value set.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorWithDefault`\<`T`\> — A new schema with the default value set.
 
 ## Examples
 
@@ -37,7 +40,3 @@ const args = {
   port: withDefault(integer({ min: 1, max: 65535 }), 8080)
 }
 ```
-
-## Tags
-
-- `@experimental`

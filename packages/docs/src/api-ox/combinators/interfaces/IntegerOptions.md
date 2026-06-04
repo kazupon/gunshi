@@ -1,4 +1,7 @@
-# IntegerOptions
+# Interface: IntegerOptions
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Options for the [integer](/api-ox/combinators/functions/integer.md) combinator.
 
@@ -10,11 +13,7 @@ interface IntegerOptions extends BaseOptions
 
 ## Properties
 
-| Name               | Kind     | Type     | Description                |
-| ------------------ | -------- | -------- | -------------------------- |
-| `min` _(optional)_ | property | `number` | Minimum value (inclusive). |
-| `max` _(optional)_ | property | `number` | Maximum value (inclusive). |
-
-## Tags
-
-- `@experimental`
+| Name               | Type                                                | Description                |
+| ------------------ | --------------------------------------------------- | -------------------------- |
+| `max` _(optional)_ | [`number`](/api-ox/combinators/functions/number.md) | Maximum value (inclusive). |
+| `min` _(optional)_ | [`number`](/api-ox/combinators/functions/number.md) | Minimum value (inclusive). |

@@ -1,4 +1,7 @@
-# BaseOptions
+# Interface: BaseOptions
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Common options shared by all base combinators.
 
@@ -10,12 +13,8 @@ interface BaseOptions
 
 ## Properties
 
-| Name                       | Kind     | Type      | Description                                          |
-| -------------------------- | -------- | --------- | ---------------------------------------------------- |
-| `description` _(optional)_ | property | `string`  | Human-readable description for help text generation. |
-| `short` _(optional)_       | property | `string`  | Single character short alias.                        |
-| `required` _(optional)_    | property | `boolean` | Mark as required.                                    |
-
-## Tags
-
-- `@experimental`
+| Name                       | Type                                                  | Description                                          |
+| -------------------------- | ----------------------------------------------------- | ---------------------------------------------------- |
+| `description` _(optional)_ | [`string`](/api-ox/combinators/functions/string.md)   | Human-readable description for help text generation. |
+| `required` _(optional)_    | [`boolean`](/api-ox/combinators/functions/boolean.md) | Mark as required.                                    |
+| `short` _(optional)_       | [`string`](/api-ox/combinators/functions/string.md)   | Single character short alias.                        |

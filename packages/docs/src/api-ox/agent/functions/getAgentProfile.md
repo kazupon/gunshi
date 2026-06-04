@@ -1,4 +1,4 @@
-# getAgentProfile
+# Function: getAgentProfile()
 
 Get the AI coding agent profile of the current process.
 

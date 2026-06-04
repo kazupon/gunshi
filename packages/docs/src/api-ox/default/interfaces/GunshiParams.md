@@ -1,8 +1,12 @@
-# GunshiParams
+# Interface: GunshiParams\<P\>
 
 Gunshi unified parameter type.
 
 This type combines both argument definitions and command context extensions.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -22,17 +26,20 @@ export interface GunshiParams<
 
 ## Type Parameters
 
-| Name                                                                                         | Description                                                        |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `P` _extends_ `{ args?: Args extensions?: ExtendContext }` = `{ args: Args extensions: {} }` | The type of parameters, which can include `args` and `extensions`. |
+| Name | Description |
+| ---- | ----------- |
+
+| `P` _extends_ {
+[`args`](/api-ox/combinators/functions/args.md)?: [`Args`](/api-ox/default/interfaces/Args.md)
+`extensions`?: [`ExtendContext`](/api-ox/default/type-aliases/ExtendContext.md)
+} = {
+[`args`](/api-ox/combinators/functions/args.md): [`Args`](/api-ox/default/interfaces/Args.md)
+`extensions`: {}
+} | The type of parameters, which can include `args` and `extensions`. |
 
 ## Properties
 
-| Name         | Kind     | Type      | Description                   |
-| ------------ | -------- | --------- | ----------------------------- |
-| `args`       | property | `unknown` | Command argument definitions. |
-| `extensions` | property | `unknown` | Command context extensions.   |
-
-## Tags
-
-- `@since` — v0.27.0
+| Name         | Type      | Description                   |
+| ------------ | --------- | ----------------------------- |
+| `args`       | `unknown` | Command argument definitions. |
+| `extensions` | `unknown` | Command context extensions.   |

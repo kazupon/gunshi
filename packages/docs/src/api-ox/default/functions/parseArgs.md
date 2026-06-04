@@ -1,4 +1,4 @@
-# parseArgs
+# Function: parseArgs()
 
 Parse command line arguments.
 
@@ -10,14 +10,14 @@ declare function parseArgs(args: string[], options?: ParserOptions): ArgToken[]
 
 ## Parameters
 
-| Name      | Type            | Description                                                 |
-| --------- | --------------- | ----------------------------------------------------------- |
-| `args`    | `string[]`      | command line arguments                                      |
-| `options` | `ParserOptions` | parse options, about details see ParserOptions _(optional)_ |
+| Name      | Type                                                    | Description                                                 |
+| --------- | ------------------------------------------------------- | ----------------------------------------------------------- |
+| `args`    | [`string`](/api-ox/combinators/functions/string.md)\[\] | command line arguments                                      |
+| `options` | `ParserOptions`                                         | parse options, about details see ParserOptions _(optional)_ |
 
 ## Returns
 
-`ArgToken[]` — Argument tokens.
+[`ArgToken`](/api-ox/default/interfaces/ArgToken.md)\[\] — Argument tokens.
 
 ## Examples
 

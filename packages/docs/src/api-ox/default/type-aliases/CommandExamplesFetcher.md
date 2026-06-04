@@ -1,4 +1,4 @@
-# CommandExamplesFetcher
+# Type Alias: CommandExamplesFetcher\<G\>
 
 Command examples fetcher.
 
@@ -14,9 +14,9 @@ export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGun
 
 ## Type Parameters
 
-| Name                                                           | Description                                                                                                            |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |
+| Name                                                                                                                                                                            | Description                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of command context. |
 
 ## Parameters
 

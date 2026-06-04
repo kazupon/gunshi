@@ -1,4 +1,4 @@
-# Prettify
+# Type Alias: Prettify\<T\>
 
 Prettify a type by flattening its structure.
 

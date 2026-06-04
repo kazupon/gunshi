@@ -1,6 +1,10 @@
-# PluginExtension
+# Type Alias: PluginExtension\<T, G\>
 
 Plugin extension
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -15,10 +19,10 @@ export type PluginExtension<
 
 ## Type Parameters
 
-| Name                                                 | Description                                                                                                                                                                       |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `T` = `Record<string, unknown>`                      | The type of the extension object returned by the plugin extension function.                                                                                                       |
-| `G` _extends_ `GunshiParams` = `DefaultGunshiParams` | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContextCore`](/api-ox/default/type-aliases/CommandContextCore.md). |
+| Name                                                                                                                                                      | Description                                                                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `T` = `Record`\<[`string`](/api-ox/combinators/functions/string.md), `unknown`\>                                                                          | The type of the extension object returned by the plugin extension function.                                                                                                       |
+| `G` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | A type extending [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContextCore`](/api-ox/default/type-aliases/CommandContextCore.md). |
 
 ## Parameters
 
@@ -30,7 +34,3 @@ export type PluginExtension<
 ## Returns
 
 `unknown` — An object of type T that represents the extension provided by the plugin
-
-## Tags
-
-- `@since` — v0.27.0

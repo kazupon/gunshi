@@ -1,6 +1,10 @@
-# PluginOptions
+# Interface: PluginOptions\<DepExt, Id, Deps, Ext, ResolvedDepExt, PluginExt, MergedExt\>
 
 Plugin definition options
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -25,27 +29,23 @@ export interface PluginOptions<
 
 ## Type Parameters
 
-| Name                                                                                                            | Description |
-| --------------------------------------------------------------------------------------------------------------- | ----------- |
-| `DepExt` _extends_ `ExtendContext` = `DefaultGunshiParams['extensions']`                                        |             |
-| `Id` _extends_ `string` = `string`                                                                              |             |
-| `Deps` _extends_ `ReadonlyArray<PluginDependency \| string>` = `(PluginDependency \| string)[]`                 |             |
-| `Ext` _extends_ `Record<string, unknown>` = `{}`                                                                |             |
-| `ResolvedDepExt` _extends_ `GunshiParams` = `DependencyParams<Deps, DepExt>`                                    |             |
-| `PluginExt` _extends_ `PluginExtension<Ext, ResolvedDepExt>` = `PluginExtension<Ext, ResolvedDepExt>`           |             |
-| `MergedExt` _extends_ `GunshiParams` = `MergedPluginParams< Id, Deps, DepExt, Awaited<ReturnType<PluginExt>> >` |             |
+| Name                                                                                                                                                                                                                                                                                                | Description |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `DepExt` _extends_ [`ExtendContext`](/api-ox/default/type-aliases/ExtendContext.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md)\['extensions'\]                                                                                                                  |             |
+| `Id` _extends_ [`string`](/api-ox/combinators/functions/string.md) = [`string`](/api-ox/combinators/functions/string.md)                                                                                                                                                                            |             |
+| `Deps` _extends_ `ReadonlyArray`\<[`PluginDependency`](/api-ox/default/interfaces/PluginDependency.md) \| [`string`](/api-ox/combinators/functions/string.md)\> = ([`PluginDependency`](/api-ox/default/interfaces/PluginDependency.md) \| [`string`](/api-ox/combinators/functions/string.md))\[\] |             |
+| `Ext` _extends_ `Record`\<[`string`](/api-ox/combinators/functions/string.md), `unknown`\> = `{}`                                                                                                                                                                                                   |             |
+| `ResolvedDepExt` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) = `DependencyParams<Deps, DepExt>`                                                                                                                                                                          |             |
+| `PluginExt` _extends_ [`PluginExtension`](/api-ox/default/type-aliases/PluginExtension.md)\<`Ext`, `ResolvedDepExt`\> = [`PluginExtension`](/api-ox/default/type-aliases/PluginExtension.md)\<`Ext`, `ResolvedDepExt`\>                                                                             |             |
+| `MergedExt` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md) = `MergedPluginParams< Id, Deps, DepExt, Awaited<ReturnType<PluginExt>> >`                                                                                                                                       |             |
 
 ## Properties
 
-| Name                        | Kind     | Type                           | Description                                                       |
-| --------------------------- | -------- | ------------------------------ | ----------------------------------------------------------------- |
-| `id`                        | property | `Id`                           | Plugin unique identifier                                          |
-| `name` _(optional)_         | property | `string`                       | Plugin name                                                       |
-| `dependencies` _(optional)_ | property | `Deps`                         | Plugin dependencies                                               |
-| `setup` _(optional)_        | property | `PluginFunction<MergedExt>`    | Plugin setup function                                             |
-| `extension` _(optional)_    | property | `PluginExt`                    | Plugin extension                                                  |
-| `onExtension` _(optional)_  | property | `OnPluginExtension<MergedExt>` | Callback for when the plugin is extended with `extension` option. |
-
-## Tags
-
-- `@since` — v0.27.0
+| Name                        | Type                                                                                    | Description                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `dependencies` _(optional)_ | `Deps`                                                                                  | Plugin dependencies                                               |
+| `extension` _(optional)_    | `PluginExt`                                                                             | Plugin extension                                                  |
+| `id`                        | `Id`                                                                                    | Plugin unique identifier                                          |
+| `name` _(optional)_         | [`string`](/api-ox/combinators/functions/string.md)                                     | Plugin name                                                       |
+| `onExtension` _(optional)_  | [`OnPluginExtension`](/api-ox/default/type-aliases/OnPluginExtension.md)\<`MergedExt`\> | Callback for when the plugin is extended with `extension` option. |
+| `setup` _(optional)_        | [`PluginFunction`](/api-ox/default/type-aliases/PluginFunction.md)\<`MergedExt`\>       | Plugin setup function                                             |

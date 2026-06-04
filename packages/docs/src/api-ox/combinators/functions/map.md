@@ -1,4 +1,7 @@
-# map
+# Function: map()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Transform the output of a combinator schema.
 
@@ -23,14 +26,14 @@ declare function map<T, U>(
 
 ## Parameters
 
-| Name        | Type                  | Description                  |
-| ----------- | --------------------- | ---------------------------- |
-| `schema`    | `CombinatorSchema<T>` | The base combinator schema.  |
-| `transform` | `(value: T) => U`     | The transformation function. |
+| Name        | Type                                                                              | Description                  |
+| ----------- | --------------------------------------------------------------------------------- | ---------------------------- |
+| `schema`    | [`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema.  |
+| `transform` | `(value: T) => U`                                                                 | The transformation function. |
 
 ## Returns
 
-`CombinatorSchema<U>` — A new combinator schema that resolves to the transformed type.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<`U`\> — A new combinator schema that resolves to the transformed type.
 
 ## Examples
 
@@ -39,7 +42,3 @@ const args = {
   doubled: map(integer(), n => n * 2)
 }
 ```
-
-## Tags
-
-- `@experimental`

@@ -1,4 +1,7 @@
-# Combinators
+# combinators
+
+> [!WARNING]
+> This module is experimental and may change in future versions.
 
 Parser combinator entry point.
 
@@ -6,46 +9,65 @@ This entry point exports composable combinator factory functions for building
 type-safe argument schemas. These combinators produce [ArgSchema](/api-ox/default/interfaces/ArgSchema.md) objects
 that can be used anywhere regular argument schemas are accepted.
 
-**[Source](https://github.com/kazupon/gunshi/blob/main/combinators)**
+## Example
 
-_31 symbols · 22 functions · 7 interfaces · 2 types · 34 parameters · 16 members · 22 returns · 19 examples_
+```ts
+import { string, integer, boolean, required, withDefault, short } from 'gunshi/combinators'
+import { define, cli } from 'gunshi'
+
+const command = define({
+  name: 'serve',
+  args: {
+    host: withDefault(string(), 'localhost'),
+    port: withDefault(integer({ min: 1, max: 65535 }), 8080),
+    verbose: short(boolean(), 'v')
+  },
+  run: ctx => {
+    console.log(`Listening on ${ctx.values.host}:${ctx.values.port}`)
+  }
+})
+```
+
+**[Source](https://github.com/kazupon/gunshi/blob/main/combinators)**
 
 ## Functions
 
-- [`args`](/api-ox/combinators/functions/args.md) `function` `args<T extends Args>(fields: T): T` - Type-safe schema factory. Returns the input unchanged at runtime, but provides type inf…
-- [`boolean`](/api-ox/combinators/functions/boolean.md) `function` `boolean(opts?: BooleanOptions): CombinatorSchema<boolean>` - Create a boolean argument schema. Boolean arguments are existence-based. The resolver p…
-- [`choice`](/api-ox/combinators/functions/choice.md) `function` `choice<const T extends readonly string[]>(values: T, opts?: BaseOptions): CombinatorSchema<T[number]>` - Create an enum-like argument schema with literal type inference. Uses const T generic t…
-- [`combinator`](/api-ox/combinators/functions/combinator.md) `function` `combinator<T>(config: CombinatorOptions<T>): CombinatorSchema<T>` - Create a custom argument schema with a user-defined parse function. This is the most ge…
-- [`describe`](/api-ox/combinators/functions/describe.md) `function` `describe<T, D extends string>(schema: CombinatorSchema<T>, text: D): CombinatorSchema<T> & CombinatorDescribe<D>` - Set a description on a combinator schema for help text generation. The original schema…
-- [`extend`](/api-ox/combinators/functions/extend.md) `function` `extend<T extends Args, U extends Args>(base: T, overrides: U): Omit<T, keyof U> & U` - Extend a schema by overriding or adding fields. Equivalent to merge(base, overrides) bu…
-- [`float`](/api-ox/combinators/functions/float.md) `function` `float(opts?: FloatOptions): CombinatorSchema<number>` - Create a floating-point argument schema with optional range validation. Rejects NaN and…
-- [`integer`](/api-ox/combinators/functions/integer.md) `function` `integer(opts?: IntegerOptions): CombinatorSchema<number>` - Create an integer argument schema with optional range validation. Only accepts integer…
-- [`map`](/api-ox/combinators/functions/map.md) `function` `map<T, U>(schema: CombinatorSchema<T>, transform: (value: T) => U): CombinatorSchema<U>` - Transform the output of a combinator schema. Creates a new schema that applies transfor…
-- [`merge`](/api-ox/combinators/functions/merge.md) `function` `merge<A extends Args, B extends Args>(a: A, b: B): Omit<A, keyof B> & B` - Compose multiple Args schemas into one. On key conflicts the later schema wins (last-wr…
-- [`merge`](/api-ox/combinators/functions/merge.md) `function` `merge<A extends Args, B extends Args, C extends Args>(a: A, b: B, c: C): Omit<Omit<A, keyof B | keyof C> & Omit<B, keyof C>, never> & C` - Compose multiple Args schemas into one.
-- [`merge`](/api-ox/combinators/functions/merge.md) `function` `merge<A extends Args, B extends Args, C extends Args, D extends Args>(a: A, b: B, c: C, d: D): MergeArgs<[A, B, C, D]>` - Compose multiple Args schemas into one.
-- [`merge`](/api-ox/combinators/functions/merge.md) `function` `merge<T extends Args[]>(...schemas: T): MergeArgs<T>` - Compose multiple Args schemas into one.
-- [`multiple`](/api-ox/combinators/functions/multiple.md) `function` `multiple<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorMultiple` - Mark a combinator schema as accepting multiple values. The resolved value becomes an ar…
-- [`number`](/api-ox/combinators/functions/number.md) `function` `number(opts?: NumberOptions): CombinatorSchema<number>` - Create a number argument schema with optional range validation. Accepts any numeric val…
-- [`positional`](/api-ox/combinators/functions/positional.md) `function` `positional<T>(parser: CombinatorSchema<T>): CombinatorSchema<T> & ArgSchemaPositionalType` - Create a positional argument schema. Without a parser, resolves to string. With a parse…
-- [`positional`](/api-ox/combinators/functions/positional.md) `function` `positional(parser?: BaseOptions): ArgSchema & ArgSchemaPositionalType` - Create a positional argument schema. Without a parser, resolves to string. With a parse…
-- [`required`](/api-ox/combinators/functions/required.md) `function` `required<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorRequired` - Mark a combinator schema as required. The original schema is not modified.
-- [`short`](/api-ox/combinators/functions/short.md) `function` `short<T, S extends string>(schema: CombinatorSchema<T>, alias: S): CombinatorSchema<T> & CombinatorShort<S>` - Set a short alias on a combinator schema. The original schema is not modified.
-- [`string`](/api-ox/combinators/functions/string.md) `function` `string(opts?: StringOptions): CombinatorSchema<string>` - Create a string argument schema with optional validation.
-- [`unrequired`](/api-ox/combinators/functions/unrequired.md) `function` `unrequired<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorUnrequired` - Mark a combinator schema as not required. Useful for overriding a base combinator that…
-- [`withDefault`](/api-ox/combinators/functions/withDefault.md) `function` `withDefault<T extends string | boolean | number>(schema: CombinatorSchema<T>, defaultValue: T): CombinatorSchema<T> & CombinatorWithDefault<T>` - Set a default value on a combinator schema. The original schema is not modified.
+| Function                                                    | Description                                                                   |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [args](/api-ox/combinators/functions/args.md)               | Type-safe schema factory.                                                     |
+| [boolean](/api-ox/combinators/functions/boolean.md)         | Create a boolean argument schema.                                             |
+| [choice](/api-ox/combinators/functions/choice.md)           | Create an enum-like argument schema with literal type inference.              |
+| [combinator](/api-ox/combinators/functions/combinator.md)   | Create a custom argument schema with a user-defined parse function.           |
+| [describe](/api-ox/combinators/functions/describe.md)       | Set a description on a combinator schema for help text generation.            |
+| [extend](/api-ox/combinators/functions/extend.md)           | Extend a schema by overriding or adding fields.                               |
+| [float](/api-ox/combinators/functions/float.md)             | Create a floating-point argument schema with optional range validation.       |
+| [integer](/api-ox/combinators/functions/integer.md)         | Create an integer argument schema with optional range validation.             |
+| [map](/api-ox/combinators/functions/map.md)                 | Transform the output of a combinator schema.                                  |
+| [merge](/api-ox/combinators/functions/merge.md)             | Compose multiple [Args](/api-ox/default/interfaces/Args.md) schemas into one. |
+| [multiple](/api-ox/combinators/functions/multiple.md)       | Mark a combinator schema as accepting multiple values.                        |
+| [number](/api-ox/combinators/functions/number.md)           | Create a number argument schema with optional range validation.               |
+| [positional](/api-ox/combinators/functions/positional.md)   | Create a positional argument schema.                                          |
+| [required](/api-ox/combinators/functions/required.md)       | Mark a combinator schema as required.                                         |
+| [short](/api-ox/combinators/functions/short.md)             | Set a short alias on a combinator schema.                                     |
+| [string](/api-ox/combinators/functions/string.md)           | Create a string argument schema with optional validation.                     |
+| [unrequired](/api-ox/combinators/functions/unrequired.md)   | Mark a combinator schema as not required.                                     |
+| [withDefault](/api-ox/combinators/functions/withDefault.md) | Set a default value on a combinator schema.                                   |
 
 ## Interfaces
 
-- [`BaseOptions`](/api-ox/combinators/interfaces/BaseOptions.md) `interface` `BaseOptions` - Common options shared by all base combinators.
-- [`BooleanOptions`](/api-ox/combinators/interfaces/BooleanOptions.md) `interface` `BooleanOptions extends BaseOptions` - Options for the boolean combinator.
-- [`CombinatorOptions`](/api-ox/combinators/interfaces/CombinatorOptions.md) `interface` `CombinatorOptions<T> extends BaseOptions` - Options for the combinator factory function.
-- [`FloatOptions`](/api-ox/combinators/interfaces/FloatOptions.md) `interface` `FloatOptions extends BaseOptions` - Options for the float combinator.
-- [`IntegerOptions`](/api-ox/combinators/interfaces/IntegerOptions.md) `interface` `IntegerOptions extends BaseOptions` - Options for the integer combinator.
-- [`NumberOptions`](/api-ox/combinators/interfaces/NumberOptions.md) `interface` `NumberOptions extends BaseOptions` - Options for the number combinator.
-- [`StringOptions`](/api-ox/combinators/interfaces/StringOptions.md) `interface` `StringOptions extends BaseOptions` - Options for the string combinator.
+| Interface                                                                | Description                                                                                 |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| [BaseOptions](/api-ox/combinators/interfaces/BaseOptions.md)             | Common options shared by all base combinators.                                              |
+| [BooleanOptions](/api-ox/combinators/interfaces/BooleanOptions.md)       | Options for the [boolean](/api-ox/combinators/functions/boolean.md) combinator.             |
+| [CombinatorOptions](/api-ox/combinators/interfaces/CombinatorOptions.md) | Options for the [combinator](/api-ox/combinators/functions/combinator.md) factory function. |
+| [FloatOptions](/api-ox/combinators/interfaces/FloatOptions.md)           | Options for the [float](/api-ox/combinators/functions/float.md) combinator.                 |
+| [IntegerOptions](/api-ox/combinators/interfaces/IntegerOptions.md)       | Options for the [integer](/api-ox/combinators/functions/integer.md) combinator.             |
+| [NumberOptions](/api-ox/combinators/interfaces/NumberOptions.md)         | Options for the [number](/api-ox/combinators/functions/number.md) combinator.               |
+| [StringOptions](/api-ox/combinators/interfaces/StringOptions.md)         | Options for the [string](/api-ox/combinators/functions/string.md) combinator.               |
 
 ## Type Aliases
 
-- [`Combinator`](/api-ox/combinators/type-aliases/Combinator.md) `type` `Combinator<T> = { /** * The parse function that converts a string to the desired type. * * @param value - The input string value. * @returns The parsed value of type T. */ parse: (value: string) => T; }` - A combinator produced by combinator factory functions.
-- [`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md) `type` `CombinatorSchema<T> = ArgSchema & Combinator<T>` - A schema produced by combinator factory functions. Any ArgSchema with a parse function…
+| Type Alias                                                               | Description                                                                                                                                  |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Combinator](/api-ox/combinators/type-aliases/Combinator.md)             | A combinator produced by combinator factory functions.                                                                                       |
+| [CombinatorSchema](/api-ox/combinators/type-aliases/CombinatorSchema.md) | A schema produced by combinator factory functions. Any [ArgSchema](/api-ox/default/interfaces/ArgSchema.md) with a parse function qualifies. |

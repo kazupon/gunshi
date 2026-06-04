@@ -1,4 +1,4 @@
-# LazyCommand
+# Type Alias: LazyCommand\<G, D\>
 
 Lazy command interface.
 
@@ -28,7 +28,7 @@ export type LazyCommand<
 
 ## Type Parameters
 
-| Name                                                           | Description                                              |
-| -------------------------------------------------------------- | -------------------------------------------------------- |
-| `G` _extends_ `GunshiParamsConstraint` = `DefaultGunshiParams` | The Gunshi parameters constraint                         |
-| `D` _extends_ `Partial<Command<G>>` = `{}`                     | The partial command definition provided to lazy function |
+| Name                                                                                                                                                                            | Description                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `G` _extends_ [`GunshiParamsConstraint`](/api-ox/default/type-aliases/GunshiParamsConstraint.md) = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md) | The Gunshi parameters constraint                         |
+| `D` _extends_ `Partial`\<[`Command`](/api-ox/default/interfaces/Command.md)\<`G`\>\> = `{}`                                                                                     | The partial command definition provided to lazy function |

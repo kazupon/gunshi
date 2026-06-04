@@ -1,4 +1,7 @@
-# string
+# Function: string()
+
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a string argument schema with optional validation.
 
@@ -10,13 +13,13 @@ declare function string(opts?: StringOptions): CombinatorSchema<string>
 
 ## Parameters
 
-| Name   | Type            | Description                      |
-| ------ | --------------- | -------------------------------- |
-| `opts` | `StringOptions` | Validation options. _(optional)_ |
+| Name   | Type                                                               | Description                      |
+| ------ | ------------------------------------------------------------------ | -------------------------------- |
+| `opts` | [`StringOptions`](/api-ox/combinators/interfaces/StringOptions.md) | Validation options. _(optional)_ |
 
 ## Returns
 
-`CombinatorSchema<string>` — A combinator schema that resolves to string.
+[`CombinatorSchema`](/api-ox/combinators/type-aliases/CombinatorSchema.md)\<[`string`](/api-ox/combinators/functions/string.md)\> — A combinator schema that resolves to string.
 
 ## Examples
 
@@ -25,7 +28,3 @@ const args = {
   name: string({ minLength: 1, maxLength: 50 })
 }
 ```
-
-## Tags
-
-- `@experimental`

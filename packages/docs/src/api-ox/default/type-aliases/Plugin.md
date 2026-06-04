@@ -1,6 +1,10 @@
-# Plugin
+# Type Alias: Plugin\<E\>
 
 Gunshi plugin, which is a function that receives a PluginContext.
+
+## Since
+
+v0.27.0
 
 ## Signature
 
@@ -18,9 +22,9 @@ export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['e
 
 ## Type Parameters
 
-| Name                                                                             | Description                                                                                                                                                                        |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `E` _extends_ `GunshiParams['extensions']` = `DefaultGunshiParams['extensions']` | A type extending [GunshiParams](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContext`](/api-ox/default/interfaces/CommandContext.md)'s extensions. |
+| Name                                                                                                                                                                                      | Description                                                                                                                                                                        |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `E` _extends_ [`GunshiParams`](/api-ox/default/interfaces/GunshiParams.md)\['extensions'\] = [`DefaultGunshiParams`](/api-ox/default/type-aliases/DefaultGunshiParams.md)\['extensions'\] | A type extending [GunshiParams](/api-ox/default/interfaces/GunshiParams.md) to specify the shape of [`CommandContext`](/api-ox/default/interfaces/CommandContext.md)'s extensions. |
 
 ## Parameters
 
@@ -31,7 +35,3 @@ export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['e
 ## Returns
 
 `unknown` — An [`Awaitable`](/api-ox/default/type-aliases/Awaitable.md) that resolves when the plugin is loaded.
-
-## Tags
-
-- `@since` — v0.27.0
