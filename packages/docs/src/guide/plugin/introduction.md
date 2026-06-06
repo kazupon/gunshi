@@ -162,6 +162,7 @@ Gunshi provides several official plugins that cover common CLI needs:
 
 - **`@gunshi/plugin-i18n`**: Internationalization support
 - **`@gunshi/plugin-completion`**: Shell completion functionality
+- **`@gunshi/plugin-dryrun`**: Dry-run support for explicitly wrapped side-effect operations
 
 ### Community Plugins
 

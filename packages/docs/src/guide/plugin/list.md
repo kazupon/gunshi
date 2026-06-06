@@ -20,6 +20,10 @@ Provides internationalization support for CLI applications.
 
 Provides shell completion functionality for bash, zsh, and fish.
 
+### [@gunshi/plugin-dryrun](https://github.com/kazupon/gunshi/tree/main/packages/plugin-dryrun)
+
+Adds a `--dry-run` option and helpers for printing planned side-effect operations without executing them.
+
 ## Community Plugins
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
