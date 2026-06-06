@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-04T02:09:22.317Z",
+  "generatedAt": "2026-06-06T11:48:41.965Z",
   "summary": {
     "modules": 8,
     "entries": 152,
@@ -11,9 +11,9 @@
       "type": 46,
       "variable": 3
     },
-    "members": 297,
-    "params": 116,
-    "returns": 76,
+    "members": 309,
+    "params": 139,
+    "returns": 80,
     "examples": 49,
     "deprecated": 0
   },
@@ -144,7 +144,8 @@
           "file": "packages/plugin-i18n/lib/index.d.ts",
           "line": 954,
           "endLine": 993,
-          "signature": "declare class DefaultTranslation implements TranslationAdapter"
+          "signature": "declare class DefaultTranslation implements TranslationAdapter",
+          "implements": ["TranslationAdapter"]
         },
         {
           "name": "parseArgs",
@@ -196,19 +197,56 @@
             },
             {
               "name": "resolveArgs",
-              "type": "unknown",
-              "description": "An arguments that contains {@link ResolveArgs | resolve arguments}."
-            },
-            {
-              "name": "param",
               "type": "ResolveArgs",
-              "description": "",
+              "description": "An arguments that contains {@link ResolveArgs | resolve arguments}.",
               "optional": true
             }
           ],
           "returns": {
-            "type": "{ ... }",
-            "description": "An object that contains the values of the arguments, positional arguments, rest arguments, {@link AggregateError | validation errors}, and explicit provision status."
+            "type": "object",
+            "description": "An object that contains the values of the arguments, positional arguments, rest arguments, {@link AggregateError | validation errors}, and explicit provision status.",
+            "members": [
+              {
+                "name": "values",
+                "kind": "property",
+                "description": "",
+                "type": "ArgValues<A>",
+                "line": 552,
+                "endLine": 552
+              },
+              {
+                "name": "positionals",
+                "kind": "property",
+                "description": "",
+                "type": "string[]",
+                "line": 553,
+                "endLine": 553
+              },
+              {
+                "name": "rest",
+                "kind": "property",
+                "description": "",
+                "type": "string[]",
+                "line": 554,
+                "endLine": 554
+              },
+              {
+                "name": "error",
+                "kind": "property",
+                "description": "",
+                "type": "AggregateError | undefined",
+                "line": 555,
+                "endLine": 555
+              },
+              {
+                "name": "explicit",
+                "kind": "property",
+                "description": "",
+                "type": "ArgExplicitlyProvided<A>",
+                "line": 556,
+                "endLine": 556
+              }
+            ]
           },
           "examples": [
             "```typescript\n// passed tokens: --port 3000\n\nconst { values, explicit } = resolveArgs({\n  port: {\n    type: 'number',\n    default: 8080\n  },\n  host: {\n    type: 'string',\n    default: 'localhost'\n  }\n}, parsedTokens)\n\nvalues.port // 3000\nvalues.host // 'localhost'\n\nexplicit.port // true (explicitly provided)\nexplicit.host // false (not provided, fallback to default)\n```"
@@ -583,7 +621,7 @@
             }
           ],
           "returns": {
-            "type": "DefineWithTypesReturn<\n  ExtractExtensions<G>,\n  ExtractArgs<G>\n>",
+            "type": "DefineWithTypesReturn<ExtractExtensions<G>, ExtractArgs<G>>",
             "description": "A function that takes a command definition via {@link define}"
           },
           "examples": [
@@ -719,7 +757,7 @@
             }
           ],
           "returns": {
-            "type": "LazyWithTypesReturn<\n  NormalizeToGunshiParams<G>\n>",
+            "type": "LazyWithTypesReturn<NormalizeToGunshiParams<G>>",
             "description": "A function that takes a lazy command definition via {@link lazy}"
           },
           "examples": [
@@ -781,8 +819,42 @@
           "params": [
             {
               "name": "options",
-              "type": "{ ... }",
+              "type": "{ id: Id; name?: string; dependencies?: Deps; setup?: (ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>; extension: PluginExt; onExtension?: OnPluginExtension<MergedExtensions> }",
               "description": "{@linkcode PluginOptions | plugin options}"
+            },
+            {
+              "name": "options.id",
+              "type": "Id",
+              "description": ""
+            },
+            {
+              "name": "options.name?",
+              "type": "string",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.dependencies?",
+              "type": "Deps",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.setup?",
+              "type": "(ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.extension",
+              "type": "PluginExt",
+              "description": ""
+            },
+            {
+              "name": "options.onExtension?",
+              "type": "OnPluginExtension<MergedExtensions>",
+              "description": "",
+              "optional": true
             }
           ],
           "returns": {
@@ -845,8 +917,37 @@
           "params": [
             {
               "name": "options",
-              "type": "{ ... }",
+              "type": "{ id: Id; name?: string; dependencies?: Deps; setup?: (ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>; onExtension?: OnPluginExtension<MergedExtensions> }",
               "description": "{@linkcode PluginOptions | plugin options} without extension"
+            },
+            {
+              "name": "options.id",
+              "type": "Id",
+              "description": ""
+            },
+            {
+              "name": "options.name?",
+              "type": "string",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.dependencies?",
+              "type": "Deps",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.setup?",
+              "type": "(ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.onExtension?",
+              "type": "OnPluginExtension<MergedExtensions>",
+              "description": "",
+              "optional": true
             }
           ],
           "returns": {
@@ -1064,10 +1165,6 @@
               "kind": "property",
               "description": "Get the global options",
               "type": "Map<string, ArgSchema>",
-              "returns": {
-                "type": "unknown",
-                "description": "A map of global options."
-              },
               "readonly": true,
               "line": 34,
               "endLine": 34
@@ -1077,10 +1174,6 @@
               "kind": "property",
               "description": "Get the registered sub commands",
               "type": "ReadonlyMap<string, Command<G> | LazyCommand<G>>",
-              "returns": {
-                "type": "unknown",
-                "description": "A map of sub commands."
-              },
               "readonly": true,
               "line": 41,
               "endLine": 41
@@ -1164,12 +1257,17 @@
                   "description": "A decorator function that wraps the base header renderer."
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 74,
               "endLine": 79
@@ -1186,12 +1284,17 @@
                   "description": "A decorator function that wraps the base usage renderer."
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 88,
               "endLine": 93
@@ -1208,12 +1311,17 @@
                   "description": "A decorator function that wraps the base validation errors renderer."
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 102,
               "endLine": 113
@@ -1230,12 +1338,17 @@
                   "description": "A decorator function that wraps the command runner"
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 124,
               "endLine": 130
@@ -1261,22 +1374,26 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<CommandContext<G>>",
               "description": "The {@linkcode CommandContext | command context}"
             },
             {
               "name": "cmd",
-              "type": "unknown",
+              "type": "Readonly<Command<G>>",
               "description": "The {@linkcode Command | command}"
             }
           ],
+          "returns": {
+            "type": "Awaitable<void>",
+            "description": ""
+          },
           "tags": {
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 131,
           "endLine": 134,
-          "signature": "export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>,\n  cmd: Readonly<Command<G>>\n) => Awaitable<void>"
+          "signature": "export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (ctx: Readonly<CommandContext<G>>, cmd: Readonly<Command<G>>) => Awaitable<void>"
         },
         {
           "name": "Plugin",
@@ -1293,21 +1410,58 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<PluginContext<G>>",
               "description": "A {@linkcode PluginContext}."
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<void>",
             "description": "An {@linkcode Awaitable} that resolves when the plugin is loaded."
           },
           "tags": {
             "since": "v0.27.0"
           },
+          "members": [
+            {
+              "name": "id",
+              "kind": "property",
+              "description": "",
+              "type": "string",
+              "line": 257,
+              "endLine": 257
+            },
+            {
+              "name": "name",
+              "kind": "property",
+              "description": "",
+              "type": "string",
+              "optional": true,
+              "line": 258,
+              "endLine": 258
+            },
+            {
+              "name": "dependencies",
+              "kind": "property",
+              "description": "",
+              "type": "(PluginDependency | string)[]",
+              "optional": true,
+              "line": 259,
+              "endLine": 259
+            },
+            {
+              "name": "extension",
+              "kind": "property",
+              "description": "",
+              "type": "CommandContextExtension<E>",
+              "optional": true,
+              "line": 260,
+              "endLine": 260
+            }
+          ],
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 255,
           "endLine": 261,
-          "signature": "export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> = PluginFunction & {\n    id: string\n    name?: string\n    dependencies?: (PluginDependency | string)[]\n    extension?: CommandContextExtension<E>\n  }"
+          "signature": "export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> = PluginFunction & { id: string; name?: string; dependencies?: (PluginDependency | string)[]; extension?: CommandContextExtension<E> }"
         },
         {
           "name": "PluginDependency",
@@ -1360,17 +1514,17 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "CommandContextCore<G>",
               "description": "The {@linkcode CommandContextCore | command context} core"
             },
             {
               "name": "cmd",
-              "type": "unknown",
+              "type": "Command<G>",
               "description": "The {@linkcode Command | command} to which the plugin is being applied"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<T>",
             "description": "An object of type T that represents the extension provided by the plugin"
           },
           "tags": {
@@ -1393,13 +1547,24 @@
               "description": "A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}."
             }
           ],
+          "params": [
+            {
+              "name": "ctx",
+              "type": "Readonly<PluginContext<G>>",
+              "description": ""
+            }
+          ],
+          "returns": {
+            "type": "Awaitable<void>",
+            "description": ""
+          },
           "tags": {
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 100,
           "endLine": 102,
-          "signature": "export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (\n  ctx: Readonly<PluginContext<G>>\n) => Awaitable<void>"
+          "signature": "export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (ctx: Readonly<PluginContext<G>>) => Awaitable<void>"
         },
         {
           "name": "PluginOptions",
@@ -1477,6 +1642,17 @@
               "kind": "property",
               "description": "Plugin setup function",
               "type": "PluginFunction<MergedExt>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "Readonly<PluginContext<G>>",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "line": 234,
               "endLine": 234
@@ -1495,6 +1671,22 @@
               "kind": "property",
               "description": "Callback for when the plugin is extended with `extension` option.",
               "type": "OnPluginExtension<MergedExt>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "Readonly<CommandContext<G>>",
+                  "description": ""
+                },
+                {
+                  "name": "cmd",
+                  "type": "Readonly<Command<G>>",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "line": 242,
               "endLine": 242
@@ -1538,7 +1730,7 @@
               "name": "dependencies",
               "kind": "property",
               "description": "Plugin dependencies",
-              "type": "unknown[]",
+              "type": "(PluginDependency | string)[]",
               "optional": true,
               "line": 284,
               "endLine": 284
@@ -1555,7 +1747,8 @@
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 270,
           "endLine": 289,
-          "signature": "export interface PluginWithExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>"
+          "signature": "export interface PluginWithExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>",
+          "extends": ["Plugin<E>"]
         },
         {
           "name": "PluginWithoutExtension",
@@ -1590,7 +1783,7 @@
               "name": "dependencies",
               "kind": "property",
               "description": "Plugin dependencies",
-              "type": "unknown[]",
+              "type": "(PluginDependency | string)[]",
               "optional": true,
               "line": 312,
               "endLine": 312
@@ -1599,12 +1792,31 @@
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 298,
           "endLine": 313,
-          "signature": "export interface PluginWithoutExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>"
+          "signature": "export interface PluginWithoutExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>",
+          "extends": ["Plugin<E>"]
         },
         {
           "name": "Args",
           "kind": "interface",
           "description": "An object that contains {@link ArgSchema | argument schema}.\n\nThis type is used to define the structure and validation rules for command line arguments.",
+          "members": [
+            {
+              "name": "[option: string]",
+              "kind": "indexSignature",
+              "description": "",
+              "signature": "[option: string]: ArgSchema",
+              "type": "ArgSchema",
+              "params": [
+                {
+                  "name": "option",
+                  "type": "string",
+                  "description": ""
+                }
+              ],
+              "line": 434,
+              "endLine": 434
+            }
+          ],
           "signature": "interface Args"
         },
         {
@@ -1674,7 +1886,7 @@
               "name": "choices",
               "kind": "property",
               "description": "Array of allowed string values for enum-type arguments.\n\nRequired when `type: 'enum'`. The argument value must be one of these choices,\notherwise an `ArgResolveError` with type 'type' will be thrown.\n\nSupports both mutable arrays and readonly arrays for type safety.",
-              "type": "string[] | unknown",
+              "type": "string[] | readonly string[]",
               "optional": true,
               "line": 214,
               "endLine": 214
@@ -1723,12 +1935,12 @@
               "params": [
                 {
                   "name": "value",
-                  "type": "unknown",
+                  "type": "string",
                   "description": "Raw string value from command line"
                 }
               ],
               "returns": {
-                "type": "unknown",
+                "type": "any",
                 "description": "Parsed value of any type"
               },
               "optional": true,
@@ -1811,7 +2023,7 @@
               "description": "{@link Args | Arguments} which is an object that defines the command line arguments."
             }
           ],
-          "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : {\n  [option: string]: string | boolean | number | (string | boolean | number)[] | undefined;\n}"
+          "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : { [option: string]: string | boolean | number | (string | boolean | number)[] | undefined; }"
         },
         {
           "name": "Awaitable",
@@ -1875,7 +2087,7 @@
               "name": "args",
               "kind": "property",
               "description": "Command argument definitions.",
-              "type": "unknown",
+              "type": "P extends { args: infer A extends Args } ? A : Args",
               "line": 54,
               "endLine": 54
             },
@@ -1883,7 +2095,7 @@
               "name": "extensions",
               "kind": "property",
               "description": "Command context extensions.",
-              "type": "unknown",
+              "type": "P extends { extensions: infer E extends ExtendContext } ? E : {}",
               "line": 58,
               "endLine": 58
             }
@@ -1915,7 +2127,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 76,
           "endLine": 83,
-          "signature": "export type GunshiParamsConstraint = | GunshiParams<any>\n  | {\n      args: Args\n    }\n  | {\n      extensions: ExtendContext\n    }"
+          "signature": "export type GunshiParamsConstraint = GunshiParams<any> | { args: Args } | { extensions: ExtendContext }"
         },
         {
           "name": "CommandEnvironment",
@@ -2004,8 +2216,8 @@
               "description": "Whether to display the usage option type.",
               "type": "boolean",
               "tags": {
-                "default": "false",
-                "see": "{@linkcode CliOptions.usageOptionType}"
+                "see": "{@linkcode CliOptions.usageOptionType}",
+                "default": "false"
               },
               "line": 203,
               "endLine": 203
@@ -2049,7 +2261,7 @@
               "name": "renderUsage",
               "kind": "property",
               "description": "Render function the command usage.",
-              "type": "unknown | null | undefined",
+              "type": "((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null | undefined",
               "line": 227,
               "endLine": 227
             },
@@ -2057,7 +2269,7 @@
               "name": "renderHeader",
               "kind": "property",
               "description": "Render function the header section in the command usage.",
-              "type": "unknown | null | undefined",
+              "type": "((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null | undefined",
               "line": 231,
               "endLine": 231
             },
@@ -2065,7 +2277,7 @@
               "name": "renderValidationErrors",
               "kind": "property",
               "description": "Render function the validation errors.",
-              "type": "unknown | null | undefined",
+              "type": "((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>) | null | undefined",
               "line": 235,
               "endLine": 238
             },
@@ -2073,10 +2285,10 @@
               "name": "onBeforeCommand",
               "kind": "property",
               "description": "Hook that runs before any command execution",
-              "type": "unknown | undefined",
+              "type": "((ctx: Readonly<CommandContext<G>>) => Awaitable<void>) | undefined",
               "tags": {
-                "see": "{@linkcode CliOptions.onBeforeCommand}",
-                "since": "v0.27.0"
+                "since": "v0.27.0",
+                "see": "{@linkcode CliOptions.onBeforeCommand}"
               },
               "line": 245,
               "endLine": 245
@@ -2085,10 +2297,10 @@
               "name": "onAfterCommand",
               "kind": "property",
               "description": "Hook that runs after successful command execution",
-              "type": "unknown | undefined",
+              "type": "((ctx: Readonly<CommandContext<G>>, result: string | undefined) => Awaitable<void>) | undefined",
               "tags": {
-                "since": "v0.27.0",
-                "see": "{@linkcode CliOptions.onAfterCommand}"
+                "see": "{@linkcode CliOptions.onAfterCommand}",
+                "since": "v0.27.0"
               },
               "line": 252,
               "endLine": 254
@@ -2097,7 +2309,7 @@
               "name": "onErrorCommand",
               "kind": "property",
               "description": "Hook that runs when a command throws an error",
-              "type": "unknown | undefined",
+              "type": "((ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>) | undefined",
               "tags": {
                 "see": "{@linkcode CliOptions.onErrorCommand}",
                 "since": "v0.27.0"
@@ -2218,7 +2430,7 @@
               "name": "renderUsage",
               "kind": "property",
               "description": "Render function the command usage.",
-              "type": "unknown | null",
+              "type": "((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null",
               "optional": true,
               "line": 314,
               "endLine": 314
@@ -2227,7 +2439,7 @@
               "name": "renderHeader",
               "kind": "property",
               "description": "Render function the header section in the command usage.",
-              "type": "unknown | null",
+              "type": "((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null",
               "optional": true,
               "line": 318,
               "endLine": 318
@@ -2236,7 +2448,7 @@
               "name": "renderValidationErrors",
               "kind": "property",
               "description": "Render function the validation errors.",
-              "type": "unknown | null",
+              "type": "((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>) | null",
               "optional": true,
               "line": 322,
               "endLine": 324
@@ -2248,8 +2460,8 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "since": "v0.27.0",
-                "default": "false"
+                "default": "false",
+                "since": "v0.27.0"
               },
               "line": 331,
               "endLine": 331
@@ -2274,10 +2486,14 @@
               "params": [
                 {
                   "name": "ctx",
-                  "type": "unknown",
+                  "type": "Readonly<CommandContext<G>>",
                   "description": "The command context"
                 }
               ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "tags": {
                 "since": "v0.27.0"
@@ -2293,15 +2509,19 @@
               "params": [
                 {
                   "name": "ctx",
-                  "type": "unknown",
+                  "type": "Readonly<CommandContext<G>>",
                   "description": "The command context"
                 },
                 {
                   "name": "result",
-                  "type": "unknown",
+                  "type": "string | undefined",
                   "description": "The command execution result"
                 }
               ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "tags": {
                 "since": "v0.27.0"
@@ -2317,15 +2537,19 @@
               "params": [
                 {
                   "name": "ctx",
-                  "type": "unknown",
+                  "type": "Readonly<CommandContext<G>>",
                   "description": "The command context"
                 },
                 {
                   "name": "error",
-                  "type": "unknown",
+                  "type": "Error",
                   "description": "The error thrown during execution"
                 }
               ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "tags": {
                 "since": "v0.27.0"
@@ -2346,7 +2570,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 369,
           "endLine": 369,
-          "signature": "export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'"
+          "signature": "export type CommandCallMode = \"entry\" | \"subCommand\" | \"unexpected\""
         },
         {
           "name": "CommandContext",
@@ -2481,19 +2705,24 @@
               "name": "log",
               "kind": "property",
               "description": "Output a message.\n\nIf {@linkcode CommandEnvironment.usageSilent} is true, the message is not output.",
-              "type": "(message?: any) => void",
+              "type": "(message?: any, ...optionalParams: any[]) => void",
               "params": [
                 {
                   "name": "message",
-                  "type": "unknown",
-                  "description": "an output message, see {@linkcode console.log}"
+                  "type": "any",
+                  "description": "an output message, see {@linkcode console.log}",
+                  "optional": true
                 },
                 {
                   "name": "optionalParams",
-                  "type": "unknown",
+                  "type": "any[]",
                   "description": "an optional parameters, see {@linkcode console.log}"
                 }
               ],
+              "returns": {
+                "type": "void",
+                "description": ""
+              },
               "line": 464,
               "endLine": 464
             },
@@ -2501,7 +2730,7 @@
               "name": "extensions",
               "kind": "property",
               "description": "Command context extensions.",
-              "type": "unknown",
+              "type": "keyof ExtractExtensions<G> extends never ? any : ExtractExtensions<G>",
               "tags": {
                 "since": "v0.27.0"
               },
@@ -2541,7 +2770,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 485,
           "endLine": 487,
-          "signature": "export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<\n  CommandContext<G>\n>"
+          "signature": "export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<CommandContext<G>>"
         },
         {
           "name": "CommandContextExtension",
@@ -2573,6 +2802,22 @@
               "kind": "property",
               "description": "Plugin extension factory",
               "type": "(ctx: CommandContextCore, cmd: Command) => Awaitable<E>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "CommandContextCore",
+                  "description": ""
+                },
+                {
+                  "name": "cmd",
+                  "type": "Command",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<E>",
+                "description": ""
+              },
               "readonly": true,
               "line": 506,
               "endLine": 506
@@ -2582,6 +2827,22 @@
               "kind": "property",
               "description": "Plugin extension factory after hook",
               "type": "(ctx: Readonly<CommandContext>, cmd: Readonly<Command>) => Awaitable<void>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "Readonly<CommandContext>",
+                  "description": ""
+                },
+                {
+                  "name": "cmd",
+                  "type": "Readonly<Command>",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "readonly": true,
               "line": 510,
@@ -2613,7 +2874,7 @@
               "name": "header",
               "kind": "property",
               "description": "Header rendering configuration\n- `null`: Disable rendering\n- `function`: Use custom renderer\n- `undefined` (when omitted): Use default renderer",
-              "type": "unknown | null",
+              "type": "((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null",
               "optional": true,
               "line": 527,
               "endLine": 527
@@ -2622,7 +2883,7 @@
               "name": "usage",
               "kind": "property",
               "description": "Usage rendering configuration\n- `null`: Disable rendering\n- `function`: Use custom renderer\n- `undefined` (when omitted): Use default renderer",
-              "type": "unknown | null",
+              "type": "((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null",
               "optional": true,
               "line": 535,
               "endLine": 535
@@ -2631,7 +2892,7 @@
               "name": "validationErrors",
               "kind": "property",
               "description": "Validation errors rendering configuration\n- `null`: Disable rendering\n- `function`: Use custom renderer\n- `undefined` (when omitted): Use default renderer",
-              "type": "unknown | null",
+              "type": "((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>) | null",
               "optional": true,
               "line": 543,
               "endLine": 545
@@ -2641,678 +2902,6 @@
           "line": 520,
           "endLine": 546,
           "signature": "export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGunshiParams>"
-        },
-        {
-          "name": "Command",
-          "kind": "interface",
-          "description": "Command interface.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "The Gunshi parameters constraint"
-            }
-          ],
-          "members": [
-            {
-              "name": "name",
-              "kind": "property",
-              "description": "Command name.\nIt's used to find command line arguments to execute from sub commands, and it's recommended to specify.",
-              "type": "string",
-              "optional": true,
-              "line": 558,
-              "endLine": 558
-            },
-            {
-              "name": "description",
-              "kind": "property",
-              "description": "Command description.\nIt's used to describe the command in usage and it's recommended to specify.",
-              "type": "string",
-              "optional": true,
-              "line": 563,
-              "endLine": 563
-            },
-            {
-              "name": "args",
-              "kind": "property",
-              "description": "Command arguments.\nEach argument can include a description property to describe the argument in usage.",
-              "type": "ExtractArgs<G>",
-              "optional": true,
-              "line": 568,
-              "endLine": 568
-            },
-            {
-              "name": "examples",
-              "kind": "property",
-              "description": "Command examples.\nexamples of how to use the command.",
-              "type": "string | CommandExamplesFetcher<G>",
-              "optional": true,
-              "line": 573,
-              "endLine": 573
-            },
-            {
-              "name": "run",
-              "kind": "property",
-              "description": "Command runner. it's the command to be executed",
-              "type": "CommandRunner<G>",
-              "optional": true,
-              "line": 577,
-              "endLine": 577
-            },
-            {
-              "name": "toKebab",
-              "kind": "property",
-              "description": "Whether to convert the camel-case style argument name to kebab-case.\nIf you will set to `true`, All {@linkcode Command.args} names will be converted to kebab-case.",
-              "type": "boolean",
-              "optional": true,
-              "line": 582,
-              "endLine": 582
-            },
-            {
-              "name": "internal",
-              "kind": "property",
-              "description": "Whether this is an internal command.\nInternal commands are not shown in help usage.",
-              "type": "boolean",
-              "optional": true,
-              "tags": {
-                "since": "v0.27.0",
-                "default": "false"
-              },
-              "line": 590,
-              "endLine": 590
-            },
-            {
-              "name": "entry",
-              "kind": "property",
-              "description": "Whether this command is an entry command.",
-              "type": "boolean",
-              "optional": true,
-              "tags": {
-                "default": "undefined",
-                "since": "v0.27.0"
-              },
-              "line": 597,
-              "endLine": 597
-            },
-            {
-              "name": "rendering",
-              "kind": "property",
-              "description": "Rendering control options",
-              "type": "RenderingOptions<G>",
-              "optional": true,
-              "tags": {
-                "since": "v0.27.0"
-              },
-              "line": 603,
-              "endLine": 603
-            },
-            {
-              "name": "subCommands",
-              "kind": "property",
-              "description": "Nested sub-commands for this command.\n\nAllows building command trees like `git remote add`.\nEach key is the sub-command name, and the value is a command or lazy command.",
-              "type": "Record<string, SubCommandable> | Map<string, SubCommandable>",
-              "optional": true,
-              "tags": {
-                "since": "v0.28.0"
-              },
-              "line": 612,
-              "endLine": 612
-            }
-          ],
-          "file": "packages/gunshi/src/types.ts",
-          "line": 553,
-          "endLine": 613,
-          "signature": "export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>"
-        },
-        {
-          "name": "LazyCommand",
-          "kind": "type",
-          "description": "Lazy command interface.\n\nLazy command that's not loaded until it is executed.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "The Gunshi parameters constraint"
-            },
-            {
-              "name": "D",
-              "constraint": "Partial<Command<G>>",
-              "default": "{}",
-              "description": "The partial command definition provided to lazy function"
-            }
-          ],
-          "file": "packages/gunshi/src/types.ts",
-          "line": 623,
-          "endLine": 637,
-          "signature": "export type LazyCommand<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  D extends Partial<Command<G>> = {}\n> = {\n  /**\n   * Command load function\n   */\n  (): Awaitable<Command<G> | CommandRunner<G>>\n} &\n  // If definition has name, commandName is required with that type\n  (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) &\n  // Properties from the definition (if provided inline)\n  Omit<D, 'name' | 'run'> &\n  // Remaining properties from Command (optional)\n  Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>"
-        },
-        {
-          "name": "Commandable",
-          "kind": "type",
-          "description": "Define a command type.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command."
-            }
-          ],
-          "file": "packages/gunshi/src/types.ts",
-          "line": 644,
-          "endLine": 646,
-          "signature": "export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> = | Command<G>\n  | LazyCommand<G, {}>"
-        },
-        {
-          "name": "SubCommandable",
-          "kind": "interface",
-          "description": "Sub-command entry type for use in subCommands.\n\nThis type uses a loose structural match to bypass TypeScript's contravariance issues\nwith function parameters, allowing any Command or LazyCommand to be used as a sub-command.",
-          "tags": {
-            "since": "v0.27.1"
-          },
-          "members": [
-            {
-              "name": "name",
-              "kind": "property",
-              "description": "see {@link Command.name}",
-              "type": "string",
-              "optional": true,
-              "line": 660,
-              "endLine": 660
-            },
-            {
-              "name": "description",
-              "kind": "property",
-              "description": "see {@link Command.description}",
-              "type": "string",
-              "optional": true,
-              "line": 664,
-              "endLine": 664
-            },
-            {
-              "name": "args",
-              "kind": "property",
-              "description": "see {@link Command.args}",
-              "type": "Args | Record<string, any>",
-              "optional": true,
-              "line": 668,
-              "endLine": 668
-            },
-            {
-              "name": "examples",
-              "kind": "property",
-              "description": "see {@link Command.examples}",
-              "type": "string | unknown",
-              "optional": true,
-              "line": 672,
-              "endLine": 672
-            },
-            {
-              "name": "run",
-              "kind": "property",
-              "description": "see {@link Command.run}",
-              "type": "() => any",
-              "optional": true,
-              "line": 676,
-              "endLine": 676
-            },
-            {
-              "name": "toKebab",
-              "kind": "property",
-              "description": "see {@link Command.toKebab}",
-              "type": "boolean",
-              "optional": true,
-              "line": 680,
-              "endLine": 680
-            },
-            {
-              "name": "internal",
-              "kind": "property",
-              "description": "see {@link Command.internal}",
-              "type": "boolean",
-              "optional": true,
-              "line": 684,
-              "endLine": 684
-            },
-            {
-              "name": "entry",
-              "kind": "property",
-              "description": "see {@link Command.entry}",
-              "type": "boolean",
-              "optional": true,
-              "line": 688,
-              "endLine": 688
-            },
-            {
-              "name": "rendering",
-              "kind": "property",
-              "description": "see {@link Command.rendering}",
-              "type": "any",
-              "optional": true,
-              "line": 692,
-              "endLine": 692
-            },
-            {
-              "name": "commandName",
-              "kind": "property",
-              "description": "see {@link LazyCommand.commandName}",
-              "type": "string",
-              "optional": true,
-              "line": 696,
-              "endLine": 696
-            },
-            {
-              "name": "subCommands",
-              "kind": "property",
-              "description": "Nested sub-commands for this command.",
-              "type": "Record<string, any> | Map<string, any>",
-              "optional": true,
-              "tags": {
-                "since": "v0.28.0",
-                "see": "{@link Command.subCommands}"
-              },
-              "line": 703,
-              "endLine": 703
-            }
-          ],
-          "file": "packages/gunshi/src/types.ts",
-          "line": 656,
-          "endLine": 708,
-          "signature": "export interface SubCommandable"
-        },
-        {
-          "name": "CommandExamplesFetcher",
-          "kind": "type",
-          "description": "Command examples fetcher.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
-            }
-          ],
-          "params": [
-            {
-              "name": "ctx",
-              "type": "unknown",
-              "description": "A {@link CommandContext | command context}"
-            }
-          ],
-          "returns": {
-            "type": "unknown",
-            "description": "A fetched command examples."
-          },
-          "file": "packages/gunshi/src/types.ts",
-          "line": 718,
-          "endLine": 720,
-          "signature": "export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>\n) => Awaitable<string>"
-        },
-        {
-          "name": "CommandRunner",
-          "kind": "type",
-          "description": "Command runner.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
-            }
-          ],
-          "params": [
-            {
-              "name": "ctx",
-              "type": "unknown",
-              "description": "A {@link CommandContext | command context}"
-            }
-          ],
-          "returns": {
-            "type": "unknown",
-            "description": "void or string (for CLI output)"
-          },
-          "file": "packages/gunshi/src/types.ts",
-          "line": 730,
-          "endLine": 732,
-          "signature": "export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>\n) => Awaitable<string | void>"
-        },
-        {
-          "name": "CommandLoader",
-          "kind": "type",
-          "description": "Command loader.\n\nA function that returns a command or command runner.\nThis is used to lazily load commands.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner."
-            }
-          ],
-          "returns": {
-            "type": "unknown",
-            "description": "A command or command runner"
-          },
-          "file": "packages/gunshi/src/types.ts",
-          "line": 744,
-          "endLine": 746,
-          "signature": "export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams> = () => Awaitable<\n  Command<G> | CommandRunner<G>\n>"
-        },
-        {
-          "name": "CommandDecorator",
-          "kind": "type",
-          "description": "Command decorator.\n\nA function that wraps a command runner to add or modify its behavior.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
-            }
-          ],
-          "params": [
-            {
-              "name": "baseRunner",
-              "type": "unknown",
-              "description": "The base command runner to decorate"
-            }
-          ],
-          "returns": {
-            "type": "unknown",
-            "description": "The decorated command runner"
-          },
-          "tags": {
-            "since": "v0.27.0"
-          },
-          "file": "packages/gunshi/src/types.ts",
-          "line": 760,
-          "endLine": 762,
-          "signature": "export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>\n) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>"
-        },
-        {
-          "name": "RendererDecorator",
-          "kind": "type",
-          "description": "Renderer decorator type.\n\nA function that wraps a base renderer to add or modify its behavior.",
-          "typeParameters": [
-            {
-              "name": "T",
-              "description": "The type of the rendered result."
-            },
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
-            }
-          ],
-          "params": [
-            {
-              "name": "baseRenderer",
-              "type": "unknown",
-              "description": "The base renderer function to decorate"
-            },
-            {
-              "name": "ctx",
-              "type": "unknown",
-              "description": "The command context"
-            }
-          ],
-          "returns": {
-            "type": "unknown",
-            "description": "The decorated result"
-          },
-          "tags": {
-            "since": "v0.27.0"
-          },
-          "file": "packages/gunshi/src/types.ts",
-          "line": 778,
-          "endLine": 781,
-          "signature": "export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>,\n  ctx: Readonly<CommandContext<G>>\n) => Promise<T>"
-        },
-        {
-          "name": "ValidationErrorsDecorator",
-          "kind": "type",
-          "description": "Validation errors renderer decorator type.\nA function that wraps a validation errors renderer to add or modify its behavior.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams",
-              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
-            }
-          ],
-          "params": [
-            {
-              "name": "baseRenderer",
-              "type": "unknown",
-              "description": "The base validation errors renderer function to decorate"
-            },
-            {
-              "name": "ctx",
-              "type": "unknown",
-              "description": "The command context"
-            },
-            {
-              "name": "error",
-              "type": "unknown",
-              "description": "The aggregate error containing validation errors"
-            }
-          ],
-          "returns": {
-            "type": "unknown",
-            "description": "The decorated result"
-          },
-          "tags": {
-            "since": "v0.27.0"
-          },
-          "file": "packages/gunshi/src/types.ts",
-          "line": 796,
-          "endLine": 800,
-          "signature": "export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>,\n  ctx: Readonly<CommandContext<G>>,\n  error: AggregateError\n) => Promise<string>"
-        }
-      ]
-    },
-    {
-      "file": "definition",
-      "description": "The entry for gunshi command definition.\n\nThis entry point exports the following APIs and types:\n- `define`: A function to define a command.\n- `defineWithTypes`: A function to define a command with specific type parameters.\n- `lazy`: A function to lazily load a command.\n- `lazyWithTypes`: A function to lazily load a command with specific type parameters.\n- Some basic type definitions, such as `Command`, `LazyCommand`, etc.",
-      "examples": [
-        "```js\nimport { define } from 'gunshi/definition'\n\nexport default define({\n  name: 'say',\n  args: {\n    say: {\n      type: 'string',\n      description: 'say something',\n      default: 'hello!'\n    }\n  },\n  run: ctx => {\n    return `You said: ${ctx.values.say}`\n  }\n})\n```"
-      ],
-      "entries": [
-        {
-          "name": "createCommandContext",
-          "kind": "function",
-          "description": "Create a command context.",
-          "typeParameters": [
-            {
-              "name": "G",
-              "constraint": "GunshiParamsConstraint",
-              "default": "DefaultGunshiParams"
-            },
-            {
-              "name": "V",
-              "constraint": "ArgValues<ExtractArgs<G>>",
-              "default": "ArgValues<ExtractArgs<G>>"
-            },
-            {
-              "name": "C",
-              "constraint": "Command<G> | LazyCommand<G>",
-              "default": "Command<G>"
-            },
-            {
-              "name": "E",
-              "constraint": "Record<string, CommandContextExtension>",
-              "default": "{}"
-            }
-          ],
-          "params": [
-            {
-              "name": "param",
-              "type": "CommandContextParams<G, V, C, E>",
-              "description": "A {@link CommandContextParams | parameters} to create a command context."
-            }
-          ],
-          "returns": {
-            "type": "Promise<CommandContextResult<G, E>>",
-            "description": "A {@link CommandContext | command context}, which is readonly."
-          },
-          "file": "packages/gunshi/src/context.ts",
-          "line": 143,
-          "endLine": 243,
-          "signature": "export async function createCommandContext<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  V extends ArgValues<ExtractArgs<G>> = ArgValues<ExtractArgs<G>>,\n  C extends Command<G> | LazyCommand<G> = Command<G>,\n  E extends Record<string, CommandContextExtension> = {}\n>({\n  args = {} as ExtractArgs<G>,\n  explicit = {} as ExtractArgExplicitlyProvided<G>,\n  values = {} as V,\n  positionals = [],\n  rest = [],\n  argv = [],\n  tokens = [],\n  command = {} as C,\n  extensions = {} as E,\n  cliOptions = {} as CliOptions<G>,\n  callMode = 'entry',\n  commandPath = [],\n  omitted = false,\n  validationError\n}: CommandContextParams<G, V, C, E>): Promise<CommandContextResult<G, E>>"
-        },
-        {
-          "name": "Args",
-          "kind": "interface",
-          "description": "An object that contains {@link ArgSchema | argument schema}.\n\nThis type is used to define the structure and validation rules for command line arguments.",
-          "signature": "interface Args"
-        },
-        {
-          "name": "ArgSchema",
-          "kind": "interface",
-          "description": "An argument schema definition for command-line argument parsing.\n\nThis schema is similar to the schema of Node.js `util.parseArgs` but with extended features:\n- Additional `required` and `description` properties\n- Extended `type` support: 'string', 'boolean', 'number', 'enum', 'positional', 'custom'\n- Simplified `default` property (single type, not union types)",
-          "examples": [
-            "Basic string argument:\n```ts\nconst schema: ArgSchema = {\n  type: 'string',\n  description: 'Server hostname',\n  default: 'localhost'\n}\n```",
-            "Required number argument with alias:\n```ts\nconst schema: ArgSchema = {\n  type: 'number',\n  short: 'p',\n  description: 'Port number to listen on',\n  required: true\n}\n```",
-            "Enum argument with choices:\n```ts\nconst schema: ArgSchema = {\n  type: 'enum',\n  choices: ['info', 'warn', 'error'],\n  description: 'Logging level',\n  default: 'info'\n}\n```"
-          ],
-          "members": [
-            {
-              "name": "type",
-              "kind": "property",
-              "description": "Type of the argument value.\n\n- `'string'`: Text value (default if not specified)\n- `'boolean'`: `true`/`false` flag (can be negatable with `--no-` prefix)\n- `'number'`: Numeric value (parsed as integer or float)\n- `'enum'`: One of predefined string values (requires `choices` property)\n- `'positional'`: Non-option argument by position\n- `'custom'`: Custom parsing with user-defined `parse` function",
-              "type": "\"string\" | \"boolean\" | \"number\" | \"enum\" | \"positional\" | \"custom\"",
-              "line": 68,
-              "endLine": 68
-            },
-            {
-              "name": "short",
-              "kind": "property",
-              "description": "Single character alias for the long option name.\n\nAs example, allows users to use `-x` instead of `--extended-option`.\nOnly valid for non-positional argument types.",
-              "type": "string",
-              "optional": true,
-              "line": 90,
-              "endLine": 90
-            },
-            {
-              "name": "description",
-              "kind": "property",
-              "description": "Human-readable description of the argument's purpose.\n\nUsed for help text generation and documentation.\nShould be concise but descriptive enough to understand the argument's role.",
-              "type": "string",
-              "optional": true,
-              "line": 112,
-              "endLine": 112
-            },
-            {
-              "name": "required",
-              "kind": "property",
-              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
-              "type": "boolean",
-              "optional": true,
-              "line": 137,
-              "endLine": 137
-            },
-            {
-              "name": "multiple",
-              "kind": "property",
-              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
-              "type": "true",
-              "optional": true,
-              "line": 163,
-              "endLine": 163
-            },
-            {
-              "name": "negatable",
-              "kind": "property",
-              "description": "Enables negation for boolean arguments using `--no-` prefix.\n\nWhen `true`, allows users to explicitly set the boolean to `false`\nusing `--no-option-name`. When `false` or omitted, only positive\nform is available.\n\nOnly applicable to `type: 'boolean'` arguments.",
-              "type": "boolean",
-              "optional": true,
-              "line": 187,
-              "endLine": 187
-            },
-            {
-              "name": "choices",
-              "kind": "property",
-              "description": "Array of allowed string values for enum-type arguments.\n\nRequired when `type: 'enum'`. The argument value must be one of these choices,\notherwise an `ArgResolveError` with type 'type' will be thrown.\n\nSupports both mutable arrays and readonly arrays for type safety.",
-              "type": "string[] | unknown",
-              "optional": true,
-              "line": 214,
-              "endLine": 214
-            },
-            {
-              "name": "default",
-              "kind": "property",
-              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default",
-              "type": "string | boolean | number",
-              "optional": true,
-              "line": 249,
-              "endLine": 249
-            },
-            {
-              "name": "toKebab",
-              "kind": "property",
-              "description": "Converts the argument name from camelCase to kebab-case for CLI usage.\n\nWhen `true`, a property like `maxCount` becomes available as `--max-count`.\nThis allows [CAC](https://github.com/cacjs/cac) user-friendly property names while maintaining CLI conventions.\n\nCan be overridden globally with `resolveArgs({ toKebab: true })`.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
-              "type": "true",
-              "optional": true,
-              "line": 276,
-              "endLine": 276
-            },
-            {
-              "name": "conflicts",
-              "kind": "property",
-              "description": "Names of other options that conflict with this option.\n\nWhen this option is used together with any of the conflicting options,\nan `ArgResolveError` with type 'conflict' will be thrown.\n\nConflicts only need to be defined on one side - if option A defines a conflict\nwith option B, the conflict is automatically detected when both are used,\nregardless of whether B also defines a conflict with A.\n\nSupports both single option name or array of option names.\nOption names must match the property keys in the schema object exactly\n(no automatic conversion between camelCase and kebab-case).",
-              "type": "string | string[]",
-              "optional": true,
-              "line": 363,
-              "endLine": 363
-            },
-            {
-              "name": "metavar",
-              "kind": "property",
-              "description": "Display name hint for help text generation.\n\nProvides a meaningful type hint for the argument value in help output.\nParticularly useful for `type: 'custom'` arguments where the type\nname would otherwise be unhelpful.",
-              "type": "string",
-              "optional": true,
-              "line": 385,
-              "endLine": 385
-            },
-            {
-              "name": "parse",
-              "kind": "property",
-              "description": "Custom parsing function for `type: 'custom'` arguments.\n\nRequired when `type: 'custom'`. Receives the raw string value and must\nreturn the parsed result. Should throw an Error (or subclass) if parsing fails.\n\nThe function's return type becomes the resolved argument type.",
-              "type": "(value: string) => any",
-              "params": [
-                {
-                  "name": "value",
-                  "type": "unknown",
-                  "description": "Raw string value from command line"
-                }
-              ],
-              "returns": {
-                "type": "unknown",
-                "description": "Parsed value of any type"
-              },
-              "optional": true,
-              "tags": {
-                "throws": "Error or subclass when value is invalid"
-              },
-              "line": 426,
-              "endLine": 426
-            }
-          ],
-          "signature": "interface ArgSchema"
-        },
-        {
-          "name": "ArgValues",
-          "kind": "type",
-          "description": "An object that contains the values of the arguments.",
-          "typeParameters": [
-            {
-              "name": "T",
-              "description": "{@link Args | Arguments} which is an object that defines the command line arguments."
-            }
-          ],
-          "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : {\n  [option: string]: string | boolean | number | (string | boolean | number)[] | undefined;\n}"
         },
         {
           "name": "Command",
@@ -3401,8 +2990,725 @@
               "type": "boolean",
               "optional": true,
               "tags": {
-                "since": "v0.27.0",
-                "default": "undefined"
+                "default": "undefined",
+                "since": "v0.27.0"
+              },
+              "line": 597,
+              "endLine": 597
+            },
+            {
+              "name": "rendering",
+              "kind": "property",
+              "description": "Rendering control options",
+              "type": "RenderingOptions<G>",
+              "optional": true,
+              "tags": {
+                "since": "v0.27.0"
+              },
+              "line": 603,
+              "endLine": 603
+            },
+            {
+              "name": "subCommands",
+              "kind": "property",
+              "description": "Nested sub-commands for this command.\n\nAllows building command trees like `git remote add`.\nEach key is the sub-command name, and the value is a command or lazy command.",
+              "type": "Record<string, SubCommandable> | Map<string, SubCommandable>",
+              "optional": true,
+              "tags": {
+                "since": "v0.28.0"
+              },
+              "line": 612,
+              "endLine": 612
+            }
+          ],
+          "file": "packages/gunshi/src/types.ts",
+          "line": 553,
+          "endLine": 613,
+          "signature": "export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>"
+        },
+        {
+          "name": "LazyCommand",
+          "kind": "type",
+          "description": "Lazy command interface.\n\nLazy command that's not loaded until it is executed.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            },
+            {
+              "name": "D",
+              "constraint": "Partial<Command<G>>",
+              "default": "{}",
+              "description": "The partial command definition provided to lazy function"
+            }
+          ],
+          "file": "packages/gunshi/src/types.ts",
+          "line": 623,
+          "endLine": 637,
+          "signature": "export type LazyCommand<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  D extends Partial<Command<G>> = {}\n> = { (): Awaitable<Command<G> | CommandRunner<G>> } & (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) & Omit<D, 'name' | 'run'> & Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>"
+        },
+        {
+          "name": "Commandable",
+          "kind": "type",
+          "description": "Define a command type.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command."
+            }
+          ],
+          "file": "packages/gunshi/src/types.ts",
+          "line": 644,
+          "endLine": 646,
+          "signature": "export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> = Command<G> | LazyCommand<G, {}>"
+        },
+        {
+          "name": "SubCommandable",
+          "kind": "interface",
+          "description": "Sub-command entry type for use in subCommands.\n\nThis type uses a loose structural match to bypass TypeScript's contravariance issues\nwith function parameters, allowing any Command or LazyCommand to be used as a sub-command.",
+          "tags": {
+            "since": "v0.27.1"
+          },
+          "members": [
+            {
+              "name": "name",
+              "kind": "property",
+              "description": "see {@link Command.name}",
+              "type": "string",
+              "optional": true,
+              "line": 660,
+              "endLine": 660
+            },
+            {
+              "name": "description",
+              "kind": "property",
+              "description": "see {@link Command.description}",
+              "type": "string",
+              "optional": true,
+              "line": 664,
+              "endLine": 664
+            },
+            {
+              "name": "args",
+              "kind": "property",
+              "description": "see {@link Command.args}",
+              "type": "Args | Record<string, any>",
+              "optional": true,
+              "line": 668,
+              "endLine": 668
+            },
+            {
+              "name": "examples",
+              "kind": "property",
+              "description": "see {@link Command.examples}",
+              "type": "string | ((...args: any[]) => any)",
+              "optional": true,
+              "line": 672,
+              "endLine": 672
+            },
+            {
+              "name": "run",
+              "kind": "property",
+              "description": "see {@link Command.run}",
+              "type": "(...args: any[]) => any",
+              "params": [
+                {
+                  "name": "args",
+                  "type": "any[]",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "any",
+                "description": ""
+              },
+              "optional": true,
+              "line": 676,
+              "endLine": 676
+            },
+            {
+              "name": "toKebab",
+              "kind": "property",
+              "description": "see {@link Command.toKebab}",
+              "type": "boolean",
+              "optional": true,
+              "line": 680,
+              "endLine": 680
+            },
+            {
+              "name": "internal",
+              "kind": "property",
+              "description": "see {@link Command.internal}",
+              "type": "boolean",
+              "optional": true,
+              "line": 684,
+              "endLine": 684
+            },
+            {
+              "name": "entry",
+              "kind": "property",
+              "description": "see {@link Command.entry}",
+              "type": "boolean",
+              "optional": true,
+              "line": 688,
+              "endLine": 688
+            },
+            {
+              "name": "rendering",
+              "kind": "property",
+              "description": "see {@link Command.rendering}",
+              "type": "any",
+              "optional": true,
+              "line": 692,
+              "endLine": 692
+            },
+            {
+              "name": "commandName",
+              "kind": "property",
+              "description": "see {@link LazyCommand.commandName}",
+              "type": "string",
+              "optional": true,
+              "line": 696,
+              "endLine": 696
+            },
+            {
+              "name": "subCommands",
+              "kind": "property",
+              "description": "Nested sub-commands for this command.",
+              "type": "Record<string, any> | Map<string, any>",
+              "optional": true,
+              "tags": {
+                "see": "{@link Command.subCommands}",
+                "since": "v0.28.0"
+              },
+              "line": 703,
+              "endLine": 703
+            },
+            {
+              "name": "[key: string]",
+              "kind": "indexSignature",
+              "description": "Index signature to allow additional properties",
+              "signature": "[key: string]: any",
+              "type": "any",
+              "params": [
+                {
+                  "name": "key",
+                  "type": "string",
+                  "description": ""
+                }
+              ],
+              "line": 707,
+              "endLine": 707
+            }
+          ],
+          "file": "packages/gunshi/src/types.ts",
+          "line": 656,
+          "endLine": 708,
+          "signature": "export interface SubCommandable"
+        },
+        {
+          "name": "CommandExamplesFetcher",
+          "kind": "type",
+          "description": "Command examples fetcher.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
+          "params": [
+            {
+              "name": "ctx",
+              "type": "Readonly<CommandContext<G>>",
+              "description": "A {@link CommandContext | command context}"
+            }
+          ],
+          "returns": {
+            "type": "Awaitable<string>",
+            "description": "A fetched command examples."
+          },
+          "file": "packages/gunshi/src/types.ts",
+          "line": 718,
+          "endLine": 720,
+          "signature": "export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (ctx: Readonly<CommandContext<G>>) => Awaitable<string>"
+        },
+        {
+          "name": "CommandRunner",
+          "kind": "type",
+          "description": "Command runner.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
+          "params": [
+            {
+              "name": "ctx",
+              "type": "Readonly<CommandContext<G>>",
+              "description": "A {@link CommandContext | command context}"
+            }
+          ],
+          "returns": {
+            "type": "Awaitable<string | void>",
+            "description": "void or string (for CLI output)"
+          },
+          "file": "packages/gunshi/src/types.ts",
+          "line": 730,
+          "endLine": 732,
+          "signature": "export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>"
+        },
+        {
+          "name": "CommandLoader",
+          "kind": "type",
+          "description": "Command loader.\n\nA function that returns a command or command runner.\nThis is used to lazily load commands.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner."
+            }
+          ],
+          "returns": {
+            "type": "Awaitable<Command<G> | CommandRunner<G>>",
+            "description": "A command or command runner"
+          },
+          "file": "packages/gunshi/src/types.ts",
+          "line": 744,
+          "endLine": 746,
+          "signature": "export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams> = () => Awaitable<Command<G> | CommandRunner<G>>"
+        },
+        {
+          "name": "CommandDecorator",
+          "kind": "type",
+          "description": "Command decorator.\n\nA function that wraps a command runner to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
+          "params": [
+            {
+              "name": "baseRunner",
+              "type": "(ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>",
+              "description": "The base command runner to decorate"
+            }
+          ],
+          "returns": {
+            "type": "(ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>",
+            "description": "The decorated command runner"
+          },
+          "tags": {
+            "since": "v0.27.0"
+          },
+          "file": "packages/gunshi/src/types.ts",
+          "line": 760,
+          "endLine": 762,
+          "signature": "export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>"
+        },
+        {
+          "name": "RendererDecorator",
+          "kind": "type",
+          "description": "Renderer decorator type.\n\nA function that wraps a base renderer to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "The type of the rendered result."
+            },
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
+          "params": [
+            {
+              "name": "baseRenderer",
+              "type": "(ctx: Readonly<CommandContext<G>>) => Promise<T>",
+              "description": "The base renderer function to decorate"
+            },
+            {
+              "name": "ctx",
+              "type": "Readonly<CommandContext<G>>",
+              "description": "The command context"
+            }
+          ],
+          "returns": {
+            "type": "Promise<T>",
+            "description": "The decorated result"
+          },
+          "tags": {
+            "since": "v0.27.0"
+          },
+          "file": "packages/gunshi/src/types.ts",
+          "line": 778,
+          "endLine": 781,
+          "signature": "export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>, ctx: Readonly<CommandContext<G>>) => Promise<T>"
+        },
+        {
+          "name": "ValidationErrorsDecorator",
+          "kind": "type",
+          "description": "Validation errors renderer decorator type.\nA function that wraps a validation errors renderer to add or modify its behavior.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "A type extending {@linkcode GunshiParams} to specify the shape of command context."
+            }
+          ],
+          "params": [
+            {
+              "name": "baseRenderer",
+              "type": "(ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>",
+              "description": "The base validation errors renderer function to decorate"
+            },
+            {
+              "name": "ctx",
+              "type": "Readonly<CommandContext<G>>",
+              "description": "The command context"
+            },
+            {
+              "name": "error",
+              "type": "AggregateError",
+              "description": "The aggregate error containing validation errors"
+            }
+          ],
+          "returns": {
+            "type": "Promise<string>",
+            "description": "The decorated result"
+          },
+          "tags": {
+            "since": "v0.27.0"
+          },
+          "file": "packages/gunshi/src/types.ts",
+          "line": 796,
+          "endLine": 800,
+          "signature": "export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>, ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>"
+        }
+      ]
+    },
+    {
+      "file": "definition",
+      "description": "The entry for gunshi command definition.\n\nThis entry point exports the following APIs and types:\n- `define`: A function to define a command.\n- `defineWithTypes`: A function to define a command with specific type parameters.\n- `lazy`: A function to lazily load a command.\n- `lazyWithTypes`: A function to lazily load a command with specific type parameters.\n- Some basic type definitions, such as `Command`, `LazyCommand`, etc.",
+      "examples": [
+        "```js\nimport { define } from 'gunshi/definition'\n\nexport default define({\n  name: 'say',\n  args: {\n    say: {\n      type: 'string',\n      description: 'say something',\n      default: 'hello!'\n    }\n  },\n  run: ctx => {\n    return `You said: ${ctx.values.say}`\n  }\n})\n```"
+      ],
+      "entries": [
+        {
+          "name": "createCommandContext",
+          "kind": "function",
+          "description": "Create a command context.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams"
+            },
+            {
+              "name": "V",
+              "constraint": "ArgValues<ExtractArgs<G>>",
+              "default": "ArgValues<ExtractArgs<G>>"
+            },
+            {
+              "name": "C",
+              "constraint": "Command<G> | LazyCommand<G>",
+              "default": "Command<G>"
+            },
+            {
+              "name": "E",
+              "constraint": "Record<string, CommandContextExtension>",
+              "default": "{}"
+            }
+          ],
+          "params": [
+            {
+              "name": "param",
+              "type": "CommandContextParams<G, V, C, E>",
+              "description": "A {@link CommandContextParams | parameters} to create a command context."
+            }
+          ],
+          "returns": {
+            "type": "Promise<CommandContextResult<G, E>>",
+            "description": "A {@link CommandContext | command context}, which is readonly."
+          },
+          "file": "packages/gunshi/src/context.ts",
+          "line": 143,
+          "endLine": 243,
+          "signature": "export async function createCommandContext<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  V extends ArgValues<ExtractArgs<G>> = ArgValues<ExtractArgs<G>>,\n  C extends Command<G> | LazyCommand<G> = Command<G>,\n  E extends Record<string, CommandContextExtension> = {}\n>({\n  args = {} as ExtractArgs<G>,\n  explicit = {} as ExtractArgExplicitlyProvided<G>,\n  values = {} as V,\n  positionals = [],\n  rest = [],\n  argv = [],\n  tokens = [],\n  command = {} as C,\n  extensions = {} as E,\n  cliOptions = {} as CliOptions<G>,\n  callMode = 'entry',\n  commandPath = [],\n  omitted = false,\n  validationError\n}: CommandContextParams<G, V, C, E>): Promise<CommandContextResult<G, E>>"
+        },
+        {
+          "name": "Args",
+          "kind": "interface",
+          "description": "An object that contains {@link ArgSchema | argument schema}.\n\nThis type is used to define the structure and validation rules for command line arguments.",
+          "members": [
+            {
+              "name": "[option: string]",
+              "kind": "indexSignature",
+              "description": "",
+              "signature": "[option: string]: ArgSchema",
+              "type": "ArgSchema",
+              "params": [
+                {
+                  "name": "option",
+                  "type": "string",
+                  "description": ""
+                }
+              ],
+              "line": 434,
+              "endLine": 434
+            }
+          ],
+          "signature": "interface Args"
+        },
+        {
+          "name": "ArgSchema",
+          "kind": "interface",
+          "description": "An argument schema definition for command-line argument parsing.\n\nThis schema is similar to the schema of Node.js `util.parseArgs` but with extended features:\n- Additional `required` and `description` properties\n- Extended `type` support: 'string', 'boolean', 'number', 'enum', 'positional', 'custom'\n- Simplified `default` property (single type, not union types)",
+          "examples": [
+            "Basic string argument:\n```ts\nconst schema: ArgSchema = {\n  type: 'string',\n  description: 'Server hostname',\n  default: 'localhost'\n}\n```",
+            "Required number argument with alias:\n```ts\nconst schema: ArgSchema = {\n  type: 'number',\n  short: 'p',\n  description: 'Port number to listen on',\n  required: true\n}\n```",
+            "Enum argument with choices:\n```ts\nconst schema: ArgSchema = {\n  type: 'enum',\n  choices: ['info', 'warn', 'error'],\n  description: 'Logging level',\n  default: 'info'\n}\n```"
+          ],
+          "members": [
+            {
+              "name": "type",
+              "kind": "property",
+              "description": "Type of the argument value.\n\n- `'string'`: Text value (default if not specified)\n- `'boolean'`: `true`/`false` flag (can be negatable with `--no-` prefix)\n- `'number'`: Numeric value (parsed as integer or float)\n- `'enum'`: One of predefined string values (requires `choices` property)\n- `'positional'`: Non-option argument by position\n- `'custom'`: Custom parsing with user-defined `parse` function",
+              "type": "\"string\" | \"boolean\" | \"number\" | \"enum\" | \"positional\" | \"custom\"",
+              "line": 68,
+              "endLine": 68
+            },
+            {
+              "name": "short",
+              "kind": "property",
+              "description": "Single character alias for the long option name.\n\nAs example, allows users to use `-x` instead of `--extended-option`.\nOnly valid for non-positional argument types.",
+              "type": "string",
+              "optional": true,
+              "line": 90,
+              "endLine": 90
+            },
+            {
+              "name": "description",
+              "kind": "property",
+              "description": "Human-readable description of the argument's purpose.\n\nUsed for help text generation and documentation.\nShould be concise but descriptive enough to understand the argument's role.",
+              "type": "string",
+              "optional": true,
+              "line": 112,
+              "endLine": 112
+            },
+            {
+              "name": "required",
+              "kind": "property",
+              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "type": "boolean",
+              "optional": true,
+              "line": 137,
+              "endLine": 137
+            },
+            {
+              "name": "multiple",
+              "kind": "property",
+              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "type": "true",
+              "optional": true,
+              "line": 163,
+              "endLine": 163
+            },
+            {
+              "name": "negatable",
+              "kind": "property",
+              "description": "Enables negation for boolean arguments using `--no-` prefix.\n\nWhen `true`, allows users to explicitly set the boolean to `false`\nusing `--no-option-name`. When `false` or omitted, only positive\nform is available.\n\nOnly applicable to `type: 'boolean'` arguments.",
+              "type": "boolean",
+              "optional": true,
+              "line": 187,
+              "endLine": 187
+            },
+            {
+              "name": "choices",
+              "kind": "property",
+              "description": "Array of allowed string values for enum-type arguments.\n\nRequired when `type: 'enum'`. The argument value must be one of these choices,\notherwise an `ArgResolveError` with type 'type' will be thrown.\n\nSupports both mutable arrays and readonly arrays for type safety.",
+              "type": "string[] | readonly string[]",
+              "optional": true,
+              "line": 214,
+              "endLine": 214
+            },
+            {
+              "name": "default",
+              "kind": "property",
+              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default",
+              "type": "string | boolean | number",
+              "optional": true,
+              "line": 249,
+              "endLine": 249
+            },
+            {
+              "name": "toKebab",
+              "kind": "property",
+              "description": "Converts the argument name from camelCase to kebab-case for CLI usage.\n\nWhen `true`, a property like `maxCount` becomes available as `--max-count`.\nThis allows [CAC](https://github.com/cacjs/cac) user-friendly property names while maintaining CLI conventions.\n\nCan be overridden globally with `resolveArgs({ toKebab: true })`.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "type": "true",
+              "optional": true,
+              "line": 276,
+              "endLine": 276
+            },
+            {
+              "name": "conflicts",
+              "kind": "property",
+              "description": "Names of other options that conflict with this option.\n\nWhen this option is used together with any of the conflicting options,\nan `ArgResolveError` with type 'conflict' will be thrown.\n\nConflicts only need to be defined on one side - if option A defines a conflict\nwith option B, the conflict is automatically detected when both are used,\nregardless of whether B also defines a conflict with A.\n\nSupports both single option name or array of option names.\nOption names must match the property keys in the schema object exactly\n(no automatic conversion between camelCase and kebab-case).",
+              "type": "string | string[]",
+              "optional": true,
+              "line": 363,
+              "endLine": 363
+            },
+            {
+              "name": "metavar",
+              "kind": "property",
+              "description": "Display name hint for help text generation.\n\nProvides a meaningful type hint for the argument value in help output.\nParticularly useful for `type: 'custom'` arguments where the type\nname would otherwise be unhelpful.",
+              "type": "string",
+              "optional": true,
+              "line": 385,
+              "endLine": 385
+            },
+            {
+              "name": "parse",
+              "kind": "property",
+              "description": "Custom parsing function for `type: 'custom'` arguments.\n\nRequired when `type: 'custom'`. Receives the raw string value and must\nreturn the parsed result. Should throw an Error (or subclass) if parsing fails.\n\nThe function's return type becomes the resolved argument type.",
+              "type": "(value: string) => any",
+              "params": [
+                {
+                  "name": "value",
+                  "type": "string",
+                  "description": "Raw string value from command line"
+                }
+              ],
+              "returns": {
+                "type": "any",
+                "description": "Parsed value of any type"
+              },
+              "optional": true,
+              "tags": {
+                "throws": "Error or subclass when value is invalid"
+              },
+              "line": 426,
+              "endLine": 426
+            }
+          ],
+          "signature": "interface ArgSchema"
+        },
+        {
+          "name": "ArgValues",
+          "kind": "type",
+          "description": "An object that contains the values of the arguments.",
+          "typeParameters": [
+            {
+              "name": "T",
+              "description": "{@link Args | Arguments} which is an object that defines the command line arguments."
+            }
+          ],
+          "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : { [option: string]: string | boolean | number | (string | boolean | number)[] | undefined; }"
+        },
+        {
+          "name": "Command",
+          "kind": "interface",
+          "description": "Command interface.",
+          "typeParameters": [
+            {
+              "name": "G",
+              "constraint": "GunshiParamsConstraint",
+              "default": "DefaultGunshiParams",
+              "description": "The Gunshi parameters constraint"
+            }
+          ],
+          "members": [
+            {
+              "name": "name",
+              "kind": "property",
+              "description": "Command name.\nIt's used to find command line arguments to execute from sub commands, and it's recommended to specify.",
+              "type": "string",
+              "optional": true,
+              "line": 558,
+              "endLine": 558
+            },
+            {
+              "name": "description",
+              "kind": "property",
+              "description": "Command description.\nIt's used to describe the command in usage and it's recommended to specify.",
+              "type": "string",
+              "optional": true,
+              "line": 563,
+              "endLine": 563
+            },
+            {
+              "name": "args",
+              "kind": "property",
+              "description": "Command arguments.\nEach argument can include a description property to describe the argument in usage.",
+              "type": "ExtractArgs<G>",
+              "optional": true,
+              "line": 568,
+              "endLine": 568
+            },
+            {
+              "name": "examples",
+              "kind": "property",
+              "description": "Command examples.\nexamples of how to use the command.",
+              "type": "string | CommandExamplesFetcher<G>",
+              "optional": true,
+              "line": 573,
+              "endLine": 573
+            },
+            {
+              "name": "run",
+              "kind": "property",
+              "description": "Command runner. it's the command to be executed",
+              "type": "CommandRunner<G>",
+              "optional": true,
+              "line": 577,
+              "endLine": 577
+            },
+            {
+              "name": "toKebab",
+              "kind": "property",
+              "description": "Whether to convert the camel-case style argument name to kebab-case.\nIf you will set to `true`, All {@linkcode Command.args} names will be converted to kebab-case.",
+              "type": "boolean",
+              "optional": true,
+              "line": 582,
+              "endLine": 582
+            },
+            {
+              "name": "internal",
+              "kind": "property",
+              "description": "Whether this is an internal command.\nInternal commands are not shown in help usage.",
+              "type": "boolean",
+              "optional": true,
+              "tags": {
+                "default": "false",
+                "since": "v0.27.0"
+              },
+              "line": 590,
+              "endLine": 590
+            },
+            {
+              "name": "entry",
+              "kind": "property",
+              "description": "Whether this command is an entry command.",
+              "type": "boolean",
+              "optional": true,
+              "tags": {
+                "default": "undefined",
+                "since": "v0.27.0"
               },
               "line": 597,
               "endLine": 597
@@ -3450,13 +3756,13 @@
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<Command<G> | CommandRunner<G>>",
             "description": "A command or command runner"
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 744,
           "endLine": 746,
-          "signature": "export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams> = () => Awaitable<\n  Command<G> | CommandRunner<G>\n>"
+          "signature": "export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams> = () => Awaitable<Command<G> | CommandRunner<G>>"
         },
         {
           "name": "CommandRunner",
@@ -3473,18 +3779,18 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<CommandContext<G>>",
               "description": "A {@link CommandContext | command context}"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<string | void>",
             "description": "void or string (for CLI output)"
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 730,
           "endLine": 732,
-          "signature": "export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>\n) => Awaitable<string | void>"
+          "signature": "export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>"
         },
         {
           "name": "DefaultGunshiParams",
@@ -3530,7 +3836,7 @@
               "name": "args",
               "kind": "property",
               "description": "Command argument definitions.",
-              "type": "unknown",
+              "type": "P extends { args: infer A extends Args } ? A : Args",
               "line": 54,
               "endLine": 54
             },
@@ -3538,7 +3844,7 @@
               "name": "extensions",
               "kind": "property",
               "description": "Command context extensions.",
-              "type": "unknown",
+              "type": "P extends { extensions: infer E extends ExtendContext } ? E : {}",
               "line": 58,
               "endLine": 58
             }
@@ -3569,7 +3875,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 623,
           "endLine": 637,
-          "signature": "export type LazyCommand<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  D extends Partial<Command<G>> = {}\n> = {\n  /**\n   * Command load function\n   */\n  (): Awaitable<Command<G> | CommandRunner<G>>\n} &\n  // If definition has name, commandName is required with that type\n  (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) &\n  // Properties from the definition (if provided inline)\n  Omit<D, 'name' | 'run'> &\n  // Remaining properties from Command (optional)\n  Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>"
+          "signature": "export type LazyCommand<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  D extends Partial<Command<G>> = {}\n> = { (): Awaitable<Command<G> | CommandRunner<G>> } & (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) & Omit<D, 'name' | 'run'> & Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>"
         },
         {
           "name": "CommandContextParams",
@@ -3809,7 +4115,7 @@
             }
           ],
           "returns": {
-            "type": "DefineWithTypesReturn<\n  ExtractExtensions<G>,\n  ExtractArgs<G>\n>",
+            "type": "DefineWithTypesReturn<ExtractExtensions<G>, ExtractArgs<G>>",
             "description": "A function that takes a command definition via {@link define}"
           },
           "examples": [
@@ -3945,7 +4251,7 @@
             }
           ],
           "returns": {
-            "type": "LazyWithTypesReturn<\n  NormalizeToGunshiParams<G>\n>",
+            "type": "LazyWithTypesReturn<NormalizeToGunshiParams<G>>",
             "description": "A function that takes a lazy command definition via {@link lazy}"
           },
           "examples": [
@@ -4282,8 +4588,42 @@
           "params": [
             {
               "name": "options",
-              "type": "{ ... }",
+              "type": "{ id: Id; name?: string; dependencies?: Deps; setup?: (ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>; extension: PluginExt; onExtension?: OnPluginExtension<MergedExtensions> }",
               "description": "{@linkcode PluginOptions | plugin options}"
+            },
+            {
+              "name": "options.id",
+              "type": "Id",
+              "description": ""
+            },
+            {
+              "name": "options.name?",
+              "type": "string",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.dependencies?",
+              "type": "Deps",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.setup?",
+              "type": "(ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.extension",
+              "type": "PluginExt",
+              "description": ""
+            },
+            {
+              "name": "options.onExtension?",
+              "type": "OnPluginExtension<MergedExtensions>",
+              "description": "",
+              "optional": true
             }
           ],
           "returns": {
@@ -4346,8 +4686,37 @@
           "params": [
             {
               "name": "options",
-              "type": "{ ... }",
+              "type": "{ id: Id; name?: string; dependencies?: Deps; setup?: (ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>; onExtension?: OnPluginExtension<MergedExtensions> }",
               "description": "{@linkcode PluginOptions | plugin options} without extension"
+            },
+            {
+              "name": "options.id",
+              "type": "Id",
+              "description": ""
+            },
+            {
+              "name": "options.name?",
+              "type": "string",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.dependencies?",
+              "type": "Deps",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.setup?",
+              "type": "(ctx: Readonly<PluginContext<MergedPluginParams<Id, Deps, Context, Awaited<ReturnType<PluginExt>>>>>) => Awaitable<void>",
+              "description": "",
+              "optional": true
+            },
+            {
+              "name": "options.onExtension?",
+              "type": "OnPluginExtension<MergedExtensions>",
+              "description": "",
+              "optional": true
             }
           ],
           "returns": {
@@ -4565,10 +4934,6 @@
               "kind": "property",
               "description": "Get the global options",
               "type": "Map<string, ArgSchema>",
-              "returns": {
-                "type": "unknown",
-                "description": "A map of global options."
-              },
               "readonly": true,
               "line": 34,
               "endLine": 34
@@ -4578,10 +4943,6 @@
               "kind": "property",
               "description": "Get the registered sub commands",
               "type": "ReadonlyMap<string, Command<G> | LazyCommand<G>>",
-              "returns": {
-                "type": "unknown",
-                "description": "A map of sub commands."
-              },
               "readonly": true,
               "line": 41,
               "endLine": 41
@@ -4665,12 +5026,17 @@
                   "description": "A decorator function that wraps the base header renderer."
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 74,
               "endLine": 79
@@ -4687,12 +5053,17 @@
                   "description": "A decorator function that wraps the base usage renderer."
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 88,
               "endLine": 93
@@ -4709,12 +5080,17 @@
                   "description": "A decorator function that wraps the base validation errors renderer."
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 102,
               "endLine": 113
@@ -4731,12 +5107,17 @@
                   "description": "A decorator function that wraps the command runner"
                 }
               ],
+              "typeParameters": [
+                {
+                  "name": "L",
+                  "constraint": "Record<string, unknown>",
+                  "default": "DefaultGunshiParams['extensions']",
+                  "description": "An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
+                }
+              ],
               "returns": {
                 "type": "void",
                 "description": ""
-              },
-              "tags": {
-                "typeParam": "L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions."
               },
               "line": 124,
               "endLine": 130
@@ -4762,22 +5143,26 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<CommandContext<G>>",
               "description": "The {@linkcode CommandContext | command context}"
             },
             {
               "name": "cmd",
-              "type": "unknown",
+              "type": "Readonly<Command<G>>",
               "description": "The {@linkcode Command | command}"
             }
           ],
+          "returns": {
+            "type": "Awaitable<void>",
+            "description": ""
+          },
           "tags": {
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 131,
           "endLine": 134,
-          "signature": "export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>,\n  cmd: Readonly<Command<G>>\n) => Awaitable<void>"
+          "signature": "export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (ctx: Readonly<CommandContext<G>>, cmd: Readonly<Command<G>>) => Awaitable<void>"
         },
         {
           "name": "Plugin",
@@ -4794,21 +5179,58 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<PluginContext<G>>",
               "description": "A {@linkcode PluginContext}."
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<void>",
             "description": "An {@linkcode Awaitable} that resolves when the plugin is loaded."
           },
           "tags": {
             "since": "v0.27.0"
           },
+          "members": [
+            {
+              "name": "id",
+              "kind": "property",
+              "description": "",
+              "type": "string",
+              "line": 257,
+              "endLine": 257
+            },
+            {
+              "name": "name",
+              "kind": "property",
+              "description": "",
+              "type": "string",
+              "optional": true,
+              "line": 258,
+              "endLine": 258
+            },
+            {
+              "name": "dependencies",
+              "kind": "property",
+              "description": "",
+              "type": "(PluginDependency | string)[]",
+              "optional": true,
+              "line": 259,
+              "endLine": 259
+            },
+            {
+              "name": "extension",
+              "kind": "property",
+              "description": "",
+              "type": "CommandContextExtension<E>",
+              "optional": true,
+              "line": 260,
+              "endLine": 260
+            }
+          ],
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 255,
           "endLine": 261,
-          "signature": "export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> = PluginFunction & {\n    id: string\n    name?: string\n    dependencies?: (PluginDependency | string)[]\n    extension?: CommandContextExtension<E>\n  }"
+          "signature": "export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> = PluginFunction & { id: string; name?: string; dependencies?: (PluginDependency | string)[]; extension?: CommandContextExtension<E> }"
         },
         {
           "name": "PluginDependency",
@@ -4861,17 +5283,17 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "CommandContextCore<G>",
               "description": "The {@linkcode CommandContextCore | command context} core"
             },
             {
               "name": "cmd",
-              "type": "unknown",
+              "type": "Command<G>",
               "description": "The {@linkcode Command | command} to which the plugin is being applied"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<T>",
             "description": "An object of type T that represents the extension provided by the plugin"
           },
           "tags": {
@@ -4894,13 +5316,24 @@
               "description": "A type extending {@linkcode GunshiParams} to specify the {@linkcode PluginContext}."
             }
           ],
+          "params": [
+            {
+              "name": "ctx",
+              "type": "Readonly<PluginContext<G>>",
+              "description": ""
+            }
+          ],
+          "returns": {
+            "type": "Awaitable<void>",
+            "description": ""
+          },
           "tags": {
             "since": "v0.27.0"
           },
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 100,
           "endLine": 102,
-          "signature": "export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (\n  ctx: Readonly<PluginContext<G>>\n) => Awaitable<void>"
+          "signature": "export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (ctx: Readonly<PluginContext<G>>) => Awaitable<void>"
         },
         {
           "name": "PluginOptions",
@@ -4978,6 +5411,17 @@
               "kind": "property",
               "description": "Plugin setup function",
               "type": "PluginFunction<MergedExt>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "Readonly<PluginContext<G>>",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "line": 234,
               "endLine": 234
@@ -4996,6 +5440,22 @@
               "kind": "property",
               "description": "Callback for when the plugin is extended with `extension` option.",
               "type": "OnPluginExtension<MergedExt>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "Readonly<CommandContext<G>>",
+                  "description": ""
+                },
+                {
+                  "name": "cmd",
+                  "type": "Readonly<Command<G>>",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "line": 242,
               "endLine": 242
@@ -5039,7 +5499,7 @@
               "name": "dependencies",
               "kind": "property",
               "description": "Plugin dependencies",
-              "type": "unknown[]",
+              "type": "(PluginDependency | string)[]",
               "optional": true,
               "line": 284,
               "endLine": 284
@@ -5056,7 +5516,8 @@
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 270,
           "endLine": 289,
-          "signature": "export interface PluginWithExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>"
+          "signature": "export interface PluginWithExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>",
+          "extends": ["Plugin<E>"]
         },
         {
           "name": "PluginWithoutExtension",
@@ -5091,7 +5552,7 @@
               "name": "dependencies",
               "kind": "property",
               "description": "Plugin dependencies",
-              "type": "unknown[]",
+              "type": "(PluginDependency | string)[]",
               "optional": true,
               "line": 312,
               "endLine": 312
@@ -5100,12 +5561,31 @@
           "file": "packages/gunshi/src/plugin/core.ts",
           "line": 298,
           "endLine": 313,
-          "signature": "export interface PluginWithoutExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>"
+          "signature": "export interface PluginWithoutExtension<\n  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']\n> extends Plugin<E>",
+          "extends": ["Plugin<E>"]
         },
         {
           "name": "Args",
           "kind": "interface",
           "description": "An object that contains {@link ArgSchema | argument schema}.\n\nThis type is used to define the structure and validation rules for command line arguments.",
+          "members": [
+            {
+              "name": "[option: string]",
+              "kind": "indexSignature",
+              "description": "",
+              "signature": "[option: string]: ArgSchema",
+              "type": "ArgSchema",
+              "params": [
+                {
+                  "name": "option",
+                  "type": "string",
+                  "description": ""
+                }
+              ],
+              "line": 434,
+              "endLine": 434
+            }
+          ],
           "signature": "interface Args"
         },
         {
@@ -5175,7 +5655,7 @@
               "name": "choices",
               "kind": "property",
               "description": "Array of allowed string values for enum-type arguments.\n\nRequired when `type: 'enum'`. The argument value must be one of these choices,\notherwise an `ArgResolveError` with type 'type' will be thrown.\n\nSupports both mutable arrays and readonly arrays for type safety.",
-              "type": "string[] | unknown",
+              "type": "string[] | readonly string[]",
               "optional": true,
               "line": 214,
               "endLine": 214
@@ -5224,12 +5704,12 @@
               "params": [
                 {
                   "name": "value",
-                  "type": "unknown",
+                  "type": "string",
                   "description": "Raw string value from command line"
                 }
               ],
               "returns": {
-                "type": "unknown",
+                "type": "any",
                 "description": "Parsed value of any type"
               },
               "optional": true,
@@ -5312,7 +5792,7 @@
               "description": "{@link Args | Arguments} which is an object that defines the command line arguments."
             }
           ],
-          "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : {\n  [option: string]: string | boolean | number | (string | boolean | number)[] | undefined;\n}"
+          "signature": "type ArgValues<T> = T extends Args ? ResolveArgValues<T, { [Arg in keyof T]: ExtractOptionValue<T[Arg]> }> : { [option: string]: string | boolean | number | (string | boolean | number)[] | undefined; }"
         },
         {
           "name": "Awaitable",
@@ -5585,19 +6065,24 @@
               "name": "log",
               "kind": "property",
               "description": "Output a message.\n\nIf {@linkcode CommandEnvironment.usageSilent} is true, the message is not output.",
-              "type": "(message?: any) => void",
+              "type": "(message?: any, ...optionalParams: any[]) => void",
               "params": [
                 {
                   "name": "message",
-                  "type": "unknown",
-                  "description": "an output message, see {@linkcode console.log}"
+                  "type": "any",
+                  "description": "an output message, see {@linkcode console.log}",
+                  "optional": true
                 },
                 {
                   "name": "optionalParams",
-                  "type": "unknown",
+                  "type": "any[]",
                   "description": "an optional parameters, see {@linkcode console.log}"
                 }
               ],
+              "returns": {
+                "type": "void",
+                "description": ""
+              },
               "line": 464,
               "endLine": 464
             },
@@ -5605,7 +6090,7 @@
               "name": "extensions",
               "kind": "property",
               "description": "Command context extensions.",
-              "type": "unknown",
+              "type": "keyof ExtractExtensions<G> extends never ? any : ExtractExtensions<G>",
               "tags": {
                 "since": "v0.27.0"
               },
@@ -5645,7 +6130,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 485,
           "endLine": 487,
-          "signature": "export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<\n  CommandContext<G>\n>"
+          "signature": "export type CommandContextCore<G extends GunshiParamsConstraint = DefaultGunshiParams> = Readonly<CommandContext<G>>"
         },
         {
           "name": "CommandContextExtension",
@@ -5677,6 +6162,22 @@
               "kind": "property",
               "description": "Plugin extension factory",
               "type": "(ctx: CommandContextCore, cmd: Command) => Awaitable<E>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "CommandContextCore",
+                  "description": ""
+                },
+                {
+                  "name": "cmd",
+                  "type": "Command",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<E>",
+                "description": ""
+              },
               "readonly": true,
               "line": 506,
               "endLine": 506
@@ -5686,6 +6187,22 @@
               "kind": "property",
               "description": "Plugin extension factory after hook",
               "type": "(ctx: Readonly<CommandContext>, cmd: Readonly<Command>) => Awaitable<void>",
+              "params": [
+                {
+                  "name": "ctx",
+                  "type": "Readonly<CommandContext>",
+                  "description": ""
+                },
+                {
+                  "name": "cmd",
+                  "type": "Readonly<Command>",
+                  "description": ""
+                }
+              ],
+              "returns": {
+                "type": "Awaitable<void>",
+                "description": ""
+              },
               "optional": true,
               "readonly": true,
               "line": 510,
@@ -5712,12 +6229,12 @@
           "params": [
             {
               "name": "baseRunner",
-              "type": "unknown",
+              "type": "(ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>",
               "description": "The base command runner to decorate"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "(ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>",
             "description": "The decorated command runner"
           },
           "tags": {
@@ -5726,7 +6243,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 760,
           "endLine": 762,
-          "signature": "export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>\n) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>"
+          "signature": "export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>"
         },
         {
           "name": "CommandExamplesFetcher",
@@ -5743,18 +6260,18 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<CommandContext<G>>",
               "description": "A {@link CommandContext | command context}"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<string>",
             "description": "A fetched command examples."
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 718,
           "endLine": 720,
-          "signature": "export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>\n) => Awaitable<string>"
+          "signature": "export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGunshiParams> = (ctx: Readonly<CommandContext<G>>) => Awaitable<string>"
         },
         {
           "name": "CommandRunner",
@@ -5771,18 +6288,18 @@
           "params": [
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<CommandContext<G>>",
               "description": "A {@link CommandContext | command context}"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Awaitable<string | void>",
             "description": "void or string (for CLI output)"
           },
           "file": "packages/gunshi/src/types.ts",
           "line": 730,
           "endLine": 732,
-          "signature": "export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  ctx: Readonly<CommandContext<G>>\n) => Awaitable<string | void>"
+          "signature": "export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>"
         },
         {
           "name": "DefaultGunshiParams",
@@ -5828,7 +6345,7 @@
               "name": "args",
               "kind": "property",
               "description": "Command argument definitions.",
-              "type": "unknown",
+              "type": "P extends { args: infer A extends Args } ? A : Args",
               "line": 54,
               "endLine": 54
             },
@@ -5836,7 +6353,7 @@
               "name": "extensions",
               "kind": "property",
               "description": "Command context extensions.",
-              "type": "unknown",
+              "type": "P extends { extensions: infer E extends ExtendContext } ? E : {}",
               "line": 58,
               "endLine": 58
             }
@@ -5856,7 +6373,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 76,
           "endLine": 83,
-          "signature": "export type GunshiParamsConstraint = | GunshiParams<any>\n  | {\n      args: Args\n    }\n  | {\n      extensions: ExtendContext\n    }"
+          "signature": "export type GunshiParamsConstraint = GunshiParams<any> | { args: Args } | { extensions: ExtendContext }"
         },
         {
           "name": "LazyCommand",
@@ -5879,7 +6396,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 623,
           "endLine": 637,
-          "signature": "export type LazyCommand<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  D extends Partial<Command<G>> = {}\n> = {\n  /**\n   * Command load function\n   */\n  (): Awaitable<Command<G> | CommandRunner<G>>\n} &\n  // If definition has name, commandName is required with that type\n  (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) &\n  // Properties from the definition (if provided inline)\n  Omit<D, 'name' | 'run'> &\n  // Remaining properties from Command (optional)\n  Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>"
+          "signature": "export type LazyCommand<\n  G extends GunshiParamsConstraint = DefaultGunshiParams,\n  D extends Partial<Command<G>> = {}\n> = { (): Awaitable<Command<G> | CommandRunner<G>> } & (D extends { name: infer N } ? { commandName: N } : { commandName?: string }) & Omit<D, 'name' | 'run'> & Partial<Omit<Command<G>, keyof D | 'run' | 'name'>>"
         },
         {
           "name": "Prettify",
@@ -5915,17 +6432,17 @@
           "params": [
             {
               "name": "baseRenderer",
-              "type": "unknown",
+              "type": "(ctx: Readonly<CommandContext<G>>) => Promise<T>",
               "description": "The base renderer function to decorate"
             },
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<CommandContext<G>>",
               "description": "The command context"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Promise<T>",
             "description": "The decorated result"
           },
           "tags": {
@@ -5934,7 +6451,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 778,
           "endLine": 781,
-          "signature": "export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>,\n  ctx: Readonly<CommandContext<G>>\n) => Promise<T>"
+          "signature": "export type RendererDecorator<T, G extends GunshiParamsConstraint = DefaultGunshiParams> = (baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>, ctx: Readonly<CommandContext<G>>) => Promise<T>"
         },
         {
           "name": "ValidationErrorsDecorator",
@@ -5951,22 +6468,22 @@
           "params": [
             {
               "name": "baseRenderer",
-              "type": "unknown",
+              "type": "(ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>",
               "description": "The base validation errors renderer function to decorate"
             },
             {
               "name": "ctx",
-              "type": "unknown",
+              "type": "Readonly<CommandContext<G>>",
               "description": "The command context"
             },
             {
               "name": "error",
-              "type": "unknown",
+              "type": "AggregateError",
               "description": "The aggregate error containing validation errors"
             }
           ],
           "returns": {
-            "type": "unknown",
+            "type": "Promise<string>",
             "description": "The decorated result"
           },
           "tags": {
@@ -5975,7 +6492,7 @@
           "file": "packages/gunshi/src/types.ts",
           "line": 796,
           "endLine": 800,
-          "signature": "export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (\n  baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>,\n  ctx: Readonly<CommandContext<G>>,\n  error: AggregateError\n) => Promise<string>"
+          "signature": "export type ValidationErrorsDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>, ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>"
         }
       ]
     },
@@ -6903,7 +7420,8 @@
               "endLine": 195
             }
           ],
-          "signature": "interface BooleanOptions extends BaseOptions"
+          "signature": "interface BooleanOptions extends BaseOptions",
+          "extends": ["BaseOptions"]
         },
         {
           "name": "Combinator",
@@ -6927,19 +7445,19 @@
               "params": [
                 {
                   "name": "value",
-                  "type": "unknown",
+                  "type": "string",
                   "description": "The input string value."
                 }
               ],
               "returns": {
-                "type": "unknown",
+                "type": "T",
                 "description": "The parsed value of type T."
               },
               "line": 22,
               "endLine": 22
             }
           ],
-          "signature": "type Combinator<T> = {\n  /**\n   * The parse function that converts a string to the desired type.\n   *\n   * @param value - The input string value.\n   * @returns The parsed value of type T.\n   */\n  parse: (value: string) => T;\n}"
+          "signature": "type Combinator<T> = { parse: (value: string) => T }"
         },
         {
           "name": "CombinatorOptions",
@@ -6963,12 +7481,12 @@
               "params": [
                 {
                   "name": "value",
-                  "type": "unknown",
+                  "type": "string",
                   "description": "The input string value."
                 }
               ],
               "returns": {
-                "type": "unknown",
+                "type": "T",
                 "description": "The parsed value of type T."
               },
               "line": 301,
@@ -6987,7 +7505,8 @@
               "endLine": 307
             }
           ],
-          "signature": "interface CombinatorOptions<T> extends BaseOptions"
+          "signature": "interface CombinatorOptions<T> extends BaseOptions",
+          "extends": ["BaseOptions"]
         },
         {
           "name": "CombinatorSchema",
@@ -7031,7 +7550,8 @@
               "endLine": 166
             }
           ],
-          "signature": "interface FloatOptions extends BaseOptions"
+          "signature": "interface FloatOptions extends BaseOptions",
+          "extends": ["BaseOptions"]
         },
         {
           "name": "IntegerOptions",
@@ -7060,7 +7580,8 @@
               "endLine": 133
             }
           ],
-          "signature": "interface IntegerOptions extends BaseOptions"
+          "signature": "interface IntegerOptions extends BaseOptions",
+          "extends": ["BaseOptions"]
         },
         {
           "name": "NumberOptions",
@@ -7089,7 +7610,8 @@
               "endLine": 100
             }
           ],
-          "signature": "interface NumberOptions extends BaseOptions"
+          "signature": "interface NumberOptions extends BaseOptions",
+          "extends": ["BaseOptions"]
         },
         {
           "name": "StringOptions",
@@ -7127,7 +7649,8 @@
               "endLine": 69
             }
           ],
-          "signature": "interface StringOptions extends BaseOptions"
+          "signature": "interface StringOptions extends BaseOptions",
+          "extends": ["BaseOptions"]
         }
       ]
     },

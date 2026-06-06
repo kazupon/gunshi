@@ -102,7 +102,7 @@ lines.push(
   `| \`build:typedoc\` (baseline) | \`typedoc --excludeInternal\` | typedoc ${pkgVersion('typedoc')}, typedoc-plugin-markdown ${pkgVersion('typedoc-plugin-markdown')}, typedoc-vitepress-theme ${pkgVersion('typedoc-vitepress-theme')} | \`src/api\` |`
 )
 lines.push(
-  `| \`build:ox-content\` | \`tsx generate-api-with-ox-content.ts\` | @ox-content/napi ${pkgVersion('@ox-content/napi')}, tsx ${pkgVersion('tsx')} | \`src/api-ox\` |`
+  `| \`build:ox-content\` | \`node generate-api-with-ox-content.mjs\` | @ox-content/napi ${pkgVersion('@ox-content/napi')}, Node.js ${process.version} | \`src/api-ox\` |`
 )
 lines.push('')
 

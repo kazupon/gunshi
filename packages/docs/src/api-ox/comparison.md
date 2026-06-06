@@ -1,6 +1,6 @@
 # ox-content API docs comparison
 
-Generated at: 2026-06-04T02:09:22.317Z
+Generated at: 2026-06-06T11:48:41.965Z
 
 ## Inputs
 
@@ -15,26 +15,28 @@ Generated at: 2026-06-04T02:09:22.317Z
   - `renderer`: `../gunshi/src/renderer.ts`
   - `combinators`: `../gunshi/src/combinators.ts`
   - `agent`: `../gunshi/src/agent.ts`
-- ox-content npm package: `@ox-content/napi@2.49.0`
-- ox-content package path: `node_modules/.pnpm/@ox-content+napi@2.49.0/node_modules/@ox-content/napi/package.json`
+- ox-content npm package: `@ox-content/napi@2.59.0`
+- ox-content package path: `node_modules/.pnpm/@ox-content+napi@2.59.0/node_modules/@ox-content/napi/package.json`
 - export graph entrypoints: 8
 - export graph source modules: 20
 - render style: `renderStyle: "markdown"` emits pure native Markdown (fenced code blocks, tables, Markdown links) with no raw HTML; this script only normalizes generic angle brackets in headings for VitePress/Vue compatibility.
 - display formats: `indexFormat`, `parametersFormat`, property/member formats, and `enumMembersFormat` are set to `"table"` to mirror the current TypeDoc configuration; `typeDeclarationFormat` is left as `"none"` because the TypeDoc config does not set it.
 - stats summaries: `renderStats: false` omits ox-content's `_N symbols · ..._` summary lines for TypeDoc-like output.
+- generated-by attribution: `renderGeneratedBy: false` omits ox-content's root attribution line for TypeDoc-like output.
 - group order: `groupOrder: ["Variables","Functions","Class"]` mirrors `packages/docs/typedoc.config.mjs` for module index and nav group order.
+- organization sort: `sort: ["alphabetical"]` and `sortEntryPoints: true` are passed to both Markdown and nav generation so page order and sidebar order stay aligned. `kindSortOrder` is intentionally unset because the current TypeDoc config does not set it.
 
 ## Summary
 
 | Metric                                       | Current TypeDoc | ox-content (typedoc) |
 | -------------------------------------------- | --------------: | -------------------: |
 | Symbol entries                               |              82 |                  152 |
-| Unique symbol names                          |              82 |                   82 |
-| Markdown pages                               |              91 |                   91 |
-| Missing TypeDoc symbols by name              |               - |                    0 |
+| Unique symbol names                          |              82 |                    0 |
+| Markdown pages                               |              91 |                    9 |
+| Missing TypeDoc symbols by name              |               - |                   82 |
 | Extra ox-content symbols by name             |               - |                    0 |
 | Public exports without extracted docs        |               - |                   10 |
-| Rendered member entries                      |               - |                  297 |
+| Rendered member entries                      |               - |                  309 |
 | ox-content extraction diagnostics            |               - |                   10 |
 | ox-content output file collisions            |               - |                    0 |
 | ox-content `@internal` entries still emitted |               - |                    0 |
@@ -45,22 +47,103 @@ ox-content kind counts: class: 1, function: 59, interface: 43, type: 46, variabl
 
 ## URL Samples
 
-| Symbol                   | Current TypeDoc URL                                | ox-content typedoc URL                             |
-| ------------------------ | -------------------------------------------------- | -------------------------------------------------- |
-| `cli`                    | `/api/default/functions/cli.md`                    | `/api-ox/default/functions/cli`                    |
-| `define`                 | `/api/definition/functions/define.md`              | `/api-ox/definition/functions/define`              |
-| `Command`                | `/api/default/interfaces/Command.md`               | `/api-ox/default/interfaces/Command`               |
-| `Plugin`                 | `/api/default/type-aliases/Plugin.md`              | `/api-ox/default/type-aliases/Plugin`              |
-| `DefaultTranslation`     | `/api/default/classes/DefaultTranslation.md`       | `/api-ox/default/classes/DefaultTranslation`       |
-| `ANONYMOUS_COMMAND_NAME` | `/api/default/variables/ANONYMOUS_COMMAND_NAME.md` | `/api-ox/default/variables/ANONYMOUS_COMMAND_NAME` |
-| `CLI_OPTIONS_DEFAULT`    | `/api/plugin/variables/CLI_OPTIONS_DEFAULT.md`     | `/api-ox/plugin/variables/CLI_OPTIONS_DEFAULT`     |
-| `string`                 | `/api/combinators/functions/string.md`             | `/api-ox/combinators/functions/string`             |
+| Symbol                   | Current TypeDoc URL                                | ox-content typedoc URL |
+| ------------------------ | -------------------------------------------------- | ---------------------- |
+| `cli`                    | `/api/default/functions/cli.md`                    | -                      |
+| `define`                 | `/api/definition/functions/define.md`              | -                      |
+| `Command`                | `/api/default/interfaces/Command.md`               | -                      |
+| `Plugin`                 | `/api/default/type-aliases/Plugin.md`              | -                      |
+| `DefaultTranslation`     | `/api/default/classes/DefaultTranslation.md`       | -                      |
+| `ANONYMOUS_COMMAND_NAME` | `/api/default/variables/ANONYMOUS_COMMAND_NAME.md` | -                      |
+| `CLI_OPTIONS_DEFAULT`    | `/api/plugin/variables/CLI_OPTIONS_DEFAULT.md`     | -                      |
+| `string`                 | `/api/combinators/functions/string.md`             | -                      |
 
 ## Missing Current TypeDoc Symbols
 
 These symbols exist in current TypeDoc pages but were not present by symbol name in ox-content entrypoint extraction.
 
-- none
+- `ANONYMOUS_COMMAND_NAME` (variable) - `/api/default/variables/ANONYMOUS_COMMAND_NAME.md`
+- `args` (function) - `/api/combinators/functions/args.md`
+- `Args` (interface) - `/api/default/interfaces/Args.md`
+- `ArgSchema` (interface) - `/api/default/interfaces/ArgSchema.md`
+- `ArgToken` (interface) - `/api/default/interfaces/ArgToken.md`
+- `ArgValues` (type) - `/api/default/type-aliases/ArgValues.md`
+- `Awaitable` (type) - `/api/default/type-aliases/Awaitable.md`
+- `BaseOptions` (interface) - `/api/combinators/interfaces/BaseOptions.md`
+- `boolean` (function) - `/api/combinators/functions/boolean.md`
+- `BooleanOptions` (interface) - `/api/combinators/interfaces/BooleanOptions.md`
+- `choice` (function) - `/api/combinators/functions/choice.md`
+- `CLI_OPTIONS_DEFAULT` (variable) - `/api/plugin/variables/CLI_OPTIONS_DEFAULT.md`
+- `cli` (function) - `/api/default/functions/cli.md`
+- `CliOptions` (interface) - `/api/default/interfaces/CliOptions.md`
+- `combinator` (function) - `/api/combinators/functions/combinator.md`
+- `Combinator` (type) - `/api/combinators/type-aliases/Combinator.md`
+- `CombinatorOptions` (interface) - `/api/combinators/interfaces/CombinatorOptions.md`
+- `CombinatorSchema` (type) - `/api/combinators/type-aliases/CombinatorSchema.md`
+- `Command` (interface) - `/api/default/interfaces/Command.md`
+- `Commandable` (type) - `/api/default/type-aliases/Commandable.md`
+- `CommandCallMode` (type) - `/api/default/type-aliases/CommandCallMode.md`
+- `CommandContext` (interface) - `/api/default/interfaces/CommandContext.md`
+- `CommandContextCore` (type) - `/api/default/type-aliases/CommandContextCore.md`
+- `CommandContextExtension` (interface) - `/api/default/interfaces/CommandContextExtension.md`
+- `CommandContextParams` (interface) - `/api/context/interfaces/CommandContextParams.md`
+- `CommandDecorator` (type) - `/api/default/type-aliases/CommandDecorator.md`
+- `CommandEnvironment` (interface) - `/api/default/interfaces/CommandEnvironment.md`
+- `CommandExamplesFetcher` (type) - `/api/default/type-aliases/CommandExamplesFetcher.md`
+- `CommandLoader` (type) - `/api/default/type-aliases/CommandLoader.md`
+- `CommandRunner` (type) - `/api/default/type-aliases/CommandRunner.md`
+- `createCommandContext` (function) - `/api/context/functions/createCommandContext.md`
+- `DefaultGunshiParams` (type) - `/api/default/type-aliases/DefaultGunshiParams.md`
+- `DefaultTranslation` (class) - `/api/default/classes/DefaultTranslation.md`
+- `define` (function) - `/api/definition/functions/define.md`
+- `defineWithTypes` (function) - `/api/definition/functions/defineWithTypes.md`
+- `describe` (function) - `/api/combinators/functions/describe.md`
+- `extend` (function) - `/api/combinators/functions/extend.md`
+- `ExtendContext` (type) - `/api/default/type-aliases/ExtendContext.md`
+- `float` (function) - `/api/combinators/functions/float.md`
+- `FloatOptions` (interface) - `/api/combinators/interfaces/FloatOptions.md`
+- `generate` (function) - `/api/generator/functions/generate.md`
+- `GenerateOptions` (type) - `/api/generator/type-aliases/GenerateOptions.md`
+- `getAgentProfile` (function) - `/api/agent/functions/getAgentProfile.md`
+- `GunshiParams` (interface) - `/api/default/interfaces/GunshiParams.md`
+- `GunshiParamsConstraint` (type) - `/api/default/type-aliases/GunshiParamsConstraint.md`
+- `integer` (function) - `/api/combinators/functions/integer.md`
+- `IntegerOptions` (interface) - `/api/combinators/interfaces/IntegerOptions.md`
+- `lazy` (function) - `/api/definition/functions/lazy.md`
+- `LazyCommand` (type) - `/api/default/type-aliases/LazyCommand.md`
+- `lazyWithTypes` (function) - `/api/definition/functions/lazyWithTypes.md`
+- `map` (function) - `/api/combinators/functions/map.md`
+- `merge` (function) - `/api/combinators/functions/merge.md`
+- `multiple` (function) - `/api/combinators/functions/multiple.md`
+- `number` (function) - `/api/combinators/functions/number.md`
+- `NumberOptions` (interface) - `/api/combinators/interfaces/NumberOptions.md`
+- `OnPluginExtension` (type) - `/api/default/type-aliases/OnPluginExtension.md`
+- `parseArgs` (function) - `/api/default/functions/parseArgs.md`
+- `plugin` (function) - `/api/default/functions/plugin.md`
+- `Plugin` (type) - `/api/default/type-aliases/Plugin.md`
+- `PluginContext` (interface) - `/api/default/interfaces/PluginContext.md`
+- `PluginDependency` (interface) - `/api/default/interfaces/PluginDependency.md`
+- `PluginExtension` (type) - `/api/default/type-aliases/PluginExtension.md`
+- `PluginFunction` (type) - `/api/default/type-aliases/PluginFunction.md`
+- `PluginOptions` (interface) - `/api/default/interfaces/PluginOptions.md`
+- `PluginWithExtension` (interface) - `/api/default/interfaces/PluginWithExtension.md`
+- `PluginWithoutExtension` (interface) - `/api/default/interfaces/PluginWithoutExtension.md`
+- `positional` (function) - `/api/combinators/functions/positional.md`
+- `Prettify` (type) - `/api/default/type-aliases/Prettify.md`
+- `RendererDecorator` (type) - `/api/default/type-aliases/RendererDecorator.md`
+- `renderHeader` (function) - `/api/renderer/functions/renderHeader.md`
+- `RenderingOptions` (interface) - `/api/default/interfaces/RenderingOptions.md`
+- `renderUsage` (function) - `/api/renderer/functions/renderUsage.md`
+- `renderValidationErrors` (function) - `/api/renderer/functions/renderValidationErrors.md`
+- `required` (function) - `/api/combinators/functions/required.md`
+- `resolveArgs` (function) - `/api/default/functions/resolveArgs.md`
+- `short` (function) - `/api/combinators/functions/short.md`
+- `string` (function) - `/api/combinators/functions/string.md`
+- `StringOptions` (interface) - `/api/combinators/interfaces/StringOptions.md`
+- `SubCommandable` (interface) - `/api/default/interfaces/SubCommandable.md`
+- `unrequired` (function) - `/api/combinators/functions/unrequired.md`
+- `ValidationErrorsDecorator` (type) - `/api/default/type-aliases/ValidationErrorsDecorator.md`
+- `withDefault` (function) - `/api/combinators/functions/withDefault.md`
 
 ## Extra ox-content Symbols
 
@@ -104,20 +187,20 @@ Diagnostics reported by `extractDocsFromEntryPoints` for exports it could not tu
   - variable `/api-ox/default/variables/ANONYMOUS_COMMAND_NAME` from `packages/gunshi/src/constants.ts` via `default`
   - variable `/api-ox/plugin/variables/ANONYMOUS_COMMAND_NAME` from `packages/gunshi/src/constants.ts` via `plugin`
 - `Args`
-  - interface `/api-ox/default/interfaces/Args` from ``via`default`
-  - interface `/api-ox/definition/interfaces/Args` from ``via`definition`
-  - interface `/api-ox/plugin/interfaces/Args` from ``via`plugin`
+  - interface `/api-ox/default/interfaces/Args` via `default`
+  - interface `/api-ox/definition/interfaces/Args` via `definition`
+  - interface `/api-ox/plugin/interfaces/Args` via `plugin`
 - `ArgSchema`
-  - interface `/api-ox/default/interfaces/ArgSchema` from ``via`default`
-  - interface `/api-ox/definition/interfaces/ArgSchema` from ``via`definition`
-  - interface `/api-ox/plugin/interfaces/ArgSchema` from ``via`plugin`
+  - interface `/api-ox/default/interfaces/ArgSchema` via `default`
+  - interface `/api-ox/definition/interfaces/ArgSchema` via `definition`
+  - interface `/api-ox/plugin/interfaces/ArgSchema` via `plugin`
 - `ArgToken`
-  - interface `/api-ox/default/interfaces/ArgToken` from ``via`default`
-  - interface `/api-ox/plugin/interfaces/ArgToken` from ``via`plugin`
+  - interface `/api-ox/default/interfaces/ArgToken` via `default`
+  - interface `/api-ox/plugin/interfaces/ArgToken` via `plugin`
 - `ArgValues`
-  - type `/api-ox/default/type-aliases/ArgValues` from ``via`default`
-  - type `/api-ox/definition/type-aliases/ArgValues` from ``via`definition`
-  - type `/api-ox/plugin/type-aliases/ArgValues` from ``via`plugin`
+  - type `/api-ox/default/type-aliases/ArgValues` via `default`
+  - type `/api-ox/definition/type-aliases/ArgValues` via `definition`
+  - type `/api-ox/plugin/type-aliases/ArgValues` via `plugin`
 - `Awaitable`
   - type `/api-ox/default/type-aliases/Awaitable` from `packages/gunshi/src/types.ts` via `default`
   - type `/api-ox/plugin/type-aliases/Awaitable` from `packages/gunshi/src/types.ts` via `plugin`
@@ -202,10 +285,10 @@ Diagnostics reported by `extractDocsFromEntryPoints` for exports it could not tu
   - function `/api-ox/default/functions/lazyWithTypes` from `packages/gunshi/src/definition.ts` via `default`
   - function `/api-ox/definition/functions/lazyWithTypes` from `packages/gunshi/src/definition.ts` via `definition`
 - `merge`
-  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
-  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
-  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
-  - function `/api-ox/combinators/functions/merge` from ``via`combinators`
+  - function `/api-ox/combinators/functions/merge` via `combinators`
+  - function `/api-ox/combinators/functions/merge` via `combinators`
+  - function `/api-ox/combinators/functions/merge` via `combinators`
+  - function `/api-ox/combinators/functions/merge` via `combinators`
 - `OnPluginExtension`
   - type `/api-ox/default/type-aliases/OnPluginExtension` from `packages/gunshi/src/plugin/core.ts` via `default`
   - type `/api-ox/plugin/type-aliases/OnPluginExtension` from `packages/gunshi/src/plugin/core.ts` via `plugin`
@@ -241,8 +324,8 @@ Diagnostics reported by `extractDocsFromEntryPoints` for exports it could not tu
   - interface `/api-ox/default/interfaces/PluginWithoutExtension` from `packages/gunshi/src/plugin/core.ts` via `default`
   - interface `/api-ox/plugin/interfaces/PluginWithoutExtension` from `packages/gunshi/src/plugin/core.ts` via `plugin`
 - `positional`
-  - function `/api-ox/combinators/functions/positional` from ``via`combinators`
-  - function `/api-ox/combinators/functions/positional` from ``via`combinators`
+  - function `/api-ox/combinators/functions/positional` via `combinators`
+  - function `/api-ox/combinators/functions/positional` via `combinators`
 - `Prettify`
   - type `/api-ox/default/type-aliases/Prettify` from `packages/gunshi/src/types.ts` via `default`
   - type `/api-ox/plugin/type-aliases/Prettify` from `packages/gunshi/src/types.ts` via `plugin`
@@ -261,99 +344,17 @@ ox-content entrypoint output uses entrypoint file names. A collision here means 
 
 ## Generated Files
 
-- `agent/functions/getAgentProfile.md`
-- `agent/index.md`
-- `combinators/functions/args.md`
-- `combinators/functions/boolean.md`
-- `combinators/functions/choice.md`
-- `combinators/functions/combinator.md`
-- `combinators/functions/describe.md`
-- `combinators/functions/extend.md`
-- `combinators/functions/float.md`
-- `combinators/functions/integer.md`
-- `combinators/functions/map.md`
-- `combinators/functions/merge.md`
-- `combinators/functions/multiple.md`
-- `combinators/functions/number.md`
-- `combinators/functions/positional.md`
-- `combinators/functions/required.md`
-- `combinators/functions/short.md`
-- `combinators/functions/string.md`
-- `combinators/functions/unrequired.md`
-- `combinators/functions/withDefault.md`
-- `combinators/index.md`
-- `combinators/interfaces/BaseOptions.md`
-- `combinators/interfaces/BooleanOptions.md`
-- `combinators/interfaces/CombinatorOptions.md`
-- `combinators/interfaces/FloatOptions.md`
-- `combinators/interfaces/IntegerOptions.md`
-- `combinators/interfaces/NumberOptions.md`
-- `combinators/interfaces/StringOptions.md`
-- `combinators/type-aliases/Combinator.md`
-- `combinators/type-aliases/CombinatorSchema.md`
-- `context/functions/createCommandContext.md`
-- `context/index.md`
-- `context/interfaces/CommandContextParams.md`
-- `default/classes/DefaultTranslation.md`
-- `default/functions/cli.md`
-- `default/functions/parseArgs.md`
-- `default/functions/plugin.md`
-- `default/functions/resolveArgs.md`
-- `default/index.md`
-- `default/interfaces/ArgSchema.md`
-- `default/interfaces/ArgToken.md`
-- `default/interfaces/Args.md`
-- `default/interfaces/CliOptions.md`
-- `default/interfaces/Command.md`
-- `default/interfaces/CommandContext.md`
-- `default/interfaces/CommandContextExtension.md`
-- `default/interfaces/CommandEnvironment.md`
-- `default/interfaces/GunshiParams.md`
-- `default/interfaces/PluginContext.md`
-- `default/interfaces/PluginDependency.md`
-- `default/interfaces/PluginOptions.md`
-- `default/interfaces/PluginWithExtension.md`
-- `default/interfaces/PluginWithoutExtension.md`
-- `default/interfaces/RenderingOptions.md`
-- `default/interfaces/SubCommandable.md`
-- `default/type-aliases/ArgValues.md`
-- `default/type-aliases/Awaitable.md`
-- `default/type-aliases/CommandCallMode.md`
-- `default/type-aliases/CommandContextCore.md`
-- `default/type-aliases/CommandDecorator.md`
-- `default/type-aliases/CommandExamplesFetcher.md`
-- `default/type-aliases/CommandLoader.md`
-- `default/type-aliases/CommandRunner.md`
-- `default/type-aliases/Commandable.md`
-- `default/type-aliases/DefaultGunshiParams.md`
-- `default/type-aliases/ExtendContext.md`
-- `default/type-aliases/GunshiParamsConstraint.md`
-- `default/type-aliases/LazyCommand.md`
-- `default/type-aliases/OnPluginExtension.md`
-- `default/type-aliases/Plugin.md`
-- `default/type-aliases/PluginExtension.md`
-- `default/type-aliases/PluginFunction.md`
-- `default/type-aliases/Prettify.md`
-- `default/type-aliases/RendererDecorator.md`
-- `default/type-aliases/ValidationErrorsDecorator.md`
-- `default/variables/ANONYMOUS_COMMAND_NAME.md`
-- `definition/functions/define.md`
-- `definition/functions/defineWithTypes.md`
-- `definition/functions/lazy.md`
-- `definition/functions/lazyWithTypes.md`
-- `definition/index.md`
+- `agent.md`
+- `combinators.md`
+- `context.md`
+- `default.md`
+- `definition.md`
 - `docs.json`
-- `generator/functions/generate.md`
-- `generator/index.md`
-- `generator/type-aliases/GenerateOptions.md`
+- `generator.md`
 - `index.md`
 - `nav.ts`
-- `plugin/index.md`
-- `plugin/variables/CLI_OPTIONS_DEFAULT.md`
-- `renderer/functions/renderHeader.md`
-- `renderer/functions/renderUsage.md`
-- `renderer/functions/renderValidationErrors.md`
-- `renderer/index.md`
+- `plugin.md`
+- `renderer.md`
 
 ## Migration Notes
 
@@ -369,11 +370,19 @@ ox-content entrypoint output uses entrypoint file names. A collision here means 
 - v2.46.0 `groupOrder` is used for both Markdown and nav generation so module index sections and sidebar groups follow the current TypeDoc ordering.
 - v2.47.0 sorts/dedupes TypeDoc nav leaf entries and sorts class/interface/type members alphabetically, so this script no longer postprocesses nav leaves or member order.
 - v2.48.0 omits the redundant `Kind` column from named member tables, bringing interface/class/type member tables closer to TypeDoc output.
-- v2.49.0 links known symbols inside type annotations, so Type Parameter constraints/defaults and Type cells can navigate to matching API pages like TypeDoc. Remaining caveat: primitive names that collide with public API exports (for example `string` / `boolean` combinators) can be over-linked.
+- v2.49.0 links known symbols inside type annotations, so Type Parameter constraints/defaults and Type cells can navigate to matching API pages like TypeDoc.
+- v2.50.0 preserves TypeScript primitive/global names such as `string` and `boolean` as code in type annotations, avoiding false links to same-named public API symbols.
+- v2.51.0 exposes TypeDoc-compatible `sort`, `sortEntryPoints`, and `kindSortOrder` organization options. This script passes the same sort inputs to Markdown and nav generation so sidebar ordering does not diverge from page ordering.
+- v2.51.0 uses the entry source path for TypeDoc-strategy module index source links, so module `**[Source]**` links point at the real entry file instead of the module name.
+- v2.52.0 through v2.54.0 are release/version updates for the docs NAPI relative to v2.51.0; this generated output is pinned to the latest `@ox-content/napi@2.59.0`.
+- v2.55.0 fixes the remaining TypeDoc-parity rendering gaps for this migration pass: mixed Markdown `@example` bodies, multiline type parameter cells, return type literal members, class method details, interface index signatures, function-valued property types, and function type alias parameter/return metadata.
+- v2.56.0 fixes return union pipe escaping in top-level `Returns`, expands object literal function parameters (including nested `options.*` rows), and renders member-level type parameters for generic interface/class methods.
+- v2.57.0 suppresses non-function property `Returns` sections for description-only `@returns`, merges destructured parameter docs into their parent parameters, and resolves callable metadata for intersection type aliases.
+- v2.59.0 omits empty Type Parameter description columns, strips raw JSDoc text from type alias signatures, avoids duplicate function-valued property Returns content, and adds `renderGeneratedBy: false` so the root attribution line can be removed without postprocessing.
 - `externalDocs: true` (with `externalPackageSources` overrides) resolves external package re-exports into documentation entries, so `args-tokens` (`parseArgs`, `resolveArgs`, combinators, `kebabnize`), `@gunshi/plugin-renderer` (`renderHeader`, `renderUsage`, `renderValidationErrors`) and `@gunshi/plugin-i18n` (`DefaultTranslation`) now appear as docs entries. This brings missing-by-name down to 0.
 - `{@link}` / `{@linkcode}` inline tags are resolved by the renderer: known symbols become internal links (e.g. `{@linkcode Command | entry command}` -> a link to the `Command` page), and unresolvable symbols (not part of gunshi's public API, e.g. `TranslationAdapter`) fall back to inline code. No raw `{@link}` tags remain in the generated pages.
 - Overloads are unified into a single page/anchor per symbol (`cli`, `define`, `lazy`, `plugin`) and v2.45.0 renders each public overload as a call signature instead of letting the implementation `any` signature overwrite the page. The "Symbol entries" count above still counts overloads and cross-entrypoint re-exports separately, but each `{module}/{category}/{Name}.md` page is unique.
 - Members are exposed/rendered for documented class/interface/type/enum entries, so pages such as `Command` include member data; `enum` symbols now get `enumerations/{Name}` pages.
 - `internal: false` is passed to entrypoint extraction to match TypeDoc `--excludeInternal`.
 - `renderStyle: "markdown"` (ox-content v2.29.0+) emits pure native Markdown — tables for params/members, fenced code blocks for signatures/examples, and Markdown links — with no raw HTML. This makes every inline `{@link}` / `{@linkcode}` a Markdown link that VitePress transforms to a clean URL and dead-link-checks (fixing the broken raw-HTML `.md` links), and removes the need for the previous `v-pre` / brace-escaping postprocess. The only remaining local normalization is escaping generic angle brackets in headings (e.g. `Command\<G\>`) so Vue does not parse them as HTML.
-- Remaining differences are limited to module-index framing details tracked in .notes/035: breadcrumb and module Source link.
+- Remaining differences are limited to the module-index breadcrumb tracked in .notes/035.

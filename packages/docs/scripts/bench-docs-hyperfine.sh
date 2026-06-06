@@ -4,7 +4,7 @@
 #
 # packages/docs が持つ 2 系統の API リファレンス生成を比較する:
 #   1. build:typedoc    — typedoc --excludeInternal            → src/api   (基準)
-#   2. build:ox-content — tsx generate-api-with-ox-content.ts   → src/api-ox
+#   2. build:ox-content — node generate-api-with-ox-content.mjs → src/api-ox
 #
 # ../ox-jsdoc/tasks/benchmark/scripts/jsdoc-linter-hyperfine.sh を踏襲し、
 # pnpm ラッパーを挟まずバイナリを直接起動して純粋なツール実行時間を測る。
@@ -32,7 +32,7 @@ if ! command -v hyperfine >/dev/null 2>&1; then
   echo "error: hyperfine not found in PATH" >&2
   exit 1
 fi
-for bin in "$DOCS_ROOT/node_modules/.bin/typedoc" "$DOCS_ROOT/node_modules/.bin/tsx"; do
+for bin in "$DOCS_ROOT/node_modules/.bin/typedoc"; do
   if [[ ! -x "$bin" ]]; then
     echo "error: missing binary: $bin (run 'pnpm install')" >&2
     exit 1
@@ -45,7 +45,7 @@ mkdir -p "$RESULTS"
 cd "$DOCS_ROOT"
 
 TYPEDOC_CMD="./node_modules/.bin/typedoc --excludeInternal"
-APIOX_CMD="./node_modules/.bin/tsx ./scripts/generate-api-with-ox-content.ts"
+APIOX_CMD="node ./scripts/generate-api-with-ox-content.mjs"
 
 # Benchmark ------------------------------------------------------------------
 # 基準(build:typedoc)を先に計測することで、api-ox が読む src/api を再生成しておく。
