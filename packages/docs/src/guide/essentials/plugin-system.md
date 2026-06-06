@@ -308,6 +308,68 @@ The completion plugin adds a special `complete` command to your CLI that generat
 
 Users run this command once to generate the script for their shell, then source it in their shell configuration to enable tab completion.
 
+### Dry Run
+
+Add a `--dry-run` option and wrap side-effect operations that should be skipped when users only want to preview actions:
+
+::: code-group
+
+```sh [npm]
+npm install --save @gunshi/plugin-dryrun
+```
+
+```sh [pnpm]
+pnpm add @gunshi/plugin-dryrun
+```
+
+```sh [yarn]
+yarn add @gunshi/plugin-dryrun
+```
+
+```sh [deno]
+deno add jsr:@gunshi/plugin-dryrun
+```
+
+```sh [bun]
+bun add @gunshi/plugin-dryrun
+```
+
+:::
+
+```js
+import { cli, define } from 'gunshi'
+import dryrun from '@gunshi/plugin-dryrun'
+
+const command = define({
+  name: 'publish',
+  async run(ctx) {
+    const dryRun = ctx.extensions['g:dryrun']
+
+    await dryRun.run(
+      async function publishPackage() {
+        // Publish package here
+      },
+      {
+        message: 'publish package'
+      }
+    )
+  }
+})
+
+await cli(process.argv.slice(2), command, {
+  name: 'publish-tool',
+  plugins: [dryrun()]
+})
+```
+
+With `--dry-run`, the wrapped operation is skipped and the message is printed through the command context logger:
+
+```sh
+[dryrun] publish package
+```
+
+The dry-run plugin does not skip the whole command. It only skips operations that command authors explicitly pass to `run()` or `wrap()`, so commands can still validate input, resolve configuration, and print useful context.
+
 ## Combining Plugins
 
 Plugins work seamlessly together. Here's an example using both i18n and completion:
