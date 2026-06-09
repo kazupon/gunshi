@@ -230,6 +230,12 @@ importers:
         specifier: ^1.0.2
         version: 1.2.4
     devDependencies:
+      '@gunshi/plugin-i18n':
+        specifier: workspace:*
+        version: link:../plugin-i18n
+      '@gunshi/plugin-renderer':
+        specifier: workspace:*
+        version: link:../plugin-renderer
       '@types/node':
         specifier: 'catalog:'
         version: 25.9.2

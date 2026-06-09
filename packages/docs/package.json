@@ -50,6 +50,8 @@
     "tinyexec": "^1.0.2"
   },
   "devDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*",
+    "@gunshi/plugin-renderer": "workspace:*",
     "@types/node": "catalog:",
     "@vueuse/core": "^14.0.0",
     "args-tokens": "^0.25.0",
