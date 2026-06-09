@@ -1,38 +1,37 @@
-[gunshi](../../index.md) / [combinators](../index.md) / describe
-
 # Function: describe()
 
-```ts
-function describe<T, D>(schema, text): ArgSchema & Combinator<T> & CombinatorDescribe<D>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Set a description on a combinator schema for help text generation.
 
 The original schema is not modified.
 
+## Signature
+
+```ts
+declare function describe<T, D extends string>(schema: CombinatorSchema<T>, text: D): CombinatorSchema<T> & CombinatorDescribe<D>
+```
+
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
+| Name | Description |
+| --- | --- |
 | `T` | The schema's parsed type. |
 | `D` *extends* `string` | The description string literal type. |
 
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `schema` | [`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 | `text` | `D` | Human-readable description. |
 
 ## Returns
 
-[`ArgSchema`](../../default/interfaces/ArgSchema.md) & [`Combinator`](../type-aliases/Combinator.md)\<`T`\> & `CombinatorDescribe`\<`D`\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorDescribe`\<`D`\> — A new schema with the description set.
 
-A new schema with the description set.
-
-## Example
+## Examples
 
 ```ts
 const args = {

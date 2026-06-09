@@ -1,8 +1,4 @@
-**@gunshi/plugin-completion**
-
-***
-
-# @gunshi/plugin-completion
+# API Documentation
 
 The entry point of completion plugin
 
@@ -58,26 +54,27 @@ await cli(process.argv.slice(2), command, {
 
 | Variable | Description |
 | ------ | ------ |
-| [pluginId](variables/pluginId.md) | The unique identifier for the completion plugin. |
+| [pluginId](/packages/plugin-completion/docs/default/variables/pluginId.md) | The unique identifier for the completion plugin. |
 
 ## Functions
 
 | Function | Description |
 | ------ | ------ |
-| [default](functions/default.md) | completion plugin |
+| [default](/packages/plugin-completion/docs/default/functions/default.md) | completion plugin |
 
 ## Interfaces
 
 | Interface | Description |
 | ------ | ------ |
-| [CompletionConfig](interfaces/CompletionConfig.md) | Completion configuration, which structure is similar `bombsh/tab`'s `CompletionConfig`. |
-| [CompletionExtension](interfaces/CompletionExtension.md) | Extended command context which provides utilities via completion plugin. These utilities are available via `CommandContext.extensions['g:completion']`. |
-| [CompletionOptions](interfaces/CompletionOptions.md) | Completion plugin options. |
-| [CompletionParams](interfaces/CompletionParams.md) | Parameters for [`the completion handler`](type-aliases/CompletionHandler.md). |
+| [CompletionConfig](/packages/plugin-completion/docs/default/interfaces/CompletionConfig.md) | Completion configuration, which structure is similar `bombsh/tab`'s `CompletionConfig`. |
+| [CompletionExtension](/packages/plugin-completion/docs/default/interfaces/CompletionExtension.md) | Extended command context which provides utilities via completion plugin. These utilities are available via `CommandContext.extensions['g:completion']`. |
+| [CompletionOptions](/packages/plugin-completion/docs/default/interfaces/CompletionOptions.md) | Completion plugin options. |
+| [CompletionParams](/packages/plugin-completion/docs/default/interfaces/CompletionParams.md) | Parameters for [`the completion handler`](/packages/plugin-completion/docs/default/type-aliases/CompletionHandler.md). |
 
 ## Type Aliases
 
 | Type Alias | Description |
 | ------ | ------ |
-| [CompletionHandler](type-aliases/CompletionHandler.md) | The handler for completion. |
-| [PluginId](type-aliases/PluginId.md) | Type representing the unique identifier for the completion plugin. |
+| [CompletionHandler](/packages/plugin-completion/docs/default/type-aliases/CompletionHandler.md) | The handler for completion. |
+| [PluginId](/packages/plugin-completion/docs/default/type-aliases/PluginId.md) | Type representing the unique identifier for the completion plugin. |
+

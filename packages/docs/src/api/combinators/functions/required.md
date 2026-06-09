@@ -1,36 +1,35 @@
-[gunshi](../../index.md) / [combinators](../index.md) / required
-
 # Function: required()
 
-```ts
-function required<T>(schema): ArgSchema & Combinator<T> & CombinatorRequired;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Mark a combinator schema as required.
 
 The original schema is not modified.
 
+## Signature
+
+```ts
+declare function required<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorRequired
+```
+
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
+| Name | Description |
+| --- | --- |
 | `T` | The schema's parsed type. |
 
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `schema` | [`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 
 ## Returns
 
-[`ArgSchema`](../../default/interfaces/ArgSchema.md) & [`Combinator`](../type-aliases/Combinator.md)\<`T`\> & `CombinatorRequired`
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorRequired` — A new schema with `required: true`.
 
-A new schema with `required: true`.
-
-## Example
+## Examples
 
 ```ts
 const args = {

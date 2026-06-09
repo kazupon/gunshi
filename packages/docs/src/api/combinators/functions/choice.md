@@ -1,37 +1,36 @@
-[gunshi](../../index.md) / [combinators](../index.md) / choice
-
 # Function: choice()
 
-```ts
-function choice<T>(values, opts?): CombinatorSchema<T[number]>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create an enum-like argument schema with literal type inference.
 
 Uses `const T` generic to infer literal union types from the values array.
 
+## Signature
+
+```ts
+declare function choice<const T extends readonly string[]>(values: T, opts?: BaseOptions): CombinatorSchema<T[number]>
+```
+
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
-| `T` *extends* readonly `string`[] | The readonly array of allowed string values. |
+| Name | Description |
+| --- | --- |
+| `T` *extends* `readonly string[]` | The readonly array of allowed string values. |
 
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
+| Name | Type | Description |
+| --- | --- | --- |
 | `values` | `T` | Allowed values. |
-| `opts?` | [`BaseOptions`](../interfaces/BaseOptions.md) | Common options (description, short, required). |
+| `opts` | [`BaseOptions`](/api/combinators/interfaces/BaseOptions.md) | Common options (description, short, required). _(optional)_ |
 
 ## Returns
 
-[`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\[`number`\]\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\[`number`\]\> — A combinator schema that resolves to a union of the allowed values.
 
-A combinator schema that resolves to a union of the allowed values.
-
-## Example
+## Examples
 
 ```ts
 const args = {

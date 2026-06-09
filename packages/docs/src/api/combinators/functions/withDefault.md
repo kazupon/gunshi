@@ -1,37 +1,36 @@
-[gunshi](../../index.md) / [combinators](../index.md) / withDefault
-
 # Function: withDefault()
 
-```ts
-function withDefault<T>(schema, defaultValue): ArgSchema & Combinator<T> & CombinatorWithDefault<T>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Set a default value on a combinator schema.
 
 The original schema is not modified.
 
+## Signature
+
+```ts
+declare function withDefault<T extends string | boolean | number>(schema: CombinatorSchema<T>, defaultValue: T): CombinatorSchema<T> & CombinatorWithDefault<T>
+```
+
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
-| `T` *extends* `string` \| `number` \| `boolean` | The schema's parsed type. |
+| Name | Description |
+| --- | --- |
+| `T` *extends* `string \| boolean \| number` | The schema's parsed type. |
 
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `schema` | [`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 | `defaultValue` | `T` | The default value. |
 
 ## Returns
 
-[`ArgSchema`](../../default/interfaces/ArgSchema.md) & [`Combinator`](../type-aliases/Combinator.md)\<`T`\> & `CombinatorWithDefault`\<`T`\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorWithDefault`\<`T`\> — A new schema with the default value set.
 
-A new schema with the default value set.
-
-## Example
+## Examples
 
 ```ts
 const args = {

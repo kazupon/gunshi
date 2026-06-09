@@ -1,14 +1,13 @@
-[gunshi](../../index.md) / [combinators](../index.md) / positional
-
 # Function: positional()
 
 ## Call Signature
 
 ```ts
-function positional<T>(parser): ArgSchema & Combinator<T> & ArgSchemaPositionalType;
+declare function positional<T>(parser: CombinatorSchema<T>): CombinatorSchema<T> & ArgSchemaPositionalType
 ```
 
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a positional argument schema.
 
@@ -17,23 +16,21 @@ With a parser (e.g., `positional(integer())`), resolves to the parser's return t
 
 ### Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
+| Name | Description |
+| --- | --- |
 | `T` | The parser's resolved type. |
 
 ### Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `parser` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The parser combinator schema. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `parser` | [`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The parser combinator schema. |
 
 ### Returns
 
-[`ArgSchema`](../../default/interfaces/ArgSchema.md) & [`Combinator`](../type-aliases/Combinator.md)\<`T`\> & `ArgSchemaPositionalType`
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `ArgSchemaPositionalType` — A positional argument schema resolving to the parser's type.
 
-A positional argument schema resolving to the parser's type.
-
-### Example
+### Examples
 
 ```ts
 const args = {
@@ -45,10 +42,11 @@ const args = {
 ## Call Signature
 
 ```ts
-function positional(parser?): ArgSchema & ArgSchemaPositionalType;
+declare function positional(parser?: BaseOptions): ArgSchema & ArgSchemaPositionalType
 ```
 
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a positional argument schema.
 
@@ -57,17 +55,15 @@ With a parser (e.g., `positional(integer())`), resolves to the parser's return t
 
 ### Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `parser?` | [`BaseOptions`](../interfaces/BaseOptions.md) | Optional base options (description, short, required). |
+| Name | Type | Description |
+| --- | --- | --- |
+| `parser` | [`BaseOptions`](/api/combinators/interfaces/BaseOptions.md) | Optional base options (description, short, required). _(optional)_ |
 
 ### Returns
 
-[`ArgSchema`](../../default/interfaces/ArgSchema.md) & `ArgSchemaPositionalType`
+[`ArgSchema`](/api/default/interfaces/ArgSchema.md) & `ArgSchemaPositionalType` — A positional argument schema resolving to string.
 
-A positional argument schema resolving to string.
-
-### Example
+### Examples
 
 ```ts
 const args = {

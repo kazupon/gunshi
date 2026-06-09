@@ -1,31 +1,30 @@
-[gunshi](../../index.md) / [combinators](../index.md) / boolean
-
 # Function: boolean()
 
-```ts
-function boolean(opts?): CombinatorSchema<boolean>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a boolean argument schema.
 
 Boolean arguments are existence-based. The resolver passes `"true"` or `"false"`
 to the parse function based on the presence or negation of the flag.
 
+## Signature
+
+```ts
+declare function boolean(opts?: BooleanOptions): CombinatorSchema<boolean>
+```
+
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `opts?` | [`BooleanOptions`](../interfaces/BooleanOptions.md) | Boolean options. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `opts` | [`BooleanOptions`](/api/combinators/interfaces/BooleanOptions.md) | Boolean options. _(optional)_ |
 
 ## Returns
 
-[`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`boolean`\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`boolean`\> — A combinator schema for boolean flags.
 
-A combinator schema for boolean flags.
-
-## Example
+## Examples
 
 ```ts
 const args = {

@@ -119,6 +119,7 @@
     "typescript": "catalog:",
     "typescript-eslint": "^8.59.2",
     "vite-tsconfig-paths": "^6.1.1",
+    "vitepress-api-references": "catalog:",
     "vitest": "^4.1.5"
   },
   "pnpm": {

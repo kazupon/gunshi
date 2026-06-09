@@ -1,8 +1,4 @@
-**@gunshi/plugin-renderer**
-
-***
-
-# @gunshi/plugin-renderer
+# API Documentation
 
 The entry point of usage renderer plugin
 
@@ -31,25 +27,26 @@ await cli(process.argv.slice(2), entry, {
 
 | Variable | Description |
 | ------ | ------ |
-| [pluginId](variables/pluginId.md) | The unique identifier for usage renderer plugin. |
+| [pluginId](/packages/plugin-renderer/docs/default/variables/pluginId.md) | The unique identifier for usage renderer plugin. |
 
 ## Functions
 
 | Function | Description |
 | ------ | ------ |
-| [default](functions/default.md) | usage renderer plugin |
-| [renderHeader](functions/renderHeader.md) | Render the header. |
-| [renderUsage](functions/renderUsage.md) | Render the usage. |
-| [renderValidationErrors](functions/renderValidationErrors.md) | Render the validation errors. |
+| [default](/packages/plugin-renderer/docs/default/functions/default.md) | usage renderer plugin |
+| [renderHeader](/packages/plugin-renderer/docs/default/functions/renderHeader.md) | Render the header. |
+| [renderUsage](/packages/plugin-renderer/docs/default/functions/renderUsage.md) | Render the usage. |
+| [renderValidationErrors](/packages/plugin-renderer/docs/default/functions/renderValidationErrors.md) | Render the validation errors. |
 
 ## Interfaces
 
 | Interface | Description |
 | ------ | ------ |
-| [UsageRendererExtension](interfaces/UsageRendererExtension.md) | Extended command context which provides utilities via usage renderer plugin. These utilities are available via `CommandContext.extensions['g:renderer']`. |
+| [UsageRendererExtension](/packages/plugin-renderer/docs/default/interfaces/UsageRendererExtension.md) | Extended command context which provides utilities via usage renderer plugin. These utilities are available via `CommandContext.extensions['g:renderer']`. |
 
 ## Type Aliases
 
 | Type Alias | Description |
 | ------ | ------ |
-| [PluginId](type-aliases/PluginId.md) | Type representing the unique identifier for usage renderer plugin. |
+| [PluginId](/packages/plugin-renderer/docs/default/type-aliases/PluginId.md) | Type representing the unique identifier for usage renderer plugin. |
+
