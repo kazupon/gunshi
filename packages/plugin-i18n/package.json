@@ -76,7 +76,7 @@
     "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
-    "@intlify/core": "next",
+    "@intlify/core-base": "12.0.0-alpha.4",
     "deno": "catalog:",
     "gunshi": "workspace:*",
     "jsr": "catalog:",

@@ -1,14 +1,15 @@
 import {
+  compile,
   createCoreContext,
   getLocaleMessage,
   NOT_RESOLVED,
   setLocaleMessage,
   translate
-} from '@intlify/core'
+} from '@intlify/core-base'
 import { MessageFormat } from 'messageformat'
 import { DefaultTranslation } from '../src/translation.ts'
 
-import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core'
+import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core-base'
 import type { TranslationAdapter, TranslationAdapterFactoryOptions } from '../src/types.ts'
 
 /**
@@ -106,7 +107,8 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
     this.#context = createCoreContext<string, {}, typeof messages>({
       locale,
       fallbackLocale,
-      messages
+      messages,
+      messageCompiler: compile
     })
   }
 

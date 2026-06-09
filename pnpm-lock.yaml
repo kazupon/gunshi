@@ -441,8 +441,8 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
-      '@intlify/core':
-        specifier: next
+      '@intlify/core-base':
+        specifier: 12.0.0-alpha.4
         version: 12.0.0-alpha.4
       deno:
         specifier: 'catalog:'
@@ -1190,10 +1190,6 @@ packages:
 
   '@intlify/core-base@12.0.0-alpha.4':
     resolution: {integrity: sha512-7JZiWLP9ScL/DDgT6+t1HebP4IqiA0FmHkd7M17LgjchPdIxWCBJFbFANK9bYAj+ZyzR8urtPK65FxyARjPi3A==}
-    engines: {node: '>= 22'}
-
-  '@intlify/core@12.0.0-alpha.4':
-    resolution: {integrity: sha512-cn7/d5ja6VU/w/uNYyXibuqTNEz5qIaWIoi8QBpEwKSyI9fzdioVJ0+hVaMaWBT+smGKTgWQ85nP8VekiX9JDQ==}
     engines: {node: '>= 22'}
 
   '@intlify/message-compiler@12.0.0-alpha.4':
@@ -5166,11 +5162,6 @@ snapshots:
   '@intlify/core-base@12.0.0-alpha.4':
     dependencies:
       '@intlify/message-compiler': 12.0.0-alpha.4
-      '@intlify/shared': 12.0.0-alpha.4
-
-  '@intlify/core@12.0.0-alpha.4':
-    dependencies:
-      '@intlify/core-base': 12.0.0-alpha.4
       '@intlify/shared': 12.0.0-alpha.4
 
   '@intlify/message-compiler@12.0.0-alpha.4':
