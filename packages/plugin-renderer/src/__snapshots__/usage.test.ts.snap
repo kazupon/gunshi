@@ -187,6 +187,19 @@ EXAMPLES:
 "
 `;
 
+exports[`optional positional arguments 1`] = `
+"A test command
+
+USAGE:
+  cmd1 test [<query>] <file> [<fallback>]
+
+ARGUMENTS:
+  query              SQL query to execute
+  file               Input file
+  fallback           Fallback source
+"
+`;
+
 exports[`positional arguments 1`] = `
 "A test command
 

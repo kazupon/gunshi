@@ -165,7 +165,7 @@ Each option can have the following properties:
   <!-- eslint-enable markdown/no-missing-label-refs -->
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
-- `required`: Set to `true` if the option is required (Note: Positional arguments defined with `type: 'positional'` without `multiple: true` are implicitly required by the parser).
+- `required`: Set to `true` if the option is required. For single positional arguments, omit this field to keep the compatibility default of required, or set `required: false` to make the positional argument optional.
 - `multiple`: Set to `true` if multiple option values are allowed
 - `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
@@ -204,14 +204,22 @@ const command = define({
     destination: {
       type: 'positional',
       description: 'The destination file path'
+    },
+
+    // optional positional argument, useful when the value may come from stdin
+    query: {
+      type: 'positional',
+      required: false,
+      description: 'SQL query to execute'
     }
     // ... potentially more positional arguments
   }
 })
 ```
 
-- **Implicitly Required**: Unlike named options which can be optional, positional arguments must always be provided by the user. When you define an argument with `type: 'positional'` in the schema, Gunshi expects it to be present on the command line. If it's missing, a validation error will occur. They cannot be truly optional like named flags.
-- **Order Matters**: Positional arguments are matched based on the order they appear on the command line and the order they are defined in the `args` object.
+- **Required by Default**: A single positional argument without `required: false` or `default` remains required for compatibility. Set `required: false` when the value can be omitted, such as a command that can read from stdin.
+- **Default Values**: A single positional argument with `default` uses that value when the command-line value is missing, unless `required: true` is set.
+- **Order Matters**: Positional arguments are matched based on the order they appear on the command line and the order they are defined in the `args` object. Optional positional arguments leave enough input values for later required positional arguments before consuming a value.
 - **Accessing Values**: The resolved value is accessible via `ctx.values`, using the _key_ you defined in the `args` object (e.g., `ctx.values.source`, `ctx.values.destination`).
 - **`ctx.positionals`**: This array still exists and contains the raw string values of positional arguments in the order they were parsed (e.g., `ctx.positionals[0]`, `ctx.positionals[1]`). While available, using `ctx.values.<key>` is generally preferred for clarity and consistency.
 - **Descriptions**: The `description` property is used for generating help/usage messages.

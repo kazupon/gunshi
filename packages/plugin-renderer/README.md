@@ -38,9 +38,13 @@ const command = define({
   description: 'Deploy your application',
   args: {
     environment: {
-      type: 'string',
-      description: 'Target environment',
-      required: true
+      type: 'positional',
+      description: 'Target environment'
+    },
+    region: {
+      type: 'positional',
+      required: false,
+      description: 'Optional deployment region'
     },
     force: {
       type: 'boolean',
@@ -48,9 +52,10 @@ const command = define({
       description: 'Force deployment without confirmation'
     }
   },
-  examples: '$ deploy production --force',
+  examples: ['$ deploy production --force', '$ deploy production us-east-1 --force'],
   run: async ctx => {
-    console.log(`Deploying to ${ctx.values.environment}...`)
+    const region = ctx.values.region ? ` in ${ctx.values.region}` : ''
+    console.log(`Deploying to ${ctx.values.environment}${region}...`)
   }
 })
 
@@ -94,18 +99,20 @@ When a user runs `--help`, the output looks like:
 ```sh
 deploy - Deploy your application
 
-USAGE
-  $ deploy [options] <environment>
+USAGE:
+  deploy <OPTIONS> <environment> [<region>]
 
-ARGUMENTS
-  environment  Target environment
+ARGUMENTS:
+  environment          Target environment
+  region               Optional deployment region
 
-OPTIONS
-  -f, --force  Force deployment without confirmation
-  -h, --help   Display this help message
+OPTIONS:
+  -f, --force          Force deployment without confirmation
+  -h, --help           Display this help message
 
-EXAMPLES
+EXAMPLES:
   $ deploy production --force
+  $ deploy production us-east-1 --force
 ```
 
 ### Exported Functions

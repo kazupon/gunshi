@@ -178,6 +178,26 @@ describe('define with combinators', () => {
 
     expect(log).toHaveBeenCalledWith('localhost', 8080)
   })
+
+  test('unrequired positional combinator can be omitted', async () => {
+    const log = vi.fn<(...args: unknown[]) => void>()
+    const command = define({
+      name: 'test',
+      args: {
+        query: unrequired(positional()),
+        file: positional()
+      },
+      run: ctx => {
+        log(ctx.values.query, ctx.values.file)
+      }
+    })
+
+    await cli(['input.sql'], command, {
+      usageSilent: true
+    })
+
+    expect(log).toHaveBeenCalledWith(undefined, 'input.sql')
+  })
 })
 
 describe('schema composition with define', () => {
@@ -298,6 +318,22 @@ describe('type inference with combinators', () => {
     })
 
     await cli(['test'], command, { usageSilent: true })
+  })
+
+  test('unrequired positional combinator', async () => {
+    const command = define({
+      name: 'test',
+      args: {
+        query: unrequired(positional()),
+        file: positional()
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.query).toEqualTypeOf<string | undefined>()
+        expectTypeOf(ctx.values.file).toEqualTypeOf<string>()
+      }
+    })
+
+    await cli(['input.sql'], command, { usageSilent: true })
   })
 
   test('choice literal type inference', async () => {

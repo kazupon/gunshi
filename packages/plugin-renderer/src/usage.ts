@@ -561,14 +561,26 @@ function generatePositionalSymbols(args: Args): string {
     ? getPositionalArgs(args)
         .map(([name, arg]) => {
           const elements: string[] = []
-          if (!arg.multiple || arg.required) {
-            elements.push(`<${name}>`)
-          }
           if (arg.multiple) {
+            if (arg.required) {
+              elements.push(`<${name}>`)
+            }
             elements.push(`[<${name}> ...]`)
+          } else {
+            elements.push(isRequiredSinglePositionalArg(arg) ? `<${name}>` : `[<${name}>]`)
           }
           return elements.join(' ')
         })
         .join(' ')
     : ''
+}
+
+function isRequiredSinglePositionalArg(arg: ArgSchema): boolean {
+  if (arg.required === true) {
+    return true
+  }
+  if (arg.required === false) {
+    return false
+  }
+  return arg.default == null
 }

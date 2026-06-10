@@ -5,9 +5,11 @@ import {
   choice,
   integer,
   merge,
+  positional,
   required,
   short,
   string,
+  unrequired,
   withDefault
 } from './combinators.ts'
 import { define } from './definition.ts'
@@ -48,12 +50,14 @@ test('define with combinators infers ctx.values types', () => {
       host: withDefault(string(), 'localhost'),
       port: withDefault(integer(), 8080),
       verbose: short(boolean(), 'v'),
+      query: unrequired(positional()),
       level: choice(['debug', 'info'] as const)
     },
     run: ctx => {
       expectTypeOf(ctx.values.host).toEqualTypeOf<string>()
       expectTypeOf(ctx.values.port).toEqualTypeOf<number>()
       expectTypeOf(ctx.values.verbose).toEqualTypeOf<boolean | undefined>()
+      expectTypeOf(ctx.values.query).toEqualTypeOf<string | undefined>()
       expectTypeOf(ctx.values.level).toEqualTypeOf<'debug' | 'info' | undefined>()
     }
   })
