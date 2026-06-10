@@ -41,6 +41,7 @@ overrides:
   tsdown>rolldown: 1.0.0
   tsdown>rolldown-plugin-dts: 0.20.0
   vitepress>vite: npm:vite@8.0.12
+  '@ox-content/napi': 2.66.0
 
 importers:
 
@@ -1348,35 +1349,35 @@ packages:
     resolution: {integrity: sha512-XRO0zi2NIUKq2lUk3T1ecFSld1fMWRKE6naRFGkgkdeosx7IslyUKNv5Dcb5PJTja9tHJoFu0v/7yEpAkrkrTg==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@ox-content/binding-darwin-arm64@2.65.0':
-    resolution: {integrity: sha512-MHKIxLHbEz8n9Gn95BlCuGWGXZkBHwvFc0e/uR5N2tpU78vBxRu6GlNnWzjYvH4GBrF9T09JX1aV4DEQlTnRHg==}
+  '@ox-content/binding-darwin-arm64@2.66.0':
+    resolution: {integrity: sha512-o5XRQQmu9kSfE/K8151vtPHwhk0EMBVjpI7o7i8CpSJOCj92ud/H8Qvko5vYSpCWf9Tfb/g/OLY3yKkbK/QLyQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@ox-content/binding-darwin-x64@2.65.0':
-    resolution: {integrity: sha512-qGbWYa7T4KvuNsitKupGvDrFr+TXIyW+E8XYGofvdQkeWT0L8v30AhnE4xJYIsMb8GVPLI9fu+W0oaXFw5rjxQ==}
+  '@ox-content/binding-darwin-x64@2.66.0':
+    resolution: {integrity: sha512-LYV2R4tWYsPxyJCAUQ1SSQwBpy93JehYGI2/mjTwOQolbXwCl2kBJ/Jn+/IW+F7Zdv5s989ILpwLHyVBchjPKg==}
     cpu: [x64]
     os: [darwin]
 
-  '@ox-content/binding-linux-arm64-gnu@2.65.0':
-    resolution: {integrity: sha512-6U3TkiikD7fZV35ncAvUoXS8ZUAidNUAlBfHjTAUbsRDhYvyGJCgGUU2XJzvm5nqgEqHLAB1wQ4D12/AuBhhng==}
+  '@ox-content/binding-linux-arm64-gnu@2.66.0':
+    resolution: {integrity: sha512-TsiG9S3qeYPg/geCO9l4p0+acXY5a7aXBO6FhfgBLxLaqn+VhSRvy/85f1f68hGaPAzU9h2wz9A5S75tVgv2CQ==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@ox-content/binding-linux-x64-gnu@2.65.0':
-    resolution: {integrity: sha512-WW+AvhnQcve/wbtJQPJgDDKtoRz776T0wGI20TcpSWr3ZcGXlOr7yjQuTtqjHoBSVM0W8ZwP77LSTMoIjv8vnA==}
+  '@ox-content/binding-linux-x64-gnu@2.66.0':
+    resolution: {integrity: sha512-EgOU3UEncz0/jh+rfX7mOAhwZ8KaGHNXD+2qFuwEMdj3P4wdyY0gs2VLk+QGoryduolnlDOEqUkL1UC4MdiW4Q==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@ox-content/binding-win32-x64-msvc@2.65.0':
-    resolution: {integrity: sha512-xJmpgKskBHgmvXx96waSDE8igSM4bp/bIjDOk4KrK0sl+I/AJQZAVEO+uYer1yscOpI33wUrjVRtxF/puuhTiw==}
+  '@ox-content/binding-win32-x64-msvc@2.66.0':
+    resolution: {integrity: sha512-9g80oE4JrtscB7J1aFob6kW8sw8nsXeQ9y8x27hBcCp/WUF8BlM6lTvrnevKKZa5d+vFjSaBrLw41DklSlSlTg==}
     cpu: [x64]
     os: [win32]
 
-  '@ox-content/napi@2.65.0':
-    resolution: {integrity: sha512-ncwMJFVmw2MFBtvOj1Mh+ncbtON2ro2hHFFBn9XZP9hzHg19E73+NPfoF7yAhPyFupLRJzi9hKOnXhNQmlWbMQ==}
+  '@ox-content/napi@2.66.0':
+    resolution: {integrity: sha512-LthpiE2ETPlFN3Bma86JtNJTB6qOij+ccGZ93aU3xAmP/QORnoq0YOtG8Ky251jBUQJb/zkasUuWsywnGbc24w==}
 
   '@oxc-minify/binding-android-arm-eabi@0.129.0':
     resolution: {integrity: sha512-GYYEIk/Lov3iaFyZuVvqeYqUefGvwtb068hQz1P7LAsZeO/saPxQDkKhdxWYmWPy/sP4TQ454/RZtbPsxId0+Q==}
@@ -5248,28 +5249,28 @@ snapshots:
 
   '@ota-meshi/ast-token-store@0.3.0': {}
 
-  '@ox-content/binding-darwin-arm64@2.65.0':
+  '@ox-content/binding-darwin-arm64@2.66.0':
     optional: true
 
-  '@ox-content/binding-darwin-x64@2.65.0':
+  '@ox-content/binding-darwin-x64@2.66.0':
     optional: true
 
-  '@ox-content/binding-linux-arm64-gnu@2.65.0':
+  '@ox-content/binding-linux-arm64-gnu@2.66.0':
     optional: true
 
-  '@ox-content/binding-linux-x64-gnu@2.65.0':
+  '@ox-content/binding-linux-x64-gnu@2.66.0':
     optional: true
 
-  '@ox-content/binding-win32-x64-msvc@2.65.0':
+  '@ox-content/binding-win32-x64-msvc@2.66.0':
     optional: true
 
-  '@ox-content/napi@2.65.0':
+  '@ox-content/napi@2.66.0':
     optionalDependencies:
-      '@ox-content/binding-darwin-arm64': 2.65.0
-      '@ox-content/binding-darwin-x64': 2.65.0
-      '@ox-content/binding-linux-arm64-gnu': 2.65.0
-      '@ox-content/binding-linux-x64-gnu': 2.65.0
-      '@ox-content/binding-win32-x64-msvc': 2.65.0
+      '@ox-content/binding-darwin-arm64': 2.66.0
+      '@ox-content/binding-darwin-x64': 2.66.0
+      '@ox-content/binding-linux-arm64-gnu': 2.66.0
+      '@ox-content/binding-linux-x64-gnu': 2.66.0
+      '@ox-content/binding-win32-x64-msvc': 2.66.0
 
   '@oxc-minify/binding-android-arm-eabi@0.129.0':
     optional: true
@@ -8569,7 +8570,7 @@ snapshots:
 
   vitepress-api-references@0.2.0(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0)):
     dependencies:
-      '@ox-content/napi': 2.65.0
+      '@ox-content/napi': 2.66.0
       vite: 8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
       vitepress: 2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0)
 
