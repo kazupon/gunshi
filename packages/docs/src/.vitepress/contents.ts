@@ -1,5 +1,3 @@
-import typedocSidebar from '../api/typedoc-sidebar.json' with { type: 'json' }
-
 export const meta = {
   title: 'Gunshi',
   description: 'Modern JavaScript Command-line library',
@@ -91,7 +89,7 @@ export const plugin = {
 export const apiReferences = {
   text: 'API References',
   collapsed: false,
-  items: typedocSidebar
+  items: [{ text: 'API References', link: '/api' }]
 }
 
 export const extraTopics = {

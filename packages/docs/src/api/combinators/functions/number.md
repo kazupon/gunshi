@@ -1,30 +1,29 @@
-[gunshi](../../index.md) / [combinators](../index.md) / number
-
 # Function: number()
 
-```ts
-function number(opts?): CombinatorSchema<number>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a number argument schema with optional range validation.
 
 Accepts any numeric value (integer or float).
 
+## Signature
+
+```ts
+declare function number(opts?: NumberOptions): CombinatorSchema<number>
+```
+
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `opts?` | [`NumberOptions`](../interfaces/NumberOptions.md) | Range options. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `opts` | [`NumberOptions`](/api/combinators/interfaces/NumberOptions.md) | Range options. _(optional)_ |
 
 ## Returns
 
-[`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`number`\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`number`\> — A combinator schema that resolves to number.
 
-A combinator schema that resolves to number.
-
-## Example
+## Examples
 
 ```ts
 const args = {

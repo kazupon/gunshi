@@ -1,37 +1,36 @@
-[gunshi](../../index.md) / [combinators](../index.md) / args
-
 # Function: args()
 
-```ts
-function args<T>(fields): T;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Type-safe schema factory.
 
 Returns the input unchanged at runtime, but provides type inference
 so that `satisfies Args` is not needed.
 
+## Signature
+
+```ts
+declare function args<T extends Args>(fields: T): T
+```
+
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
-| `T` *extends* [`Args`](../../default/interfaces/Args.md) | The exact schema type. |
+| Name | Description |
+| --- | --- |
+| `T` *extends* [`Args`](/api/default/interfaces/Args.md) | The exact schema type. |
 
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
+| Name | Type | Description |
+| --- | --- | --- |
 | `fields` | `T` | The argument schema object. |
 
 ## Returns
 
-`T`
+`T` — The same schema object with its type inferred.
 
-The same schema object with its type inferred.
-
-## Example
+## Examples
 
 ```ts
 const common = args({

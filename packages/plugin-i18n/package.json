@@ -54,7 +54,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "build:docs": "typedoc --excludeInternal",
+    "build:docs": "tsx ../../scripts/api-references.ts",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
@@ -76,15 +76,13 @@
     "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
-    "@intlify/core": "next",
+    "@intlify/core-base": "12.0.0-alpha.4",
     "deno": "catalog:",
     "gunshi": "workspace:*",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",
     "messageformat": "4.0.0",
     "publint": "catalog:",
-    "tsdown": "catalog:",
-    "typedoc": "catalog:",
-    "typedoc-plugin-markdown": "catalog:"
+    "tsdown": "catalog:"
   }
 }

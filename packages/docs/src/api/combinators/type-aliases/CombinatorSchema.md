@@ -1,18 +1,19 @@
-[gunshi](../../index.md) / [combinators](../index.md) / CombinatorSchema
+# Type Alias: CombinatorSchema&lt;T&gt;
 
-# Type Alias: CombinatorSchema\<T\>
-
-```ts
-type CombinatorSchema<T> = ArgSchema & Combinator<T>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 A schema produced by combinator factory functions.
-Any [ArgSchema](../../default/interfaces/ArgSchema.md) with a parse function qualifies.
+Any [ArgSchema](/api/default/interfaces/ArgSchema.md) with a parse function qualifies.
+
+## Signature
+
+```ts
+type CombinatorSchema<T> = ArgSchema & Combinator<T>
+```
 
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
+| Name | Description |
+| --- | --- |
 | `T` | The parsed value type. |

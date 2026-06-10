@@ -1,8 +1,4 @@
-**@gunshi/plugin-global**
-
-***
-
-# @gunshi/plugin-global
+# API Documentation
 
 The entry point of global options plugin
 
@@ -31,22 +27,23 @@ await cli(process.argv.slice(2), entry, {
 
 | Variable | Description |
 | ------ | ------ |
-| [pluginId](variables/pluginId.md) | The unique identifier for the global options plugin. |
+| [pluginId](/packages/plugin-global/docs/default/variables/pluginId.md) | The unique identifier for the global options plugin. |
 
 ## Functions
 
 | Function | Description |
 | ------ | ------ |
-| [default](functions/default.md) | global options plugin |
+| [default](/packages/plugin-global/docs/default/functions/default.md) | global options plugin |
 
 ## Interfaces
 
 | Interface | Description |
 | ------ | ------ |
-| [GlobalExtension](interfaces/GlobalExtension.md) | Extended command context which provides utilities via global options plugin. These utilities are available via `CommandContext.extensions['g:global']`. |
+| [GlobalExtension](/packages/plugin-global/docs/default/interfaces/GlobalExtension.md) | Extended command context which provides utilities via global options plugin. These utilities are available via `CommandContext.extensions['g:global']`. |
 
 ## Type Aliases
 
 | Type Alias | Description |
 | ------ | ------ |
-| [PluginId](type-aliases/PluginId.md) | Type representing the unique identifier for the global options plugin. |
+| [PluginId](/packages/plugin-global/docs/default/type-aliases/PluginId.md) | Type representing the unique identifier for the global options plugin. |
+

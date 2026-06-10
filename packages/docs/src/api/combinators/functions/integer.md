@@ -1,30 +1,29 @@
-[gunshi](../../index.md) / [combinators](../index.md) / integer
-
 # Function: integer()
 
-```ts
-function integer(opts?): CombinatorSchema<number>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create an integer argument schema with optional range validation.
 
 Only accepts integer values (no decimals).
 
+## Signature
+
+```ts
+declare function integer(opts?: IntegerOptions): CombinatorSchema<number>
+```
+
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `opts?` | [`IntegerOptions`](../interfaces/IntegerOptions.md) | Range options. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `opts` | [`IntegerOptions`](/api/combinators/interfaces/IntegerOptions.md) | Range options. _(optional)_ |
 
 ## Returns
 
-[`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`number`\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`number`\> — A combinator schema that resolves to number (integer).
 
-A combinator schema that resolves to number (integer).
-
-## Example
+## Examples
 
 ```ts
 const args = {

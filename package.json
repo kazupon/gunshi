@@ -46,7 +46,7 @@
     "build": "pnpm -r build",
     "build:bone": "pnpm -F @gunshi/plugin build",
     "build:definition": "pnpm -F @gunshi/definition build",
-    "build:docs": "pnpm -F @gunshi/docs build",
+    "build:docs": "pnpm run build:plugin:renderer && pnpm run build:plugin:i18n && pnpm -F @gunshi/docs build",
     "build:gunshi": "pnpm -F gunshi build",
     "build:plugin": "pnpm -F @gunshi/bone build",
     "build:plugin:completion": "pnpm -F @gunshi/plugin-completion build",
@@ -119,6 +119,7 @@
     "typescript": "catalog:",
     "typescript-eslint": "^8.59.2",
     "vite-tsconfig-paths": "^6.1.1",
+    "vitepress-api-references": "catalog:",
     "vitest": "^4.1.5"
   },
   "pnpm": {

@@ -18,7 +18,13 @@ export default {
     'packages/docs': {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts'],
       ignore: ['src/.vitepress/banner.js', 'src/.vitepress/theme/components/GunshiBanner.vue'],
-      ignoreDependencies: ['@vueuse/core']
+      ignoreDependencies: [
+        '@vueuse/core',
+        // API reference generation reads built declaration files from these
+        // workspace packages during the docs build.
+        '@gunshi/plugin-i18n',
+        '@gunshi/plugin-renderer'
+      ]
     }
   },
   ignore: [

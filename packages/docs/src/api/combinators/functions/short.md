@@ -1,38 +1,37 @@
-[gunshi](../../index.md) / [combinators](../index.md) / short
-
 # Function: short()
 
-```ts
-function short<T, S>(schema, alias): ArgSchema & Combinator<T> & CombinatorShort<S>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Set a short alias on a combinator schema.
 
 The original schema is not modified.
 
+## Signature
+
+```ts
+declare function short<T, S extends string>(schema: CombinatorSchema<T>, alias: S): CombinatorSchema<T> & CombinatorShort<S>
+```
+
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
+| Name | Description |
+| --- | --- |
 | `T` | The schema's parsed type. |
 | `S` *extends* `string` | The short alias string literal type. |
 
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `schema` | [`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 | `alias` | `S` | Single character short alias. |
 
 ## Returns
 
-[`ArgSchema`](../../default/interfaces/ArgSchema.md) & [`Combinator`](../type-aliases/Combinator.md)\<`T`\> & `CombinatorShort`\<`S`\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorShort`\<`S`\> — A new schema with the short alias set.
 
-A new schema with the short alias set.
-
-## Example
+## Examples
 
 ```ts
 const args = {

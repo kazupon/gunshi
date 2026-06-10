@@ -874,41 +874,44 @@ This approach ensures your documentation stays synchronized with your code, as u
 
 Various tools can generate documentation from JSDoc comments:
 
-- **[TypeDoc](https://typedoc.org/)** - Recommended for TypeScript projects, generates documentation from TypeScript declarations and JSDoc
+- **[vitepress-api-references](https://github.com/kazupon/vitepress-api-references)** - Recommended for VitePress projects, generates Markdown API references from TypeScript declarations and JSDoc
+- **[TypeDoc](https://typedoc.org/)** - A popular documentation generator for TypeScript projects
 - **[API Extractor](https://api-extractor.com/)** - Microsoft's tool focusing on API review and documentation for TypeScript libraries
 
-The following example demonstrates configuring `TypeDoc`, a popular choice for TypeScript plugin projects. Create a `typedoc.config.mjs` file:
+The following example demonstrates configuring `vitepress-api-references`. Create a `scripts/generate-api-reference.ts` file:
 
-```js [typedoc.config.mjs]
-// @ts-check
+```ts [scripts/generate-api-reference.ts]
+import { rm } from 'node:fs/promises'
+import { generateOxContentApiDocs } from 'vitepress-api-references'
 
-export default {
-  /**
-   * typedoc options
-   * ref: https://typedoc.org/documents/Options.html
-   */
+await rm('docs', { recursive: true, force: true })
+
+await generateOxContentApiDocs({
+  root: process.cwd(),
   entryPoints: ['./src/index.ts'],
-  out: 'docs',
-  plugin: ['typedoc-plugin-markdown'],
-  readme: 'none',
-  groupOrder: ['Variables', 'Functions', 'Classes', 'Interfaces', 'Type Aliases'],
-
-  /**
-   * typedoc-plugin-markdown options
-   * ref: https://typedoc-plugin-markdown.org/docs/options
-   */
-  entryFileName: 'index',
-  hidePageTitle: false,
-  useCodeBlocks: true,
-  disableSources: true,
-  indexFormat: 'table',
-  parametersFormat: 'table',
-  interfacePropertiesFormat: 'table',
-  classPropertiesFormat: 'table',
-  propertyMembersFormat: 'table',
-  typeAliasPropertiesFormat: 'table',
-  enumMembersFormat: 'table'
-}
+  outDir: 'docs',
+  basePath: '/docs',
+  extraction: {
+    internal: false,
+    private: false,
+    typeParameters: true
+  },
+  markdown: {
+    pathStrategy: 'typedoc',
+    renderStyle: 'markdown',
+    indexFormat: 'table',
+    parametersFormat: 'table',
+    interfacePropertiesFormat: 'table',
+    classPropertiesFormat: 'table',
+    propertyMembersFormat: 'table',
+    typeAliasPropertiesFormat: 'table',
+    enumMembersFormat: 'table',
+    renderStats: false,
+    renderGeneratedBy: false
+  },
+  nav: { enabled: false },
+  escapeHeadingAngleBrackets: true
+})
 ```
 
 Add documentation scripts to your `package.json`:
@@ -916,13 +919,12 @@ Add documentation scripts to your `package.json`:
 ```json [package.json]
 {
   "scripts": {
-    "docs": "typedoc",
-    "docs:watch": "typedoc --watch",
+    "docs": "tsx ./scripts/generate-api-reference.ts",
     "docs:clean": "rm -rf docs"
   },
   "devDependencies": {
-    "typedoc": "^0.26.0",
-    "typedoc-plugin-markdown": "^4.0.0"
+    "tsx": "^4.0.0",
+    "vitepress-api-references": "^0.1.0"
   }
 }
 ```

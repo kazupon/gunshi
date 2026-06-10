@@ -1,28 +1,27 @@
-[gunshi](../../index.md) / [combinators](../index.md) / string
-
 # Function: string()
 
-```ts
-function string(opts?): CombinatorSchema<string>;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Create a string argument schema with optional validation.
 
+## Signature
+
+```ts
+declare function string(opts?: StringOptions): CombinatorSchema<string>
+```
+
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `opts?` | [`StringOptions`](../interfaces/StringOptions.md) | Validation options. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `opts` | [`StringOptions`](/api/combinators/interfaces/StringOptions.md) | Validation options. _(optional)_ |
 
 ## Returns
 
-[`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`string`\>
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`string`\> — A combinator schema that resolves to string.
 
-A combinator schema that resolves to string.
-
-## Example
+## Examples
 
 ```ts
 const args = {

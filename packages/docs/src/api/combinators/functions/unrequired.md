@@ -1,37 +1,36 @@
-[gunshi](../../index.md) / [combinators](../index.md) / unrequired
-
 # Function: unrequired()
 
-```ts
-function unrequired<T>(schema): ArgSchema & Combinator<T> & CombinatorUnrequired;
-```
-
-**`Experimental`**
+> [!WARNING]
+> This API is experimental and may change in future versions.
 
 Mark a combinator schema as not required.
 
 Useful for overriding a base combinator that was created with `required: true`.
 The original schema is not modified.
 
+## Signature
+
+```ts
+declare function unrequired<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorUnrequired
+```
+
 ## Type Parameters
 
-| Type Parameter | Description |
-| ------ | ------ |
+| Name | Description |
+| --- | --- |
 | `T` | The schema's parsed type. |
 
 ## Parameters
 
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `schema` | [`CombinatorSchema`](../type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
+| Name | Type | Description |
+| --- | --- | --- |
+| `schema` | [`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> | The base combinator schema. |
 
 ## Returns
 
-[`ArgSchema`](../../default/interfaces/ArgSchema.md) & [`Combinator`](../type-aliases/Combinator.md)\<`T`\> & `CombinatorUnrequired`
+[`CombinatorSchema`](/api/combinators/type-aliases/CombinatorSchema.md)\<`T`\> & `CombinatorUnrequired` — A new schema with `required: false`.
 
-A new schema with `required: false`.
-
-## Example
+## Examples
 
 ```ts
 const args = {
