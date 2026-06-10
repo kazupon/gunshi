@@ -42,7 +42,7 @@ jobs:
       id-token: write # npm OIDC trusted publisher + provenance
     steps:
       - name: Checkout codes
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: ${{ env.TAG }}
           persist-credentials: false
@@ -110,7 +110,7 @@ jobs:
       id-token: write # JSR OIDC
     steps:
       - name: Checkout codes
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: ${{ env.TAG }}
           persist-credentials: false
@@ -188,7 +188,7 @@ jobs:
       - name: Checkout main
         # zizmor: ignore[artipacked] needs persisted credentials so that
         # stefanzweifel/git-auto-commit-action can push the changelog commit.
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: main
           fetch-depth: 0
