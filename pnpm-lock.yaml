@@ -31,8 +31,8 @@ catalogs:
       specifier: ^6.0.3
       version: 6.0.3
     vitepress-api-references:
-      specifier: ^0.2.0
-      version: 0.2.0
+      specifier: ^0.2.1
+      version: 0.2.1
     zod:
       specifier: ^4.4.3
       version: 4.4.3
@@ -41,7 +41,6 @@ overrides:
   tsdown>rolldown: 1.0.0
   tsdown>rolldown-plugin-dts: 0.20.0
   vitepress>vite: npm:vite@8.0.12
-  '@ox-content/napi': 2.66.0
 
 importers:
 
@@ -145,7 +144,7 @@ importers:
         version: 6.1.1(typescript@6.0.3)(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
       vitepress-api-references:
         specifier: 'catalog:'
-        version: 0.2.0(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0))
+        version: 0.2.1(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0))
       vitest:
         specifier: ^4.1.5
         version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.5)(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -260,7 +259,7 @@ importers:
         version: 2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0)
       vitepress-api-references:
         specifier: 'catalog:'
-        version: 0.2.0(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0))
+        version: 0.2.1(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0))
       vitepress-plugin-group-icons:
         specifier: ^1.5.5
         version: 1.7.5(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -4711,8 +4710,8 @@ packages:
       yaml:
         optional: true
 
-  vitepress-api-references@0.2.0:
-    resolution: {integrity: sha512-Gxig1tSC3IMdAPt/mo7Rxe8+zMuvru6NbArnq2UbwVs3ZVuU45jaQUMr2Ck4D/gBtZf6trpe7QpHJ5zQpUSvLA==}
+  vitepress-api-references@0.2.1:
+    resolution: {integrity: sha512-PN4vcwAPfgTTW6H6Ntn5u/2aWJtwD+pg8ZxwUx2vdR+zG199exYXAl8DoggFEmdo0zwtfIez0vE6C1hZ1jlQpA==}
     engines: {node: '>= 22'}
     peerDependencies:
       vite: '>=5'
@@ -8568,7 +8567,7 @@ snapshots:
       tsx: 4.22.4
       yaml: 2.9.0
 
-  vitepress-api-references@0.2.0(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0)):
+  vitepress-api-references@0.2.1(vite@8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(oxc-minify@0.129.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0)):
     dependencies:
       '@ox-content/napi': 2.66.0
       vite: 8.0.12(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)

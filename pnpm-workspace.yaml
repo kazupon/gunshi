@@ -32,7 +32,7 @@ catalog:
   publint: ^0.3.20
   tsdown: 0.21.0
   "@types/node": ^25.6.2
-  vitepress-api-references: ^0.2.0
+  vitepress-api-references: ^0.2.1
   tsx: ^4.21.0
 overrides:
   # Pin rolldown to 1.0.0 (GA). Without this, tsdown@0.21.0 resolves to
@@ -49,7 +49,6 @@ overrides:
   # https://github.com/sxzz/rolldown-plugin-dts/issues/199
   tsdown>rolldown-plugin-dts: 0.20.0
   vitepress>vite: npm:vite@8.0.12
-  "@ox-content/napi": 2.66.0
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - deno
