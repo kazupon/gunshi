@@ -40,7 +40,7 @@ overrides:
   # rolldown@1.0.0-rc.7, whose `@rolldown/binding-*` optional dependencies
   # pnpm fails to symlink under `rolldown/node_modules/@rolldown/`, causing
   # native binding load errors at runtime.
-  tsdown>rolldown: 1.0.0
+  tsdown>rolldown: 1.0.3
   # Pin rolldown-plugin-dts to 0.20.0 because `dts.resolve` (array form) was
   # removed in v0.21.0. We rely on `dts.resolve: ['args-tokens', ...]` in each
   # package's tsdown.config.ts to inline `args-tokens` types into `.d.ts` so
