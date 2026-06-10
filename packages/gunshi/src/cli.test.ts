@@ -1008,6 +1008,66 @@ describe('positional arguments', () => {
     expect(stdout).toEqual(`Positional argument 'bar' is required`)
   })
 
+  test('optional positional arguments', async () => {
+    const args = {
+      query: {
+        type: 'positional',
+        required: false
+      },
+      file: {
+        type: 'positional'
+      }
+    } satisfies Args
+
+    const omitted = vi.fn<() => void>()
+    await cli(['input.sql'], {
+      args,
+      run: omitted
+    })
+    expect(omitted).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { file: 'input.sql' },
+        positionals: ['input.sql']
+      })
+    )
+
+    const provided = vi.fn<() => void>()
+    await cli(['SELECT * FROM users', 'input.sql'], {
+      args,
+      run: provided
+    })
+    expect(provided).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { query: 'SELECT * FROM users', file: 'input.sql' },
+        positionals: ['SELECT * FROM users', 'input.sql']
+      })
+    )
+  })
+
+  test('positional argument default is used when omitted', async () => {
+    const args = {
+      query: {
+        type: 'positional',
+        default: 'SELECT 1'
+      },
+      file: {
+        type: 'positional'
+      }
+    } satisfies Args
+
+    const mockFn1 = vi.fn<() => void>()
+    await cli(['input.sql'], {
+      args,
+      run: mockFn1
+    })
+    expect(mockFn1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { query: 'SELECT 1', file: 'input.sql' },
+        positionals: ['input.sql']
+      })
+    )
+  })
+
   test('sub commands', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)

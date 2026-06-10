@@ -42,8 +42,8 @@
                   "description": "Options for the translation adapter, see {@linkcode TranslationAdapterFactoryOptions}"
                 }
               ],
-              "line": 961,
-              "endLine": 961
+              "line": 969,
+              "endLine": 969
             },
             {
               "name": "getResource",
@@ -61,8 +61,8 @@
                 "type": "Record<string, string> | undefined",
                 "description": "A resource of locale. If resource not found, return `undefined`."
               },
-              "line": 968,
-              "endLine": 968
+              "line": 976,
+              "endLine": 976
             },
             {
               "name": "setResource",
@@ -85,8 +85,8 @@
                 "type": "void",
                 "description": ""
               },
-              "line": 975,
-              "endLine": 975
+              "line": 983,
+              "endLine": 983
             },
             {
               "name": "getMessage",
@@ -109,8 +109,8 @@
                 "type": "string | undefined",
                 "description": "A message of locale. If message not found, return `undefined`."
               },
-              "line": 983,
-              "endLine": 983
+              "line": 991,
+              "endLine": 991
             },
             {
               "name": "translate",
@@ -139,13 +139,13 @@
                 "type": "string | undefined",
                 "description": "A translated message, if message is not translated, return `undefined`."
               },
-              "line": 992,
-              "endLine": 992
+              "line": 1000,
+              "endLine": 1000
             }
           ],
           "file": "packages/plugin-i18n/lib/index.d.ts",
-          "line": 954,
-          "endLine": 993,
+          "line": 962,
+          "endLine": 1001,
           "signature": "declare class DefaultTranslation implements TranslationAdapter",
           "implements": [
             "TranslationAdapter"
@@ -215,40 +215,40 @@
                 "kind": "property",
                 "description": "",
                 "type": "ArgValues<A>",
-                "line": 552,
-                "endLine": 552
+                "line": 561,
+                "endLine": 561
               },
               {
                 "name": "positionals",
                 "kind": "property",
                 "description": "",
                 "type": "string[]",
-                "line": 553,
-                "endLine": 553
+                "line": 562,
+                "endLine": 562
               },
               {
                 "name": "rest",
                 "kind": "property",
                 "description": "",
                 "type": "string[]",
-                "line": 554,
-                "endLine": 554
+                "line": 563,
+                "endLine": 563
               },
               {
                 "name": "error",
                 "kind": "property",
                 "description": "",
                 "type": "AggregateError | undefined",
-                "line": 555,
-                "endLine": 555
+                "line": 564,
+                "endLine": 564
               },
               {
                 "name": "explicit",
                 "kind": "property",
                 "description": "",
                 "type": "ArgExplicitlyProvided<A>",
-                "line": 556,
-                "endLine": 556
+                "line": 565,
+                "endLine": 565
               }
             ]
           },
@@ -1821,8 +1821,8 @@
                   "description": ""
                 }
               ],
-              "line": 434,
-              "endLine": 434
+              "line": 442,
+              "endLine": 442
             }
           ],
           "signature": "interface Args"
@@ -1866,20 +1866,20 @@
             {
               "name": "required",
               "kind": "property",
-              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nFor single-value positional arguments, omitting `required` keeps the argument\nrequired for compatibility. Set `required: false` to make a positional argument\noptional. Optional positional arguments leave enough input values for later\nrequired positional arguments before consuming a value.",
               "type": "boolean",
               "optional": true,
-              "line": 137,
-              "endLine": 137
+              "line": 140,
+              "endLine": 140
             },
             {
               "name": "multiple",
               "kind": "property",
-              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments after preserving values for\nlater required positional arguments.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
               "type": "true",
               "optional": true,
-              "line": 163,
-              "endLine": 163
+              "line": 167,
+              "endLine": 167
             },
             {
               "name": "negatable",
@@ -1887,8 +1887,8 @@
               "description": "Enables negation for boolean arguments using `--no-` prefix.\n\nWhen `true`, allows users to explicitly set the boolean to `false`\nusing `--no-option-name`. When `false` or omitted, only positive\nform is available.\n\nOnly applicable to `type: 'boolean'` arguments.",
               "type": "boolean",
               "optional": true,
-              "line": 187,
-              "endLine": 187
+              "line": 191,
+              "endLine": 191
             },
             {
               "name": "choices",
@@ -1896,17 +1896,17 @@
               "description": "Array of allowed string values for enum-type arguments.\n\nRequired when `type: 'enum'`. The argument value must be one of these choices,\notherwise an `ArgResolveError` with type 'type' will be thrown.\n\nSupports both mutable arrays and readonly arrays for type safety.",
               "type": "string[] | readonly string[]",
               "optional": true,
-              "line": 214,
-              "endLine": 214
+              "line": 218,
+              "endLine": 218
             },
             {
               "name": "default",
               "kind": "property",
-              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default",
+              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default\n\nFor single-value positional arguments, the default is used when the positional\nvalue is missing or when the value is preserved for later required positional\narguments, unless `required: true` is set.",
               "type": "string | boolean | number",
               "optional": true,
-              "line": 249,
-              "endLine": 249
+              "line": 257,
+              "endLine": 257
             },
             {
               "name": "toKebab",
@@ -1914,8 +1914,8 @@
               "description": "Converts the argument name from camelCase to kebab-case for CLI usage.\n\nWhen `true`, a property like `maxCount` becomes available as `--max-count`.\nThis allows [CAC](https://github.com/cacjs/cac) user-friendly property names while maintaining CLI conventions.\n\nCan be overridden globally with `resolveArgs({ toKebab: true })`.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
               "type": "true",
               "optional": true,
-              "line": 276,
-              "endLine": 276
+              "line": 284,
+              "endLine": 284
             },
             {
               "name": "conflicts",
@@ -1923,8 +1923,8 @@
               "description": "Names of other options that conflict with this option.\n\nWhen this option is used together with any of the conflicting options,\nan `ArgResolveError` with type 'conflict' will be thrown.\n\nConflicts only need to be defined on one side - if option A defines a conflict\nwith option B, the conflict is automatically detected when both are used,\nregardless of whether B also defines a conflict with A.\n\nSupports both single option name or array of option names.\nOption names must match the property keys in the schema object exactly\n(no automatic conversion between camelCase and kebab-case).",
               "type": "string | string[]",
               "optional": true,
-              "line": 363,
-              "endLine": 363
+              "line": 371,
+              "endLine": 371
             },
             {
               "name": "metavar",
@@ -1932,8 +1932,8 @@
               "description": "Display name hint for help text generation.\n\nProvides a meaningful type hint for the argument value in help output.\nParticularly useful for `type: 'custom'` arguments where the type\nname would otherwise be unhelpful.",
               "type": "string",
               "optional": true,
-              "line": 385,
-              "endLine": 385
+              "line": 393,
+              "endLine": 393
             },
             {
               "name": "parse",
@@ -1955,8 +1955,8 @@
               "tags": {
                 "throws": "Error or subclass when value is invalid"
               },
-              "line": 426,
-              "endLine": 426
+              "line": 434,
+              "endLine": 434
             }
           ],
           "signature": "interface ArgSchema"
@@ -2295,8 +2295,8 @@
               "description": "Hook that runs before any command execution",
               "type": "((ctx: Readonly<CommandContext<G>>) => Awaitable<void>) | undefined",
               "tags": {
-                "since": "v0.27.0",
-                "see": "{@linkcode CliOptions.onBeforeCommand}"
+                "see": "{@linkcode CliOptions.onBeforeCommand}",
+                "since": "v0.27.0"
               },
               "line": 245,
               "endLine": 245
@@ -2319,8 +2319,8 @@
               "description": "Hook that runs when a command throws an error",
               "type": "((ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>) | undefined",
               "tags": {
-                "see": "{@linkcode CliOptions.onErrorCommand}",
-                "since": "v0.27.0"
+                "since": "v0.27.0",
+                "see": "{@linkcode CliOptions.onErrorCommand}"
               },
               "line": 261,
               "endLine": 261
@@ -3190,8 +3190,8 @@
               "type": "Record<string, any> | Map<string, any>",
               "optional": true,
               "tags": {
-                "since": "v0.28.0",
-                "see": "{@link Command.subCommands}"
+                "see": "{@link Command.subCommands}",
+                "since": "v0.28.0"
               },
               "line": 703,
               "endLine": 703
@@ -3476,8 +3476,8 @@
                   "description": ""
                 }
               ],
-              "line": 434,
-              "endLine": 434
+              "line": 442,
+              "endLine": 442
             }
           ],
           "signature": "interface Args"
@@ -3521,20 +3521,20 @@
             {
               "name": "required",
               "kind": "property",
-              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nFor single-value positional arguments, omitting `required` keeps the argument\nrequired for compatibility. Set `required: false` to make a positional argument\noptional. Optional positional arguments leave enough input values for later\nrequired positional arguments before consuming a value.",
               "type": "boolean",
               "optional": true,
-              "line": 137,
-              "endLine": 137
+              "line": 140,
+              "endLine": 140
             },
             {
               "name": "multiple",
               "kind": "property",
-              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments after preserving values for\nlater required positional arguments.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
               "type": "true",
               "optional": true,
-              "line": 163,
-              "endLine": 163
+              "line": 167,
+              "endLine": 167
             },
             {
               "name": "negatable",
@@ -3542,8 +3542,8 @@
               "description": "Enables negation for boolean arguments using `--no-` prefix.\n\nWhen `true`, allows users to explicitly set the boolean to `false`\nusing `--no-option-name`. When `false` or omitted, only positive\nform is available.\n\nOnly applicable to `type: 'boolean'` arguments.",
               "type": "boolean",
               "optional": true,
-              "line": 187,
-              "endLine": 187
+              "line": 191,
+              "endLine": 191
             },
             {
               "name": "choices",
@@ -3551,17 +3551,17 @@
               "description": "Array of allowed string values for enum-type arguments.\n\nRequired when `type: 'enum'`. The argument value must be one of these choices,\notherwise an `ArgResolveError` with type 'type' will be thrown.\n\nSupports both mutable arrays and readonly arrays for type safety.",
               "type": "string[] | readonly string[]",
               "optional": true,
-              "line": 214,
-              "endLine": 214
+              "line": 218,
+              "endLine": 218
             },
             {
               "name": "default",
               "kind": "property",
-              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default",
+              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default\n\nFor single-value positional arguments, the default is used when the positional\nvalue is missing or when the value is preserved for later required positional\narguments, unless `required: true` is set.",
               "type": "string | boolean | number",
               "optional": true,
-              "line": 249,
-              "endLine": 249
+              "line": 257,
+              "endLine": 257
             },
             {
               "name": "toKebab",
@@ -3569,8 +3569,8 @@
               "description": "Converts the argument name from camelCase to kebab-case for CLI usage.\n\nWhen `true`, a property like `maxCount` becomes available as `--max-count`.\nThis allows [CAC](https://github.com/cacjs/cac) user-friendly property names while maintaining CLI conventions.\n\nCan be overridden globally with `resolveArgs({ toKebab: true })`.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
               "type": "true",
               "optional": true,
-              "line": 276,
-              "endLine": 276
+              "line": 284,
+              "endLine": 284
             },
             {
               "name": "conflicts",
@@ -3578,8 +3578,8 @@
               "description": "Names of other options that conflict with this option.\n\nWhen this option is used together with any of the conflicting options,\nan `ArgResolveError` with type 'conflict' will be thrown.\n\nConflicts only need to be defined on one side - if option A defines a conflict\nwith option B, the conflict is automatically detected when both are used,\nregardless of whether B also defines a conflict with A.\n\nSupports both single option name or array of option names.\nOption names must match the property keys in the schema object exactly\n(no automatic conversion between camelCase and kebab-case).",
               "type": "string | string[]",
               "optional": true,
-              "line": 363,
-              "endLine": 363
+              "line": 371,
+              "endLine": 371
             },
             {
               "name": "metavar",
@@ -3587,8 +3587,8 @@
               "description": "Display name hint for help text generation.\n\nProvides a meaningful type hint for the argument value in help output.\nParticularly useful for `type: 'custom'` arguments where the type\nname would otherwise be unhelpful.",
               "type": "string",
               "optional": true,
-              "line": 385,
-              "endLine": 385
+              "line": 393,
+              "endLine": 393
             },
             {
               "name": "parse",
@@ -3610,8 +3610,8 @@
               "tags": {
                 "throws": "Error or subclass when value is invalid"
               },
-              "line": 426,
-              "endLine": 426
+              "line": 434,
+              "endLine": 434
             }
           ],
           "signature": "interface ArgSchema"
@@ -5596,8 +5596,8 @@
                   "description": ""
                 }
               ],
-              "line": 434,
-              "endLine": 434
+              "line": 442,
+              "endLine": 442
             }
           ],
           "signature": "interface Args"
@@ -5641,20 +5641,20 @@
             {
               "name": "required",
               "kind": "property",
-              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "description": "Marks the argument as required.\n\nWhen `true`, the argument must be provided by the user.\nIf missing, an `ArgResolveError` with type 'required' will be thrown.\n\nFor single-value positional arguments, omitting `required` keeps the argument\nrequired for compatibility. Set `required: false` to make a positional argument\noptional. Optional positional arguments leave enough input values for later\nrequired positional arguments before consuming a value.",
               "type": "boolean",
               "optional": true,
-              "line": 137,
-              "endLine": 137
+              "line": 140,
+              "endLine": 140
             },
             {
               "name": "multiple",
               "kind": "property",
-              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
+              "description": "Allows the argument to accept multiple values.\n\nWhen `true`, the resolved value becomes an array.\nFor options: can be specified multiple times (--tag foo --tag bar)\nFor positional: collects remaining positional arguments after preserving values for\nlater required positional arguments.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
               "type": "true",
               "optional": true,
-              "line": 163,
-              "endLine": 163
+              "line": 167,
+              "endLine": 167
             },
             {
               "name": "negatable",
@@ -5662,8 +5662,8 @@
               "description": "Enables negation for boolean arguments using `--no-` prefix.\n\nWhen `true`, allows users to explicitly set the boolean to `false`\nusing `--no-option-name`. When `false` or omitted, only positive\nform is available.\n\nOnly applicable to `type: 'boolean'` arguments.",
               "type": "boolean",
               "optional": true,
-              "line": 187,
-              "endLine": 187
+              "line": 191,
+              "endLine": 191
             },
             {
               "name": "choices",
@@ -5671,17 +5671,17 @@
               "description": "Array of allowed string values for enum-type arguments.\n\nRequired when `type: 'enum'`. The argument value must be one of these choices,\notherwise an `ArgResolveError` with type 'type' will be thrown.\n\nSupports both mutable arrays and readonly arrays for type safety.",
               "type": "string[] | readonly string[]",
               "optional": true,
-              "line": 214,
-              "endLine": 214
+              "line": 218,
+              "endLine": 218
             },
             {
               "name": "default",
               "kind": "property",
-              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default",
+              "description": "Default value used when the argument is not provided.\n\nThe type must match the argument's `type` property:\n- `string` type: string default\n- `boolean` type: boolean default\n- `number` type: number default\n- `enum` type: must be one of the `choices` values\n- `positional`/`custom` type: any appropriate default\n\nFor single-value positional arguments, the default is used when the positional\nvalue is missing or when the value is preserved for later required positional\narguments, unless `required: true` is set.",
               "type": "string | boolean | number",
               "optional": true,
-              "line": 249,
-              "endLine": 249
+              "line": 257,
+              "endLine": 257
             },
             {
               "name": "toKebab",
@@ -5689,8 +5689,8 @@
               "description": "Converts the argument name from camelCase to kebab-case for CLI usage.\n\nWhen `true`, a property like `maxCount` becomes available as `--max-count`.\nThis allows [CAC](https://github.com/cacjs/cac) user-friendly property names while maintaining CLI conventions.\n\nCan be overridden globally with `resolveArgs({ toKebab: true })`.\n\nNote: Only `true` is allowed (not `false`) to make intent explicit.",
               "type": "true",
               "optional": true,
-              "line": 276,
-              "endLine": 276
+              "line": 284,
+              "endLine": 284
             },
             {
               "name": "conflicts",
@@ -5698,8 +5698,8 @@
               "description": "Names of other options that conflict with this option.\n\nWhen this option is used together with any of the conflicting options,\nan `ArgResolveError` with type 'conflict' will be thrown.\n\nConflicts only need to be defined on one side - if option A defines a conflict\nwith option B, the conflict is automatically detected when both are used,\nregardless of whether B also defines a conflict with A.\n\nSupports both single option name or array of option names.\nOption names must match the property keys in the schema object exactly\n(no automatic conversion between camelCase and kebab-case).",
               "type": "string | string[]",
               "optional": true,
-              "line": 363,
-              "endLine": 363
+              "line": 371,
+              "endLine": 371
             },
             {
               "name": "metavar",
@@ -5707,8 +5707,8 @@
               "description": "Display name hint for help text generation.\n\nProvides a meaningful type hint for the argument value in help output.\nParticularly useful for `type: 'custom'` arguments where the type\nname would otherwise be unhelpful.",
               "type": "string",
               "optional": true,
-              "line": 385,
-              "endLine": 385
+              "line": 393,
+              "endLine": 393
             },
             {
               "name": "parse",
@@ -5730,8 +5730,8 @@
               "tags": {
                 "throws": "Error or subclass when value is invalid"
               },
-              "line": 426,
-              "endLine": 426
+              "line": 434,
+              "endLine": 434
             }
           ],
           "signature": "interface ArgSchema"
@@ -7203,7 +7203,7 @@
             "description": "A positional argument schema resolving to the parser's type."
           },
           "examples": [
-            "```ts\nconst args = {\n  command: positional(),           // resolves to string\n  port: positional(integer()),     // resolves to number\n}\n```"
+            "```ts\nconst args = {\n  command: positional(),           // resolves to string\n  port: positional(integer()),     // resolves to number\n  query: unrequired(positional())  // optional positional\n}\n```"
           ],
           "tags": {
             "experimental": ""
@@ -7227,7 +7227,7 @@
             "description": "A positional argument schema resolving to string."
           },
           "examples": [
-            "```ts\nconst args = {\n  command: positional(),           // resolves to string\n  port: positional(integer()),     // resolves to number\n}\n```"
+            "```ts\nconst args = {\n  command: positional(),           // resolves to string\n  port: positional(integer()),     // resolves to number\n  query: unrequired(positional())  // optional positional\n}\n```"
           ],
           "tags": {
             "experimental": ""
@@ -7329,31 +7329,32 @@
         {
           "name": "unrequired",
           "kind": "function",
-          "description": "Mark a combinator schema as not required.\n\nUseful for overriding a base combinator that was created with `required: true`.\nThe original schema is not modified.",
+          "description": "Mark a combinator schema as not required.\n\nUseful for overriding a base combinator that was created with `required: true`,\nor for making a positional argument explicitly optional.\nThe original schema is not modified.",
           "typeParameters": [
             {
               "name": "T",
-              "description": "The schema's parsed type."
+              "constraint": "ArgSchema",
+              "description": "The schema type."
             }
           ],
           "params": [
             {
               "name": "schema",
-              "type": "CombinatorSchema<T>",
+              "type": "T",
               "description": "The base combinator schema."
             }
           ],
           "returns": {
-            "type": "CombinatorSchema<T> & CombinatorUnrequired",
+            "type": "Omit<T, 'required'> & CombinatorUnrequired",
             "description": "A new schema with `required: false`."
           },
           "examples": [
-            "```ts\nconst args = {\n  name: unrequired(string({ required: true }))\n}\n```"
+            "```ts\nconst args = {\n  name: unrequired(string({ required: true })),\n  query: unrequired(positional())\n}\n```"
           ],
           "tags": {
             "experimental": ""
           },
-          "signature": "declare function unrequired<T>(schema: CombinatorSchema<T>): CombinatorSchema<T> & CombinatorUnrequired"
+          "signature": "declare function unrequired<T extends ArgSchema>(schema: T): Omit<T, 'required'> & CombinatorUnrequired"
         },
         {
           "name": "withDefault",
@@ -7517,8 +7518,8 @@
                 "type": "T",
                 "description": "The parsed value of type T."
               },
-              "line": 301,
-              "endLine": 301
+              "line": 303,
+              "endLine": 303
             },
             {
               "name": "metavar",
@@ -7527,8 +7528,8 @@
               "type": "string",
               "default": "'custom'",
               "optional": true,
-              "line": 307,
-              "endLine": 307
+              "line": 309,
+              "endLine": 309
             }
           ],
           "signature": "interface CombinatorOptions<T> extends BaseOptions",

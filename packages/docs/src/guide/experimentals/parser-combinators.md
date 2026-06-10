@@ -320,7 +320,7 @@ Creates a positional argument that can optionally use a parser:
 
 ```ts [positional-example.ts]
 import { define } from 'gunshi'
-import { positional, integer } from 'gunshi/combinators'
+import { positional, integer, unrequired } from 'gunshi/combinators'
 
 const command = define({
   name: 'copy',
@@ -329,9 +329,19 @@ const command = define({
     source: positional({ description: 'Source file' }),
 
     // Positional with type parser
-    count: positional(integer({ min: 1 }), {
-      description: 'Number of copies'
-    })
+    count: positional(
+      integer({
+        min: 1,
+        description: 'Number of copies'
+      })
+    ),
+
+    // Optional positional argument
+    query: unrequired(
+      positional({
+        description: 'Query to use instead of reading stdin'
+      })
+    )
   },
   run: ctx => {
     console.log(`Copying ${ctx.values.source} ${ctx.values.count} times`)
@@ -426,11 +436,11 @@ const command = define({
 
 ### unrequired()
 
-Explicitly marks an argument as optional. This is useful when you want to override a `required()` field from a base schema using `extend()`:
+Explicitly marks an argument as optional. This is useful when you want to override a `required()` field from a base schema using `extend()`, or when you want a positional argument that may be omitted:
 
 ```ts [unrequired-example.ts]
 import { define } from 'gunshi'
-import { string, required, unrequired, extend, args } from 'gunshi/combinators'
+import { string, positional, required, unrequired, extend, args } from 'gunshi/combinators'
 
 // Base schema with required field
 const base = args({
@@ -439,7 +449,8 @@ const base = args({
 
 // Override to make it optional in specific context
 const relaxed = extend(base, {
-  name: unrequired(string())
+  name: unrequired(string()),
+  query: unrequired(positional({ description: 'Optional query' }))
 })
 
 const command = define({
@@ -447,6 +458,7 @@ const command = define({
   args: relaxed,
   run: ctx => {
     // ctx.values.name is now string | undefined
+    // ctx.values.query is now string | undefined
     console.log(`Name: ${ctx.values.name || 'Anonymous'}`)
   }
 })

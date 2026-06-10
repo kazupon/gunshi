@@ -243,8 +243,8 @@ importers:
         specifier: ^14.0.0
         version: 14.3.0(vue@3.5.35(typescript@6.0.3))
       args-tokens:
-        specifier: ^0.25.0
-        version: 0.25.2
+        specifier: ^0.26.0
+        version: 0.26.0
       mermaid:
         specifier: ^11.12.0
         version: 11.15.0
@@ -291,8 +291,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       args-tokens:
-        specifier: ^0.25.0
-        version: 0.25.2
+        specifier: ^0.26.0
+        version: 0.26.0
       deno:
         specifier: 'catalog:'
         version: 2.8.2
@@ -2858,8 +2858,8 @@ packages:
     resolution: {integrity: sha512-kWceoEa1zXbcBvgy+BT1ddTLyB7B51u32EhOK/ZMY324nxmQAm767HD+g+9avBEPVmoDjWIYLvsSCQqtbcph/g==}
     engines: {node: '>= 20'}
 
-  args-tokens@0.25.2:
-    resolution: {integrity: sha512-0MGp0jB1xmCBYAg3dncMugGMRDNIWrUmigJofa2XEEwmet6cjw5DX8Eb1tqcSchrHGpCuoP6PwXKKg1iGVDGNQ==}
+  args-tokens@0.26.0:
+    resolution: {integrity: sha512-17Wd6JA5E43O9YDxx8cjcO47u1Uf/+U5iCngi4qYz0Gk7LvahN56F2dlWbtRR7Ib98wF2WB2jlrorb39aAHcoQ==}
     engines: {node: '>= 22'}
 
   array-find-index@1.0.2:
@@ -6341,7 +6341,7 @@ snapshots:
 
   args-tokens@0.17.1: {}
 
-  args-tokens@0.25.2: {}
+  args-tokens@0.26.0: {}
 
   array-find-index@1.0.2: {}
 

@@ -41,6 +41,8 @@ OPTIONS:
 Square brackets indicate optional elements or parameters with default values:
 
 - `[name]` - An option parameter with a default value
+- `[<positional>]` - An optional positional argument
+- `[<positional> ...]` - Optional multiple positional arguments
 - `[COMMANDS]` - Sub-command selection (when multiple commands exist)
 - `[commandName]` - A default command that runs when no sub-command is specified
 
@@ -233,7 +235,7 @@ OPTIONS:
   -v, --version          Display this version
 ```
 
-Positional arguments are displayed with clear, descriptive names that indicate their purpose. Currently, all positional arguments are shown as required using angle brackets (e.g., `<resource>`).
+Positional arguments are displayed with clear, descriptive names that indicate their purpose. Required positional arguments use angle brackets (e.g., `<resource>`), while optional positional arguments use square brackets (e.g., `[<query>]`). Multiple positional arguments are shown as `[<file> ...]`, or `<file> [<file> ...]` when at least one value is required.
 
 ## Automatic Features
 

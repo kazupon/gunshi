@@ -365,6 +365,54 @@ test('multiple positional arguments', async () => {
   expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
+test('optional positional arguments', async () => {
+  const command = {
+    args: {
+      query: {
+        type: 'positional',
+        required: false,
+        description: 'SQL query to execute'
+      },
+      file: {
+        type: 'positional',
+        description: 'Input file'
+      },
+      fallback: {
+        type: 'positional',
+        default: 'stdin',
+        description: 'Fallback source'
+      }
+    },
+    name: 'test',
+    description: 'A test command',
+    run: NOOP
+  } as Command<GunshiParams<{ args: Args }>>
+
+  const ctx = await createCommandContext({
+    args: command.args!,
+    explicit: {},
+    values: {},
+    positionals: [],
+    rest: [],
+    argv: [],
+    tokens: [], // dummy, due to test
+    omitted: false,
+    callMode: 'subCommand',
+    command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+
+  expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
+})
+
 test('multiple positional arguments with required', async () => {
   const command = {
     args: {
