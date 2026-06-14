@@ -8,6 +8,7 @@ import { define, lazy } from './definition.ts'
 import { generate } from './generator.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
+import { hidden, string } from './combinators.ts'
 
 import type { Args } from 'args-tokens'
 import type { Mocked } from 'vitest'
@@ -504,6 +505,93 @@ describe('auto generate usage', () => {
     const message = log()
     expect(message).toMatchSnapshot('console')
     expect(renderedUsage).toMatchSnapshot('rendered')
+  })
+
+  test('hidden object literal option is parseable and excluded from help', async () => {
+    const entry = {
+      name: 'command1',
+      description: 'This command has a hidden option',
+      args: {
+        visible: {
+          type: 'string',
+          short: 'v',
+          description: 'visible option'
+        },
+        legacy: {
+          type: 'string',
+          hidden: true,
+          description: 'legacy option'
+        }
+      },
+      run: vi.fn<() => void>()
+    } satisfies Command<GunshiParams>
+
+    const runSpy = entry.run
+    await cli(['--visible', 'public', '--legacy', 'hidden'], entry, {
+      name: 'legacy-cli',
+      description: 'legacy-cli',
+      version: '1.0.0'
+    })
+
+    expect(runSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: {
+          visible: 'public',
+          legacy: 'hidden'
+        }
+      })
+    )
+
+    const renderedUsage = await cli(['-h'], entry, {
+      name: 'legacy-cli',
+      description: 'legacy-cli',
+      version: '1.0.0'
+    })
+
+    expect(renderedUsage).toContain('--visible')
+    expect(renderedUsage).not.toContain('--legacy')
+    expect(renderedUsage).not.toContain('legacy option')
+  })
+
+  test('hidden() combinator option is parseable and excluded from help', async () => {
+    const entry = {
+      name: 'command2',
+      description: 'This command uses hidden() combinator',
+      args: {
+        visible: {
+          type: 'string',
+          short: 'v',
+          description: 'visible option'
+        },
+        legacy: hidden(string())
+      },
+      run: vi.fn<() => void>()
+    } satisfies Command<GunshiParams>
+
+    const runSpy = entry.run
+    await cli(['--visible', 'public', '--legacy', 'hidden'], entry, {
+      name: 'legacy-cli-2',
+      description: 'legacy-cli',
+      version: '1.0.0'
+    })
+
+    expect(runSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: {
+          visible: 'public',
+          legacy: 'hidden'
+        }
+      })
+    )
+
+    const renderedUsage = await cli(['-h'], entry, {
+      name: 'legacy-cli-2',
+      description: 'legacy-cli',
+      version: '1.0.0'
+    })
+
+    expect(renderedUsage).toContain('--visible')
+    expect(renderedUsage).not.toContain('--legacy')
   })
 
   test('loosely sub commands', async () => {

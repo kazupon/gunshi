@@ -16,5 +16,6 @@ interface BaseOptions
 | Name | Type | Description |
 | --- | --- | --- |
 | `description` _(optional)_ | `string` | Human-readable description for help text generation. |
+| `hidden` _(optional)_ | `boolean` | Hide from generated help or usage output. |
 | `required` _(optional)_ | `boolean` | Mark as required. |
 | `short` _(optional)_ | `string` | Single character short alias. |

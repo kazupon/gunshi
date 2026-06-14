@@ -544,6 +544,32 @@ const command = define({
 })
 ```
 
+### hidden()
+
+Marks an argument schema as hidden from generated usage/help output.
+
+Use this for deprecated or internal options that should remain parseable:
+
+```ts [hidden-example.ts]
+import { define } from 'gunshi'
+import { string, hidden } from 'gunshi/combinators'
+
+const command = define({
+  name: 'example',
+  args: {
+    publicMode: string(),
+
+    // Kept for backward compatibility, but hidden from help
+    legacyMode: hidden(string({ description: 'Deprecated internal flag' }))
+  },
+  run: ctx => {
+    if (ctx.values.legacyMode) {
+      console.log('legacy mode enabled')
+    }
+  }
+})
+```
+
 ### multiple()
 
 Allows multiple values for an argument:

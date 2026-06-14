@@ -3,6 +3,7 @@ import {
   args,
   boolean,
   choice,
+  hidden,
   integer,
   merge,
   positional,
@@ -69,4 +70,10 @@ test('CombinatorSchema type parameter', () => {
 
   const n: CombinatorSchema<number> = integer()
   expectTypeOf(n.parse).toMatchTypeOf<(value: string) => number>()
+})
+
+test('hidden combinator marks schema as hidden', () => {
+  const s = hidden(string())
+  expectTypeOf(s).toMatchTypeOf<ArgSchema>()
+  expectTypeOf(s.hidden).toEqualTypeOf<true>()
 })

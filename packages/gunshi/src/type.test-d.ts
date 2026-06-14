@@ -165,3 +165,28 @@ test('Command with rendering', () => {
   }
   expectTypeOf(commandWithPartialRendering).toMatchTypeOf<Command>()
 })
+
+test('command args can use hidden option', () => {
+  const args = {
+    public: {
+      type: 'string',
+      description: 'public option'
+    },
+    legacy: {
+      type: 'string',
+      hidden: true,
+      description: 'legacy option'
+    }
+  } satisfies Args
+
+  const command = {
+    name: 'test',
+    args,
+    run: () => {
+      // no-op
+    }
+  } satisfies Command<GunshiParams<{ args: typeof args }>>
+
+  expectTypeOf(command.args.legacy).toMatchTypeOf<Args['legacy']>()
+  expectTypeOf(command.args.legacy.hidden).toEqualTypeOf<true>()
+})

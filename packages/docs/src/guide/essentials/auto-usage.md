@@ -36,6 +36,12 @@ OPTIONS:
   -n, --name <name>    Name to use (required)
 ```
 
+### Hiding Internal Options
+
+If you need to support options for backward compatibility or internal workflows without showing them in `--help`, set `hidden: true` on the argument schema (or apply the `hidden()` combinator).
+
+The option continues to be accepted and parsed at runtime, but it is omitted from the `OPTIONS` section and usage symbols.
+
 ### Square Brackets `[]` - Optional Elements
 
 Square brackets indicate optional elements or parameters with default values:

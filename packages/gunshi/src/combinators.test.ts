@@ -6,6 +6,7 @@ import {
   choice,
   combinator,
   describe as desc,
+  hidden,
   extend,
   float,
   integer,
@@ -40,6 +41,7 @@ describe('combinators re-export', () => {
     expect(typeof withDefault).toBe('function')
     expect(typeof multiple).toBe('function')
     expect(typeof short).toBe('function')
+    expect(typeof hidden).toBe('function')
     expect(typeof desc).toBe('function')
     expect(typeof map).toBe('function')
   })

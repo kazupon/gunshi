@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { ArgExplicitlyProvided, Args, ArgToken, ArgValues } from 'args-tokens'
+import type { ArgExplicitlyProvided, ArgToken, Args, ArgValues } from 'args-tokens'
 import type { Plugin } from './plugin/core.ts'
 
 export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
