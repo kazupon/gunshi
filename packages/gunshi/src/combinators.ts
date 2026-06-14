@@ -41,6 +41,7 @@ export {
   describe,
   extend,
   float,
+  hidden,
   integer,
   map,
   merge,

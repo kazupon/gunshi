@@ -39,6 +39,7 @@ const command = define({
 | [describe](/api/combinators/functions/describe.md) | Set a description on a combinator schema for help text generation. |
 | [extend](/api/combinators/functions/extend.md) | Extend a schema by overriding or adding fields. |
 | [float](/api/combinators/functions/float.md) | Create a floating-point argument schema with optional range validation. |
+| [hidden](/api/combinators/functions/hidden.md) | Hide a combinator schema from generated help or usage output. |
 | [integer](/api/combinators/functions/integer.md) | Create an integer argument schema with optional range validation. |
 | [map](/api/combinators/functions/map.md) | Transform the output of a combinator schema. |
 | [merge](/api/combinators/functions/merge.md) | Compose multiple [Args](/api/default/interfaces/Args.md) schemas into one. |

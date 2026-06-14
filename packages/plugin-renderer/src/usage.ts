@@ -30,6 +30,22 @@ type Extensions = Record<PluginId, UsageRendererExtension>
 
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
 
+function isHiddenArg(schema: ArgSchema): boolean {
+  return (schema as { hidden?: boolean }).hidden === true
+}
+
+function getVisibleOptionalArgs(args: Args): [string, ArgSchema][] {
+  return Object.entries(args).filter(
+    ([_, schema]) => schema.type !== 'positional' && !isHiddenArg(schema)
+  )
+}
+
+function getVisiblePositionalArgs(args: Args): [string, ArgSchema][] {
+  return Object.entries(args).filter(
+    ([_, schema]) => schema.type === 'positional' && !isHiddenArg(schema)
+  )
+}
+
 /**
  * Render the usage.
  *
@@ -359,7 +375,7 @@ async function hasCommands<
  * @returns True if the command has options
  */
 function hasOptionalArgs(args: Args): boolean {
-  return Object.values(args).some(arg => arg.type !== 'positional')
+  return getVisibleOptionalArgs(args).length > 0
 }
 
 /**
@@ -369,7 +385,7 @@ function hasOptionalArgs(args: Args): boolean {
  * @returns True if the command has options
  */
 function hasPositionalArgs(args: Args): boolean {
-  return Object.values(args).some(arg => arg.type === 'positional')
+  return getVisiblePositionalArgs(args).length > 0
 }
 
 /**
@@ -379,7 +395,8 @@ function hasPositionalArgs(args: Args): boolean {
  * @returns True if all options have default values
  */
 function hasAllDefaultOptions(args: Args): boolean {
-  return !!(args && Object.values(args).every(arg => arg.default))
+  const visibleOptionalArgs = getVisibleOptionalArgs(args)
+  return visibleOptionalArgs.length > 0 && visibleOptionalArgs.every(([_, arg]) => arg.default)
 }
 
 /**
@@ -395,7 +412,9 @@ async function generateOptionsSymbols<
     extensions: Extensions
   }>
 >(ctx: CommandContext<G>, args: Args): Promise<string> {
-  return hasOptionalArgs(args)
+  const visibleOptionalArgs = getVisibleOptionalArgs(args)
+
+  return visibleOptionalArgs.length > 0
     ? hasAllDefaultOptions(args)
       ? `[${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}]`
       : `<${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}>`
@@ -411,11 +430,8 @@ async function generateOptionsSymbols<
 function getOptionalArgsPairs<G extends GunshiParams>(
   ctx: CommandContext<G>
 ): Record<string, string> {
-  return Object.entries(ctx.args).reduce(
+  return getVisibleOptionalArgs(ctx.args).reduce(
     (acc, [name, schema]) => {
-      if (schema.type === 'positional') {
-        return acc
-      }
       let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
       if (schema.type !== 'boolean') {
         // Convert parameter placeholders to kebab-case format when toKebab is enabled
@@ -495,18 +511,19 @@ async function generateOptionalArgsUsage<
     extensions: Extensions
   }>
 >(ctx: CommandContext<G>, optionsPairs: Record<string, string>): Promise<string> {
-  const optionsMaxLength = Math.max(
-    ...Object.entries(optionsPairs).map(([_, value]) => value.length)
-  )
+  const optionsPairsEntries = Object.entries(optionsPairs)
+  if (optionsPairsEntries.length === 0) {
+    return ''
+  }
+
+  const optionsMaxLength = Math.max(...optionsPairsEntries.map(([_, value]) => value.length))
 
   const optionSchemaMaxLength = ctx.env.usageOptionType
-    ? Math.max(
-        ...Object.entries(optionsPairs).map(([key]) => resolveNegatableType(key, ctx).length)
-      )
+    ? Math.max(...optionsPairsEntries.map(([key]) => resolveNegatableType(key, ctx).length))
     : 0
 
   const usages = await Promise.all(
-    Object.entries(optionsPairs).map(async ([key, value]) => {
+    optionsPairsEntries.map(async ([key, value]) => {
       let rawDesc = await ctx.extensions[pluginId].text(resolveArgKey(key, ctx.name))
       if (!rawDesc && key.startsWith(ARG_NEGATABLE_PREFIX)) {
         const name = resolveNegatableKey(key)
@@ -530,7 +547,7 @@ async function generateOptionalArgsUsage<
 }
 
 function getPositionalArgs(args: Args): [string, ArgSchema][] {
-  return Object.entries(args).filter(([_, schema]) => schema.type === 'positional')
+  return getVisiblePositionalArgs(args)
 }
 
 async function generatePositionalArgsUsage<
@@ -540,6 +557,10 @@ async function generatePositionalArgsUsage<
   }>
 >(ctx: CommandContext<G>): Promise<string> {
   const positionals = getPositionalArgs(ctx.args)
+  if (positionals.length === 0) {
+    return ''
+  }
+
   const argsMaxLength = Math.max(...positionals.map(([name]) => name.length))
 
   const usages = await Promise.all(
@@ -557,8 +578,10 @@ async function generatePositionalArgsUsage<
 }
 
 function generatePositionalSymbols(args: Args): string {
-  return hasPositionalArgs(args)
-    ? getPositionalArgs(args)
+  const visiblePositionalArgs = getVisiblePositionalArgs(args)
+
+  return visiblePositionalArgs.length > 0
+    ? visiblePositionalArgs
         .map(([name, arg]) => {
           const elements: string[] = []
           if (arg.multiple) {

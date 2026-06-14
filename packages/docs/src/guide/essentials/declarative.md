@@ -168,6 +168,7 @@ Each option can have the following properties:
 - `required`: Set to `true` if the option is required. For single positional arguments, omit this field to keep the compatibility default of required, or set `required: false` to make the positional argument optional.
 - `multiple`: Set to `true` if multiple option values are allowed
 - `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
+- `hidden`: Set to `true` to hide the argument from generated help/usage output while keeping it parseable.
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
 - `conflicts`: Specify mutually exclusive options that cannot be used together
 

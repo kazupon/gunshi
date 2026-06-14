@@ -322,6 +322,182 @@ test('mixed positionals and optionals', async () => {
   expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
+test('hidden optional args are omitted from usage and options', async () => {
+  const command = {
+    args: {
+      visible: {
+        type: 'string',
+        short: 'v',
+        description: 'The visible option'
+      },
+      hidden: {
+        type: 'string',
+        short: 'h',
+        hidden: true,
+        description: 'The hidden option'
+      }
+    },
+    name: 'test',
+    description: 'A command with hidden optional args',
+    run: NOOP
+  } satisfies Command<GunshiParams<{ args: Args }>>
+
+  const ctx = await createCommandContext({
+    args: command.args,
+    callMode: 'subCommand',
+    command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+
+  const usage = await renderUsage<WithI18nAndRenderer>(ctx)
+
+  expect(usage).toContain('USAGE:\n  cmd1 test <OPTIONS>')
+  expect(usage).toContain('The visible option')
+  expect(usage).not.toContain('--hidden')
+  expect(usage).not.toContain('The hidden option')
+})
+
+test('hidden boolean negatable options do not generate negated entry', async () => {
+  const command = {
+    args: {
+      visible: {
+        type: 'boolean',
+        short: 'v',
+        description: 'Visible boolean'
+      },
+      hidden: {
+        type: 'boolean',
+        short: 'h',
+        negatable: true,
+        hidden: true,
+        description: 'Hidden boolean'
+      }
+    },
+    name: 'test',
+    description: 'A command with hidden negatable option',
+    run: NOOP
+  } satisfies Command<GunshiParams<{ args: Args }>>
+
+  const ctx = await createCommandContext({
+    args: command.args,
+    callMode: 'subCommand',
+    command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+
+  const usage = await renderUsage<WithI18nAndRenderer>(ctx)
+
+  expect(usage).toContain('--visible')
+  expect(usage).not.toContain('--hidden')
+  expect(usage).not.toContain('--no-hidden')
+})
+
+test('hidden positional args are omitted from usage and arguments', async () => {
+  const command = {
+    args: {
+      visible: {
+        type: 'positional',
+        description: 'The visible positional argument'
+      },
+      hidden: {
+        type: 'positional',
+        hidden: true,
+        description: 'The hidden positional argument'
+      }
+    },
+    name: 'test',
+    description: 'A command with positional args',
+    run: NOOP
+  } satisfies Command<GunshiParams<{ args: Args }>>
+
+  const ctx = await createCommandContext({
+    args: command.args,
+    callMode: 'subCommand',
+    command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+
+  const usage = await renderUsage<WithI18nAndRenderer>(ctx)
+
+  expect(usage).toContain('ARGUMENTS:')
+  expect(usage).toContain('visible           The visible positional argument')
+  expect(usage).not.toContain('hidden')
+})
+
+test('hidden-only args do not show options or arguments sections', async () => {
+  const command = {
+    args: {
+      hiddenOptional: {
+        type: 'string',
+        hidden: true,
+        description: 'The hidden optional argument'
+      },
+      hiddenPositional: {
+        type: 'positional',
+        hidden: true,
+        description: 'The hidden positional argument'
+      }
+    },
+    name: 'test',
+    description: 'A command with hidden args only',
+    run: NOOP
+  } satisfies Command<GunshiParams<{ args: Args }>>
+
+  const ctx = await createCommandContext({
+    args: command.args,
+    callMode: 'subCommand',
+    command,
+    explicit: {},
+    values: {},
+    positionals: [],
+    rest: [],
+    argv: [],
+    tokens: [],
+    omitted: false,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    },
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+
+  const usage = await renderUsage<WithI18nAndRenderer>(ctx)
+
+  expect(usage).toContain('USAGE:\n  cmd1 test')
+  expect(usage).not.toContain('[OPTIONS]')
+  expect(usage).not.toContain('ARGUMENTS:')
+  expect(usage).not.toContain('The hidden optional argument')
+  expect(usage).not.toContain('The hidden positional argument')
+})
+
 test('multiple positional arguments', async () => {
   const command = {
     args: {
