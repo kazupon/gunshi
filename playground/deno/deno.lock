@@ -1,32 +1,34 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@gunshi/gunshi@0.29.5": "0.29.5",
-    "npm:@gunshi/plugin-global@0.29.5": "0.29.5",
-    "npm:@gunshi/plugin-i18n@0.29.5": "0.29.5_@gunshi+plugin-global@0.29.5",
-    "npm:@gunshi/plugin-renderer@0.29.5": "0.29.5_@gunshi+plugin-i18n@0.29.5__@gunshi+plugin-global@0.29.5_@gunshi+plugin-global@0.29.5",
-    "npm:args-tokens@~0.24.3": "0.24.3"
+    "jsr:@gunshi/gunshi@0.33.0": "0.33.0",
+    "npm:@gunshi/plugin-global@0.33.0": "0.33.0",
+    "npm:@gunshi/plugin-i18n@0.33.0": "0.33.0_@gunshi+plugin-global@0.33.0",
+    "npm:@gunshi/plugin-renderer@0.33.0": "0.33.0_@gunshi+plugin-i18n@0.33.0__@gunshi+plugin-global@0.33.0_@gunshi+plugin-global@0.33.0",
+    "npm:args-tokens@0.25": "0.25.2",
+    "npm:std-env@^4.1.0": "4.1.0"
   },
   "jsr": {
-    "@gunshi/gunshi@0.29.5": {
-      "integrity": "f96c1a76ebcdd946a561bae78f587ca0c24bce0246161f46edce6ab1b92bb019",
+    "@gunshi/gunshi@0.33.0": {
+      "integrity": "dd1a0d908467a8146a376c22879ecbb34ed288ccc0b354f786bd894ff79e7bdf",
       "dependencies": [
         "npm:@gunshi/plugin-global",
         "npm:@gunshi/plugin-i18n",
         "npm:@gunshi/plugin-renderer",
-        "npm:args-tokens"
+        "npm:args-tokens",
+        "npm:std-env"
       ]
     }
   },
   "npm": {
-    "@gunshi/plugin-global@0.29.5": {
-      "integrity": "sha512-sNBoTK0odCTawABhJzo7XCXV1oH6K3ilCxln5e5pSd1dIFYTENx7VLRUCC9jXXrWagL77SaF08d5tYohk6U1iA==",
+    "@gunshi/plugin-global@0.33.0": {
+      "integrity": "sha512-/DRd3wlU/ZQeEv15UrcoV6p1Fj8tFUm3OFRR+ZZsUCV/cox5l9NDj9uP8B/HR/A4xxNvoJ62fgMmws3JjHuraQ==",
       "dependencies": [
         "@gunshi/plugin"
       ]
     },
-    "@gunshi/plugin-i18n@0.29.5_@gunshi+plugin-global@0.29.5": {
-      "integrity": "sha512-qt10lQMRFYKo51hhlLDsXEcta/qFoGPVlOVCPghwlt6OXo4G0q5DOWt6OZL1ZcZ1RE7JhFKPdkTauACQpEAhHQ==",
+    "@gunshi/plugin-i18n@0.33.0_@gunshi+plugin-global@0.33.0": {
+      "integrity": "sha512-9nsSyQNRhXJgKF1YLI0Gp5A9lN6BxeYwrqQBRxxa9AJVl4sZWtYIJfKsI2Hzrqzds+IlJtlFMRHmK733OqTp2A==",
       "dependencies": [
         "@gunshi/plugin",
         "@gunshi/plugin-global"
@@ -35,23 +37,26 @@
         "@gunshi/plugin-global"
       ]
     },
-    "@gunshi/plugin-renderer@0.29.5_@gunshi+plugin-i18n@0.29.5__@gunshi+plugin-global@0.29.5_@gunshi+plugin-global@0.29.5": {
-      "integrity": "sha512-Y3YVqxKnVxByVvkbGOeh3hxkvBWYLE1IljF4/Lhj+xmAaezi+Hyj345lrjU1SGnMfMymnVJO+97PVwMCI+LLzw==",
+    "@gunshi/plugin-renderer@0.33.0_@gunshi+plugin-i18n@0.33.0__@gunshi+plugin-global@0.33.0_@gunshi+plugin-global@0.33.0": {
+      "integrity": "sha512-2zXKOUDvDvglQy5kb99dl2t+LQ+zswXnc32yfz6suQkjsaqNBB/diXQhaDMUmRyOkuK7ADtXDKjbcbGELmkliA==",
       "dependencies": [
         "@gunshi/plugin",
         "@gunshi/plugin-i18n"
       ]
     },
-    "@gunshi/plugin@0.29.5": {
-      "integrity": "sha512-0YO4u5hJvHTDXpYYOOf3I4IxJUmdrD/YXWx8cpFDHNrDon/FGD18uazmuEG474iwoST6G9JMsJ8kPsKgIrRonw=="
+    "@gunshi/plugin@0.33.0": {
+      "integrity": "sha512-VUTMU86eBcQXZNlItOr+RLTueQlhzPMvJivhExvwjWU8TiTzNgMD4QFq6+VPMC7etSWw2WSrDp3Njjbt545GDA=="
     },
-    "args-tokens@0.24.3": {
-      "integrity": "sha512-Blg4MQS0dlrkYS9qQWlcvLZcYGufO0vqLzCfT2yxXyczbRF6PgxE1ZxIpuCd9tGB7kbWzWoN/GG+afKktW33Mg=="
+    "args-tokens@0.25.2": {
+      "integrity": "sha512-0MGp0jB1xmCBYAg3dncMugGMRDNIWrUmigJofa2XEEwmet6cjw5DX8Eb1tqcSchrHGpCuoP6PwXKKg1iGVDGNQ=="
+    },
+    "std-env@4.1.0": {
+      "integrity": "sha512-Rq7ybcX2RuC55r9oaPVEW7/xu3tj8u4GeBYHBWCychFtzMIr86A7e3PPEBPT37sHStKX3+TiX/Fr/ACmJLVlLQ=="
     }
   },
   "workspace": {
     "dependencies": [
-      "jsr:@gunshi/gunshi@0.29.5"
+      "jsr:@gunshi/gunshi@0.33.0"
     ]
   }
 }
