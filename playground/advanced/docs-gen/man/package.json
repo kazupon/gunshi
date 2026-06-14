@@ -7,7 +7,7 @@
     "start": "node cli.ts"
   },
   "dependencies": {
-    "marked-man": "2.1.0",
+    "marked-man": "2.1.1",
     "gunshi": "file:../../../../packages/gunshi"
   }
 }
