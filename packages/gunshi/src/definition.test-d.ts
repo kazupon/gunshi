@@ -63,8 +63,9 @@ describe('define', () => {
         expectTypeOf(ctx.values.count).toEqualTypeOf<number | undefined>()
         expectTypeOf(ctx.values.verbose).toEqualTypeOf<boolean>()
         expectTypeOf(ctx.extensions[loggerPluginId]).toEqualTypeOf<LoggerExtension>()
-        // @ts-expect-error unknown plugin extension should not be available
-        ctx.extensions.missing
+        expectTypeOf(ctx.extensions)
+          // @ts-expect-error unknown plugin extension should not be available
+          .toHaveProperty('missing')
       }
     })
   })
@@ -80,8 +81,9 @@ describe('defineWithTypes', () => {
         expectTypeOf(ctx.values.count).toEqualTypeOf<number | undefined>()
         expectTypeOf(ctx.values.verbose).toEqualTypeOf<boolean>()
         expectTypeOf(ctx.extensions[loggerPluginId]).toEqualTypeOf<LoggerExtension>()
-        // @ts-expect-error unknown plugin extension should not be available
-        ctx.extensions.missing
+        expectTypeOf(ctx.extensions)
+          // @ts-expect-error unknown plugin extension should not be available
+          .toHaveProperty('missing')
       }
     })
 
@@ -116,6 +118,41 @@ describe('defineWithTypes', () => {
 })
 
 describe('lazy', () => {
+  test('infers loader context from inline definition without explicit extensions generic (Issue #582)', () => {
+    lazy(
+      () => {
+        return ({ values }) => {
+          const test = values.test
+          expectTypeOf(test).toEqualTypeOf<boolean | undefined>()
+        }
+      },
+      {
+        name: 'main',
+        args: {
+          test: {
+            type: 'boolean'
+          }
+        }
+      }
+    )
+  })
+
+  test('infers standard arg value types from inline definition', () => {
+    lazy(
+      () => {
+        return ({ values }) => {
+          expectTypeOf(values.input).toEqualTypeOf<string>()
+          expectTypeOf(values.count).toEqualTypeOf<number | undefined>()
+          expectTypeOf(values.verbose).toEqualTypeOf<boolean>()
+        }
+      },
+      {
+        name: 'deploy',
+        args: commandArgs
+      }
+    )
+  })
+
   test('infers loader context from CommandRunner annotation', () => {
     const lazyCommand = lazy((): CommandRunner<{ args: typeof commandArgs; extensions: {} }> => {
       return ctx => {
@@ -127,6 +164,19 @@ describe('lazy', () => {
     })
 
     expectTypeOf(lazyCommand.commandName).toEqualTypeOf<string | undefined>()
+  })
+
+  test('preserves inline definition metadata without args', () => {
+    const lazyCommand = lazy(
+      () => {
+        return () => {}
+      },
+      {
+        name: 'lazy'
+      }
+    )
+
+    expectTypeOf(lazyCommand.commandName).toEqualTypeOf<string>()
   })
 
   test('preserves inline definition metadata', () => {
