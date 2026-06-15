@@ -20,7 +20,70 @@ const args = parseArgs({
   }
 })
 
-function updatePkgJson(pkg: string, json: Record<string, unknown>): Record<string, unknown> {
+function getDependencyVersion(
+  json: Record<string, unknown>,
+  catalogVersions: Record<string, string>,
+  dep: string
+): string {
+  const dependencies = json.dependencies as Record<string, string> | undefined
+  const devDependencies = json.devDependencies as Record<string, string> | undefined
+  const dependencyVersion = dependencies?.[dep] || devDependencies?.[dep]
+
+  if (!dependencyVersion) {
+    throw new Error(`Dependency ${dep} is not defined in package.json`)
+  }
+
+  if (dependencyVersion === 'catalog:') {
+    const catalogVersion = catalogVersions[dep]
+    if (!catalogVersion) {
+      throw new Error(`Dependency ${dep} is not defined in pnpm-workspace.yaml catalog`)
+    }
+    return catalogVersion
+  }
+
+  return dependencyVersion
+}
+
+function parseCatalogVersions(source: string): Record<string, string> {
+  const catalogVersions: Record<string, string> = {}
+  let inCatalog = false
+
+  for (const line of source.split(/\r?\n/)) {
+    if (line === 'catalog:') {
+      inCatalog = true
+      continue
+    }
+
+    if (!inCatalog) {
+      continue
+    }
+
+    if (line && !line.startsWith(' ')) {
+      break
+    }
+
+    const match = line.match(/^\s{2}([\w@./-]+): ['"]?([^'"\s]+)['"]?$/)
+    if (match) {
+      catalogVersions[match[1]] = match[2]
+    }
+  }
+
+  return catalogVersions
+}
+
+async function loadCatalogVersions(): Promise<Record<string, string>> {
+  const source = await fs.readFile(
+    path.resolve(import.meta.dirname, '../pnpm-workspace.yaml'),
+    'utf8'
+  )
+  return parseCatalogVersions(source)
+}
+
+function updatePkgJson(
+  pkg: string,
+  json: Record<string, unknown>,
+  catalogVersions: Record<string, string>
+): Record<string, unknown> {
   const version = json.version as string
   if (!version) {
     throw new Error(`Package ${pkg} does not have a version defined in package.json`)
@@ -32,11 +95,20 @@ function updatePkgJson(pkg: string, json: Record<string, unknown>): Record<strin
     ;(json.dependencies as Record<string, string>)[dep] = version
   }
 
+  function setExternalDependency(dep: string) {
+    ;(json.dependencies as Record<string, string>)[dep] = getDependencyVersion(
+      json,
+      catalogVersions,
+      dep
+    )
+  }
+
   switch (pkg) {
     case 'packages/gunshi': {
       setDependency('@gunshi/plugin-global')
       setDependency('@gunshi/plugin-renderer')
       setDependency('@gunshi/plugin-i18n')
+      setExternalDependency('args-tokens')
       break
     }
     case 'packages/bone':
@@ -75,6 +147,7 @@ function updatePkgJson(pkg: string, json: Record<string, unknown>): Record<strin
 
 async function main() {
   const { package: pkg } = args.values
+  const catalogVersions = await loadCatalogVersions()
 
   let json: Record<string, unknown>
   try {
@@ -88,7 +161,7 @@ async function main() {
     )
   }
 
-  json = updatePkgJson(pkg as string, json)
+  json = updatePkgJson(pkg as string, json, catalogVersions)
 
   try {
     await fs.writeFile(
