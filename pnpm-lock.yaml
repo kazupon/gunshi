@@ -54,7 +54,7 @@ importers:
         version: 8.0.2
       '@kazupon/eslint-config':
         specifier: ^0.45.0
-        version: 0.45.0(d41de80c7ad16ad469c416d9068c6492)
+        version: 0.45.0(fbcdbeaf797db98ca3051763db7ba683)
       '@kazupon/eslint-plugin':
         specifier: ^0.7.1
         version: 0.7.1(eslint@10.4.1(jiti@2.7.0))
@@ -77,8 +77,8 @@ importers:
         specifier: ^10.3.0
         version: 10.4.1(jiti@2.7.0)
       eslint-plugin-jsdoc:
-        specifier: ^62.9.0
-        version: 62.9.0(eslint@10.4.1(jiti@2.7.0))
+        specifier: ^63.0.0
+        version: 63.0.2(eslint@10.4.1(jiti@2.7.0))
       eslint-plugin-jsonc:
         specifier: ^3.1.2
         version: 3.2.0(eslint@10.4.1(jiti@2.7.0))
@@ -931,8 +931,8 @@ packages:
     resolution: {integrity: sha512-rQkU5u8hNAq2NVRzHnIUUvR6arbO0b6AOlvpTNS48CkiKSn/xtNfOzBK23JE4SiW89DgvU7GtxLVgV4Vn2HBAw==}
     engines: {node: '>=20.11.0'}
 
-  '@es-joy/jsdoccomment@0.86.0':
-    resolution: {integrity: sha512-ukZmRQ81WiTpDWO6D/cTBM7XbrNtutHKvAVnZN/8pldAwLoJArGOvkNyxPTBGsPjsoaQBJxlH+tE2TNA/92Qgw==}
+  '@es-joy/jsdoccomment@0.87.0':
+    resolution: {integrity: sha512-mFXZloZMzuJZXSHUmAFu/pXTk0ZJTJBluuAkrvbzidpTN8W6F2bpRFuedSH+85kbdlRLJqc+gfN+kD3JOLJK5g==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   '@es-joy/resolve.exports@1.2.0':
@@ -2947,10 +2947,6 @@ packages:
     resolution: {integrity: sha512-buhp5kePrmda3vhc5B9t7pUQXAb2Tnd0qgpkIhPhkHXxJpiPJ11H0ZEU0oBpJ2QztSbzG/ZxMj/CHsYJqRHmyg==}
     engines: {node: '>= 12.0.0'}
 
-  comment-parser@1.4.6:
-    resolution: {integrity: sha512-ObxuY6vnbWTN6Od72xfwN9DbzC7Y2vv8u1Soi9ahRKL37gb6y1qk6/dgjs+3JWuXJHWvsg3BXIwzd/rkmAwavg==}
-    engines: {node: '>= 12.0.0'}
-
   comment-parser@1.4.7:
     resolution: {integrity: sha512-0h+uSNtQGW3D98eQt3jJ8L06Fves8hncB4V/PKdw/Qb8Hnk19VaKuTr55UNRYiSoVa7WwrFls+rh3ux9agmkeQ==}
     engines: {node: '>= 12.0.0'}
@@ -3265,9 +3261,9 @@ packages:
     peerDependencies:
       eslint: '*'
 
-  eslint-plugin-jsdoc@62.9.0:
-    resolution: {integrity: sha512-PY7/X4jrVgoIDncUmITlUqK546Ltmx/Pd4Hdsu4CvSjryQZJI2mEV4vrdMufyTetMiZ5taNSqvK//BTgVUlNkA==}
-    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+  eslint-plugin-jsdoc@63.0.2:
+    resolution: {integrity: sha512-0TchoK1uS4VxHSo3P4CyWQ31Lm+6zsT+xkHMC5KbFKwgOf8YrXPf1Bl8EP7kpgw1wfe/Ui5jz5mSX7ou8WAVuw==}
+    engines: {node: ^22.13.0 || >=24}
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
 
@@ -4978,11 +4974,11 @@ snapshots:
       esquery: 1.7.0
       jsdoc-type-pratt-parser: 7.0.0
 
-  '@es-joy/jsdoccomment@0.86.0':
+  '@es-joy/jsdoccomment@0.87.0':
     dependencies:
       '@types/estree': 1.0.9
       '@typescript-eslint/types': 8.60.1
-      comment-parser: 1.4.6
+      comment-parser: 1.4.7
       esquery: 1.7.0
       jsdoc-type-pratt-parser: 7.2.0
 
@@ -5192,7 +5188,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@kazupon/eslint-config@0.45.0(d41de80c7ad16ad469c416d9068c6492)':
+  '@kazupon/eslint-config@0.45.0(fbcdbeaf797db98ca3051763db7ba683)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.7.2(eslint@10.4.1(jiti@2.7.0))
       '@eslint/js': 9.39.4
@@ -5205,7 +5201,7 @@ snapshots:
       globals: 16.5.0
     optionalDependencies:
       '@eslint/markdown': 8.0.2
-      eslint-plugin-jsdoc: 62.9.0(eslint@10.4.1(jiti@2.7.0))
+      eslint-plugin-jsdoc: 63.0.2(eslint@10.4.1(jiti@2.7.0))
       eslint-plugin-jsonc: 3.2.0(eslint@10.4.1(jiti@2.7.0))
       eslint-plugin-markdown-preferences: 0.41.1(@eslint/markdown@8.0.2)(eslint@10.4.1(jiti@2.7.0))
       eslint-plugin-module-interop: 0.3.1(eslint@10.4.1(jiti@2.7.0))
@@ -6418,8 +6414,6 @@ snapshots:
 
   comment-parser@1.4.1: {}
 
-  comment-parser@1.4.6: {}
-
   comment-parser@1.4.7: {}
 
   commenting@1.1.0: {}
@@ -6747,12 +6741,12 @@ snapshots:
     dependencies:
       eslint: 10.4.1(jiti@2.7.0)
 
-  eslint-plugin-jsdoc@62.9.0(eslint@10.4.1(jiti@2.7.0)):
+  eslint-plugin-jsdoc@63.0.2(eslint@10.4.1(jiti@2.7.0)):
     dependencies:
-      '@es-joy/jsdoccomment': 0.86.0
+      '@es-joy/jsdoccomment': 0.87.0
       '@es-joy/resolve.exports': 1.2.0
       are-docs-informative: 0.0.2
-      comment-parser: 1.4.6
+      comment-parser: 1.4.7
       debug: 4.4.3
       escape-string-regexp: 4.0.0
       eslint: 10.4.1(jiti@2.7.0)
