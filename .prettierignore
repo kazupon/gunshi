@@ -2,5 +2,6 @@ pnpm-workspace.yaml
 packages/plugin-**/docs/**
 packages/docs/src/api/**
 **/tsconfig.json
+CHANGELOG.md
 # avoid conflict with eslint config
 **/package.json
