@@ -26,5 +26,5 @@ test('subcomments', async () => {
   // cannot find subcommand
   await expect(async () => {
     await generate('create', show, { subCommands, ...meta })
-  }).rejects.toThrowError()
+  }).rejects.toThrowError(/create/)
 })

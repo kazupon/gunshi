@@ -22,6 +22,7 @@ describe('playground tests', async () => {
   const fixtureDirs = await getFixtureDirents(fixturePath)
 
   for (const dir of fixtureDirs) {
+    // oxlint-disable-next-line vitest/valid-title -- fixture directory name defines the dynamic suite
     describe(dir, async () => {
       const targetPath = path.resolve(fixturePath, dir)
       const configPath = path.resolve(targetPath, 'config.json')
@@ -34,6 +35,7 @@ describe('playground tests', async () => {
       // oxlint-disable-next-line vitest/no-conditional-tests -- NOTE(kazupon): ignore
       if (config.length > 0) {
         for (const [testCase, cmd] of config) {
+          // oxlint-disable-next-line vitest/valid-title -- fixture config defines the dynamic test case
           test(testCase, async () => {
             const output = await runCommand(cmd, {
               cwd: path.resolve(playgroundPath, dir),
