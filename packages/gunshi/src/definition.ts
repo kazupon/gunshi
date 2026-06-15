@@ -43,7 +43,6 @@ import type {
   ExtendContext,
   ExtractArgs,
   ExtractExtensions,
-  GunshiParams,
   GunshiParamsConstraint,
   LazyCommand,
   NormalizeToGunshiParams,
@@ -153,7 +152,7 @@ type DefineWithTypesReturn<DefaultExtensions extends ExtendContext, DefaultArgs 
 /**
  * Define a {@link Command | command} with types
  *
- * This helper function allows specifying the type parameter of {@link GunshiParams}
+ * This helper function allows specifying the type parameter of {@link GunshiParamsConstraint}
  * while inferring the {@link Args} type, {@link ExtendContext} type from the definition.
  *
  * @example
@@ -173,7 +172,7 @@ type DefineWithTypesReturn<DefaultExtensions extends ExtendContext, DefaultArgs 
  * })
  * ```
  *
- * @typeParam G - A {@link GunshiParams} type
+ * @typeParam G - A {@link GunshiParamsConstraint} type
  *
  * @returns A function that takes a command definition via {@link define}
  *
@@ -246,7 +245,23 @@ export function lazy<A extends Args>(
  * }, testDefinition)
  * ```
  *
- * @typeParam A - An {@link Args} type
+ * @typeParam D - A partial {@link Command} definition type with required `args`
+ *
+ * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
+ * @param definition - A {@link Command | command} definition
+ * @returns A {@link LazyCommand | lazy command} that can be executed later
+ */
+export function lazy<
+  D extends { args: Args } & Partial<Command<{ args: D['args']; extensions: {} }>>
+>(
+  loader: CommandLoader<{ args: D['args']; extensions: {} }>,
+  definition: D
+): LazyCommand<{ args: D['args']; extensions: {} }, D>
+
+/**
+ * Define a {@link LazyCommand | lazy command} with explicit Gunshi parameters and optional definition.
+ *
+ * @typeParam G - A {@link GunshiParamsConstraint}
  * @typeParam D - A partial {@link Command} definition type
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
@@ -255,14 +270,8 @@ export function lazy<A extends Args>(
  */
 export function lazy<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
-  A extends ExtractArgs<G> = ExtractArgs<G>,
-  D extends Partial<Command<{ args: A; extensions: {} }>> = Partial<
-    Command<{ args: A; extensions: {} }>
-  >
->(
-  loader: CommandLoader<{ args: A; extensions: {} }>,
-  definition: D
-): LazyCommand<{ args: A; extensions: {} }, D>
+  D extends Partial<Command<G>> = Partial<Command<G>>
+>(loader: CommandLoader<G>, definition?: D): LazyCommand<G, D>
 
 /**
  * Define a {@link LazyCommand | lazy command} with or without definition.
@@ -301,7 +310,7 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 /**
  * Return type for lazyWithTypes
  *
- * @typeParam FullG - The normalized {@link GunshiParams} type
+ * @typeParam FullG - The normalized {@link GunshiParamsConstraint} type
  *
  * @internal
  */
@@ -315,7 +324,7 @@ type LazyWithTypesReturn<FullG extends GunshiParamsConstraint> = <
 /**
  * Define a {@link LazyCommand | lazy command} with specific type parameters.
  *
- * This helper function allows specifying the type parameter of {@link GunshiParams}
+ * This helper function allows specifying the type parameter of {@link GunshiParamsConstraint}
  * while inferring the {@link Args} type, {@link ExtendContext} type from the definition.
  *
  * @example
@@ -340,7 +349,7 @@ type LazyWithTypesReturn<FullG extends GunshiParamsConstraint> = <
  * )
  * ```
  *
- * @typeParam G - A {@link GunshiParams} type
+ * @typeParam G - A {@link GunshiParamsConstraint} type
  *
  * @returns A function that takes a lazy command definition via {@link lazy}
  *
