@@ -3,18 +3,26 @@
  * @license MIT
  */
 
-import { parseArgs, resolveArgs } from 'args-tokens'
+import { ArgsValidationError, ArgsValidationErrorKeys, parseArgs, resolveArgs } from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
-import { create, getCommandSubCommands, isLazyCommand, resolveLazyCommand } from '../utils.ts'
+import {
+  create,
+  getCommandSubCommands,
+  isLazyCommand,
+  kebabnize,
+  resolveLazyCommand
+} from '../utils.ts'
 
 import type { Decorators } from '../decorators.ts'
 import type { Plugin, PluginContext } from '../plugin.ts'
 import type {
   ArgToken,
+  Args,
+  ArgSchema,
   CliOptions,
   Command,
   CommandCallMode,
@@ -92,6 +100,16 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     toKebab: resolvedCommand.toKebab,
     skipPositional
   })
+  const validationError = mergeValidationErrors(
+    error,
+    cliOptions.strict
+      ? createUnknownOptionErrors(
+          findUnknownOptions(args, tokens, {
+            toKebab: resolvedCommand.toKebab
+          })
+        )
+      : []
+  )
   const omitted = resolved.omitted
 
   const commandContext = await createCommandContext({
@@ -107,7 +125,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     commandPath,
     command: resolvedCommand,
     extensions: getPluginExtensions(resolvedPlugins),
-    validationError: error,
+    validationError,
     cliOptions: cliOptions
   })
 
@@ -156,6 +174,111 @@ function resolveArguments<G extends GunshiParamsConstraint>(
     create<ExtractArgs<G>>(),
     Object.fromEntries(pluginContext.globalOptions),
     args
+  )
+}
+
+type UnknownOption = {
+  rawName: string
+  name: string
+}
+
+type StrictOptionValidationOptions = {
+  toKebab?: boolean
+}
+
+const NEGATABLE_OPTION_PREFIX = 'no-'
+
+function findUnknownOptions(
+  args: Args,
+  tokens: ArgToken[],
+  options: StrictOptionValidationOptions
+): UnknownOption[] {
+  const knownLongOptions = new Set<string>()
+  const knownShortOptions = new Set<string>()
+  const knownNegatableOptions = new Set<string>()
+
+  for (const [name, schema] of Object.entries(args)) {
+    if (schema.type === 'positional') {
+      continue
+    }
+
+    const optionName = resolveOptionName(name, schema, options)
+    knownLongOptions.add(optionName)
+
+    if (schema.short) {
+      knownShortOptions.add(schema.short)
+    }
+
+    if (schema.type === 'boolean' && schema.negatable) {
+      knownNegatableOptions.add(`${NEGATABLE_OPTION_PREFIX}${optionName}`)
+    }
+  }
+
+  const unknownOptions: UnknownOption[] = []
+  for (const token of tokens) {
+    if (token.kind === 'option-terminator') {
+      break
+    }
+
+    if (token.kind !== 'option' || !token.name || !token.rawName) {
+      continue
+    }
+
+    const isLongOption = token.rawName.startsWith('--')
+    if (isLongOption) {
+      if (knownLongOptions.has(token.name) || knownNegatableOptions.has(token.name)) {
+        continue
+      }
+    } else if (knownShortOptions.has(token.name)) {
+      continue
+    }
+
+    unknownOptions.push({
+      rawName: token.rawName,
+      name: token.name
+    })
+  }
+
+  return unknownOptions
+}
+
+function resolveOptionName(
+  name: string,
+  schema: ArgSchema,
+  options: StrictOptionValidationOptions
+): string {
+  return options.toKebab || schema.toKebab ? kebabnize(name) : name
+}
+
+function createUnknownOptionErrors(unknownOptions: UnknownOption[]): ArgsValidationError[] {
+  return unknownOptions.map(({ rawName, name }) => {
+    return new ArgsValidationError(`Unknown option: ${rawName}`, {
+      code: ArgsValidationErrorKeys.unknownOption,
+      values: {
+        rawName,
+        name
+      }
+    })
+  })
+}
+
+function mergeValidationErrors(
+  error: AggregateError | undefined,
+  additionalErrors: Error[]
+): AggregateError | undefined {
+  if (additionalErrors.length === 0) {
+    return error
+  }
+
+  return new AggregateError(error ? [...error.errors, ...additionalErrors] : additionalErrors)
+}
+
+function hasUnknownOptionValidationError(error: AggregateError | undefined): boolean {
+  return (
+    error?.errors.some(
+      (error: unknown) =>
+        error instanceof ArgsValidationError && error.code === ArgsValidationErrorKeys.unknownOption
+    ) ?? false
   )
 }
 
@@ -443,7 +566,13 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
   ctx: Readonly<CommandContext<G>>,
   decorators: Readonly<CommandDecorator<G>[]>
 ): Promise<string | undefined> {
-  const baseRunner = cmd.run || NOOP
+  const commandRunner = cmd.run || NOOP
+  const baseRunner: CommandRunner<G> = ctx => {
+    if (hasUnknownOptionValidationError(ctx.validationError)) {
+      throw ctx.validationError
+    }
+    return commandRunner(ctx)
+  }
 
   // apply plugin decorators
   const decoratedRunner = decorators.reduceRight(

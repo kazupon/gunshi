@@ -97,3 +97,14 @@ test('CommandContext has commandPath accessible', () => {
   type Ctx = CommandContext
   expectTypeOf<Ctx['commandPath']>().toEqualTypeOf<string[]>()
 })
+
+test('cli() accepts strict option', () => {
+  expectTypeOf(cli).toBeCallableWith(
+    [],
+    define({
+      name: 'strict',
+      run: () => {}
+    }),
+    { strict: true }
+  )
+})

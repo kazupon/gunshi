@@ -23,6 +23,7 @@ export const CLI_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   middleMargin: 10,
   usageOptionType: false,
   usageOptionValue: true,
+  strict: false,
   renderHeader: undefined,
   renderUsage: undefined,
   renderValidationErrors: undefined,

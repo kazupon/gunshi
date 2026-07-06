@@ -4,6 +4,7 @@ import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
+import { cli as boneCli } from './cli/bone.ts'
 import { define, lazy } from './definition.ts'
 import { generate } from './generator.ts'
 import { plugin } from './plugin/core.ts'
@@ -1815,6 +1816,277 @@ describe('command lifecycle hooks', () => {
     expect(mockCommand).not.toHaveBeenCalled()
     expect(capturedError).toBeInstanceOf(AggregateError)
     expect(log()).toBe(`Optional argument '--id' is required`)
+  })
+
+  describe('strict option validation', () => {
+    test('keeps unknown options compatible by default and with strict disabled', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(['--alow-reload'], { run: mockCommand })
+      await cli(['--alow-reload'], { run: mockCommand }, { strict: false })
+
+      expect(mockCommand).toHaveBeenCalledTimes(2)
+    })
+
+    test('reports unknown long options before command execution', async () => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+      const mockCommand = vi.fn<() => void>()
+
+      await expect(
+        cli(['--alow-reload'], { run: mockCommand }, { strict: true })
+      ).rejects.toBeInstanceOf(AggregateError)
+
+      expect(mockCommand).not.toHaveBeenCalled()
+      expect(log()).toBe('Unknown option: --alow-reload')
+    })
+
+    test('allows declared long, short, negatable, and kebab-case options', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(
+        ['--out-dir', 'dist', '-f', '--no-cache'],
+        {
+          toKebab: true,
+          args: {
+            outDir: {
+              type: 'string'
+            },
+            force: {
+              type: 'boolean',
+              short: 'f'
+            },
+            cache: {
+              type: 'boolean',
+              negatable: true
+            }
+          },
+          run: mockCommand
+        },
+        {
+          strict: true
+        }
+      )
+
+      expect(mockCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          values: {
+            outDir: 'dist',
+            force: true,
+            cache: false
+          }
+        })
+      )
+    })
+
+    test('ignores options after option terminator', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(['--', '--unknown'], { run: mockCommand }, { strict: true })
+
+      expect(mockCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rest: ['--unknown']
+        })
+      )
+    })
+
+    test('allows built-in help and version options', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await expect(
+        cli(['--help'], { run: mockCommand }, { strict: true, usageSilent: true })
+      ).resolves.toBeTypeOf('string')
+      await expect(
+        cli(
+          ['--version'],
+          { run: mockCommand },
+          { strict: true, usageSilent: true, version: '1.0.0' }
+        )
+      ).resolves.toBe('1.0.0')
+
+      expect(mockCommand).not.toHaveBeenCalled()
+    })
+
+    test('reports help and version as unknown options without global plugin', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      for (const option of ['--help', '-h', '--version', '-v']) {
+        await expect(
+          boneCli([option], { run: mockCommand }, { strict: true, version: '1.0.0' })
+        ).rejects.toBeInstanceOf(AggregateError)
+      }
+
+      expect(mockCommand).not.toHaveBeenCalled()
+    })
+
+    test('allows custom global options from plugins', async () => {
+      const mockCommand = vi.fn<() => void>()
+      const globalConfig = plugin({
+        id: 'global-config',
+        setup: ctx => {
+          ctx.addGlobalOption('config', {
+            type: 'string',
+            short: 'c'
+          })
+        }
+      })
+
+      await cli(
+        ['--config', 'production'],
+        { run: mockCommand },
+        {
+          strict: true,
+          plugins: [globalConfig]
+        }
+      )
+
+      expect(mockCommand).toHaveBeenCalledWith(
+        expect.objectContaining({
+          values: {
+            config: 'production'
+          }
+        })
+      )
+    })
+
+    test('uses resolved subcommand args', async () => {
+      const mockEntry = vi.fn<() => void>()
+      const mockDeploy = vi.fn<() => void>()
+
+      await cli(
+        ['deploy', '--env', 'production'],
+        { run: mockEntry },
+        {
+          strict: true,
+          subCommands: new Map([
+            [
+              'deploy',
+              define({
+                name: 'deploy',
+                args: {
+                  env: {
+                    type: 'string'
+                  }
+                },
+                run: mockDeploy
+              })
+            ]
+          ])
+        }
+      )
+
+      expect(mockEntry).not.toHaveBeenCalled()
+      expect(mockDeploy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          values: {
+            env: 'production'
+          }
+        })
+      )
+    })
+
+    test('uses resolved lazy command args', async () => {
+      const mockEntry = vi.fn<() => void>()
+      const mockLazy = vi.fn<() => void>()
+
+      await cli(
+        ['load', '--config', 'production'],
+        { run: mockEntry },
+        {
+          strict: true,
+          subCommands: new Map([
+            [
+              'load',
+              lazy(
+                () =>
+                  define({
+                    name: 'load',
+                    args: {
+                      config: {
+                        type: 'string'
+                      }
+                    },
+                    run: mockLazy
+                  }),
+                { name: 'load' }
+              )
+            ]
+          ])
+        }
+      )
+
+      expect(mockEntry).not.toHaveBeenCalled()
+      expect(mockLazy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          values: {
+            config: 'production'
+          }
+        })
+      )
+    })
+
+    test('merges unknown option errors with existing validation errors', async () => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+      const mockCommand = vi.fn<() => void>()
+      let capturedError: AggregateError | undefined
+
+      await expect(
+        cli(
+          ['--bad'],
+          {
+            args: {
+              id: {
+                type: 'string',
+                required: true
+              }
+            },
+            run: mockCommand
+          },
+          {
+            strict: true,
+            onErrorCommand: (_ctx, error) => {
+              capturedError = error as AggregateError
+            }
+          }
+        )
+      ).rejects.toBeInstanceOf(AggregateError)
+
+      expect(mockCommand).not.toHaveBeenCalled()
+      expect(capturedError?.errors.map((error: Error) => error.message)).toEqual([
+        `Optional argument '--id' is required`,
+        'Unknown option: --bad'
+      ])
+      expect(log()).toBe(`Optional argument '--id' is required\nUnknown option: --bad`)
+    })
+
+    test('localizes unknown option validation errors with i18n plugin', async () => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+      const mockCommand = vi.fn<() => void>()
+
+      await expect(
+        cli(
+          ['--alow-reload'],
+          { run: mockCommand },
+          {
+            strict: true,
+            plugins: [
+              i18n({
+                locale: 'ja-JP',
+                builtinResources: {
+                  'ja-JP': jsJPResource
+                }
+              })
+            ]
+          }
+        )
+      ).rejects.toBeInstanceOf(AggregateError)
+
+      expect(mockCommand).not.toHaveBeenCalled()
+      expect(log()).toBe('未定義のオプションです: --alow-reload')
+    })
   })
 
   test('hooks with subcommands', async () => {

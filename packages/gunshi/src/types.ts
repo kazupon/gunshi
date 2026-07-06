@@ -216,6 +216,13 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   usageSilent: boolean
   /**
+   * Whether to treat undefined options as argument validation errors.
+   *
+   * @default false
+   * @see {@linkcode CliOptions.strict}
+   */
+  strict: boolean
+  /**
    * Sub commands.
    *
    * @see {@linkcode CliOptions.subCommands}
@@ -308,6 +315,16 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Whether to display the command usage.
    */
   usageSilent?: boolean
+  /**
+   * Whether to treat undefined options as argument validation errors.
+   *
+   * When enabled, option tokens that are not declared by the resolved command
+   * arguments or installed global options are reported as validation errors
+   * before the command runner is executed.
+   *
+   * @default false
+   */
+  strict?: boolean
   /**
    * Render function the command usage.
    */
