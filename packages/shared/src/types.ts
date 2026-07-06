@@ -75,12 +75,22 @@ export type ArgErrorResourceKeys = (typeof ARG_ERROR_RESOURCE_KEYS)[number]
 /**
  * Built-in resource keys.
  */
-export type BuiltinResourceKeys = CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
+export type BuiltinResourceKeys =
+  | ArgErrorResourceKeys
+  | CommandBuiltinArgsKeys
+  | CommandBuiltinResourceKeys
+
+/**
+ * Built-in resource.
+ */
+export type BuiltinResource = Partial<Record<BuiltinResourceKeys, string>>
 
 /**
  * Command built-in keys.
  */
-export type CommandBuiltinKeys = GenerateNamespacedKey<BuiltinResourceKeys>
+export type CommandBuiltinKeys = GenerateNamespacedKey<
+  CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
+>
 
 /**
  * Command i18n option keys.

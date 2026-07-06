@@ -66,6 +66,11 @@ describe('extension: translate', () => {
         'For more info, run any command with the `--help` flag'
       )
       expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('Negatable of')
+      expect(
+        extension.translate('err:arg:required-option', {
+          displayName: "'--id'"
+        })
+      ).toEqual("Optional argument '--id' is required")
     })
 
     test('custom locale: ja-JP', async () => {
@@ -89,6 +94,30 @@ describe('extension: translate', () => {
         '詳細は、コマンドと`--help`フラグを実行してください'
       )
       expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('否定可能な')
+      expect(
+        extension.translate('err:arg:required-option', {
+          displayName: "'--id'"
+        })
+      ).toEqual("オプション '--id' は必須です")
+    })
+
+    test('custom builtinResources can override args validation error keys', async () => {
+      const plugin = i18n({
+        locale: 'ja-JP',
+        builtinResources: {
+          'ja-JP': {
+            'err:arg:required-option': '必須オプション: {$displayName}'
+          }
+        }
+      })
+      const ctx = await createCommandContext({})
+      const extension = await plugin.extension.factory(ctx, {} as Command)
+
+      expect(
+        extension.translate('err:arg:required-option', {
+          displayName: "'--id'"
+        })
+      ).toEqual("必須オプション: '--id'")
     })
   })
 
