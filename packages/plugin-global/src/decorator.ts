@@ -5,6 +5,12 @@
 
 import { pluginId as Global } from './types.ts'
 
+import {
+  ArgsValidationErrorKeys,
+  isArgsValidationError,
+  isCommandNotFoundError
+} from '@gunshi/plugin'
+
 import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
 import type { GlobalExtension } from './extension.ts'
 import type { PluginId } from './types.ts'
@@ -26,6 +32,11 @@ const decorator: CommandDecorator<{
       [Global]: { showVersion, showHeader, showUsage, showValidationErrors }
     }
   } = ctx
+
+  if (hasPriorityValidationError(validationError)) {
+    await showValidationErrors(validationError!)
+    throw validationError
+  }
 
   if (values.version) {
     return showVersion()
@@ -54,6 +65,16 @@ const decorator: CommandDecorator<{
 
   // normal command execution
   return baseRunner(ctx)
+}
+
+function hasPriorityValidationError(error: AggregateError | undefined): boolean {
+  return (
+    error?.errors.some(
+      (error: unknown) =>
+        isCommandNotFoundError(error) ||
+        (isArgsValidationError(error) && error.code === ArgsValidationErrorKeys.unknownOption)
+    ) ?? false
+  )
 }
 
 export default decorator

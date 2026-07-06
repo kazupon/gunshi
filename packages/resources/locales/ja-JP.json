@@ -17,5 +17,6 @@
   "err:arg:invalid-type": "{$displayName} の値が不正です。期待される型: {$expected}",
   "err:arg:invalid-choice": "{$displayName} の値が不正です。指定可能な値: {$choices}",
   "err:arg:custom-parse": "{$displayName} の値が不正です: {$reason}",
-  "err:arg:unknown-option": "未定義のオプションです: {$rawName}"
+  "err:arg:unknown-option": "未定義のオプションです: {$rawName}",
+  "err:cmd:not-found": "コマンドが見つかりません: {$commandName}"
 }

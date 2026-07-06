@@ -69,3 +69,5 @@ export const ARG_ERROR_RESOURCE_KEYS = [
   'err:arg:custom-parse',
   'err:arg:unknown-option'
 ] as const
+
+export const COMMAND_ERROR_RESOURCE_KEYS = ['err:cmd:not-found'] as const

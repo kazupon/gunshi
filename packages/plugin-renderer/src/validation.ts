@@ -3,7 +3,11 @@
  * @license MIT
  */
 
-import { ArgsValidationErrorKeys, isArgsValidationError } from '@gunshi/plugin'
+import {
+  ArgsValidationErrorKeys,
+  isArgsValidationError,
+  isCommandNotFoundError
+} from '@gunshi/plugin'
 import { namespacedId, resolveKey } from '@gunshi/shared'
 
 import type {
@@ -37,6 +41,13 @@ async function renderValidationError<G extends GunshiParams = DefaultGunshiParam
   ctx: CommandContext<G>,
   error: Error
 ): Promise<string> {
+  if (isCommandNotFoundError(error) && error.code) {
+    const message = await localize(ctx, error.code, error.values)
+    if (message && message !== error.code) {
+      return message
+    }
+  }
+
   if (isArgsValidationError(error) && error.code) {
     const values = await resolveValidationValues(ctx, error)
     const message = await localize(ctx, error.code, values)

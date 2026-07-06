@@ -8,6 +8,7 @@ import {
   ARG_PREFIX,
   BUILT_IN_KEY_SEPARATOR,
   BUILT_IN_PREFIX,
+  COMMAND_ERROR_RESOURCE_KEYS,
   COMMAND_BUILTIN_RESOURCE_KEYS,
   COMMON_ARGS
 } from './constants.ts'
@@ -73,10 +74,16 @@ export type CommandBuiltinResourceKeys = (typeof COMMAND_BUILTIN_RESOURCE_KEYS)[
 export type ArgErrorResourceKeys = (typeof ARG_ERROR_RESOURCE_KEYS)[number]
 
 /**
+ * Command validation error resource keys.
+ */
+export type CommandErrorResourceKeys = (typeof COMMAND_ERROR_RESOURCE_KEYS)[number]
+
+/**
  * Built-in resource keys.
  */
 export type BuiltinResourceKeys =
   | ArgErrorResourceKeys
+  | CommandErrorResourceKeys
   | CommandBuiltinArgsKeys
   | CommandBuiltinResourceKeys
 

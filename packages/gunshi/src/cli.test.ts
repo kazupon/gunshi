@@ -6,6 +6,7 @@ import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
 import { define, lazy } from './definition.ts'
+import { CommandNotFoundError, CommandNotFoundErrorKeys, isCommandNotFoundError } from './error.ts'
 import { generate } from './generator.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
@@ -292,6 +293,50 @@ describe('execute command', () => {
     await expect(async () => {
       await cli(['show'], { run: vi.fn<() => void>() }, { subCommands })
     }).rejects.toThrowError('Command not found: show')
+  })
+
+  test('command not found exposes structured metadata', async () => {
+    const mockEntry = vi.fn<() => void>()
+    const entry = define({
+      name: 'main',
+      run: mockEntry
+    })
+    const subCommands = new Map([
+      ['deploy', define({ name: 'deploy', run: vi.fn<() => void>() })],
+      ['init', define({ name: 'init', run: vi.fn<() => void>() })]
+    ])
+
+    let capturedError: AggregateError | undefined
+    await expect(
+      cli(['deply'], entry, {
+        subCommands,
+        onErrorCommand: (ctx, error) => {
+          capturedError = error as AggregateError
+          expect(ctx.name).toBe('main')
+          expect(ctx.commandPath).toEqual([])
+          expect(ctx.validationError).toBe(error)
+        }
+      })
+    ).rejects.toThrowError('Command not found: deply')
+
+    const commandError = findCommandNotFoundError(capturedError)
+    expect(commandError).toBeInstanceOf(CommandNotFoundError)
+    expect(commandError.code).toBe(CommandNotFoundErrorKeys.notFound)
+    expect(commandError.values).toEqual({ commandName: 'deply' })
+    expect(commandError.commandName).toBe('deply')
+    expect(commandError.commandPath).toEqual([])
+    expect(commandError.candidates).toEqual(['deploy', 'init', 'main'])
+    expect(mockEntry).not.toHaveBeenCalled()
+  })
+
+  test('command not found throws aggregate error without global plugin', async () => {
+    const entry = define({
+      name: 'main',
+      run: vi.fn<() => void>()
+    })
+    const subCommands = new Map([['deploy', define({ name: 'deploy', run: vi.fn<() => void>() })]])
+
+    await expect(boneCli(['deply'], entry, { subCommands })).rejects.toBeInstanceOf(AggregateError)
   })
 
   test('not registered entry in sub commands', async () => {
@@ -2087,6 +2132,41 @@ describe('command lifecycle hooks', () => {
       expect(mockCommand).not.toHaveBeenCalled()
       expect(log()).toBe('未定義のオプションです: --alow-reload')
     })
+
+    test('localizes command not found validation errors with i18n plugin', async () => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+      const mockCommand = vi.fn<() => void>()
+
+      await expect(
+        cli(
+          ['deply'],
+          define({
+            name: 'main',
+            run: mockCommand
+          }),
+          {
+            subCommands: {
+              deploy: define({
+                name: 'deploy',
+                run: vi.fn<() => void>()
+              })
+            },
+            plugins: [
+              i18n({
+                locale: 'ja-JP',
+                builtinResources: {
+                  'ja-JP': jsJPResource
+                }
+              })
+            ]
+          }
+        )
+      ).rejects.toBeInstanceOf(AggregateError)
+
+      expect(mockCommand).not.toHaveBeenCalled()
+      expect(log()).toBe('コマンドが見つかりません: deply')
+    })
   })
 
   test('hooks with subcommands', async () => {
@@ -2514,6 +2594,47 @@ describe('nested sub-commands', () => {
     )
   })
 
+  test('unknown nested sub-command reports parent command metadata', async () => {
+    const mockRemote = vi.fn<() => void>()
+
+    const remoteCommand = define({
+      name: 'remote',
+      description: 'Manage remotes',
+      subCommands: {
+        add: define({ name: 'add', run: vi.fn<() => void>() }),
+        remove: define({ name: 'remove', run: vi.fn<() => void>() })
+      },
+      run: mockRemote
+    })
+
+    let capturedError: AggregateError | undefined
+    await expect(
+      cli(
+        ['remote', 'ad'],
+        define({
+          name: 'git',
+          run: vi.fn<() => void>()
+        }),
+        {
+          name: 'git',
+          subCommands: { remote: remoteCommand },
+          onErrorCommand: (ctx, error) => {
+            capturedError = error as AggregateError
+            expect(ctx.name).toBe('remote')
+            expect(ctx.commandPath).toEqual(['remote'])
+            expect(ctx.validationError).toBe(error)
+          }
+        }
+      )
+    ).rejects.toThrowError('Command not found: ad')
+
+    const commandError = findCommandNotFoundError(capturedError)
+    expect(commandError.commandName).toBe('ad')
+    expect(commandError.commandPath).toEqual(['remote'])
+    expect(commandError.candidates).toEqual(['add', 'remove'])
+    expect(mockRemote).not.toHaveBeenCalled()
+  })
+
   test('commandPath is correct for depth=1', async () => {
     const mockCmd = vi.fn<() => void>()
 
@@ -2667,4 +2788,65 @@ describe('nested sub-commands', () => {
       })
     )
   })
+
+  test('unknown nested sub-command resolves lazy parent command context', async () => {
+    const mockRemote = vi.fn<() => void>()
+
+    const remoteCommand = lazy(
+      () =>
+        Promise.resolve(
+          define({
+            name: 'remote',
+            description: 'Manage remotes',
+            subCommands: {
+              add: define({ name: 'add', run: vi.fn<() => void>() }),
+              remove: define({ name: 'remove', run: vi.fn<() => void>() })
+            },
+            run: mockRemote
+          })
+        ),
+      {
+        name: 'remote',
+        description: 'Manage remotes',
+        subCommands: {
+          add: define({ name: 'add', run: vi.fn<() => void>() }),
+          remove: define({ name: 'remove', run: vi.fn<() => void>() })
+        }
+      }
+    )
+
+    let capturedError: AggregateError | undefined
+    await expect(
+      cli(
+        ['remote', 'ad'],
+        define({
+          name: 'git',
+          run: vi.fn<() => void>()
+        }),
+        {
+          name: 'git',
+          subCommands: { remote: remoteCommand },
+          onErrorCommand: (ctx, error) => {
+            capturedError = error as AggregateError
+            expect(ctx.name).toBe('remote')
+            expect(ctx.commandPath).toEqual(['remote'])
+            expect(ctx.validationError).toBe(error)
+          }
+        }
+      )
+    ).rejects.toThrowError('Command not found: ad')
+
+    const commandError = findCommandNotFoundError(capturedError)
+    expect(commandError.commandName).toBe('ad')
+    expect(commandError.commandPath).toEqual(['remote'])
+    expect(commandError.candidates).toEqual(['add', 'remove'])
+    expect(mockRemote).not.toHaveBeenCalled()
+  })
 })
+
+function findCommandNotFoundError(error: AggregateError | undefined): CommandNotFoundError {
+  expect(error).toBeInstanceOf(AggregateError)
+  const commandError = error?.errors.find((error: unknown) => isCommandNotFoundError(error))
+  expect(commandError).toBeInstanceOf(CommandNotFoundError)
+  return commandError as CommandNotFoundError
+}

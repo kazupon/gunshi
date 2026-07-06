@@ -315,6 +315,36 @@ Unknown option: --alow-reload
 
 The error uses the `err:arg:unknown-option` resource key, so the message follows the same renderer and i18n behavior as other argument validation errors. Suggestions such as `Did you mean --allow-reload?` are intentionally left to suggestion plugins.
 
+#### Command Not Found Handling
+
+When a sub-command cannot be resolved, Gunshi reports it as a structured `CommandNotFoundError` inside the validation error pipeline. This avoids brittle checks such as `error.message.startsWith('Command not found:')`.
+
+```js
+import { CommandNotFoundError, cli, define, isCommandNotFoundError } from 'gunshi'
+
+try {
+  await cli(process.argv.slice(2), define({ name: 'app', run: () => {} }), {
+    subCommands: {
+      deploy: define({ name: 'deploy', run: () => {} })
+    }
+  })
+} catch (error) {
+  if (error instanceof AggregateError) {
+    const commandError = error.errors.find(isCommandNotFoundError)
+    if (commandError instanceof CommandNotFoundError) {
+      console.error(`Unknown command: ${commandError.commandName}`)
+      console.error(`Available commands: ${commandError.candidates.join(', ')}`)
+    }
+  }
+}
+```
+
+`commandName` is the command that could not be resolved. `candidates` contains command names from the same command level, which can be used by suggestion plugins. `commandPath` points to the parent command path. For example, `git remote ad` sets `commandName` to `ad` and `commandPath` to `['remote']`.
+
+The command context is created from the parent command, not the missing command. This means `ctx.command`, `ctx.name`, and `ctx.commandPath` describe the parent command. The actual missing command is available from `CommandNotFoundError.commandName`.
+
+The error uses the `err:cmd:not-found` resource key, so i18n plugins can localize the message while the fallback message remains compatible with `Command not found: <name>`.
+
 #### Kebab-Case Argument Names
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
