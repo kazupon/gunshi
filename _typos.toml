@@ -1,0 +1,3 @@
+[default.extend-words]
+# Intentional misspelling used in strict unknown-option tests and docs.
+alow = "alow"
