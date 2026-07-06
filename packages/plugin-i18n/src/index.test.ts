@@ -141,7 +141,7 @@ describe('extension: translate', () => {
       expect(
         extension.translate('err:arg:invalid-type', {
           displayName: "'--count'",
-          type: 'number'
+          expected: 'number'
         })
       ).toEqual("Option '--count' must be of type number")
     })

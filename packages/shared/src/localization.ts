@@ -105,6 +105,13 @@ function resolveAndFormatResource(
   )
 }
 
+/**
+ * Format a resource message by replacing placeholder values.
+ *
+ * @param resource - Resource message template
+ * @param values - Placeholder values
+ * @returns Formatted resource message
+ */
 export function formatResource(
   resource: string | undefined,
   values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
