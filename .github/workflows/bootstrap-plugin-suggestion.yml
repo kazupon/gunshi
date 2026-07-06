@@ -52,3 +52,5 @@ jobs:
             echo "⚡ Publishing $name@$version to npm"
             pnpm publish --access public --no-git-checks --tag latest
           fi
+          npm access public "$name"
+          npm view "$name@$version" version --registry=https://registry.npmjs.org/
