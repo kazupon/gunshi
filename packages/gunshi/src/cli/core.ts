@@ -7,7 +7,11 @@ import { ArgsValidationError, ArgsValidationErrorKeys, parseArgs, resolveArgs } 
 import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
-import { CommandNotFoundError, CommandNotFoundErrorKeys, isCommandNotFoundError } from '../error.ts'
+import {
+  CommandNotFoundError,
+  CommandNotFoundErrorKeys,
+  hasPriorityValidationError
+} from '../error.ts'
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
 import {
@@ -294,17 +298,6 @@ function mergeValidationErrors(
   return new AggregateError(
     error ? [...error.errors, ...additionalErrors] : additionalErrors,
     error?.message || additionalErrors[0]?.message
-  )
-}
-
-function hasPriorityValidationError(error: AggregateError | undefined): boolean {
-  return (
-    error?.errors.some(
-      (error: unknown) =>
-        isCommandNotFoundError(error) ||
-        (error instanceof ArgsValidationError &&
-          error.code === ArgsValidationErrorKeys.unknownOption)
-    ) ?? false
   )
 }
 

@@ -25,7 +25,12 @@
 
 export { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT } from './constants.ts'
 export { createCommandContext } from './context.ts'
-export { CommandNotFoundError, CommandNotFoundErrorKeys, isCommandNotFoundError } from './error.ts'
+export {
+  CommandNotFoundError,
+  CommandNotFoundErrorKeys,
+  hasPriorityValidationError,
+  isCommandNotFoundError
+} from './error.ts'
 export { plugin } from './plugin/core.ts'
 export { ArgsValidationError, ArgsValidationErrorKeys, isArgsValidationError } from 'args-tokens'
 

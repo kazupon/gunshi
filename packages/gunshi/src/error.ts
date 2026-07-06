@@ -3,6 +3,8 @@
  * @license MIT
  */
 
+import { ArgsValidationErrorKeys, isArgsValidationError } from 'args-tokens'
+
 /**
  * Command not found error resource keys.
  */
@@ -81,4 +83,20 @@ export class CommandNotFoundError extends Error {
  */
 export function isCommandNotFoundError(error: unknown): error is CommandNotFoundError {
   return error instanceof CommandNotFoundError
+}
+
+/**
+ * Check whether validation errors should be handled before version, help, or command execution.
+ *
+ * @param error - An aggregate validation error
+ * @returns `true` if the validation error must be handled with priority
+ */
+export function hasPriorityValidationError(error: AggregateError | undefined): boolean {
+  return (
+    error?.errors.some(
+      (error: unknown) =>
+        isCommandNotFoundError(error) ||
+        (isArgsValidationError(error) && error.code === ArgsValidationErrorKeys.unknownOption)
+    ) ?? false
+  )
 }

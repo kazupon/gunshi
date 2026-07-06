@@ -5,11 +5,7 @@
 
 import { pluginId as Global } from './types.ts'
 
-import {
-  ArgsValidationErrorKeys,
-  isArgsValidationError,
-  isCommandNotFoundError
-} from '@gunshi/plugin'
+import { hasPriorityValidationError } from '@gunshi/plugin'
 
 import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
 import type { GlobalExtension } from './extension.ts'
@@ -65,16 +61,6 @@ const decorator: CommandDecorator<{
 
   // normal command execution
   return baseRunner(ctx)
-}
-
-function hasPriorityValidationError(error: AggregateError | undefined): boolean {
-  return (
-    error?.errors.some(
-      (error: unknown) =>
-        isCommandNotFoundError(error) ||
-        (isArgsValidationError(error) && error.code === ArgsValidationErrorKeys.unknownOption)
-    ) ?? false
-  )
 }
 
 export default decorator
