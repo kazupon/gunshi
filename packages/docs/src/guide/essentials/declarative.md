@@ -297,6 +297,24 @@ Custom type arguments support:
 - **Multiple values**: Set `multiple: true` to allow multiple instances of the argument
 - **Short aliases**: Set a `short` property to provide a single-character alias
 
+#### Strict Unknown Option Validation
+
+By default, Gunshi keeps backward compatibility by ignoring option tokens that are not declared in the resolved command's `args` or installed global options. Enable `strict` when you want typos or unsupported options to fail before the command runner executes:
+
+```js
+await cli(process.argv.slice(2), command, {
+  strict: true
+})
+```
+
+With `strict: true`, an input such as `--alow-reload` is reported as an argument validation error:
+
+```txt
+Unknown option: --alow-reload
+```
+
+The error uses the `err:arg:unknown-option` resource key, so the message follows the same renderer and i18n behavior as other argument validation errors. Suggestions such as `Did you mean --allow-reload?` are intentionally left to suggestion plugins.
+
 #### Kebab-Case Argument Names
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
