@@ -28,7 +28,7 @@ test('basic', async () => {
   )
 })
 
-test('args validation error uses default resource', async () => {
+test('args validation error keeps fallback message without i18n', async () => {
   const ctx = await createCommandContext({
     cliOptions: {
       cwd: '/path/to/cmd1',
@@ -37,7 +37,7 @@ test('args validation error uses default resource', async () => {
     }
   })
   const error = new AggregateError([
-    new ArgsValidationError(`Optional argument '--id' is required`, {
+    new ArgsValidationError('fallback required option message', {
       code: ArgsValidationErrorKeys.requiredOption,
       values: {
         displayName: "'--id'"
@@ -46,7 +46,7 @@ test('args validation error uses default resource', async () => {
   ])
 
   await expect(renderValidationErrors(ctx, error)).resolves.toEqual(
-    `Optional argument '--id' is required`
+    'fallback required option message'
   )
 })
 

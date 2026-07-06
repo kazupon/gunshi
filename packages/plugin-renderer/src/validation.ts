@@ -4,11 +4,12 @@
  */
 
 import { ArgsValidationErrorKeys, isArgsValidationError } from 'args-tokens'
-import { DefaultResource, resolveKey } from '@gunshi/shared'
-import { pluginId } from './types.ts'
+import { namespacedId, resolveKey } from '@gunshi/shared'
 
 import type { CommandContext, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
 import type { ArgsValidationError } from 'args-tokens'
+
+const i18nPluginId = namespacedId('i18n')
 
 /**
  * Render the validation errors.
@@ -73,33 +74,21 @@ async function localize<G extends GunshiParams = DefaultGunshiParams>(
   key: string,
   values?: Record<string, unknown>
 ): Promise<string> {
-  const renderer = (
+  const i18n = (
     ctx.extensions as
-      | Record<
-          string,
-          { text?: (key: string, values?: Record<string, unknown>) => Promise<string> }
-        >
+      | Record<string, { translate?: (key: string, values?: Record<string, unknown>) => string }>
       | undefined
-  )?.[pluginId]
+  )?.[i18nPluginId]
 
-  if (renderer?.text) {
-    return await renderer.text(key, values)
+  if (i18n?.translate) {
+    return i18n.translate(key, values)
   }
 
-  return formatResource(DefaultResource[key as keyof typeof DefaultResource], values) || key
+  return key
 }
 
 function toRecord(value: unknown): Record<string, unknown> {
   return value != null && typeof value === 'object'
     ? (value as Record<string, unknown>)
     : (Object.create(null) as Record<string, unknown>)
-}
-
-function formatResource(
-  resource: string | undefined,
-  values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
-): string | undefined {
-  return resource?.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
-    return values[name] == null ? '' : String(values[name])
-  })
 }
