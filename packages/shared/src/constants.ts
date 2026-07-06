@@ -9,11 +9,15 @@ export const PLUGIN_PREFIX = 'g'
 
 export const ARG_PREFIX = 'arg'
 
+export const ERROR_PREFIX = 'err'
+
 export const BUILT_IN_KEY_SEPARATOR = ':'
 
 export const BUILD_IN_PREFIX_AND_KEY_SEPARATOR: string = `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}`
 
 export const ARG_PREFIX_AND_KEY_SEPARATOR: string = `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}`
+
+export const ERROR_PREFIX_AND_KEY_SEPARATOR: string = `${ERROR_PREFIX}${BUILT_IN_KEY_SEPARATOR}`
 
 export const ARG_NEGATABLE_PREFIX = 'no-'
 
@@ -55,4 +59,13 @@ export const COMMAND_BUILTIN_RESOURCE_KEYS = [
   'NEGATABLE',
   'DEFAULT',
   'CHOICES'
+] as const
+
+export const ARG_ERROR_RESOURCE_KEYS = [
+  'err:arg:required-option',
+  'err:arg:required-positional',
+  'err:arg:invalid-type',
+  'err:arg:invalid-choice',
+  'err:arg:custom-parse',
+  'err:arg:unknown-option'
 ] as const

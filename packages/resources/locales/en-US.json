@@ -11,5 +11,11 @@
   "DEFAULT": "default",
   "CHOICES": "choices",
   "help": "Display this help message",
-  "version": "Display this version"
+  "version": "Display this version",
+  "err:arg:required-option": "Optional argument {$displayName} is required",
+  "err:arg:required-positional": "Positional argument {$name} is required",
+  "err:arg:invalid-type": "Invalid value for {$displayName}: expected {$expected}",
+  "err:arg:invalid-choice": "Invalid value for {$displayName}: expected one of {$choices}",
+  "err:arg:custom-parse": "Invalid value for {$displayName}: {$reason}",
+  "err:arg:unknown-option": "Unknown option: {$rawName}"
 }

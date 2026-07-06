@@ -6,7 +6,8 @@
 import {
   ARG_NEGATABLE_PREFIX,
   ARG_PREFIX_AND_KEY_SEPARATOR,
-  BUILD_IN_PREFIX_AND_KEY_SEPARATOR
+  BUILD_IN_PREFIX_AND_KEY_SEPARATOR,
+  ERROR_PREFIX_AND_KEY_SEPARATOR
 } from './constants.ts'
 import DefaultResource from './resource.ts'
 import { makeShortLongOptionPair, resolveExamples, resolveKey } from './utils.ts'
@@ -56,7 +57,17 @@ export function localizable<
 
     if ((key as string).startsWith(BUILD_IN_PREFIX_AND_KEY_SEPARATOR)) {
       const resKey = (key as string).slice(BUILD_IN_PREFIX_AND_KEY_SEPARATOR.length)
-      return DefaultResource[resKey as keyof typeof DefaultResource] || (key as string)
+      return (
+        formatResource(DefaultResource[resKey as keyof typeof DefaultResource], values) ||
+        (key as string)
+      )
+    }
+
+    if ((key as string).startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)) {
+      return (
+        formatResource(DefaultResource[key as keyof typeof DefaultResource], values) ||
+        (key as string)
+      )
     }
 
     const namaspacedArgKey = resolveKey(ARG_PREFIX_AND_KEY_SEPARATOR, ctx.name)
@@ -87,4 +98,13 @@ export function localizable<
   }
 
   return localize as unknown as Localization<A, C, E>
+}
+
+function formatResource(
+  resource: string | undefined,
+  values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
+): string | undefined {
+  return resource?.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
+    return values[name] == null ? '' : String(values[name])
+  })
 }
