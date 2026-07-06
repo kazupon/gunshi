@@ -308,7 +308,7 @@ describe('execute command', () => {
 
     let capturedError: AggregateError | undefined
     await expect(
-      cli(['deply'], entry, {
+      cli(['missing'], entry, {
         subCommands,
         onErrorCommand: (ctx, error) => {
           capturedError = error as AggregateError
@@ -317,13 +317,13 @@ describe('execute command', () => {
           expect(ctx.validationError).toBe(error)
         }
       })
-    ).rejects.toThrowError('Command not found: deply')
+    ).rejects.toThrowError('Command not found: missing')
 
     const commandError = findCommandNotFoundError(capturedError)
     expect(commandError).toBeInstanceOf(CommandNotFoundError)
     expect(commandError.code).toBe(CommandNotFoundErrorKeys.notFound)
-    expect(commandError.values).toEqual({ commandName: 'deply' })
-    expect(commandError.commandName).toBe('deply')
+    expect(commandError.values).toEqual({ commandName: 'missing' })
+    expect(commandError.commandName).toBe('missing')
     expect(commandError.commandPath).toEqual([])
     expect(commandError.candidates).toEqual(['deploy', 'init', 'main'])
     expect(mockEntry).not.toHaveBeenCalled()
@@ -336,7 +336,9 @@ describe('execute command', () => {
     })
     const subCommands = new Map([['deploy', define({ name: 'deploy', run: vi.fn<() => void>() })]])
 
-    await expect(boneCli(['deply'], entry, { subCommands })).rejects.toBeInstanceOf(AggregateError)
+    await expect(boneCli(['missing'], entry, { subCommands })).rejects.toBeInstanceOf(
+      AggregateError
+    )
   })
 
   test('not registered entry in sub commands', async () => {
@@ -2140,7 +2142,7 @@ describe('command lifecycle hooks', () => {
 
       await expect(
         cli(
-          ['deply'],
+          ['missing'],
           define({
             name: 'main',
             run: mockCommand
@@ -2165,7 +2167,7 @@ describe('command lifecycle hooks', () => {
       ).rejects.toBeInstanceOf(AggregateError)
 
       expect(mockCommand).not.toHaveBeenCalled()
-      expect(log()).toBe('コマンドが見つかりません: deply')
+      expect(log()).toBe('コマンドが見つかりません: missing')
     })
   })
 
