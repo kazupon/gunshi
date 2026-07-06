@@ -140,6 +140,10 @@ function updatePkgJson(
       setDependency('@gunshi/plugin')
       break
     }
+    case 'packages/plugin-suggestion': {
+      setDependency('@gunshi/plugin')
+      break
+    }
   }
 
   return json
