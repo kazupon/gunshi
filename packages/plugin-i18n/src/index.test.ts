@@ -143,7 +143,7 @@ describe('extension: translate', () => {
           displayName: "'--count'",
           expected: 'number'
         })
-      ).toEqual("Option '--count' must be of type number")
+      ).toEqual("Invalid value for '--count': expected number")
     })
   })
 
