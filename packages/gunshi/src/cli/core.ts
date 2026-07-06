@@ -273,6 +273,15 @@ function mergeValidationErrors(
   return new AggregateError(error ? [...error.errors, ...additionalErrors] : additionalErrors)
 }
 
+function hasUnknownOptionValidationError(error: AggregateError | undefined): boolean {
+  return (
+    error?.errors.some(
+      (error: unknown) =>
+        error instanceof ArgsValidationError && error.code === ArgsValidationErrorKeys.unknownOption
+    ) ?? false
+  )
+}
+
 const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object'
 
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
@@ -557,7 +566,13 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
   ctx: Readonly<CommandContext<G>>,
   decorators: Readonly<CommandDecorator<G>[]>
 ): Promise<string | undefined> {
-  const baseRunner = cmd.run || NOOP
+  const commandRunner = cmd.run || NOOP
+  const baseRunner: CommandRunner<G> = ctx => {
+    if (hasUnknownOptionValidationError(ctx.validationError)) {
+      throw ctx.validationError
+    }
+    return commandRunner(ctx)
+  }
 
   // apply plugin decorators
   const decoratedRunner = decorators.reduceRight(
