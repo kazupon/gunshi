@@ -119,6 +119,32 @@ describe('extension: translate', () => {
         })
       ).toEqual("必須オプション: '--id'")
     })
+
+    test('partial builtinResources falls back to default locale per key', async () => {
+      const plugin = i18n({
+        locale: 'ja-JP',
+        builtinResources: {
+          'ja-JP': {
+            'err:arg:required-option': '必須オプション: {$displayName}'
+          }
+        }
+      })
+      const ctx = await createCommandContext({})
+      const extension = await plugin.extension.factory(ctx, {} as Command)
+
+      expect(extension.translate(resolveBuiltInKey('OPTIONS'))).toEqual('OPTIONS')
+      expect(
+        extension.translate('err:arg:required-option', {
+          displayName: "'--id'"
+        })
+      ).toEqual("必須オプション: '--id'")
+      expect(
+        extension.translate('err:arg:invalid-type', {
+          displayName: "'--count'",
+          type: 'number'
+        })
+      ).toEqual("Option '--count' must be of type number")
+    })
   })
 
   describe('translate non-built-in keys', () => {

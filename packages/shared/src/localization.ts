@@ -57,17 +57,11 @@ export function localizable<
 
     if ((key as string).startsWith(BUILD_IN_PREFIX_AND_KEY_SEPARATOR)) {
       const resKey = (key as string).slice(BUILD_IN_PREFIX_AND_KEY_SEPARATOR.length)
-      return (
-        formatResource(DefaultResource[resKey as keyof typeof DefaultResource], values) ||
-        (key as string)
-      )
+      return resolveAndFormatResource(resKey, key as string, values)
     }
 
     if ((key as string).startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)) {
-      return (
-        formatResource(DefaultResource[key as keyof typeof DefaultResource], values) ||
-        (key as string)
-      )
+      return resolveAndFormatResource(key as string, key as string, values)
     }
 
     const namaspacedArgKey = resolveKey(ARG_PREFIX_AND_KEY_SEPARATOR, ctx.name)
@@ -100,11 +94,22 @@ export function localizable<
   return localize as unknown as Localization<A, C, E>
 }
 
-function formatResource(
+function resolveAndFormatResource(
+  resourceKey: string,
+  fallbackKey: string,
+  values?: Record<string, unknown>
+): string {
+  return (
+    formatResource(DefaultResource[resourceKey as keyof typeof DefaultResource], values) ||
+    fallbackKey
+  )
+}
+
+export function formatResource(
   resource: string | undefined,
   values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
 ): string | undefined {
-  return resource?.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
+  return resource?.replaceAll(/\{\$(\w+)\}/g, (_: string, name: string): string => {
     return values[name] == null ? '' : String(values[name])
   })
 }

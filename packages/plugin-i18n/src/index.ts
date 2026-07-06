@@ -40,6 +40,7 @@ import {
   COMMON_ARGS,
   DefaultResource,
   ERROR_PREFIX_AND_KEY_SEPARATOR,
+  formatResource,
   namespacedId,
   resolveArgKey,
   resolveBuiltInKey,
@@ -157,9 +158,9 @@ export default function i18n(
         const strKey = key as string
         if (isBuiltinResourceKey(strKey)) {
           // handle built-in keys
-          const resource =
-            localeBuiltinResources.get(localeStr) || localeBuiltinResources.get(DEFAULT_LOCALE)!
-          return formatResource(resource[strKey], values) || strKey
+          const resource = localeBuiltinResources.get(localeStr)
+          const defaultResource = localeBuiltinResources.get(DEFAULT_LOCALE)!
+          return formatResource(resource?.[strKey] ?? defaultResource[strKey], values) || strKey
         } else {
           // handle command-specific keys
           return adapter.translate(localeStr, strKey, values) || ''
@@ -347,15 +348,6 @@ function isBuiltinResourceKey(key: string): boolean {
   return (
     key.codePointAt(0) === BUILT_IN_PREFIX_CODE || key.startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)
   )
-}
-
-function formatResource(
-  resource: string | undefined,
-  values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
-): string | undefined {
-  return resource?.replaceAll(/\{\$(\w+)\}/g, (_: string | RegExp, name: string): string => {
-    return values[name] == null ? '' : String(values[name])
-  })
 }
 
 function hasI18nResource<G extends GunshiParamsConstraint = DefaultGunshiParams>(

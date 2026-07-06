@@ -1,5 +1,5 @@
 import i18n from '@gunshi/plugin-i18n'
-import { ArgsValidationError, ArgsValidationErrorKeys } from 'args-tokens'
+import { ArgsValidationError, ArgsValidationErrorKeys } from '@gunshi/plugin'
 import { expect, test } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import renderer from './index.ts'

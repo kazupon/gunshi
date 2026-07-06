@@ -477,9 +477,6 @@ importers:
       '@gunshi/plugin-i18n':
         specifier: workspace:*
         version: link:../plugin-i18n
-      args-tokens:
-        specifier: 'catalog:'
-        version: 0.28.0
     devDependencies:
       '@gunshi/shared':
         specifier: workspace:*

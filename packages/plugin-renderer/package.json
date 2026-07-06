@@ -60,8 +60,7 @@
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "dependencies": {
-    "@gunshi/plugin": "workspace:*",
-    "args-tokens": "catalog:"
+    "@gunshi/plugin": "workspace:*"
   },
   "peerDependencies": {
     "@gunshi/plugin-i18n": "workspace:*"

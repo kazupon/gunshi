@@ -9,7 +9,7 @@
  * - `lazyWithTypes`: A function to lazily load a command with specific type parameters.
  * - `plugin`: A function to create a plugin.
  * - `createCommandContext`: A function to create a command context, mainly for testing purposes.
- * - `args-tokens` utilities, `parseArgs` and `resolveArgs` for parsing command line arguments.
+ * - `args-tokens` utilities: `parseArgs`, `resolveArgs`, `ArgsValidationError`, `ArgsValidationErrorKeys`, `ArgsValidationErrorCode`, and `isArgsValidationError` for parsing and validating command line arguments.
  * - Some basic type definitions, such as `CommandContext`, `Plugin`, `PluginContext`, etc.
  *
  * @example

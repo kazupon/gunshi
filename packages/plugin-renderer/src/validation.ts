@@ -3,11 +3,15 @@
  * @license MIT
  */
 
-import { ArgsValidationErrorKeys, isArgsValidationError } from 'args-tokens'
+import { ArgsValidationErrorKeys, isArgsValidationError } from '@gunshi/plugin'
 import { namespacedId, resolveKey } from '@gunshi/shared'
 
-import type { CommandContext, DefaultGunshiParams, GunshiParams } from '@gunshi/plugin'
-import type { ArgsValidationError } from 'args-tokens'
+import type {
+  ArgsValidationError,
+  CommandContext,
+  DefaultGunshiParams,
+  GunshiParams
+} from '@gunshi/plugin'
 
 const i18nPluginId = namespacedId('i18n')
 
@@ -52,7 +56,7 @@ async function resolveValidationValues<G extends GunshiParams = DefaultGunshiPar
     return error.values
   }
 
-  const { reason, reasonKey, reasonValues } = error.values
+  const { reasonKey, reasonValues } = error.values
   if (typeof reasonKey !== 'string') {
     return error.values
   }
@@ -65,7 +69,7 @@ async function resolveValidationValues<G extends GunshiParams = DefaultGunshiPar
 
   return {
     ...error.values,
-    reason: localizedReason || reason
+    reason: localizedReason
   }
 }
 
