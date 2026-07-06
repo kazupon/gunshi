@@ -24,6 +24,10 @@ Provides shell completion functionality for bash, zsh, and fish.
 
 Adds a `--dry-run` option and helpers for printing planned side-effect operations without executing them.
 
+### [@gunshi/plugin-suggestion](https://github.com/kazupon/gunshi/tree/main/packages/plugin-suggestion)
+
+Adds Levenshtein-based suggestions for unknown long options and unknown commands.
+
 ## Community Plugins
 
 <!-- eslint-disable markdown/no-missing-label-refs -->

@@ -204,6 +204,84 @@ Key benefits:
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+### Suggestions
+
+Add correction hints for unknown long options and unknown commands with the suggestion plugin:
+
+::: code-group
+
+```sh [npm]
+npm install --save @gunshi/plugin-suggestion
+```
+
+```sh [pnpm]
+pnpm add @gunshi/plugin-suggestion
+```
+
+```sh [yarn]
+yarn add @gunshi/plugin-suggestion
+```
+
+```sh [deno]
+deno add jsr:@gunshi/plugin-suggestion
+```
+
+```sh [bun]
+bun add @gunshi/plugin-suggestion
+```
+
+:::
+
+```js
+import { cli, define } from 'gunshi'
+import { suggestion } from '@gunshi/plugin-suggestion'
+
+const command = define({
+  name: 'app',
+  toKebab: true,
+  args: {
+    allowReload: {
+      type: 'boolean',
+      description: 'Allow reload'
+    }
+  },
+  run: () => {}
+})
+
+await cli(process.argv.slice(2), command, {
+  strict: true,
+  plugins: [suggestion()]
+})
+```
+
+If the user runs `app --alow-reload`, the validation output includes a hint:
+
+```txt
+Unknown option: --alow-reload
+Did you mean --allow-reload?
+```
+
+The same plugin also handles command suggestions:
+
+```txt
+Command not found: rn
+Did you mean run?
+```
+
+The plugin decorates validation error rendering. It does not detect unknown options or commands itself; Gunshi core provides structured validation errors and candidate metadata.
+
+You can combine it with the i18n plugin so the base validation message and suggestion hint use locale resources:
+
+```js
+import i18n from '@gunshi/plugin-i18n'
+import { suggestion } from '@gunshi/plugin-suggestion'
+
+await cli(process.argv.slice(2), command, {
+  strict: true,
+  plugins: [i18n({ locale: 'ja-JP' }), suggestion()]
+})
+```
+
 ### Shell Completion
 
 Enable tab completion across different shells:

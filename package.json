@@ -54,6 +54,7 @@
     "build:plugin:global": "pnpm -F @gunshi/plugin-global build",
     "build:plugin:i18n": "pnpm -F @gunshi/plugin-i18n build",
     "build:plugin:renderer": "pnpm -F @gunshi/plugin-renderer build",
+    "build:plugin:suggestion": "pnpm -F @gunshi/plugin-suggestion build",
     "build:resources": "pnpm -F @gunshi/resources build",
     "build:shared": "pnpm -F @gunshi/shared build",
     "changelog": "gh-changelogen --repo=kazupon/gunshi",
@@ -84,6 +85,7 @@
     "test:plugin-global": "vitest --typecheck run packages/plugin-global",
     "test:plugin-i18n": "vitest --typecheck run packages/plugin-i18n",
     "test:plugin-renderer": "vitest --typecheck run packages/plugin-renderer",
+    "test:plugin-suggestion": "vitest --typecheck run packages/plugin-suggestion",
     "typecheck:deno": "pnpm -r --if-present typecheck:deno"
   },
   "devDependencies": {

@@ -1,0 +1,77 @@
+{
+  "name": "@gunshi/plugin-suggestion",
+  "description": "suggestion plugin for gunshi",
+  "version": "0.35.1",
+  "author": {
+    "name": "kazuya kawaguchi",
+    "email": "kawakazu80@gmail.com"
+  },
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/kazupon",
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazupon/gunshi.git",
+    "directory": "packages/plugin-suggestion"
+  },
+  "keywords": [
+    "gunshi",
+    "suggestion",
+    "plugin",
+    "cli"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "files": [
+    "lib"
+  ],
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/*",
+        "./*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "build:docs": "tsx ../../scripts/api-references.ts",
+    "lint:jsr": "jsr publish --dry-run --allow-dirty",
+    "prepack": "pnpm build",
+    "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
+  },
+  "dependencies": {
+    "@gunshi/plugin": "workspace:*"
+  },
+  "peerDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*"
+  },
+  "devDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*",
+    "@gunshi/resources": "workspace:*",
+    "deno": "catalog:",
+    "gunshi": "workspace:*",
+    "jsr": "catalog:",
+    "jsr-exports-lint": "catalog:",
+    "publint": "catalog:",
+    "tsdown": "catalog:"
+  }
+}
