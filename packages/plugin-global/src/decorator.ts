@@ -5,6 +5,8 @@
 
 import { pluginId as Global } from './types.ts'
 
+import { hasPriorityValidationError } from '@gunshi/plugin'
+
 import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
 import type { GlobalExtension } from './extension.ts'
 import type { PluginId } from './types.ts'
@@ -26,6 +28,11 @@ const decorator: CommandDecorator<{
       [Global]: { showVersion, showHeader, showUsage, showValidationErrors }
     }
   } = ctx
+
+  if (hasPriorityValidationError(validationError)) {
+    await showValidationErrors(validationError!)
+    throw validationError
+  }
 
   if (values.version) {
     return showVersion()

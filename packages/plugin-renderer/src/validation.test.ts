@@ -1,5 +1,10 @@
 import i18n from '@gunshi/plugin-i18n'
-import { ArgsValidationError, ArgsValidationErrorKeys } from '@gunshi/plugin'
+import {
+  ArgsValidationError,
+  ArgsValidationErrorKeys,
+  CommandNotFoundError,
+  CommandNotFoundErrorKeys
+} from '@gunshi/plugin'
 import { expect, test } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import renderer from './index.ts'
@@ -65,6 +70,63 @@ test('args validation error falls back to message for unknown code', async () =>
   ])
 
   await expect(renderValidationErrors(ctx, error)).resolves.toEqual('fallback message')
+})
+
+test('command not found error keeps fallback message without i18n', async () => {
+  const ctx = await createCommandContext({
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+  const error = new AggregateError([
+    new CommandNotFoundError('Command not found: deployx', {
+      code: CommandNotFoundErrorKeys.notFound,
+      values: {
+        commandName: 'deployx'
+      },
+      commandName: 'deployx',
+      candidates: ['deploy']
+    })
+  ])
+
+  await expect(renderValidationErrors(ctx, error)).resolves.toEqual('Command not found: deployx')
+})
+
+test('command not found error uses i18n resource', async () => {
+  const i18nPlugin = i18n({
+    locale: 'ja-JP',
+    builtinResources: {
+      'ja-JP': {
+        'err:cmd:not-found': '不明なコマンド: {$commandName}'
+      }
+    }
+  })
+  const rendererPlugin = renderer()
+  const command = {
+    name: 'test',
+    run: async () => {}
+  } as Command
+  const ctx = await createCommandContext({
+    command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    }
+  })
+  const error = new AggregateError([
+    new CommandNotFoundError('Command not found: deployx', {
+      code: CommandNotFoundErrorKeys.notFound,
+      values: {
+        commandName: 'deployx'
+      },
+      commandName: 'deployx',
+      candidates: ['deploy']
+    })
+  ])
+
+  await expect(renderValidationErrors(ctx, error)).resolves.toEqual('不明なコマンド: deployx')
 })
 
 test('args validation error uses i18n resource', async () => {

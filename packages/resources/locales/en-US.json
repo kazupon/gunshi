@@ -17,5 +17,6 @@
   "err:arg:invalid-type": "Invalid value for {$displayName}: expected {$expected}",
   "err:arg:invalid-choice": "Invalid value for {$displayName}: expected one of {$choices}",
   "err:arg:custom-parse": "Invalid value for {$displayName}: {$reason}",
-  "err:arg:unknown-option": "Unknown option: {$rawName}"
+  "err:arg:unknown-option": "Unknown option: {$rawName}",
+  "err:cmd:not-found": "Command not found: {$commandName}"
 }

@@ -7,6 +7,11 @@ import { ArgsValidationError, ArgsValidationErrorKeys, parseArgs, resolveArgs } 
 import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
+import {
+  CommandNotFoundError,
+  CommandNotFoundErrorKeys,
+  hasPriorityValidationError
+} from '../error.ts'
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
 import {
@@ -75,42 +80,62 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 
   const resolved = resolveCommandTree(tokens, entry, cliOptions)
   const { commandName: name, command, callMode, commandPath, depth, levelSubCommands } = resolved
-  if (!command) {
-    throw new Error(`Command not found: ${name || ''}`)
+
+  let targetCommand = command
+  let targetCommandName = name
+  let targetCallMode = callMode
+  let targetCommandPath = commandPath
+  let targetDepth = depth
+  let targetOmitted = resolved.omitted
+  let targetLevelSubCommands = levelSubCommands
+  const additionalValidationErrors: Error[] = []
+
+  if (!targetCommand) {
+    if (!resolved.parentCommand || !resolved.unresolvedCommandName) {
+      throw new Error(`Command not found: ${name || ''}`)
+    }
+
+    targetCommand = resolved.parentCommand
+    targetCommandName = resolved.parentCommandName
+    targetCommandPath = resolved.parentCommandPath || []
+    targetDepth = targetCommandPath.length
+    targetCallMode = targetDepth > 0 ? 'subCommand' : 'entry'
+    targetOmitted = false
+    targetLevelSubCommands = resolved.parentSubCommands
+    additionalValidationErrors.push(createCommandNotFoundError(resolved))
   }
 
   // override subCommands with level-specific sub-commands for rendering
-  if (levelSubCommands) {
-    cliOptions.subCommands = levelSubCommands
+  if (targetLevelSubCommands) {
+    cliOptions.subCommands = targetLevelSubCommands
   }
 
   // resolve lazy commands before parsing so loader-defined args are available
-  const resolvedCommand = isLazyCommand<G>(command)
-    ? await resolveLazyCommand<G>(command, name, true)
-    : command
+  const resolvedCommand = isLazyCommand<G>(targetCommand)
+    ? await resolveLazyCommand<G>(targetCommand, targetCommandName, true)
+    : targetCommand
 
   const args = resolveArguments(pluginContext, getCommandArgs(resolvedCommand))
 
   // skipPositional: how many leading positionals to skip (they're consumed as command names)
   // depth=0 → -1 (no skip), depth=1 → 0 (skip 1, existing behavior), depth=2 → 1 (skip 2), etc.
-  const skipPositional = depth > 0 ? depth - 1 : -1
+  const skipPositional = targetDepth > 0 ? targetDepth - 1 : -1
 
   const { explicit, values, positionals, rest, error } = resolveArgs(args, tokens, {
     shortGrouping: true,
     toKebab: resolvedCommand.toKebab,
     skipPositional
   })
-  const validationError = mergeValidationErrors(
-    error,
-    cliOptions.strict
+  const validationError = mergeValidationErrors(error, [
+    ...additionalValidationErrors,
+    ...(cliOptions.strict
       ? createUnknownOptionErrors(
           findUnknownOptions(args, tokens, {
             toKebab: resolvedCommand.toKebab
           })
         )
-      : []
-  )
-  const omitted = resolved.omitted
+      : [])
+  ])
 
   const commandContext = await createCommandContext({
     args,
@@ -120,9 +145,9 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     rest,
     argv,
     tokens,
-    omitted,
-    callMode,
-    commandPath,
+    omitted: targetOmitted,
+    callMode: targetCallMode,
+    commandPath: targetCommandPath,
     command: resolvedCommand,
     extensions: getPluginExtensions(resolvedPlugins),
     validationError,
@@ -270,15 +295,9 @@ function mergeValidationErrors(
     return error
   }
 
-  return new AggregateError(error ? [...error.errors, ...additionalErrors] : additionalErrors)
-}
-
-function hasUnknownOptionValidationError(error: AggregateError | undefined): boolean {
-  return (
-    error?.errors.some(
-      (error: unknown) =>
-        error instanceof ArgsValidationError && error.code === ArgsValidationErrorKeys.unknownOption
-    ) ?? false
+  return new AggregateError(
+    error ? [...error.errors, ...additionalErrors] : additionalErrors,
+    error?.message || additionalErrors[0]?.message
   )
 }
 
@@ -378,6 +397,11 @@ type ResolveCommandContext<G extends GunshiParamsConstraint = DefaultGunshiParam
   depth: number
   omitted: boolean
   levelSubCommands: Map<string, Command<G> | LazyCommand<G>> | undefined
+  unresolvedCommandName?: string | undefined
+  parentCommand?: Command<G> | LazyCommand<G> | undefined
+  parentCommandName?: string | undefined
+  parentCommandPath?: string[] | undefined
+  parentSubCommands?: Map<string, Command<G> | LazyCommand<G>> | undefined
 }
 
 function resolveCommandTree<G extends GunshiParamsConstraint>(
@@ -455,17 +479,34 @@ function resolveCommandTree<G extends GunshiParamsConstraint>(
         if (options.fallbackToEntry) {
           return resolveAsEntry()
         }
+        const parent = resolveAsEntry()
         return {
           commandName: token,
           callMode: 'unexpected',
           commandPath: [],
           depth: 0,
           omitted: false,
-          levelSubCommands: undefined
+          levelSubCommands: undefined,
+          unresolvedCommandName: token,
+          parentCommand: parent.command,
+          parentCommandName: parent.commandName,
+          parentCommandPath: [],
+          parentSubCommands: options.subCommands
         }
       }
-      // depth > 0: stop exploring, remaining tokens are positional args
-      break
+      return {
+        commandName: token,
+        callMode: 'unexpected',
+        commandPath: [...commandPath],
+        depth,
+        omitted: false,
+        levelSubCommands: undefined,
+        unresolvedCommandName: token,
+        parentCommand: resolvedCommand,
+        parentCommandName: resolvedName,
+        parentCommandPath: [...commandPath],
+        parentSubCommands: currentSubCommands
+      }
     }
 
     // resolve command name if missing - shallow copy to avoid mutating user objects
@@ -536,6 +577,21 @@ function resolveCommandTree<G extends GunshiParamsConstraint>(
   }
 }
 
+function createCommandNotFoundError<G extends GunshiParamsConstraint>(
+  resolved: ResolveCommandContext<G>
+): CommandNotFoundError {
+  const commandName = resolved.unresolvedCommandName || resolved.commandName || ''
+  return new CommandNotFoundError(`Command not found: ${commandName}`, {
+    code: CommandNotFoundErrorKeys.notFound,
+    values: {
+      commandName
+    },
+    commandName,
+    candidates: [...(resolved.parentSubCommands?.keys() || [])],
+    commandPath: resolved.parentCommandPath || []
+  })
+}
+
 function resolveEntryName<G extends GunshiParamsConstraint>(
   entry: Command<G> | LazyCommand<G>
 ): string {
@@ -568,7 +624,7 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
 ): Promise<string | undefined> {
   const commandRunner = cmd.run || NOOP
   const baseRunner: CommandRunner<G> = ctx => {
-    if (hasUnknownOptionValidationError(ctx.validationError)) {
+    if (hasPriorityValidationError(ctx.validationError)) {
       throw ctx.validationError
     }
     return commandRunner(ctx)
