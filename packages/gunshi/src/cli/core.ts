@@ -187,8 +187,6 @@ type StrictOptionValidationOptions = {
 }
 
 const NEGATABLE_OPTION_PREFIX = 'no-'
-const IMPLICIT_ALLOWED_LONG_OPTIONS = new Set(['help', 'version'])
-const IMPLICIT_ALLOWED_SHORT_OPTIONS = new Set(['h', 'v'])
 
 function findUnknownOptions(
   args: Args,
@@ -228,17 +226,10 @@ function findUnknownOptions(
 
     const isLongOption = token.rawName.startsWith('--')
     if (isLongOption) {
-      if (
-        knownLongOptions.has(token.name) ||
-        knownNegatableOptions.has(token.name) ||
-        IMPLICIT_ALLOWED_LONG_OPTIONS.has(token.name)
-      ) {
+      if (knownLongOptions.has(token.name) || knownNegatableOptions.has(token.name)) {
         continue
       }
-    } else if (
-      knownShortOptions.has(token.name) ||
-      IMPLICIT_ALLOWED_SHORT_OPTIONS.has(token.name)
-    ) {
+    } else if (knownShortOptions.has(token.name)) {
       continue
     }
 

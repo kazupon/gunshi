@@ -4,6 +4,7 @@ import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
+import { cli as boneCli } from './cli/bone.ts'
 import { define, lazy } from './definition.ts'
 import { generate } from './generator.ts'
 import { plugin } from './plugin/core.ts'
@@ -1903,6 +1904,18 @@ describe('command lifecycle hooks', () => {
           { strict: true, usageSilent: true, version: '1.0.0' }
         )
       ).resolves.toBe('1.0.0')
+
+      expect(mockCommand).not.toHaveBeenCalled()
+    })
+
+    test('reports help and version as unknown options without global plugin', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      for (const option of ['--help', '-h', '--version', '-v']) {
+        await expect(
+          boneCli([option], { run: mockCommand }, { strict: true, version: '1.0.0' })
+        ).rejects.toBeInstanceOf(AggregateError)
+      }
 
       expect(mockCommand).not.toHaveBeenCalled()
     })
