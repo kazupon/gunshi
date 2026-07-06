@@ -1879,12 +1879,37 @@ describe('command lifecycle hooks', () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
       const mockCommand = vi.fn<() => void>()
+      let capturedError: AggregateError | undefined
 
       await expect(
-        cli(['--alow-reload'], { run: mockCommand }, { strict: true })
+        cli(
+          ['--alow-reload'],
+          {
+            toKebab: true,
+            args: {
+              allowReload: {
+                type: 'boolean'
+              }
+            },
+            run: mockCommand
+          },
+          {
+            strict: true,
+            onErrorCommand: (_ctx, error) => {
+              capturedError = error as AggregateError
+            }
+          }
+        )
       ).rejects.toBeInstanceOf(AggregateError)
 
       expect(mockCommand).not.toHaveBeenCalled()
+      expect(
+        (capturedError?.errors[0] as { values: Record<string, unknown> } | undefined)?.values
+      ).toEqual({
+        rawName: '--alow-reload',
+        name: 'alow-reload',
+        candidates: ['--help', '--version', '--allow-reload']
+      })
       expect(log()).toBe('Unknown option: --alow-reload')
     })
 

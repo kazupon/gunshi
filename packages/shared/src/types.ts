@@ -10,7 +10,8 @@ import {
   BUILT_IN_PREFIX,
   COMMAND_ERROR_RESOURCE_KEYS,
   COMMAND_BUILTIN_RESOURCE_KEYS,
-  COMMON_ARGS
+  COMMON_ARGS,
+  SUGGESTION_ERROR_RESOURCE_KEYS
 } from './constants.ts'
 
 import type { Args } from 'gunshi'
@@ -79,11 +80,23 @@ export type ArgErrorResourceKeys = (typeof ARG_ERROR_RESOURCE_KEYS)[number]
 export type CommandErrorResourceKeys = (typeof COMMAND_ERROR_RESOURCE_KEYS)[number]
 
 /**
+ * Suggestion error resource keys.
+ */
+export type SuggestionErrorResourceKeys = (typeof SUGGESTION_ERROR_RESOURCE_KEYS)[number]
+
+/**
+ * Error resource keys.
+ */
+export type ErrorResourceKeys =
+  | ArgErrorResourceKeys
+  | CommandErrorResourceKeys
+  | SuggestionErrorResourceKeys
+
+/**
  * Built-in resource keys.
  */
 export type BuiltinResourceKeys =
-  | ArgErrorResourceKeys
-  | CommandErrorResourceKeys
+  | ErrorResourceKeys
   | CommandBuiltinArgsKeys
   | CommandBuiltinResourceKeys
 
@@ -126,7 +139,7 @@ export type ResolveTranslationKeys<
       : R
     : R | CommandBuiltinKeys,
   O = CommandArgKeys<A, C>
-> = ArgErrorResourceKeys | CommandBuiltinKeys | O | T
+> = ErrorResourceKeys | CommandBuiltinKeys | O | T
 
 /**
  * Translation function interface

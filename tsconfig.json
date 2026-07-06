@@ -49,7 +49,8 @@
       "@gunshi/plugin-renderer": ["./packages/plugin-renderer/src/index.ts"],
       "@gunshi/plugin-completion": ["./packages/plugin-completion/src/index.ts"],
       "@gunshi/plugin-i18n": ["./packages/plugin-i18n/src/index.ts"],
-      "@gunshi/plugin-global": ["./packages/plugin-global/src/index.ts"]
+      "@gunshi/plugin-global": ["./packages/plugin-global/src/index.ts"],
+      "@gunshi/plugin-suggestion": ["./packages/plugin-suggestion/src/index.ts"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

@@ -205,6 +205,7 @@ function resolveArguments<G extends GunshiParamsConstraint>(
 type UnknownOption = {
   rawName: string
   name: string
+  candidates: readonly string[]
 }
 
 type StrictOptionValidationOptions = {
@@ -221,6 +222,17 @@ function findUnknownOptions(
   const knownLongOptions = new Set<string>()
   const knownShortOptions = new Set<string>()
   const knownNegatableOptions = new Set<string>()
+  const knownLongOptionCandidates = new Set<string>()
+  const longOptionCandidates: string[] = []
+
+  function addLongOptionCandidate(name: string): void {
+    const candidate = `--${name}`
+    if (knownLongOptionCandidates.has(candidate)) {
+      return
+    }
+    knownLongOptionCandidates.add(candidate)
+    longOptionCandidates.push(candidate)
+  }
 
   for (const [name, schema] of Object.entries(args)) {
     if (schema.type === 'positional') {
@@ -229,13 +241,16 @@ function findUnknownOptions(
 
     const optionName = resolveOptionName(name, schema, options)
     knownLongOptions.add(optionName)
+    addLongOptionCandidate(optionName)
 
     if (schema.short) {
       knownShortOptions.add(schema.short)
     }
 
     if (schema.type === 'boolean' && schema.negatable) {
-      knownNegatableOptions.add(`${NEGATABLE_OPTION_PREFIX}${optionName}`)
+      const negatableOptionName = `${NEGATABLE_OPTION_PREFIX}${optionName}`
+      knownNegatableOptions.add(negatableOptionName)
+      addLongOptionCandidate(negatableOptionName)
     }
   }
 
@@ -260,7 +275,8 @@ function findUnknownOptions(
 
     unknownOptions.push({
       rawName: token.rawName,
-      name: token.name
+      name: token.name,
+      candidates: isLongOption ? longOptionCandidates : []
     })
   }
 
@@ -276,12 +292,13 @@ function resolveOptionName(
 }
 
 function createUnknownOptionErrors(unknownOptions: UnknownOption[]): ArgsValidationError[] {
-  return unknownOptions.map(({ rawName, name }) => {
+  return unknownOptions.map(({ rawName, name, candidates }) => {
     return new ArgsValidationError(`Unknown option: ${rawName}`, {
       code: ArgsValidationErrorKeys.unknownOption,
       values: {
         rawName,
-        name
+        name,
+        candidates
       }
     })
   })

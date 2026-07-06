@@ -71,6 +71,11 @@ describe('extension: translate', () => {
           displayName: "'--id'"
         })
       ).toEqual("Optional argument '--id' is required")
+      expect(
+        extension.translate('err:suggestion:did-you-mean', {
+          name: '--allow-reload'
+        })
+      ).toEqual('Did you mean --allow-reload?')
     })
 
     test('custom locale: ja-JP', async () => {
@@ -99,6 +104,11 @@ describe('extension: translate', () => {
           displayName: "'--id'"
         })
       ).toEqual("オプション '--id' は必須です")
+      expect(
+        extension.translate('err:suggestion:did-you-mean', {
+          name: '--allow-reload'
+        })
+      ).toEqual('--allow-reload の指定ミスではありませんか？')
     })
 
     test('custom builtinResources can override args validation error keys', async () => {

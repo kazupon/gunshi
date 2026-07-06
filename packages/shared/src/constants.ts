@@ -71,3 +71,5 @@ export const ARG_ERROR_RESOURCE_KEYS = [
 ] as const
 
 export const COMMAND_ERROR_RESOURCE_KEYS = ['err:cmd:not-found'] as const
+
+export const SUGGESTION_ERROR_RESOURCE_KEYS = ['err:suggestion:did-you-mean'] as const

@@ -2,9 +2,9 @@ import { describe, expect, expectTypeOf, test } from 'vitest'
 
 import type { Args } from 'gunshi'
 import type {
-  ArgErrorResourceKeys,
   CommandArgKeys,
   CommandBuiltinKeys,
+  ErrorResourceKeys,
   ResolveTranslationKeys,
   Translation
 } from './types.ts'
@@ -50,7 +50,7 @@ describe('ResolveTranslationKeys', () => {
     } satisfies Args
 
     expectTypeOf<ResolveTranslationKeys<typeof _args>>().toEqualTypeOf<
-      'arg:foo' | 'arg:bar' | 'arg:no-bar' | ArgErrorResourceKeys | CommandBuiltinKeys
+      'arg:foo' | 'arg:bar' | 'arg:no-bar' | ErrorResourceKeys | CommandBuiltinKeys
     >()
   })
 
@@ -73,11 +73,7 @@ describe('ResolveTranslationKeys', () => {
     } as const
 
     expectTypeOf<ResolveTranslationKeys<typeof _args, typeof _ctx>>().toEqualTypeOf<
-      | 'test:arg:foo'
-      | 'test:arg:bar'
-      | 'test:arg:no-bar'
-      | ArgErrorResourceKeys
-      | CommandBuiltinKeys
+      'test:arg:foo' | 'test:arg:bar' | 'test:arg:no-bar' | ErrorResourceKeys | CommandBuiltinKeys
     >()
   })
 
@@ -98,7 +94,7 @@ describe('ResolveTranslationKeys', () => {
     const _ctx = {} as const
 
     expectTypeOf<ResolveTranslationKeys<typeof _args, typeof _ctx>>().toEqualTypeOf<
-      'arg:foo' | 'arg:bar' | 'arg:no-bar' | ArgErrorResourceKeys | CommandBuiltinKeys
+      'arg:foo' | 'arg:bar' | 'arg:no-bar' | ErrorResourceKeys | CommandBuiltinKeys
     >()
   })
 
@@ -130,7 +126,7 @@ describe('ResolveTranslationKeys', () => {
       | 'test:arg:foo'
       | 'test:arg:bar'
       | 'test:arg:no-bar'
-      | ArgErrorResourceKeys
+      | ErrorResourceKeys
       | CommandBuiltinKeys
       | 'test:customResource'
     >()
