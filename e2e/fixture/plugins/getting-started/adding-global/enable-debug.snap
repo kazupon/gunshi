@@ -16,6 +16,7 @@ Context: [Object: null prototype] {
     middleMargin: 10,
     usageOptionType: false,
     usageOptionValue: true,
+    strict: false,
     renderHeader: [Function: renderer],
     renderUsage: [Function: renderer],
     renderValidationErrors: [Function: renderer],
