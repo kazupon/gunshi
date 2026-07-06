@@ -1060,6 +1060,149 @@ test('enum optional argument', async () => {
   )
 })
 
+describe('args validation i18n', () => {
+  test('translates required option', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        [],
+        {
+          args: {
+            id: {
+              type: 'string',
+              required: true
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [
+            i18n({
+              locale: 'ja-JP',
+              builtinResources: {
+                'ja-JP': {
+                  'err:arg:required-option': '必須オプション: {$displayName}'
+                }
+              }
+            })
+          ]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual("必須オプション: '--id'")
+  })
+
+  test('translates required positional', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        [],
+        {
+          args: {
+            file: {
+              type: 'positional'
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [
+            i18n({
+              locale: 'ja-JP',
+              builtinResources: {
+                'ja-JP': {
+                  'err:arg:required-positional': '必須位置引数: {$name}'
+                }
+              }
+            })
+          ]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual('必須位置引数: file')
+  })
+
+  test('translates invalid type and invalid choice', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        ['--count', 'invalid', '--level', 'trace'],
+        {
+          args: {
+            count: {
+              type: 'number'
+            },
+            level: {
+              type: 'enum',
+              choices: ['debug', 'info']
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [
+            i18n({
+              locale: 'ja-JP',
+              builtinResources: {
+                'ja-JP': {
+                  'err:arg:invalid-type': '型エラー: {$displayName}',
+                  'err:arg:invalid-choice': '選択エラー: {$displayName}'
+                }
+              }
+            })
+          ]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual(["型エラー: '--count'", "選択エラー: '--level'"].join('\n'))
+  })
+
+  test('translates custom parse wrapper', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        ['--port', '80'],
+        {
+          args: {
+            port: {
+              type: 'custom',
+              parse: () => {
+                throw new Error('Invalid port')
+              }
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [
+            i18n({
+              locale: 'ja-JP',
+              builtinResources: {
+                'ja-JP': {
+                  'err:arg:custom-parse': 'カスタム解析エラー: {$reason}'
+                }
+              }
+            })
+          ]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual('カスタム解析エラー: Invalid port')
+  })
+})
+
 describe('positional arguments', () => {
   test('basic', async () => {
     const utils = await import('./utils.ts')

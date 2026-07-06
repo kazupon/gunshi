@@ -16,7 +16,7 @@ import type {
 import { ARG_PREFIX, namespacedId, PLUGIN_PREFIX } from '@gunshi/shared'
 
 import type {
-  BuiltinResourceKeys,
+  BuiltinResource,
   GenerateNamespacedKey,
   KeyOfArgs,
   RemovedIndex,
@@ -103,7 +103,7 @@ export interface I18nPluginOptions {
   /**
    * Built-in localizable resources
    */
-  builtinResources?: Record<string, Record<BuiltinResourceKeys, string>>
+  builtinResources?: Record<string, BuiltinResource>
 }
 
 /**

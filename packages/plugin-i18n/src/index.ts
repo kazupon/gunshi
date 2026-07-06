@@ -39,6 +39,8 @@ import {
   BUILT_IN_PREFIX,
   COMMON_ARGS,
   DefaultResource,
+  ERROR_PREFIX_AND_KEY_SEPARATOR,
+  formatResource,
   namespacedId,
   resolveArgKey,
   resolveBuiltInKey,
@@ -56,7 +58,7 @@ import type {
   LazyCommand,
   PluginWithExtension
 } from '@gunshi/plugin'
-import type { BuiltinResourceKeys, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
+import type { BuiltinResource, CommandArgKeys, CommandBuiltinKeys } from '@gunshi/shared'
 import type { CommandResource, I18nCommand, I18nExtension, I18nPluginOptions } from './types.ts'
 
 export { resolveArgKey, resolveBuiltInKey, resolveKey } from '@gunshi/shared'
@@ -85,8 +87,7 @@ export default function i18n(
   const localeStr = toLocaleString(locale)
 
   const builtinResources =
-    options.builtinResources ||
-    (Object.create(null) as Record<string, Record<BuiltinResourceKeys, string>>)
+    options.builtinResources || (Object.create(null) as Record<string, BuiltinResource>)
 
   // create translation adapter
   const translationAdapterFactory = options.translationAdapterFactory || createTranslationAdapter
@@ -155,11 +156,11 @@ export default function i18n(
         values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
       ): string {
         const strKey = key as string
-        if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
+        if (isBuiltinResourceKey(strKey)) {
           // handle built-in keys
-          const resource =
-            localeBuiltinResources.get(localeStr) || localeBuiltinResources.get(DEFAULT_LOCALE)!
-          return resource[strKey as CommandBuiltinKeys] || strKey
+          const resource = localeBuiltinResources.get(localeStr)
+          const defaultResource = localeBuiltinResources.get(DEFAULT_LOCALE)!
+          return formatResource(resource?.[strKey] ?? defaultResource[strKey], values) || strKey
         } else {
           // handle command-specific keys
           return adapter.translate(localeStr, strKey, values) || ''
@@ -167,10 +168,7 @@ export default function i18n(
       }
 
       // define setResource function
-      function setResource(
-        locale: string | Intl.Locale,
-        resource: Record<BuiltinResourceKeys, string>
-      ): void {
+      function setResource(locale: string | Intl.Locale, resource: BuiltinResource): void {
         const targetLocale = toLocale(locale)
         const targetLocaleStr = toLocaleString(targetLocale)
         if (localeBuiltinResources.has(targetLocaleStr)) {
@@ -194,7 +192,10 @@ export default function i18n(
       for (const [locale, resource] of Object.entries(builtinResources)) {
         for (const globalOption of builtinGlobalOptions) {
           const globalOptionResource = builtinGlobalOptionResources[globalOption]
-          globalOptionResource[locale] = (resource as Record<string, string>)[globalOption]
+          const message = (resource as Record<string, string>)[globalOption]
+          if (message) {
+            globalOptionResource[locale] = message
+          }
         }
       }
       for (const globalOption of builtinGlobalOptions) {
@@ -202,7 +203,7 @@ export default function i18n(
       }
 
       // set default locale resources
-      setResource(DEFAULT_LOCALE, DefaultResource as Record<BuiltinResourceKeys, string>)
+      setResource(DEFAULT_LOCALE, DefaultResource as BuiltinResource)
 
       // install built-in locale resources
       for (const [locale, resource] of Object.entries(builtinResources)) {
@@ -320,17 +321,32 @@ async function loadCommandResource(
 }
 
 function mapResourceWithBuiltinKey(
-  resource: Record<string, string>,
+  resource: BuiltinResource,
   ctx: CommandContext,
   globalOptions: string[]
 ): Record<string, string> {
   return Object.entries(resource).reduce(
     (acc, [key, value]) => {
-      acc[globalOptions.includes(key) ? resolveArgKey(key, ctx.name) : resolveBuiltInKey(key)] =
-        value
+      if (value == null) {
+        return acc
+      }
+
+      acc[
+        key.startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)
+          ? key
+          : globalOptions.includes(key)
+            ? resolveArgKey(key, ctx.name)
+            : resolveBuiltInKey(key)
+      ] = value
       return acc
     },
     Object.create(null) as Record<string, string>
+  )
+}
+
+function isBuiltinResourceKey(key: string): boolean {
+  return (
+    key.codePointAt(0) === BUILT_IN_PREFIX_CODE || key.startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)
   )
 }
 

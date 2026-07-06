@@ -1,7 +1,12 @@
 import { describe, expectTypeOf, test } from 'vitest'
 
 import type { Awaitable, Command, Prettify } from '@gunshi/plugin'
-import type { CommandResource, CommandResourceFetcher, I18nCommand } from './types.ts'
+import type {
+  CommandResource,
+  CommandResourceFetcher,
+  I18nCommand,
+  I18nPluginOptions
+} from './types.ts'
 
 const _args = {
   force: { type: 'boolean' },
@@ -39,6 +44,20 @@ describe('CommandResource', () => {
       CommandResource<{ description: string; args: typeof _args; extensions: typeof _extensions }>
     >
     expectTypeOf<Actual>().toEqualTypeOf<Expected>()
+  })
+})
+
+describe('I18nPluginOptions', () => {
+  test('builtinResources accepts args validation error keys', () => {
+    const options = {
+      builtinResources: {
+        'ja-JP': {
+          'err:arg:required-option': 'オプション {$displayName} は必須です'
+        }
+      }
+    } satisfies I18nPluginOptions
+
+    expectTypeOf(options).toMatchTypeOf<I18nPluginOptions>()
   })
 })
 

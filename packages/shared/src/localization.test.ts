@@ -65,6 +65,18 @@ describe('without translation function', () => {
     expect(await localize(resolveBuiltInKey('help'))).toEqual('Display this help message')
   })
 
+  test('args validation error keys', async () => {
+    const { ctx, command1 } = await setup()
+    const localize = localizable(ctx, command1)
+
+    expect(
+      await localize('err:arg:required-option', {
+        displayName: "'--id'"
+      })
+    ).toEqual("Optional argument '--id' is required")
+    expect(await localize('err:arg:not-found')).toEqual('err:arg:not-found')
+  })
+
   test('gunshi args keys', async () => {
     const { ctx, command1 } = await setup()
     const localize = localizable<
