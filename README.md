@@ -17,7 +17,7 @@ Gunshi is a modern javascript command-line library
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
-## ✨ Features
+## Features
 
 Gunshi is designed to simplify the creation of modern command-line interfaces:
 
@@ -28,7 +28,7 @@ Gunshi is designed to simplify the creation of modern command-line interfaces:
 - 🌍 **Internationalization**: Built with global users in mind, featuring locale-aware design, resource management, and multi-language support.
 - 🔌 **Pluggable**: Extensible plugin system with dependency management and lifecycle hooks for modular CLI development.
 
-## 💿 Installation
+## Installation
 
 ```sh
 # npm
@@ -47,7 +47,7 @@ deno add jsr:@gunshi/gunshi
 bun add gunshi
 ```
 
-## 🚀 Usage
+## Usage
 
 ```js
 import { cli } from 'gunshi'
@@ -94,7 +94,7 @@ await cli(process.argv.slice(2), command, {
 
 About more details and usage, see [documentations](https://gunshi.dev)
 
-## 💁‍♀️ Showcases
+## Showcases
 
 - [pnpmc](https://github.com/kazupon/pnpmc): PNPM Catalogs Tooling
 - [sourcemap-publisher](https://github.com/es-tooling/sourcemap-publisher): A tool to publish sourcemaps externally and rewrite sourcemap URLs at pre-publish time
@@ -103,11 +103,11 @@ About more details and usage, see [documentations](https://gunshi.dev)
 - [ccusage](https://github.com/ryoppippi/ccusage): A CLI tool for analyzing Claude Code usage from local JSONL files
 - [varlock](https://github.com/dmno-dev/varlock): Enhanced .env file loader, using @decorator style comments to add validation, type-safety, and more
 
-## 🙌 Contributing guidelines
+## Contributing guidelines
 
 If you are interested in contributing to `gunshi`, I highly recommend checking out [the contributing guidelines](/CONTRIBUTING.md) here. You'll find all the relevant information such as [how to make a PR](/CONTRIBUTING.md#pull-request-guidelines), [how to setup development](/CONTRIBUTING.md#development-setup)) etc., there.
 
-## 💖 Credits
+## Credits
 
 This project is inspired and powered by:
 
@@ -117,7 +117,7 @@ This project is inspired and powered by:
 
 Thank you!
 
-## 🤝 Sponsors
+## Sponsors
 
 The development of Gunshi is supported by my OSS sponsors!
 
@@ -127,7 +127,7 @@ The development of Gunshi is supported by my OSS sponsors!
   </a>
 </p>
 
-## ©️ License
+## License
 
 [MIT](http://opensource.org/licenses/MIT)
 
