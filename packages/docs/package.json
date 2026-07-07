@@ -56,7 +56,7 @@
     "@vueuse/core": "^14.0.0",
     "args-tokens": "catalog:",
     "mermaid": "^11.12.0",
-    "oxc-minify": "^0.137.0",
+    "oxc-minify": "^0.138.0",
     "tsx": "catalog:",
     "vitepress": "^2.0.0-alpha.17",
     "vitepress-api-references": "catalog:",
