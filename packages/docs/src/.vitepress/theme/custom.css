@@ -132,6 +132,11 @@
   background: var(--vp-c-bg-soft);
 }
 
+.copy-page-item:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
 .copy-page-item-icon {
   flex: 0 0 auto;
   width: 18px;

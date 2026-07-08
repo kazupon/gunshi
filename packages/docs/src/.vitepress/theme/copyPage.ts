@@ -34,17 +34,34 @@ export async function copyMarkdownPage(
   markdownPath: string,
   {
     fetcher = fetch,
-    clipboard = navigator.clipboard
+    clipboard = navigator.clipboard,
+    timeoutMs = 10_000
   }: {
     fetcher?: typeof fetch
     clipboard?: Pick<Clipboard, 'writeText'>
+    timeoutMs?: number
   } = {}
 ): Promise<void> {
-  const response = await fetcher(markdownPath)
+  const controller = new AbortController()
+  const timeout = setTimeout(() => {
+    controller.abort()
+  }, timeoutMs)
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch Markdown page: ${response.status} ${response.statusText}`)
+  try {
+    const response = await fetcher(markdownPath, { signal: controller.signal })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Markdown page: ${response.status} ${response.statusText}`)
+    }
+
+    await clipboard.writeText(await response.text())
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(`Timed out fetching Markdown page after ${timeoutMs}ms`)
+    }
+
+    throw error
+  } finally {
+    clearTimeout(timeout)
   }
-
-  await clipboard.writeText(await response.text())
 }
