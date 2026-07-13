@@ -42,7 +42,10 @@ describe('copy page helpers', () => {
       fetcher
     })
 
-    expect(fetcher).toHaveBeenCalledWith('/guide/essentials/getting-started.md')
+    expect(fetcher).toHaveBeenCalledWith(
+      '/guide/essentials/getting-started.md',
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    )
     expect(writeText).toHaveBeenCalledWith(markdown)
   })
 })
