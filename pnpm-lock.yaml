@@ -342,8 +342,8 @@ importers:
   packages/plugin-completion:
     dependencies:
       '@bomb.sh/tab':
-        specifier: ^0.0.18
-        version: 0.0.18
+        specifier: ^0.0.19
+        version: 0.0.19
       '@gunshi/plugin':
         specifier: workspace:*
         version: link:../plugin
@@ -884,13 +884,13 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bomb.sh/tab@0.0.18':
-    resolution: {integrity: sha512-VVQqpP2O6PzGXDtFTH6KD0+o98M2Zgo4x5OmzPKHJyGw/MoAECxJPOtvTfEIN1USSZcS+WCRHY9rp+4cUOdiJw==}
+  '@bomb.sh/tab@0.0.19':
+    resolution: {integrity: sha512-dTRfo9Q9B+lbLG3JCu8a/AGQSfD2XXcFcnakQzVjSOX+VvR/s9zpsH8TlqV3iHqazniRn1Ypwd1hcRlXcu/4BA==}
     hasBin: true
     peerDependencies:
       cac: ^6.7.14
       citty: ^0.1.6 || ^0.2.0
-      commander: ^13.1.0
+      commander: ^13.1.0 || ^14.0.0 || ^15.0.0
     peerDependenciesMeta:
       cac:
         optional: true
@@ -4979,7 +4979,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bomb.sh/tab@0.0.18': {}
+  '@bomb.sh/tab@0.0.19': {}
 
   '@braintree/sanitize-url@6.0.4':
     optional: true
