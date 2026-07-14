@@ -48,4 +48,77 @@ describe('copy page helpers', () => {
     )
     expect(writeText).toHaveBeenCalledWith(markdown)
   })
+
+  test('throws when the Markdown response is not OK', async () => {
+    const writeText = vi.fn<Clipboard['writeText']>().mockResolvedValue(undefined)
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response('Not found', {
+        status: 404,
+        statusText: 'Not Found'
+      })
+    )
+
+    await expect(
+      copyMarkdownPage('/guide/essentials/missing.md', {
+        clipboard: { writeText },
+        fetcher
+      })
+    ).rejects.toThrow('Failed to fetch Markdown page: 404 Not Found')
+
+    expect(writeText).not.toHaveBeenCalled()
+  })
+
+  test('throws a timeout error when the Markdown request is aborted', async () => {
+    vi.useFakeTimers()
+
+    const writeText = vi.fn<Clipboard['writeText']>().mockResolvedValue(undefined)
+    const fetcher = vi.fn<typeof fetch>((_input, init) => {
+      return new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener(
+          'abort',
+          () => {
+            reject(new DOMException('Aborted', 'AbortError'))
+          },
+          { once: true }
+        )
+      })
+    })
+
+    try {
+      const copy = copyMarkdownPage('/guide/essentials/getting-started.md', {
+        clipboard: { writeText },
+        fetcher,
+        timeoutMs: 50
+      })
+      const assertion = expect(copy).rejects.toThrow('Timed out fetching Markdown page after 50ms')
+
+      await vi.advanceTimersByTimeAsync(50)
+
+      await assertion
+      expect(writeText).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test('clears the timeout when fetching Markdown fails', async () => {
+    const error = new Error('Network unavailable')
+    const writeText = vi.fn<Clipboard['writeText']>().mockResolvedValue(undefined)
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout')
+    const fetcher = vi.fn<typeof fetch>().mockRejectedValue(error)
+
+    try {
+      await expect(
+        copyMarkdownPage('/guide/essentials/getting-started.md', {
+          clipboard: { writeText },
+          fetcher
+        })
+      ).rejects.toThrow(error)
+
+      expect(clearTimeoutSpy).toHaveBeenCalledTimes(1)
+      expect(writeText).not.toHaveBeenCalled()
+    } finally {
+      clearTimeoutSpy.mockRestore()
+    }
+  })
 })
