@@ -110,9 +110,7 @@ onBeforeUnmount(() => {
       @click="toggle"
     >
       <svg class="copy-page-trigger-icon" viewBox="0 0 16 16" aria-hidden="true">
-        <path
-          d="M5.5 2.5h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z"
-        />
+        <path d="M5.5 2.5h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z" />
         <path d="M2.5 9.5v-7h7" />
       </svg>
       Copy page
@@ -139,7 +137,9 @@ onBeforeUnmount(() => {
         @click="close({ restoreFocus: true })"
       >
         <svg class="copy-page-item-icon solid" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M1.5 4A1.5 1.5 0 0 1 3 2.5h10A1.5 1.5 0 0 1 14.5 4v8A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12V4Zm2 6.5h1.7V7.7l1.3 1.8 1.3-1.8v2.8h1.7v-5h-1.7L6.5 7.4 5.2 5.5H3.5v5Zm7-1.5H9.3l2 2 2-2H12V5.5h-1.5V9Z" />
+          <path
+            d="M1.5 4A1.5 1.5 0 0 1 3 2.5h10A1.5 1.5 0 0 1 14.5 4v8A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12V4Zm2 6.5h1.7V7.7l1.3 1.8 1.3-1.8v2.8h1.7v-5h-1.7L6.5 7.4 5.2 5.5H3.5v5Zm7-1.5H9.3l2 2 2-2H12V5.5h-1.5V9Z"
+          />
         </svg>
         <span>View as Markdown</span>
         <svg class="copy-page-external" viewBox="0 0 16 16" aria-hidden="true">
@@ -174,7 +174,9 @@ onBeforeUnmount(() => {
       >
         <svg class="copy-page-item-icon logo anthropic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M16.8 4h-3.2l5.7 16h3.2L16.8 4Z" />
-          <path d="M7.2 4 1.5 20h3.3l1.1-3.3h6.3l1.1 3.3h3.3L10.8 4H7.2Zm-.4 10 2.2-6.5 2.2 6.5H6.8Z" />
+          <path
+            d="M7.2 4 1.5 20h3.3l1.1-3.3h6.3l1.1 3.3h3.3L10.8 4H7.2Zm-.4 10 2.2-6.5 2.2 6.5H6.8Z"
+          />
         </svg>
         <span>Open in Claude</span>
         <svg class="copy-page-external" viewBox="0 0 16 16" aria-hidden="true">
