@@ -1,7 +1,7 @@
 const PUBLIC_DOCS_ORIGIN = 'https://gunshi.dev'
 
-export const chatGptPromptBaseUrl = 'https://chatgpt.com/?hints=search&prompt='
-export const claudePromptBaseUrl = 'https://claude.ai/new?q='
+const chatGptPromptBaseUrl = 'https://chatgpt.com/?hints=search&prompt='
+const claudePromptBaseUrl = 'https://claude.ai/new?q='
 
 export function resolveMarkdownPath(pathname: string): string {
   const path = pathname.split(/[?#]/u)[0]?.replace(/\/+$/u, '') || '/'
@@ -18,7 +18,7 @@ export function resolvePublicMarkdownUrl(pathname: string): string {
   return `${PUBLIC_DOCS_ORIGIN}${resolveMarkdownPath(pathname)}`
 }
 
-export function createAiPrompt(markdownUrl: string): string {
+function createAiPrompt(markdownUrl: string): string {
   return `Read from ${markdownUrl} so I can ask questions about this Gunshi documentation page.`
 }
 
