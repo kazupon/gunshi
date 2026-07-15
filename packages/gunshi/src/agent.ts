@@ -1,15 +1,14 @@
 /**
- * The entry point for AI agent detection utility.
+ * The entry point for AI agent detection utilities.
+ *
+ * Detection is delegated to {@link https://github.com/unjs/std-env | std-env}.
+ * The `gunshi/agent` API exposes a stable, minimal profile while the recognized
+ * agent names and detection rules may evolve with the upstream detector.
  *
  * @example
  * ```js
  * import { getAgentProfile } from 'gunshi/agent'
  * ```
- *
- * @experimental
- * The `gunshi/agent` entry point is experimental. The agent detection rules
- * are delegated to {@link https://github.com/unjs/std-env | std-env} and may
- * change as the upstream detector list evolves.
  *
  * @author kazuya kawaguchi (a.k.a. kazupon)
  * @license MIT

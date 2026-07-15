@@ -1,9 +1,8 @@
 # AI Agent Detection
 
-> [!WARNING] Experimental
-> The `gunshi/agent` entry point is experimental. The agent detection rules are delegated to [`std-env`](https://github.com/unjs/std-env), and this API may change as the upstream detector list and conventions evolve.
-
 `gunshi/agent` provides a minimal utility, `getAgentProfile()`, that lets your CLI adjust its UX when running on an AI coding agent (Claude Code, Cursor, Codex, Replit, etc.). It does **not** change Gunshi's behavior automatically. The detection result is a _hint_ that your command, plugin, or renderer can opt into.
+
+The `gunshi/agent` entry point and its profile shape are stable. Detection itself is delegated to [`std-env`](https://github.com/unjs/std-env), so recognized agent names and detection rules may evolve independently as the upstream detector is updated.
 
 ## Why a separate utility?
 
@@ -58,31 +57,19 @@ type AgentProfile = ReturnType<typeof getAgentProfile>
 
 ## Supported agents
 
-Detection is delegated to [`std-env`](https://github.com/unjs/std-env). The current detector list and detection rules are documented there. As of writing, `std-env` recognizes:
+Detection is delegated to [`std-env`](https://github.com/unjs/std-env), which recognizes agents such as Claude Code, Cursor, Codex, and others. Refer to the upstream documentation for the authoritative detector list and detection rules. New agent names may be added without changing the stable `gunshi/agent` API.
 
-- `claude` (Claude Code)
-- `cursor`
-- `codex`
-- `replit`
-- `gemini`
-- `auggie`
-- `opencode`
-- `kiro`
-- `goose`
-- `pi`
-- `devin`
-
-If you need any of these to behave differently, prefer reading the value at runtime via `getAgentProfile().name` rather than hard-coding environment variable checks.
+If a specific agent must behave differently, read the value at runtime via `getAgentProfile().name` rather than hard-coding environment variable checks.
 
 ### `AI_AGENT` override
 
-`std-env` honors an `AI_AGENT` environment variable as an explicit override:
+As part of its upstream API, `std-env` honors an `AI_AGENT` environment variable as an explicit override:
 
 ```sh
 AI_AGENT=codex my-cli ...
 ```
 
-This is useful for testing agent-aware behavior locally, or for declaring a custom agent name. Gunshi passes the name through verbatim — it does not normalize it.
+This is useful for testing agent-aware behavior locally, or for declaring a custom agent name. Gunshi does not define or parse this variable itself; it passes the name reported by `std-env` through verbatim without normalizing it.
 
 ```ts
 // AI_AGENT=my-agent
