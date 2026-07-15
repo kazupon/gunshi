@@ -26,6 +26,7 @@ Gunshi is designed to simplify the creation of modern command-line interfaces:
 - 🧩 **Composable & Lazy**: Create modular sub-commands with context sharing and lazy loading for better performance.
 - 🎨 **Flexible Rendering**: Customize usage generation, validation errors, and help messages with pluggable renderers.
 - 🌍 **Internationalization**: Built with global users in mind, featuring locale-aware design, resource management, and multi-language support.
+- 🤖 **Agent-aware**: Detect AI coding-agent environments through the stable [`gunshi/agent`](https://gunshi.dev/guide/advanced/ai-agent-detection) utility without changing CLI behavior automatically.
 - 🔌 **Pluggable**: Extensible plugin system with dependency management and lifecycle hooks for modular CLI development.
 
 ## Installation

@@ -42,6 +42,7 @@ export const advanced = {
     { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
     { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
     { text: 'Internationalization', link: '/guide/advanced/internationalization' },
+    { text: 'AI Agent Detection', link: '/guide/advanced/ai-agent-detection' },
     { text: 'Documentation Generation', link: '/guide/advanced/docs-gen' },
     {
       text: 'Advanced Lazy Loading and Sub-Commands',
@@ -57,13 +58,7 @@ export const advanced = {
 export const experimentals = {
   text: 'Experimentals',
   collapsed: false,
-  items: [
-    { text: 'Parser Combinators', link: '/guide/experimentals/parser-combinators' },
-    {
-      text: 'AI Agent Detection',
-      link: '/guide/advanced/ai-agent-detection'
-    }
-  ]
+  items: [{ text: 'Parser Combinators', link: '/guide/experimentals/parser-combinators' }]
 }
 
 export const plugin = {
