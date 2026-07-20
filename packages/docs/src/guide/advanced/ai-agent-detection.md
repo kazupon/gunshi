@@ -55,6 +55,14 @@ import { getAgentProfile } from 'gunshi/agent'
 type AgentProfile = ReturnType<typeof getAgentProfile>
 ```
 
+## What the detection result means
+
+The returned profile is not an operating-system signal or proof of who invoked the command. It is a normalized runtime hint derived from the environment by `std-env`. In this guide, "running on an AI coding agent" means that the current process appears to have been launched by, or inherited its environment from, a recognized agent.
+
+Detection can produce false positives or false negatives. Environment variables can be set manually, inherited by unrelated child processes, or omitted by an unknown agent. Do not use the profile for authentication, authorization, sandbox decisions, or any other security boundary.
+
+The profile also does not describe the agent's capabilities. In particular, `isAgent: true` does not guarantee that the caller requires JSON, cannot process colors, or cannot answer a prompt. Treat it as a default-selection hint that explicit CLI options and application configuration can override.
+
 ## Supported agents
 
 Detection is delegated to [`std-env`](https://github.com/unjs/std-env), which recognizes agents such as Claude Code, Cursor, Codex, and others. Refer to the upstream documentation for the authoritative detector list and detection rules. New agent names may be added without changing the stable `gunshi/agent` API.
@@ -77,7 +85,20 @@ getAgentProfile()
 // → { isAgent: true, name: 'my-agent' }
 ```
 
+## Turn detection into behavior
+
+Detection is useful when it changes an observable CLI behavior. Common agent-friendly choices include:
+
+- Emit deterministic, machine-readable output with a documented schema.
+- Require all necessary values as arguments instead of opening a hidden interactive prompt.
+- Keep successful and failed outcomes distinguishable through stable result fields and exit statuses.
+- Avoid ANSI colors and terminal-only decoration in machine-readable output.
+
+Gunshi does not apply these policies automatically. Commands and plugins decide which adaptations are appropriate for their CLI. Prefer explicit options such as `--json` or `--no-interactive` when your CLI exposes them, and use agent detection only to choose their defaults.
+
 ## Using it in a command
+
+This command requires `--target`, so an agent cannot be left waiting for an implicit prompt. When an agent is detected, the command emits a stable JSON object with an explicit status instead of human-oriented prose:
 
 ```ts
 import { define } from 'gunshi'
@@ -92,15 +113,21 @@ export default define({
     const profile = getAgentProfile()
 
     if (profile.isAgent) {
-      // emit machine-friendly output
-      ctx.log(JSON.stringify({ ok: true, target: ctx.values.target }))
+      ctx.log(
+        JSON.stringify({
+          status: 'success',
+          target: ctx.values.target
+        })
+      )
       return
     }
 
-    ctx.log(`Deployed to ${ctx.values.target} ✨`)
+    ctx.log(`Deployed to ${ctx.values.target}`)
   }
 })
 ```
+
+Keep the JSON shape stable once consumers depend on it. Do not catch and discard command failures; map them to documented non-zero exit statuses in your runtime entry point so agents, scripts, and people receive the same unambiguous result.
 
 ## Using it in a plugin
 
