@@ -30,7 +30,7 @@ catalog:
   jsr: ^0.14.3
   jsr-exports-lint: ^0.4.2
   publint: ^0.3.20
-  tsdown: 0.21.0
+  tsdown: 0.22.9
   "@types/node": ^25.6.2
   vitepress-api-references: ^0.2.1
   tsx: ^4.21.0
