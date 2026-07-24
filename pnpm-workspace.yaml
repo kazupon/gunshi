@@ -48,7 +48,7 @@ overrides:
   # (the JS side already bundles it via devDependencies). No equivalent API
   # exists yet in newer versions; tracked at:
   # https://github.com/sxzz/rolldown-plugin-dts/issues/199
-  tsdown>rolldown-plugin-dts: 0.20.0
+  tsdown>rolldown-plugin-dts: 0.27.11
   vitepress>vite: npm:vite@8.1.5
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
