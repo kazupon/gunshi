@@ -107,8 +107,8 @@ importers:
         specifier: ^3.3.2
         version: 3.4.0(eslint@10.4.1(jiti@2.7.0))
       gh-changelogen:
-        specifier: ^0.2.8
-        version: 0.2.8
+        specifier: ^1.0.0
+        version: 1.0.0
       gunshi019:
         specifier: npm:gunshi@0.19.0
         version: gunshi@0.19.0
@@ -3560,8 +3560,8 @@ packages:
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
 
-  gh-changelogen@0.2.8:
-    resolution: {integrity: sha512-E9mRhhmpol2WkCqqljVhg+aUST0RE5WEDbh+oeF4MGIA1T+UvgYxv7sFQemnvY5EWj3pg2xz8cVzJX6gNvgHSw==}
+  gh-changelogen@1.0.0:
+    resolution: {integrity: sha512-EkEpsIeQSaS3fZEEgmGFSM/vqFgoCHpcIANp+IFslZ6eEBH7axlxOu7QbSyiDCgjNSatvtqu+tLJ+BJoCnJIKA==}
     engines: {node: '>= 14.18'}
     hasBin: true
 
@@ -7181,7 +7181,7 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  gh-changelogen@0.2.8:
+  gh-changelogen@1.0.0:
     dependencies:
       ohmyfetch: 0.4.21
       semver: 7.8.2
