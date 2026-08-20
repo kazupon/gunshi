@@ -29,10 +29,11 @@ export {
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
   hasPriorityValidationError,
+  isArgsValidationError,
   isCommandNotFoundError
 } from './error.ts'
 export { plugin } from './plugin/core.ts'
-export { ArgsValidationError, ArgsValidationErrorKeys, isArgsValidationError } from 'args-tokens'
+export { ArgsValidationError, ArgsValidationErrorKeys } from 'args-tokens'
 
 export type { CommandContextParams } from './context.ts'
 export type { CommandNotFoundErrorCode, CommandNotFoundErrorOptions } from './error.ts'
