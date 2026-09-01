@@ -32,7 +32,7 @@ catalog:
   publint: ^0.3.20
   tsdown: 0.21.0
   "@types/node": ^25.6.2
-  vitepress-api-references: ^0.2.1
+  vitepress-api-references: ^0.3.0
   tsx: ^4.21.0
   args-tokens: ^0.28.1
 overrides:
