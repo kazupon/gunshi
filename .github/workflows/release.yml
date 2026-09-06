@@ -1,6 +1,8 @@
 name: Release
 
 # Triggered automatically by tag push (created via `pnpm release` → bumpp).
+# CHANGELOG.md is already part of the tagged release commit produced by
+# `pnpm release`. This workflow does not generate or commit the changelog.
 # Can also be re-run manually via `workflow_dispatch` for partial recovery
 # (e.g. retry only npm-publish after a transient failure).
 on:
@@ -172,12 +174,13 @@ jobs:
           done
 
   release-notes:
-    name: Create GitHub Release and sync changelog
+    name: Create GitHub Release
     needs: [npm-publish, jsr-publish]
     # Runs when:
     # - tag push and both publish jobs succeeded, OR
     # - workflow_dispatch with job=release-notes (publish jobs are skipped), OR
     # - workflow_dispatch with job=all and both publish jobs succeeded
+    # CHANGELOG.md is already in the tagged commit from `pnpm release`.
     if: >-
       always() && (
         (github.event_name == 'push' &&
@@ -190,35 +193,25 @@ jobs:
       )
     runs-on: ubuntu-latest
     permissions:
-      contents: write # GitHub Release 作成 + main への CHANGELOG push
+      contents: write # create GitHub Release
     steps:
-      - name: Checkout main
-        # zizmor: ignore[artipacked] needs persisted credentials so that
-        # stefanzweifel/git-auto-commit-action can push the changelog commit.
+      - name: Checkout tag
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: main
-          fetch-depth: 0
+          ref: ${{ env.TAG }}
+          persist-credentials: false
 
       - name: Create GitHub Release
         # 既存 Release があれば skip (workflow_dispatch リトライ時の冪等性)。
         run: |
-          if gh release view "$TAG" > /dev/null 2>&1; then
+          if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists, skipping creation"
           else
-            gh release create "$TAG" --generate-notes
+            FLAGS=(--verify-tag --generate-notes)
+            if [[ "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+- ]]; then
+              FLAGS+=(--prerelease)
+            fi
+            gh release create "$TAG" "${FLAGS[@]}"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Sync changelog from GitHub Releases
-        run: npx gh-changelogen --repo=kazupon/gunshi --tag="$TAG"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit changelog
-        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
-        with:
-          branch: main
-          file_pattern: CHANGELOG.md
-          commit_message: 'chore: generate changelog'

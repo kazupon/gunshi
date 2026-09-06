@@ -6,6 +6,7 @@
     - [Work Step Example](#work-step-example)
   - [Development Setup](#development-setup)
     - [Commonly used NPM scripts](#commonly-used-npm-scripts)
+  - [Release](#release)
 
 ## Issue Reporting Guidelines
 
@@ -62,6 +63,20 @@ pnpm fix
 There are some other scripts available in the `scripts` section of the `package.json` file.
 
 **Please make sure to have this pass successfully before submitting a PR.** Although the lint will be run against your PR on the CI server, it is better to have it working locally beforehand.
+
+## Release
+
+Bump versions, write `CHANGELOG.md` from GitHub-generated notes, then commit, tag, and push. Run on a clean `main` whose `HEAD` is already on `origin`. Provide a token with Contents: write:
+
+```sh
+GH_TOKEN="$(gh auth token)" pnpm release
+```
+
+Do not leave unrelated tracked changes: bumpp commits every tracked dirty file (`all: true`). `CHANGELOG.md` must already be tracked. The future tag must not exist locally or remotely.
+
+`pnpm release` generates changelog notes for the current `HEAD` (the commit before the release commit). GitHub Actions then publishes npm/JSR from the tag and creates the GitHub Release. It does not rewrite or commit `CHANGELOG.md`.
+
+If GitHub Release creation fails after publish, re-run the Release workflow with `job=release-notes` and the existing tag. The `"changelog"` script (`gh-changelogen --repo=kazupon/gunshi`) is published-release mode for manual recovery and requires `--tag`.
 
 ## Notes
 
