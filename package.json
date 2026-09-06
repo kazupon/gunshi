@@ -77,7 +77,7 @@
     "lint:typecheck": "pnpm run \"/^typecheck:/\"",
     "prepare": "git config --local core.hooksPath .githooks && pnpm run gen:importmap",
     "preview:docs": "pnpm -F @gunshi/docs preview",
-    "release": "bumpp \"package.json\" \"packages/**/package.json\" \"packages/**/jsr.json\" --commit \"release: v\" --all --push --tag",
+    "release": "bumpp",
     "test": "vitest --typecheck run",
     "test:core": "vitest --typecheck run packages/gunshi",
     "test:plugin-completion": "vitest --typecheck run packages/plugin-completion",

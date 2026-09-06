@@ -51,7 +51,8 @@ pnpm build:docs
 # Develop documentation site
 pnpm dev:docs
 
-# Release new version (bumps versions, creates tag, pushes)
+# Release new version (updates CHANGELOG.md, bumps versions, creates tag, pushes)
+# Requires GH_TOKEN with Contents: write, e.g. GH_TOKEN="$(gh auth token)" pnpm release
 pnpm release
 ```
 

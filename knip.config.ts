@@ -3,7 +3,7 @@ import type { KnipConfig } from 'knip'
 export default {
   workspaces: {
     '.': {
-      entry: ['scripts/*.ts'],
+      entry: ['scripts/*.ts', 'bump.config.ts'],
       project: '**/*.ts'
     },
     'packages/gunshi': {
