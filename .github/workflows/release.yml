@@ -142,6 +142,13 @@ jobs:
             pnpm exec tsx ./scripts/jsr.ts --package "${PKG%/}" --tag latest
           done
 
+      - name: Wait until rewritten packages are visible on npm
+        # jsr.ts pins workspace deps to the release version, so the next
+        # `pnpm install` fetches them from npm. npm can lag several seconds
+        # after `npm-publish`, which previously failed this job with
+        # ERR_PNPM_NO_MATCHING_VERSION for @gunshi/resources.
+        run: pnpm exec tsx ./scripts/wait-npm.ts
+
       - name: Re-install with rewritten package.json
         # `--ignore-scripts` で esbuild 等の build script を skip
         # (workspace の onlyBuiltDependencies は dlx context で読まれないため)。
