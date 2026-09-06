@@ -1,42 +1,29 @@
 import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
 
-const DEFAULT_TIMEOUT_MS = 5 * 60 * 1000
-const DEFAULT_INTERVAL_MS = 5_000
+const TIMEOUT_MS = 5 * 60 * 1000
+const INTERVAL_MS = 5_000
 const SKIP_PACKAGES = new Set(['docs'])
 
-export type NpmPackage = {
+type NpmPackage = {
   name: string
   version: string
 }
 
-export type WaitForNpmPackagesOptions = {
-  isPublished: (pkg: NpmPackage) => Promise<boolean>
-  now?: () => number
-  sleep?: (ms: number) => Promise<void>
-  timeoutMs?: number
-  intervalMs?: number
-  log?: (message: string) => void
-}
-
-export function npmSpec(pkg: NpmPackage): string {
+function npmSpec(pkg: NpmPackage): string {
   return `${pkg.name}@${pkg.version}`
 }
 
-export async function collectWorkspacePackages(
-  packagesDir: string,
-  skip: ReadonlySet<string> = SKIP_PACKAGES
-): Promise<NpmPackage[]> {
+async function collectWorkspacePackages(packagesDir: string): Promise<NpmPackage[]> {
   const entries = await fs.readdir(packagesDir, { withFileTypes: true })
   const packages: NpmPackage[] = []
 
   for (const entry of entries) {
-    if (!entry.isDirectory() || skip.has(entry.name)) {
+    if (!entry.isDirectory() || SKIP_PACKAGES.has(entry.name)) {
       continue
     }
 
@@ -54,7 +41,7 @@ export async function collectWorkspacePackages(
   return packages.sort((a, b) => a.name.localeCompare(b.name))
 }
 
-export async function isPublishedOnNpm(pkg: NpmPackage): Promise<boolean> {
+async function isPublishedOnNpm(pkg: NpmPackage): Promise<boolean> {
   try {
     const { stdout } = await execFileAsync(
       'npm',
@@ -69,16 +56,8 @@ export async function isPublishedOnNpm(pkg: NpmPackage): Promise<boolean> {
   }
 }
 
-export async function waitForNpmPackages(
-  packages: readonly NpmPackage[],
-  options: WaitForNpmPackagesOptions
-): Promise<void> {
-  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS
-  const intervalMs = options.intervalMs ?? DEFAULT_INTERVAL_MS
-  const now = options.now ?? Date.now
-  const sleep = options.sleep ?? ((ms: number) => new Promise(resolve => setTimeout(resolve, ms)))
-  const log = options.log ?? console.log
-  const start = now()
+async function waitForNpmPackages(packages: readonly NpmPackage[]): Promise<void> {
+  const start = Date.now()
   const pending = new Set(packages.map(npmSpec))
 
   while (pending.size > 0) {
@@ -87,8 +66,8 @@ export async function waitForNpmPackages(
       if (!pending.has(id)) {
         continue
       }
-      if (await options.isPublished(pkg)) {
-        log(`✓ ${id} is on npm`)
+      if (await isPublishedOnNpm(pkg)) {
+        console.log(`✓ ${id} is on npm`)
         pending.delete(id)
       }
     }
@@ -97,33 +76,18 @@ export async function waitForNpmPackages(
       return
     }
 
-    if (now() - start >= timeoutMs) {
+    if (Date.now() - start >= TIMEOUT_MS) {
       throw new Error(`Timed out waiting for npm packages: ${[...pending].join(', ')}`)
     }
 
-    log(`waiting for ${[...pending].join(', ')}`)
-    await sleep(intervalMs)
+    console.log(`waiting for ${[...pending].join(', ')}`)
+    await new Promise(resolve => setTimeout(resolve, INTERVAL_MS))
   }
 }
 
-export async function main(
-  packagesDir = path.resolve(import.meta.dirname, '../packages')
-): Promise<void> {
-  const packages = await collectWorkspacePackages(packagesDir)
-  logPackages('waiting for npm to serve', packages)
-  await waitForNpmPackages(packages, { isPublished: isPublishedOnNpm })
+const packages = await collectWorkspacePackages(path.resolve(import.meta.dirname, '../packages'))
+console.log('waiting for npm to serve:')
+for (const pkg of packages) {
+  console.log(`  - ${npmSpec(pkg)}`)
 }
-
-function logPackages(prefix: string, packages: readonly NpmPackage[]): void {
-  console.log(`${prefix}:`)
-  for (const pkg of packages) {
-    console.log(`  - ${npmSpec(pkg)}`)
-  }
-}
-
-const invokedDirectly =
-  Boolean(process.argv[1]) && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
-
-if (invokedDirectly) {
-  await main()
-}
+await waitForNpmPackages(packages)
