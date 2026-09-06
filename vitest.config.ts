@@ -1,8 +1,9 @@
-import viteTsconfigPaths from 'vite-tsconfig-paths'
 import { defaultExclude, defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [viteTsconfigPaths()],
+  resolve: {
+    tsconfigPaths: true
+  },
   test: {
     globals: true,
     testTimeout: 60_000,

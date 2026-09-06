@@ -95,7 +95,7 @@
     "@kazupon/prettier-config": "^0.2.0",
     "@types/node": "catalog:",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "^5.0.0",
     "bumpp": "^12.0.0",
     "eslint": "^10.3.0",
     "eslint-plugin-jsdoc": "^64.0.0",
@@ -120,9 +120,8 @@
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "^8.59.2",
-    "vite-tsconfig-paths": "^6.1.1",
     "vitepress-api-references": "catalog:",
-    "vitest": "^4.1.5"
+    "vitest": "^5.0.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
