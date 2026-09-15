@@ -3,7 +3,12 @@
  * @license MIT
  */
 
-import { ArgsValidationErrorKeys, isArgsValidationError } from 'args-tokens'
+import {
+  ArgsValidationErrorKeys,
+  isArgsValidationError as isArgsValidationErrorInstance
+} from 'args-tokens'
+
+import type { ArgsValidationError } from 'args-tokens'
 
 /**
  * Command not found error resource keys.
@@ -82,7 +87,37 @@ export class CommandNotFoundError extends Error {
  * @returns `true` if the error is a {@link CommandNotFoundError}
  */
 export function isCommandNotFoundError(error: unknown): error is CommandNotFoundError {
-  return error instanceof CommandNotFoundError
+  return (
+    error instanceof CommandNotFoundError ||
+    // `instanceof` alone is not enough: `@gunshi/plugin` is bundled with its own copy of
+    // this class (`noExternal: ['gunshi/plugin']`), so an error thrown by `gunshi` is never
+    // an instance of the class a plugin imports. Fall back to a structural check on the
+    // `name` brand the constructor sets, so the guard works across duplicated copies.
+    (error instanceof Error &&
+      error.name === 'CommandNotFoundError' &&
+      'commandName' in error &&
+      'candidates' in error)
+  )
+}
+
+/**
+ * Check whether an error is an {@link ArgsValidationError}.
+ *
+ * Prefer this over the `args-tokens` guard of the same name: it additionally matches
+ * errors produced by a duplicated copy of the class, which is what plugins importing
+ * from `@gunshi/plugin` receive.
+ *
+ * @param error - An unknown error
+ * @returns `true` if the error is an {@link ArgsValidationError}
+ */
+export function isArgsValidationError(error: unknown): error is ArgsValidationError {
+  return (
+    isArgsValidationErrorInstance(error) ||
+    (error instanceof Error &&
+      error.name === 'ArgsValidationError' &&
+      'code' in error &&
+      'values' in error)
+  )
 }
 
 /**
