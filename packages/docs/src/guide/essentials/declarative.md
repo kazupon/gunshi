@@ -342,7 +342,7 @@ try {
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> Use `isCommandNotFoundError` and `isArgsValidationError` instead of `instanceof` checks. `gunshi`, `@gunshi/plugin`, and `@gunshi/bone` each bundle their own copy of the error classes, so `instanceof` fails when an error is thrown by one package and checked with a class imported from another. The guards recognize errors from every copy, including argument errors whose `name` is overridden with the argument name. Keep all `gunshi` and `@gunshi/*` packages on the same version, because copies from older versions do not carry the markers that the guards rely on.
+> Use `isCommandNotFoundError` and `isArgsValidationError` instead of `instanceof` checks. `gunshi`, `@gunshi/plugin`, and `@gunshi/bone` each bundle their own copy of the error classes, so `instanceof` fails when an error is thrown by one package and checked with a class imported from another. The guards recognize errors from every copy, including argument errors such as a missing required option or an invalid value, whose `name` is overridden with the argument name. Keep all `gunshi` and `@gunshi/*` packages on the same version. Older copies do not mark those argument errors, so the guards cannot recognize them when an older copy throws them. Unknown option and command not found errors from older copies are still recognized.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

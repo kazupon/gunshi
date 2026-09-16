@@ -221,6 +221,8 @@ await cli(args, command, {
 })
 ```
 
+The renderer imports its error guards from `@gunshi/plugin`, which bundles its own copy of the error classes. It still recognizes and localizes validation errors thrown by `gunshi` or `@gunshi/bone`. Keep `gunshi` and all `@gunshi/*` packages on the same version: when an older copy throws an argument validation error such as a missing required option, the renderer cannot recognize it and falls back to the English message.
+
 ### Custom Rendering
 
 You can create custom plugins that use the renderer functions while adding your own branding or logic:
