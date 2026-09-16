@@ -91,3 +91,6 @@ Without i18n, the plugin falls back to `Did you mean {$name}?`.
 The plugin does not detect unknown options or unknown commands by itself.
 Gunshi core creates structured validation errors and provides candidate metadata.
 This plugin only decorates validation error rendering and appends suggestion hints.
+
+The plugin imports its error guards from `@gunshi/plugin`, which bundles its own copy of the error classes.
+The guards still recognize errors thrown by `gunshi` or `@gunshi/bone`, so keep `gunshi` and all `@gunshi/*` packages on the same version.
