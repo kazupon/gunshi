@@ -54,7 +54,21 @@ export type CommandNotFoundErrorOptions = {
 }
 
 /**
+ * Brand that marks {@link CommandNotFoundError} instances.
+ *
+ * The brand is looked up in the global symbol registry with `Symbol.for`, so it stays
+ * identical across bundled copies of gunshi (`gunshi`, `@gunshi/plugin`, `@gunshi/bone`)
+ * and across realms. It lets {@link isCommandNotFoundError} recognize errors created by
+ * another copy, where `instanceof` cannot match.
+ */
+const COMMAND_NOT_FOUND_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandNotFoundError')
+
+/**
  * Error raised when a command cannot be resolved.
+ *
+ * Each instance carries a non-enumerable brand keyed by
+ * `Symbol.for('gunshi.CommandNotFoundError')`, so that {@link isCommandNotFoundError}
+ * recognizes it even when it was created by another bundled copy of gunshi.
  */
 export class CommandNotFoundError extends Error {
   readonly code?: CommandNotFoundErrorCode
@@ -77,29 +91,51 @@ export class CommandNotFoundError extends Error {
     this.commandName = options.commandName
     this.candidates = options.candidates || []
     this.commandPath = options.commandPath || []
+    // The brand is an own property so that the guard can reject a brand inherited from a
+    // prototype, such as a polluted `Object.prototype`.
+    Object.defineProperty(this, COMMAND_NOT_FOUND_ERROR_BRAND, {
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
   }
 }
 
 /**
  * Check whether an error is a {@link CommandNotFoundError}.
  *
+ * `instanceof` alone is not enough: `@gunshi/plugin` is bundled with its own copy of this
+ * class (`noExternal: ['gunshi/plugin']`), so an error thrown by `gunshi` is never an instance
+ * of the class a plugin imports. Errors from another copy are recognized through the
+ * `Symbol.for('gunshi.CommandNotFoundError')` brand, which does not depend on `error.name`.
+ *
  * @param error - An unknown error
  * @returns `true` if the error is a {@link CommandNotFoundError}
  */
 export function isCommandNotFoundError(error: unknown): error is CommandNotFoundError {
-  return (
-    error instanceof CommandNotFoundError ||
-    // `instanceof` alone is not enough: `@gunshi/plugin` is bundled with its own copy of
-    // this class (`noExternal: ['gunshi/plugin']`), so an error thrown by `gunshi` is never
-    // an instance of the class a plugin imports. Fall back to a structural check on the
-    // `name` brand the constructor sets, so the guard works across duplicated copies.
-    (error instanceof Error &&
-      error.name === 'CommandNotFoundError' &&
-      'commandName' in error &&
-      typeof error.commandName === 'string' &&
-      'candidates' in error &&
-      Array.isArray(error.candidates))
-  )
+  if (error instanceof CommandNotFoundError) {
+    return true
+  }
+  if (typeof error !== 'object' || error === null) {
+    return false
+  }
+  // Callers such as `@gunshi/plugin-suggestion` read these properties, so an error from
+  // another copy must carry them with the expected types however it is recognized.
+  const { commandName, candidates } = error as { commandName?: unknown; candidates?: unknown }
+  if (typeof commandName !== 'string' || !Array.isArray(candidates)) {
+    return false
+  }
+  // Accept only an own brand, so that an inherited one cannot mark arbitrary objects.
+  if (
+    Object.hasOwn(error, COMMAND_NOT_FOUND_ERROR_BRAND) &&
+    (error as Record<PropertyKey, unknown>)[COMMAND_NOT_FOUND_ERROR_BRAND] === true
+  ) {
+    return true
+  }
+  // NOTE(kazupon): Structural fallback for copies of gunshi older than the brand, which
+  // only set `name`. Drop it in the next major.
+  return error instanceof Error && error.name === 'CommandNotFoundError'
 }
 
 /**
@@ -109,20 +145,33 @@ export function isCommandNotFoundError(error: unknown): error is CommandNotFound
  * errors produced by a duplicated copy of the class, which is what plugins importing
  * from `@gunshi/plugin` receive.
  *
+ * Errors from another copy are recognized through the
+ * `Symbol.for('args-tokens.ArgsValidationError')` brand that `args-tokens` 0.29.0 or later
+ * sets, including subclasses such as `ArgResolveError` that override `name` with the argument
+ * name. The guard narrows only to {@link ArgsValidationError}: across copies,
+ * `instanceof ArgResolveError` still fails, so do not rely on `type` or `schema` for such errors.
+ *
  * @param error - An unknown error
  * @returns `true` if the error is an {@link ArgsValidationError}
  */
 export function isArgsValidationError(error: unknown): error is ArgsValidationError {
+  // `args-tokens` checks `instanceof` and its registry brand, which also covers subclasses
+  // such as `ArgResolveError` created by another copy.
+  if (isArgsValidationErrorInstance(error)) {
+    return true
+  }
+  // NOTE(kazupon): Structural fallback for copies bundling `args-tokens` older than 0.29.0,
+  // which do not set the brand. It matches only direct `ArgsValidationError` instances,
+  // because `ArgResolveError` overrides `name`. Drop it in the next major.
   return (
-    isArgsValidationErrorInstance(error) ||
-    (error instanceof Error &&
-      error.name === 'ArgsValidationError' &&
-      'code' in error &&
-      // `code` is optional on the class, so the constructor may leave it `undefined`
-      (typeof error.code === 'string' || error.code === undefined) &&
-      'values' in error &&
-      typeof error.values === 'object' &&
-      error.values !== null)
+    error instanceof Error &&
+    error.name === 'ArgsValidationError' &&
+    'code' in error &&
+    // `code` is optional on the class, so the constructor may leave it `undefined`
+    (typeof error.code === 'string' || error.code === undefined) &&
+    'values' in error &&
+    typeof error.values === 'object' &&
+    error.values !== null
   )
 }
 
