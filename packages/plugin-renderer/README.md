@@ -214,7 +214,7 @@ await cli(args, command, {
   plugins: [
     i18n({
       locale: 'ja-JP',
-      resources // Uses built-in resources from `@gunshi/resources`
+      builtinResources: resources // Uses built-in resources from `@gunshi/resources`
     }),
     renderer() // Will use Japanese translations
   ]

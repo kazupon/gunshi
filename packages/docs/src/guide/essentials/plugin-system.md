@@ -305,7 +305,7 @@ yarn add @gunshi/plugin-completion
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!IMPORTANT]
-> Shell completion currently requires Node.js. The completion feature is not available when running your CLI with Deno or Bun runtimes.
+> Shell completion supports Node.js and Bun, including Bun single-file executables built with `bun build --compile`. The completion feature is not available yet when running your CLI with Deno.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

@@ -175,7 +175,7 @@ The standard `cli()` function automatically includes these built-in plugins:
 - `@gunshi/plugin-global` - Provides global options like `--help` and `--version`
 - `@gunshi/plugin-renderer` - Handles formatted output for help messages, error messages, and usage information
 
-These plugins are included by default when you use `cli()` from the main `gunshi` package. If you use the lower-level `run()` function instead, you'll need to manually configure these plugins to get help and version functionality.
+These plugins are included by default when you use `cli()` from the main `gunshi` package. If you use `cli()` from [`@gunshi/bone`](./plugin-system.md#minimal-setup) instead, which includes no plugins, you'll need to manually configure these plugins to get help and version functionality.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 

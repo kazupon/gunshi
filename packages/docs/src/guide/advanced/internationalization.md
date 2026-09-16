@@ -202,7 +202,7 @@ const command = defineI18nWithTypes<{ extensions: { [i18nId]: I18nExtension } }>
   },
 
   // Load translations from files
-  resource: locale => {
+  resource: async locale => {
     if (locale.toString() === 'ja-JP') {
       // Dynamic import for lazy loading
       const jaJP = await import('./locales/ja-JP.json', {
