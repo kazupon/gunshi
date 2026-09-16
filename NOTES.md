@@ -52,7 +52,7 @@ The current tsdown-based bundling setup is a workaround. We plan to revisit and 
 
 ### pnpm version
 
-The repository currently pins `pnpm@10.33.2` via the `packageManager` field in `package.json`.
+The repository stays on pnpm v10. The exact version is pinned by the `packageManager` field in `package.json`.
 
 Do not upgrade to `pnpm@11` yet. CI started failing after the upgrade from `pnpm@10.33.2` to `pnpm@11.0.9` because `rolldown` could not resolve its Linux native optional dependency on GitHub Actions:
 
@@ -62,4 +62,4 @@ Cannot find module '@rolldown/binding-linux-x64-gnu'
 
 Adding `@rolldown/binding-linux-x64-gnu` directly as a root `optionalDependency` did not fix the issue, because `rolldown` still could not resolve the binding from its own package location under pnpm's install layout.
 
-Keep `pnpm@10.33.2` until pnpm v11's optional native dependency linking behavior is confirmed to work with `rolldown` in CI.
+Stay on pnpm v10 until pnpm v11's optional native dependency linking behavior is confirmed to work with `rolldown` in CI.

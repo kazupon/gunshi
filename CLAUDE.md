@@ -74,6 +74,11 @@ The repository contains the following packages:
   - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers
   - Published to: npm, JSR
 
+- **`packages/combinators/`** - Parser combinators for argument schemas (`@gunshi/combinators`, experimental)
+  - Composable factories such as `string`, `integer`, `required`, `withDefault`, `args`
+  - Same exports as `gunshi/combinators`
+  - Published to: npm, JSR
+
 - **`packages/plugin/`** - Plugin development kit (`@gunshi/plugin`)
   - Type definitions and APIs for creating plugins
   - Same exports as `gunshi/plugin` but with smaller footprint
@@ -110,6 +115,10 @@ The repository contains the following packages:
 
 - **`packages/plugin-dryrun/`** - Dry-run mode plugin (`@gunshi/plugin-dryrun`)
   - Adds `--dry-run` option to commands
+
+- **`packages/plugin-suggestion/`** - Suggestion plugin (`@gunshi/plugin-suggestion`)
+  - Adds "Did you mean" hints for unknown long options and unknown commands
+  - Uses Levenshtein distance by default
 
 ### Documentation
 
@@ -185,6 +194,7 @@ Gunshi has a fully-implemented, production-ready plugin system. Plugins can:
 3. **@gunshi/plugin-renderer** - Customizable help/error rendering
 4. **@gunshi/plugin-completion** - Shell tab completion
 5. **@gunshi/plugin-dryrun** - Dry-run mode support
+6. **@gunshi/plugin-suggestion** - "Did you mean" hints for unknown options and commands
 
 ### Plugin Development
 
