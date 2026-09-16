@@ -17,13 +17,18 @@ import type { Args } from 'args-tokens'
  * Stand-ins for the duplicated class copies that `@gunshi/plugin` ships: it is bundled
  * with `noExternal: ['gunshi/plugin']`, so a plugin importing these guards holds a
  * different class object than the one `gunshi` throws with, and `instanceof` cannot match.
+ * Like the real constructors, they set every property of the class, but no brand.
  */
 class DuplicatedCommandNotFoundError extends Error {
+  readonly code = CommandNotFoundErrorKeys.notFound
+  readonly values: Record<string, unknown>
   readonly commandName: string
   readonly candidates: readonly string[]
+  readonly commandPath: readonly string[] = []
   constructor(message: string, commandName: string, candidates: readonly string[]) {
     super(message)
     this.name = 'CommandNotFoundError'
+    this.values = { commandName }
     this.commandName = commandName
     this.candidates = candidates
   }
@@ -132,8 +137,11 @@ describe('CommandNotFoundError brand', () => {
 
   test('recognizes a branded error from a foreign class that overrides name', () => {
     class ForeignCommandNotFoundError extends Error {
+      code = CommandNotFoundErrorKeys.notFound
+      values = { commandName: 'lod' }
       commandName = 'lod'
       candidates = ['load']
+      commandPath = []
       constructor() {
         super('Command not found: lod')
         this.name = 'SomethingElse'
@@ -150,8 +158,11 @@ describe('CommandNotFoundError brand', () => {
     const error: unknown = runInNewContext(`
       const error = new Error('Command not found: lod')
       Object.defineProperty(error, Symbol.for('gunshi.CommandNotFoundError'), { value: true })
+      error.code = 'err:cmd:not-found'
+      error.values = { commandName: 'lod' }
       error.commandName = 'lod'
       error.candidates = ['load']
+      error.commandPath = []
       error
     `)
 
@@ -160,36 +171,100 @@ describe('CommandNotFoundError brand', () => {
     expect(isCommandNotFoundError(error)).toBe(true)
   })
 
+  /**
+   * Create the own properties that every copy of `CommandNotFoundError` sets.
+   *
+   * @returns The properties, which each rejection case below breaks one at a time
+   */
+  function commandNotFoundErrorShape(): Record<string, unknown> {
+    return {
+      code: CommandNotFoundErrorKeys.notFound,
+      values: { commandName: 'lod' },
+      commandName: 'lod',
+      candidates: ['load'],
+      commandPath: []
+    }
+  }
+
+  /**
+   * Create a plain object with the brand and a valid shape, with some properties overridden.
+   *
+   * @param overrides - Properties to override, where `undefined` removes the property
+   * @returns The branded object
+   */
+  function brandedCommandNotFoundError(overrides: Record<string, unknown> = {}): object {
+    const value: Record<PropertyKey, unknown> = {
+      [COMMAND_NOT_FOUND_ERROR_BRAND]: true,
+      ...commandNotFoundErrorShape(),
+      ...overrides
+    }
+    for (const [key, override] of Object.entries(overrides)) {
+      if (override === undefined) {
+        delete value[key]
+      }
+    }
+    return value
+  }
+
+  test('recognizes a branded plain object with a valid shape', () => {
+    // the control for the rejection cases below
+    expect(isCommandNotFoundError(brandedCommandNotFoundError())).toBe(true)
+  })
+
   test.each([
     {
       title: 'brand without commandName',
-      value: { [COMMAND_NOT_FOUND_ERROR_BRAND]: true, candidates: [] }
+      value: brandedCommandNotFoundError({ commandName: undefined })
     },
     {
       title: 'brand with a non-string commandName',
-      value: { [COMMAND_NOT_FOUND_ERROR_BRAND]: true, commandName: 1, candidates: [] }
+      value: brandedCommandNotFoundError({ commandName: 1 })
     },
     {
       title: 'brand without candidates',
-      value: { [COMMAND_NOT_FOUND_ERROR_BRAND]: true, commandName: 'lod' }
+      value: brandedCommandNotFoundError({ candidates: undefined })
     },
     {
       title: 'brand with non-array candidates',
-      value: { [COMMAND_NOT_FOUND_ERROR_BRAND]: true, commandName: 'lod', candidates: 'load' }
+      value: brandedCommandNotFoundError({ candidates: 'load' })
     },
     {
+      title: 'brand with a non-string candidate',
+      value: brandedCommandNotFoundError({ candidates: ['load', 1] })
+    },
+    {
+      title: 'brand without commandPath',
+      value: brandedCommandNotFoundError({ commandPath: undefined })
+    },
+    {
+      title: 'brand with a non-string command path segment',
+      value: brandedCommandNotFoundError({ commandPath: [null] })
+    },
+    { title: 'brand without values', value: brandedCommandNotFoundError({ values: undefined }) },
+    { title: 'brand with null values', value: brandedCommandNotFoundError({ values: null }) },
+    { title: 'brand without code', value: brandedCommandNotFoundError({ code: undefined }) },
+    { title: 'brand with a non-string code', value: brandedCommandNotFoundError({ code: 42 }) },
+    {
       title: 'brand set to a string',
-      value: { [COMMAND_NOT_FOUND_ERROR_BRAND]: 'true', commandName: 'lod', candidates: [] }
+      value: { ...commandNotFoundErrorShape(), [COMMAND_NOT_FOUND_ERROR_BRAND]: 'true' }
     },
     {
       title: 'brand keyed by a non-registry symbol',
-      value: { [Symbol('gunshi.CommandNotFoundError')]: true, commandName: 'lod', candidates: [] }
+      value: { ...commandNotFoundErrorShape(), [Symbol('gunshi.CommandNotFoundError')]: true }
     },
     {
       title: 'inherited brand',
-      value: Object.assign(Object.create({ [COMMAND_NOT_FOUND_ERROR_BRAND]: true }) as object, {
-        commandName: 'lod',
-        candidates: []
+      value: Object.assign(
+        Object.create({ [COMMAND_NOT_FOUND_ERROR_BRAND]: true }) as object,
+        commandNotFoundErrorShape()
+      )
+    },
+    {
+      title: 'error named CommandNotFoundError with a non-string candidate',
+      value: Object.assign(new Error('Command not found: lod'), {
+        ...commandNotFoundErrorShape(),
+        name: 'CommandNotFoundError',
+        candidates: [1]
       })
     }
   ])('rejects $title', ({ value }) => {
@@ -281,6 +356,28 @@ describe('isArgsValidationError', () => {
 
   test('does not match a forged brand without values', () => {
     expect(isArgsValidationError({ [ARGS_VALIDATION_ERROR_BRAND]: true })).toBe(false)
+  })
+
+  test('matches a branded plain object with a valid shape', () => {
+    // the control for the rejection cases below
+    expect(
+      isArgsValidationError({ [ARGS_VALIDATION_ERROR_BRAND]: true, code: undefined, values: {} })
+    ).toBe(true)
+  })
+
+  test.each([
+    // `args-tokens` accepts these, but consumers use `code` as a resource key
+    {
+      title: 'brand with a non-string code',
+      value: { [ARGS_VALIDATION_ERROR_BRAND]: true, code: 42, values: {} }
+    },
+    { title: 'brand without code', value: { [ARGS_VALIDATION_ERROR_BRAND]: true, values: {} } },
+    {
+      title: 'error named ArgsValidationError without code',
+      value: Object.assign(new Error('bad'), { name: 'ArgsValidationError', values: {} })
+    }
+  ])('rejects $title', ({ value }) => {
+    expect(isArgsValidationError(value)).toBe(false)
   })
 })
 

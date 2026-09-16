@@ -4,11 +4,10 @@
  */
 
 import {
+  ArgsValidationError,
   ArgsValidationErrorKeys,
-  isArgsValidationError as isArgsValidationErrorInstance
+  isArgsValidationError as isBrandedArgsValidationError
 } from 'args-tokens'
-
-import type { ArgsValidationError } from 'args-tokens'
 
 /**
  * Command not found error resource keys.
@@ -117,19 +116,16 @@ export function isCommandNotFoundError(error: unknown): error is CommandNotFound
   if (error instanceof CommandNotFoundError) {
     return true
   }
-  if (typeof error !== 'object' || error === null) {
-    return false
-  }
-  // Callers such as `@gunshi/plugin-suggestion` read these properties, so an error from
-  // another copy must carry them with the expected types however it is recognized.
-  const { commandName, candidates } = error as { commandName?: unknown; candidates?: unknown }
-  if (typeof commandName !== 'string' || !Array.isArray(candidates)) {
+  // Consumers such as `@gunshi/plugin-renderer` and `@gunshi/plugin-suggestion` read these
+  // properties, so an error from another copy must have the shape that this type predicate
+  // promises, however it is recognized. The constructor of every copy sets all of them.
+  if (!isRecord(error) || !hasCommandNotFoundErrorShape(error)) {
     return false
   }
   // Accept only an own brand, so that an inherited one cannot mark arbitrary objects.
   if (
     Object.hasOwn(error, COMMAND_NOT_FOUND_ERROR_BRAND) &&
-    (error as Record<PropertyKey, unknown>)[COMMAND_NOT_FOUND_ERROR_BRAND] === true
+    error[COMMAND_NOT_FOUND_ERROR_BRAND] === true
   ) {
     return true
   }
@@ -141,38 +137,72 @@ export function isCommandNotFoundError(error: unknown): error is CommandNotFound
 /**
  * Check whether an error is an {@link ArgsValidationError}.
  *
- * Prefer this over the `args-tokens` guard of the same name: it additionally matches
- * errors produced by a duplicated copy of the class, which is what plugins importing
- * from `@gunshi/plugin` receive.
+ * Prefer this over the `args-tokens` guard of the same name. Both recognize errors from another
+ * bundled copy through the `Symbol.for('args-tokens.ArgsValidationError')` brand that
+ * `args-tokens` 0.29.0 or later sets, including subclasses such as `ArgResolveError` that
+ * override `name` with the argument name. This guard additionally:
  *
- * Errors from another copy are recognized through the
- * `Symbol.for('args-tokens.ArgsValidationError')` brand that `args-tokens` 0.29.0 or later
- * sets, including subclasses such as `ArgResolveError` that override `name` with the argument
- * name. The guard narrows only to {@link ArgsValidationError}: across copies,
+ * - recognizes direct `ArgsValidationError` instances from copies bundling `args-tokens`
+ *   older than 0.29.0, which do not set the brand
+ * - checks that `code` and `values` of an error from another copy have the expected types
+ *
+ * The guard narrows only to {@link ArgsValidationError}: across copies,
  * `instanceof ArgResolveError` still fails, so do not rely on `type` or `schema` for such errors.
  *
  * @param error - An unknown error
  * @returns `true` if the error is an {@link ArgsValidationError}
  */
 export function isArgsValidationError(error: unknown): error is ArgsValidationError {
-  // `args-tokens` checks `instanceof` and its registry brand, which also covers subclasses
-  // such as `ArgResolveError` created by another copy.
-  if (isArgsValidationErrorInstance(error)) {
+  if (error instanceof ArgsValidationError) {
+    return true
+  }
+  // Consumers such as `@gunshi/plugin-renderer` use `code` as a resource key and read `values`,
+  // so an error from another copy must have the shape that this type predicate promises.
+  if (!isRecord(error) || !hasArgsValidationErrorShape(error)) {
+    return false
+  }
+  // `args-tokens` checks its registry brand, which also covers subclasses from another copy.
+  if (isBrandedArgsValidationError(error)) {
     return true
   }
   // NOTE(kazupon): Structural fallback for copies bundling `args-tokens` older than 0.29.0,
   // which do not set the brand. It matches only direct `ArgsValidationError` instances,
   // because `ArgResolveError` overrides `name`. Drop it in the next major.
+  return error instanceof Error && error.name === 'ArgsValidationError'
+}
+
+function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isStringArray(value: unknown): value is readonly string[] {
+  return Array.isArray(value) && value.every(item => typeof item === 'string')
+}
+
+/**
+ * Check whether `code` is an own or inherited property that is a string or `undefined`.
+ *
+ * Constructors always assign `code`, even when the option is omitted.
+ *
+ * @param error - An error from another copy
+ * @returns `true` if `code` has the expected type
+ */
+function hasOptionalStringCode(error: Record<PropertyKey, unknown>): boolean {
+  return 'code' in error && (error.code === undefined || typeof error.code === 'string')
+}
+
+function hasCommandNotFoundErrorShape(error: Record<PropertyKey, unknown>): boolean {
   return (
-    error instanceof Error &&
-    error.name === 'ArgsValidationError' &&
-    'code' in error &&
-    // `code` is optional on the class, so the constructor may leave it `undefined`
-    (typeof error.code === 'string' || error.code === undefined) &&
-    'values' in error &&
-    typeof error.values === 'object' &&
-    error.values !== null
+    hasOptionalStringCode(error) &&
+    isRecord(error.values) &&
+    typeof error.commandName === 'string' &&
+    isStringArray(error.candidates) &&
+    isStringArray(error.commandPath)
   )
+}
+
+function hasArgsValidationErrorShape(error: Record<PropertyKey, unknown>): boolean {
+  return hasOptionalStringCode(error) && isRecord(error.values)
 }
 
 /**
