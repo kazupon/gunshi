@@ -119,6 +119,7 @@
     "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
+    "@types/node": "catalog:",
     "args-tokens": "catalog:",
     "deno": "catalog:",
     "jsr": "catalog:",
