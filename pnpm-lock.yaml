@@ -290,6 +290,9 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.2
       args-tokens:
         specifier: 'catalog:'
         version: 0.29.0
