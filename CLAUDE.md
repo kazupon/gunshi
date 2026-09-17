@@ -30,16 +30,17 @@ pnpm test:plugin-i18n           # i18n plugin
 pnpm test:plugin-renderer       # Renderer plugin
 pnpm test:plugin-completion     # Completion plugin
 
-# Run linter (ESLint, Prettier, Knip, JSR checks)
+# Run linters (oxlint, ESLint, oxfmt, Knip, JSR checks, Deno type checks)
 pnpm lint
 
-# Auto-fix linting issues
+# Auto-fix lint and formatting issues (oxlint, ESLint, oxfmt, Knip)
 pnpm fix
 
 # Run type checking
-pnpm lint:typecheck             # Run all type checks (typecheck:deno, typecheck:tsc)
+pnpm lint:typecheck             # Run all typecheck:* scripts (currently typecheck:deno)
 pnpm typecheck:deno             # Deno-specific type checking
-pnpm typecheck:tsc              # TypeScript compiler diagnostics
+# TypeScript diagnostics are also reported by `pnpm test` (vitest --typecheck)
+# and `pnpm lint` (oxlint --type-check)
 
 # Run benchmarks
 pnpm bench:vitest
@@ -111,7 +112,7 @@ The repository contains the following packages:
 
 - **`packages/plugin-completion/`** - Shell completion plugin (`@gunshi/plugin-completion`)
   - Tab completion for commands and options
-  - Supports bash, zsh, fish
+  - Supports bash, zsh, fish, powershell
 
 - **`packages/plugin-dryrun/`** - Dry-run mode plugin (`@gunshi/plugin-dryrun`)
   - Adds `--dry-run` option to commands
@@ -141,12 +142,16 @@ packages/gunshi/src/
 │   └── bone.ts           # Bone CLI logic
 ├── context.ts            # Command context creation and management
 ├── definition.ts         # Command definition helpers
+├── combinators.ts        # Parser combinators entry (`gunshi/combinators`, experimental)
 ├── decorators.ts         # Command runner decorators
+├── error.ts              # Error classes and type guards (`CommandNotFoundError`, `isArgsValidationError`)
 ├── generator.ts          # Command generator utilities
 ├── renderer.ts           # Usage/help rendering
-├── utils.ts              # Runtime utilities (Node.js, Deno, Bun)
+├── agent.ts              # AI agent detection (`gunshi/agent`)
+├── utils.ts              # Command utilities (lazy command resolution, sub-command lookup)
 ├── types.ts              # TypeScript type definitions
 ├── constants.ts          # Constants and defaults
+├── plugin.ts             # Plugin entry (`gunshi/plugin`)
 └── plugin/
     ├── core.ts           # Plugin system core
     ├── context.ts        # Plugin context management
@@ -164,7 +169,7 @@ packages/gunshi/src/
 - **Type Safety**: Full TypeScript support with type inference for arguments and context
 - **Plugin System**: Extensible architecture with dependency management, lifecycle hooks, and context extensions
 - **Lazy Loading**: Commands can be lazily loaded for better performance
-- **Runtime Agnostic**: Works across Node.js, Deno, and Bun with runtime-specific utilities
+- **Runtime Agnostic**: Works across Node.js, Deno, and Bun; the core receives `argv` from the caller instead of calling runtime-specific APIs
 
 ### Playground Examples
 
@@ -173,6 +178,7 @@ playground/
 ├── essentials/           # Basic CLI examples
 ├── advanced/             # Advanced features (sub-commands, lazy loading)
 ├── plugins/              # Plugin usage examples
+├── experimentals/        # Experimental features (parser combinators)
 ├── bun/                  # Bun runtime examples
 └── deno/                 # Deno runtime examples
 ```
@@ -211,12 +217,14 @@ When creating plugins:
 
 1. **TypeScript Strict Mode**: All source code uses TypeScript with strict mode enabled
 2. **ES Modules**: Use ES modules throughout (`import`/`export`, not `require`)
-3. **Code Style**: Enforced by ESLint and Prettier (run `pnpm fix` to auto-fix)
+3. **Code Style**: Enforced by oxlint, ESLint, and oxfmt (run `pnpm fix` to auto-fix)
 4. **Linting**: Must pass `pnpm lint` before submitting PRs
-   - ESLint for code quality
-   - Prettier for formatting
-   - Knip for unused exports detection
+   - oxlint for JavaScript/TypeScript code quality, with type-aware rules and TypeScript type checking
+   - ESLint for JSDoc, comments, Markdown, JSON, YAML, and Vue files
+   - oxfmt for formatting, using the Prettier config from `@kazupon/prettier-config`
+   - Knip for unused files, exports, and dependencies
    - JSR export validation
+   - Deno type checking
 
 ### Testing Requirements
 
@@ -296,7 +304,8 @@ Packages are published to:
 ### Multi-Runtime Support
 
 - The project supports Node.js, Deno, and Bun
-- Runtime-specific utilities are in `packages/gunshi/src/utils.ts`
+- The core does not call runtime-specific APIs directly. Callers pass the arguments, e.g. `process.argv.slice(2)`, `Deno.args`, or `Bun.argv.slice(2)`
+- Plugins that need runtime detection implement it themselves (e.g. `packages/plugin-completion/src/utils.ts`)
 - Always test changes across all supported runtimes when modifying core functionality
 - Use `pnpm typecheck:deno` for Deno-specific type checking
 
