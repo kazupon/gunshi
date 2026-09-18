@@ -5,6 +5,7 @@
 
 import { createCommandContext } from '@gunshi/plugin'
 import {
+  ARG_NEGATABLE_PREFIX,
   getCommandSubCommands,
   localizable,
   resolveArgKey,
@@ -272,12 +273,26 @@ export async function registerCompletion({
     if (schema.type === 'positional') {
       commandTab.argument(key, resolveCompletionHandler(name, key, config, i18n), schema.multiple)
     } else {
-      commandTab.option(
-        key,
-        (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || '',
-        resolveCompletionHandler(name, key, config, i18n),
-        schema.short
-      )
+      const description =
+        (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || ''
+      if (schema.type === 'boolean') {
+        // no handler, which is how `Command#option` tells that the option takes no value
+        commandTab.option(key, description, schema.short)
+        if (schema.negatable) {
+          const negatableKey = `${ARG_NEGATABLE_PREFIX}${key}`
+          commandTab.option(
+            negatableKey,
+            (await localizeDescription(resolveArgKey(negatableKey, ctx.name))) || ''
+          )
+        }
+      } else {
+        commandTab.option(
+          key,
+          description,
+          resolveCompletionHandler(name, key, config, i18n),
+          schema.short
+        )
+      }
     }
   }
 

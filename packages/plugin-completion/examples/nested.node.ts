@@ -74,13 +74,6 @@ await cli(process.argv.slice(2), entry, {
   plugins: [
     completion({
       config: {
-        entry: {
-          args: {
-            verbose: {
-              handler: () => []
-            }
-          }
-        },
         subCommands: {
           'remote add': {
             args: {

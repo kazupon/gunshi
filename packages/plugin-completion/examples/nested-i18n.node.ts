@@ -123,13 +123,6 @@ await cli(process.argv.slice(2), entry, {
     }),
     completion({
       config: {
-        entry: {
-          args: {
-            verbose: {
-              handler: () => []
-            }
-          }
-        },
         subCommands: {
           'remote add': {
             args: {

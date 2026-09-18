@@ -63,7 +63,7 @@ const remote = defineCommand({
       description: 'Add a remote',
       args: {
         url: { type: 'string', short: 'u', description: 'Remote URL' },
-        force: { type: 'boolean', short: 'f', description: 'Force' },
+        force: { type: 'boolean', short: 'f', negatable: true, description: 'Force' },
         name: { type: 'positional', description: 'Remote name' }
       },
       resource: resource('リモートを追加', { url: 'リモートの URL', force: '強制' }),
@@ -256,12 +256,31 @@ async function complete(
   args: string[],
   useI18n: boolean,
   output: string[]
-): Promise<string> {
+): Promise<[string, RootCommand]> {
   const t = new RootCommand()
   await register(t, useI18n ? await createI18nExtension() : undefined)
   output.length = 0
   t.parse([...args])
-  return output.join('\n')
+  return [output.join('\n'), t]
+}
+
+function hasOption(t: RootCommand, arg: string, booleanOnly = false): boolean {
+  const name = arg.replace(/^-+/, '')
+  return [t, ...t.commands.values()].some(command =>
+    [...command.options.values()].some(
+      option =>
+        (option.value === name || option.alias === name) && (!booleanOnly || !!option.isBoolean)
+    )
+  )
+}
+
+// `RootCommand#parse` looks an option up in every registered command, so the full command tree
+// knows the boolean options of the commands off the typed path, and the active path does not.
+// Such an option is not valid where it is typed, and the active path takes it as an unknown option.
+function usesOptionOffThePath(args: string[], full: RootCommand, activePath: RootCommand): boolean {
+  return args.some(
+    arg => arg.startsWith('-') && hasOption(full, arg, true) && !hasOption(activePath, arg)
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -321,6 +340,8 @@ const TAILS = [
   ['-d', ''],
   ['--open', ''],
   ['--force', ''],
+  ['--no-force', ''],
+  ['--no-'],
   ['--url', ''],
   ['--url', 'https://x', ''],
   ['-u', ''],
@@ -381,6 +402,28 @@ describe('registerForCompletion', () => {
     expect(candidate?.arguments.size).toEqual(0)
   })
 
+  test('a boolean option takes no value', async () => {
+    const t = new RootCommand()
+    await registerActivePath(['remote', 'add', ''])(t)
+
+    expect(t.options.get('debug')?.isBoolean).toEqual(true)
+    expect(t.options.get('config')?.isBoolean).toEqual(false)
+    expect(t.commands.get('remote add')?.options.get('force')?.isBoolean).toEqual(true)
+    expect(t.commands.get('remote add')?.options.get('no-force')?.isBoolean).toEqual(true)
+  })
+
+  test.each([
+    [['--debug', ''], 'dev\tStart dev server'],
+    [['-d', 'rem'], 'remote\tManage remotes'],
+    [['remote', '--verbose', ''], 'add\tAdd a remote'],
+    [['remote', 'add', '--force', ''], 'origin\t'],
+    [['remote', 'add', '--no-force', ''], 'origin\t'],
+    [['remote', 'add', '--no-'], '--no-force\tNegatable of -f, --force']
+  ])('completes after a boolean option: %j', async (args, expected) => {
+    const [actual] = await complete(registerActivePath(args), args, false, output)
+    expect(actual.split('\n')).toContain(expected)
+  })
+
   describe.each([
     ['without i18n', false],
     ['with i18n', true]
@@ -388,10 +431,15 @@ describe('registerForCompletion', () => {
     test('completes exactly like the full command tree', async () => {
       const mismatches: string[] = []
       let withCandidates = 0
+      let compared = 0
 
       for (const args of INPUTS) {
-        const expected = await complete(registerAll, args, useI18n, output)
-        const actual = await complete(registerActivePath(args), args, useI18n, output)
+        const [expected, full] = await complete(registerAll, args, useI18n, output)
+        const [actual, activePath] = await complete(registerActivePath(args), args, useI18n, output)
+        if (usesOptionOffThePath(args, full, activePath)) {
+          continue
+        }
+        compared++
         if (expected !== ':4') {
           withCandidates++
         }
@@ -404,7 +452,8 @@ describe('registerForCompletion', () => {
 
       expect(mismatches).toEqual([])
       // guard against an all-empty corpus, which would compare nothing
-      expect(withCandidates).toBeGreaterThan(INPUTS.length / 5)
+      expect(compared).toBeGreaterThan(INPUTS.length * 0.9)
+      expect(withCandidates).toBeGreaterThan(compared / 5)
     })
   })
 })

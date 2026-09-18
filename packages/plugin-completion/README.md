@@ -309,6 +309,13 @@ completion({
 })
 ```
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> A handler completes the value of an option, or a positional argument. An option of `type: 'boolean'` takes no value, so a handler for it is never called.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 ### Internationalization Support
 
 When used with `@gunshi/plugin-i18n`, completion descriptions are automatically localized:
