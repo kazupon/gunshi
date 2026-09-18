@@ -95,8 +95,8 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
        */
 
       /**
-       * NOTE(kazupon): registered as the completion root when the CLI has no entry command,
-       * which keeps the behavior of the `onExtension` hook this replaces.
+       * NOTE(kazupon): registered as the completion root only when gunshi does not expose
+       * the entry command, which is the case with the versions before `env.entryCommand`.
        */
       const fallbackEntry: Command = {
         name: COMPLETE_COMMAND_NAME,
@@ -134,7 +134,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
                 (cmdCtx.env.subCommands as
                   | ReadonlyMap<string, Command | LazyCommand>
                   | undefined) || new Map<string, Command | LazyCommand>(),
-              fallbackEntry,
+              fallbackEntry: cmdCtx.env.entryCommand || fallbackEntry,
               config,
               i18nPluginId,
               i18n: cmdCtx.extensions[i18nPluginId]

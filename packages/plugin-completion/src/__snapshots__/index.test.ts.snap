@@ -266,22 +266,27 @@ exports[`no sub-commands > no input 1`] = `
 `;
 
 exports[`no sub-commands > suggest for inputting 1`] = `
-":4
+"--environment	Target environment
+--config	Config file path
+:4
 "
 `;
 
 exports[`no sub-commands > suggest for long option 1`] = `
-":4
+"--config	Config file path
+:4
 "
 `;
 
 exports[`no sub-commands > suggest for short option 1`] = `
-":4
+"-c	Config file path
+:4
 "
 `;
 
 exports[`no sub-commands > suggest value if option values correctly 1`] = `
-":4
+"prod.json	Production config
+:4
 "
 `;
 
