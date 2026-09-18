@@ -57,36 +57,19 @@
  */
 
 import { RootCommand } from '@bomb.sh/tab'
-import { createCommandContext, plugin } from '@gunshi/plugin'
-import {
-  localizable,
-  namespacedId,
-  resolveArgKey,
-  resolveKey,
-  resolveLazyCommand
-} from '@gunshi/shared'
+import { plugin } from '@gunshi/plugin'
+import { namespacedId } from '@gunshi/shared'
+import { COMPLETE_COMMAND_NAME, registerForCompletion } from './registration.ts'
 import { pluginId } from './types.ts'
 import { quoteExec } from './utils.ts'
 
-import type { Complete, Completion } from '@bomb.sh/tab'
-import type {
-  Args,
-  Command,
-  CommandContextExtension,
-  LazyCommand,
-  PluginContext,
-  PluginWithoutExtension
-} from '@gunshi/plugin'
+import type { Command, LazyCommand, PluginWithoutExtension } from '@gunshi/plugin'
 import type { I18nExtension } from '@gunshi/plugin-i18n'
-import type { CompletionConfig, CompletionOptions } from './types.ts'
+import type { CompletionOptions } from './types.ts'
 
 export * from './types.ts'
 
 const TERMINATOR = '--'
-
-const NOOP_HANDLER = () => {
-  return [] as Completion[]
-}
 
 const i18nPluginId = namespacedId('i18n')
 
@@ -100,7 +83,6 @@ const dependencies = [{ id: i18nPluginId, optional: true }] as const
  */
 export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {
   const config = options.config || {}
-  const t = new RootCommand()
 
   return plugin<Record<typeof i18nPluginId, I18nExtension>, typeof pluginId, typeof dependencies>({
     id: pluginId,
@@ -109,18 +91,25 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
 
     setup(ctx) {
       /**
-       * add command for completion script generation
+       * add command for completion script generation and runtime completion
        */
 
-      const completeName = 'complete'
-      ctx.addCommand(completeName, {
-        name: completeName,
+      /**
+       * NOTE(kazupon): registered as the completion root when the CLI has no entry command,
+       * which keeps the behavior of the `onExtension` hook this replaces.
+       */
+      const fallbackEntry: Command = {
+        name: COMPLETE_COMMAND_NAME,
         // TODO(kazupon): support description localization
-        description: 'Generate shell completion script',
+        description: 'Generate shell completion script'
+      }
+
+      ctx.addCommand(COMPLETE_COMMAND_NAME, {
+        ...fallbackEntry,
         rendering: {
           header: null // disable header rendering for completion command
         },
-        run: cmdCtx => {
+        run: async cmdCtx => {
           if (!cmdCtx.env.name) {
             throw new Error('your cli name is not defined.')
           }
@@ -130,165 +119,33 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
             shell = undefined
           }
 
+          /**
+           * NOTE(kazupon): the completion tree is built here, and only here.
+           * Building it for every command run, which is what the `onExtension` hook would do,
+           * costs the whole command tree on runs that never complete anything.
+           */
+          const t = new RootCommand()
           if (shell === undefined) {
-            t.parse(cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1))
+            const args = cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1)
+            await registerForCompletion({
+              t,
+              args,
+              subCommands:
+                (cmdCtx.env.subCommands as
+                  | ReadonlyMap<string, Command | LazyCommand>
+                  | undefined) || new Map<string, Command | LazyCommand>(),
+              fallbackEntry,
+              config,
+              i18nPluginId,
+              i18n: cmdCtx.extensions[i18nPluginId]
+            })
+            t.parse(args)
           } else if (['zsh', 'bash', 'fish', 'powershell'].includes(shell)) {
+            // the completion script only needs the CLI name and the executable
             t.setup(cmdCtx.env.name, quoteExec(), shell)
           }
         }
       })
-    },
-
-    /**
-     * setup bombshell completion with `onExtension` hook
-     */
-
-    onExtension: async (ctx, cmd) => {
-      const i18n = ctx.extensions[i18nPluginId]
-      const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
-
-      const entry =
-        [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry) || (cmd as Command)
-
-      await registerCompletion({
-        name: 'entry',
-        cmd: entry,
-        config,
-        i18nPluginId,
-        i18n,
-        t,
-        isBombshellRoot: true
-      })
-
-      await handleSubCommands(t, subCommands, i18nPluginId, config.subCommands, i18n)
     }
   })
-}
-
-async function registerCompletion({
-  name,
-  cmd,
-  config,
-  i18nPluginId,
-  i18n,
-  t,
-  isBombshellRoot = false
-}: {
-  name: string
-  cmd: Command | LazyCommand
-  config: Record<string, CompletionConfig>
-  i18nPluginId: string
-  i18n?: I18nExtension
-  t: RootCommand
-  isBombshellRoot?: boolean
-}) {
-  const resolvedCmd = await resolveLazyCommand(cmd)
-  const extensions: Record<string, CommandContextExtension> = Object.create(null) as Record<
-    string,
-    CommandContextExtension
-  >
-  if (i18n) {
-    extensions[i18nPluginId] = {
-      key: Symbol(i18nPluginId),
-      factory: () => i18n
-    }
-  }
-  const ctx = await createCommandContext({
-    args: resolvedCmd.args || (Object.create(null) as Args),
-    command: resolvedCmd,
-    callMode: resolvedCmd.entry ? 'entry' : 'subCommand',
-    extensions
-  })
-  if (i18n) {
-    const ret = await i18n.loadResource(i18n.locale, ctx, resolvedCmd)
-    if (!ret) {
-      console.warn(`Failed to load i18n resources for command: ${name} (${i18n.locale.toString()})`)
-    }
-  }
-  const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
-
-  const commandTab = isBombshellRoot
-    ? t
-    : t.command(
-        name,
-        (await localizeDescription(resolveKey('description', ctx.name))) ||
-          resolvedCmd.description ||
-          ''
-      )
-
-  const args = resolvedCmd.args || (Object.create(null) as Args)
-  for (const [key, schema] of Object.entries(args)) {
-    if (schema.type === 'positional') {
-      commandTab.argument(key, resolveCompletionHandler(name, key, config, i18n), schema.multiple)
-    } else {
-      commandTab.option(
-        key,
-        (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || '',
-        resolveCompletionHandler(name, key, config, i18n),
-        schema.short
-      )
-    }
-  }
-}
-
-function resolveCompletionHandler(
-  name: string,
-  optionOrArgKey: string,
-  config: Record<string, CompletionConfig>,
-  i18n?: I18nExtension
-) {
-  return function (complete: Complete) {
-    const handler = config[name]?.args?.[optionOrArgKey]?.handler || NOOP_HANDLER
-    for (const item of handler({ locale: i18n?.locale })) {
-      complete(item.value, item.description || '')
-    }
-  }
-}
-
-async function handleSubCommands(
-  t: RootCommand,
-  subCommands: PluginContext['subCommands'],
-  i18nPluginId: string,
-  config: Record<string, CompletionConfig> = {},
-  i18n?: I18nExtension,
-  parentPath: string = ''
-) {
-  for (const [name, cmd] of subCommands) {
-    if (cmd.internal || cmd.entry || name === 'complete') {
-      continue // skip entry / internal command / completion command itself
-    }
-    const fullName = parentPath ? `${parentPath} ${name}` : name
-    await registerCompletion({ name: fullName, cmd, config, i18nPluginId, i18n, t })
-
-    // recursively register nested sub-commands
-    const nestedSubCommands = getNestedSubCommands(cmd)
-    if (nestedSubCommands && nestedSubCommands.size > 0) {
-      await handleSubCommands(t, nestedSubCommands, i18nPluginId, config, i18n, fullName)
-    }
-  }
-}
-
-function getNestedSubCommands(
-  cmd: Command | LazyCommand
-): Map<string, Command | LazyCommand> | undefined {
-  const subCommands =
-    typeof cmd === 'function' ? (cmd as any).subCommands : (cmd as Command).subCommands
-  if (!subCommands) {
-    return undefined
-  }
-  if (subCommands instanceof Map) {
-    return subCommands.size > 0 ? (subCommands as Map<string, Command | LazyCommand>) : undefined
-  }
-  if (typeof subCommands === 'object') {
-    const entries = Object.entries(subCommands)
-    if (entries.length === 0) {
-      return undefined
-    }
-    const map = new Map<string, Command | LazyCommand>()
-    for (const [name, c] of entries) {
-      map.set(name, c as Command | LazyCommand)
-    }
-    return map
-  }
-  return undefined
 }

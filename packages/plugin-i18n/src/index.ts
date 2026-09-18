@@ -99,6 +99,9 @@ export default function i18n(
   // store built-in locale resources
   const localeBuiltinResources: Map<string, Record<string, string>> = new Map()
 
+  // store the command resources handed to the adapter, so that they can be merged in place
+  const loadedCommandResources: Map<string, Record<string, string>> = new Map()
+
   // built-in global options
   const builtinGlobalOptions = Object.keys(COMMON_ARGS)
 
@@ -238,14 +241,26 @@ export default function i18n(
               ''
           }
         }
-        adapter.setResource(
-          localeStr,
-          Object.assign(
-            Object.create(null) as Record<string, string>,
-            adapter.getResource(localeStr),
-            resource
-          )
-        )
+        /**
+         * NOTE(kazupon): merge into the resource this function handed to the adapter before,
+         * when the adapter still holds it. Copying it on every call makes loading N commands
+         * cost O(N^2), which shows up when a plugin loads the resources of a whole command tree.
+         * Anything else the adapter returns is left alone: a custom adapter may return a copy,
+         * the resource of another locale as a fallback, or freeze what it is given.
+         */
+        const currentResource = adapter.getResource(localeStr)
+        const mergedResource =
+          currentResource &&
+          loadedCommandResources.get(localeStr) === currentResource &&
+          Object.isExtensible(currentResource)
+            ? Object.assign(currentResource, resource)
+            : Object.assign(
+                Object.create(null) as Record<string, string>,
+                currentResource,
+                resource
+              )
+        loadedCommandResources.set(localeStr, mergedResource)
+        adapter.setResource(localeStr, mergedResource)
 
         return loaded
       }

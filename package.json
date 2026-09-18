@@ -135,11 +135,11 @@
   "lint-staged": {
     "*.ts?(x)": [
       "oxfmt --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
-      "oxlint --config .oxlintrc.json --type-aware --type-check --fix"
+      "oxlint --config .oxlintrc.json --type-aware --type-check --fix --no-error-on-unmatched-pattern"
     ],
     "*.{js,mjs,cjs}": [
       "oxfmt --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
-      "oxlint --config .oxlintrc.json --fix"
+      "oxlint --config .oxlintrc.json --fix --no-error-on-unmatched-pattern"
     ],
     "*.{json,jsonc,json5,md,yml,yaml}": [
       "oxfmt --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",

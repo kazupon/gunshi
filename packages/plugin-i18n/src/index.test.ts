@@ -11,9 +11,16 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
 } from '../test/helper.ts'
-import i18n, { defineI18n, pluginId } from './index.ts'
+import i18n, {
+  createTranslationAdapter,
+  DEFAULT_LOCALE,
+  defineI18n,
+  DefaultTranslation,
+  pluginId
+} from './index.ts'
 
 import type { Args, Command, GunshiParams } from '@gunshi/plugin'
+import type { I18nPluginOptions } from './index.ts'
 import type {
   CommandResource,
   CommandResourceFetcher,
@@ -255,6 +262,152 @@ describe('extension: registerGlobalOptionResources', () => {
       ]
     })
     expect(outputJa).toContain(debugDescriptionJa)
+  })
+})
+
+describe('extension: loadResource', () => {
+  const LOCALE = 'ja-JP'
+
+  const args = {
+    foo: {
+      type: 'string',
+      description: 'this is foo option'
+    }
+  } satisfies Args
+
+  function defineCommand(name: string, resource: CommandResource) {
+    return defineI18n({
+      name,
+      args,
+      run: () => {},
+      resource: () => Promise.resolve(resource)
+    })
+  }
+
+  async function createExtension(options: I18nPluginOptions = {}) {
+    const plugin = i18n({ locale: LOCALE, ...options })
+    const ctx = await createCommandContext({})
+    return await plugin.extension.factory(ctx, {} as Command)
+  }
+
+  async function load(extension: I18nExtension, command: Command): Promise<boolean> {
+    const ctx = await createCommandContext({
+      args: command.args,
+      command,
+      callMode: 'subCommand'
+    })
+    return await extension.loadResource(LOCALE, ctx, command)
+  }
+
+  test('keep the resources of the commands loaded before', async () => {
+    const extension = await createExtension()
+
+    await load(extension, defineCommand('cmd1', { description: 'これはコマンド1です' }))
+    await load(extension, defineCommand('cmd2', { description: 'これはコマンド2です' }))
+
+    expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('これはコマンド1です')
+    expect(extension.translate(resolveKey('description', 'cmd2'))).toEqual('これはコマンド2です')
+  })
+
+  test('the resource loaded later wins', async () => {
+    const extension = await createExtension()
+
+    await load(extension, defineCommand('cmd1', { description: 'ひとつめ' }))
+    await load(extension, defineCommand('cmd1', { description: 'ふたつめ' }))
+
+    expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('ふたつめ')
+  })
+
+  test('merge into the resource that the adapter holds', async () => {
+    let adapter: TranslationAdapter | undefined
+    const extension = await createExtension({
+      translationAdapterFactory: options => {
+        adapter = createTranslationAdapter(options)
+        return adapter
+      }
+    })
+
+    await load(extension, defineCommand('cmd1', { description: 'これはコマンド1です' }))
+    const resource = adapter!.getResource(LOCALE)
+    await load(extension, defineCommand('cmd2', { description: 'これはコマンド2です' }))
+
+    // not a copy per call: loading N commands would cost O(N^2)
+    expect(adapter!.getResource(LOCALE)).toBe(resource)
+    expect(resource).toMatchObject({
+      [resolveKey('description', 'cmd1')]: 'これはコマンド1です',
+      [resolveKey('description', 'cmd2')]: 'これはコマンド2です'
+    })
+  })
+
+  test('adapter whose getResource falls back to another locale', async () => {
+    // the fallback resource belongs to another locale, so it must not be merged into
+    const fallbackResource: Record<string, string> = Object.create(null) as Record<string, string>
+    const resources = new Map<string, Record<string, string>>([[DEFAULT_LOCALE, fallbackResource]])
+    const read = (locale: string) => resources.get(locale) ?? resources.get(DEFAULT_LOCALE)
+    const adapter: TranslationAdapter = {
+      getResource: read,
+      setResource: (locale, resource) => {
+        resources.set(locale, resource)
+      },
+      getMessage: (locale, key) => read(locale)?.[key],
+      translate: (locale, key) => read(locale)?.[key]
+    }
+
+    const extension = await createExtension({ translationAdapterFactory: () => adapter })
+    await load(extension, defineCommand('cmd1', { description: 'これはコマンド1です' }))
+
+    expect(Object.keys(fallbackResource)).toEqual([])
+    expect(resources.get(LOCALE)?.[resolveKey('description', 'cmd1')]).toEqual(
+      'これはコマンド1です'
+    )
+  })
+
+  test('adapter that returns a frozen resource', async () => {
+    class FrozenResourceTranslation extends DefaultTranslation {
+      override getResource(locale: string): Record<string, string> | undefined {
+        const resource = super.getResource(locale)
+        return resource ? Object.freeze({ ...resource }) : resource
+      }
+    }
+
+    const extension = await createExtension({
+      translationAdapterFactory: options => new FrozenResourceTranslation(options)
+    })
+
+    await load(extension, defineCommand('cmd1', { description: 'これはコマンド1です' }))
+    await load(extension, defineCommand('cmd2', { description: 'これはコマンド2です' }))
+
+    expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('これはコマンド1です')
+    expect(extension.translate(resolveKey('description', 'cmd2'))).toEqual('これはコマンド2です')
+  })
+
+  test('adapter that freezes the resource it is given', async () => {
+    const resources = new Map<string, Record<string, string>>()
+    const adapter: TranslationAdapter = {
+      getResource: locale => resources.get(locale),
+      setResource: (locale, resource) => {
+        resources.set(locale, Object.freeze(resource))
+      },
+      getMessage: (locale, key) => resources.get(locale)?.[key],
+      translate: (locale, key) => resources.get(locale)?.[key]
+    }
+
+    const extension = await createExtension({ translationAdapterFactory: () => adapter })
+    await load(extension, defineCommand('cmd1', { description: 'これはコマンド1です' }))
+    await load(extension, defineCommand('cmd2', { description: 'これはコマンド2です' }))
+
+    expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('これはコマンド1です')
+    expect(extension.translate(resolveKey('description', 'cmd2'))).toEqual('これはコマンド2です')
+  })
+
+  test('command without resource', async () => {
+    const extension = await createExtension()
+    await load(extension, defineCommand('cmd1', { description: 'これはコマンド1です' }))
+
+    const loaded = await load(extension, { name: 'cmd2', args, run: () => {} })
+
+    expect(loaded).toBe(false)
+    expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('これはコマンド1です')
   })
 })
 
