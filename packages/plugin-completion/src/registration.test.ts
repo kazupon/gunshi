@@ -541,3 +541,154 @@ describe('registration scope', () => {
     expect(warnSpy).not.toHaveBeenCalled()
   })
 })
+
+// ---------------------------------------------------------------------------
+// a CLI without sub-commands, where the entry command is not part of `env.subCommands`
+// ---------------------------------------------------------------------------
+
+describe('a CLI without sub-commands', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  const args = {
+    environment: { type: 'string', short: 'e', description: 'Target environment' },
+    config: { type: 'string', short: 'c', description: 'Config file path' }
+  } as const
+
+  const entryConfig: NonNullable<CompletionOptions['config']> = {
+    entry: {
+      args: {
+        config: { handler: () => [{ value: 'prod.json', description: 'Production config' }] }
+      }
+    }
+  }
+
+  test('completes the options of the entry command', async () => {
+    const entry = defineCommand({ name: 'deploy', description: 'Deploy the app', args, run: NOOP })
+
+    await cli(['complete', '--', '--'], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion({ config: entryConfig })]
+    })
+
+    expect(output).toEqual([
+      '--environment\tTarget environment',
+      '--config\tConfig file path',
+      ':4'
+    ])
+  })
+
+  test('completes the option values of the entry command', async () => {
+    const entry = defineCommand({ name: 'deploy', description: 'Deploy the app', args, run: NOOP })
+
+    await cli(['complete', '--', '--config', ''], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion({ config: entryConfig })]
+    })
+
+    expect(output).toEqual(['prod.json\tProduction config', ':4'])
+  })
+
+  test('completes the positional arguments of the entry command', async () => {
+    const entry = defineCommand({
+      name: 'deploy',
+      description: 'Deploy the app',
+      args: { ...args, target: { type: 'positional', description: 'Deploy target' } },
+      run: NOOP
+    })
+
+    await cli(['complete', '--', ''], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [
+        completion({
+          config: {
+            entry: {
+              args: { target: { handler: () => [{ value: 'staging', description: 'Staging' }] } }
+            }
+          }
+        })
+      ]
+    })
+
+    expect(output).toEqual(['staging\tStaging', ':4'])
+  })
+
+  test('completes a lazy entry command', async () => {
+    const entry = lazy(() => NOOP, { name: 'deploy', description: 'Deploy the app', args })
+
+    await cli(['complete', '--', '--'], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion({ config: entryConfig })]
+    })
+
+    expect(output).toEqual([
+      '--environment\tTarget environment',
+      '--config\tConfig file path',
+      ':4'
+    ])
+  })
+
+  test('localizes the entry command', async () => {
+    const loaded: string[] = []
+    const entry = defineCommand({
+      name: 'deploy',
+      description: 'Deploy the app',
+      args,
+      resource: () => {
+        loaded.push('deploy')
+        return Promise.resolve({
+          description: 'アプリをデプロイ',
+          'arg:environment': 'デプロイ先の環境',
+          'arg:config': '設定ファイルのパス'
+        })
+      },
+      run: NOOP
+    })
+
+    await cli(['complete', '--', '--'], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [i18n({ locale: 'ja-JP' }), completion({ config: entryConfig })]
+    })
+
+    expect(loaded).toEqual(['deploy'])
+    expect(output).toEqual([
+      '--environment\tデプロイ先の環境',
+      '--config\t設定ファイルのパス',
+      ':4'
+    ])
+  })
+
+  test('falls back to the given command when gunshi does not expose the entry command', async () => {
+    // gunshi before `env.entryCommand`: the completion root has nothing to complete
+    const t = new RootCommand()
+    await registerForCompletion({
+      t,
+      args: ['--'],
+      subCommands: new Map<string, Command | LazyCommand>([
+        [COMPLETE_COMMAND_NAME, defineCommand({ name: COMPLETE_COMMAND_NAME, run: NOOP })]
+      ]),
+      fallbackEntry: { name: COMPLETE_COMMAND_NAME },
+      config: entryConfig,
+      i18nPluginId
+    })
+    t.parse(['--'])
+
+    expect(output).toEqual([':4'])
+  })
+})

@@ -21,7 +21,12 @@ Context: [Object: null prototype] {
     renderUsage: [Function: renderer],
     renderValidationErrors: [Function: renderer],
     plugins: [ [AsyncFunction] ],
-    fallbackToEntry: false
+    fallbackToEntry: false,
+    entryCommand: [Object: null prototype] {
+      name: 'build',
+      run: [Function: run],
+      entry: true
+    }
   },
   args: [Object: null prototype] {
     help: [Object: null prototype] {

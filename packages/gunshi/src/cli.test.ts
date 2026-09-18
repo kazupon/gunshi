@@ -14,7 +14,14 @@ import { hidden, string } from './combinators.ts'
 
 import type { Args } from 'args-tokens'
 import type { Mocked } from 'vitest'
-import type { CliOptions, Command, CommandRunner, GunshiParams, LazyCommand } from './types.ts'
+import type {
+  CliOptions,
+  Command,
+  CommandEnvironment,
+  CommandRunner,
+  GunshiParams,
+  LazyCommand
+} from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -2868,6 +2875,142 @@ describe('nested sub-commands', () => {
     expect(commandError.commandPath).toEqual(['remote'])
     expect(commandError.candidates).toEqual(['add', 'remove'])
     expect(mockRemote).not.toHaveBeenCalled()
+  })
+})
+
+describe('entry command in the command environment', () => {
+  test('CLI without sub-commands', async () => {
+    let env: Readonly<CommandEnvironment> | undefined
+    const args = { config: { type: 'string', short: 'c' } } satisfies Args
+    const entry = define({
+      name: 'deploy',
+      description: 'Deploy the app',
+      args,
+      run: ctx => {
+        env = ctx.env
+      }
+    })
+
+    await cli([], entry)
+
+    expect(env?.subCommands?.size).toBe(0)
+    expect(env?.entryCommand).toMatchObject({
+      name: 'deploy',
+      description: 'Deploy the app',
+      entry: true
+    })
+    expect(env?.entryCommand?.args).toBe(args)
+    // the command that the user passes is not marked
+    expect(entry.entry).toBeUndefined()
+  })
+
+  test('CLI to which only a plugin adds a command', async () => {
+    let env: Readonly<CommandEnvironment> | undefined
+    const entry = define({ name: 'deploy', run: vi.fn<() => void>() })
+    const tools = plugin({
+      id: 'tools',
+      setup: ctx => {
+        ctx.addCommand('inspect', {
+          name: 'inspect',
+          run: cmdCtx => {
+            env = cmdCtx.env
+          }
+        })
+      }
+    })
+
+    await cli(['inspect'], entry, { plugins: [tools] })
+
+    // the entry command is not part of the sub-commands, because the user passes none
+    expect([...(env?.subCommands?.keys() || [])]).toEqual(['inspect'])
+    expect(env?.entryCommand).toMatchObject({ name: 'deploy', entry: true })
+  })
+
+  test('CLI with sub-commands', async () => {
+    let env: Readonly<CommandEnvironment> | undefined
+    const entry = define({ name: 'main', run: vi.fn<() => void>() })
+    const sub = define({
+      name: 'sub',
+      run: ctx => {
+        env = ctx.env
+      }
+    })
+
+    await cli(['sub'], entry, { subCommands: { sub } })
+
+    expect(env?.entryCommand).toMatchObject({ name: 'main', entry: true })
+    expect(env?.entryCommand).toBe(env?.subCommands?.get('main'))
+  })
+
+  test('lazy entry command', async () => {
+    let env: Readonly<CommandEnvironment> | undefined
+    const args = { config: { type: 'string', short: 'c' } } satisfies Args
+    const entry = lazy(
+      () => ctx => {
+        env = ctx.env
+      },
+      { name: 'deploy', args }
+    )
+
+    await cli([], entry)
+
+    const entryCommand = env?.entryCommand as LazyCommand | undefined
+    expect(typeof entryCommand).toBe('function')
+    expect(entryCommand?.commandName).toBe('deploy')
+    expect(entryCommand?.entry).toBe(true)
+    expect(entryCommand?.args).toBe(args)
+    // the lazy command that the user passes is not marked
+    expect(entry.entry).toBeUndefined()
+  })
+
+  test('inline command runner as entry', async () => {
+    let env: Readonly<CommandEnvironment> | undefined
+    const main: CommandRunner = ctx => {
+      env = ctx.env
+    }
+
+    await cli([], main)
+
+    expect(env?.entryCommand).toMatchObject({ name: 'main', entry: true, run: main })
+  })
+
+  test('nested sub-commands', async () => {
+    let env: Readonly<CommandEnvironment> | undefined
+    const remote = define({
+      name: 'remote',
+      subCommands: { add: define({ name: 'add', run: vi.fn<() => void>() }) },
+      run: ctx => {
+        env = ctx.env
+      }
+    })
+    const entry = define({ name: 'git', run: vi.fn<() => void>() })
+
+    await cli(['remote'], entry, { subCommands: { remote } })
+
+    // the sub-commands are the ones of `remote`, which is their entry ...
+    expect(env?.subCommands?.get('remote')?.entry).toBe(true)
+    // ... while the entry command stays the one of the CLI
+    expect(env?.entryCommand).toMatchObject({ name: 'git', entry: true })
+  })
+
+  test('not freeze the command that the user defines', async () => {
+    let env: Readonly<CommandEnvironment> | undefined
+    const args = { config: { type: 'string', short: 'c' } } satisfies Args
+    const entry = define({
+      name: 'deploy',
+      args,
+      run: ctx => {
+        env = ctx.env
+      }
+    })
+
+    await cli([], entry)
+
+    // the command environment is frozen, but it must not reach the user's objects through the entry command
+    expect(Object.isFrozen(env)).toBe(true)
+    expect(Object.isFrozen(entry)).toBe(false)
+    expect(Object.isFrozen(args)).toBe(false)
+    expect(Object.isFrozen(args.config)).toBe(false)
   })
 })
 

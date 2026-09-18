@@ -44,6 +44,8 @@ import type {
 type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 'subCommands'> & {
   // Internal type uses Command<G> | LazyCommand<G> for proper type safety within the implementation
   subCommands: Map<string, Command<G> | LazyCommand<G>>
+  // The entry command, which is exposed as `CommandEnvironment.entryCommand`
+  entryCommand: Command<G> | LazyCommand<G> | undefined
 }
 
 /**
@@ -65,7 +67,9 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 ): Promise<string | undefined> {
   const decorators = createDecorators<G>()
 
-  const initialSubCommands = createInitialSubCommands(options, entry)
+  const entryCommand = createEntryCommand(entry)
+
+  const initialSubCommands = createInitialSubCommands(options, entryCommand)
 
   const pluginContext = createPluginContext<G>(decorators, initialSubCommands)
 
@@ -74,7 +78,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     ...(options.plugins || [])
   ])
 
-  const cliOptions = normalizeCliOptions(options, decorators, pluginContext)
+  const cliOptions = normalizeCliOptions(options, decorators, pluginContext, entryCommand)
 
   const tokens = parseArgs(argv)
 
@@ -320,9 +324,34 @@ function mergeValidationErrors(
 
 const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object'
 
+/**
+ * Create the entry command that sub-commands and plugins can see.
+ * The user-provided entry is copied, so that marking it with `entry: true` does not mutate it.
+ *
+ * @param entryCmd - The entry that is passed to `cli`
+ * @returns The entry command marked with `entry: true`, or `undefined` if the entry is not a command
+ */
+function createEntryCommand<G extends GunshiParamsConstraint>(
+  entryCmd: Command<G> | CommandRunner<G> | LazyCommand<G>
+): Command<G> | LazyCommand<G> | undefined {
+  if (isLazyCommand<G>(entryCmd)) {
+    // for lazy command - copy properties onto a new function to avoid mutating the original
+    return Object.assign((...args: unknown[]) => (entryCmd as Function)(...args), entryCmd, {
+      entry: true
+    }) as unknown as LazyCommand<G>
+  } else if (typeof entryCmd === 'object') {
+    // for command object - shallow copy to avoid mutating the user-provided object
+    return Object.assign(create<Command<G>>(), entryCmd, { entry: true }) as Command<G>
+  } else if (typeof entryCmd === 'function') {
+    // for command runner
+    return { run: entryCmd, name: entryCmd.name || ANONYMOUS_COMMAND_NAME, entry: true }
+  }
+  return undefined
+}
+
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
-  entryCmd: Command<G> | CommandRunner<G> | LazyCommand<G>
+  entryCommand: Command<G> | LazyCommand<G> | undefined
 ): Map<string, Command<G> | LazyCommand<G>> {
   const hasSubCommands = options.subCommands
     ? options.subCommands instanceof Map
@@ -344,30 +373,8 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
   }
 
   // add entry command to sub commands if there are sub commands
-  if (hasSubCommands) {
-    if (isLazyCommand(entryCmd)) {
-      // for lazy command - copy properties onto a new function to avoid mutating the original
-      const entryCopy = Object.assign(
-        (...args: unknown[]) => (entryCmd as Function)(...args),
-        entryCmd,
-        { entry: true }
-      ) as unknown as LazyCommand<G>
-      subCommands.set(resolveEntryName(entryCopy), entryCopy)
-    } else if (typeof entryCmd === 'object') {
-      // for command object - shallow copy to avoid mutating the user-provided object
-      const entryCopy = Object.assign(create<Command<G>>(), entryCmd, {
-        entry: true
-      }) as Command<G>
-      subCommands.set(resolveEntryName(entryCopy), entryCopy)
-    } else if (typeof entryCmd === 'function') {
-      // for command runner
-      const name = entryCmd.name || ANONYMOUS_COMMAND_NAME
-      subCommands.set(name, {
-        run: entryCmd as CommandRunner<G>,
-        name,
-        entry: true
-      })
-    }
+  if (hasSubCommands && entryCommand) {
+    subCommands.set(resolveEntryName(entryCommand), entryCommand)
   }
 
   return subCommands
@@ -376,13 +383,19 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
 function normalizeCliOptions<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
   decorators: Decorators<G>,
-  pluginContext: PluginContext<G>
+  pluginContext: PluginContext<G>,
+  entryCommand: Command<G> | LazyCommand<G> | undefined
 ): InternalCliOptions<G> {
   // get the latest sub commands from plugin context (already includes entry command)
   const subCommands = new Map(pluginContext.subCommands)
 
+  /**
+   * NOTE(kazupon): the entry command is part of `subCommands` only when the user passes sub-commands,
+   * so it is exposed on its own for the plugins that add commands to a CLI without sub-commands.
+   */
   const resolvedOptions = Object.assign(create<CliOptions<G>>(), CLI_OPTIONS_DEFAULT, options, {
-    subCommands
+    subCommands,
+    entryCommand
   }) as InternalCliOptions<G>
 
   // set default renderers if not provided via cli options

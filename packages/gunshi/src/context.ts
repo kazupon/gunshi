@@ -237,7 +237,11 @@ export async function createCommandContext<
       }
     }
   }
-  const ctx = deepFreeze(core, ['extensions'])
+  /**
+   * NOTE(kazupon): `env.entryCommand` is not frozen, like the commands in `env.subCommands`.
+   * It shares the argument schemas with the command that the user defined, which must stay mutable.
+   */
+  const ctx = deepFreeze(core, ['extensions', 'entryCommand'])
 
   return ctx as CommandContextResult<G, E>
 }
