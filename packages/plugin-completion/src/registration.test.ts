@@ -694,6 +694,43 @@ describe('a CLI without sub-commands', () => {
     expect(output).toEqual(['staging\tStaging', ':4'])
   })
 
+  test('completes after a boolean option of the entry command', async () => {
+    const entry = defineCommand({
+      name: 'deploy',
+      description: 'Deploy the app',
+      args: {
+        ...args,
+        verbose: { type: 'boolean', short: 'V', description: 'Verbose output' },
+        force: { type: 'boolean', negatable: true, description: 'Force' },
+        target: { type: 'positional', description: 'Deploy target' }
+      },
+      run: NOOP
+    })
+    const config: NonNullable<CompletionOptions['config']> = {
+      entry: { args: { target: { handler: () => [{ value: 'staging', description: 'Staging' }] } } }
+    }
+
+    await cli(['complete', '--', '--verbose', ''], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion({ config })]
+    })
+
+    expect(output).toEqual(['staging\tStaging', ':4'])
+
+    // the negatable form takes no value either, and is offered with the other options
+    output.length = 0
+    await cli(['complete', '--', '--no-force', ''], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion({ config })]
+    })
+
+    expect(output).toEqual(['staging\tStaging', ':4'])
+  })
+
   test('completes a lazy entry command', async () => {
     const entry = lazy(() => NOOP, { name: 'deploy', description: 'Deploy the app', args })
 
