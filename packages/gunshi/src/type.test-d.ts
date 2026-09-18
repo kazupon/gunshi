@@ -3,8 +3,10 @@ import type {
   Args,
   Command,
   CommandContext,
+  CommandEnvironment,
   DefaultGunshiParams,
   GunshiParams,
+  LazyCommand,
   MergeGunshiExtensions,
   NormalizeToGunshiParams,
   RenderingOptions
@@ -189,4 +191,13 @@ test('command args can use hidden option', () => {
 
   expectTypeOf(command.args.legacy).toMatchTypeOf<Args['legacy']>()
   expectTypeOf(command.args.legacy.hidden).toEqualTypeOf<true>()
+})
+
+test('CommandEnvironment entryCommand', () => {
+  expectTypeOf<CommandEnvironment['entryCommand']>().toEqualTypeOf<
+    Command<any> | LazyCommand<any> | undefined
+  >()
+  expectTypeOf<CommandContext['env']['entryCommand']>().toEqualTypeOf<
+    Command<any> | LazyCommand<any> | undefined
+  >()
 })

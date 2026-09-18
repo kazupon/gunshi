@@ -229,6 +229,14 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   subCommands: Map<string, Command<any> | LazyCommand<any>> | undefined
   /**
+   * The entry command of the CLI, marked with `entry: true`.
+   *
+   * It is available whether or not the CLI has sub-commands, while {@linkcode CommandEnvironment.subCommands}
+   * includes the entry command only when the sub-commands are given with {@linkcode CliOptions.subCommands}.
+   * It is not frozen, like the commands in {@linkcode CommandEnvironment.subCommands}.
+   */
+  entryCommand?: Command<any> | LazyCommand<any>
+  /**
    * Render function the command usage.
    */
   renderUsage: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null | undefined
