@@ -218,7 +218,7 @@ async function registerAllSubCommands(
   parentPath = ''
 ): Promise<void> {
   for (const [name, cmd] of level) {
-    if (cmd.internal || cmd.entry || name === COMPLETE_COMMAND_NAME) {
+    if (cmd.internal || cmd.entry || (parentPath === '' && name === COMPLETE_COMMAND_NAME)) {
       continue
     }
     const fullName = parentPath ? `${parentPath} ${name}` : name
@@ -422,6 +422,26 @@ describe('registerForCompletion', () => {
   ])('completes after a boolean option: %j', async (args, expected) => {
     const [actual] = await complete(registerActivePath(args), args, false, output)
     expect(actual.split('\n')).toContain(expected)
+  })
+
+  test('a nested command named like the completion command is a user command', async () => {
+    const args = ['remote', '']
+    const [actual] = await complete(registerActivePath(args), args, false, output)
+    expect(actual.split('\n')).toContain('complete\tNested complete')
+
+    // the completion command itself lives at the top level, and is not offered
+    const tree = new Map(subCommands).set(COMPLETE_COMMAND_NAME, { name: COMPLETE_COMMAND_NAME })
+    const t = new RootCommand()
+    await registerForCompletion({
+      t,
+      args: [''],
+      subCommands: tree,
+      fallbackEntry: { name: COMPLETE_COMMAND_NAME },
+      config,
+      i18nPluginId
+    })
+    expect(t.commands.has(COMPLETE_COMMAND_NAME)).toEqual(false)
+    expect(t.commands.has('remote')).toEqual(true)
   })
 
   describe.each([
