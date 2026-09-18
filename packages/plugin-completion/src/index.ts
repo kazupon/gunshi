@@ -59,7 +59,7 @@
 import { RootCommand } from '@bomb.sh/tab'
 import { plugin } from '@gunshi/plugin'
 import { namespacedId } from '@gunshi/shared'
-import { handleSubCommands, registerCompletion } from './registration.ts'
+import { COMPLETE_COMMAND_NAME, registerForCompletion } from './registration.ts'
 import { pluginId } from './types.ts'
 import { quoteExec } from './utils.ts'
 
@@ -83,7 +83,6 @@ const dependencies = [{ id: i18nPluginId, optional: true }] as const
  */
 export default function completion(options: CompletionOptions = {}): PluginWithoutExtension {
   const config = options.config || {}
-  const t = new RootCommand()
 
   return plugin<Record<typeof i18nPluginId, I18nExtension>, typeof pluginId, typeof dependencies>({
     id: pluginId,
@@ -92,18 +91,25 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
 
     setup(ctx) {
       /**
-       * add command for completion script generation
+       * add command for completion script generation and runtime completion
        */
 
-      const completeName = 'complete'
-      ctx.addCommand(completeName, {
-        name: completeName,
+      /**
+       * NOTE(kazupon): registered as the completion root when the CLI has no entry command,
+       * which keeps the behavior of the `onExtension` hook this replaces.
+       */
+      const fallbackEntry: Command = {
+        name: COMPLETE_COMMAND_NAME,
         // TODO(kazupon): support description localization
-        description: 'Generate shell completion script',
+        description: 'Generate shell completion script'
+      }
+
+      ctx.addCommand(COMPLETE_COMMAND_NAME, {
+        ...fallbackEntry,
         rendering: {
           header: null // disable header rendering for completion command
         },
-        run: cmdCtx => {
+        run: async cmdCtx => {
           if (!cmdCtx.env.name) {
             throw new Error('your cli name is not defined.')
           }
@@ -113,37 +119,33 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
             shell = undefined
           }
 
+          /**
+           * NOTE(kazupon): the completion tree is built here, and only here.
+           * Building it for every command run, which is what the `onExtension` hook would do,
+           * costs the whole command tree on runs that never complete anything.
+           */
+          const t = new RootCommand()
           if (shell === undefined) {
-            t.parse(cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1))
+            const args = cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1)
+            await registerForCompletion({
+              t,
+              args,
+              subCommands:
+                (cmdCtx.env.subCommands as
+                  | ReadonlyMap<string, Command | LazyCommand>
+                  | undefined) || new Map<string, Command | LazyCommand>(),
+              fallbackEntry,
+              config,
+              i18nPluginId,
+              i18n: cmdCtx.extensions[i18nPluginId]
+            })
+            t.parse(args)
           } else if (['zsh', 'bash', 'fish', 'powershell'].includes(shell)) {
+            // the completion script only needs the CLI name and the executable
             t.setup(cmdCtx.env.name, quoteExec(), shell)
           }
         }
       })
-    },
-
-    /**
-     * setup bombshell completion with `onExtension` hook
-     */
-
-    onExtension: async (ctx, cmd) => {
-      const i18n = ctx.extensions[i18nPluginId]
-      const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
-
-      const entry =
-        [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry) || (cmd as Command)
-
-      await registerCompletion({
-        name: 'entry',
-        cmd: entry,
-        config,
-        i18nPluginId,
-        i18n,
-        t,
-        isBombshellRoot: true
-      })
-
-      await handleSubCommands(t, subCommands, i18nPluginId, config.subCommands, i18n)
     }
   })
 }
