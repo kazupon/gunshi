@@ -247,10 +247,11 @@ export async function registerCompletion({
     extensions
   })
   if (i18n) {
-    const ret = await i18n.loadResource(i18n.locale, ctx, resolvedCmd)
-    if (!ret) {
-      console.warn(`Failed to load i18n resources for command: ${name} (${i18n.locale.toString()})`)
-    }
+    /**
+     * NOTE(kazupon): `false` means the command has no resource of its own, which is normal.
+     * A resource that fails to load is reported by the i18n plugin itself.
+     */
+    await i18n.loadResource(i18n.locale, ctx, resolvedCmd)
   }
   const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
 
@@ -329,6 +330,10 @@ function isSkipped(name: string, cmd: Command | LazyCommand): boolean {
 /**
  * Whether an option is known to take no value, as `RootCommand#stripOptions` decides it:
  * the completion root first, then the commands registered so far. An unknown option takes a value.
+ *
+ * @param commands - The completion commands registered so far, the completion root first
+ * @param arg - An option as it was typed, such as `--verbose` or `-v`
+ * @returns `true` if the option takes no value
  */
 function isBooleanOption(commands: TabCommand[], arg: string): boolean {
   for (const command of commands) {
@@ -342,6 +347,10 @@ function isBooleanOption(commands: TabCommand[], arg: string): boolean {
 
 /**
  * The same lookup as `RootCommand#findOption`, which is private.
+ *
+ * @param command - A completion command to look in
+ * @param arg - An option as it was typed, such as `--verbose` or `-v`
+ * @returns The option, or `undefined` if the command does not have it
  */
 function findOption(command: TabCommand, arg: string): Option | undefined {
   const option = command.options.get(arg) || command.options.get(arg.replace(/^-+/, ''))

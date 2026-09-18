@@ -3,15 +3,20 @@ import { createCommandContext } from '@gunshi/plugin'
 import i18n from '@gunshi/plugin-i18n'
 import { getCommandSubCommands, namespacedId } from '@gunshi/shared'
 import { cli, lazy } from 'gunshi'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import completion from './index.ts'
 import { COMPLETE_COMMAND_NAME, registerCompletion, registerForCompletion } from './registration.ts'
 
 import type { Command, LazyCommand } from '@gunshi/plugin'
 import type { I18nCommand, I18nExtension } from '@gunshi/plugin-i18n'
+import type { MockInstance } from 'vitest'
 import type { CompletionOptions } from './types.ts'
 
 const NOOP = () => {}
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
 const i18nPluginId = namespacedId('i18n')
 
@@ -190,10 +195,8 @@ async function createI18nExtension(): Promise<I18nExtension> {
   return await plugin.extension.factory(ctx, {} as Command)
 }
 
-/**
- * Registers the whole command tree, as the plugin did before it registered
- * only what a single completion request needs.
- */
+// registers the whole command tree, as the plugin did before it registered
+// only what a single completion request needs
 async function registerAll(t: RootCommand, extension?: I18nExtension): Promise<void> {
   const entry = [...subCommands.values()].find(cmd => cmd.entry)!
   await registerCompletion({
@@ -463,9 +466,11 @@ describe('registration scope', () => {
     })
   }
 
+  let warnSpy: MockInstance<typeof console.warn>
+
   beforeEach(() => {
     vi.spyOn(console, 'log').mockImplementation(NOOP)
-    vi.spyOn(console, 'warn').mockImplementation(NOOP)
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(NOOP)
   })
 
   test('a normal command run loads only the resource of the command it runs', async () => {
@@ -516,5 +521,23 @@ describe('registration scope', () => {
     await run(['complete', '--', 'de'], tree)
 
     expect(tree.loaded).toEqual(['root', 'dev', 'deploy'])
+  })
+
+  test('a command without an i18n resource does not warn', async () => {
+    const entry = defineCommand({ name: 'root', description: 'Root command', run: NOOP })
+    const withoutResources = new Map<string, Command | LazyCommand>([
+      ['dev', defineCommand({ name: 'dev', description: 'Start dev server', run: NOOP })],
+      ['lint', defineCommand({ name: 'lint', description: 'Lint files', run: NOOP })]
+    ])
+
+    await cli(['complete', '--', ''], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      subCommands: withoutResources,
+      usageSilent: true,
+      plugins: [i18n({ locale: 'ja-JP' }), completion()]
+    })
+
+    expect(warnSpy).not.toHaveBeenCalled()
   })
 })
