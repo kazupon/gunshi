@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import completion from './index.ts'
 import { COMPLETE_COMMAND_NAME, registerCompletion, registerForCompletion } from './registration.ts'
 
-import type { ArgSchema, Command, LazyCommand } from '@gunshi/plugin'
+import type { ArgSchema, Args, Command, LazyCommand } from '@gunshi/plugin'
 import type { I18nCommand, I18nExtension } from '@gunshi/plugin-i18n'
 import type { MockInstance } from 'vitest'
 import type { CompletionOptions } from './types.ts'
@@ -1940,6 +1940,57 @@ describe("#730 - a command's own short name", () => {
     expect(await complete(['-'])).toEqual([
       '-h\tDisplay this help message',
       '-v\tDisplay this version',
+      ':4'
+    ])
+  })
+})
+
+describe('#732 - an argument whose name starts with `no-`', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  async function completeEntry(args: Args): Promise<string[]> {
+    const entry = defineCommand({ name: 'main', description: 'Main', args, run: NOOP })
+    await cli(['complete', '--', '--'], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion()]
+    })
+    return output
+  }
+
+  test('is offered with its own description', async () => {
+    expect(
+      await completeEntry({
+        emoji: { type: 'string', description: 'Emoji style' },
+        'no-emoji': { type: 'boolean', description: 'Disable emoji' }
+      })
+    ).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--emoji\tEmoji style',
+      '--no-emoji\tDisable emoji',
+      ':4'
+    ])
+  })
+
+  test('the negated form of a negatable option is unchanged', async () => {
+    expect(
+      await completeEntry({
+        force: { type: 'boolean', short: 'f', negatable: true, description: 'Force' }
+      })
+    ).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--force\tForce',
+      '--no-force\tNegatable of -f, --force',
       ':4'
     ])
   })

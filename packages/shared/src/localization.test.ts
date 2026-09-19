@@ -4,6 +4,8 @@ import { describe, expect, test, vi } from 'vitest'
 import { localizable } from './localization.ts'
 import { resolveArgKey, resolveBuiltInKey } from './utils.ts'
 
+import type { Args } from 'gunshi'
+
 const LANG_RESOURCES = {
   description: 'これはcommand1の説明です',
   foo: 'foo引数の説明'
@@ -109,5 +111,77 @@ describe('without translation function', () => {
     expect(await localize('command1:examples')).toEqual('command1 --foo value --no-bar')
     // other keys
     expect(await localize('other_key')).toEqual('other_key')
+  })
+})
+
+/**
+ * An argument describes itself, whatever it is called. `no-` is stripped only to reach the option
+ * that a negated form negates, and only when no argument answers to the name as written.
+ */
+describe('an argument whose name starts with `no-`', () => {
+  async function localizeOf(args: Args) {
+    const command = define({ name: 'main', args })
+    const ctx = await createCommandContext({ args, command })
+    return localizable(ctx, command)
+  }
+
+  test('describes itself, not the argument the prefix would reach', async () => {
+    const localize = await localizeOf({
+      emoji: { type: 'string', description: 'Emoji style' },
+      'no-emoji': { type: 'boolean', description: 'Disable emoji' }
+    })
+
+    expect(await localize(resolveArgKey('emoji', 'main'))).toEqual('Emoji style')
+    expect(await localize(resolveArgKey('no-emoji', 'main'))).toEqual('Disable emoji')
+  })
+
+  test('describes itself when the prefix would reach nothing', async () => {
+    const localize = await localizeOf({
+      'no-widgets': { type: 'boolean', description: 'Build without widgets' }
+    })
+
+    // the key used to answer with `widgets`, a word no argument of this command is called
+    expect(await localize(resolveArgKey('no-widgets', 'main'))).toEqual('Build without widgets')
+  })
+
+  test('describes itself when the prefix appears twice', async () => {
+    const localize = await localizeOf({
+      'no-no-cache': { type: 'boolean', description: 'Double negative' }
+    })
+
+    expect(await localize(resolveArgKey('no-no-cache', 'main'))).toEqual('Double negative')
+  })
+
+  test('wins over the negated form of an option of the same name', async () => {
+    const localize = await localizeOf({
+      cache: { type: 'boolean', negatable: true, description: 'Use the cache' },
+      'no-cache': { type: 'boolean', description: 'Skip the cache' }
+    })
+
+    expect(await localize(resolveArgKey('no-cache', 'main'))).toEqual('Skip the cache')
+  })
+
+  test('is still composed for the negated form of a negatable option', async () => {
+    const localize = await localizeOf({
+      force: { type: 'boolean', short: 'f', negatable: true, description: 'Force' }
+    })
+
+    expect(await localize(resolveArgKey('no-force', 'main'))).toEqual('Negatable of -f, --force')
+  })
+
+  test('is not composed for an option that is not negatable', async () => {
+    const localize = await localizeOf({ widgets: { type: 'boolean', description: 'Widgets' } })
+
+    // `widgets` cannot be negated, so `no-widgets` is not its negated form
+    expect(await localize(resolveArgKey('no-widgets', 'main'))).toEqual('no-widgets')
+  })
+
+  test('composes the negated form of an option that is itself called `no-...`', async () => {
+    const localize = await localizeOf({
+      'no-cache': { type: 'boolean', negatable: true, description: 'Skip the cache' }
+    })
+
+    expect(await localize(resolveArgKey('no-cache', 'main'))).toEqual('Skip the cache')
+    expect(await localize(resolveArgKey('no-no-cache', 'main'))).toEqual('Negatable of --no-cache')
   })
 })
