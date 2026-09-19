@@ -7,6 +7,7 @@ import { createCommandContext } from '@gunshi/plugin'
 import {
   ARG_NEGATABLE_PREFIX,
   getCommandSubCommands,
+  kebabnize,
   localizable,
   resolveArgKey,
   resolveKey,
@@ -286,21 +287,27 @@ export async function registerCompletion({
     if (schema.type === 'positional') {
       commandTab.argument(key, resolveCompletionHandler(name, key, config, i18n), schema.multiple)
     } else {
+      /**
+       * NOTE(kazupon): the option is registered with the name that gunshi parses and renders,
+       * which is kebab-cased with `toKebab`. The key of the argument still looks up everything else:
+       * the description, the i18n resource and the completion handler of the user's configuration.
+       */
+      const optionName = ctx.toKebab || schema.toKebab ? kebabnize(key) : key
       const description =
         (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || ''
       if (schema.type === 'boolean') {
         // no handler, which is how `Command#option` tells that the option takes no value
-        commandTab.option(key, description, schema.short)
+        commandTab.option(optionName, description, schema.short)
         if (schema.negatable) {
-          const negatableKey = `${ARG_NEGATABLE_PREFIX}${key}`
           commandTab.option(
-            negatableKey,
-            (await localizeDescription(resolveArgKey(negatableKey, ctx.name))) || ''
+            `${ARG_NEGATABLE_PREFIX}${optionName}`,
+            (await localizeDescription(resolveArgKey(`${ARG_NEGATABLE_PREFIX}${key}`, ctx.name))) ||
+              ''
           )
         }
       } else {
         commandTab.option(
-          key,
+          optionName,
           description,
           resolveCompletionHandler(name, key, config, i18n),
           schema.short
