@@ -137,7 +137,12 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
               fallbackEntry: cmdCtx.env.entryCommand || fallbackEntry,
               config,
               i18nPluginId,
-              i18n: cmdCtx.extensions[i18nPluginId]
+              i18n: cmdCtx.extensions[i18nPluginId],
+              /**
+               * NOTE(kazupon): read here, not in `setup`. The getter returns a copy of the options that are
+               * registered so far, and the plugins that are installed after this one have not run by then.
+               */
+              globalOptions: ctx.globalOptions
             })
             t.parse(args)
           } else if (['zsh', 'bash', 'fish', 'powershell'].includes(shell)) {

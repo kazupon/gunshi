@@ -15,7 +15,7 @@ import {
 } from '@gunshi/shared'
 
 import type { Command as TabCommand, Complete, Completion, Option, RootCommand } from '@bomb.sh/tab'
-import type { Args, Command, CommandContextExtension, LazyCommand } from '@gunshi/plugin'
+import type { Args, ArgSchema, Command, CommandContextExtension, LazyCommand } from '@gunshi/plugin'
 import type { I18nExtension } from '@gunshi/plugin-i18n'
 import type { CompletionConfig, CompletionOptions } from './types.ts'
 
@@ -69,6 +69,10 @@ export interface RegisterCompletionParams {
    * so that the arguments of the command that the loader returns are registered.
    */
   load?: boolean
+  /**
+   * The global options, which gunshi merges into the arguments of the command that it runs.
+   */
+  globalOptions?: ReadonlyMap<string, ArgSchema>
 }
 
 /**
@@ -103,6 +107,10 @@ export interface RegisterForCompletionParams {
    * An {@linkcode I18nExtension}, when the i18n plugin is installed.
    */
   i18n?: I18nExtension
+  /**
+   * The global options, which gunshi merges into the arguments of the command that it runs.
+   */
+  globalOptions?: ReadonlyMap<string, ArgSchema>
 }
 
 /**
@@ -122,7 +130,8 @@ export async function registerForCompletion({
   fallbackEntry,
   config,
   i18nPluginId,
-  i18n
+  i18n,
+  globalOptions
 }: RegisterForCompletionParams): Promise<void> {
   // mirror the preamble of `RootCommand#parse`, which splits the arguments into
   // the word being completed and the words before it
@@ -151,7 +160,8 @@ export async function registerForCompletion({
       i18nPluginId,
       i18n,
       isBombshellRoot: true,
-      load: !isFollowedBySubCommand(previousArgs[0], subCommands, true)
+      load: !isFollowedBySubCommand(previousArgs[0], subCommands, true),
+      globalOptions
     })
   ]
 
@@ -192,7 +202,8 @@ export async function registerForCompletion({
         config: subConfig,
         i18nPluginId,
         i18n,
-        load: !isFollowedBySubCommand(previousArgs[i + 1], getCommandSubCommands(cmd), false)
+        load: !isFollowedBySubCommand(previousArgs[i + 1], getCommandSubCommands(cmd), false),
+        globalOptions
       })
     )
     level = getCommandSubCommands(cmd)
@@ -237,7 +248,8 @@ export async function registerCompletion({
   i18n,
   isBombshellRoot = false,
   shallow = false,
-  load = false
+  load = false,
+  globalOptions
 }: RegisterCompletionParams): Promise<TabCommand> {
   const resolvedCmd = await resolveCommand(
     cmd,
@@ -255,8 +267,18 @@ export async function registerCompletion({
       factory: () => i18n
     }
   }
+  /**
+   * NOTE(kazupon): the arguments as gunshi resolves them to run the command. The global options are part
+   * of no command definition: gunshi merges them into the arguments of the command that it runs,
+   * where an argument of the command shadows the global option of the same name.
+   */
+  const args: Args = Object.assign(
+    Object.create(null) as Args,
+    globalOptions && Object.fromEntries(globalOptions),
+    resolvedCmd.args
+  )
   const ctx = await createCommandContext({
-    args: resolvedCmd.args || (Object.create(null) as Args),
+    args,
     command: resolvedCmd,
     callMode: resolvedCmd.entry ? 'entry' : 'subCommand',
     extensions
@@ -282,7 +304,6 @@ export async function registerCompletion({
     return commandTab
   }
 
-  const args = resolvedCmd.args || (Object.create(null) as Args)
   for (const [key, schema] of Object.entries(args)) {
     if (schema.type === 'positional') {
       commandTab.argument(key, resolveCompletionHandler(name, key, config, i18n), schema.multiple)
