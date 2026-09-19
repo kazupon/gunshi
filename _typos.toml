@@ -3,3 +3,5 @@
 alow = "alow"
 # Intentional misspelling used in command-not-found tests.
 lod = "lod"
+# Intentional misspelling used in the test for a near miss of a plugin command.
+healt = "healt"
