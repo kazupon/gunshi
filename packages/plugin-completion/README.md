@@ -392,6 +392,15 @@ completion({
 })
 ```
 
+A command may give one of its arguments a short name that a global option also uses — `-h` for `--host`, say. The value behind it is completed as the command's, the way the command receives it when it runs:
+
+```sh
+$ my-cli serve -h <TAB>
+localhost  0.0.0.0                                 # the values of --host, not the global --help
+```
+
+The one shape this cannot express is the same letter on both sides of the command name. `my-cli -h serve -h <TAB>` means the global option in front and the command's behind it, and completion has to settle on one of them for the whole line, so it offers nothing there. Writing the long name on one of the two, or not sharing the letter, avoids it.
+
 ### Hidden Arguments
 
 An argument with `hidden: true` is kept out of completion, the way it is kept out of `--help`. It is not offered among the candidates, a typed prefix does not complete it, its short name is not suggested, its negatable `--no-` form is not offered, and its value is not completed. A hidden global option is treated the same way.
