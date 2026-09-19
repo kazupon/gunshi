@@ -926,9 +926,12 @@ test('internal commands are filtered out', async () => {
 })
 
 describe('#727 - the commands section describes each listed command', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+  type TestLazyCommand = LazyCommand<GunshiParams<{ args: Args }>>
+
   async function renderCommandsSection(
-    subCommands: Map<string, Command<any> | LazyCommand<any>>,
-    running?: Command<any>
+    subCommands: Map<string, TestCommand | TestLazyCommand>,
+    running?: TestCommand
   ): Promise<string[]> {
     const ctx = await createCommandContext({
       args: running?.args || {},
@@ -969,27 +972,27 @@ describe('#727 - the commands section describes each listed command', () => {
       loud: { type: 'boolean', description: 'Shout' }
     },
     run: NOOP
-  } as unknown as Command<any>
+  } as TestCommand
 
   const PUSH = {
     name: 'push',
     description: 'Push things',
     args: { remote: { type: 'positional', description: 'Remote name' } },
     run: NOOP
-  } as unknown as Command<any>
+  } as TestCommand
 
   const STATUS = {
     name: 'status',
     description: 'Show status',
     run: NOOP
-  } as unknown as Command<any>
+  } as TestCommand
 
   const TIDY = {
     name: 'tidy',
     description: 'Tidy up',
     args: { level: { type: 'string', default: 'low', description: 'Level' } },
     run: NOOP
-  } as unknown as Command<any>
+  } as TestCommand
 
   test('each row shows the arguments that its own command declares', async () => {
     const rows = await renderCommandsSection(
@@ -1032,7 +1035,7 @@ describe('#727 - the commands section describes each listed command', () => {
         target: { type: 'positional', description: 'Target', hidden: true }
       },
       run: NOOP
-    } as unknown as Command<any>
+    } as TestCommand
 
     const rows = await renderCommandsSection(
       new Map([
@@ -1047,7 +1050,7 @@ describe('#727 - the commands section describes each listed command', () => {
   })
 
   test('a lazy command is described by the definition, without running its loader', async () => {
-    const loader = vi.fn<() => Promise<Command<any>>>(async () => ({
+    const loader = vi.fn<() => Promise<TestCommand>>(async () => ({
       name: 'build',
       args: { watch: { type: 'boolean', description: 'Watch' } },
       run: NOOP
@@ -1056,16 +1059,16 @@ describe('#727 - the commands section describes each listed command', () => {
       commandName: 'build',
       description: 'Build the project',
       args: { target: { type: 'positional', description: 'Target' } }
-    }) as unknown as LazyCommand<any>
+    }) as unknown as TestLazyCommand
 
     const bare = Object.assign(
-      vi.fn<() => Promise<Command<any>>>(async () => ({
+      vi.fn<() => Promise<TestCommand>>(async () => ({
         name: 'test',
         args: { watch: { type: 'boolean' } },
         run: NOOP
       })),
       { commandName: 'test', description: 'Test the project' }
-    ) as unknown as LazyCommand<any>
+    ) as unknown as TestLazyCommand
 
     const rows = await renderCommandsSection(
       new Map([
@@ -1079,7 +1082,7 @@ describe('#727 - the commands section describes each listed command', () => {
   })
 
   test('the descriptions are aligned, and a row without one has no trailing space', async () => {
-    const quiet = { name: 'quiet', run: NOOP } as unknown as Command<any>
+    const quiet = { name: 'quiet', run: NOOP } as TestCommand
     const rows = await renderCommandsSection(
       new Map([
         ['greet', ENTRY],
@@ -1104,7 +1107,7 @@ describe('#727 - the commands section describes each listed command', () => {
   })
 
   test('an anonymous entry command is shown with the name of the cli', async () => {
-    const anonymous = { description: 'The default command', entry: true, run: NOOP } as Command<any>
+    const anonymous = { description: 'The default command', entry: true, run: NOOP } as TestCommand
     const rows = await renderCommandsSection(
       new Map([
         ['(anonymous)', anonymous],
