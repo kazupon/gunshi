@@ -63,6 +63,11 @@ export interface RegisterCompletionParams {
    * Whether to register the name and the description only, without options and positional arguments.
    */
   shallow?: boolean
+  /**
+   * Whether to run the loader of a lazy command whose definition has no `args`,
+   * so that the arguments of the command that the loader returns are registered.
+   */
+  load?: boolean
 }
 
 /**
@@ -144,7 +149,8 @@ export async function registerForCompletion({
       config,
       i18nPluginId,
       i18n,
-      isBombshellRoot: true
+      isBombshellRoot: true,
+      load: !isFollowedBySubCommand(previousArgs[0], subCommands, true)
     })
   ]
 
@@ -184,7 +190,8 @@ export async function registerForCompletion({
         cmd,
         config: subConfig,
         i18nPluginId,
-        i18n
+        i18n,
+        load: !isFollowedBySubCommand(previousArgs[i + 1], getCommandSubCommands(cmd), false)
       })
     )
     level = getCommandSubCommands(cmd)
@@ -228,9 +235,15 @@ export async function registerCompletion({
   i18nPluginId,
   i18n,
   isBombshellRoot = false,
-  shallow = false
+  shallow = false,
+  load = false
 }: RegisterCompletionParams): Promise<TabCommand> {
-  const resolvedCmd = await resolveLazyCommand(cmd)
+  const resolvedCmd = await resolveCommand(
+    cmd,
+    // the completion root is not registered under its own name
+    isBombshellRoot ? undefined : name.split(' ').at(-1),
+    load && !shallow
+  )
   const extensions: Record<string, CommandContextExtension> = Object.create(null) as Record<
     string,
     CommandContextExtension
@@ -297,6 +310,65 @@ export async function registerCompletion({
   }
 
   return commandTab
+}
+
+/**
+ * Resolve a command for completion.
+ *
+ * A lazy command is resolved from the definition that is given to `lazy`, without running its loader.
+ * When the definition has no `args`, they can only come from the command that the loader returns,
+ * which is what gunshi resolves to run the command and to render its usage, so the loader runs if `load` is set.
+ *
+ * @param cmd - A command to resolve
+ * @param key - The name that the command is registered with in its parent, if any
+ * @param load - Whether to run the loader of a lazy command whose definition has no `args`
+ * @returns The resolved command
+ */
+async function resolveCommand(
+  cmd: Command | LazyCommand,
+  key: string | undefined,
+  load: boolean
+): Promise<Command> {
+  if (load && typeof cmd === 'function' && cmd.args == undefined) {
+    // a lazy command without a definition is named after its key, like gunshi does to run it
+    const commandName = cmd.commandName || key
+    const lazyCmd = cmd.commandName
+      ? cmd
+      : (Object.assign((...args: unknown[]) => (cmd as Function)(...args), cmd, {
+          commandName
+        }) as unknown as LazyCommand)
+    try {
+      return await resolveLazyCommand(lazyCmd, commandName, true)
+    } catch {
+      /**
+       * NOTE(kazupon): a loader that fails is reported when the command runs.
+       * A completion request falls back to the definition, and stays quiet, because not every shell discards stderr.
+       */
+    }
+  }
+  return await resolveLazyCommand(cmd)
+}
+
+/**
+ * Whether the word after a command is one of its sub-commands.
+ * The arguments of such a command cannot change the result: it is not the command that is completed,
+ * and no option that would have to be looked up in it comes before the sub-command.
+ *
+ * @param next - The word after the command, if any
+ * @param level - The sub-commands of the command
+ * @param topLevel - Whether `level` is the top level of the CLI, where the completion command lives
+ * @returns `true` if the word resolves to a sub-command
+ */
+function isFollowedBySubCommand(
+  next: string | undefined,
+  level: ReadonlyMap<string, Command | LazyCommand> | undefined,
+  topLevel: boolean
+): boolean {
+  return (
+    next != undefined &&
+    !next.startsWith('-') &&
+    resolveCommandPath(level, next.split(' '), topLevel) != undefined
+  )
 }
 
 function resolveCompletionHandler(
