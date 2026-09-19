@@ -1227,3 +1227,206 @@ describe('a CLI without sub-commands', () => {
     expect(output).toEqual([':4'])
   })
 })
+
+// ---------------------------------------------------------------------------
+// `toKebab`: the option names that gunshi parses and renders are kebab-cased
+// ---------------------------------------------------------------------------
+
+describe('toKebab', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  const args = {
+    dryRun: { type: 'boolean', negatable: true, description: 'Dry run' },
+    logLevel: { type: 'string', short: 'l', description: 'Log level' },
+    target: { type: 'positional', description: 'Deploy target' }
+  } as const
+
+  // `toKebab` of the command
+  const deploy = defineCommand({
+    name: 'deploy',
+    description: 'Deploy the app',
+    toKebab: true,
+    args,
+    run: NOOP
+  })
+
+  // `toKebab` of the argument schema, which converts that argument only
+  const build = defineCommand({
+    name: 'build',
+    description: 'Build the app',
+    args: {
+      dryRun: { type: 'boolean', toKebab: true, description: 'Dry run' },
+      logLevel: { type: 'string', description: 'Log level' }
+    },
+    run: NOOP
+  })
+
+  const remote = defineCommand({
+    name: 'remote',
+    description: 'Manage remotes',
+    toKebab: true,
+    args: { dryRun: { type: 'boolean', description: 'Dry run' } },
+    subCommands: {
+      add: defineCommand({ name: 'add', description: 'Add a remote', run: NOOP })
+    },
+    run: NOOP
+  })
+
+  // the configuration is keyed by the argument, not by the option name
+  const kebabConfig: NonNullable<CompletionOptions['config']> = {
+    subCommands: {
+      deploy: {
+        args: {
+          logLevel: { handler: () => [{ value: 'debug', description: 'Debug' }] },
+          target: { handler: () => [{ value: 'staging', description: 'Staging' }] }
+        }
+      }
+    }
+  }
+
+  // the options that the plugins of `cli` add to every command are not what these tests are about
+  const GLOBAL_OPTIONS = /^--(?:help|version)\t/
+
+  async function complete(
+    request: string[],
+    subCommands: Record<string, Command | LazyCommand> = { deploy, build, remote },
+    plugins = [completion({ config: kebabConfig })]
+  ): Promise<string[]> {
+    output.length = 0
+    await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands,
+      plugins
+    })
+    return output.filter(line => !GLOBAL_OPTIONS.test(line))
+  }
+
+  test('suggests the names that gunshi accepts', async () => {
+    expect(await complete(['deploy', '--'])).toEqual([
+      '--dry-run\tDry run',
+      '--no-dry-run\tNegatable of --dry-run',
+      '--log-level\tLog level',
+      ':4'
+    ])
+  })
+
+  test('`toKebab` of an argument converts that argument only', async () => {
+    expect(await complete(['build', '--'])).toEqual([
+      '--dry-run\tDry run',
+      '--logLevel\tLog level',
+      ':4'
+    ])
+  })
+
+  test('completes a prefix that is typed in kebab-case', async () => {
+    expect(await complete(['deploy', '--dry-'])).toEqual(['--dry-run\tDry run', ':4'])
+    expect(await complete(['deploy', '--no-d'])).toEqual([
+      '--no-dry-run\tNegatable of --dry-run',
+      ':4'
+    ])
+  })
+
+  test('completes the value with the handler that is configured by the argument key', async () => {
+    expect(await complete(['deploy', '--log-level', ''])).toEqual(['debug\tDebug', ':4'])
+    expect(await complete(['deploy', '--log-level='])).toEqual(['debug\tDebug', ':4'])
+    expect(await complete(['deploy', '-l', ''])).toEqual(['debug\tDebug', ':4'])
+  })
+
+  test('typed boolean option does not consume the next word', async () => {
+    // a positional argument of the command
+    expect(await complete(['deploy', '--dry-run', ''])).toEqual(['staging\tStaging', ':4'])
+    expect(await complete(['deploy', '--no-dry-run', ''])).toEqual(['staging\tStaging', ':4'])
+    // a sub-command of the command
+    expect(await complete(['remote', '--dry-run', ''])).toEqual(['add\tAdd a remote', ':4'])
+  })
+
+  test('localizes the descriptions by the argument key', async () => {
+    const localized = defineCommand({
+      ...deploy,
+      resource: () =>
+        Promise.resolve({
+          description: 'アプリをデプロイ',
+          'arg:dryRun': 'ドライラン',
+          'arg:no-dryRun': 'ドライランを無効にする',
+          'arg:logLevel': 'ログレベル',
+          'arg:target': 'デプロイ先'
+        })
+    })
+
+    expect(
+      await complete(['deploy', '--'], { deploy: localized }, [
+        i18n({ locale: 'ja-JP' }),
+        completion()
+      ])
+    ).toEqual([
+      '--dry-run\tドライラン',
+      '--no-dry-run\tドライランを無効にする',
+      '--log-level\tログレベル',
+      ':4'
+    ])
+  })
+
+  test('lazy command follows the `toKebab` that gunshi resolves for it', async () => {
+    const lazyDeploy = lazy(() => NOOP, {
+      name: 'deploy',
+      description: 'Deploy the app',
+      toKebab: true,
+      args
+    })
+
+    expect(await complete(['deploy', '--'], { deploy: lazyDeploy })).toEqual([
+      '--dry-run\tDry run',
+      '--no-dry-run\tNegatable of --dry-run',
+      '--log-level\tLog level',
+      ':4'
+    ])
+    expect(await complete(['deploy', '--log-level', ''], { deploy: lazyDeploy })).toEqual([
+      'debug\tDebug',
+      ':4'
+    ])
+  })
+
+  test('every suggested option is an option that gunshi parses', async () => {
+    // [the command, the arguments that it requires besides the option]
+    const commands = [
+      ['deploy', deploy, ['staging']],
+      ['build', build, []]
+    ] as const
+
+    for (const [name, definition, required] of commands) {
+      const candidates = (await complete([name, '--']))
+        .map(line => line.split('\t')[0])
+        .filter(candidate => candidate.startsWith('--'))
+      expect(candidates.length).toBeGreaterThan(0)
+
+      for (const candidate of candidates) {
+        let values: Record<string, unknown> | undefined
+        const command = defineCommand({
+          ...definition,
+          run: ctx => {
+            values = ctx.values
+          }
+        })
+        const isFlag = candidate.endsWith('dry-run')
+
+        // `strict` rejects an option that the command does not declare
+        await cli(
+          [name, ...required, ...(isFlag ? [candidate] : [candidate, 'debug'])],
+          defineCommand({ name: 'main', run: NOOP }),
+          { name: 'mycli', usageSilent: true, strict: true, subCommands: { [name]: command } }
+        )
+
+        expect(values, candidate).toHaveProperty(isFlag ? 'dryRun' : 'logLevel')
+      }
+    }
+  })
+})
