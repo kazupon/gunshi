@@ -2710,6 +2710,79 @@ describe('github issues', () => {
       expect(usage).toMatchSnapshot()
     })
   })
+
+  describe('#728 - hidden arguments suggested for an unknown option', () => {
+    const args = {
+      output: { type: 'string', description: 'Output file' },
+      legacyMode: { type: 'boolean', description: 'Deprecated flag', hidden: true },
+      legacyLevel: { type: 'string', short: 'L', description: 'Deprecated level', hidden: true },
+      legacyForce: {
+        type: 'boolean',
+        negatable: true,
+        description: 'Deprecated force',
+        hidden: true
+      },
+      force: { type: 'boolean', negatable: true, description: 'Force' }
+    } as const
+
+    async function candidatesOf(argv: string[]): Promise<unknown> {
+      let captured: AggregateError | undefined
+      await expect(
+        cli(
+          argv,
+          { name: 'app', args, run: vi.fn<() => void>() },
+          {
+            strict: true,
+            usageSilent: true,
+            onErrorCommand: (_ctx, error) => {
+              captured = error as AggregateError
+            }
+          }
+        )
+      ).rejects.toBeInstanceOf(AggregateError)
+      return (captured?.errors[0] as { values: Record<string, unknown> } | undefined)?.values
+        ?.candidates
+    }
+
+    test('a hidden option is not offered as a candidate', async () => {
+      expect(await candidatesOf(['--outpu'])).toEqual([
+        '--help',
+        '--version',
+        '--output',
+        '--force',
+        '--no-force'
+      ])
+    })
+
+    test('a mistyped hidden option reports the error without naming it', async () => {
+      expect(await candidatesOf(['--legacyMod'])).not.toContain('--legacyMode')
+    })
+
+    test('a hidden option is still accepted, which is what `hidden` means', async () => {
+      const run = vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+
+      await cli(
+        ['--legacyMode', '--legacyLevel', 'trace', '--no-legacyForce', '--output', 'dist'],
+        { name: 'app', args, run },
+        { strict: true, usageSilent: true }
+      )
+
+      expect(run.mock.calls[0][0].values).toMatchObject({
+        legacyMode: true,
+        legacyLevel: 'trace',
+        legacyForce: false,
+        output: 'dist'
+      })
+    })
+
+    test('the short name of a hidden option is still accepted', async () => {
+      const run = vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+
+      await cli(['-L', 'trace'], { name: 'app', args, run }, { strict: true, usageSilent: true })
+
+      expect(run.mock.calls[0][0].values).toMatchObject({ legacyLevel: 'trace' })
+    })
+  })
 })
 
 describe('nested sub-commands', () => {

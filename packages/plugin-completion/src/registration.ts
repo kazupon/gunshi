@@ -29,6 +29,17 @@ const NOOP_HANDLER = () => {
 }
 
 /**
+ * The name of the command that holds the options of `hidden` arguments.
+ *
+ * `@bomb.sh/tab` has no notion of a hidden option, and an option that it does not know is taken
+ * for one that takes a value, so it swallows the word after it (#710). A command whose name is
+ * the empty string is skipped when the candidates are listed, while the arity of an option is
+ * looked up in every registered command. Registering a hidden option there keeps it out of the
+ * candidates without losing its arity.
+ */
+const HIDDEN_HOLDER_NAME = ''
+
+/**
  * Parameters of {@linkcode registerCompletion}.
  */
 export interface RegisterCompletionParams {
@@ -305,8 +316,17 @@ export async function registerCompletion({
   }
 
   for (const [key, schema] of Object.entries(args)) {
+    const hidden = schema.hidden === true
     if (schema.type === 'positional') {
-      commandTab.argument(key, resolveCompletionHandler(name, key, config, i18n), schema.multiple)
+      /**
+       * NOTE(kazupon): the argument keeps its place, so that the positions of the arguments after it
+       * do not shift, but a hidden one completes no values.
+       */
+      commandTab.argument(
+        key,
+        hidden ? undefined : resolveCompletionHandler(name, key, config, i18n),
+        schema.multiple
+      )
     } else {
       /**
        * NOTE(kazupon): the option is registered with the name that gunshi parses and renders,
@@ -314,20 +334,25 @@ export async function registerCompletion({
        * the description, the i18n resource and the completion handler of the user's configuration.
        */
       const optionName = ctx.toKebab || schema.toKebab ? kebabnize(key) : key
-      const description =
-        (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || ''
+      const target = hidden ? resolveHiddenHolder(t) : commandTab
+      const description = hidden
+        ? ''
+        : (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || ''
       if (schema.type === 'boolean') {
         // no handler, which is how `Command#option` tells that the option takes no value
-        commandTab.option(optionName, description, schema.short)
+        target.option(optionName, description, schema.short)
         if (schema.negatable) {
-          commandTab.option(
+          target.option(
             `${ARG_NEGATABLE_PREFIX}${optionName}`,
-            (await localizeDescription(resolveArgKey(`${ARG_NEGATABLE_PREFIX}${key}`, ctx.name))) ||
-              ''
+            hidden
+              ? ''
+              : (await localizeDescription(
+                  resolveArgKey(`${ARG_NEGATABLE_PREFIX}${key}`, ctx.name)
+                )) || ''
           )
         }
       } else {
-        commandTab.option(
+        target.option(
           optionName,
           description,
           resolveCompletionHandler(name, key, config, i18n),
@@ -397,6 +422,16 @@ function isFollowedBySubCommand(
     !next.startsWith('-') &&
     resolveCommandPath(level, next.split(' '), topLevel) != undefined
   )
+}
+
+/**
+ * Resolve the command that holds the options of `hidden` arguments, creating it if needed.
+ *
+ * @param t - The completion root command
+ * @returns The {@linkcode HIDDEN_HOLDER_NAME | holder} command
+ */
+function resolveHiddenHolder(t: RootCommand): TabCommand {
+  return t.commands.get(HIDDEN_HOLDER_NAME) || t.command(HIDDEN_HOLDER_NAME, '')
 }
 
 function resolveCompletionHandler(
