@@ -388,6 +388,7 @@ When the loader returns a Command object, Gunshi resolves the command from both 
 
 - **The loaded command takes precedence**: A property that the loaded command defines is used, even if the definition has it too
 - **The definition is the fallback**: A property that the loaded command does not define is taken from the definition, so a loader that returns only `{ run }` behaves the same as a loader that returns the runner function
+- **Properties are not merged**: If both of them define a property such as `args` or `rendering`, the whole value of the loaded command is used
 
 In the example above, `my-cli config --help` shows the description `Config command (debug: false)` and the `--verbose` option, which come from the loaded command. On the other hand, `my-cli --help` lists the command as `Dynamically configured command`, because the command list is rendered from the definition without calling the loader.
 

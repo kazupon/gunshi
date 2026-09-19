@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
-import { define } from './definition.ts'
+import { define, lazy } from './definition.ts'
 import { plugin } from './plugin/core.ts'
 
-import type { Command } from './types.ts'
+import type { Args, Command, CommandRunner, RenderingOptions } from './types.ts'
 
 describe('Command rendering options', () => {
   describe('header rendering', () => {
@@ -248,6 +248,70 @@ describe('Command rendering options', () => {
       expect(stdout).not.toContain('Default header')
       // Usage should still be rendered
       expect(stdout).toContain('OPTIONS')
+    })
+  })
+
+  describe('lazy command', () => {
+    const args = {
+      env: { type: 'string', required: true, description: 'Target environment' }
+    } satisfies Args
+
+    const rendering: RenderingOptions = {
+      header: null,
+      usage: () => Promise.resolve('Custom usage'),
+      validationErrors: () => Promise.resolve('Custom validation errors')
+    }
+
+    const run: CommandRunner = ctx => {
+      ctx.log('Command executed')
+    }
+
+    // where the rendering options of a lazy command come from
+    const commands = {
+      'the definition that is given to `lazy`': () =>
+        lazy(() => run, { name: 'test', args, rendering }),
+      'the command that the loader returns': () =>
+        lazy(() => define({ name: 'test', args, rendering, run }), { name: 'test' })
+    }
+    const sources = Object.keys(commands) as (keyof typeof commands)[]
+
+    function createOptions(source: keyof typeof commands) {
+      return {
+        name: 'test-cli',
+        subCommands: { test: commands[source]() },
+        renderHeader: () => Promise.resolve('Default header')
+      }
+    }
+
+    const entry = define({ run: () => {} })
+
+    test.each(sources)('header by %s', async source => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+
+      await cli(['test', '--env', 'prod'], entry, createOptions(source))
+
+      expect(log()).toBe('Command executed')
+    })
+
+    test.each(sources)('usage by %s', async source => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+
+      await cli(['test', '--help'], entry, createOptions(source))
+
+      expect(log()).toBe('Custom usage')
+    })
+
+    test.each(sources)('validation errors by %s', async source => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+
+      await expect(cli(['test'], entry, createOptions(source))).rejects.toBeInstanceOf(
+        AggregateError
+      )
+
+      expect(log()).toBe('Custom validation errors')
     })
   })
 })

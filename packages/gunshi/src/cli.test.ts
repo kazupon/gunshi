@@ -2455,6 +2455,111 @@ describe('github issues', () => {
     })
   })
 
+  // the `rendering` half of the issue is in rendering.test.ts, under `Command rendering options`
+  describe('#717 - `toKebab` and `rendering` of a lazy command ignored', () => {
+    const definition = define({
+      name: 'deploy',
+      description: 'Deploy the app',
+      toKebab: true,
+      args: {
+        dryRun: { type: 'boolean', negatable: true, description: 'Dry run' },
+        targetEnv: { type: 'string', required: true, description: 'Target environment' }
+      }
+    })
+
+    // `plain` is the baseline, and the others are where `toKebab` of a lazy command comes from
+    const commands = {
+      plain: (run: CommandRunner) => define({ ...definition, run }),
+      'lazy with the definition': (run: CommandRunner) => lazy(() => run, definition),
+      'lazy with the loaded command': (run: CommandRunner) =>
+        lazy(() => define({ ...definition, run }), { name: 'deploy' }),
+      // the loaded command defines no `toKebab`, so it falls back to the definition
+      'lazy with both': (run: CommandRunner) => lazy(() => define({ run }), definition)
+    }
+    const kinds = Object.keys(commands) as (keyof typeof commands)[]
+    const lazyKinds = kinds.filter(kind => kind !== 'plain')
+
+    function createOptions(kind: keyof typeof commands, run: CommandRunner): CliOptions {
+      return {
+        name: 'my-cli',
+        version: '1.0.0',
+        subCommands: { deploy: commands[kind](run) }
+      }
+    }
+
+    const entry = define({ run: () => {} })
+
+    test.each(kinds)('%s: parse the kebab-case options', async kind => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(['deploy', '--target-env', 'prod', '--no-dry-run'], entry, createOptions(kind, run))
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({
+          toKebab: true,
+          values: { targetEnv: 'prod', dryRun: false }
+        })
+      )
+    })
+
+    test.each(kinds)('%s: kebab-case options are known ones with `strict`', async kind => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(['deploy', '--target-env', 'prod', '--dry-run'], entry, {
+        ...createOptions(kind, run),
+        strict: true
+      })
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({ values: { targetEnv: 'prod', dryRun: true } })
+      )
+    })
+
+    test('usage is the same as the one of the command that is not lazy', async () => {
+      const usage = await generate('deploy', entry, createOptions('plain', vi.fn<CommandRunner>()))
+
+      expect(usage).toContain('--target-env <target-env>')
+      expect(usage).toContain('--no-dry-run')
+      for (const kind of lazyKinds) {
+        expect(
+          await generate('deploy', entry, createOptions(kind, vi.fn<CommandRunner>()))
+        ).toEqual(usage)
+      }
+    })
+
+    test.each(lazyKinds)('%s: entry command of a CLI without sub-commands', async kind => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(['--target-env', 'prod'], commands[kind](run), {
+        name: 'my-cli',
+        version: '1.0.0'
+      })
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({ toKebab: true, values: { targetEnv: 'prod' } })
+      )
+    })
+
+    test.each(lazyKinds)('%s: nested sub-command', async kind => {
+      const run = vi.fn<CommandRunner>()
+      const remote = define({
+        name: 'remote',
+        subCommands: { deploy: commands[kind](run) },
+        run: () => {}
+      })
+
+      await cli(['remote', 'deploy', '--target-env', 'prod'], entry, {
+        name: 'my-cli',
+        version: '1.0.0',
+        subCommands: { remote }
+      })
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({ toKebab: true, values: { targetEnv: 'prod' } })
+      )
+    })
+  })
+
   describe('#499 - lazy command args not parsed', () => {
     const mainCommand = define({
       description: 'My CLI application',
