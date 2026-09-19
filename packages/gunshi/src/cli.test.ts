@@ -2560,6 +2560,89 @@ describe('github issues', () => {
     })
   })
 
+  describe("#729 - a command's own `version` / `help` argument is hijacked", () => {
+    const base = { name: 'my-cli', version: '9.9.9', usageSilent: true } satisfies CliOptions
+
+    function createCli(args: Args, run: CommandRunner, argv: string[]) {
+      const command = define({ name: 'target', args, run })
+      return cli(['target', ...argv], define({ name: 'root', run: () => {} }), {
+        ...base,
+        subCommands: { target: command }
+      })
+    }
+
+    test('an option of the command takes the value, instead of printing the version', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await createCli({ version: { type: 'string', description: 'Version to release' } }, run, [
+        '--version',
+        '1.2.3'
+      ])
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { version: '1.2.3' } }))
+    })
+
+    test('a default value does not make the command unreachable', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      // `values.version` is truthy on every run, so the command could never be reached
+      await createCli({ version: { type: 'string', default: 'latest' } }, run, [])
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { version: 'latest' } }))
+    })
+
+    test('an option of the command takes the value, instead of printing the usage', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await createCli({ help: { type: 'string', description: 'Help topic' } }, run, [
+        '--help',
+        'topics'
+      ])
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { help: 'topics' } }))
+    })
+
+    test('a positional argument of the command is not a global option either', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      // nothing on the command line looks like `--version`, yet the version used to be printed
+      await createCli({ version: { type: 'positional' } }, run, ['1.2.3'])
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { version: '1.2.3' } }))
+    })
+
+    test('the entry command may declare it too', async () => {
+      const run = vi.fn<CommandRunner>()
+      const entry = define({ name: 'root', args: { version: { type: 'string' } }, run })
+
+      await cli(['--version', '1.2.3'], entry, base)
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { version: '1.2.3' } }))
+    })
+
+    test('a command that declares neither keeps the global options', async () => {
+      const run = vi.fn<CommandRunner>()
+      const args = { name: { type: 'string' } } satisfies Args
+
+      await expect(createCli(args, run, ['--version'])).resolves.toBe('9.9.9')
+      await expect(createCli(args, run, ['--help'])).resolves.toContain('OPTIONS')
+      expect(run).not.toHaveBeenCalled()
+    })
+
+    test('a schema identical to the global one is left to the global option', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await expect(
+        createCli(
+          { version: { type: 'boolean', short: 'v', description: 'Display this version' } },
+          run,
+          ['--version']
+        )
+      ).resolves.toBe('9.9.9')
+      expect(run).not.toHaveBeenCalled()
+    })
+  })
+
   describe('#722 - positional arguments lost when a plugin adds a command', () => {
     const args = { name: { type: 'positional', description: 'Name to greet' } } satisfies Args
 

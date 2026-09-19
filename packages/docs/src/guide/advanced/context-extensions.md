@@ -197,13 +197,13 @@ import { define } from 'gunshi'
 import { pluginId as globalId } from '@gunshi/plugin-global'
 
 const command = define({
-  run: ctx => {
+  run: async ctx => {
     // Safe access technique
     const global = ctx.extensions[globalId]
 
     if (global) {
       // Extension is available
-      global.showUsage()
+      await global.showUsage()
     } else {
       // Fallback behavior
       console.log('Usage information not available')
@@ -249,7 +249,10 @@ Extensions can be conditionally utilized based on command arguments, environment
 
 This dynamic approach allows your CLI to adapt its behavior to different contexts and user preferences.
 
-The following code shows how to selectively engage extensions based on command flags:
+The following code shows how to selectively engage extensions based on command flags.
+Note the `help` argument: declaring it is what makes `--help` reach this command's runner, because a
+command's own argument shadows the global option of the same name. `showUsage()` is asynchronous, so
+the runner awaits it.
 
 ```ts
 import { define } from 'gunshi'
@@ -262,10 +265,10 @@ const command = define({
     debug: { type: 'boolean' },
     help: { type: 'boolean' }
   },
-  run: ctx => {
+  run: async ctx => {
     // Use extensions based on command flags
     if (ctx.values.help) {
-      ctx.extensions[globalId]?.showUsage()
+      await ctx.extensions[globalId]?.showUsage()
       return
     }
 
