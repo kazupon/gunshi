@@ -1,3 +1,4 @@
+import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { RootCommand } from '@bomb.sh/tab'
 import { createCommandContext, plugin } from '@gunshi/plugin'
 import i18n from '@gunshi/plugin-i18n'
@@ -1993,5 +1994,198 @@ describe('#732 - an argument whose name starts with `no-`', () => {
       '--no-force\tNegatable of -f, --force',
       ':4'
     ])
+  })
+})
+
+describe("#731 - a negatable option's description with the i18n plugin", () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  const args = {
+    force: { type: 'boolean', short: 'f', negatable: true, description: 'Force' },
+    color: { type: 'boolean', negatable: true, description: 'Colorize output' },
+    quiet: { type: 'boolean', description: 'Quiet' },
+    target: { type: 'positional', description: 'Target' }
+  } satisfies Record<string, ArgSchema>
+
+  const build = defineCommand({
+    name: 'build',
+    description: 'Build the app',
+    args,
+    resource: resource('ビルドする', { force: '強制', color: '色を付ける' }),
+    run: NOOP
+  })
+
+  // the same command, with a resource for the negated form of `force`
+  const described = defineCommand({
+    ...build,
+    resource: resource('ビルドする', {
+      force: '強制',
+      'no-force': '強制しない',
+      color: '色を付ける'
+    })
+  })
+
+  // `toKebab`, so that the composed text has to be kebab-cased too
+  const deploy = defineCommand({
+    name: 'deploy',
+    description: 'Deploy the app',
+    toKebab: true,
+    args: {
+      dryRun: { type: 'boolean', short: 'd', negatable: true, description: 'Dry run' }
+    },
+    resource: resource('デプロイする', { dryRun: 'ドライラン' }),
+    run: NOOP
+  })
+
+  // a plugin that adds a negatable global option, and a hidden one
+  const globals = plugin({
+    id: 'test:globals',
+    name: 'globals',
+    setup: ctx => {
+      ctx.addGlobalOption('tty', { type: 'boolean', negatable: true, description: 'Use a TTY' })
+      ctx.addGlobalOption('telemetry', {
+        type: 'boolean',
+        negatable: true,
+        hidden: true,
+        description: 'Send telemetry'
+      })
+    }
+  })
+
+  const config: NonNullable<CompletionOptions['config']> = {
+    subCommands: { build: { args: { target: { handler: () => [{ value: 'prod' }] } } } }
+  }
+
+  // the built-in resources of a locale reach the CLI only when the user hands them over, which is
+  // what makes `--help` and the composed text below speak that locale
+  function localized(locale: string) {
+    return i18n({ locale, builtinResources: { 'ja-JP': jaJPResource } })
+  }
+
+  async function complete(
+    request: string[],
+    subCommands: Record<string, Command> = { build, deploy },
+    plugins = [localized('ja-JP'), completion({ config })]
+  ): Promise<string[]> {
+    output.length = 0
+    await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands,
+      plugins
+    })
+    // a copy, so that two results can be compared (the next call clears the shared buffer)
+    return [...output]
+  }
+
+  test('the negated form is described in the locale of the i18n plugin', async () => {
+    expect(await complete(['build', '--'])).toEqual([
+      '--help\tこのヘルプメッセージを表示',
+      '--version\tこのバージョンを表示',
+      '--force\t強制',
+      '--no-force\t否定可能な -f, --force',
+      '--color\t色を付ける',
+      '--no-color\t否定可能な --color',
+      '--quiet\tQuiet',
+      ':4'
+    ])
+  })
+
+  test('the built-in resource of the locale is used, not a text of its own', async () => {
+    const english = await complete(['build', '--'], { build, deploy }, [
+      localized('en-US'),
+      completion({ config })
+    ])
+    const japanese = await complete(['build', '--'])
+
+    expect(english).toContain('--no-force\tNegatable of -f, --force')
+    expect(english).toContain('--no-color\tNegatable of --color')
+    // the same CLI, and the same argument, described in the other locale
+    expect(japanese).toContain('--no-force\t否定可能な -f, --force')
+  })
+
+  test('a resource of its own still wins', async () => {
+    const candidates = await complete(['build', '--'], { build: described })
+
+    expect(candidates).toContain('--no-force\t強制しない')
+    // the one without a resource of its own still falls back to the composed text
+    expect(candidates).toContain('--no-color\t否定可能な --color')
+  })
+
+  test('the composed text follows `toKebab`', async () => {
+    expect(await complete(['deploy', '--'])).toContain('--no-dry-run\t否定可能な -d, --dry-run')
+  })
+
+  test('a negatable global option is described too', async () => {
+    const candidates = await complete(['build', '--'], { build }, [
+      globals,
+      localized('ja-JP'),
+      completion({ config })
+    ])
+
+    expect(candidates).toContain('--no-tty\t否定可能な --tty')
+  })
+
+  test('a hidden negatable global option stays hidden, and takes no value', async () => {
+    const plugins = [globals, localized('ja-JP'), completion({ config })]
+
+    // by name, because a leaked hidden option would carry an empty description, not this text
+    expect(
+      (await complete(['build', '--'], { build }, plugins)).some(candidate =>
+        candidate.startsWith('--no-telemetry')
+      )
+    ).toBe(false)
+    expect(await complete(['build', '--no-t'], { build }, plugins)).toEqual([
+      '--no-tty\t否定可能な --tty',
+      ':4'
+    ])
+    // a boolean option takes no value, so the word after it completes the positional (#710, #735)
+    expect(await complete(['build', '--no-telemetry', ''], { build }, plugins)).toEqual([
+      'prod\t',
+      ':4'
+    ])
+  })
+
+  test('without the i18n plugin, the candidates are what they always were', async () => {
+    // the whole list, because nothing about a CLI without the plugin may change
+    expect(await complete(['build', '--'], { build, deploy }, [completion({ config })])).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--force\tForce',
+      '--no-force\tNegatable of -f, --force',
+      '--color\tColorize output',
+      '--no-color\tNegatable of --color',
+      '--quiet\tQuiet',
+      ':4'
+    ])
+  })
+
+  test('an argument that owns the name of a negated form keeps its own description', async () => {
+    // `no-cache` is an argument in its own right (#732), declared before the negatable `cache` so
+    // that the negated form would overwrite it if the registration did not leave it alone
+    const cache = defineCommand({
+      name: 'cache',
+      description: 'Cache',
+      args: {
+        'no-cache': { type: 'boolean', description: 'Skip the cache' },
+        cache: { type: 'boolean', negatable: true, description: 'Use the cache' }
+      },
+      // no resource for `no-cache`, which is what sends the negated form down the fallback
+      resource: resource('キャッシュ', { cache: 'キャッシュを使う' }),
+      run: NOOP
+    })
+
+    const candidates = await complete(['cache', '--'], { cache })
+
+    expect(candidates).toContain('--no-cache\tSkip the cache')
+    expect(candidates).not.toContain('--no-cache\t否定可能な --cache')
   })
 })

@@ -517,7 +517,7 @@ When defining translation resources, follow these conventions:
 - **Command Description**: Use the key `description`
 - **Examples**: Use the key `examples`
 - **Argument Descriptions**: Prefix with `arg:` (e.g., `arg:name`)
-- **Negatable Arguments**: Use `arg:no-<option>` for custom negation descriptions
+- **Negatable Arguments**: Use `arg:no-<option>` for custom negation descriptions. Without one, the description is composed from the `NEGATABLE` built-in resource of the locale (e.g. `否定可能な -f, --force`), in the help and in shell completion alike
 - **Built-in Keys**: Keys like `_:USAGE`, `_:OPTIONS` are handled by built-in resources
 - **Custom Keys**: Free naming for your application-specific messages, but always use `resolveKey()` when accessing them
 

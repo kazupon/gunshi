@@ -67,6 +67,7 @@
   },
   "devDependencies": {
     "@gunshi/plugin-i18n": "workspace:*",
+    "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
     "@types/node": "catalog:",
     "deno": "catalog:",
