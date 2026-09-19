@@ -230,8 +230,8 @@ async function applyPlugins<G extends GunshiParamsConstraint>(
   plugins: Plugin[]
 ): Promise<Plugin[]> {
   const sortedPlugins = resolveDependencies(plugins)
-  try {
-    for (const plugin of sortedPlugins) {
+  for (const plugin of sortedPlugins) {
+    try {
       /**
        * NOTE(kazupon):
        * strictly `Args` are not required for plugin installation.
@@ -239,9 +239,17 @@ async function applyPlugins<G extends GunshiParamsConstraint>(
        * and the plugin side can not know what the user will specify.
        */
       await plugin(pluginContext as unknown as PluginContext<DefaultGunshiParams>)
+    } catch (error: unknown) {
+      /**
+       * NOTE(kazupon): a plugin that cannot be installed leaves the CLI without the options, the
+       * commands and the decorators it was written to add, and the plugins behind it are not
+       * installed either, while their context extensions are handed to the command all the same.
+       * `resolveDependencies()` already ends the run for a circular or a missing dependency, so a
+       * `setup` that throws ends it too, naming the plugin rather than leaving the failure to
+       * surface somewhere else.
+       */
+      throw new Error(`Failed to install the plugin \`${plugin.id}\``, { cause: error })
     }
-  } catch (error: unknown) {
-    console.error('Error loading plugin:', (error as Error).message)
   }
 
   return sortedPlugins
