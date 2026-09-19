@@ -139,6 +139,88 @@ const subCommands = new Map<string, Command | LazyCommand>([
       }
     })
   ],
+  // lazy commands whose arguments are defined by the command that the loader returns.
+  // the descriptions and the resources are the same on both sides, because a candidate at the cursor
+  // is described by its definition, while the full registration below runs every loader
+  [
+    'publish',
+    lazy(
+      () =>
+        Promise.resolve(
+          defineCommand({
+            name: 'publish',
+            description: 'Publish packages',
+            args: {
+              tag: { type: 'string', short: 't', description: 'Tag' },
+              dry: { type: 'boolean', description: 'Dry run' },
+              pkg: { type: 'positional', description: 'Package' }
+            },
+            run: NOOP
+          })
+        ),
+      {
+        name: 'publish',
+        description: 'Publish packages',
+        resource: resource('パッケージを公開', { tag: 'タグ' })
+      } as I18nCommand
+    )
+  ],
+  [
+    'cloud',
+    lazy(
+      () =>
+        Promise.resolve(
+          defineCommand({
+            name: 'cloud',
+            description: 'Manage the cloud',
+            args: {
+              region: { type: 'string', short: 'r', description: 'Region' },
+              quiet: { type: 'boolean', short: 'q', description: 'Quiet' }
+            },
+            run: NOOP
+          })
+        ),
+      {
+        name: 'cloud',
+        description: 'Manage the cloud',
+        subCommands: {
+          login: lazy(
+            () =>
+              Promise.resolve(
+                defineCommand({
+                  name: 'login',
+                  description: 'Log in',
+                  args: {
+                    token: { type: 'string', description: 'Token' },
+                    profile: { type: 'positional', description: 'Profile' }
+                  },
+                  run: NOOP
+                })
+              ),
+            { name: 'login', description: 'Log in' }
+          )
+        }
+      }
+    )
+  ],
+  // a lazy command without a definition, which does not even have a name of its own
+  [
+    'bare',
+    lazy(() =>
+      Promise.resolve(
+        defineCommand({
+          name: 'bare',
+          args: { output: { type: 'string', short: 'o', description: 'Output' } },
+          run: NOOP
+        })
+      )
+    )
+  ],
+  // a lazy command whose loader fails
+  [
+    'broken',
+    lazy(() => Promise.reject(new Error('cannot load')), { name: 'broken', description: 'Broken' })
+  ],
   ['devtools', defineCommand({ name: 'devtools', description: 'Dev tools', run: NOOP })],
   ['hidden', defineCommand({ name: 'hidden', description: 'Internal', internal: true, run: NOOP })],
   // gunshi puts a copy of the entry command into the sub-commands
@@ -181,7 +263,23 @@ const config: NonNullable<CompletionOptions['config']> = {
       }
     },
     'remote remove': { args: { name: { handler: () => [{ value: 'origin' }] } } },
-    deploy: { args: { env: { handler: () => [{ value: 'prod' }, { value: 'staging' }] } } }
+    deploy: { args: { env: { handler: () => [{ value: 'prod' }, { value: 'staging' }] } } },
+    publish: {
+      args: {
+        tag: { handler: () => [{ value: 'latest' }, { value: 'next' }] },
+        pkg: { handler: () => [{ value: 'gunshi', description: 'Core' }] }
+      }
+    },
+    cloud: {
+      args: { region: { handler: () => [{ value: 'us-east-1' }, { value: 'eu-west-1' }] } }
+    },
+    'cloud login': {
+      args: {
+        token: { handler: () => [{ value: 'env:TOKEN' }] },
+        profile: { handler: () => [{ value: 'default' }] }
+      }
+    },
+    bare: { args: { output: { handler: () => [{ value: 'dist' }] } } }
   }
 }
 
@@ -196,7 +294,7 @@ async function createI18nExtension(): Promise<I18nExtension> {
 }
 
 // registers the whole command tree, as the plugin did before it registered
-// only what a single completion request needs
+// only what a single completion request needs, and runs the loader of every lazy command
 async function registerAll(t: RootCommand, extension?: I18nExtension): Promise<void> {
   const entry = [...subCommands.values()].find(cmd => cmd.entry)!
   await registerCompletion({
@@ -206,7 +304,8 @@ async function registerAll(t: RootCommand, extension?: I18nExtension): Promise<v
     config,
     i18nPluginId,
     i18n: extension,
-    isBombshellRoot: true
+    isBombshellRoot: true,
+    load: true
   })
   await registerAllSubCommands(t, subCommands, extension)
 }
@@ -228,7 +327,8 @@ async function registerAllSubCommands(
       cmd,
       config: config.subCommands ?? {},
       i18nPluginId,
-      i18n: extension
+      i18n: extension,
+      load: true
     })
     const nested = getCommandSubCommands(cmd)
     if (nested && nested.size > 0) {
@@ -300,6 +400,11 @@ const PATHS = [
   ['remote', 'complete'],
   ['deploy'],
   ['deploy', 'status'],
+  ['publish'],
+  ['cloud'],
+  ['cloud', 'login'],
+  ['bare'],
+  ['broken'],
   ['devtools'],
   ['hidden'],
   ['unknown'],
@@ -308,7 +413,8 @@ const PATHS = [
   // a single quoted word that holds a whole command path
   ['remote add'],
   ['remote prune'],
-  ['remote unknown']
+  ['remote unknown'],
+  ['cloud login']
 ]
 
 const TAILS = [
@@ -367,7 +473,30 @@ for (const prefix of PREFIXES) {
 }
 // an option between command names
 for (const tail of TAILS) {
-  INPUTS.push(['remote', '--verbose', 'add', ...tail], ['remote', '--url', 'x', 'add', ...tail])
+  INPUTS.push(
+    ['remote', '--verbose', 'add', ...tail],
+    ['remote', '--url', 'x', 'add', ...tail],
+    ['cloud', '--quiet', 'login', ...tail],
+    ['cloud', '--region', 'x', 'login', ...tail],
+    // a boolean option that only the loader of the command before it defines
+    ['cloud', '--quiet', ...tail]
+  )
+}
+// the values of the options that only a loader defines
+const LOADER_OPTION_INPUTS = [
+  ['publish', '--tag', ''],
+  ['publish', '-t', 'n'],
+  ['publish', '--tag', 'latest', ''],
+  ['cloud', '--region', ''],
+  ['cloud', '-r', 'eu'],
+  ['cloud', 'login', '--token', ''],
+  ['bare', '-o', ''],
+  ['bare', '--output', 'dist', '']
+]
+for (const prefix of PREFIXES) {
+  for (const input of LOADER_OPTION_INPUTS) {
+    INPUTS.push([...prefix, ...input])
+  }
 }
 
 function formatInput(args: string[]): string {
@@ -608,6 +737,306 @@ describe('registration scope', () => {
     })
 
     expect(warnSpy).not.toHaveBeenCalled()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// lazy commands, whose arguments may only be known to the command that the loader returns
+// ---------------------------------------------------------------------------
+
+describe('lazy commands', () => {
+  function createLazyTree() {
+    const loaded: string[] = []
+    const track = <T>(name: string, value: T) => {
+      return () => {
+        loaded.push(name)
+        return Promise.resolve(value)
+      }
+    }
+
+    const add = lazy(
+      track(
+        'remote add',
+        defineCommand({
+          name: 'add',
+          description: 'Add a remote',
+          args: {
+            url: { type: 'string', short: 'u', description: 'Remote URL' },
+            name: { type: 'positional', description: 'Remote name' }
+          },
+          run: NOOP
+        })
+      ),
+      { name: 'add', description: 'Add a remote' }
+    )
+
+    const tree = new Map<string, Command | LazyCommand>([
+      // the arguments are defined by the command that the loader returns
+      [
+        'deploy',
+        lazy(
+          track(
+            'deploy',
+            defineCommand({
+              name: 'deploy',
+              description: 'Deploy the app (loaded)',
+              args: {
+                target: { type: 'string', short: 't', description: 'Deploy target' },
+                env: { type: 'positional', description: 'Environment' }
+              },
+              resource: resource('アプリをデプロイ', { target: 'デプロイ先' }),
+              run: NOOP
+            })
+          ),
+          { name: 'deploy', description: 'Deploy the app' }
+        )
+      ],
+      // the arguments are defined by the definition, and the loader returns the runner
+      [
+        'build',
+        lazy(track('build', NOOP), {
+          name: 'build',
+          description: 'Build the project',
+          args: { watch: { type: 'boolean', short: 'w', description: 'Watch for changes' } }
+        })
+      ],
+      // no definition at all
+      [
+        'bare',
+        lazy(
+          track(
+            'bare',
+            defineCommand({
+              name: 'bare',
+              description: 'Bare (loaded)',
+              args: { output: { type: 'string', short: 'o', description: 'Output file' } },
+              run: NOOP
+            })
+          )
+        )
+      ],
+      // a lazy command with lazy sub-commands
+      [
+        'remote',
+        lazy(
+          track(
+            'remote',
+            defineCommand({
+              name: 'remote',
+              description: 'Manage remotes',
+              args: { verbose: { type: 'boolean', short: 'v', description: 'Verbose' } },
+              run: NOOP
+            })
+          ),
+          { name: 'remote', description: 'Manage remotes', subCommands: { add } }
+        )
+      ],
+      [
+        'broken',
+        lazy(
+          () => {
+            loaded.push('broken')
+            return Promise.reject(new Error('cannot load the command'))
+          },
+          { name: 'broken', description: 'Broken loader' }
+        )
+      ],
+      [
+        'norun',
+        lazy(track('norun', { args: { x: { type: 'string' } } } as unknown as Command), {
+          name: 'norun',
+          description: 'Loader without a runner'
+        })
+      ]
+    ])
+
+    const entry = lazy(
+      track(
+        'entry',
+        defineCommand({
+          name: 'main',
+          description: 'Main command',
+          args: { config: { type: 'string', short: 'c', description: 'Config file' } },
+          run: NOOP
+        })
+      ),
+      { name: 'main', description: 'Main command' }
+    )
+
+    return { loaded, subCommands: tree, entry }
+  }
+
+  const lazyConfig: NonNullable<CompletionOptions['config']> = {
+    subCommands: {
+      deploy: {
+        args: {
+          target: { handler: () => [{ value: 'production' }, { value: 'staging' }] },
+          env: { handler: () => [{ value: 'prod', description: 'Production' }] }
+        }
+      },
+      'remote add': { args: { name: { handler: () => [{ value: 'origin' }] } } }
+    }
+  }
+
+  async function run(
+    argv: string[],
+    tree: ReturnType<typeof createLazyTree>,
+    plugins = [completion({ config: lazyConfig })]
+  ): Promise<void> {
+    await cli(argv, tree.entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      subCommands: tree.subCommands,
+      usageSilent: true,
+      plugins
+    })
+  }
+
+  let output: string[] = []
+  let warnSpy: MockInstance<typeof console.warn>
+  let errorSpy: MockInstance<typeof console.error>
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(NOOP)
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(NOOP)
+  })
+
+  test('completes the options that the loader defines', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'deploy', '--'], tree)
+
+    expect(output).toEqual(['--target\tDeploy target', ':4'])
+    expect(tree.loaded).toEqual(['deploy'])
+  })
+
+  test('completes the option values and the positional arguments that the loader defines', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'deploy', '--target', ''], tree)
+    expect(output).toEqual(['production\t', 'staging\t', ':4'])
+
+    output.length = 0
+    await run(['complete', '--', 'deploy', ''], tree)
+    expect(output).toEqual(['prod\tProduction', ':4'])
+  })
+
+  test('localizes the options with the resource that the loader defines', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'deploy', '--'], tree, [
+      i18n({ locale: 'ja-JP' }),
+      completion({ config: lazyConfig })
+    ])
+
+    expect(output).toEqual(['--target\tデプロイ先', ':4'])
+  })
+
+  test('completes a lazy command without a definition', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'bare', '--'], tree)
+
+    expect(output).toEqual(['--output\tOutput file', ':4'])
+    expect(tree.loaded).toEqual(['bare'])
+  })
+
+  test('does not run the loader of a command that defines its arguments', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'build', '--'], tree)
+
+    expect(output).toEqual(['--watch\tWatch for changes', ':4'])
+    expect(tree.loaded).toEqual([])
+  })
+
+  test('does not run the loaders of the candidates at the cursor', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'b'], tree)
+
+    // a candidate is described by its definition, like the commands that the usage lists
+    expect(output).toEqual(['build\tBuild the project', 'bare\t', 'broken\tBroken loader', ':4'])
+    // the entry command is the one being completed, as it can have positional arguments
+    expect(tree.loaded).toEqual(['entry'])
+  })
+
+  test('does not run the loader of a command that is followed by its sub-command', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'remote', 'add', '--'], tree)
+
+    expect(output).toEqual(['--url\tRemote URL', ':4'])
+    expect(tree.loaded).toEqual(['remote add'])
+  })
+
+  test('runs the loader of a command that is followed by an option', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'remote', '--verbose', ''], tree)
+
+    expect(tree.loaded).toEqual(['remote'])
+  })
+
+  test('completes the sub-commands and the arguments of a lazy command', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'remote', ''], tree)
+    expect(output).toEqual(['add\tAdd a remote', ':4'])
+    expect(tree.loaded).toEqual(['remote'])
+
+    output.length = 0
+    tree.loaded.length = 0
+    await run(['complete', '--', 'remote', 'add', ''], tree)
+    expect(output).toEqual(['origin\t', ':4'])
+    expect(tree.loaded).toEqual(['remote add'])
+  })
+
+  test('completes a lazy entry command', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', '--'], tree)
+
+    expect(output).toEqual(['--config\tConfig file', ':4'])
+    expect(tree.loaded).toEqual(['entry'])
+  })
+
+  test.each([
+    ['throws', 'broken'],
+    ['returns a command without a runner', 'norun']
+  ])('falls back to the definition when the loader %s', async (_label, name) => {
+    const tree = createLazyTree()
+    await run(['complete', '--', name, '--'], tree)
+
+    expect(output).toEqual([':4'])
+    expect(tree.loaded).toEqual([name])
+    // the shell is the one that receives the output, and not every shell discards stderr
+    expect(warnSpy).not.toHaveBeenCalled()
+    expect(errorSpy).not.toHaveBeenCalled()
+  })
+
+  test('generating a completion script runs no loader', async () => {
+    const tree = createLazyTree()
+    await run(['complete', 'zsh'], tree)
+
+    expect(tree.loaded).toEqual([])
+  })
+
+  test('registerCompletion does not run the loader unless it is asked to', async () => {
+    const tree = createLazyTree()
+    const t = new RootCommand()
+    const params = {
+      t,
+      name: 'deploy',
+      cmd: tree.subCommands.get('deploy')!,
+      config: lazyConfig.subCommands ?? {},
+      i18nPluginId
+    }
+
+    expect((await registerCompletion(params)).options.size).toEqual(0)
+    expect(
+      (await registerCompletion({ ...params, load: true, shallow: true })).options.size
+    ).toEqual(0)
+    expect(tree.loaded).toEqual([])
+
+    expect([...(await registerCompletion({ ...params, load: true })).options.keys()]).toEqual([
+      'target'
+    ])
+    expect(tree.loaded).toEqual(['deploy'])
   })
 })
 
