@@ -2387,4 +2387,64 @@ describe('#744 - a short name that a global option also uses', () => {
     // `verbose` and the global `version` are both boolean, so there is nothing to align
     expect(await complete(['build', '-v', ''])).toEqual(['dist\t', ':4'])
   })
+
+  test('the long name of the global option keeps the arity it was registered with', async () => {
+    // `--help` is the same option as the `-h` that the command takes over, and it still takes no
+    // value: aligning the letter for this command must not make the long name swallow `serve`
+    expect(await complete(['--help', 'serve', '-h', ''])).toEqual([
+      'localhost\t',
+      '0.0.0.0\t',
+      ':4'
+    ])
+  })
+
+  test('a global option that takes a value keeps its long name taking one', async () => {
+    const logging = plugin({
+      id: 'test:logging',
+      name: 'logging',
+      setup: ctx => {
+        ctx.addGlobalOption('logLevel', { type: 'string', short: 'l', description: 'Log level' })
+      }
+    })
+    const local = defineCommand({
+      name: 'local',
+      description: 'Local',
+      args: {
+        local: { type: 'boolean', short: 'l', description: 'Local mode' },
+        env: { type: 'positional', description: 'Environment' }
+      },
+      run: NOOP
+    })
+    const completeWith = async (request: string[]): Promise<string[]> => {
+      output.length = 0
+      await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+        name: 'mycli',
+        version: '0.0.0',
+        usageSilent: true,
+        subCommands: { local },
+        plugins: [
+          logging,
+          completion({
+            config: {
+              subCommands: {
+                local: {
+                  args: {
+                    logLevel: { handler: () => [{ value: 'debug' }] },
+                    env: { handler: () => [{ value: 'prod' }] }
+                  }
+                }
+              }
+            }
+          })
+        ]
+      })
+      return output
+    }
+
+    // `-l` is the command's boolean, so the word after it is the positional
+    expect(await completeWith(['local', '-l', ''])).toEqual(['prod\t', ':4'])
+    // `--logLevel` is the global option, and it still takes its value
+    expect(await completeWith(['local', '-l', '--logLevel', ''])).toEqual(['debug\t', ':4'])
+    expect(await completeWith(['local', '-l', '--logLevel', 'debug', ''])).toEqual(['prod\t', ':4'])
+  })
 })
