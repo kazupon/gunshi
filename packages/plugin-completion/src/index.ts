@@ -127,7 +127,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
           const t = new RootCommand()
           if (shell === undefined) {
             const args = cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1)
-            await registerForCompletion({
+            const resolvedArgs = await registerForCompletion({
               t,
               args,
               subCommands:
@@ -144,7 +144,11 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
                */
               globalOptions: ctx.globalOptions
             })
-            t.parse(args)
+            /**
+             * NOTE(kazupon): the registration normalizes the request, so `parse` is given what was
+             * registered and matches the same command.
+             */
+            t.parse(resolvedArgs)
           } else if (['zsh', 'bash', 'fish', 'powershell'].includes(shell)) {
             // the completion script only needs the CLI name and the executable
             t.setup(cmdCtx.env.name, quoteExec(), shell)

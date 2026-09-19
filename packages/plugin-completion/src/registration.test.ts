@@ -1736,6 +1736,7 @@ describe('hidden', () => {
       extra: { type: 'positional', description: 'Extra', required: false },
       output: { type: 'string', description: 'Output file' },
       legacyMode: { type: 'boolean', description: 'Deprecated flag', hidden: true },
+      legacyQuiet: { type: 'boolean', short: 'Q', description: 'Deprecated quiet', hidden: true },
       legacyLevel: { type: 'string', short: 'L', description: 'Deprecated level', hidden: true },
       legacyForce: {
         type: 'boolean',
@@ -1745,6 +1746,18 @@ describe('hidden', () => {
       },
       force: { type: 'boolean', negatable: true, description: 'Force' }
     },
+    run: NOOP
+  })
+
+  // a command with sub-commands and a hidden boolean option of its own
+  const remote = defineCommand({
+    name: 'remote',
+    description: 'Manage remotes',
+    args: {
+      legacyMode: { type: 'boolean', description: 'Deprecated flag', hidden: true },
+      legacyQuiet: { type: 'boolean', short: 'Q', description: 'Deprecated quiet', hidden: true }
+    },
+    subCommands: { add: defineCommand({ name: 'add', description: 'Add a remote', run: NOOP }) },
     run: NOOP
   })
 
@@ -1768,10 +1781,11 @@ describe('hidden', () => {
       name: 'mycli',
       version: '0.0.0',
       usageSilent: true,
-      subCommands: { deploy },
+      subCommands: { deploy, remote },
       plugins: [globals, completion({ config: hiddenConfig })]
     })
-    return output
+    // a copy, so that two requests can be compared with each other
+    return [...output]
   }
 
   test('a hidden option is not among the candidates', async () => {
@@ -1827,5 +1841,40 @@ describe('hidden', () => {
   test('a hidden positional completes no value, and keeps the place of the next one', async () => {
     expect(await complete(['deploy', 'prod', ''])).toEqual([':4'])
     expect(await complete(['deploy', 'prod', 'legacy-a', ''])).toEqual(['extra-1\t', ':4'])
+  })
+
+  test('a typed hidden boolean option does not stop the completion of commands', async () => {
+    // the walk that decides which commands to register mirrors `RootCommand#stripOptions`,
+    // so it has to know the arity of a hidden option too (#710)
+    expect(await complete(['remote', '--legacyMode', ''])).toEqual(['add\tAdd a remote', ':4'])
+    expect(await complete(['--secretGlobal', ''])).toEqual([
+      'deploy\tDeploy the app',
+      'remote\tManage remotes',
+      ':4'
+    ])
+  })
+
+  test('a typed hidden boolean option does not hide the options of the command behind it', async () => {
+    expect(await complete(['--secretGlobal', 'deploy', '--'])).toEqual(
+      await complete(['deploy', '--'])
+    )
+  })
+
+  test('the short name of a hidden boolean option keeps its arity', async () => {
+    // the short name is registered on the holder as well, or `stripOptions` cannot look `-Q` up
+    expect(await complete(['deploy', '-Q', ''])).toEqual(['prod\t', ':4'])
+    expect(await complete(['deploy', '-Q', 'prod', ''])).toEqual([':4'])
+    expect(await complete(['remote', '-Q', ''])).toEqual(['add\tAdd a remote', ':4'])
+  })
+
+  test('a request that starts with an empty word does not match the holder', async () => {
+    // the holder is named with the empty string, and `RootCommand#matchCommand` would match it
+    expect(await complete(['', '--'])).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--visibleGlobal\tVisible global',
+      ':4'
+    ])
+    expect(await complete(['', 'deploy', '--'])).toEqual(await complete(['deploy', '--']))
   })
 })

@@ -400,10 +400,13 @@ It is still accepted when the command runs, and completion knows that, so typing
 
 ```sh
 $ my-cli deploy --<TAB>
---output  --force  --no-force        # --legacyMode is hidden, so it is not offered
+--help  --version  --output  --force  --no-force   # --legacyMode is hidden, so it is not offered
 
 $ my-cli deploy --legacyMode <TAB>
-prod  staging                        # the positional argument is still completed
+prod  staging                                      # the positional argument is still completed
+
+$ my-cli --legacyGlobal <TAB>
+deploy  remote                                     # and so are the sub-commands
 ```
 
 ## ⚙️ Plugin Options
