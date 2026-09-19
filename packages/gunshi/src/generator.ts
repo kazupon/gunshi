@@ -14,7 +14,7 @@
  * @license MIT
  */
 
-import { cli } from './cli.ts'
+import { cliUsage } from './cli/builtin.ts'
 import { create } from './utils.ts'
 
 import type {
@@ -47,13 +47,13 @@ export async function generate<G extends GunshiParamsConstraint = DefaultGunshiP
   entry: Command<G> | LazyCommand<G>,
   options: GenerateOptions<G> = {}
 ): Promise<string> {
-  const args = ['-h']
+  const args: string[] = []
   if (command != null) {
     const parts = Array.isArray(command) ? command : command.split(' ')
-    args.unshift(...parts)
+    args.push(...parts)
   }
   return (
-    (await cli(args, entry, {
+    (await cliUsage(args, entry, {
       ...create<GenerateOptions<G>>(), // default options
       ...options, // caller-supplied overrides
       usageSilent: true // force silent usage

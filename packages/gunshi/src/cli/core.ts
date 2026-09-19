@@ -58,15 +58,25 @@ type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
  * @param plugins - An array of {@link Plugin | plugins} to be applied
+ * @param usageOnly - Whether to render the usage of the command instead of running it, which is what `generate` of `gunshi/generator` asks for
  * @returns A rendered usage or undefined. if you will use {@link CliOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   argv: string[],
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: CliOptions<G>,
-  plugins: Plugin[]
+  plugins: Plugin[],
+  usageOnly: boolean = false
 ): Promise<string | undefined> {
   const decorators = createDecorators<G>()
+
+  /**
+   * NOTE(kazupon): the decorator goes on before any plugin, which makes it the outermost one, so
+   * that the usage is rendered whatever the command declares and the runner is never reached.
+   */
+  if (usageOnly) {
+    decorators.addCommandDecorator(usageOnlyDecorator<G>())
+  }
 
   const entryCommand = createEntryCommand(entry)
 
@@ -176,6 +186,43 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   })
 
   return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
+}
+
+/**
+ * Create the decorator that renders the usage of the command instead of running it.
+ *
+ * NOTE(kazupon): `generate()` of `gunshi/generator` asks the core for a usage. It used to ask by
+ * adding `-h` to the arguments, which made the answer depend on what the command calls its own
+ * arguments: a command that declares one named `help` takes the schema of the global option, and
+ * the usage was never rendered. A decorator is not an argument, so no command can take it away.
+ *
+ * @returns A {@linkcode CommandDecorator | command decorator} that renders the usage
+ */
+function usageOnlyDecorator<G extends GunshiParamsConstraint>(): CommandDecorator<G> {
+  return () => async ctx => {
+    if (hasPriorityValidationError(ctx.validationError)) {
+      throw ctx.validationError!
+    }
+
+    const buf: string[] = []
+    if (ctx.env.renderHeader != null) {
+      const header = await ctx.env.renderHeader(ctx)
+      if (header) {
+        buf.push(header)
+      }
+    }
+
+    if (ctx.env.renderUsage == null) {
+      return
+    }
+    const usage = await ctx.env.renderUsage(ctx)
+    if (!usage) {
+      return
+    }
+
+    buf.push(usage)
+    return buf.join('\n')
+  }
 }
 
 async function applyPlugins<G extends GunshiParamsConstraint>(
