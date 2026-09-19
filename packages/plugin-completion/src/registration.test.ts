@@ -1,13 +1,13 @@
 import { RootCommand } from '@bomb.sh/tab'
-import { createCommandContext } from '@gunshi/plugin'
+import { createCommandContext, plugin } from '@gunshi/plugin'
 import i18n from '@gunshi/plugin-i18n'
-import { getCommandSubCommands, namespacedId } from '@gunshi/shared'
+import { COMMON_ARGS, getCommandSubCommands, namespacedId } from '@gunshi/shared'
 import { cli, lazy } from 'gunshi'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import completion from './index.ts'
 import { COMPLETE_COMMAND_NAME, registerCompletion, registerForCompletion } from './registration.ts'
 
-import type { Command, LazyCommand } from '@gunshi/plugin'
+import type { ArgSchema, Command, LazyCommand } from '@gunshi/plugin'
 import type { I18nCommand, I18nExtension } from '@gunshi/plugin-i18n'
 import type { MockInstance } from 'vitest'
 import type { CompletionOptions } from './types.ts'
@@ -282,6 +282,24 @@ const config: NonNullable<CompletionOptions['config']> = {
     bare: { args: { output: { handler: () => [{ value: 'dist' }] } } }
   }
 }
+// a global option is completed per command, with the handler that the command configures for it
+config.entry!.args!.profile = { handler: () => [{ value: 'default' }, { value: 'ci' }] }
+config.subCommands!.dev.args!.profile = { handler: () => [{ value: 'dev-profile' }] }
+// `release` is not part of the command tree above: it belongs to the test that shadows a global option
+config.subCommands!.release = {
+  args: { version: { handler: () => [{ value: '1.0.0' }, { value: '2.0.0' }] } }
+}
+
+// the options that plugins register with `addGlobalOption`, which gunshi merges into the arguments of
+// the command that it runs: the ones of `@gunshi/plugin-global`, one that takes a value, and a negatable one
+const globalOptions = new Map<string, ArgSchema>([
+  ...Object.entries(COMMON_ARGS),
+  ['profile', { type: 'string', short: 'P', description: 'Profile' }],
+  ['color', { type: 'boolean', negatable: true, description: 'Colorize output' }]
+])
+
+// what `@gunshi/plugin-global`, which `cli` installs, adds to the options of every command
+const GLOBAL_OPTION_LINES = ['--help\tDisplay this help message', '--version\tDisplay this version']
 
 // ---------------------------------------------------------------------------
 // registration under test, and the full registration it has to agree with
@@ -305,7 +323,8 @@ async function registerAll(t: RootCommand, extension?: I18nExtension): Promise<v
     i18nPluginId,
     i18n: extension,
     isBombshellRoot: true,
-    load: true
+    load: true,
+    globalOptions
   })
   await registerAllSubCommands(t, subCommands, extension)
 }
@@ -328,7 +347,8 @@ async function registerAllSubCommands(
       config: config.subCommands ?? {},
       i18nPluginId,
       i18n: extension,
-      load: true
+      load: true,
+      globalOptions
     })
     const nested = getCommandSubCommands(cmd)
     if (nested && nested.size > 0) {
@@ -346,7 +366,8 @@ function registerActivePath(args: string[]) {
       fallbackEntry: { name: COMPLETE_COMMAND_NAME },
       config,
       i18nPluginId,
-      i18n: extension
+      i18n: extension,
+      globalOptions
     })
   }
 }
@@ -452,6 +473,11 @@ const TAILS = [
   ['--url', 'https://x', ''],
   ['-u', ''],
   ['--env', ''],
+  ['--help', ''],
+  ['-h', ''],
+  ['--he'],
+  ['--profile', ''],
+  ['--no-color', ''],
   ['--unknown', ''],
   ['--unknown', 'value', ''],
   ['main.ts', ''],
@@ -461,7 +487,17 @@ const TAILS = [
 ]
 
 // options typed before the command path
-const PREFIXES = [[], ['--config', 'x'], ['--debug'], ['--port', '3000'], ['--config=x'], ['-d']]
+const PREFIXES = [
+  [],
+  ['--config', 'x'],
+  ['--debug'],
+  ['--port', '3000'],
+  ['--config=x'],
+  ['-d'],
+  // global options typed before the command path
+  ['--version'],
+  ['--profile', 'ci']
+]
 
 const INPUTS: string[][] = []
 for (const prefix of PREFIXES) {
@@ -741,6 +777,239 @@ describe('registration scope', () => {
 })
 
 // ---------------------------------------------------------------------------
+// global options, which no command defines: gunshi merges them into the command that it runs
+// ---------------------------------------------------------------------------
+
+describe('global options', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  async function completeWith(
+    args: string[],
+    tree: ReadonlyMap<string, Command | LazyCommand> = subCommands
+  ): Promise<RootCommand> {
+    const t = new RootCommand()
+    await registerForCompletion({
+      t,
+      args,
+      subCommands: tree,
+      fallbackEntry: { name: COMPLETE_COMMAND_NAME },
+      config,
+      i18nPluginId,
+      globalOptions
+    })
+    output.length = 0
+    t.parse([...args])
+    return t
+  }
+
+  test('are offered before the options of the command, like the usage lists them', async () => {
+    await completeWith(['--'])
+
+    expect(output).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--profile\tProfile',
+      '--color\tColorize output',
+      '--no-color\tNegatable of --color',
+      '--config\tConfig file',
+      '--mode\tMode',
+      '--debug\tDebug',
+      ':4'
+    ])
+  })
+
+  test('are offered by their short names', async () => {
+    await completeWith(['-'])
+
+    expect(output).toEqual([
+      '-h\tDisplay this help message',
+      '-v\tDisplay this version',
+      '-P\tProfile',
+      '-c\tConfig file',
+      '-m\tMode',
+      '-d\tDebug',
+      ':4'
+    ])
+  })
+
+  test.each([
+    [['remote', 'add', '--'], '--url\tRemote URL'],
+    // a lazy command whose arguments are defined by its loader
+    [['publish', '--'], '--tag\tTag']
+  ])('are offered for a command on the typed path: %j', async (args, own) => {
+    await completeWith(args)
+
+    expect(output.slice(0, 2)).toEqual(GLOBAL_OPTION_LINES)
+    expect(output).toContain(own)
+  })
+
+  test('are not registered for the candidates at the cursor', async () => {
+    const t = await completeWith(['remote', ''])
+
+    expect(t.commands.get('remote')?.options.has('help')).toEqual(true)
+    expect(t.commands.get('remote add')?.options.size).toEqual(0)
+  })
+
+  test.each([
+    [['--help', ''], 'dev\tStart dev server'],
+    [['-h', 'rem'], 'remote\tManage remotes'],
+    [['remote', '--version', ''], 'add\tAdd a remote'],
+    [['--no-color', 'remote', 'add', ''], 'origin\t']
+  ])('a boolean one takes no value: %j', async (args, expected) => {
+    await completeWith(args)
+
+    expect(output).toContain(expected)
+  })
+
+  test('one that takes a value is completed with the handler of the command', async () => {
+    await completeWith(['--profile', ''])
+    expect(output).toEqual(['default\t', 'ci\t', ':4'])
+
+    await completeWith(['dev', '--profile', ''])
+    expect(output).toEqual(['dev-profile\t', ':4'])
+
+    // the word after it is its value, not a command
+    await completeWith(['--profile', 'remote', ''])
+    expect(output).toContain('dev\tStart dev server')
+  })
+
+  test('an argument of the command shadows the global option of the same name', async () => {
+    const tree = new Map<string, Command | LazyCommand>([
+      [
+        'release',
+        defineCommand({
+          name: 'release',
+          description: 'Release',
+          args: { version: { type: 'string', description: 'Version to release' } },
+          run: NOOP
+        })
+      ]
+    ])
+    const t = await completeWith(['release', '--'], tree)
+
+    // registered once, with the schema of the command, where the global option was
+    expect(output).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tVersion to release',
+      '--profile\tProfile',
+      '--color\tColorize output',
+      '--no-color\tNegatable of --color',
+      ':4'
+    ])
+    expect(t.commands.get('release')?.options.get('version')?.isBoolean).toEqual(false)
+
+    // the handler of the command is reachable, so the pair below says something
+    await completeWith(['release', '--version='], tree)
+    expect(output).toEqual(['1.0.0\t', '2.0.0\t', ':4'])
+
+    // but not after a space: `RootCommand#stripOptions` resolves an option's arity from the completion
+    // root first, where the global option is a boolean, so the word after it is not taken as its value.
+    // Registering the whole command tree behaves the same way.
+    await completeWith(['release', '--version', ''], tree)
+    expect(output).toEqual([':4'])
+  })
+
+  test('registerCompletion registers the arguments of the command only, unless they are given', async () => {
+    const t = new RootCommand()
+    const params = {
+      t,
+      name: 'dev',
+      cmd: subCommands.get('dev')!,
+      config: config.subCommands ?? {},
+      i18nPluginId
+    }
+
+    expect([...(await registerCompletion(params)).options.keys()]).toEqual(['port', 'host', 'open'])
+    expect([...(await registerCompletion({ ...params, globalOptions })).options.keys()]).toEqual([
+      'help',
+      'version',
+      'profile',
+      'color',
+      'no-color',
+      'port',
+      'host',
+      'open'
+    ])
+  })
+
+  describe('through the plugin', () => {
+    const entry = defineCommand({
+      name: 'root',
+      description: 'Root command',
+      args: { verbose: { type: 'boolean', short: 'V', description: 'Verbose output' } },
+      run: NOOP
+    })
+    const tree = {
+      status: defineCommand({ name: 'status', description: 'Show status', run: NOOP })
+    }
+
+    // a plugin that is installed after the completion plugin, like `@gunshi/plugin-dryrun` can be
+    const lateDependencies = [{ id: i18nPluginId, optional: true }] as const
+    const late = plugin<
+      Record<typeof i18nPluginId, I18nExtension>,
+      'test:late',
+      typeof lateDependencies
+    >({
+      id: 'test:late',
+      name: 'late',
+      dependencies: lateDependencies,
+      setup(ctx) {
+        ctx.addGlobalOption('late', { type: 'boolean', description: 'Late option' })
+      },
+      onExtension(ctx) {
+        ctx.extensions[i18nPluginId]?.registerGlobalOptionResources('late', {
+          'en-US': 'Late option',
+          'ja-JP': '後から登録されたオプション'
+        })
+      }
+    })
+
+    test('reads them when a completion request runs, whatever the install order is', async () => {
+      await cli(['complete', '--', 'status', '--'], entry, {
+        name: 'mycli',
+        version: '0.0.0',
+        subCommands: tree,
+        usageSilent: true,
+        plugins: [completion(), late]
+      })
+
+      expect(output).toEqual([...GLOBAL_OPTION_LINES, '--late\tLate option', ':4'])
+    })
+
+    test('completes after them', async () => {
+      await cli(['complete', '--', '--late', ''], entry, {
+        name: 'mycli',
+        version: '0.0.0',
+        subCommands: tree,
+        usageSilent: true,
+        plugins: [completion(), late]
+      })
+
+      expect(output).toEqual(['status\tShow status', ':4'])
+    })
+
+    test('localizes them', async () => {
+      await cli(['complete', '--', 'status', '--'], entry, {
+        name: 'mycli',
+        version: '0.0.0',
+        subCommands: tree,
+        usageSilent: true,
+        plugins: [i18n({ locale: 'ja-JP' }), completion(), late]
+      })
+
+      expect(output).toEqual([...GLOBAL_OPTION_LINES, '--late\t後から登録されたオプション', ':4'])
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
 // lazy commands, whose arguments may only be known to the command that the loader returns
 // ---------------------------------------------------------------------------
 
@@ -909,7 +1178,7 @@ describe('lazy commands', () => {
     const tree = createLazyTree()
     await run(['complete', '--', 'deploy', '--'], tree)
 
-    expect(output).toEqual(['--target\tDeploy target', ':4'])
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, '--target\tDeploy target', ':4'])
     expect(tree.loaded).toEqual(['deploy'])
   })
 
@@ -930,14 +1199,14 @@ describe('lazy commands', () => {
       completion({ config: lazyConfig })
     ])
 
-    expect(output).toEqual(['--target\tデプロイ先', ':4'])
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, '--target\tデプロイ先', ':4'])
   })
 
   test('completes a lazy command without a definition', async () => {
     const tree = createLazyTree()
     await run(['complete', '--', 'bare', '--'], tree)
 
-    expect(output).toEqual(['--output\tOutput file', ':4'])
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, '--output\tOutput file', ':4'])
     expect(tree.loaded).toEqual(['bare'])
   })
 
@@ -945,7 +1214,7 @@ describe('lazy commands', () => {
     const tree = createLazyTree()
     await run(['complete', '--', 'build', '--'], tree)
 
-    expect(output).toEqual(['--watch\tWatch for changes', ':4'])
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, '--watch\tWatch for changes', ':4'])
     expect(tree.loaded).toEqual([])
   })
 
@@ -963,7 +1232,7 @@ describe('lazy commands', () => {
     const tree = createLazyTree()
     await run(['complete', '--', 'remote', 'add', '--'], tree)
 
-    expect(output).toEqual(['--url\tRemote URL', ':4'])
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, '--url\tRemote URL', ':4'])
     expect(tree.loaded).toEqual(['remote add'])
   })
 
@@ -991,7 +1260,7 @@ describe('lazy commands', () => {
     const tree = createLazyTree()
     await run(['complete', '--', '--'], tree)
 
-    expect(output).toEqual(['--config\tConfig file', ':4'])
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, '--config\tConfig file', ':4'])
     expect(tree.loaded).toEqual(['entry'])
   })
 
@@ -1002,7 +1271,7 @@ describe('lazy commands', () => {
     const tree = createLazyTree()
     await run(['complete', '--', name, '--'], tree)
 
-    expect(output).toEqual([':4'])
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, ':4'])
     expect(tree.loaded).toEqual([name])
     // the shell is the one that receives the output, and not every shell discards stderr
     expect(warnSpy).not.toHaveBeenCalled()
@@ -1078,6 +1347,7 @@ describe('a CLI without sub-commands', () => {
     })
 
     expect(output).toEqual([
+      ...GLOBAL_OPTION_LINES,
       '--environment\tTarget environment',
       '--config\tConfig file path',
       ':4'
@@ -1171,6 +1441,7 @@ describe('a CLI without sub-commands', () => {
     })
 
     expect(output).toEqual([
+      ...GLOBAL_OPTION_LINES,
       '--environment\tTarget environment',
       '--config\tConfig file path',
       ':4'
@@ -1203,6 +1474,7 @@ describe('a CLI without sub-commands', () => {
 
     expect(loaded).toEqual(['deploy'])
     expect(output).toEqual([
+      ...GLOBAL_OPTION_LINES,
       '--environment\tデプロイ先の環境',
       '--config\t設定ファイルのパス',
       ':4'

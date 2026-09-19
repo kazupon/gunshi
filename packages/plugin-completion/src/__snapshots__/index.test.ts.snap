@@ -1,7 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`default command > suggest duplicate options 1`] = `
-"--config	Use specified config file
+"--help	Display this help message
+--version	Display this version
+--config	Use specified config file
 --mode	Set env mode
 --logLevel	info | warn | error | silent
 :4
@@ -9,7 +11,9 @@ exports[`default command > suggest duplicate options 1`] = `
 `;
 
 exports[`default command > suggest duplicate options for short option 1`] = `
-"--config	Use specified config file
+"--help	Display this help message
+--version	Display this version
+--config	Use specified config file
 --mode	Set env mode
 --logLevel	info | warn | error | silent
 :4
@@ -17,7 +21,9 @@ exports[`default command > suggest duplicate options for short option 1`] = `
 `;
 
 exports[`default command > suggest for inputting 1`] = `
-"--config	Use specified config file
+"--help	Display this help message
+--version	Display this version
+--config	Use specified config file
 --mode	Set env mode
 --logLevel	info | warn | error | silent
 :4
@@ -44,7 +50,9 @@ vite.config.js	Vite config file
 `;
 
 exports[`i18n support > default command > suggest duplicate options 1`] = `
-"--config	設定ファイルを指定します
+"--help	Display this help message
+--version	Display this version
+--config	設定ファイルを指定します
 --mode	環境モードを設定します
 --logLevel	ログレベルを設定します
 :4
@@ -52,7 +60,9 @@ exports[`i18n support > default command > suggest duplicate options 1`] = `
 `;
 
 exports[`i18n support > default command > suggest duplicate options for short option 1`] = `
-"--config	設定ファイルを指定します
+"--help	Display this help message
+--version	Display this version
+--config	設定ファイルを指定します
 --mode	環境モードを設定します
 --logLevel	ログレベルを設定します
 :4
@@ -60,7 +70,9 @@ exports[`i18n support > default command > suggest duplicate options for short op
 `;
 
 exports[`i18n support > default command > suggest for inputting 1`] = `
-"--config	設定ファイルを指定します
+"--help	Display this help message
+--version	Display this version
+--config	設定ファイルを指定します
 --mode	環境モードを設定します
 --logLevel	ログレベルを設定します
 :4
@@ -144,7 +156,9 @@ exports[`i18n support > subcommand > suggest for long option 1`] = `
 `;
 
 exports[`i18n support > subcommand > suggest for option inputting 1`] = `
-"--host	ホスト名を指定します
+"--help	Display this help message
+--version	Display this version
+--host	ホスト名を指定します
 --port	ポート番号を指定します
 :4
 "
@@ -189,13 +203,17 @@ exports[`nested sub-commands > suggest option value for remote add --url 1`] = `
 `;
 
 exports[`nested sub-commands > suggest options for nested remote add 1`] = `
-"--url	Remote URL
+"--help	Display this help message
+--version	Display this version
+--url	Remote URL
 :4
 "
 `;
 
 exports[`nested sub-commands > suggest options for top-level status 1`] = `
-"--short	Short format
+"--help	Display this help message
+--version	Display this version
+--short	Short format
 :4
 "
 `;
@@ -234,13 +252,17 @@ exports[`nested sub-commands with i18n > suggest nested sub-commands for remote 
 `;
 
 exports[`nested sub-commands with i18n > suggest options for nested remote add with localized description 1`] = `
-"--url	リモートURL
+"--help	Display this help message
+--version	Display this version
+--url	リモートURL
 :4
 "
 `;
 
 exports[`nested sub-commands with i18n > suggest options for top-level status with localized description 1`] = `
-"--short	短い形式で表示
+"--help	Display this help message
+--version	Display this version
+--short	短い形式で表示
 :4
 "
 `;
@@ -266,7 +288,9 @@ exports[`no sub-commands > no input 1`] = `
 `;
 
 exports[`no sub-commands > suggest for inputting 1`] = `
-"--environment	Target environment
+"--help	Display this help message
+--version	Display this version
+--environment	Target environment
 --config	Config file path
 :4
 "
@@ -340,7 +364,9 @@ exports[`subcommand > suggest for long option 1`] = `
 `;
 
 exports[`subcommand > suggest for option inputting 1`] = `
-"--host	Specify hostname
+"--help	Display this help message
+--version	Display this version
+--host	Specify hostname
 --port	Specify port
 :4
 "
