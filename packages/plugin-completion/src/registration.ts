@@ -5,6 +5,7 @@
 
 import { createCommandContext } from '@gunshi/plugin'
 import {
+  ARG_NEGATABLE_PREFIX,
   getCommandSubCommands,
   localizable,
   resolveArgKey,
@@ -170,7 +171,7 @@ export async function registerForCompletion({
      * NOTE(kazupon): `RootCommand#matchCommand` joins the words it has matched with a space
      * before looking them up, so a single quoted word can hold a whole command path.
      */
-    const cmd = resolveCommandPath(level, arg.split(' '))
+    const cmd = resolveCommandPath(level, arg.split(' '), path.length === 0)
     if (cmd == undefined) {
       walked = false // the rest of the arguments are positional arguments
       break
@@ -197,7 +198,7 @@ export async function registerForCompletion({
     (!!lastArg?.startsWith('-') && !isBooleanOption(registered, lastArg))
   if (walked && !completesFlags && level) {
     for (const [name, cmd] of level) {
-      if (isSkipped(name, cmd) || !name.startsWith(toComplete)) {
+      if (isSkipped(name, cmd, path.length === 0) || !name.startsWith(toComplete)) {
         continue
       }
       await registerCompletion({
@@ -272,12 +273,26 @@ export async function registerCompletion({
     if (schema.type === 'positional') {
       commandTab.argument(key, resolveCompletionHandler(name, key, config, i18n), schema.multiple)
     } else {
-      commandTab.option(
-        key,
-        (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || '',
-        resolveCompletionHandler(name, key, config, i18n),
-        schema.short
-      )
+      const description =
+        (await localizeDescription(resolveArgKey(key, ctx.name))) || schema.description || ''
+      if (schema.type === 'boolean') {
+        // no handler, which is how `Command#option` tells that the option takes no value
+        commandTab.option(key, description, schema.short)
+        if (schema.negatable) {
+          const negatableKey = `${ARG_NEGATABLE_PREFIX}${key}`
+          commandTab.option(
+            negatableKey,
+            (await localizeDescription(resolveArgKey(negatableKey, ctx.name))) || ''
+          )
+        }
+      } else {
+        commandTab.option(
+          key,
+          description,
+          resolveCompletionHandler(name, key, config, i18n),
+          schema.short
+        )
+      }
     }
   }
 
@@ -303,17 +318,19 @@ function resolveCompletionHandler(
  *
  * @param level - The sub-commands the names start from
  * @param names - The command names, from the current level downwards
+ * @param topLevel - Whether `level` is the top level of the CLI, where the completion command lives
  * @returns The command, or `undefined` if any of the names does not resolve
  */
 function resolveCommandPath(
   level: ReadonlyMap<string, Command | LazyCommand> | undefined,
-  names: string[]
+  names: string[],
+  topLevel: boolean
 ): Command | LazyCommand | undefined {
   let current: Command | LazyCommand | undefined
   let currentLevel = level
-  for (const name of names) {
+  for (const [index, name] of names.entries()) {
     const cmd = currentLevel?.get(name)
-    if (cmd == undefined || isSkipped(name, cmd)) {
+    if (cmd == undefined || isSkipped(name, cmd, topLevel && index === 0)) {
       return undefined
     }
     current = cmd
@@ -322,9 +339,9 @@ function resolveCommandPath(
   return current
 }
 
-function isSkipped(name: string, cmd: Command | LazyCommand): boolean {
-  // skip entry / internal command / completion command itself
-  return !!cmd.internal || !!cmd.entry || name === COMPLETE_COMMAND_NAME
+function isSkipped(name: string, cmd: Command | LazyCommand, topLevel: boolean): boolean {
+  // skip entry / internal command, and the completion command itself, which only lives at the top level
+  return !!cmd.internal || !!cmd.entry || (topLevel && name === COMPLETE_COMMAND_NAME)
 }
 
 /**
