@@ -2368,6 +2368,93 @@ describe('github issues', () => {
     expect(log()).toMatchSnapshot('console output')
   })
 
+  describe('#716 - lazy command definition dropped by a loaded command object', () => {
+    const definition = define({
+      name: 'deploy',
+      description: 'Deploy the app',
+      args: {
+        env: { type: 'string', short: 'e', description: 'Target environment', required: true },
+        port: { type: 'number', default: 3000 }
+      },
+      examples: '$ my-cli deploy --env prod'
+    })
+
+    // the two shapes that a loader can return for the same definition
+    const loaders = {
+      runner: (run: CommandRunner) => () => run,
+      command: (run: CommandRunner) => () => define({ run })
+    }
+
+    function createOptions(shape: keyof typeof loaders, run: CommandRunner): CliOptions {
+      return {
+        name: 'my-cli',
+        version: '1.0.0',
+        subCommands: { deploy: lazy(loaders[shape](run), definition) }
+      }
+    }
+
+    const entry = define({ run: () => {} })
+
+    test.each(['runner', 'command'] as const)(
+      'loader that returns a %s: parse the arguments of the definition',
+      async shape => {
+        const run = vi.fn<CommandRunner>()
+
+        await cli(['deploy', '--env', 'prod'], entry, createOptions(shape, run))
+
+        expect(run).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: 'deploy',
+            description: 'Deploy the app',
+            values: { env: 'prod', port: 3000 }
+          })
+        )
+      }
+    )
+
+    test.each(['runner', 'command'] as const)(
+      'loader that returns a %s: validate the arguments of the definition',
+      async shape => {
+        const run = vi.fn<CommandRunner>()
+
+        await expect(cli(['deploy'], entry, createOptions(shape, run))).rejects.toBeInstanceOf(
+          AggregateError
+        )
+        expect(run).not.toHaveBeenCalled()
+      }
+    )
+
+    test('usage is the same for both of the loaders', async () => {
+      const usage = await generate(
+        'deploy',
+        entry,
+        createOptions('command', vi.fn<CommandRunner>())
+      )
+
+      expect(usage).toContain('Deploy the app')
+      expect(usage).toContain('-e, --env <env>')
+      expect(usage).toContain('$ my-cli deploy --env prod')
+      expect(usage).toEqual(
+        await generate('deploy', entry, createOptions('runner', vi.fn<CommandRunner>()))
+      )
+    })
+
+    test('entry command of a CLI without sub-commands', async () => {
+      const options = { name: 'my-cli', version: '1.0.0' }
+      const usage = await generate(
+        null,
+        lazy(loaders.command(vi.fn<CommandRunner>()), definition),
+        options
+      )
+
+      expect(usage).toContain('-e, --env <env>')
+      expect(usage).toContain('$ my-cli deploy --env prod')
+      expect(usage).toEqual(
+        await generate(null, lazy(loaders.runner(vi.fn<CommandRunner>()), definition), options)
+      )
+    })
+  })
+
   describe('#499 - lazy command args not parsed', () => {
     const mainCommand = define({
       description: 'My CLI application',

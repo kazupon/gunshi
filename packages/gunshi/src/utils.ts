@@ -28,6 +28,9 @@ export function isLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
 /**
  * Resolve a lazy command to a {@link Command}.
  *
+ * If the loader returns a command, the properties of the loaded command take precedence,
+ * and the properties that it does not define fall back to the definition that is given to `lazy`.
+ *
  * @param cmd - A {@link Commandable} or {@link LazyCommand} to resolve
  * @param name - Optional name of the command, if not provided, it will use the name from the command itself.
  * @param needRunResolving - Whether to run the resolving function of the lazy command.
@@ -62,13 +65,18 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         if (loaded.run == null) {
           throw new TypeError(`'run' is required in command: ${cmd.name || name}`)
         }
+        /**
+         * NOTE(kazupon): the loaded command wins, and the definition that is given to `lazy` is the fallback
+         * for what the loaded command does not define. A loader that returns `{ run }` keeps the whole definition,
+         * like a loader that returns the runner itself.
+         */
         command.run = loaded.run
-        command.name = loaded.name
-        command.description = loaded.description
-        command.args = loaded.args
-        command.examples = loaded.examples
-        command.internal = loaded.internal
-        command.entry = loaded.entry
+        command.name = loaded.name ?? cmd.commandName
+        command.description = loaded.description ?? cmd.description
+        command.args = loaded.args ?? cmd.args
+        command.examples = loaded.examples ?? cmd.examples
+        command.internal = loaded.internal ?? cmd.internal
+        command.entry = loaded.entry ?? cmd.entry
         command.subCommands = loaded.subCommands || cmd.subCommands
         if ('resource' in loaded && loaded.resource) {
           ;(command as { resource: any }).resource = loaded.resource

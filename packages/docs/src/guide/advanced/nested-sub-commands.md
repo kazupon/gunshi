@@ -216,7 +216,7 @@ await cli(process.argv.slice(2), entry, {
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!IMPORTANT]
-> When using `lazy()` with nested sub-commands, include `args` in the lazy definition (the second argument) if you want argument parsing to work before the command is loaded. The `subCommands` property is automatically carried over from the definition to the lazy command.
+> When using `lazy()` with nested sub-commands, include `args` in the lazy definition (the second argument) if you want argument parsing to work before the command is loaded. The `subCommands` of the definition, like the other properties it declares, is carried over to the lazy command, and is used when the loaded command does not define it.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

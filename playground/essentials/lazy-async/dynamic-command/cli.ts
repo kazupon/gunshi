@@ -21,7 +21,8 @@ const configLoader = async () => {
   })
 }
 
-// Override command meta info with 2nd parameters
+// The definition (2nd parameter) is used without calling the loader, e.g. for the command list.
+// Once loaded, the loaded command takes precedence, and the definition is the fallback
 const config = lazy(configLoader, {
   name: 'config',
   description: 'Dynamically configured command'
