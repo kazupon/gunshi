@@ -316,6 +316,21 @@ const release = define({
 
 Taking the name means taking it whole. `my-cli release --version` no longer prints the version of the CLI, and `-v` is no longer defined either, because the global schema is replaced rather than extended. Declare a `short` of your own if you want one. Other commands of the same CLI keep the global option.
 
+A short name is taken the same way, and on its own. When an argument of the command declares a `short` that a global option also uses, the letter belongs to the command, and the global option keeps its long name:
+
+```js
+const build = define({
+  name: 'build',
+  args: {
+    // takes `-v` from the global `--version`, for this command only
+    verbose: { type: 'boolean', short: 'v', description: 'Verbose output' }
+  },
+  run: ctx => console.log(`building${ctx.values.verbose ? ' verbosely' : ''}`)
+})
+```
+
+`my-cli build -v` sets `verbose`, while `my-cli build --version` still prints the version of the CLI, and its help lists it as `--version` alone. Other commands of the same CLI keep `-v` for `--version`.
+
 Two limits are worth knowing. A schema that is identical, field for field, to the one the plugin registers cannot be told apart from it, so it keeps the plugin's behaviour. And only `@gunshi/plugin-global` looks at whether the command took the name: `@gunshi/plugin-dryrun` still reads the value it finds, so a command that declares a truthy `dryRun` of its own also switches that plugin into dry-run mode.
 
 #### Strict Unknown Option Validation
