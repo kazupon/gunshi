@@ -2866,6 +2866,105 @@ describe('github issues', () => {
       expect(run.mock.calls[0][0].values).toMatchObject({ legacyLevel: 'trace' })
     })
   })
+
+  describe("#730 - a command's own short option loses to a global one", () => {
+    const build = define({
+      name: 'build',
+      args: { verbose: { type: 'boolean', short: 'v', description: 'Verbose output' } },
+      run: vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+    })
+    const serve = define({
+      name: 'serve',
+      args: { host: { type: 'string', short: 'h', description: 'Host name' } },
+      run: vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+    })
+    const entry = define({
+      name: 'root',
+      run: vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+    })
+
+    function run(argv: string[]): Promise<string | undefined> {
+      return cli(argv, entry, {
+        name: 'my-cli',
+        version: '9.9.9',
+        usageSilent: true,
+        renderHeader: null,
+        subCommands: { build, serve }
+      })
+    }
+
+    test('a boolean short name reaches the command, not the global option', async () => {
+      await run(['build', '-v'])
+
+      expect(build.run.mock.calls[0][0].values).toEqual({ verbose: true })
+    })
+
+    test.each([
+      ['separate', ['serve', '-h', 'localhost']],
+      ['inline', ['serve', '-h=localhost']]
+    ])('a short name that takes a value keeps it (%s)', async (_, argv) => {
+      await run(argv)
+
+      expect(serve.run.mock.calls[0][0].values).toEqual({ host: 'localhost' })
+    })
+
+    test('the global option keeps its long name', async () => {
+      expect(await run(['build', '--version'])).toEqual('9.9.9')
+      expect(await run(['serve', '--help'])).toContain('--help')
+      expect(build.run).not.toHaveBeenCalled()
+      expect(serve.run).not.toHaveBeenCalled()
+    })
+
+    test('only the global option of the same letter gives up its short name', async () => {
+      const usage = await run(['build', '--help'])
+
+      // `verbose` claims `-v`, so `--version` gives it up, while `--help` keeps `-h`
+      expect(usage).toContain('-h, --help')
+      expect(usage).toContain('--version')
+      expect(usage).not.toContain('-v, --version')
+      expect(usage).toContain('-v, --verbose')
+    })
+
+    test('a command that claims no short name leaves the global ones alone', async () => {
+      expect(await run(['-v'])).toEqual('9.9.9')
+      expect(await run(['-h'])).toContain('-h, --help')
+    })
+
+    test('a short name of a global option that a plugin adds is shadowed too', async () => {
+      const deploy = define({
+        name: 'deploy',
+        args: { port: { type: 'number', short: 'p', description: 'Port' } },
+        run: vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+      })
+      const globals = plugin({
+        id: 'test:globals',
+        name: 'globals',
+        setup: ctx => {
+          ctx.addGlobalOption('profile', { type: 'string', short: 'p', description: 'Profile' })
+        }
+      })
+
+      await cli(['deploy', '-p', '8080'], entry, {
+        name: 'my-cli',
+        version: '9.9.9',
+        usageSilent: true,
+        renderHeader: null,
+        subCommands: { deploy },
+        plugins: [globals]
+      })
+
+      expect(deploy.run.mock.calls[0][0].values).toEqual({ port: 8080 })
+    })
+
+    test('the schema that the plugin registered is left as it is', async () => {
+      // the global options are shared by every command, so a command that gives one a new short
+      // name must not change what the next command sees
+      await run(['build', '-v'])
+
+      expect(await run(['-v'])).toEqual('9.9.9')
+      expect(await run(['serve', '--help'])).toContain('-v, --version')
+    })
+  })
 })
 
 describe('nested sub-commands', () => {

@@ -19,6 +19,7 @@ import {
   getCommandSubCommands,
   isLazyCommand,
   kebabnize,
+  resolveCommandArgs,
   resolveLazyCommand
 } from '../utils.ts'
 
@@ -132,7 +133,10 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     ? await resolveLazyCommand<G>(targetCommand, targetCommandName, true)
     : targetCommand
 
-  const args = resolveArguments(pluginContext, getCommandArgs(resolvedCommand))
+  const args = resolveCommandArgs<ExtractArgs<G>>(
+    pluginContext.globalOptions,
+    getCommandArgs(resolvedCommand)
+  )
 
   // skipPositional: how many leading positionals to skip (they're consumed as command names)
   // depth=0 → -1 (no skip), depth=1 → 0 (skip 1, existing behavior), depth=2 → 1 (skip 2), etc.
@@ -206,17 +210,6 @@ function getCommandArgs<G extends GunshiParamsConstraint>(
   } else {
     return create<ExtractArgs<G>>()
   }
-}
-
-function resolveArguments<G extends GunshiParamsConstraint>(
-  pluginContext: PluginContext<G>,
-  args?: ExtractArgs<G>
-): ExtractArgs<G> {
-  return Object.assign(
-    create<ExtractArgs<G>>(),
-    Object.fromEntries(pluginContext.globalOptions),
-    args
-  )
 }
 
 type UnknownOption = {

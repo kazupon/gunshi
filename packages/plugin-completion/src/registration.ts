@@ -10,6 +10,7 @@ import {
   kebabnize,
   localizable,
   resolveArgKey,
+  resolveCommandArgs,
   resolveKey,
   resolveLazyCommand
 } from '@gunshi/shared'
@@ -283,16 +284,8 @@ export async function registerCompletion({
       factory: () => i18n
     }
   }
-  /**
-   * NOTE(kazupon): the arguments as gunshi resolves them to run the command. The global options are part
-   * of no command definition: gunshi merges them into the arguments of the command that it runs,
-   * where an argument of the command shadows the global option of the same name.
-   */
-  const args: Args = Object.assign(
-    Object.create(null) as Args,
-    globalOptions && Object.fromEntries(globalOptions),
-    resolvedCmd.args
-  )
+  // the arguments as gunshi resolves them to run the command, with the global options merged in
+  const args: Args = resolveCommandArgs(globalOptions, resolvedCmd.args)
   const ctx = await createCommandContext({
     args,
     command: resolvedCmd,
