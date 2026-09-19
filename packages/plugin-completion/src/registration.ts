@@ -9,7 +9,9 @@ import {
   getCommandSubCommands,
   kebabnize,
   localizable,
+  makeShortLongOptionPair,
   resolveArgKey,
+  resolveBuiltInKey,
   resolveCommandArgs,
   resolveKey,
   resolveLazyCommand
@@ -339,14 +341,26 @@ export async function registerCompletion({
       if (schema.type === 'boolean') {
         // no handler, which is how `Command#option` tells that the option takes no value
         target.option(optionName, description, schema.short)
-        if (schema.negatable) {
+        /**
+         * NOTE(kazupon): an argument that answers to the name of the negated form describes itself
+         * and registers itself in its own turn of this loop (#732), so the negated form of another
+         * option must not take its place. The renderer leaves it alone in the same way.
+         */
+        if (schema.negatable && !ctx.args[`${ARG_NEGATABLE_PREFIX}${key}`]) {
+          /**
+           * NOTE(kazupon): a negatable option has no resource of its own unless the user writes one.
+           * `localizable()` composes the text from the `NEGATABLE` built-in resource, but only while
+           * no i18n plugin is installed, because `translate()` answers first and the rest of that
+           * function is then out of reach. Compose it here too, the way the renderer does.
+           */
           target.option(
             `${ARG_NEGATABLE_PREFIX}${optionName}`,
             hidden
               ? ''
               : (await localizeDescription(
                   resolveArgKey(`${ARG_NEGATABLE_PREFIX}${key}`, ctx.name)
-                )) || ''
+                )) ||
+                  `${await localizeDescription(resolveBuiltInKey('NEGATABLE'))} ${makeShortLongOptionPair(schema, key, ctx.toKebab)}`
           )
         }
       } else {
