@@ -133,6 +133,8 @@ export interface RegisterForCompletionParams {
  * every command resolves its arguments and loads its i18n resources.
  *
  * @param params - {@linkcode RegisterForCompletionParams | Registration parameters}
+ * @returns The request as it was registered, which is what {@linkcode RootCommand.parse} has to be
+ *          given so that it matches the same command
  */
 export async function registerForCompletion({
   t,
@@ -143,10 +145,11 @@ export async function registerForCompletion({
   i18nPluginId,
   i18n,
   globalOptions
-}: RegisterForCompletionParams): Promise<void> {
+}: RegisterForCompletionParams): Promise<string[]> {
+  const resolvedArgs = stripLeadingEmptyWords(args)
   // mirror the preamble of `RootCommand#parse`, which splits the arguments into
   // the word being completed and the words before it
-  const rest = [...args]
+  const rest = [...resolvedArgs]
   const endsWithSpace = rest.at(-1) === ''
   if (endsWithSpace) {
     rest.pop()
@@ -187,7 +190,7 @@ export async function registerForCompletion({
     if (arg.startsWith('-')) {
       i++
       if (
-        !isBooleanOption(registered, arg) &&
+        !isBooleanOption(t, registered, arg) &&
         i < previousArgs.length &&
         !previousArgs[i].startsWith('-')
       ) {
@@ -225,7 +228,7 @@ export async function registerForCompletion({
   const lastArg = previousArgs.at(-1)
   const completesFlags =
     toComplete.startsWith('-') ||
-    (!!lastArg?.startsWith('-') && !isBooleanOption(registered, lastArg))
+    (!!lastArg?.startsWith('-') && !isBooleanOption(t, registered, lastArg))
   if (walked && !completesFlags && level) {
     for (const [name, cmd] of level) {
       if (isSkipped(name, cmd, path.length === 0) || !name.startsWith(toComplete)) {
@@ -242,6 +245,8 @@ export async function registerForCompletion({
       })
     }
   }
+
+  return resolvedArgs
 }
 
 /**
@@ -480,21 +485,49 @@ function isSkipped(name: string, cmd: Command | LazyCommand, topLevel: boolean):
 }
 
 /**
+ * Drop the empty words that a completion request starts with.
+ *
+ * `RootCommand#matchCommand` joins the words it has matched with a space and looks the result up
+ * among the registered commands, so a request whose first word is empty resolves to the command that
+ * holds the options of `hidden` arguments, and those options become the only thing completed.
+ * An empty word is never a command name. The word the cursor is on is always kept.
+ *
+ * @param args - The words of a completion request
+ * @returns The words without the empty ones they start with
+ */
+function stripLeadingEmptyWords(args: string[]): string[] {
+  let index = 0
+  while (index < args.length - 1 && args[index] === '') {
+    index++
+  }
+  return index === 0 ? args : args.slice(index)
+}
+
+/**
  * Whether an option is known to take no value, as `RootCommand#stripOptions` decides it:
  * the completion root first, then the commands registered so far. An unknown option takes a value.
  *
+ * @param t - The completion root command, which holds the options of `hidden` arguments
  * @param commands - The completion commands registered so far, the completion root first
  * @param arg - An option as it was typed, such as `--verbose` or `-v`
  * @returns `true` if the option takes no value
  */
-function isBooleanOption(commands: TabCommand[], arg: string): boolean {
+function isBooleanOption(t: RootCommand, commands: TabCommand[], arg: string): boolean {
   for (const command of commands) {
     const option = findOption(command, arg)
     if (option) {
       return option.isBoolean ?? false
     }
   }
-  return false
+  /**
+   * NOTE(kazupon): the options of `hidden` arguments live on the holder, which is not one of the
+   * commands that are registered along the typed path. `RootCommand#stripOptions` finds them all
+   * the same, so this walk has to as well: a hidden boolean option that reads as taking a value
+   * swallows the word after it, and the command behind it is never registered (#710).
+   */
+  const holder = t.commands.get(HIDDEN_HOLDER_NAME)
+  const hiddenOption = holder && findOption(holder, arg)
+  return hiddenOption ? (hiddenOption.isBoolean ?? false) : false
 }
 
 /**
