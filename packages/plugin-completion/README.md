@@ -332,6 +332,39 @@ await cli(args, command, {
 })
 ```
 
+### Lazy Commands
+
+A [lazy command](https://gunshi.dev/guide/essentials/lazy-async) is completed from the definition that is passed to `lazy`, without running its loader:
+
+```ts
+const build = lazy(() => import('./commands/build.ts').then(m => m.run), {
+  name: 'build',
+  description: 'Build the project',
+  args: {
+    watch: { type: 'boolean', short: 'w', description: 'Watch for changes' }
+  }
+})
+```
+
+When the definition has no `args`, only the command that the loader returns can define them. The plugin then runs the loader of the command that is being completed, which is the loader that `my-cli deploy --help` runs too:
+
+```ts
+// `my-cli deploy --<TAB>` runs the loader, and completes the options of the command it returns
+const deploy = lazy(() => import('./commands/deploy.ts').then(m => m.default), {
+  name: 'deploy',
+  description: 'Deploy the app'
+})
+```
+
+The commands that are offered as candidates never run their loaders. They are described by their definitions, like the commands that the usage lists.
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!TIP]
+> A loader that imports heavy dependencies slows down every completion of its command. Define `args` in the definition to keep the loader from running, with `args: {}` for a command that takes no arguments.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 ## ⚙️ Plugin Options
 
 ### `config`
