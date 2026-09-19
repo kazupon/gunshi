@@ -86,13 +86,6 @@ describe('Command rendering options', () => {
       const cmd: Command = define({
         name: 'test',
         description: 'Test command',
-        args: {
-          help: {
-            type: 'boolean',
-            short: 'h',
-            description: 'Show help'
-          }
-        },
         rendering: {
           header: null, // Also disable header to test usage only
           usage: null
@@ -112,13 +105,6 @@ describe('Command rendering options', () => {
       const cmd: Command = define({
         name: 'test',
         description: 'Test command',
-        args: {
-          help: {
-            type: 'boolean',
-            short: 'h',
-            description: 'Show help'
-          }
-        },
         rendering: {
           usage: ctx => Promise.resolve(`Usage: ${ctx.env.name} ${ctx.name} [options]`)
         }
@@ -226,13 +212,6 @@ describe('Command rendering options', () => {
       const cmd: Command = define({
         name: 'test',
         description: 'Test command',
-        args: {
-          help: {
-            type: 'boolean',
-            short: 'h',
-            description: 'Show help'
-          }
-        },
         rendering: {
           header: null // Disable only header
           // usage and validationErrors use defaults
