@@ -187,6 +187,7 @@ export async function registerForCompletion({
   // an option consumes the next argument unless it is known as a boolean option
   const subConfig = config.subCommands || {}
   const path: string[] = []
+  const commandIndexes: number[] = []
   let level: ReadonlyMap<string, Command | LazyCommand> | undefined = subCommands
   let walked = true
   for (let i = 0; i < previousArgs.length; ) {
@@ -212,6 +213,7 @@ export async function registerForCompletion({
       break
     }
     path.push(arg)
+    commandIndexes.push(i)
     registered.push(
       await registerCompletion({
         t,
@@ -227,6 +229,8 @@ export async function registerForCompletion({
     level = getCommandSubCommands(cmd)
     i++
   }
+
+  alignRootShortArity(t, registered, commandIndexes, previousArgs)
 
   // 3. the commands that can be completed at the cursor, with their names and descriptions only
   const lastArg = previousArgs.at(-1)
@@ -513,6 +517,53 @@ function stripLeadingEmptyWords(args: string[]): string[] {
     index++
   }
   return index === 0 ? args : args.slice(index)
+}
+
+/**
+ * Make the completion root agree with the command about what a short name takes.
+ *
+ * NOTE(kazupon): `@bomb.sh/tab` keeps one arity per option for the whole request, and looks an
+ * option up in the completion root before anywhere else. A short name that a command takes a value
+ * under, and that a global option takes no value under, is therefore read as the global one
+ * wherever it is typed (#744). The root is made to agree with the command for this request, and
+ * only when the letter was typed behind that command, so that the same letter in front of a command
+ * name still means the global option. A fix upstream, where the lookup would follow the command
+ * that was matched, takes the place of this.
+ *
+ * @param t - The completion root command
+ * @param registered - The completion commands registered so far, the completion root first
+ * @param commandIndexes - The index in `previousArgs` at which each command of the path was named
+ * @param previousArgs - The words before the one being completed
+ */
+function alignRootShortArity(
+  t: RootCommand,
+  registered: TabCommand[],
+  commandIndexes: number[],
+  previousArgs: string[]
+): void {
+  for (const [position, command] of registered.slice(1).entries()) {
+    const commandIndex = commandIndexes[position]
+    for (const option of command.options.values()) {
+      if (!option.alias) {
+        continue
+      }
+      const short = `-${option.alias}`
+      const rootOption = findOption(t, short)
+      if (!rootOption || (rootOption.isBoolean ?? false) === (option.isBoolean ?? false)) {
+        continue
+      }
+      const typedBehind = previousArgs.some((arg, index) => index > commandIndex && arg === short)
+      if (!typedBehind) {
+        continue
+      }
+      // re-register the root's option with the arity the command gives the letter
+      if (option.isBoolean) {
+        t.option(rootOption.value, rootOption.description ?? '', rootOption.alias)
+      } else {
+        t.option(rootOption.value, rootOption.description ?? '', () => {}, rootOption.alias)
+      }
+    }
+  }
 }
 
 /**

@@ -2268,3 +2268,123 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
     ])
   })
 })
+
+describe('#744 - a short name that a global option also uses', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  const args = {
+    host: { type: 'string', short: 'h', description: 'Host name' },
+    bind: { type: 'string', short: 'x', description: 'Bind address' },
+    env: { type: 'positional', description: 'Environment' }
+  } as const
+
+  const handlers = {
+    host: { handler: () => [{ value: 'localhost' }, { value: '0.0.0.0' }] },
+    bind: { handler: () => [{ value: '127.0.0.1' }] },
+    env: { handler: () => [{ value: 'prod' }, { value: 'staging' }] }
+  }
+
+  const serve = defineCommand({ name: 'serve', description: 'Serve the app', args, run: NOOP })
+  const start = defineCommand({ name: 'start', description: 'Start', args, run: NOOP })
+  const remote = defineCommand({
+    name: 'remote',
+    description: 'Remote',
+    subCommands: { start },
+    run: NOOP
+  })
+  const build = defineCommand({
+    name: 'build',
+    description: 'Build the app',
+    args: {
+      verbose: { type: 'boolean', short: 'v', description: 'Verbose output' },
+      target: { type: 'positional', description: 'Target' }
+    },
+    run: NOOP
+  })
+
+  const config = {
+    subCommands: {
+      serve: { args: handlers },
+      'remote start': { args: handlers },
+      build: { args: { target: { handler: () => [{ value: 'dist' }] } } }
+    }
+  } as NonNullable<CompletionOptions['config']>
+
+  async function complete(request: string[]): Promise<string[]> {
+    output.length = 0
+    await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands: { serve, remote, build },
+      plugins: [completion({ config })]
+    })
+    return output
+  }
+
+  test('the word behind the short name completes the value of the argument', async () => {
+    expect(await complete(['serve', '-h', ''])).toEqual(['localhost\t', '0.0.0.0\t', ':4'])
+  })
+
+  test('a value typed there is counted as the value, not as the positional', async () => {
+    expect(await complete(['serve', '-h', 'localhost', ''])).toEqual(['prod\t', 'staging\t', ':4'])
+  })
+
+  test('a short name no global option uses is unchanged', async () => {
+    expect(await complete(['serve', '-x', ''])).toEqual(['127.0.0.1\t', ':4'])
+    expect(await complete(['serve', '-x', '127.0.0.1', ''])).toEqual(['prod\t', 'staging\t', ':4'])
+  })
+
+  test('the long name is unchanged', async () => {
+    expect(await complete(['serve', '--host', ''])).toEqual(['localhost\t', '0.0.0.0\t', ':4'])
+  })
+
+  test('the list of short names is unchanged', async () => {
+    expect(await complete(['serve', '-'])).toEqual([
+      '-v\tDisplay this version',
+      '-h\tHost name',
+      '-x\tBind address',
+      ':4'
+    ])
+  })
+
+  test('the same letter in front of a command name still means the global option', async () => {
+    // the alignment must not reach a `-h` that was typed before the command that claims the letter
+    expect(await complete(['-h', ''])).toEqual([
+      'serve\tServe the app',
+      'remote\tRemote',
+      'build\tBuild the app',
+      ':4'
+    ])
+    expect(await complete(['-h', 'serve', ''])).toEqual(['prod\t', 'staging\t', ':4'])
+  })
+
+  test('a nested command is aligned as well', async () => {
+    expect(await complete(['remote', 'start', '-h', ''])).toEqual([
+      'localhost\t',
+      '0.0.0.0\t',
+      ':4'
+    ])
+    expect(await complete(['remote', 'start', '-h', 'localhost', ''])).toEqual([
+      'prod\t',
+      'staging\t',
+      ':4'
+    ])
+  })
+
+  test('a command that claims no such short name is unchanged', async () => {
+    expect(await complete(['remote', '-h', ''])).toEqual(['start\tStart', ':4'])
+  })
+
+  test('a short name that both sides take no value under is unchanged', async () => {
+    // `verbose` and the global `version` are both boolean, so there is nothing to align
+    expect(await complete(['build', '-v', ''])).toEqual(['dist\t', ':4'])
+  })
+})
