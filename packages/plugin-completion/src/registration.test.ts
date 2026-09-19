@@ -1878,3 +1878,69 @@ describe('hidden', () => {
     expect(await complete(['', 'deploy', '--'])).toEqual(await complete(['deploy', '--']))
   })
 })
+
+describe("#730 - a command's own short name", () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  const build = defineCommand({
+    name: 'build',
+    description: 'Build the app',
+    args: { verbose: { type: 'boolean', short: 'v', description: 'Verbose output' } },
+    run: NOOP
+  })
+  const serve = defineCommand({
+    name: 'serve',
+    description: 'Serve the app',
+    args: { host: { type: 'string', short: 'h', description: 'Host name' } },
+    run: NOOP
+  })
+
+  async function complete(request: string[]): Promise<string[]> {
+    output.length = 0
+    await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands: { build, serve },
+      plugins: [completion()]
+    })
+    return output
+  }
+
+  test('the short name completes the argument of the command, not the global option', async () => {
+    expect(await complete(['build', '-'])).toEqual([
+      '-h\tDisplay this help message',
+      '-v\tVerbose output',
+      ':4'
+    ])
+    expect(await complete(['serve', '-'])).toEqual([
+      '-v\tDisplay this version',
+      '-h\tHost name',
+      ':4'
+    ])
+  })
+
+  test('the long names are all still offered', async () => {
+    expect(await complete(['build', '--'])).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--verbose\tVerbose output',
+      ':4'
+    ])
+  })
+
+  test('a command that claims no short name leaves the global ones alone', async () => {
+    expect(await complete(['-'])).toEqual([
+      '-h\tDisplay this help message',
+      '-v\tDisplay this version',
+      ':4'
+    ])
+  })
+})
