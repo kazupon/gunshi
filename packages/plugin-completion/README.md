@@ -367,6 +367,31 @@ The commands that are offered as candidates never run their loaders. They are de
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+### Global Options
+
+The options that plugins register with `addGlobalOption`, such as `--help` and `--version` of `@gunshi/plugin-global`, are completed for every command. They come before the options of the command itself, like the usage lists them, and an argument of a command shadows the global option of the same name, as it does when the command runs.
+
+A global option that takes a value is completed with the handler that is configured for the command being completed:
+
+```ts
+completion({
+  config: {
+    entry: {
+      args: {
+        config: { handler: () => [{ value: 'gunshi.config.ts' }] }
+      }
+    },
+    subCommands: {
+      deploy: {
+        args: {
+          config: { handler: () => [{ value: 'deploy.config.ts' }] }
+        }
+      }
+    }
+  }
+})
+```
+
 ## ⚙️ Plugin Options
 
 ### `config`
