@@ -147,6 +147,15 @@ const myPlugin = plugin({
 })
 ```
 
+A `setup` that throws ends the run: `cli()` rejects with an error naming the plugin, and the error it threw is available as the `cause`. Nothing is installed after it, and no command runs. This matches how a circular or a missing dependency is reported in Step C — a CLI that cannot be assembled is not run.
+
+```sh
+Error: Failed to install the plugin `my-plugin`
+  [cause]: Error: Global option 'verbose' is already registered
+```
+
+Keep `setup` to registration. Work that can fail for reasons outside your control — reading a file, probing the environment, talking to a network — belongs in an extension or a decorator, where it runs per command and can be handled there.
+
 ### Command Processing (Steps E-H)
 
 Between the setup phase and execution phase, Gunshi processes the command-line arguments and prepares the execution context:
