@@ -80,6 +80,19 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 
   const cliOptions = normalizeCliOptions(options, decorators, pluginContext, entryCommand)
 
+  /**
+   * NOTE(kazupon): a CLI whose user declares no sub-commands has no command tree of its own,
+   * so a positional argument must not become a command name just because a plugin added a command.
+   * The user can still opt out with an explicit `fallbackToEntry: false`.
+   */
+  if (
+    initialSubCommands.size === 0 &&
+    cliOptions.subCommands.size > 0 &&
+    options.fallbackToEntry === undefined
+  ) {
+    cliOptions.fallbackToEntry = true
+  }
+
   const tokens = parseArgs(argv)
 
   const resolved = resolveCommandTree(tokens, entry, cliOptions)

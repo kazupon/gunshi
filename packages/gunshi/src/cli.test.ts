@@ -2560,6 +2560,101 @@ describe('github issues', () => {
     })
   })
 
+  describe('#722 - positional arguments lost when a plugin adds a command', () => {
+    const args = { name: { type: 'positional', description: 'Name to greet' } } satisfies Args
+
+    function addsCommand(name: string, run: () => void = () => {}, internal = false) {
+      return plugin({
+        id: `adds-${name}`,
+        setup: ctx => {
+          ctx.addCommand(name, { name, internal, run })
+        }
+      })
+    }
+
+    function createEntry(run: CommandRunner) {
+      return define({ name: 'greet', args, run })
+    }
+
+    const base = { name: 'my-cli', version: '1.0.0', usageSilent: true } satisfies CliOptions
+
+    test.each([
+      ['a plain value', 'World'],
+      // the entry command is not part of `subCommands`, so its own name is a plain value too
+      ["the entry command's own name", 'greet'],
+      // only an exact match is a command name
+      ['a near miss of the plugin command', 'healt']
+    ])('%s is a positional argument, not a command name', async (_label, value) => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli([value], createEntry(run), { ...base, plugins: [addsCommand('health')] })
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { name: value } }))
+    })
+
+    test('an internal command of a plugin does not change it either', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(['World'], createEntry(run), {
+        ...base,
+        plugins: [addsCommand('health', () => {}, true)]
+      })
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { name: 'World' } }))
+    })
+
+    test('the command that the plugin adds still runs', async () => {
+      const run = vi.fn<CommandRunner>()
+      const health = vi.fn<() => void>()
+
+      await cli(['health'], createEntry(run), { ...base, plugins: [addsCommand('health', health)] })
+
+      expect(health).toHaveBeenCalled()
+      expect(run).not.toHaveBeenCalled()
+    })
+
+    test('`fallbackToEntry: false` keeps the error', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await expect(
+        cli(['World'], createEntry(run), {
+          ...base,
+          fallbackToEntry: false,
+          plugins: [addsCommand('health')]
+        })
+      ).rejects.toBeInstanceOf(AggregateError)
+      expect(run).not.toHaveBeenCalled()
+    })
+
+    test('a CLI that declares sub-commands still reports an unknown command', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await expect(
+        cli(['World'], createEntry(run), {
+          ...base,
+          subCommands: { list: define({ name: 'list', run: () => {} }) },
+          plugins: [addsCommand('health')]
+        })
+      ).rejects.toBeInstanceOf(AggregateError)
+      expect(run).not.toHaveBeenCalled()
+    })
+
+    test('a plugin that adds no command leaves `fallbackToEntry` alone', async () => {
+      let env: Readonly<CommandEnvironment> | undefined
+      const noCommand = plugin({ id: 'no-command', setup: () => {} })
+
+      await cli(
+        ['World'],
+        createEntry(ctx => {
+          env = ctx.env
+        }),
+        { ...base, plugins: [noCommand] }
+      )
+
+      expect((env as { fallbackToEntry?: boolean } | undefined)?.fallbackToEntry).toBe(false)
+    })
+  })
+
   describe('#499 - lazy command args not parsed', () => {
     const mainCommand = define({
       description: 'My CLI application',
