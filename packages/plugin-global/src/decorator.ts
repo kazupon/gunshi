@@ -34,10 +34,19 @@ function isShadowedByCommand(args: Args, name: keyof typeof COMMON_ARGS): boolea
 
   const globalOption = COMMON_ARGS[name] as unknown as Record<string, unknown>
   const current = schema as unknown as Record<string, unknown>
-  const keys = Object.keys(globalOption)
+  /**
+   * NOTE(kazupon): a `short` that is there but empty is not a difference. The core takes the short
+   * name away from a global option when an argument of the command claims the same letter (#730),
+   * which leaves a schema that is the global option in every other respect. A command that leaves
+   * `short` out, or gives it a letter of its own, still declares an argument of its own.
+   */
+  const gaveUpShort = 'short' in current && current.short === undefined
+  const compared = (key: string): boolean => !gaveUpShort || key !== 'short'
+  const keys = Object.keys(globalOption).filter(compared)
+  const currentKeys = Object.keys(current).filter(compared)
 
   return (
-    Object.keys(current).length !== keys.length ||
+    currentKeys.length !== keys.length ||
     keys.some(key => !Object.is(current[key], globalOption[key]))
   )
 }

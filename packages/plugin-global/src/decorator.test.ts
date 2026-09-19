@@ -1,4 +1,4 @@
-import { COMMON_ARGS } from '@gunshi/shared'
+import { COMMON_ARGS, resolveCommandArgs } from '@gunshi/shared'
 import { expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import decorator from './decorator.ts'
@@ -191,6 +191,32 @@ test('a schema identical to the global one is left to the global option', async 
   const baseRunner = vi.fn<() => string>(() => 'command executed')
 
   expect(await decorator(baseRunner)(ctx)).toBe('1.0.0')
+})
+
+test('a global option that only gave up its short name is still the global option', async () => {
+  // the core takes `-v` away from `--version` when an argument of the command claims the letter
+  // (#730), which leaves a schema that is the global option in every other respect
+  const ctx = await createContext(
+    resolveCommandArgs(new Map(Object.entries(COMMON_ARGS)), {
+      verbose: { type: 'boolean', short: 'v', description: 'Verbose output' }
+    } satisfies Args),
+    { version: true }
+  )
+  const baseRunner = vi.fn<() => string>(() => 'command executed')
+
+  expect(await decorator(baseRunner)(ctx)).toBe('1.0.0')
+  expect(baseRunner).not.toHaveBeenCalled()
+})
+
+test("leaving `short` out is enough to make the argument the command's", async () => {
+  // declares no short name at all, which is not the same as the core taking one away
+  const ctx = await createContext(
+    { version: { type: 'boolean', description: 'Display this version' } },
+    { version: true }
+  )
+  const baseRunner = vi.fn<() => string>(() => 'command executed')
+
+  expect(await decorator(baseRunner)(ctx)).toBe('command executed')
 })
 
 test('a property of its own is enough as well', async () => {
