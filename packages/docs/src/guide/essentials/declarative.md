@@ -297,6 +297,27 @@ Custom type arguments support:
 - **Multiple values**: Set `multiple: true` to allow multiple instances of the argument
 - **Short aliases**: Set a `short` property to provide a single-character alias
 
+#### Argument Names That Plugins Also Use
+
+Plugins add global options, which are merged into the arguments of every command. `@gunshi/plugin-global`, installed by default, adds `help` and `version`; `@gunshi/plugin-dryrun` adds `dryRun`, under a name you can change with its `name` option.
+
+None of those names is reserved. A command may declare an argument of its own under any of them, and the command's argument wins — gunshi merges the arguments of the command over the global options:
+
+```js
+const release = define({
+  name: 'release',
+  args: {
+    // shadows the global `--version` for this command only
+    version: { type: 'string', description: 'Version to release' }
+  },
+  run: ctx => console.log(`releasing ${ctx.values.version}`)
+})
+```
+
+Taking the name means taking it whole. `my-cli release --version` no longer prints the version of the CLI, and `-v` is no longer defined either, because the global schema is replaced rather than extended. Declare a `short` of your own if you want one. Other commands of the same CLI keep the global option.
+
+Two limits are worth knowing. A schema that is identical, field for field, to the one the plugin registers cannot be told apart from it, so it keeps the plugin's behaviour. And only `@gunshi/plugin-global` looks at whether the command took the name: `@gunshi/plugin-dryrun` still reads the value it finds, so a command that declares a truthy `dryRun` of its own also switches that plugin into dry-run mode.
+
 #### Strict Unknown Option Validation
 
 By default, Gunshi keeps backward compatibility by ignoring option tokens that are not declared in the resolved command's `args` or installed global options. Enable `strict` when you want typos or unsupported options to fail before the command runner executes:

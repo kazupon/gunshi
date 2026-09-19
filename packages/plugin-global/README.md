@@ -78,6 +78,31 @@ When these options are used:
 - **With `--help`**: The command execution is bypassed, and the usage information is displayed instead
 - **With `--version`**: The command execution is bypassed, and only the version number is printed
 
+### Commands That Take the Name
+
+`help` and `version` are not reserved. A command may declare an argument of its own under either name, and gunshi merges the arguments of a command over the global options, so the command's argument wins:
+
+```js
+import { define } from 'gunshi'
+
+const release = define({
+  name: 'release',
+  args: {
+    version: { type: 'string', description: 'Version to release' }
+  },
+  run: ctx => console.log(`releasing ${ctx.values.version}`)
+})
+```
+
+`my-cli release --version 1.2.3` runs the command with `1.2.3`, rather than printing the version of the CLI. Two things follow from the command owning the name:
+
+- The option no longer does what this plugin does automatically. `my-cli release --version` does not print the version of the CLI, and `--help` on a command that takes the name no longer shows its usage by itself — the command receives the value and decides, and it can still call `showUsage()` or `showVersion()` from `ctx.extensions['g:global']`
+- The short name goes with it. The global schema is replaced whole, so `-v` (or `-h`) is no longer defined unless the command declares a `short` of its own
+
+Other commands of the same CLI are unaffected, and so is the entry command unless it declares the name itself.
+
+One case is left to this plugin on purpose: a schema that is identical to the one this plugin registers, field for field, cannot be told apart from it, so `version: { type: 'boolean', short: 'v', description: 'Display this version' }` still prints the version of the CLI. Any difference at all — a description of your own, an extra property, another type — makes the argument the command's.
+
 ## 🧩 Context Extensions
 
 When using the global options plugin, your command context is extended via `ctx.extensions['g:global']`.
