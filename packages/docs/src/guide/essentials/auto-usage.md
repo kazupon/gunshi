@@ -42,6 +42,8 @@ If you need to support options for backward compatibility or internal workflows 
 
 The option continues to be accepted and parsed at runtime, but it is omitted from the `OPTIONS` section and usage symbols.
 
+It is left out of the other places a user could discover it, too: shell completion does not offer it and does not complete its value, and the `Did you mean` hint for an unknown option does not suggest it.
+
 ### Square Brackets `[]` - Optional Elements
 
 Square brackets indicate optional elements or parameters with default values:

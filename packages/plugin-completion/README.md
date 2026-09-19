@@ -392,6 +392,20 @@ completion({
 })
 ```
 
+### Hidden Arguments
+
+An argument with `hidden: true` is kept out of completion, the way it is kept out of `--help`. It is not offered among the candidates, a typed prefix does not complete it, its short name is not suggested, its negatable `--no-` form is not offered, and its value is not completed. A hidden global option is treated the same way.
+
+It is still accepted when the command runs, and completion knows that, so typing one does not stop the completion of what comes after it:
+
+```sh
+$ my-cli deploy --<TAB>
+--output  --force  --no-force        # --legacyMode is hidden, so it is not offered
+
+$ my-cli deploy --legacyMode <TAB>
+prod  staging                        # the positional argument is still completed
+```
+
 ## ⚙️ Plugin Options
 
 ### `config`

@@ -258,7 +258,13 @@ function findUnknownOptions(
 
     const optionName = resolveOptionName(name, schema, options)
     knownLongOptions.add(optionName)
-    addLongOptionCandidate(optionName)
+    /**
+     * NOTE(kazupon): a hidden option is still accepted, so it stays a known option. It is left out
+     * of the candidates, which are what `@gunshi/plugin-suggestion` offers as "Did you mean".
+     */
+    if (!schema.hidden) {
+      addLongOptionCandidate(optionName)
+    }
 
     if (schema.short) {
       knownShortOptions.add(schema.short)
@@ -267,7 +273,9 @@ function findUnknownOptions(
     if (schema.type === 'boolean' && schema.negatable) {
       const negatableOptionName = `${NEGATABLE_OPTION_PREFIX}${optionName}`
       knownNegatableOptions.add(negatableOptionName)
-      addLongOptionCandidate(negatableOptionName)
+      if (!schema.hidden) {
+        addLongOptionCandidate(negatableOptionName)
+      }
     }
   }
 

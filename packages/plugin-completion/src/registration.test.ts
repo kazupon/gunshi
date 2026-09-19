@@ -1702,3 +1702,130 @@ describe('toKebab', () => {
     }
   })
 })
+
+describe('hidden', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  // a plugin that adds one hidden and one visible global option
+  const globals = plugin({
+    id: 'test:globals',
+    name: 'globals',
+    setup: ctx => {
+      ctx.addGlobalOption('secretGlobal', {
+        type: 'boolean',
+        description: 'Secret global',
+        hidden: true
+      })
+      ctx.addGlobalOption('visibleGlobal', { type: 'boolean', description: 'Visible global' })
+    }
+  })
+
+  const deploy = defineCommand({
+    name: 'deploy',
+    description: 'Deploy the app',
+    args: {
+      target: { type: 'positional', description: 'Target' },
+      legacyTarget: { type: 'positional', description: 'Legacy target', hidden: true },
+      extra: { type: 'positional', description: 'Extra', required: false },
+      output: { type: 'string', description: 'Output file' },
+      legacyMode: { type: 'boolean', description: 'Deprecated flag', hidden: true },
+      legacyLevel: { type: 'string', short: 'L', description: 'Deprecated level', hidden: true },
+      legacyForce: {
+        type: 'boolean',
+        negatable: true,
+        description: 'Deprecated force',
+        hidden: true
+      },
+      force: { type: 'boolean', negatable: true, description: 'Force' }
+    },
+    run: NOOP
+  })
+
+  const hiddenConfig: NonNullable<CompletionOptions['config']> = {
+    subCommands: {
+      deploy: {
+        args: {
+          target: { handler: () => [{ value: 'prod' }] },
+          legacyTarget: { handler: () => [{ value: 'legacy-a' }] },
+          extra: { handler: () => [{ value: 'extra-1' }] },
+          output: { handler: () => [{ value: 'dist' }] },
+          legacyLevel: { handler: () => [{ value: 'trace' }] }
+        }
+      }
+    }
+  }
+
+  async function complete(request: string[]): Promise<string[]> {
+    output.length = 0
+    await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands: { deploy },
+      plugins: [globals, completion({ config: hiddenConfig })]
+    })
+    return output
+  }
+
+  test('a hidden option is not among the candidates', async () => {
+    const candidates = await complete(['deploy', '--'])
+    expect(candidates).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--visibleGlobal\tVisible global',
+      '--output\tOutput file',
+      '--force\tForce',
+      '--no-force\tNegatable of --force',
+      ':4'
+    ])
+  })
+
+  test('a hidden option is not completed from a typed prefix, long or short', async () => {
+    expect(await complete(['deploy', '--legacy'])).toEqual([':4'])
+    expect(await complete(['deploy', '--no-le'])).toEqual([':4'])
+    expect(await complete(['deploy', '-'])).toEqual([
+      '-h\tDisplay this help message',
+      '-v\tDisplay this version',
+      ':4'
+    ])
+  })
+
+  test('a hidden global option is not among the candidates', async () => {
+    expect(await complete(['--'])).toEqual([
+      '--help\tDisplay this help message',
+      '--version\tDisplay this version',
+      '--visibleGlobal\tVisible global',
+      ':4'
+    ])
+  })
+
+  test('a hidden option completes no value', async () => {
+    expect(await complete(['deploy', '--legacyLevel', ''])).toEqual([':4'])
+    expect(await complete(['deploy', '-L', ''])).toEqual([':4'])
+    // the visible one still does
+    expect(await complete(['deploy', '--output', ''])).toEqual(['dist\t', ':4'])
+  })
+
+  test('a typed hidden boolean option does not consume the next word', async () => {
+    // the arity of a hidden option is still known, which is what #710 was about
+    expect(await complete(['deploy', '--legacyMode', ''])).toEqual(['prod\t', ':4'])
+    expect(await complete(['deploy', '--no-legacyForce', ''])).toEqual(['prod\t', ':4'])
+  })
+
+  test('a typed hidden option that takes a value consumes exactly one word', async () => {
+    expect(await complete(['deploy', '--legacyLevel', 'trace', ''])).toEqual(['prod\t', ':4'])
+    expect(await complete(['deploy', '-L', 'trace', ''])).toEqual(['prod\t', ':4'])
+  })
+
+  test('a hidden positional completes no value, and keeps the place of the next one', async () => {
+    expect(await complete(['deploy', 'prod', ''])).toEqual([':4'])
+    expect(await complete(['deploy', 'prod', 'legacy-a', ''])).toEqual(['extra-1\t', ':4'])
+  })
+})
