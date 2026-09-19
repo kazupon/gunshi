@@ -50,6 +50,8 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
       examples: cmd.examples,
       internal: cmd.internal,
       entry: cmd.entry,
+      toKebab: cmd.toKebab,
+      rendering: cmd.rendering,
       subCommands: cmd.subCommands
     }
     if ('resource' in cmd && cmd.resource) {
@@ -77,6 +79,8 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         command.examples = loaded.examples ?? cmd.examples
         command.internal = loaded.internal ?? cmd.internal
         command.entry = loaded.entry ?? cmd.entry
+        command.toKebab = loaded.toKebab ?? cmd.toKebab
+        command.rendering = loaded.rendering ?? cmd.rendering
         command.subCommands = loaded.subCommands || cmd.subCommands
         if ('resource' in loaded && loaded.resource) {
           ;(command as { resource: any }).resource = loaded.resource

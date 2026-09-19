@@ -325,7 +325,8 @@ describe('lazy', () => {
       args: { opt: { type: 'string' } },
       examples: 'lazy-test --opt value',
       toKebab: true,
-      internal: true
+      internal: true,
+      rendering: { header: null }
     })
 
     expect(lazyCmd.commandName).toBe('lazy-test')
@@ -347,6 +348,9 @@ describe('lazy', () => {
 
     expect(lazyCmd.internal).toBe(true)
     expectTypeOf<typeof lazyCmd.internal>().toEqualTypeOf<true>()
+
+    expect(lazyCmd.rendering).toEqual({ header: null })
+    expectTypeOf<typeof lazyCmd.rendering>().toEqualTypeOf<{ header: null }>()
   })
 })
 

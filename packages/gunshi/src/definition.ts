@@ -295,6 +295,7 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
     lazyCommand.internal = definition.internal
     lazyCommand.entry = definition.entry
     lazyCommand.toKebab = definition.toKebab
+    lazyCommand.rendering = definition.rendering
     if (definition.subCommands) {
       lazyCommand.subCommands = definition.subCommands
     }
