@@ -20,8 +20,8 @@ USAGE:
   gunshi [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS> 
-  command1 <OPTIONS>            This is command1 (entry)
+  [gunshi]
+  command1 <OPTIONS>          This is command1 (entry)
 
 For more info, run any command with the \`--help\` flag:
   gunshi --help
@@ -93,8 +93,8 @@ exports[`auto generate usage > loosely sub commands > console output 1`] = `
   my-cli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS>                     This is entry command
-  command2 <OPTIONS>            This is command2
+  [my-cli] <OPTIONS>          This is entry command
+  command2 [OPTIONS]          This is command2
 
 For more info, run any command with the \`--help\` flag:
   my-cli --help
@@ -122,8 +122,8 @@ exports[`auto generate usage > loosely sub commands > entry 1`] = `
   my-cli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS>                     This is entry command
-  command2 <OPTIONS>            This is command2
+  [my-cli] <OPTIONS>          This is entry command
+  command2 [OPTIONS]          This is command2
 
 For more info, run any command with the \`--help\` flag:
   my-cli --help
@@ -156,8 +156,8 @@ USAGE:
   gunshi [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  [entry] <OPTIONS>
-  command1 <OPTIONS>         This is command1 (entry)
+  [entry]
+  command1 <OPTIONS>          This is command1 (entry)
 
 For more info, run any command with the \`--help\` flag:
   gunshi --help
@@ -284,8 +284,8 @@ exports[`auto generate usage > strictly sub commands > console output 1`] = `
     gunshi [コマンド] <オプション>
 
 コマンド:
-    [command1] <オプション>            This is command1 (entry)
-    command2 <オプション>              This is command2
+    [command1] <オプション>               This is command1 (entry)
+    command2 [オプション]                 This is command2
 
 詳細は、コマンドと\`--help\`フラグを実行してください:
     gunshi --help
@@ -346,8 +346,8 @@ exports[`auto generate usage > strictly sub commands > entry 1`] = `
     gunshi [コマンド] <オプション>
 
 コマンド:
-    [command1] <オプション>            This is command1 (entry)
-    command2 <オプション>              This is command2
+    [command1] <オプション>               This is command1 (entry)
+    command2 [オプション]                 This is command2
 
 詳細は、コマンドと\`--help\`フラグを実行してください:
     gunshi --help
@@ -421,8 +421,8 @@ USAGE:
   mycli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS> 
-  cmd1 <OPTIONS>
+  [mycli]
+  cmd1
 
 For more info, run any command with the \`--help\` flag:
   mycli --help
@@ -438,9 +438,9 @@ USAGE:
   mycli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS> 
-  cmd1 <OPTIONS>
-  cmd2 <OPTIONS>
+  [mycli]
+  cmd1
+  cmd2
 
 For more info, run any command with the \`--help\` flag:
   mycli --help
@@ -470,8 +470,8 @@ USAGE:
   mycli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS> 
-  cmd1 <OPTIONS>
+  [mycli]
+  cmd1
 
 For more info, run any command with the \`--help\` flag:
   mycli --help
@@ -489,9 +489,9 @@ USAGE:
   mycli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS> 
-  cmd1 <OPTIONS>
-  cmd2 <OPTIONS>
+  [mycli]
+  cmd1
+  cmd2
 
 For more info, run any command with the \`--help\` flag:
   mycli --help
@@ -538,8 +538,8 @@ USAGE:
   lazy-command-loading [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  <OPTIONS>                     CLI with dynamic commands
-  config <OPTIONS>              Load command configuration
+  [lazy-command-loading]          CLI with dynamic commands
+  config                          Load command configuration
 
 For more info, run any command with the \`--help\` flag:
   lazy-command-loading --help

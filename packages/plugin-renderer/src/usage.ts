@@ -217,19 +217,18 @@ async function renderCommandsSection<
     `${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}:`
   ]
   const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
-  const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
-  const commandsStr = await Promise.all(
-    loadedCommands.map(async cmd => {
-      const desc = cmd.description || ''
-      const optionSymbol = await generateOptionsSymbols(ctx, ctx.args)
-      const positionalSymbol = generatePositionalSymbols(ctx.args)
-      const commandStr = await makeCommandSymbol(ctx, cmd)
-      const symbolLength =
-        desc.length > 0 ? commandMaxLength + optionSymbol.length + positionalSymbol.length : 0
-      const command = `${commandStr.padEnd(symbolLength + ctx.env.middleMargin)}${desc}`
-      return `${command.padStart(ctx.env.leftMargin + command.length)}`
-    })
+  const commandSymbols = await Promise.all(
+    loadedCommands.map(async cmd => await makeCommandSymbol(ctx, cmd))
   )
+  const symbolMaxLength = Math.max(...commandSymbols.map(symbol => symbol.length))
+  const commandsStr = loadedCommands.map((cmd, index) => {
+    const desc = cmd.description || ''
+    const commandStr = commandSymbols[index]
+    const command = desc
+      ? `${commandStr.padEnd(symbolMaxLength + ctx.env.middleMargin)}${desc}`
+      : commandStr
+    return `${command.padStart(ctx.env.leftMargin + command.length)}`
+  })
   messages.push(
     ...commandsStr,
     '',
@@ -258,11 +257,17 @@ async function makeCommandSymbol<
     extensions: Extensions
   }>
 >(ctx: CommandContext<G>, cmd: Command): Promise<string> {
-  const optionSymbol = await generateOptionsSymbols(ctx, ctx.args)
-  const positionalSymbol = generatePositionalSymbols(ctx.args)
+  /**
+   * NOTE(kazupon): the row describes `cmd`, so its symbols come from what `cmd` declares.
+   * A lazy command is described by the definition that is given to `lazy`, since the command
+   * list does not run the loader.
+   */
+  const args = cmd.args || {}
+  const optionSymbol = await generateOptionsSymbols(ctx, args)
+  const positionalSymbol = generatePositionalSymbols(args)
   let commandStr = cmd.entry
     ? cmd.name === undefined || cmd.name === ANONYMOUS_COMMAND_NAME
-      ? ''
+      ? `[${await resolveEntry(ctx)}]`
       : `[${cmd.name}]`
     : cmd.name || ''
   if (optionSymbol) {

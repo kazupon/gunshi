@@ -4,7 +4,7 @@ resource-cli (resource-cli v1.0.0)
   resource-cli [コマンド] <オプション>
 
 コマンド:
-  [resource-manager] <オプション>
+  [resource-manager]
   create <オプション>
 
 詳細は、コマンドと`--help`フラグを実行してください:

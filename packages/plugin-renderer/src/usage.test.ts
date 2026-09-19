@@ -1,5 +1,5 @@
 import i18n from '@gunshi/plugin-i18n'
-import { afterEach, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import renderer from './index.ts'
 import { renderUsage } from './usage.ts'
@@ -923,4 +923,196 @@ test('internal commands are filtered out', async () => {
   expect(usage).toContain('another')
   expect(usage).not.toContain('internal')
   expect(usage).not.toContain('Internal command')
+})
+
+describe('#727 - the commands section describes each listed command', () => {
+  async function renderCommandsSection(
+    subCommands: Map<string, Command<any> | LazyCommand<any>>,
+    running?: Command<any>
+  ): Promise<string[]> {
+    const ctx = await createCommandContext({
+      args: running?.args || {},
+      omitted: true,
+      command: running,
+      extensions: {
+        [rendererPlugin.id]: rendererPlugin.extension
+      },
+      cliOptions: {
+        cwd: '/path/to/cmd',
+        version: '0.0.0',
+        name: 'my-cli',
+        subCommands
+      }
+    })
+    const lines = (await renderUsage<WithRendererOnly>(ctx)).split('\n')
+    const start = lines.indexOf('COMMANDS:')
+    const end = lines.indexOf('', start)
+    return lines.slice(start + 1, end)
+  }
+
+  /**
+   * Take the symbol of each row, that is everything before the description column.
+   *
+   * @param rows - The rows of the commands section
+   * @returns The symbol of each row
+   */
+  function symbolsOf(rows: string[]): string[] {
+    return rows.map(row => row.trim().split(/\s{2,}/)[0])
+  }
+
+  const ENTRY = {
+    name: 'greet',
+    description: 'Greet someone',
+    entry: true,
+    args: {
+      name: { type: 'positional', description: 'Name to greet' },
+      loud: { type: 'boolean', description: 'Shout' }
+    },
+    run: NOOP
+  } as unknown as Command<any>
+
+  const PUSH = {
+    name: 'push',
+    description: 'Push things',
+    args: { remote: { type: 'positional', description: 'Remote name' } },
+    run: NOOP
+  } as unknown as Command<any>
+
+  const STATUS = {
+    name: 'status',
+    description: 'Show status',
+    run: NOOP
+  } as unknown as Command<any>
+
+  const TIDY = {
+    name: 'tidy',
+    description: 'Tidy up',
+    args: { level: { type: 'string', default: 'low', description: 'Level' } },
+    run: NOOP
+  } as unknown as Command<any>
+
+  test('each row shows the arguments that its own command declares', async () => {
+    const rows = await renderCommandsSection(
+      new Map([
+        ['greet', ENTRY],
+        ['push', PUSH],
+        ['status', STATUS],
+        ['tidy', TIDY]
+      ]),
+      ENTRY
+    )
+
+    expect(symbolsOf(rows)).toEqual([
+      '[greet] <OPTIONS> <name>',
+      'push <remote>',
+      'status',
+      'tidy [OPTIONS]'
+    ])
+  })
+
+  test('the arguments of the running command do not leak into the other rows', async () => {
+    const rows = await renderCommandsSection(
+      new Map([
+        ['greet', ENTRY],
+        ['status', STATUS]
+      ]),
+      ENTRY
+    )
+
+    expect(rows.filter(row => row.includes('<name>'))).toHaveLength(1)
+    expect(rows.find(row => row.includes('status'))).not.toContain('<')
+  })
+
+  test('a hidden argument is not shown in the row of its command', async () => {
+    const secret = {
+      name: 'secret',
+      description: 'Secret command',
+      args: {
+        token: { type: 'string', description: 'Token', hidden: true },
+        target: { type: 'positional', description: 'Target', hidden: true }
+      },
+      run: NOOP
+    } as unknown as Command<any>
+
+    const rows = await renderCommandsSection(
+      new Map([
+        ['greet', ENTRY],
+        ['secret', secret],
+        ['status', STATUS]
+      ]),
+      ENTRY
+    )
+
+    expect(symbolsOf(rows)).toEqual(['[greet] <OPTIONS> <name>', 'secret', 'status'])
+  })
+
+  test('a lazy command is described by the definition, without running its loader', async () => {
+    const loader = vi.fn<() => Promise<Command<any>>>(async () => ({
+      name: 'build',
+      args: { watch: { type: 'boolean', description: 'Watch' } },
+      run: NOOP
+    }))
+    const build = Object.assign(loader, {
+      commandName: 'build',
+      description: 'Build the project',
+      args: { target: { type: 'positional', description: 'Target' } }
+    }) as unknown as LazyCommand<any>
+
+    const bare = Object.assign(
+      vi.fn<() => Promise<Command<any>>>(async () => ({
+        name: 'test',
+        args: { watch: { type: 'boolean' } },
+        run: NOOP
+      })),
+      { commandName: 'test', description: 'Test the project' }
+    ) as unknown as LazyCommand<any>
+
+    const rows = await renderCommandsSection(
+      new Map([
+        ['build', build],
+        ['test', bare]
+      ])
+    )
+
+    expect(symbolsOf(rows)).toEqual(['build <target>', 'test'])
+    expect(loader).not.toHaveBeenCalled()
+  })
+
+  test('the descriptions are aligned, and a row without one has no trailing space', async () => {
+    const quiet = { name: 'quiet', run: NOOP } as unknown as Command<any>
+    const rows = await renderCommandsSection(
+      new Map([
+        ['greet', ENTRY],
+        ['push', PUSH],
+        ['quiet', quiet]
+      ]),
+      ENTRY
+    )
+
+    /**
+     * A row is `<left margin><symbol><gap><description>`, and a symbol never contains
+     * two spaces in a row, so the first gap is where the description starts.
+     */
+    const describedColumns = rows
+      .map(row => /\s{2,}(?=\S)/.exec(row.slice(2)))
+      .filter(matched => matched !== null)
+      .map(matched => matched.index + matched[0].length)
+
+    expect(describedColumns).toHaveLength(2)
+    expect(new Set(describedColumns).size).toBe(1)
+    expect(rows.find(row => row.includes('quiet'))).toBe('  quiet')
+  })
+
+  test('an anonymous entry command is shown with the name of the cli', async () => {
+    const anonymous = { description: 'The default command', entry: true, run: NOOP } as Command<any>
+    const rows = await renderCommandsSection(
+      new Map([
+        ['(anonymous)', anonymous],
+        ['status', STATUS]
+      ]),
+      anonymous
+    )
+
+    expect(symbolsOf(rows)).toEqual(['[my-cli]', 'status'])
+  })
 })
