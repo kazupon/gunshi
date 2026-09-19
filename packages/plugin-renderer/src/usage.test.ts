@@ -1134,3 +1134,100 @@ describe('#727 - the commands section describes each listed command', () => {
     expect(symbolsOf(rows)).toEqual(['[COMMAND]', 'status'])
   })
 })
+
+describe('#732 - an argument whose name starts with `no-` is described by itself', () => {
+  async function render(args: Args, usageOptionType = false, withI18n = true) {
+    const command = { args, name: 'main', description: 'Main', run: NOOP } as Command<
+      GunshiParams<{ args: Args }>
+    >
+    const ctx = await createCommandContext({
+      args,
+      callMode: 'subCommand',
+      command,
+      extensions: withI18n
+        ? {
+            [i18nPlugin.id]: i18nPlugin.extension,
+            [rendererPlugin.id]: rendererPlugin.extension
+          }
+        : { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { name: 'my-cli', version: '0.0.0', usageOptionType }
+    })
+    return withI18n
+      ? await renderUsage<WithI18nAndRenderer>(ctx)
+      : await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  test('carries its own description, not the one of the argument the prefix reaches', async () => {
+    const usage = await render(
+      {
+        emoji: { type: 'string', description: 'Emoji style' },
+        'no-emoji': { type: 'boolean', description: 'Disable emoji' }
+      },
+      false,
+      false
+    )
+
+    expect(usage).toContain('--no-emoji')
+    expect(usage).toContain('Disable emoji')
+    // the description of `--emoji` used to be repeated on the row of `--no-emoji`
+    expect(usage).not.toMatch(/--no-emoji\s+Emoji style/)
+  })
+
+  test('is not announced as the negated form of an option that is not negatable', async () => {
+    const usage = await render(
+      { widgets: { type: 'boolean' }, 'no-widgets': { type: 'boolean' } },
+      false,
+      false
+    )
+
+    expect(usage).toContain('--no-widgets')
+    expect(usage).not.toContain('Negatable of')
+  })
+
+  test('is typed by its own schema', async () => {
+    const usage = await render(
+      {
+        emoji: { type: 'string', description: 'Emoji style' },
+        'no-emoji': { type: 'boolean', description: 'Disable emoji' }
+      },
+      true,
+      false
+    )
+
+    expect(usage).toMatch(/--no-emoji\s+\[boolean\]/)
+  })
+
+  test('does not throw when the prefix reaches nothing and the type is shown', async () => {
+    await expect(
+      render(
+        { 'no-widgets': { type: 'boolean', description: 'Build without widgets' } },
+        true,
+        false
+      )
+    ).resolves.toContain('Build without widgets')
+  })
+
+  test('does not throw when the prefix reaches nothing and there is no description', async () => {
+    // the i18n plugin answers with an empty string, which used to reach the composition below it
+    await expect(render({ 'no-widgets': { type: 'boolean' } })).resolves.toContain('--no-widgets')
+  })
+
+  test('does not throw for the negated form of an option that is itself called `no-...`', async () => {
+    const usage = await render({
+      'no-cache': { type: 'boolean', negatable: true, description: 'Skip the cache' }
+    })
+
+    expect(usage).toContain('Skip the cache')
+    expect(usage).toMatch(/--no-no-cache\s+Negatable of --no-cache/)
+  })
+
+  test('the negated form of a negatable option is unchanged', async () => {
+    const usage = await render(
+      { force: { type: 'boolean', short: 'f', negatable: true, description: 'Force' } },
+      false,
+      false
+    )
+
+    expect(usage).toMatch(/--no-force\s+Negatable of -f, --force/)
+  })
+})

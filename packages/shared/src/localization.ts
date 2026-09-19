@@ -66,19 +66,28 @@ export function localizable<
 
     const namaspacedArgKey = resolveKey(ARG_PREFIX_AND_KEY_SEPARATOR, ctx.name)
     if ((key as string).startsWith(namaspacedArgKey)) {
-      let argKey = (key as string).slice(namaspacedArgKey.length)
-      let negatable = false
+      const argKey = (key as string).slice(namaspacedArgKey.length)
+
+      /**
+       * NOTE(kazupon): an argument describes itself, whatever it is called. `no-` is stripped only
+       * to reach the option that a negated form negates, and only when there is no argument under
+       * the name as written: `no-emoji` may be an argument of its own, and it then has nothing to do
+       * with `emoji`.
+       */
+      const ownSchema = ctx.args[argKey as keyof typeof ctx.args]
+      if (ownSchema) {
+        return ownSchema.description || ''
+      }
+
       if (argKey.startsWith(ARG_NEGATABLE_PREFIX)) {
-        argKey = argKey.slice(ARG_NEGATABLE_PREFIX.length)
-        negatable = true
+        const negatedKey = argKey.slice(ARG_NEGATABLE_PREFIX.length)
+        const schema = ctx.args[negatedKey as keyof typeof ctx.args]
+        if (schema && schema.type === 'boolean' && schema.negatable) {
+          return `${DefaultResource['NEGATABLE']} ${makeShortLongOptionPair(schema, negatedKey, ctx.toKebab)}`
+        }
       }
-      const schema = ctx.args[argKey as keyof typeof ctx.args]
-      if (!schema) {
-        return argKey
-      }
-      return negatable && schema.type === 'boolean' && schema.negatable
-        ? `${DefaultResource['NEGATABLE']} ${makeShortLongOptionPair(schema, argKey, ctx.toKebab)}`
-        : schema.description || ''
+
+      return argKey
     }
 
     // if the key is a built-in key 'description' and 'examples', return empty string, because the these keys are resolved by the user.

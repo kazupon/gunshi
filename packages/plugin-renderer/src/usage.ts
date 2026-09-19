@@ -455,13 +455,17 @@ function getOptionalArgsPairs<G extends GunshiParams>(
   )
 }
 
-const resolveNegatableKey = (key: string): string => key.split(ARG_NEGATABLE_PREFIX)[1]
+const resolveNegatableKey = (key: string): string => key.slice(ARG_NEGATABLE_PREFIX.length)
 
 function resolveNegatableType<G extends GunshiParams>(
   key: string,
   ctx: Readonly<CommandContext<G>>
 ) {
-  return ctx.args[key.startsWith(ARG_NEGATABLE_PREFIX) ? resolveNegatableKey(key) : key].type
+  /**
+   * NOTE(kazupon): the key of an argument wins over the option that a negated form negates, and a
+   * negated form is a boolean flag whether or not the option it negates can be reached from here.
+   */
+  return (ctx.args[key] ?? ctx.args[resolveNegatableKey(key)])?.type ?? 'boolean'
 }
 
 async function generateDefaultDisplayValue<
@@ -530,11 +534,17 @@ async function generateOptionalArgsUsage<
   const usages = await Promise.all(
     optionsPairsEntries.map(async ([key, value]) => {
       let rawDesc = await ctx.extensions[pluginId].text(resolveArgKey(key, ctx.name))
-      if (!rawDesc && key.startsWith(ARG_NEGATABLE_PREFIX)) {
+      if (!rawDesc && !ctx.args[key] && key.startsWith(ARG_NEGATABLE_PREFIX)) {
+        /**
+         * NOTE(kazupon): only a key that no argument answers to may be read as the negated form of
+         * another option, and only when that option is there to be negated.
+         */
         const name = resolveNegatableKey(key)
         const schema = ctx.args[name]
-        const optionKey = makeShortLongOptionPair(schema, name, ctx.toKebab)
-        rawDesc = `${await ctx.extensions[pluginId].text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
+        if (schema) {
+          const optionKey = makeShortLongOptionPair(schema, name, ctx.toKebab)
+          rawDesc = `${await ctx.extensions[pluginId].text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
+        }
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
       const valueDesc = key.startsWith(ARG_NEGATABLE_PREFIX)
