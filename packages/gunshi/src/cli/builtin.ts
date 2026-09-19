@@ -128,6 +128,33 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: CliOptions<G> = {}
 ): Promise<string | undefined> {
-  const builtInPlugins: Plugin[] = [globals(), renderer()]
-  return cliCore<G>(args, entry, options, builtInPlugins)
+  return cliCore<G>(args, entry, options, createBuiltInPlugins())
+}
+
+/**
+ * Render the usage of a command, without running it.
+ *
+ * This is what `generate` of `gunshi/generator` is made of. It resolves the command the same way
+ * {@linkcode cli} does, with the same built-in plugins, and renders the usage of the command it
+ * arrives at, whatever that command declares as its own arguments.
+ *
+ * @internal
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
+ *
+ * @param args - Command line arguments, which name the command to render
+ * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+ * @param options - A {@link CliOptions | CLI options}
+ * @returns A rendered usage, or `undefined` if there is no usage renderer to render it
+ */
+export async function cliUsage<G extends GunshiParamsConstraint = DefaultGunshiParams>(
+  args: string[],
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  options: CliOptions<G> = {}
+): Promise<string | undefined> {
+  return cliCore<G>(args, entry, options, createBuiltInPlugins(), true)
+}
+
+function createBuiltInPlugins(): Plugin[] {
+  return [globals(), renderer()]
 }
