@@ -1736,6 +1736,7 @@ describe('hidden', () => {
       extra: { type: 'positional', description: 'Extra', required: false },
       output: { type: 'string', description: 'Output file' },
       legacyMode: { type: 'boolean', description: 'Deprecated flag', hidden: true },
+      legacyQuiet: { type: 'boolean', short: 'Q', description: 'Deprecated quiet', hidden: true },
       legacyLevel: { type: 'string', short: 'L', description: 'Deprecated level', hidden: true },
       legacyForce: {
         type: 'boolean',
@@ -1752,7 +1753,10 @@ describe('hidden', () => {
   const remote = defineCommand({
     name: 'remote',
     description: 'Manage remotes',
-    args: { legacyMode: { type: 'boolean', description: 'Deprecated flag', hidden: true } },
+    args: {
+      legacyMode: { type: 'boolean', description: 'Deprecated flag', hidden: true },
+      legacyQuiet: { type: 'boolean', short: 'Q', description: 'Deprecated quiet', hidden: true }
+    },
     subCommands: { add: defineCommand({ name: 'add', description: 'Add a remote', run: NOOP }) },
     run: NOOP
   })
@@ -1854,6 +1858,13 @@ describe('hidden', () => {
     expect(await complete(['--secretGlobal', 'deploy', '--'])).toEqual(
       await complete(['deploy', '--'])
     )
+  })
+
+  test('the short name of a hidden boolean option keeps its arity', async () => {
+    // the short name is registered on the holder as well, or `stripOptions` cannot look `-Q` up
+    expect(await complete(['deploy', '-Q', ''])).toEqual(['prod\t', ':4'])
+    expect(await complete(['deploy', '-Q', 'prod', ''])).toEqual([':4'])
+    expect(await complete(['remote', '-Q', ''])).toEqual(['add\tAdd a remote', ':4'])
   })
 
   test('a request that starts with an empty word does not match the holder', async () => {
