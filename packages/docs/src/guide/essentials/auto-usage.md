@@ -181,9 +181,9 @@ USAGE:
   resource-manager [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  [manage] <OPTIONS>       Manage resources
-  create <OPTIONS>         Create a new resource
-  list <OPTIONS>           List all resources
+  [manage]                  Manage resources
+  create <OPTIONS>          Create a new resource
+  list <OPTIONS>            List all resources
 
 For more info, run any command with the `--help` flag:
   resource-manager --help
@@ -199,6 +199,8 @@ OPTIONS:
 
 > [!NOTE]
 > The brackets in `[manage]` indicate it's the default command that runs when no sub-command is specified.
+> Each row describes the arguments that its own command declares, so a command with no options of its own
+> has no `<OPTIONS>` next to it.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

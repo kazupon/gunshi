@@ -217,9 +217,9 @@ exports[`sub commands 1`] = `
   cmd1 [COMMANDS] <OPTIONS> <positional1>
 
 COMMANDS:
-  command1 <OPTIONS> <positional1>        this is command1
-  command2 <OPTIONS> <positional1>
-  show <OPTIONS> <positional1>            A show command
+  command1 <OPTIONS>                    this is command1
+  command2
+  show <OPTIONS> <positional1>          A show command
 
 For more info, run any command with the \`--help\` flag:
   cmd1 command1 --help

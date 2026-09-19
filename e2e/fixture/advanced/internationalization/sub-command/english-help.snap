@@ -4,7 +4,7 @@ USAGE:
   resource-cli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  [resource-manager] <OPTIONS>
+  [resource-manager]
   create <OPTIONS>
 
 For more info, run any command with the `--help` flag:
