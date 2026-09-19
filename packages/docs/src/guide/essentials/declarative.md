@@ -479,6 +479,8 @@ The description for the negatable option (e.g., `--no-verbose`) is automatically
 
 `no-` is not reserved: an argument may be named `no-cache` or `no-emoji`, and it is then an option of its own, described by its own `description`. Declaring both `cache: { type: 'boolean', negatable: true }` and a separate `no-cache` argument is best avoided, though — a single `--no-cache` on the command line then sets a value for both of them.
 
+The name that decides this is the one the argument is written under on the command line, not the key it is declared with. With `toKebab`, `noCache` is written `--no-cache` as well, so it takes the name from the negated form of `cache` the same way a literal `no-cache` does.
+
 #### Conflicting Options
 
 You can define mutually exclusive options using the `conflicts` property.
