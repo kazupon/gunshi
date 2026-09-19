@@ -313,6 +313,8 @@ completion({
 
 > [!NOTE]
 > A handler completes the value of an option, or a positional argument. An option of `type: 'boolean'` takes no value, so a handler for it is never called.
+>
+> A handler is configured by the key of the argument as it is written in `args`. With [`toKebab`](https://gunshi.dev/guide/essentials/declarative#kebab-case-argument-names), the option of an argument such as `logLevel` is completed as `--log-level`, which is the name that gunshi parses, while its handler stays under `logLevel`.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
