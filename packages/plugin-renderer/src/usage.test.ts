@@ -931,7 +931,8 @@ describe('#727 - the commands section describes each listed command', () => {
 
   async function renderCommandsSection(
     subCommands: Map<string, TestCommand | TestLazyCommand>,
-    running?: TestCommand
+    running?: TestCommand,
+    overrides: { name?: string } = { name: 'my-cli' }
   ): Promise<string[]> {
     const ctx = await createCommandContext({
       args: running?.args || {},
@@ -943,7 +944,7 @@ describe('#727 - the commands section describes each listed command', () => {
       cliOptions: {
         cwd: '/path/to/cmd',
         version: '0.0.0',
-        name: 'my-cli',
+        ...overrides,
         subCommands
       }
     })
@@ -1117,5 +1118,19 @@ describe('#727 - the commands section describes each listed command', () => {
     )
 
     expect(symbolsOf(rows)).toEqual(['[my-cli]', 'status'])
+  })
+
+  test('an anonymous entry command of a cli with no name falls back to the command word', async () => {
+    const anonymous = { description: 'The default command', entry: true, run: NOOP } as TestCommand
+    const rows = await renderCommandsSection(
+      new Map([
+        ['(anonymous)', anonymous],
+        ['status', STATUS]
+      ]),
+      anonymous,
+      {} // no `name` in the cli options
+    )
+
+    expect(symbolsOf(rows)).toEqual(['[COMMAND]', 'status'])
   })
 })
