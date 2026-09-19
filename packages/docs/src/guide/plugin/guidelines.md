@@ -200,6 +200,10 @@ export default function api(endpoint: string) {
 }
 ```
 
+The same applies to `setup`: it throws, and the CLI does not start. `cli()` rejects with an error naming your plugin, carrying yours as the `cause`, and no command runs. That is the right outcome for a configuration the CLI cannot be assembled with, so let `setup` throw rather than register half of what it meant to.
+
+For the same reason, keep `setup` to registration. Work that can fail for reasons outside your control — reading a file, probing the environment, talking to a network — belongs in an extension or a decorator, where it runs per command and the failure can be handled there.
+
 ### Provide Actionable Error Messages
 
 Clear, actionable error messages reduce debugging time by pointing developers to the root cause and solution.

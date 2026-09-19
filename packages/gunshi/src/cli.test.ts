@@ -2965,6 +2965,101 @@ describe('github issues', () => {
       expect(await run(['serve', '--help'])).toContain('-v, --version')
     })
   })
+
+  describe('#742 - a plugin that cannot be installed', () => {
+    const entry = { name: 'root', run: vi.fn<() => void>() } satisfies Command
+    const base = { name: 'my-cli', version: '0.0.0', usageSilent: true } satisfies CliOptions
+
+    function failing(id: string, error: Error, sync = true) {
+      return plugin({
+        id,
+        setup: () => {
+          if (sync) {
+            throw error
+          }
+          return Promise.reject(error)
+        }
+      })
+    }
+
+    test('ends the run, naming the plugin', async () => {
+      await expect(
+        cli([], entry, { ...base, plugins: [failing('broken', new Error('boom'))] })
+      ).rejects.toThrow('Failed to install the plugin `broken`')
+    })
+
+    test('carries the error it was given as the cause', async () => {
+      const cause = new Error('boom')
+
+      await expect(
+        cli([], entry, { ...base, plugins: [failing('broken', cause)] })
+      ).rejects.toMatchObject({ cause })
+    })
+
+    test('a `setup` that rejects ends the run the same way', async () => {
+      await expect(
+        cli([], entry, { ...base, plugins: [failing('broken', new Error('boom'), false)] })
+      ).rejects.toThrow('Failed to install the plugin `broken`')
+    })
+
+    test('a global option that is already registered ends the run', async () => {
+      const clash = plugin({
+        id: 'clash',
+        setup: ctx => {
+          // `help` belongs to `@gunshi/plugin-global`, which is installed before this one
+          ctx.addGlobalOption('help', { type: 'string' })
+        }
+      })
+
+      await expect(cli([], entry, { ...base, plugins: [clash] })).rejects.toThrow(
+        'Failed to install the plugin `clash`'
+      )
+    })
+
+    test('the plugins behind it are not installed', async () => {
+      const setup = vi.fn<() => void>()
+      const after = plugin({ id: 'after', setup })
+
+      await expect(
+        cli([], entry, { ...base, plugins: [failing('broken', new Error('boom')), after] })
+      ).rejects.toThrow('Failed to install the plugin `broken`')
+      expect(setup).not.toHaveBeenCalled()
+    })
+
+    test('the command is not run', async () => {
+      const run = vi.fn<() => void>()
+
+      await expect(
+        cli([], { name: 'root', run }, { ...base, plugins: [failing('broken', new Error('boom'))] })
+      ).rejects.toThrow('Failed to install the plugin `broken`')
+      expect(run).not.toHaveBeenCalled()
+    })
+
+    test('a plugin that installs cleanly is left alone', async () => {
+      const run = vi.fn<CommandRunner>()
+      const fine = plugin({
+        id: 'fine',
+        setup: ctx => {
+          ctx.addGlobalOption('fineOpt', { type: 'boolean', description: 'Fine' })
+        }
+      })
+
+      await cli([], { name: 'root', run }, { ...base, plugins: [fine] })
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({ args: expect.objectContaining({ fineOpt: expect.anything() }) })
+      )
+    })
+
+    test('a circular dependency is reported as it was before', async () => {
+      const a = plugin({ id: 'a', dependencies: ['b'], setup: () => {} })
+      const b = plugin({ id: 'b', dependencies: ['a'], setup: () => {} })
+
+      await expect(cli([], entry, { ...base, plugins: [a, b] })).rejects.toThrow(
+        'Circular dependency detected'
+      )
+    })
+  })
 })
 
 describe('nested sub-commands', () => {
