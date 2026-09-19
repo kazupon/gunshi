@@ -7,14 +7,15 @@ import { createCommandContext } from '@gunshi/plugin'
 import {
   ARG_NEGATABLE_PREFIX,
   getCommandSubCommands,
-  kebabnize,
   localizable,
   makeShortLongOptionPair,
   resolveArgKey,
   resolveBuiltInKey,
   resolveCommandArgs,
+  resolveDisplayName,
   resolveKey,
-  resolveLazyCommand
+  resolveLazyCommand,
+  resolveOptionNames
 } from '@gunshi/shared'
 
 import type { Command as TabCommand, Complete, Completion, Option, RootCommand } from '@bomb.sh/tab'
@@ -315,6 +316,8 @@ export async function registerCompletion({
     return commandTab
   }
 
+  const optionNames = resolveOptionNames(args, ctx.toKebab)
+
   for (const [key, schema] of Object.entries(args)) {
     const hidden = schema.hidden === true
     if (schema.type === 'positional') {
@@ -333,7 +336,7 @@ export async function registerCompletion({
        * which is kebab-cased with `toKebab`. The key of the argument still looks up everything else:
        * the description, the i18n resource and the completion handler of the user's configuration.
        */
-      const optionName = ctx.toKebab || schema.toKebab ? kebabnize(key) : key
+      const optionName = resolveDisplayName(key, schema, ctx.toKebab)
       const target = hidden ? resolveHiddenHolder(t) : commandTab
       const description = hidden
         ? ''
@@ -344,9 +347,11 @@ export async function registerCompletion({
         /**
          * NOTE(kazupon): an argument that answers to the name of the negated form describes itself
          * and registers itself in its own turn of this loop (#732), so the negated form of another
-         * option must not take its place. The renderer leaves it alone in the same way.
+         * option must not take its place. The names are compared as they are rendered, because
+         * `toKebab` can bring two different keys under one name (#743). The renderer leaves the
+         * negated form alone in the same way.
          */
-        if (schema.negatable && !ctx.args[`${ARG_NEGATABLE_PREFIX}${key}`]) {
+        if (schema.negatable && !optionNames.has(`${ARG_NEGATABLE_PREFIX}${optionName}`)) {
           /**
            * NOTE(kazupon): a negatable option has no resource of its own unless the user writes one.
            * `localizable()` composes the text from the `NEGATABLE` built-in resource, but only while

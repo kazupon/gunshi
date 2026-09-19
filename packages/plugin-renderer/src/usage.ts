@@ -8,11 +8,12 @@ import {
   ARG_NEGATABLE_PREFIX,
   COMMON_ARGS,
   resolveExamples as _resolvedExamples,
-  kebabnize,
   makeShortLongOptionPair,
   resolveArgKey,
   resolveBuiltInKey,
-  resolveKey
+  resolveDisplayName,
+  resolveKey,
+  resolveOptionNames
 } from '@gunshi/shared'
 import { pluginId } from './types.ts'
 
@@ -435,19 +436,27 @@ async function generateOptionsSymbols<
 function getOptionalArgsPairs<G extends GunshiParams>(
   ctx: CommandContext<G>
 ): Record<string, string> {
+  /**
+   * NOTE(kazupon): an argument owns the name that it renders under, so the negated form of another
+   * option must not be listed under it (#732). The names are compared as they are rendered, because
+   * `toKebab` can bring two different keys under one name (#743). A `hidden` argument counts: it is
+   * not listed, and neither is a negated form that would take its name.
+   */
+  const optionNames = resolveOptionNames(ctx.args, ctx.toKebab)
+
   return getVisibleOptionalArgs(ctx.args).reduce(
     (acc, [name, schema]) => {
+      const displayName = resolveDisplayName(name, schema, ctx.toKebab)
       let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
       if (schema.type !== 'boolean') {
-        // Convert parameter placeholders to kebab-case format when toKebab is enabled
-        const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
         key = schema.default ? `${key} [${displayName}]` : `${key} <${displayName}>`
       }
       acc[name] = key
       if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {
-        // Convert parameter placeholders to kebab-case format when toKebab is enabled
-        const displayName = ctx.toKebab || schema.toKebab ? kebabnize(name) : name
-        acc[`${ARG_NEGATABLE_PREFIX}${name}`] = `--${ARG_NEGATABLE_PREFIX}${displayName}`
+        const negatedName = `${ARG_NEGATABLE_PREFIX}${displayName}`
+        if (!optionNames.has(negatedName)) {
+          acc[`${ARG_NEGATABLE_PREFIX}${name}`] = `--${negatedName}`
+        }
       }
       return acc
     },

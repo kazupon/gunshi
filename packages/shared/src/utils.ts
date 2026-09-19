@@ -121,11 +121,42 @@ export function makeShortLongOptionPair(
   name: string,
   toKebab?: boolean
 ): string {
-  // Convert camelCase to kebab-case for display in help text if toKebab is true
-  const displayName = toKebab || schema.toKebab ? kebabnize(name) : name
+  const displayName = resolveDisplayName(name, schema, toKebab)
   let key = `--${displayName}`
   if (schema.short) {
     key = `-${schema.short}, ${key}`
   }
   return key
+}
+
+/**
+ * Resolve the name that an argument is parsed and rendered under.
+ *
+ * @param name - The key of the argument.
+ * @param schema - The {@linkcode ArgSchema | argument schema}.
+ * @param toKebab - Whether to convert the name to kebab-case.
+ * @returns The name of the argument, kebab-cased when `toKebab` asks for it.
+ */
+export function resolveDisplayName(name: string, schema: ArgSchema, toKebab?: boolean): string {
+  return toKebab || schema.toKebab ? kebabnize(name) : name
+}
+
+/**
+ * Collect the names that the arguments are parsed and rendered under.
+ *
+ * A positional argument is left out: it is never spelled as an option, so it cannot take the name of
+ * one. A `hidden` argument is counted, because it still owns the name that it parses.
+ *
+ * @param args - The {@linkcode Args | arguments} of a command, global options included.
+ * @param toKebab - Whether the command converts its names to kebab-case.
+ * @returns The set of names.
+ */
+export function resolveOptionNames(args: Args, toKebab?: boolean): Set<string> {
+  const names = new Set<string>()
+  for (const [name, schema] of Object.entries(args)) {
+    if (schema.type !== 'positional') {
+      names.add(resolveDisplayName(name, schema, toKebab))
+    }
+  }
+  return names
 }

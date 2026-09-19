@@ -2189,3 +2189,82 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
     expect(candidates).not.toContain('--no-cache\t否定可能な --cache')
   })
 })
+
+describe('#743 - `toKebab` brings two keys under one name', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  const negatable = {
+    type: 'boolean',
+    short: 'd',
+    negatable: true,
+    description: 'Dry run'
+  } satisfies ArgSchema
+
+  async function complete(args: Args, toKebab = true): Promise<string[]> {
+    output.length = 0
+    const build = defineCommand({ name: 'build', description: 'Build', toKebab, args, run: NOOP })
+    await cli(['complete', '--', 'build', '--'], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands: { build },
+      plugins: [completion()]
+    })
+    return output.filter(line => !/^--(?:help|version)\t/.test(line))
+  }
+
+  test.each([
+    ['a camelCase key', 'noDryRun'],
+    ['a key that is already kebab-case', 'no-dry-run'],
+    ['a key that is the negated form as written', 'no-dryRun']
+  ])('is offered once, described by the argument that owns it (%s)', async (_, own) => {
+    expect(
+      await complete({
+        [own]: { type: 'boolean', description: 'Never run for real' },
+        dryRun: negatable
+      })
+    ).toEqual(['--no-dry-run\tNever run for real', '--dry-run\tDry run', ':4'])
+  })
+
+  test('the order in which the two are declared makes no difference', async () => {
+    expect(
+      await complete({
+        dryRun: negatable,
+        noDryRun: { type: 'boolean', description: 'Never run for real' }
+      })
+    ).toEqual(['--dry-run\tDry run', '--no-dry-run\tNever run for real', ':4'])
+  })
+
+  test('a hidden argument owns the name too, so neither of them is offered', async () => {
+    expect(
+      await complete({
+        noDryRun: { type: 'boolean', hidden: true, description: 'Never run for real' },
+        dryRun: negatable
+      })
+    ).toEqual(['--dry-run\tDry run', ':4'])
+  })
+
+  test('without `toKebab` the two are different names, and both are offered', async () => {
+    expect(
+      await complete(
+        {
+          noDryRun: { type: 'boolean', description: 'Never run for real' },
+          dryRun: negatable
+        },
+        false
+      )
+    ).toEqual([
+      '--noDryRun\tNever run for real',
+      '--dryRun\tDry run',
+      '--no-dryRun\tNegatable of -d, --dryRun',
+      ':4'
+    ])
+  })
+})

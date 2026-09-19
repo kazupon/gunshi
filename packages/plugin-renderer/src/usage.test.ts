@@ -4,7 +4,14 @@ import { createCommandContext } from '../../gunshi/src/context.ts'
 import renderer from './index.ts'
 import { renderUsage } from './usage.ts'
 
-import type { Args, Command, DefaultGunshiParams, GunshiParams, LazyCommand } from '@gunshi/plugin'
+import type {
+  ArgSchema,
+  Args,
+  Command,
+  DefaultGunshiParams,
+  GunshiParams,
+  LazyCommand
+} from '@gunshi/plugin'
 import type { I18nExtension } from '@gunshi/plugin-i18n'
 import type { UsageRendererExtension } from './types.ts'
 
@@ -1229,5 +1236,106 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
     )
 
     expect(usage).toMatch(/--no-force\s+Negatable of -f, --force/)
+  })
+})
+
+describe('#743 - `toKebab` brings two keys under one name', () => {
+  async function render(args: Args, toKebab = true): Promise<string> {
+    const command = { args, name: 'main', description: 'Main', toKebab, run: NOOP } as Command<
+      GunshiParams<{ args: Args }>
+    >
+    const ctx = await createCommandContext({
+      args,
+      callMode: 'subCommand',
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { name: 'my-cli', version: '0.0.0' }
+    })
+    return await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  // the rows of `--no-dry-run`, whatever their description
+  function negatedRows(usage: string): string[] {
+    return usage.split('\n').filter(line => /^\s*--no-dry-run\s/.test(line))
+  }
+
+  const negatable = {
+    type: 'boolean',
+    short: 'd',
+    negatable: true,
+    description: 'Dry run'
+  } satisfies ArgSchema
+
+  test.each([
+    ['a camelCase key', 'noDryRun'],
+    ['a key that is already kebab-case', 'no-dry-run'],
+    ['a key that is the negated form as written', 'no-dryRun']
+  ])('is listed once, described by the argument that owns it (%s)', async (_, own) => {
+    const usage = await render({
+      [own]: { type: 'boolean', description: 'Never run for real' },
+      dryRun: negatable
+    })
+
+    expect(negatedRows(usage)).toHaveLength(1)
+    expect(negatedRows(usage)[0]).toContain('Never run for real')
+    expect(usage).not.toContain('Negatable of')
+  })
+
+  test('the order in which the two are declared makes no difference', async () => {
+    const usage = await render({
+      dryRun: negatable,
+      noDryRun: { type: 'boolean', description: 'Never run for real' }
+    })
+
+    expect(negatedRows(usage)).toHaveLength(1)
+    expect(negatedRows(usage)[0]).toContain('Never run for real')
+  })
+
+  test('`toKebab` of the schema is read the same way', async () => {
+    const usage = await render(
+      {
+        noDryRun: { type: 'boolean', toKebab: true, description: 'Never run for real' },
+        dryRun: { ...negatable, toKebab: true }
+      },
+      false
+    )
+
+    expect(negatedRows(usage)).toHaveLength(1)
+    expect(negatedRows(usage)[0]).toContain('Never run for real')
+  })
+
+  test('a hidden argument owns the name too, so neither of them is listed', async () => {
+    const usage = await render({
+      noDryRun: { type: 'boolean', hidden: true, description: 'Never run for real' },
+      dryRun: negatable
+    })
+
+    expect(negatedRows(usage)).toHaveLength(0)
+    expect(usage).not.toContain('Never run for real')
+    expect(usage).toMatch(/-d, --dry-run\s+Dry run/)
+  })
+
+  test('a positional argument of that name does not take it', async () => {
+    // a positional is never spelled as an option, so it cannot claim `--no-dry-run`
+    const usage = await render({
+      noDryRun: { type: 'positional', description: 'What not to run' },
+      dryRun: negatable
+    })
+
+    expect(negatedRows(usage)).toHaveLength(1)
+    expect(negatedRows(usage)[0]).toContain('Negatable of -d, --dry-run')
+  })
+
+  test('without `toKebab` the two are different names, and both are listed', async () => {
+    const usage = await render(
+      {
+        noDryRun: { type: 'boolean', description: 'Never run for real' },
+        dryRun: negatable
+      },
+      false
+    )
+
+    expect(usage).toMatch(/--noDryRun\s+Never run for real/)
+    expect(usage).toMatch(/--no-dryRun\s+Negatable of -d, --dryRun/)
   })
 })
