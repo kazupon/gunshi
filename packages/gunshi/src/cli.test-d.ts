@@ -5,7 +5,7 @@
 
 import { expectTypeOf, test } from 'vitest'
 import { cli } from './cli.ts'
-import { define } from './definition.ts'
+import { define, lazy } from './definition.ts'
 
 import type { Command, CommandContext } from './types.ts'
 
@@ -106,5 +106,19 @@ test('cli() accepts strict option', () => {
       run: () => {}
     }),
     { strict: true }
+  )
+})
+
+test('cli() preserves values for an unnamed lazy entry', async () => {
+  await cli(
+    ['--input', 'value'],
+    lazy(
+      () => {
+        return ctx => {
+          expectTypeOf(ctx.values.input).toEqualTypeOf<string | undefined>()
+        }
+      },
+      { args: { input: { type: 'string' } } }
+    )
   )
 })

@@ -267,6 +267,31 @@ describe('defineWithTypes', () => {
 })
 
 describe('lazy', () => {
+  test('marks an unnamed loader as lazy without changing an existing marker', () => {
+    const run = () => {}
+    const loader = Object.assign(() => run, { commandName: 'existing' })
+    const unnamed = () => run
+
+    const marked = lazy(unnamed)
+    const existing = lazy(loader)
+
+    expect(marked).toBe(unnamed)
+    expect(marked).toHaveProperty('commandName', undefined)
+    expect(existing).toBe(loader)
+    expect(existing.commandName).toBe('existing')
+  })
+
+  test('wraps a frozen unnamed loader without mutating it', () => {
+    const run = () => {}
+    const loader = Object.freeze(() => run)
+
+    const marked = lazy(loader)
+
+    expect(marked).not.toBe(loader)
+    expect(Object.hasOwn(loader, 'commandName')).toBe(false)
+    expect(marked).toHaveProperty('commandName', undefined)
+  })
+
   test('basic', async () => {
     const subCommands = new Map()
     const test = define({

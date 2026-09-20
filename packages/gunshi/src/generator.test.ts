@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest'
 import register from '../test/fixtures/register.ts'
 import show from '../test/fixtures/show.ts'
-import { define } from './definition.ts'
+import { define, lazy } from './definition.ts'
 import { generate } from './generator.ts'
 import { plugin } from './plugin/core.ts'
 
@@ -58,6 +58,24 @@ test('#768 includes the entry when a plugin adds commands', async () => {
   expect(usage).toContain('  clean')
   expect(entryRun).not.toHaveBeenCalled()
   expect(cleanRun).not.toHaveBeenCalled()
+})
+
+test('#769 generates usage for an unnamed lazy entry', async () => {
+  let loaderCalls = 0
+  const entryRun = vi.fn<CommandRunner>()
+  const entry = lazy(
+    async () => {
+      loaderCalls++
+      return entryRun
+    },
+    { args: { target: { type: 'string', description: 'Deployment target' } } }
+  )
+
+  const usage = await generate(null, entry, { name: 'mycli' })
+
+  expect(usage).toContain('--target <target>')
+  expect(loaderCalls).toBe(1)
+  expect(entryRun).not.toHaveBeenCalled()
 })
 
 describe('a command that declares an argument of its own', () => {

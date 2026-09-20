@@ -19,12 +19,15 @@ export { kebabnize } from 'args-tokens/utils'
  * Check if the given command is a {@link LazyCommand}.
  *
  * @param cmd - A command to check
- * @returns `true` if the command is a {@link LazyCommand}, otherwise `false
+ * @returns `true` if the command is a {@link LazyCommand}, otherwise `false`
+ *
+ * A lazy command is identified by its `commandName` property. The property may be
+ * `undefined` when the lazy command has no definition name.
  */
 export function isLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   cmd: unknown
 ): cmd is LazyCommand<G> {
-  return typeof cmd === 'function' && 'commandName' in cmd && !!cmd.commandName
+  return typeof cmd === 'function' && 'commandName' in cmd
 }
 
 /**

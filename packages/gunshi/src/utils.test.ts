@@ -1,10 +1,32 @@
 import { describe, expect, test } from 'vitest'
 import { lazy } from './definition.ts'
-import { resolveCommandArgs, resolveLazyCommand } from './utils.ts'
+import { isLazyCommand, resolveCommandArgs, resolveLazyCommand } from './utils.ts'
 
 import type { ArgSchema, Args, Command, CommandRunner } from './types.ts'
 
 const run: CommandRunner = () => {}
+
+describe('isLazyCommand', () => {
+  test.each([
+    ['a named definition', lazy(() => run, { name: 'deploy' })],
+    ['an unnamed definition', lazy(() => run, { args: {} })],
+    ['no definition', lazy(() => run)],
+    ['an empty name', lazy(() => run, { name: '' })]
+  ])('recognizes %s', (_label, command) => {
+    expect(isLazyCommand(command)).toBe(true)
+  })
+
+  test('does not recognize an ordinary command runner', () => {
+    expect(isLazyCommand(run)).toBe(false)
+    expect(isLazyCommand({ run })).toBe(false)
+  })
+
+  test('recognizes a structurally marked lazy command with no name', () => {
+    const command = Object.assign(() => run, { commandName: undefined })
+
+    expect(isLazyCommand(command)).toBe(true)
+  })
+})
 
 describe('resolveLazyCommand', () => {
   /**
@@ -166,6 +188,24 @@ describe('resolveLazyCommand', () => {
     expect(byLoaded.name).toBe('loaded')
     expect(byDefinition.name).toBe('deploy')
     expect(byGivenName.name).toBe('key')
+  })
+
+  test('resolves an unnamed lazy command without running its loader for metadata', async () => {
+    let called = 0
+    const command = lazy(
+      () => {
+        called++
+        return run
+      },
+      { args: { target: { type: 'string' } } }
+    )
+
+    const resolved = await resolveLazyCommand(command)
+
+    expect(called).toBe(0)
+    expect(resolved.args).toEqual({ target: { type: 'string' } })
+    expect(resolved.name).toBeUndefined()
+    expect(resolved.run).toBeUndefined()
   })
 })
 

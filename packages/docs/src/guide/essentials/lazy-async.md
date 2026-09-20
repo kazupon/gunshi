@@ -101,6 +101,28 @@ Only when the user runs `npx tsx cli.ts hello` does Gunshi execute the loader an
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+A lazy command can also be used as the entry command without a definition name. Gunshi still
+uses the arguments from the definition and runs the loader before the returned runner:
+
+```ts
+const entry = lazy(
+  async () => ctx => {
+    console.log(`Building ${ctx.values.target}`)
+  },
+  {
+    args: {
+      target: { type: 'string', required: true }
+    }
+  }
+)
+
+await cli(['--target', 'prod'], entry, { name: 'my-cli' })
+```
+
+When a lazy command has no definition name, `commandName` is `undefined`. This is different from
+the CLI name in `CliOptions.name`; the latter identifies the application, while the lazy command
+is the default entry used when no sub-command is selected.
+
 ## Dynamic Imports for Code Splitting
 
 For real-world applications, you'll typically want to use dynamic imports to load command implementations from separate files.

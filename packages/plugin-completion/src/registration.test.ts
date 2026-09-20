@@ -1449,6 +1449,55 @@ describe('a CLI without sub-commands', () => {
     ])
   })
 
+  test('completes an unnamed lazy entry from its definition', async () => {
+    let loaderCalls = 0
+    const entry = lazy(
+      async () => {
+        loaderCalls++
+        return NOOP
+      },
+      { description: 'Deploy the app', args }
+    )
+
+    await cli(['complete', '--', '--'], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion({ config: entryConfig })]
+    })
+
+    expect(output).toEqual([
+      ...GLOBAL_OPTION_LINES,
+      '--environment\tTarget environment',
+      '--config\tConfig file path',
+      ':4'
+    ])
+    expect(loaderCalls).toBe(0)
+  })
+
+  test('loads an unnamed lazy entry when its arguments come from the loader', async () => {
+    let loaderCalls = 0
+    const entry = lazy(async () => {
+      loaderCalls++
+      return { args, run: NOOP }
+    })
+
+    await cli(['complete', '--', '--'], entry, {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      plugins: [completion({ config: entryConfig })]
+    })
+
+    expect(output).toEqual([
+      ...GLOBAL_OPTION_LINES,
+      '--environment\tTarget environment',
+      '--config\tConfig file path',
+      ':4'
+    ])
+    expect(loaderCalls).toBe(1)
+  })
+
   test('localizes the entry command', async () => {
     const loaded: string[] = []
     const entry = defineCommand({

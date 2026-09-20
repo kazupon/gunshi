@@ -548,10 +548,10 @@ function resolveCommandTree<G extends GunshiParamsConstraint>(
 
   function resolveAsEntry(): ResolveCommandContext<G> {
     if (typeof entry === 'function') {
-      if ('commandName' in entry && entry.commandName) {
+      if (isLazyCommand<G>(entry)) {
         // lazy command
         return {
-          commandName: entry.commandName,
+          commandName: resolveEntryName(entry),
           command: entry,
           callMode: 'entry',
           commandPath: [],

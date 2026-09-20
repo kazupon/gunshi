@@ -91,7 +91,7 @@ describe('execute command', () => {
     )
   })
 
-  test('entry lazy command name omitted', async () => {
+  test('entry lazy argv command name omitted', async () => {
     const mockFn = vi.fn<() => void>()
     await cli(
       [''],
@@ -2862,6 +2862,117 @@ describe('github issues', () => {
 
       expect(usage).toContain('  [build] <target>')
       expect(usage).toContain('  [plugin]')
+    })
+  })
+
+  describe('#769 - unnamed lazy entry commands', () => {
+    const args = { target: { type: 'string' } } satisfies Args
+    const options = { name: 'mycli', renderHeader: null, usageSilent: true } satisfies CliOptions
+
+    test('runs an unnamed lazy entry and passes parsed values to its runner', async () => {
+      let loaderCalls = 0
+      let runnerCalls = 0
+      let values: unknown
+      let commandName: string | undefined
+      const command = lazy(async () => {
+        loaderCalls++
+        return ctx => {
+          runnerCalls++
+          values = ctx.values
+          commandName = ctx.name
+        }
+      }, define({ args }))
+
+      await cli(['--target', 'prod'], command, options)
+
+      expect(loaderCalls).toBe(1)
+      expect(runnerCalls).toBe(1)
+      expect(values).toEqual({ target: 'prod' })
+      expect(commandName).toBe('(anonymous)')
+    })
+
+    test('runs an unnamed lazy entry without a definition', async () => {
+      let loaderCalls = 0
+      let runnerCalls = 0
+      const runner = vi.fn<CommandRunner>(() => {
+        runnerCalls++
+      })
+      const command = lazy(async () => {
+        loaderCalls++
+        return runner
+      })
+
+      await cli([], command, options)
+
+      expect(loaderCalls).toBe(1)
+      expect(runnerCalls).toBe(1)
+      expect(runner).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
+    })
+
+    test('runs an unnamed lazy command registered as a sub-command', async () => {
+      let loaderCalls = 0
+      const runner = vi.fn<CommandRunner>()
+      const command = lazy(async () => {
+        loaderCalls++
+        return runner
+      }, define({ args }))
+
+      await cli(['build', '--target', 'prod'], define({ run: () => {} }), {
+        ...options,
+        subCommands: { build: command }
+      })
+
+      expect(loaderCalls).toBe(1)
+      expect(runner).toHaveBeenCalledWith(
+        expect.objectContaining({ callMode: 'subCommand', values: { target: 'prod' } })
+      )
+    })
+
+    test('does not load an unnamed lazy parent when resolving its child', async () => {
+      let parentLoaderCalls = 0
+      const childRunner = vi.fn<CommandRunner>()
+      const parent = lazy(
+        async () => {
+          parentLoaderCalls++
+          return () => {}
+        },
+        {
+          subCommands: {
+            add: define({ run: childRunner })
+          }
+        }
+      )
+
+      await cli(['remote', 'add'], define({ run: () => {} }), {
+        ...options,
+        subCommands: { remote: parent }
+      })
+
+      expect(parentLoaderCalls).toBe(0)
+      expect(childRunner).toHaveBeenCalledWith(
+        expect.objectContaining({ commandPath: ['remote', 'add'] })
+      )
+    })
+
+    test('keeps validation before the runner for an unnamed lazy entry', async () => {
+      let loaderCalls = 0
+      const runner = vi.fn<CommandRunner>()
+      const command = lazy(
+        async () => {
+          loaderCalls++
+          return runner
+        },
+        { args: { target: { type: 'string', required: true } } }
+      )
+
+      await expect(cli([], command, options)).rejects.toMatchObject({
+        errors: expect.arrayContaining([
+          expect.objectContaining({ message: "Optional argument '--target' is required" })
+        ])
+      })
+
+      expect(loaderCalls).toBe(1)
+      expect(runner).not.toHaveBeenCalled()
     })
   })
 
