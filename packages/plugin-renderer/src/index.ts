@@ -29,7 +29,7 @@
  * @license MIT
  */
 
-import { createCommandContext, plugin } from '@gunshi/plugin'
+import { ANONYMOUS_COMMAND_NAME, createCommandContext, plugin } from '@gunshi/plugin'
 import { localizable, namespacedId, resolveKey, resolveLazyCommand } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
 import { pluginId as id } from './types.ts'
@@ -87,6 +87,18 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
         const allCommands = await Promise.all(
           subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
         )
+
+        // Plugins can add sub-commands without registering the CLI's entry in the command map.
+        // Add it only to the root's display list; nested lists already have their own entry.
+        const entryCommand = ctx.env.entryCommand
+        if (
+          ctx.callMode === 'entry' &&
+          subCommands.length > 0 &&
+          entryCommand &&
+          !allCommands.some(command => command.entry)
+        ) {
+          allCommands.push(await resolveLazyCommand<G>(entryCommand, ANONYMOUS_COMMAND_NAME))
+        }
 
         // filter out internal commands
         cachedCommands = allCommands.filter(cmd => !cmd.internal).filter(Boolean)

@@ -30,7 +30,7 @@ export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGun
 
 ### loadCommands Returns
 
-`Promise<Command<G>[]>` — A list of commands loaded from the usage renderer plugin.
+`Promise<Command<G>[]>` — A list of commands loaded from the usage renderer plugin. At the top-level entry, the list includes the CLI entry command even when a plugin registered the other commands without adding the entry to `env.subCommands`; nested lists use their local entry.
 
 ### text Type Parameters
 

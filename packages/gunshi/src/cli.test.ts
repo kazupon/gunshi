@@ -2772,6 +2772,86 @@ describe('github issues', () => {
     })
   })
 
+  describe('#768 - plugin-added commands include the entry in help', () => {
+    function createEntry() {
+      return define({
+        name: 'build',
+        description: 'Build the project',
+        args: { target: { type: 'positional', description: 'Build target' } },
+        run: vi.fn<CommandRunner>()
+      })
+    }
+
+    function createCommands(count: number) {
+      const commands = [
+        define({ name: 'clean', description: 'Clean artifacts', run: vi.fn<CommandRunner>() }),
+        define({ name: 'lint', description: 'Run linter', run: vi.fn<CommandRunner>() })
+      ]
+      return Object.fromEntries(commands.slice(0, count).map(command => [command.name, command]))
+    }
+
+    function addCommands(commands: Record<string, Command>) {
+      return plugin({
+        id: 'issue-768-help',
+        setup: ctx => {
+          for (const [name, command] of Object.entries(commands)) {
+            ctx.addCommand(name, command)
+          }
+        }
+      })
+    }
+
+    test.each([1, 2])('matches subCommands help with %s plugin command(s)', async count => {
+      const options = { name: 'mycli', renderHeader: null, usageSilent: true } satisfies CliOptions
+      const commands = createCommands(count)
+      const userHelp = await cli(['--help'], createEntry(), {
+        ...options,
+        subCommands: commands
+      })
+      const mapHelp = await cli(['--help'], createEntry(), {
+        ...options,
+        subCommands: new Map(Object.entries(commands))
+      })
+      const pluginHelp = await cli(['--help'], createEntry(), {
+        ...options,
+        plugins: [addCommands(createCommands(count))]
+      })
+
+      expect(mapHelp).toBe(userHelp)
+      expect(pluginHelp).toBe(userHelp)
+      expect(pluginHelp).toContain('  [build] <target>')
+      expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
+    })
+
+    test('does not add the entry to the command registry', async () => {
+      let env: Readonly<CommandEnvironment> | undefined
+      const entry = createEntry()
+      const pluginCommand = define({ name: 'clean', run: () => {} })
+      const tools = plugin({
+        id: 'issue-768-registry',
+        setup: ctx => ctx.addCommand('clean', pluginCommand)
+      })
+
+      await cli(['clean'], entry, {
+        name: 'mycli',
+        plugins: [
+          tools,
+          plugin({
+            id: 'issue-768-capture',
+            setup: ctx =>
+              ctx.decorateCommand(base => commandCtx => {
+                env = commandCtx.env
+                return base(commandCtx)
+              })
+          })
+        ]
+      })
+
+      expect([...(env?.subCommands?.keys() || [])]).toEqual(['clean'])
+      expect(env?.entryCommand).toMatchObject({ name: 'build', entry: true })
+    })
+  })
+
   describe('#499 - lazy command args not parsed', () => {
     const mainCommand = define({
       description: 'My CLI application',

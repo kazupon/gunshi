@@ -1,7 +1,10 @@
 import i18n from '@gunshi/plugin-i18n'
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { cli } from '../../gunshi/src/cli.ts'
 import { createCommandContext } from '../../gunshi/src/context.ts'
-import { lazy } from '../../gunshi/src/definition.ts'
+import { define, lazy } from '../../gunshi/src/definition.ts'
+import { plugin } from '../../gunshi/src/plugin/core.ts'
+import type { CliOptions } from '../../gunshi/src/types.ts'
 import renderer from './index.ts'
 import { renderUsage } from './usage.ts'
 import { displayWidth } from './width.ts'
@@ -932,6 +935,124 @@ test('internal commands are filtered out', async () => {
   expect(usage).toContain('another')
   expect(usage).not.toContain('internal')
   expect(usage).not.toContain('Internal command')
+})
+
+describe('#768 - plugin-added commands include the entry in top-level help', () => {
+  const entry = define({
+    name: 'build',
+    description: 'Build the project',
+    args: { target: { type: 'positional', description: 'Build target' } },
+    run: NOOP
+  })
+
+  const commands = {
+    clean: define({ name: 'clean', description: 'Clean artifacts', run: NOOP }),
+    lint: define({ name: 'lint', description: 'Run linter', run: NOOP })
+  }
+
+  function addCommands(selected: Record<string, Command>): ReturnType<typeof plugin> {
+    return plugin({
+      id: 'issue-768-tools',
+      setup(ctx) {
+        for (const [name, command] of Object.entries(selected)) {
+          ctx.addCommand(name, command)
+        }
+      }
+    })
+  }
+
+  function commandRows(usage: string): string[] {
+    const lines = usage.split('\n')
+    const start = lines.indexOf('COMMANDS:')
+    const end = lines.indexOf('', start)
+    return start === -1 || end === -1
+      ? []
+      : lines.slice(start + 1, end).map(line => line.trim().split(/\s{2,}/)[0])
+  }
+
+  test.each([1, 2])('matches user-registered help with %s plugin command(s)', async count => {
+    const selected = Object.fromEntries(Object.entries(commands).slice(0, count))
+    const options = { name: 'mycli', renderHeader: null, usageSilent: true }
+    const userHelp = await cli(['--help'], entry, {
+      ...options,
+      subCommands: selected
+    })
+    const pluginHelp = await cli(['--help'], entry, {
+      ...options,
+      plugins: [addCommands(selected)]
+    })
+
+    expect(pluginHelp).toBe(userHelp)
+    expect(commandRows(pluginHelp!)).toEqual(['[build] <target>', ...Object.keys(selected)])
+  })
+
+  test('does not add the root entry to nested help', async () => {
+    const remote = define({
+      name: 'remote',
+      description: 'Manage remotes',
+      subCommands: commands,
+      run: NOOP
+    })
+    const usage = await cli(['remote', '--help'], entry, {
+      name: 'mycli',
+      renderHeader: null,
+      usageSilent: true,
+      plugins: [addCommands({ remote })]
+    })
+
+    expect(commandRows(usage!)).toEqual(['[remote]', 'clean', 'lint'])
+    expect(usage).not.toContain('[build]')
+  })
+
+  test('keeps the registry unchanged and caches the synthesized entry', async () => {
+    const entry = { name: 'build', entry: true, run: NOOP } as Command
+    const clean = { name: 'clean', run: NOOP } as Command
+    const subCommands = new Map([['clean', clean]])
+    const context = await createCommandContext({
+      command: entry,
+      omitted: true,
+      cliOptions: {
+        name: 'mycli',
+        subCommands,
+        entryCommand: entry
+      } as CliOptions,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension }
+    })
+    const extension = context.extensions[rendererPlugin.id]
+    const first = await extension.loadCommands()
+    const second = await extension.loadCommands()
+
+    expect(first).toBe(second)
+    expect(first.map((command: Command) => command.name)).toEqual(['build', 'clean'])
+    expect([...subCommands.keys()]).toEqual(['clean'])
+  })
+
+  test('uses the anonymous fallback when localizing a synthesized entry', async () => {
+    const entry = {
+      entry: true,
+      resource: () => Promise.resolve({ description: 'Default command' }),
+      run: NOOP
+    } as unknown as Command
+    const subCommands = new Map([['clean', { name: 'clean', run: NOOP } as Command]])
+    const context = await createCommandContext({
+      command: entry,
+      omitted: true,
+      cliOptions: {
+        name: 'mycli',
+        subCommands,
+        entryCommand: entry
+      } as CliOptions,
+      extensions: {
+        [i18nPlugin.id]: i18nPlugin.extension,
+        [rendererPlugin.id]: rendererPlugin.extension
+      }
+    })
+
+    const usage = await renderUsage<WithI18nAndRenderer>(context)
+
+    expect(usage).toContain('[mycli]')
+    expect(usage).toContain('Default command')
+  })
 })
 
 describe('#727 - the commands section describes each listed command', () => {

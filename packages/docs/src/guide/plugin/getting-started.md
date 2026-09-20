@@ -211,6 +211,20 @@ Running linter...
 No issues found!
 ```
 
+The top-level help lists the default command together with commands supplied by the plugin:
+
+```sh
+node cli.js --help
+
+COMMANDS:
+  [build]
+  clean [OPTIONS]          Clean build artifacts
+  lint                     Run linter
+```
+
+The brackets around `build` indicate that it is the default entry command used when no
+sub-command is specified.
+
 ## Advanced Plugin Features
 
 Beyond basic setup and global options, plugins can provide much more powerful functionality:
