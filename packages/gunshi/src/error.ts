@@ -147,6 +147,12 @@ export class CommandResolutionError extends Error {
   readonly commandPath: readonly string[]
   readonly candidatePaths: readonly (readonly string[])[]
 
+  /**
+   * Create a command resolution error with structured routing metadata.
+   *
+   * @param message - Human-readable fallback message
+   * @param options - Error code and command-routing metadata
+   */
   constructor(message: string, options: CommandResolutionErrorOptions = {}) {
     super(message, { cause: options.cause })
     this.name = 'CommandResolutionError'
@@ -196,7 +202,12 @@ export function isCommandNotFoundError(error: unknown): error is CommandNotFound
   return error instanceof Error && error.name === 'CommandNotFoundError'
 }
 
-/** Check whether an error is a {@link CommandResolutionError}. */
+/**
+ * Check whether an error is a {@link CommandResolutionError}.
+ *
+ * @param error - An unknown error
+ * @returns `true` when the error has the command-resolution brand and shape
+ */
 export function isCommandResolutionError(error: unknown): error is CommandResolutionError {
   if (error instanceof CommandResolutionError) {
     return true

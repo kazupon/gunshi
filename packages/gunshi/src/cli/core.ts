@@ -165,7 +165,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
       resolvedCommand
     )
     const loaded = resolveCommandTreeFromPositionals(loadedPositionals, entry, routingOptions)
-    if (loaded.commandPath.join('\u0000') !== targetCommandPath.join('\u0000')) {
+    if (!sameCommandPath(loaded.commandPath, targetCommandPath)) {
       additionalValidationErrors.push(
         createLazySchemaMismatchError(targetCommandPath, loaded.commandPath)
       )
@@ -784,6 +784,12 @@ type CommandSelectionResult<G extends GunshiParamsConstraint> = {
  * classify tokens. It never copies `parse`, defaults, required checks, or other user code. A
  * candidate is accepted only when routing its own declaration reaches the same Map-key path in the
  * declaration tree.
+ *
+ * @param tokens - Tokenized command-line arguments
+ * @param entry - Entry command definition or runner
+ * @param options - Internal CLI options with the declared sub-command tree
+ * @param globalOptions - Global option schemas used during candidate classification
+ * @returns The selected command context or a diagnostic resolution error
  */
 function resolveCommandSelection<G extends GunshiParamsConstraint>(
   tokens: ArgToken[],

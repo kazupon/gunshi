@@ -208,6 +208,40 @@ describe.each<{ thrower: string; runCli: () => RunCli }>([
     )
     expect(plugin.hasPriorityValidationError(error)).toBe(true)
   })
+
+  test('@gunshi/plugin recognizes command-resolution errors as priority errors', async () => {
+    const routing = plugin.plugin({
+      id: 'e2e:command-routing',
+      setup(ctx) {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+    const error = await captureAggregateError(() =>
+      runCli()(
+        ['--config', 'clean', 'deploy'],
+        { name: 'app', run: () => {} },
+        {
+          plugins: [routing],
+          subCommands: {
+            clean: { name: 'clean', run: () => {} },
+            deploy: {
+              name: 'deploy',
+              args: { config: { type: 'boolean' } },
+              run: () => {}
+            }
+          }
+        }
+      )
+    )
+    const [resolution] = error.errors
+
+    expect(resolution).not.toBeInstanceOf(plugin.CommandResolutionError)
+    expect(plugin.isCommandResolutionError(resolution)).toBe(true)
+    expect((resolution as InstanceType<PluginModule['CommandResolutionError']>).code).toBe(
+      'err:cmd:inconsistent-options'
+    )
+    expect(plugin.hasPriorityValidationError(error)).toBe(true)
+  })
 })
 
 describe('@gunshi/bone with plugins built separately', () => {
