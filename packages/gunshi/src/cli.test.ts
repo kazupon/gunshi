@@ -14,6 +14,7 @@ import { hidden, string } from './combinators.ts'
 
 import type { ArgSchema, Args } from 'args-tokens'
 import type { Mocked } from 'vitest'
+import type { Plugin } from './plugin/core.ts'
 import type {
   CliOptions,
   Command,
@@ -3080,6 +3081,29 @@ describe('github issues', () => {
       await expect(cli([], entry, { ...base, plugins: [a, b] })).rejects.toThrow(
         'Circular dependency detected'
       )
+    })
+  })
+
+  describe('#761 - a plugin whose id is empty', () => {
+    test('a function with no id is rejected, and the command is not run', async () => {
+      const run = vi.fn<() => void>()
+      const setup = vi.fn<() => void>()
+      const raw = setup as unknown as Plugin
+
+      await expect(
+        cli(
+          [],
+          { name: 'root', run },
+          {
+            name: 'my-cli',
+            version: '0.0.0',
+            usageSilent: true,
+            plugins: [raw]
+          }
+        )
+      ).rejects.toThrow('Plugin id must be a non-empty string')
+      expect(run).not.toHaveBeenCalled()
+      expect(setup).not.toHaveBeenCalled()
     })
   })
 

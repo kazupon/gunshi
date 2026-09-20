@@ -534,3 +534,17 @@ describe('Plugin Extensions Integration', () => {
     expect(onExtension).toHaveBeenCalledWith(ctx, contextCommand)
   })
 })
+
+describe('#761 - a plugin whose id is empty', () => {
+  test('plugin({ id: "" }) is rejected', () => {
+    expect(() => plugin({ id: '' })).toThrow('Plugin id must be a non-empty string')
+  })
+
+  test('plugin() with no id is rejected', () => {
+    expect(() => plugin({} as { id: string })).toThrow('Plugin id must be a non-empty string')
+  })
+
+  test('a plugin with an id is left alone', () => {
+    expect(plugin({ id: 'ok' }).id).toBe('ok')
+  })
+})

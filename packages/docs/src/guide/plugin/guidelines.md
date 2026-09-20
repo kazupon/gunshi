@@ -38,7 +38,7 @@ Type safety prevents runtime errors and improves developer experience. Performan
 
 ### Plugin IDs
 
-Use namespaced IDs to prevent conflicts and clearly identify plugin ownership.
+Use namespaced IDs to prevent conflicts and clearly identify plugin ownership. An id must be a non-empty string; `plugin()` and the installer both reject an empty one.
 
 Namespacing prevents ID collisions in large applications where multiple teams might develop plugins independently.
 
