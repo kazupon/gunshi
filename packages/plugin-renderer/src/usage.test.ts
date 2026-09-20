@@ -4,6 +4,7 @@ import { createCommandContext } from '../../gunshi/src/context.ts'
 import { lazy } from '../../gunshi/src/definition.ts'
 import renderer from './index.ts'
 import { renderUsage } from './usage.ts'
+import { displayWidth } from './width.ts'
 
 import type {
   ArgSchema,
@@ -1665,5 +1666,143 @@ describe('#748 - the commands section is localized', () => {
 
     expect(rows.find(row => row.includes('deploy'))).toContain('Deploy the app')
     expect(loader).not.toHaveBeenCalled()
+  })
+})
+
+describe('#749 - the columns are aligned by the width a terminal draws', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  async function usageOf(args: Args, subCommands?: Map<string, TestCommand>): Promise<string> {
+    const command = { args, name: 'main', description: 'Main', run: NOOP } as TestCommand
+    const ctx = await createCommandContext({
+      args,
+      omitted: subCommands !== undefined,
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { cwd: '/path/to/main', name: 'my-cli', version: '0.0.0', subCommands }
+    })
+    return await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  /**
+   * The column each description starts at, measured the way a terminal would.
+   *
+   * @param usage - The rendered usage
+   * @param heading - The section to look at
+   * @returns The column of every row of the section
+   */
+  function descriptionColumns(usage: string, heading: string): number[] {
+    const lines = usage.split('\n')
+    const start = lines.indexOf(`${heading}:`)
+    const columns: number[] = []
+    for (let i = start + 1; i < lines.length && lines[i].trim() !== ''; i++) {
+      const row = lines[i]
+      // the indent first, so that the run of spaces below is the one before the description
+      const indent = row.length - row.trimStart().length
+      const rest = row.slice(indent)
+      const separator = /\s{2,}/.exec(rest)
+      if (separator) {
+        const prefix = rest.slice(0, separator.index + separator[0].length)
+        columns.push(indent + displayWidth(prefix))
+      }
+    }
+    return columns
+  }
+
+  test('the commands section lines up with a full-width command name', async () => {
+    const deploy = {
+      name: '配置',
+      description: 'Deploy it',
+      args: { target: { type: 'string', description: 'Target' } },
+      run: NOOP
+    } as TestCommand
+    const build = { name: 'build', description: 'Build it', run: NOOP } as TestCommand
+
+    const usage = await usageOf(
+      {},
+      new Map([
+        ['配置', deploy],
+        ['build', build]
+      ])
+    )
+
+    expect(new Set(descriptionColumns(usage, 'COMMANDS')).size).toEqual(1)
+  })
+
+  test('the arguments section lines up with a full-width name', async () => {
+    const usage = await usageOf({
+      対象: { type: 'positional', description: 'Target' },
+      rest: { type: 'positional', description: 'Rest' }
+    })
+
+    expect(new Set(descriptionColumns(usage, 'ARGUMENTS')).size).toEqual(1)
+  })
+
+  test('the options section lines up with a full-width name', async () => {
+    const usage = await usageOf({
+      出力: { type: 'string', description: 'Output' },
+      quiet: { type: 'boolean', description: 'Quiet' }
+    })
+
+    expect(new Set(descriptionColumns(usage, 'OPTIONS')).size).toEqual(1)
+  })
+
+  test('a combining mark does not push the column the other way', async () => {
+    // `créer` written as `e` + U+0301: five columns, six code units
+    const usage = await usageOf({
+      'cre\u0301er': { type: 'string', description: 'Create' },
+      quiet: { type: 'boolean', description: 'Quiet' }
+    })
+
+    expect(new Set(descriptionColumns(usage, 'OPTIONS')).size).toEqual(1)
+  })
+
+  test('a cli with ascii names only renders exactly as before', async () => {
+    const usage = await usageOf({
+      output: { type: 'string', description: 'Output' },
+      quiet: { type: 'boolean', description: 'Quiet' }
+    })
+
+    expect(usage).toContain('--output <output>')
+    expect(new Set(descriptionColumns(usage, 'OPTIONS')).size).toEqual(1)
+    // the padding is the one `padEnd` would have produced
+    const row = usage.split('\n').find(line => line.includes('--quiet'))!
+    expect(row).toEqual(row.trimEnd())
+  })
+
+  test('the padding is the number of columns a terminal draws, not a consistent guess', async () => {
+    /**
+     * NOTE(kazupon): the rows above are compared with `displayWidth`, so they stay aligned even if
+     * `displayWidth` is wrong in a consistent way. These two lines pin the numbers themselves:
+     * `対象` is four columns, so it is followed by eleven spaces, the same as `rest`.
+     */
+    const usage = await usageOf({
+      対象: { type: 'positional', description: 'Target' },
+      rest: { type: 'positional', description: 'Rest' }
+    })
+    const lines = usage.split('\n')
+    const start = lines.indexOf('ARGUMENTS:')
+
+    expect(lines.slice(start + 1, start + 3)).toEqual([
+      '  対象           Target',
+      '  rest           Rest'
+    ])
+  })
+
+  test('the left margin is not measured in columns', async () => {
+    // `padStart(leftMargin + x.length)` is an indent idiom; measuring it in columns would
+    // indent a row with a full-width name further than the others
+    const usage = await usageOf({
+      対象: { type: 'positional', description: 'Target' },
+      rest: { type: 'positional', description: 'Rest' }
+    })
+    const rows = usage
+      .split('\n')
+      .slice(usage.split('\n').indexOf('ARGUMENTS:') + 1)
+      .filter(line => line.trim() !== '')
+      .slice(0, 2)
+
+    const indents = rows.map(row => /^ */.exec(row)![0].length)
+    expect(new Set(indents).size).toEqual(1)
   })
 })

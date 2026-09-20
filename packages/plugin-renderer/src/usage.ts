@@ -16,6 +16,7 @@ import {
   resolveOptionNames
 } from '@gunshi/shared'
 import { pluginId } from './types.ts'
+import { displayWidth, padEndToWidth } from './width.ts'
 
 import type {
   ArgSchema,
@@ -221,14 +222,14 @@ async function renderCommandsSection<
   const commandSymbols = await Promise.all(
     loadedCommands.map(async cmd => await makeCommandSymbol(ctx, cmd))
   )
-  const symbolMaxLength = Math.max(...commandSymbols.map(symbol => symbol.length))
+  const symbolMaxLength = Math.max(...commandSymbols.map(symbol => displayWidth(symbol)))
   const descriptions = await Promise.all(
     loadedCommands.map(async cmd => await ctx.extensions[pluginId].localizeCommandDescription(cmd))
   )
   const commandsStr = descriptions.map((desc, index) => {
     const commandStr = commandSymbols[index]
     const command = desc
-      ? `${commandStr.padEnd(symbolMaxLength + ctx.env.middleMargin)}${desc}`
+      ? `${padEndToWidth(commandStr, symbolMaxLength + ctx.env.middleMargin)}${desc}`
       : commandStr
     return `${command.padStart(ctx.env.leftMargin + command.length)}`
   })
@@ -548,10 +549,10 @@ async function generateOptionalArgsUsage<
     return ''
   }
 
-  const optionsMaxLength = Math.max(...optionsPairsEntries.map(([_, value]) => value.length))
+  const optionsMaxLength = Math.max(...optionsPairsEntries.map(([_, value]) => displayWidth(value)))
 
   const optionSchemaMaxLength = ctx.env.usageOptionType
-    ? Math.max(...optionsPairsEntries.map(([key]) => resolveNegatableType(key, ctx).length))
+    ? Math.max(...optionsPairsEntries.map(([key]) => displayWidth(resolveNegatableType(key, ctx))))
     : 0
 
   const usages = await Promise.all(
@@ -574,9 +575,9 @@ async function generateOptionalArgsUsage<
         ? ''
         : await resolveDisplayValue(ctx, key)
       // padEnd is used to align the `[]` symbols
-      const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
+      const desc = `${optionsSchema ? padEndToWidth(optionsSchema, optionSchemaMaxLength + 3) : ''}${rawDesc}`
       const descLength = desc.length + valueDesc.length
-      const option = `${value.padEnd((descLength > 0 ? optionsMaxLength : 0) + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
+      const option = `${padEndToWidth(value, (descLength > 0 ? optionsMaxLength : 0) + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
       return `${option.padStart(ctx.env.leftMargin + option.length)}`
     })
   )
@@ -599,7 +600,7 @@ async function generatePositionalArgsUsage<
     return ''
   }
 
-  const argsMaxLength = Math.max(...positionals.map(([name]) => name.length))
+  const argsMaxLength = Math.max(...positionals.map(([name]) => displayWidth(name)))
 
   const usages = await Promise.all(
     positionals.map(async ([name]) => {
@@ -607,7 +608,7 @@ async function generatePositionalArgsUsage<
         (await ctx.extensions[pluginId].text(resolveArgKey(name, ctx.name))) ||
         (ctx.args[name] as ArgSchema & { description?: string }).description ||
         ''
-      const arg = `${name.padEnd(argsMaxLength + ctx.env.middleMargin)} ${desc}`
+      const arg = `${padEndToWidth(name, argsMaxLength + ctx.env.middleMargin)} ${desc}`
       return `${arg.padStart(ctx.env.leftMargin + arg.length)}`
     })
   )
