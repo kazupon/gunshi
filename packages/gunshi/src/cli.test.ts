@@ -993,6 +993,7 @@ test('usageSilent silences ctx.log but not console.log', async () => {
   )
 
   expect(log()).toBe('')
+  expect(consoleLog).toHaveBeenCalledTimes(1)
   expect(consoleLog).toHaveBeenCalledWith('via console.log')
 })
 
