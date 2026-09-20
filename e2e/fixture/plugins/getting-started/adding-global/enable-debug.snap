@@ -77,7 +77,8 @@ Context: [Object: null prototype] {
     },
     'g:renderer': {
       text: [AsyncFunction: localize],
-      loadCommands: [AsyncFunction: loadCommands]
+      loadCommands: [AsyncFunction: loadCommands],
+      localizeCommandDescription: [AsyncFunction: localizeCommandDescription]
     },
     debug: [Object: null prototype] {}
   }

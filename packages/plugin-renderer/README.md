@@ -138,6 +138,8 @@ Available extensions:
 
 - **`loadCommands<G>(): Promise<Command<G>[]>`**: Load and cache subcommands for rendering command lists. Results are cached after the first call for performance.
 
+- **`localizeCommandDescription(cmd): Promise<string>`**: Resolve the description of a command in the command list. Localized when `@gunshi/plugin-i18n` is installed and the command has a resource of its own; otherwise `Command.description`.
+
 ### Usage Example
 
 ```ts

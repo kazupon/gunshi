@@ -4,8 +4,8 @@ resource-cli (resource-cli v1.0.0)
   resource-cli [コマンド] <オプション>
 
 コマンド:
-  [resource-manager]
-  create <オプション>
+  [resource-manager]          Resource management tool
+  create <オプション>              リソースを作成
 
 詳細は、コマンドと`--help`フラグを実行してください:
   resource-cli --help
