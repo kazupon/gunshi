@@ -22,7 +22,7 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
 
   // build a map for quick lookup
   for (const plugin of plugins) {
-    if (!plugin.id) {
+    if (typeof plugin.id !== 'string' || plugin.id.length === 0) {
       throw new Error('Plugin id must be a non-empty string')
     }
     if (pluginMap.has(plugin.id)) {
@@ -32,7 +32,7 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
   }
 
   function visit(plugin: Plugin<E>) {
-    if (!plugin.id) {
+    if (typeof plugin.id !== 'string' || plugin.id.length === 0) {
       throw new Error('Plugin id must be a non-empty string')
     }
     if (visited.has(plugin.id)) {

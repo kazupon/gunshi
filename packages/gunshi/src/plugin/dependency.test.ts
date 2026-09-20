@@ -114,6 +114,15 @@ describe('resolveDependencies', () => {
     )
   })
 
+  test('a non-string id is rejected', () => {
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const bad = { id: 1, name: 'n' } as unknown as Plugin
+
+    expect(() => resolveDependencies([bad, pluginA])).toThrow(
+      'Plugin id must be a non-empty string'
+    )
+  })
+
   test('handle PluginDependency objects array', () => {
     const pluginA = plugin({ id: 'a', name: 'a' })
     const pluginB = plugin({ id: 'b', name: 'b' })

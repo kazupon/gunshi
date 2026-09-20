@@ -544,6 +544,10 @@ describe('#761 - a plugin whose id is empty', () => {
     expect(() => plugin({} as { id: string })).toThrow('Plugin id must be a non-empty string')
   })
 
+  test.each([1, true, {}])('a non-string id is rejected (%s)', id => {
+    expect(() => plugin({ id } as { id: string })).toThrow('Plugin id must be a non-empty string')
+  })
+
   test('a plugin with an id is left alone', () => {
     expect(plugin({ id: 'ok' }).id).toBe('ok')
   })

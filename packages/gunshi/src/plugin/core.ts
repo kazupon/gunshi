@@ -420,7 +420,7 @@ export function plugin(options: any = {}): any {
     dependencies?: ReadonlyArray<string>
   } = options
 
-  if (!id) {
+  if (typeof id !== 'string' || id.length === 0) {
     throw new Error('Plugin id must be a non-empty string')
   }
 
