@@ -289,13 +289,17 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
 ): LazyCommand<G, any> {
   let lazyCommand = loader as LazyCommand<G, any>
 
-  // A lazy command without a definition name still needs a marker so that it can
-  // be distinguished from an inline command runner. Preserve the loader's
-  // existing identity whenever its function object can be extended.
+  // Definition metadata and marker properties are copied onto the loader below.
+  // Preserve its identity whenever the function object can be extended, and use
+  // a delegating wrapper when the loader cannot be modified.
+  if (
+    (definition != null || !('commandName' in lazyCommand)) &&
+    !Object.isExtensible(lazyCommand)
+  ) {
+    lazyCommand = Object.assign(() => loader(), loader) as LazyCommand<G, any>
+  }
+
   if (definition == null && !('commandName' in lazyCommand)) {
-    if (!Object.isExtensible(lazyCommand)) {
-      lazyCommand = Object.assign(() => loader(), loader) as LazyCommand<G, any>
-    }
     lazyCommand.commandName = undefined
   }
 

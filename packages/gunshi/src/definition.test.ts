@@ -292,6 +292,24 @@ describe('lazy', () => {
     expect(marked).toHaveProperty('commandName', undefined)
   })
 
+  test('wraps a frozen loader before copying an inline definition', async () => {
+    const run = vi.fn<CommandRunner>()
+    let loaderCalls = 0
+    const loader = Object.freeze(() => {
+      loaderCalls++
+      return run
+    })
+    const definition = { args: { target: { type: 'string' } } } satisfies { args: Args }
+
+    const marked = lazy(loader, definition)
+
+    expect(marked).not.toBe(loader)
+    expect(Object.hasOwn(loader, 'args')).toBe(false)
+    expect(marked.args).toEqual(definition.args)
+    expect(await marked()).toBe(run)
+    expect(loaderCalls).toBe(1)
+  })
+
   test('basic', async () => {
     const subCommands = new Map()
     const test = define({
