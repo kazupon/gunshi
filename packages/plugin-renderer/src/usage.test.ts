@@ -1463,3 +1463,90 @@ describe('#747 - the CLI is named the same way in the "for more info" block', ()
     expect(forMoreLines(usage)[0].split(' ')[0]).toBe(usageLine.split(' ')[0])
   })
 })
+
+describe('#750 - a falsy default is a default', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  async function render(args: Args, subCommands?: Map<string, TestCommand>): Promise<string> {
+    const command = { args, name: 'app', description: 'App', run: NOOP } as TestCommand
+    const ctx = await createCommandContext({
+      args,
+      omitted: subCommands !== undefined,
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { cwd: '/path/to/app', name: 'app', version: '0.0.0', subCommands }
+    })
+    return await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  test.each([
+    ['a number default of `0`', { retries: { type: 'number', default: 0 } }, 'retries'],
+    ['an empty string default', { tag: { type: 'string', default: '' } }, 'tag'],
+    ['a custom default of `0`', { size: { type: 'custom', default: 0 } }, 'size']
+  ])('is shown with square brackets (%s)', async (_, args, name) => {
+    const usage = await render(args as Args)
+
+    expect(usage).toContain(`--${name} [${name}]`)
+    expect(usage).not.toContain(`--${name} <${name}>`)
+  })
+
+  test('an argument with no default keeps its angle brackets', async () => {
+    const usage = await render({ name: { type: 'string', description: 'Name' } })
+
+    expect(usage).toContain('--name <name>')
+  })
+
+  test('the usage line is `[OPTIONS]` when every option has a default, falsy or not', async () => {
+    const usage = await render({
+      retries: { type: 'number', default: 0 },
+      tag: { type: 'string', default: '' },
+      quiet: { type: 'boolean', default: false }
+    })
+
+    expect(usage).toContain('app [OPTIONS]')
+  })
+
+  test('the usage line stays `<OPTIONS>` while one option has no default', async () => {
+    const usage = await render({
+      retries: { type: 'number', default: 0 },
+      name: { type: 'string' }
+    })
+
+    expect(usage).toContain('app <OPTIONS>')
+  })
+
+  test('the row no longer contradicts the default it prints', async () => {
+    const usage = await render({ retries: { type: 'number', default: 0, description: 'Retries' } })
+    const row = usage.split('\n').find(line => line.includes('--retries'))!
+
+    expect(row).toContain('[retries]')
+    expect(row).toContain('(default: 0)')
+  })
+
+  test('a command in the commands section is listed the same way', async () => {
+    const alpha = {
+      name: 'alpha',
+      description: 'Alpha',
+      args: { verbose: { type: 'boolean', default: false } },
+      run: NOOP
+    } as TestCommand
+    const beta = {
+      name: 'beta',
+      description: 'Beta',
+      args: { level: { type: 'string', default: 'low' } },
+      run: NOOP
+    } as TestCommand
+
+    const usage = await render(
+      {},
+      new Map([
+        ['alpha', alpha],
+        ['beta', beta]
+      ])
+    )
+    const rows = usage.split('\n')
+
+    expect(rows.find(row => row.includes('alpha'))).toContain('alpha [OPTIONS]')
+    expect(rows.find(row => row.includes('beta'))).toContain('beta [OPTIONS]')
+  })
+})

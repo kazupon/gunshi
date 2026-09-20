@@ -406,7 +406,14 @@ function hasPositionalArgs(args: Args): boolean {
  */
 function hasAllDefaultOptions(args: Args): boolean {
   const visibleOptionalArgs = getVisibleOptionalArgs(args)
-  return visibleOptionalArgs.length > 0 && visibleOptionalArgs.every(([_, arg]) => arg.default)
+  /**
+   * NOTE(kazupon): an argument has a default when one is declared, whatever its value. `0`, `''` and
+   * `false` are defaults like any other, and an option that has one is not required (#750).
+   */
+  return (
+    visibleOptionalArgs.length > 0 &&
+    visibleOptionalArgs.every(([_, arg]) => arg.default !== undefined)
+  )
 }
 
 /**
@@ -453,7 +460,8 @@ function getOptionalArgsPairs<G extends GunshiParams>(
       const displayName = resolveDisplayName(name, schema, ctx.toKebab)
       let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
       if (schema.type !== 'boolean') {
-        key = schema.default ? `${key} [${displayName}]` : `${key} <${displayName}>`
+        // an argument with a default is optional, whatever the value of that default is (#750)
+        key = schema.default === undefined ? `${key} <${displayName}>` : `${key} [${displayName}]`
       }
       acc[name] = key
       if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {
