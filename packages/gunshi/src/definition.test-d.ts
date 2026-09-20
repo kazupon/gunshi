@@ -166,6 +166,20 @@ describe('lazy', () => {
     expectTypeOf(lazyCommand.commandName).toEqualTypeOf<string | undefined>()
   })
 
+  test('infers an unnamed definition and keeps commandName optional', () => {
+    const lazyCommand = lazy(
+      () => {
+        return ctx => {
+          expectTypeOf(ctx.values.input).toEqualTypeOf<string>()
+        }
+      },
+      { args: commandArgs }
+    )
+
+    expectTypeOf(lazyCommand.commandName).toEqualTypeOf<string | undefined>()
+    expectTypeOf(lazyCommand.args).toEqualTypeOf<typeof commandArgs>()
+  })
+
   test('preserves inline definition metadata without args', () => {
     const lazyCommand = lazy(
       () => {
@@ -200,6 +214,16 @@ describe('lazy', () => {
 })
 
 describe('lazyWithTypes', () => {
+  test('infers an unnamed lazy command without a definition', () => {
+    const lazyCommand = lazyWithTypes<{ args: typeof commandArgs }>()(() => {
+      return ctx => {
+        expectTypeOf(ctx.values.input).toEqualTypeOf<string>()
+      }
+    })
+
+    expectTypeOf(lazyCommand.commandName).toEqualTypeOf<string | undefined>()
+  })
+
   test('respects explicit args', () => {
     lazyWithTypes<{ args: typeof commandArgs }>()(
       () => {

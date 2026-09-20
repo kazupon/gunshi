@@ -248,7 +248,8 @@ export function lazy<A extends Args>(
  * @typeParam D - A partial {@link Command} definition type with required `args`
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - A {@link Command | command} definition
+ * @param definition - A {@link Command | command} definition. Its `name` may be omitted,
+ *   including when the lazy command is used as the CLI entry command.
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
 export function lazy<
@@ -265,7 +266,8 @@ export function lazy<
  * @typeParam D - A partial {@link Command} definition type
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - An optional {@link Command | command} definition
+ * @param definition - An optional {@link Command | command} definition. Its `name` may be omitted,
+ *   including when the lazy command is used as the CLI entry command.
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
 export function lazy<
@@ -277,14 +279,29 @@ export function lazy<
  * Define a {@link LazyCommand | lazy command} with or without definition.
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - An optional {@link Command | command} definition
+ * @param definition - An optional {@link Command | command} definition. Its `name` may be omitted,
+ *   including when the lazy command is used as the CLI entry command.
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
 export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition?: Partial<Command<G>>
 ): LazyCommand<G, any> {
-  const lazyCommand = loader as LazyCommand<G, any>
+  let lazyCommand = loader as LazyCommand<G, any>
+
+  // Definition metadata and marker properties are copied onto the loader below.
+  // Preserve its identity whenever the function object can be extended, and use
+  // a delegating wrapper when the loader cannot be modified.
+  if (
+    (definition != null || !('commandName' in lazyCommand)) &&
+    !Object.isExtensible(lazyCommand)
+  ) {
+    lazyCommand = Object.assign(() => loader(), loader) as LazyCommand<G, any>
+  }
+
+  if (definition == null && !('commandName' in lazyCommand)) {
+    lazyCommand.commandName = undefined
+  }
 
   if (definition != null) {
     // copy existing properties

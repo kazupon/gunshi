@@ -267,6 +267,49 @@ describe('defineWithTypes', () => {
 })
 
 describe('lazy', () => {
+  test('marks an unnamed loader as lazy without changing an existing marker', () => {
+    const run = () => {}
+    const loader = Object.assign(() => run, { commandName: 'existing' })
+    const unnamed = () => run
+
+    const marked = lazy(unnamed)
+    const existing = lazy(loader)
+
+    expect(marked).toBe(unnamed)
+    expect(marked).toHaveProperty('commandName', undefined)
+    expect(existing).toBe(loader)
+    expect(existing.commandName).toBe('existing')
+  })
+
+  test('wraps a frozen unnamed loader without mutating it', () => {
+    const run = () => {}
+    const loader = Object.freeze(() => run)
+
+    const marked = lazy(loader)
+
+    expect(marked).not.toBe(loader)
+    expect(Object.hasOwn(loader, 'commandName')).toBe(false)
+    expect(marked).toHaveProperty('commandName', undefined)
+  })
+
+  test('wraps a frozen loader before copying an inline definition', async () => {
+    const run = vi.fn<CommandRunner>()
+    let loaderCalls = 0
+    const loader = Object.freeze(() => {
+      loaderCalls++
+      return run
+    })
+    const definition = { args: { target: { type: 'string' } } } satisfies { args: Args }
+
+    const marked = lazy(loader, definition)
+
+    expect(marked).not.toBe(loader)
+    expect(Object.hasOwn(loader, 'args')).toBe(false)
+    expect(marked.args).toEqual(definition.args)
+    expect(await marked()).toBe(run)
+    expect(loaderCalls).toBe(1)
+  })
+
   test('basic', async () => {
     const subCommands = new Map()
     const test = define({
