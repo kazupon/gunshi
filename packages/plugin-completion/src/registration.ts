@@ -556,11 +556,16 @@ function alignRootShortArity(
       if (!typedBehind) {
         continue
       }
-      // re-register the root's option with the arity the command gives the letter
+      /**
+       * NOTE(kazupon): the entry is keyed by the short name as it is typed, which is the first
+       * thing `RootCommand#findOption` looks up. The option that owns the letter keeps its own
+       * entry, so its long name keeps the arity it was registered with: aligning `-h` for this
+       * command must not make `--help` swallow the word after it.
+       */
       if (option.isBoolean) {
-        t.option(rootOption.value, rootOption.description ?? '', rootOption.alias)
+        t.option(short, rootOption.description ?? '')
       } else {
-        t.option(rootOption.value, rootOption.description ?? '', () => {}, rootOption.alias)
+        t.option(short, rootOption.description ?? '', () => {})
       }
     }
   }
