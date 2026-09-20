@@ -6,7 +6,7 @@
 
 > usage renderer plugin for gunshi.
 
-This plugin provides customizable rendering for CLI help messages, usage information, and validation errors. It automatically formats command descriptions, arguments, options, examples, and error messages in a consistent and readable format.
+This plugin provides customizable rendering for CLI help messages, usage information, and validation errors. It automatically formats command descriptions, arguments, options, examples, and error messages in a consistent and readable format. Description columns are aligned by the width a terminal draws, including full-width names; emoji sequences joined with ZWJ may still differ by terminal.
 
 ## 💿 Installation
 
