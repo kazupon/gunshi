@@ -14,6 +14,10 @@ describe('displayWidth', () => {
     expect(displayWidth(value)).toEqual(width)
   })
 
+  test('halfwidth katakana stays one column', () => {
+    expect(displayWidth('ｱｲｳ')).toEqual(3)
+  })
+
   test('a mix of wide and narrow adds up', () => {
     expect(displayWidth('<オプション>')).toEqual(12)
   })

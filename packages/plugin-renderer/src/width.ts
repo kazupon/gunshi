@@ -10,130 +10,36 @@
  * written with. The text is walked by grapheme, so that a mark or a joiner is part of the character
  * it belongs to, and each grapheme is measured by the code point it starts with.
  *
- * The ranges below are the East Asian Wide and Fullwidth ones of Unicode, coalesced over the
- * unassigned code points between them.
+ * JavaScript has no `\p{East_Asian_Width=Wide}` escape. Wide columns are those the engine already
+ * classifies as Han / Hiragana / Katakana / Hangul or emoji-presentation, plus the fullwidth slice
+ * of Halfwidth and Fullwidth Forms. That covers CLI names; the rest of the East Asian Width table
+ * is symbols that do not appear there. Unicode updates then come with the runtime.
  */
-const WIDE_RANGES: readonly (readonly [number, number])[] = [
-  [0x11_00, 0x11_5f],
-  [0x23_1a, 0x23_1b],
-  [0x23_29, 0x23_2a],
-  [0x23_e9, 0x23_ec],
-  [0x23_f0, 0x23_f0],
-  [0x23_f3, 0x23_f3],
-  [0x25_fd, 0x25_fe],
-  [0x26_14, 0x26_15],
-  [0x26_30, 0x26_37],
-  [0x26_48, 0x26_53],
-  [0x26_7f, 0x26_7f],
-  [0x26_8a, 0x26_8f],
-  [0x26_93, 0x26_93],
-  [0x26_a1, 0x26_a1],
-  [0x26_aa, 0x26_ab],
-  [0x26_bd, 0x26_be],
-  [0x26_c4, 0x26_c5],
-  [0x26_ce, 0x26_ce],
-  [0x26_d4, 0x26_d4],
-  [0x26_ea, 0x26_ea],
-  [0x26_f2, 0x26_f3],
-  [0x26_f5, 0x26_f5],
-  [0x26_fa, 0x26_fa],
-  [0x26_fd, 0x26_fd],
-  [0x27_05, 0x27_05],
-  [0x27_0a, 0x27_0b],
-  [0x27_28, 0x27_28],
-  [0x27_4c, 0x27_4c],
-  [0x27_4e, 0x27_4e],
-  [0x27_53, 0x27_55],
-  [0x27_57, 0x27_57],
-  [0x27_95, 0x27_97],
-  [0x27_b0, 0x27_b0],
-  [0x27_bf, 0x27_bf],
-  [0x2b_1b, 0x2b_1c],
-  [0x2b_50, 0x2b_50],
-  [0x2b_55, 0x2b_55],
-  [0x2e_80, 0x30_3e],
-  [0x30_41, 0x33_ff],
-  [0x34_00, 0x4d_bf],
-  [0x4e_00, 0xa4_cf],
-  [0xa9_60, 0xa9_7f],
-  [0xac_00, 0xd7_a3],
-  [0xf9_00, 0xfa_ff],
-  [0xfe_10, 0xfe_19],
-  [0xfe_30, 0xfe_52],
-  [0xfe_54, 0xfe_66],
-  [0xfe_68, 0xfe_6b],
-  [0xff_01, 0xff_60],
-  [0xff_e0, 0xff_e6],
-  [0x1_6f_e0, 0x1_6f_e4],
-  [0x1_6f_f0, 0x1_6f_f1],
-  [0x1_70_00, 0x1_8c_d5],
-  [0x1_8c_ff, 0x1_8d_08],
-  [0x1_af_f0, 0x1_b1_6f],
-  [0x1_b1_70, 0x1_b2_ff],
-  [0x1_f0_04, 0x1_f0_04],
-  [0x1_f0_cf, 0x1_f0_cf],
-  [0x1_f1_8e, 0x1_f1_8e],
-  [0x1_f1_91, 0x1_f1_9a],
-  [0x1_f2_00, 0x1_f3_20],
-  [0x1_f3_2d, 0x1_f3_35],
-  [0x1_f3_37, 0x1_f3_7c],
-  [0x1_f3_7e, 0x1_f3_93],
-  [0x1_f3_a0, 0x1_f3_ca],
-  [0x1_f3_cf, 0x1_f3_d3],
-  [0x1_f3_e0, 0x1_f3_f0],
-  [0x1_f3_f4, 0x1_f3_f4],
-  [0x1_f3_f8, 0x1_f4_3e],
-  [0x1_f4_40, 0x1_f4_40],
-  [0x1_f4_42, 0x1_f4_fc],
-  [0x1_f4_ff, 0x1_f5_3d],
-  [0x1_f5_4b, 0x1_f5_4e],
-  [0x1_f5_50, 0x1_f5_67],
-  [0x1_f5_7a, 0x1_f5_7a],
-  [0x1_f5_95, 0x1_f5_96],
-  [0x1_f5_a4, 0x1_f5_a4],
-  [0x1_f5_fb, 0x1_f6_4f],
-  [0x1_f6_80, 0x1_f6_c5],
-  [0x1_f6_cc, 0x1_f6_cc],
-  [0x1_f6_d0, 0x1_f6_d2],
-  [0x1_f6_d5, 0x1_f6_d7],
-  [0x1_f6_dc, 0x1_f6_df],
-  [0x1_f6_eb, 0x1_f6_ec],
-  [0x1_f6_f4, 0x1_f6_fc],
-  [0x1_f7_e0, 0x1_f7_eb],
-  [0x1_f7_f0, 0x1_f7_f0],
-  [0x1_f9_0c, 0x1_f9_3a],
-  [0x1_f9_3c, 0x1_f9_45],
-  [0x1_f9_47, 0x1_f9_ff],
-  [0x1_fa_70, 0x1_fa_ff],
-  [0x2_00_00, 0x2_ff_fd],
-  [0x3_00_00, 0x3_ff_fd]
-]
+const WIDE =
+  /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Emoji_Presentation}]/u
 
-/**
- * The format characters that a terminal draws nothing for.
- */
-const ZERO_WIDTH_RANGES: readonly (readonly [number, number])[] = [
-  [0x20_0b, 0x20_0f],
-  [0x20_28, 0x20_2e],
-  [0x20_60, 0x20_64],
-  [0xfe_ff, 0xfe_ff]
-]
+const ZERO_WIDTH = /\p{Default_Ignorable_Code_Point}/u
 
-function inRanges(codePoint: number, ranges: readonly (readonly [number, number])[]): boolean {
-  let low = 0
-  let high = ranges.length - 1
-  while (low <= high) {
-    const middle = (low + high) >> 1
-    const [start, end] = ranges[middle]
-    if (codePoint < start) {
-      high = middle - 1
-    } else if (codePoint > end) {
-      low = middle + 1
-    } else {
-      return true
-    }
+function graphemeWidth(codePoint: number): number {
+  const ch = String.fromCodePoint(codePoint)
+  if (ZERO_WIDTH.test(ch)) {
+    return 0
   }
-  return false
+  /**
+   * Halfwidth and Fullwidth Forms: only the fullwidth slices are two columns. The rest of the
+   * block is halfwidth katakana / hangul, which `\p{Script=Katakana}` and `\p{Script=Hangul}`
+   * would otherwise count as wide.
+   */
+  if (codePoint >= 0xff00 && codePoint <= 0xffef) {
+    if (
+      (codePoint >= 0xff01 && codePoint <= 0xff60) ||
+      (codePoint >= 0xffe0 && codePoint <= 0xffe6)
+    ) {
+      return 2
+    }
+    return 1
+  }
+  return WIDE.test(ch) ? 2 : 1
 }
 
 const segmenter = new Intl.Segmenter()
@@ -147,11 +53,7 @@ const segmenter = new Intl.Segmenter()
 export function displayWidth(value: string): number {
   let width = 0
   for (const { segment } of segmenter.segment(value)) {
-    const codePoint = segment.codePointAt(0)!
-    if (inRanges(codePoint, ZERO_WIDTH_RANGES)) {
-      continue
-    }
-    width += inRanges(codePoint, WIDE_RANGES) ? 2 : 1
+    width += graphemeWidth(segment.codePointAt(0)!)
   }
   return width
 }
