@@ -528,7 +528,7 @@ function stripLeadingEmptyWords(args: string[]): string[] {
  * wherever it is typed (#744). The root is made to agree with the command for this request, and
  * only when the letter was typed behind that command, so that the same letter in front of a command
  * name still means the global option. A fix upstream, where the lookup would follow the command
- * that was matched, takes the place of this.
+ * that was matched, takes the place of this: https://github.com/bombshell-dev/tab/issues/153
  *
  * @param t - The completion root command
  * @param registered - The completion commands registered so far, the completion root first
