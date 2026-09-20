@@ -235,10 +235,14 @@ async function renderCommandsSection<
     '',
     `${await ctx.extensions[pluginId].text(resolveBuiltInKey('FORMORE'))}:`
   )
+  /**
+   * NOTE(kazupon): the CLI is named the same way the usage line and the entry row of the section
+   * above name it, because `CliOptions.name` is optional and the block would otherwise invite the
+   * reader to run `undefined --help`.
+   */
+  const entry = await resolveEntry(ctx)
   const basePath =
-    ctx.commandPath && ctx.commandPath.length > 0
-      ? `${ctx.env.name} ${ctx.commandPath.join(' ')}`
-      : ctx.env.name
+    ctx.commandPath && ctx.commandPath.length > 0 ? `${entry} ${ctx.commandPath.join(' ')}` : entry
   messages.push(
     ...loadedCommands.map(cmd => {
       let commandStr = cmd.entry ? '' : cmd.name || ''

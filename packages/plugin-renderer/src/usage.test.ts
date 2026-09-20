@@ -1339,3 +1339,127 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
     expect(usage).toMatch(/--no-dryRun\s+Negatable of -d, --dryRun/)
   })
 })
+
+describe('#747 - the CLI is named the same way in the "for more info" block', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  const ENTRY = { name: 'entry', description: 'Entry', entry: true, run: NOOP } as TestCommand
+  const CMD1 = { name: 'cmd1', description: 'C1', run: NOOP } as TestCommand
+  const CMD2 = { name: 'cmd2', description: 'C2', run: NOOP } as TestCommand
+  const REMOTE = { name: 'remote', description: 'Remote', entry: true, run: NOOP } as TestCommand
+  const ADD = { name: 'add', description: 'Add', run: NOOP } as TestCommand
+  const REMOVE = { name: 'remove', description: 'Remove', run: NOOP } as TestCommand
+
+  const jaPlugin = i18n({
+    locale: 'ja-JP',
+    builtinResources: {
+      'ja-JP': {
+        COMMAND: 'コマンド',
+        FORMORE: '詳細は、コマンドと`--help`フラグを実行してください'
+      }
+    }
+  })
+
+  async function renderPage(
+    options: {
+      name?: string
+      commandPath?: string[]
+      subCommands?: Map<string, TestCommand>
+      locale?: boolean
+    } = {}
+  ): Promise<string> {
+    const subCommands =
+      options.subCommands ??
+      new Map<string, TestCommand>([
+        ['entry', ENTRY],
+        ['cmd1', CMD1],
+        ['cmd2', CMD2]
+      ])
+    const ctx = await createCommandContext({
+      args: {},
+      omitted: true,
+      commandPath: options.commandPath ?? [],
+      command: options.commandPath?.length ? REMOTE : ENTRY,
+      extensions: options.locale
+        ? { [jaPlugin.id]: jaPlugin.extension, [rendererPlugin.id]: rendererPlugin.extension }
+        : { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { version: '0.0.0', ...(options.name ? { name: options.name } : {}), subCommands }
+    })
+    return options.locale
+      ? await renderUsage<WithI18nAndRenderer>(ctx)
+      : await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  /**
+   * Take the lines of the block that follows the `for more info` heading.
+   *
+   * @param usage - A rendered usage
+   * @returns The lines of the block, trimmed
+   */
+  function forMoreLines(usage: string): string[] {
+    const lines = usage.split('\n')
+    const start = lines.findIndex(line => line.trim().endsWith(':') && line.includes('--help'))
+    expect(start).toBeGreaterThan(-1)
+    const rest = lines.slice(start + 1)
+    const end = rest.findIndex(line => line.trim() === '')
+    return (end === -1 ? rest : rest.slice(0, end)).map(line => line.trim())
+  }
+
+  const NESTED = new Map<string, TestCommand>([
+    ['remote', REMOTE],
+    ['add', ADD],
+    ['remove', REMOVE]
+  ])
+
+  test('a CLI with no name uses the placeholder the rest of the page uses', async () => {
+    const lines = forMoreLines(await renderPage())
+
+    expect(lines).toEqual(['COMMAND --help', 'COMMAND cmd1 --help', 'COMMAND cmd2 --help'])
+  })
+
+  test('a CLI with no name never says `undefined`', async () => {
+    expect(await renderPage()).not.toContain('undefined')
+  })
+
+  test('a CLI with a name is unchanged', async () => {
+    const lines = forMoreLines(await renderPage({ name: 'my-cli' }))
+
+    expect(lines).toEqual(['my-cli --help', 'my-cli cmd1 --help', 'my-cli cmd2 --help'])
+  })
+
+  test('the placeholder is localized', async () => {
+    const lines = forMoreLines(await renderPage({ locale: true }))
+
+    expect(lines).toEqual(['コマンド --help', 'コマンド cmd1 --help', 'コマンド cmd2 --help'])
+  })
+
+  test('a nested command keeps the path behind the placeholder', async () => {
+    const lines = forMoreLines(await renderPage({ commandPath: ['remote'], subCommands: NESTED }))
+
+    expect(lines).toEqual([
+      'COMMAND remote --help',
+      'COMMAND remote add --help',
+      'COMMAND remote remove --help'
+    ])
+  })
+
+  test('a nested command of a named CLI is unchanged', async () => {
+    const lines = forMoreLines(
+      await renderPage({ name: 'my-cli', commandPath: ['remote'], subCommands: NESTED })
+    )
+
+    expect(lines).toEqual([
+      'my-cli remote --help',
+      'my-cli remote add --help',
+      'my-cli remote remove --help'
+    ])
+  })
+
+  test('the block and the usage line name the CLI with the same word', async () => {
+    // whatever `resolveEntry()` falls back to, the page has to say it in both places
+    const usage = await renderPage()
+    const usageLine = usage.split('\n')[1].trim()
+
+    expect(forMoreLines(usage)[0].split(' ')[0]).toBe(usageLine.split(' ')[0])
+  })
+})
