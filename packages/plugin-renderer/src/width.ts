@@ -18,7 +18,7 @@
 const WIDE =
   /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Emoji_Presentation}]/u
 
-const ZERO_WIDTH = /\p{Default_Ignorable_Code_Point}/u
+const ZERO_WIDTH = /[\p{Default_Ignorable_Code_Point}\p{Mn}]/u
 
 function graphemeWidth(codePoint: number): number {
   const ch = String.fromCodePoint(codePoint)

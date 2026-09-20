@@ -26,6 +26,9 @@ describe('displayWidth', () => {
     // `e` + U+0301 is two code units and one column
     expect(displayWidth('café')).toEqual(4)
     expect('café'.length).toEqual(5)
+    // a mark with no base is its own grapheme; East Asian Width still draws nothing
+    expect(displayWidth('\u0301')).toEqual(0)
+    expect(displayWidth('\u0301a')).toEqual(1)
   })
 
   test('a surrogate pair is one wide character', () => {
