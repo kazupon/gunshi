@@ -167,6 +167,22 @@ export function createPluginContext<G extends GunshiParamsConstraint = DefaultGu
       if (globalOptions.has(name)) {
         throw new Error(`Global option '${name}' is already registered`)
       }
+      /**
+       * NOTE(kazupon): a short name belongs to one option. The global options of a CLI come from
+       * plugins that know nothing of each other, so two of them may reach for the same letter, and
+       * the parser would then match both and give neither the value that was typed. The one that
+       * asked first keeps the letter, and the other keeps its long name — the same way a global
+       * option gives its short name up to an argument of the command that claims it.
+       */
+      const taken = schema.short && findGlobalOptionByShort(globalOptions, schema.short)
+      if (taken) {
+        console.warn(
+          `Short name '-${schema.short}' of the global option '${name}' is already used by '${taken}'. ` +
+            `Global option '${name}' is registered without it.`
+        )
+        globalOptions.set(name, { ...schema, short: undefined })
+        return
+      }
       globalOptions.set(name, schema)
     },
 
@@ -235,4 +251,23 @@ export function createPluginContext<G extends GunshiParamsConstraint = DefaultGu
       decorators.addCommandDecorator(decorator as unknown as CommandDecorator<G>)
     }
   })
+}
+
+/**
+ * Find the global option that already uses a short name.
+ *
+ * @param globalOptions - The global options registered so far
+ * @param short - A short name, without the leading dash
+ * @returns The name of the global option that uses it, or `undefined`
+ */
+function findGlobalOptionByShort(
+  globalOptions: ReadonlyMap<string, ArgSchema>,
+  short: string
+): string | undefined {
+  for (const [name, schema] of globalOptions) {
+    if (schema.short === short) {
+      return name
+    }
+  }
+  return undefined
 }

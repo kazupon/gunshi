@@ -1,9 +1,10 @@
-import { describe, expect, expectTypeOf, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from './context.ts'
 
 import type { Args } from 'args-tokens'
+import type { MockInstance } from 'vitest'
 import type { GunshiParams } from '../types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
@@ -36,6 +37,80 @@ describe('PluginContext#addGlobalOpttion', () => {
     expect(() => ctx.addGlobalOption('foo', { type: 'string' })).toThrow(
       `Global option 'foo' is already registered`
     )
+  })
+
+  describe('a short name that another global option already uses', () => {
+    let warn: MockInstance<typeof console.warn>
+
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+      warn.mockRestore()
+    })
+
+    test('the one that asked second is registered without it', () => {
+      const ctx = createPluginContext(createDecorators())
+      ctx.addGlobalOption('config', { type: 'string', short: 'c', description: 'Config file' })
+      ctx.addGlobalOption('color', { type: 'boolean', short: 'c', description: 'Colorize output' })
+
+      expect(ctx.globalOptions.get('color')).toEqual({
+        type: 'boolean',
+        short: undefined,
+        description: 'Colorize output'
+      })
+    })
+
+    test('the one that asked first keeps it', () => {
+      const ctx = createPluginContext(createDecorators())
+      ctx.addGlobalOption('config', { type: 'string', short: 'c', description: 'Config file' })
+      ctx.addGlobalOption('color', { type: 'boolean', short: 'c', description: 'Colorize output' })
+
+      expect(ctx.globalOptions.get('config')?.short).toBe('c')
+    })
+
+    test('the letter and both names are named in a warning', () => {
+      const ctx = createPluginContext(createDecorators())
+      ctx.addGlobalOption('config', { type: 'string', short: 'c' })
+      ctx.addGlobalOption('color', { type: 'boolean', short: 'c' })
+
+      expect(warn).toHaveBeenCalledTimes(1)
+      expect(warn.mock.calls[0][0]).toContain(`'-c'`)
+      expect(warn.mock.calls[0][0]).toContain(`'color'`)
+      expect(warn.mock.calls[0][0]).toContain(`'config'`)
+    })
+
+    test('the schema that the plugin passed is left as it is', () => {
+      const ctx = createPluginContext(createDecorators())
+      const schema = { type: 'boolean', short: 'c' } satisfies Args[string]
+      ctx.addGlobalOption('config', { type: 'string', short: 'c' })
+      ctx.addGlobalOption('color', schema)
+
+      // the plugin keeps the object it registered, which other CLIs of the same process share
+      expect(schema.short).toBe('c')
+    })
+
+    test('short names that do not collide are left alone', () => {
+      const ctx = createPluginContext(createDecorators())
+      ctx.addGlobalOption('config', { type: 'string', short: 'c' })
+      ctx.addGlobalOption('output', { type: 'string', short: 'o' })
+
+      expect(ctx.globalOptions.get('output')?.short).toBe('o')
+      expect(warn).not.toHaveBeenCalled()
+    })
+
+    test('an option with no short name says nothing', () => {
+      const ctx = createPluginContext(createDecorators())
+      ctx.addGlobalOption('config', { type: 'string', short: 'c' })
+      ctx.addGlobalOption('color', { type: 'boolean' })
+      // two of them without a short name do not collide with each other either
+      ctx.addGlobalOption('output', { type: 'string' })
+
+      expect(ctx.globalOptions.get('color')).toEqual({ type: 'boolean' })
+      expect(ctx.globalOptions.get('output')).toEqual({ type: 'string' })
+      expect(warn).not.toHaveBeenCalled()
+    })
   })
 })
 

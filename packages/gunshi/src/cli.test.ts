@@ -1,5 +1,5 @@
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockLog } from '../test/utils.ts'
@@ -3057,6 +3057,100 @@ describe('github issues', () => {
 
       await expect(cli([], entry, { ...base, plugins: [a, b] })).rejects.toThrow(
         'Circular dependency detected'
+      )
+    })
+  })
+
+  describe('#746 - two global options with the same short name', () => {
+    const base = { name: 'my-cli', version: '9.9.9', usageSilent: true } satisfies CliOptions
+
+    function global(id: string, name: string, schema: Args[string]) {
+      return plugin({ id, setup: ctx => ctx.addGlobalOption(name, schema) })
+    }
+
+    // the collision is warned about, which `context.test.ts` pins; keep it out of the test output,
+    // and give `console.warn` back afterwards so that the rest of the file sees the real one
+    let warn: ReturnType<typeof vi.spyOn>
+    beforeEach(() => {
+      warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    })
+    afterEach(() => {
+      warn.mockRestore()
+    })
+
+    test('the letter reaches the one that asked for it first', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(
+        ['-c', 'conf.json'],
+        { name: 'app', run },
+        {
+          ...base,
+          plugins: [
+            global('config', 'config', { type: 'string', short: 'c' }),
+            // a boolean under the same letter used to make the parser leave the value behind
+            global('color', 'color', { type: 'boolean', short: 'c' })
+          ]
+        }
+      )
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({ values: expect.objectContaining({ config: 'conf.json' }) })
+      )
+    })
+
+    test('the value does not reach both of them', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(
+        ['-c', 'conf.json'],
+        { name: 'app', run },
+        {
+          ...base,
+          plugins: [
+            global('config', 'config', { type: 'string', short: 'c' }),
+            global('cache', 'cache', { type: 'string', short: 'c' })
+          ]
+        }
+      )
+
+      const values = run.mock.calls[0][0].values as Record<string, unknown>
+      expect(values.config).toBe('conf.json')
+      expect(values.cache).toBeUndefined()
+    })
+
+    test('the long name of the one that gave the letter up still works', async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(
+        ['--color'],
+        { name: 'app', run },
+        {
+          ...base,
+          plugins: [
+            global('config', 'config', { type: 'string', short: 'c' }),
+            global('color', 'color', { type: 'boolean', short: 'c' })
+          ]
+        }
+      )
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({ values: expect.objectContaining({ color: true }) })
+      )
+    })
+
+    test("a command's own short name still shadows a global one", async () => {
+      const run = vi.fn<CommandRunner>()
+
+      // #730: the command claims `-h`, and the global `help` gives it up for this command
+      await cli(
+        ['-h', 'myhost'],
+        { name: 'app', args: { host: { type: 'string', short: 'h' } }, run },
+        base
+      )
+
+      expect(run).toHaveBeenCalledWith(
+        expect.objectContaining({ values: expect.objectContaining({ host: 'myhost' }) })
       )
     })
   })
