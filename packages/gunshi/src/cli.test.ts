@@ -2850,6 +2850,19 @@ describe('github issues', () => {
       expect([...(env?.subCommands?.keys() || [])]).toEqual(['clean'])
       expect(env?.entryCommand).toMatchObject({ name: 'build', entry: true })
     })
+
+    test('includes the root entry when a distinct plugin command is marked as entry', async () => {
+      const pluginEntry = define({ name: 'plugin', entry: true, run: vi.fn<CommandRunner>() })
+      const usage = await cli(['--help'], createEntry(), {
+        name: 'mycli',
+        renderHeader: null,
+        usageSilent: true,
+        plugins: [addCommands({ plugin: pluginEntry })]
+      })
+
+      expect(usage).toContain('  [build] <target>')
+      expect(usage).toContain('  [plugin]')
+    })
   })
 
   describe('#499 - lazy command args not parsed', () => {

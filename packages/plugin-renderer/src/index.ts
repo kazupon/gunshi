@@ -95,7 +95,7 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
           ctx.callMode === 'entry' &&
           subCommands.length > 0 &&
           entryCommand &&
-          !allCommands.some(command => command.entry)
+          !subCommands.some(([, command]) => command === entryCommand)
         ) {
           allCommands.push(await resolveLazyCommand<G>(entryCommand, ANONYMOUS_COMMAND_NAME))
         }
