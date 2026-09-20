@@ -138,6 +138,12 @@ await writeOutputFile('dist/result.json', JSON.stringify({ ok: true }, null, 2))
 - Default: `'dryRun'`
 - Description: The command value key for the dry-run option. With Gunshi's default kebab-case option handling, `dryRun` maps to `--dry-run`.
 
+  The name belongs to this plugin. A command that declares an argument of its own under the same name takes the option away for that command: dry-run mode stays off there, whatever value the argument carries, and the plugin reports the collision on stderr. Give the option another name to avoid it:
+
+  ```js
+  dryrun({ name: 'pretend' })
+  ```
+
 ### `description`
 
 - Type: `string`

@@ -310,6 +310,55 @@ export default plugin({
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+### Reading a Global Option Your Plugin Registered
+
+A global option is merged into the arguments of every command, and a command may declare an argument of its own under the same name. The command's argument then **replaces** the global option, and `ctx.values[name]` holds the command's value — not your plugin's flag. Reading it anyway makes the plugin act on a value that was never meant for it.
+
+`ctx.env.globalOptions` says which global options are in effect for the command that is running:
+
+```ts [debug.ts]
+import { plugin } from 'gunshi/plugin'
+
+const OPTION_NAME = 'debug'
+
+export default plugin({
+  id: 'debug',
+
+  setup: ctx => {
+    ctx.addGlobalOption(OPTION_NAME, { type: 'boolean', description: 'Enable debug output' })
+  },
+
+  extension: ctx => {
+    // `undefined` when the context was built on its own, as in a plugin's own unit tests
+    const inEffect = ctx.env.globalOptions?.has(OPTION_NAME) ?? true
+    if (!inEffect) {
+      console.warn(
+        `The command "${ctx.name ?? ''}" declares an argument called "${OPTION_NAME}", which replaces the global option of this plugin.`
+      )
+    }
+
+    const debug = inEffect && ctx.values[OPTION_NAME] === true
+    return {
+      log: (message: string) => {
+        if (debug) {
+          console.log(`[debug] ${message}`)
+        }
+      }
+    }
+  }
+})
+```
+
+Three things are worth keeping to:
+
+- **Fall back to "in effect" when the map is absent.** A `CommandContext` built directly with `createCommandContext()` carries no `globalOptions`, and a plugin's own tests usually do that.
+- **Say something when the name was taken.** It is the author of the CLI who can fix it, and nothing else tells them. Use `console.warn`, because `ctx.log` is silenced by `usageSilent`.
+- **Offer a way out.** A plugin that lets the option be renamed — `dryrun({ name: 'pretend' })`, say — should name that in the warning.
+
+The schema in the map is the one in effect, which may differ from the one you registered: a global option gives up its short name to an argument of the command that claims the same letter, and it is still in effect under its long name.
+
+`@gunshi/plugin-dryrun` is the worked example of all of this.
+
 ## Next Steps
 
 You've mastered extensions—the powerful mechanism for sharing functionality between plugins and commands. With extensions, your plugins can provide APIs, services, and utilities that enhance the entire CLI ecosystem.
