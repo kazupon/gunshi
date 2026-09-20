@@ -318,7 +318,7 @@ Note: Interpolation placeholders use the format `{$variableName}` in the i18n pl
 
 ## Internationalization with Sub-commands
 
-When working with sub-commands, each command has its own namespace for translations:
+When working with sub-commands, each command has its own namespace for translations. The `COMMANDS` section of `--help` is localized too: each listed command's description comes from that command's own resource.
 
 ```ts [cli.ts]
 import i18n, { defineI18nWithTypes, pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
