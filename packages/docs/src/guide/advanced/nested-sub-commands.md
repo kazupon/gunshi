@@ -218,6 +218,13 @@ await cli(process.argv.slice(2), entry, {
 > [!IMPORTANT]
 > When using `lazy()` with nested sub-commands, include `args` in the lazy definition (the second argument) if you want argument parsing to work before the command is loaded. The `subCommands` of the definition, like the other properties it declares, is carried over to the lazy command, and is used when the loaded command does not define it.
 
+Options can be placed at the start or between path segments, for example
+`remote --config prod.json add origin`. Gunshi uses each candidate command's declared option metadata
+to remove option values before matching `remote add`; the option is then parsed once for the selected
+leaf. If a lazy parent or leaf can receive a leading option, declare that option in its lazy metadata.
+Use `--` when the remaining values must stay in `ctx.rest` rather than being explored as another
+sub-command.
+
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## Generating Documentation for Nested Commands

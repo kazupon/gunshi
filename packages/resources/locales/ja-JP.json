@@ -19,5 +19,8 @@
   "err:arg:custom-parse": "{$displayName} の値が不正です: {$reason}",
   "err:arg:unknown-option": "未定義のオプションです: {$rawName}",
   "err:cmd:not-found": "コマンドが見つかりません: {$commandName}",
+  "err:cmd:ambiguous": "コマンドを一意に解決できません。オプションをコマンド名の後ろに移してください: {$candidatePaths}",
+  "err:cmd:inconsistent-options": "オプションからコマンドを一意に解決できません。オプションをコマンド名の後ろに移してください。",
+  "err:cmd:lazy-schema-mismatch": "lazy コマンドの定義とロード後のオプションが一致しません。前置きするオプションを lazy の定義に記載するか、コマンド名の後ろに移してください: {$commandPath}",
   "err:suggestion:did-you-mean": "{$name} の指定ミスではありませんか？"
 }

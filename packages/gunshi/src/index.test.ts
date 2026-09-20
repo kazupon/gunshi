@@ -4,8 +4,11 @@ import {
   ArgsValidationErrorKeys,
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
+  CommandResolutionError,
+  CommandResolutionErrorKeys,
   isArgsValidationError,
-  isCommandNotFoundError
+  isCommandNotFoundError,
+  isCommandResolutionError
 } from './index.ts'
 
 test('exports args validation error runtime API', () => {
@@ -41,4 +44,17 @@ test('exports command not found error runtime API', () => {
   expect(error.values).toEqual({
     commandName: 'deployx'
   })
+})
+
+test('exports command resolution error runtime API', () => {
+  const error = new CommandResolutionError('ambiguous', {
+    code: CommandResolutionErrorKeys.ambiguous,
+    values: { candidatePaths: 'clean, deploy' },
+    commandPath: [],
+    candidatePaths: [['clean'], ['deploy']]
+  })
+
+  expect(isCommandResolutionError(error)).toBe(true)
+  expect(error.code).toBe(CommandResolutionErrorKeys.ambiguous)
+  expect(error.candidatePaths).toEqual([['clean'], ['deploy']])
 })
