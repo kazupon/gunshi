@@ -29,8 +29,8 @@
  * @license MIT
  */
 
-import { plugin } from '@gunshi/plugin'
-import { localizable, namespacedId, resolveLazyCommand } from '@gunshi/shared'
+import { createCommandContext, plugin } from '@gunshi/plugin'
+import { localizable, namespacedId, resolveKey, resolveLazyCommand } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
 import { pluginId as id } from './types.ts'
 import { renderUsage } from './usage.ts'
@@ -117,9 +117,38 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
         return cachedCommands
       }
 
+      /**
+       * Resolve the description of a command in the command list.
+       *
+       * NOTE(kazupon): the description is localized the way the command's own help localizes it,
+       * which needs that command's resource. `text()` is bound to the command that is running, so it
+       * cannot answer for another one. The i18n plugin loads a resource into the adapter under the
+       * name of the command it is given, and `translate()` reads it back from there (#748).
+       *
+       * @param target - A command from `loadCommands`
+       * @returns The description to show for the command
+       */
+      async function localizeCommandDescription(target: Command): Promise<string> {
+        const fallback = target.description || ''
+        if (!i18n || !target.name) {
+          return fallback
+        }
+
+        const commandCtx = await createCommandContext({
+          args: target.args,
+          command: target,
+          callMode: target.entry ? 'entry' : 'subCommand',
+          extensions: {}
+        })
+        await i18n.loadResource(i18n.locale, commandCtx, target)
+
+        return (await i18n.translate(resolveKey('description', target.name))) || fallback
+      }
+
       return {
         text: localizable(ctx as unknown as CommandContext, cmd, i18n?.translate),
-        loadCommands
+        loadCommands,
+        localizeCommandDescription
       }
     },
 

@@ -54,4 +54,14 @@ export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGun
    * @returns A list of commands loaded from the usage renderer plugin.
    */
   loadCommands: <G extends GunshiParams = DefaultGunshiParams>() => Promise<Command<G>[]>
+  /**
+   * Resolve the description of a command in the command list.
+   *
+   * The description is localized when `@gunshi/plugin-i18n` is installed and the command has a
+   * resource of its own, and falls back to {@link Command.description} otherwise.
+   *
+   * @param cmd - A command from {@link UsageRendererExtension.loadCommands}.
+   * @returns The description to show for the command.
+   */
+  localizeCommandDescription: (cmd: Command) => Promise<string>
 }

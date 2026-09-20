@@ -1,6 +1,7 @@
 import i18n from '@gunshi/plugin-i18n'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
+import { lazy } from '../../gunshi/src/definition.ts'
 import renderer from './index.ts'
 import { renderUsage } from './usage.ts'
 
@@ -1548,5 +1549,121 @@ describe('#750 - a falsy default is a default', () => {
 
     expect(rows.find(row => row.includes('alpha'))).toContain('alpha [OPTIONS]')
     expect(rows.find(row => row.includes('beta'))).toContain('beta [OPTIONS]')
+  })
+})
+
+describe('#748 - the commands section is localized', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  async function commandsSection(
+    subCommands: Map<string, TestCommand | LazyCommand<GunshiParams<{ args: Args }>>>,
+    running: TestCommand,
+    withI18n = true
+  ): Promise<string[]> {
+    const ctx = await createCommandContext({
+      args: running.args || {},
+      omitted: true,
+      command: running,
+      extensions: withI18n
+        ? {
+            [i18nPlugin.id]: i18nPlugin.extension,
+            [rendererPlugin.id]: rendererPlugin.extension
+          }
+        : { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { cwd: '/path/to/cmd', name: 'my-cli', version: '0.0.0', subCommands }
+    })
+    const usage = withI18n
+      ? await renderUsage<WithI18nAndRenderer>(ctx)
+      : await renderUsage<WithRendererOnly>(ctx)
+    const lines = usage.split('\n')
+    const start = lines.indexOf('COMMANDS:')
+    return lines.slice(start + 1, lines.indexOf('', start))
+  }
+
+  // the description lives only in the resource
+  const CREATE = {
+    name: 'create',
+    resource: () => Promise.resolve({ description: 'Create a resource' }),
+    run: NOOP
+  } as unknown as TestCommand
+
+  // both a plain description and a resource
+  const REMOVE = {
+    name: 'remove',
+    description: 'plain remove',
+    resource: () => Promise.resolve({ description: 'Remove a resource' }),
+    run: NOOP
+  } as unknown as TestCommand
+
+  // neither
+  const BARE = { name: 'bare', run: NOOP } as TestCommand
+
+  const ENTRY = {
+    name: 'manage',
+    description: 'plain manage',
+    entry: true,
+    resource: () => Promise.resolve({ description: 'Manage resources' }),
+    run: NOOP
+  } as unknown as TestCommand
+
+  const TREE = new Map<string, TestCommand | LazyCommand<GunshiParams<{ args: Args }>>>([
+    ['manage', ENTRY],
+    ['create', CREATE],
+    ['remove', REMOVE],
+    ['bare', BARE]
+  ])
+
+  test('a description that lives only in the resource is shown', async () => {
+    const rows = await commandsSection(TREE, ENTRY)
+
+    expect(rows.find(row => row.includes('create'))).toContain('Create a resource')
+  })
+
+  test('the resource wins over the plain description', async () => {
+    const rows = await commandsSection(TREE, ENTRY)
+
+    expect(rows.find(row => row.includes('remove'))).toContain('Remove a resource')
+    expect(rows.join('\n')).not.toContain('plain remove')
+  })
+
+  test('the entry command is localized too', async () => {
+    const rows = await commandsSection(TREE, ENTRY)
+
+    expect(rows.find(row => row.includes('manage'))).toContain('Manage resources')
+    expect(rows.join('\n')).not.toContain('plain manage')
+  })
+
+  test('a command with neither is left without a description', async () => {
+    const rows = await commandsSection(TREE, ENTRY)
+    const bare = rows.find(row => row.includes('bare'))!
+
+    expect(bare.trim()).toEqual('bare')
+  })
+
+  test('without the i18n plugin, the plain description is what is shown', async () => {
+    const rows = await commandsSection(TREE, ENTRY, false)
+
+    expect(rows.find(row => row.includes('remove'))).toContain('plain remove')
+    expect(rows.find(row => row.includes('manage'))).toContain('plain manage')
+    // a command whose description lives only in its resource has none to show
+    expect(rows.find(row => row.includes('create'))!.trim()).toEqual('create')
+  })
+
+  test('a lazy command is described by its definition, without running the loader', async () => {
+    const loader = vi.fn(() => Promise.resolve(NOOP))
+    const deploy = lazy(loader, {
+      name: 'deploy',
+      description: 'plain deploy',
+      resource: () => Promise.resolve({ description: 'Deploy the app' })
+    } as never) as unknown as LazyCommand<GunshiParams<{ args: Args }>>
+    const tree = new Map<string, TestCommand | LazyCommand<GunshiParams<{ args: Args }>>>([
+      ['manage', ENTRY],
+      ['deploy', deploy]
+    ])
+
+    const rows = await commandsSection(tree, ENTRY)
+
+    expect(rows.find(row => row.includes('deploy'))).toContain('Deploy the app')
+    expect(loader).not.toHaveBeenCalled()
   })
 })

@@ -222,8 +222,10 @@ async function renderCommandsSection<
     loadedCommands.map(async cmd => await makeCommandSymbol(ctx, cmd))
   )
   const symbolMaxLength = Math.max(...commandSymbols.map(symbol => symbol.length))
-  const commandsStr = loadedCommands.map((cmd, index) => {
-    const desc = cmd.description || ''
+  const descriptions = await Promise.all(
+    loadedCommands.map(async cmd => await ctx.extensions[pluginId].localizeCommandDescription(cmd))
+  )
+  const commandsStr = descriptions.map((desc, index) => {
     const commandStr = commandSymbols[index]
     const command = desc
       ? `${commandStr.padEnd(symbolMaxLength + ctx.env.middleMargin)}${desc}`
