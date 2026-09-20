@@ -19,5 +19,8 @@
   "err:arg:custom-parse": "Invalid value for {$displayName}: {$reason}",
   "err:arg:unknown-option": "Unknown option: {$rawName}",
   "err:cmd:not-found": "Command not found: {$commandName}",
+  "err:cmd:ambiguous": "The command is ambiguous. Move options after the command name: {$candidatePaths}",
+  "err:cmd:inconsistent-options": "The options do not identify a consistent command. Move options after the command name.",
+  "err:cmd:lazy-schema-mismatch": "The lazy command definition does not match its loaded options. Declare leading options in the lazy definition or move options after the command name: {$commandPath}",
   "err:suggestion:did-you-mean": "Did you mean {$name}?"
 }

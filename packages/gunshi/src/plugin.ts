@@ -28,15 +28,23 @@ export { createCommandContext } from './context.ts'
 export {
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
+  CommandResolutionError,
+  CommandResolutionErrorKeys,
   hasPriorityValidationError,
   isArgsValidationError,
-  isCommandNotFoundError
+  isCommandNotFoundError,
+  isCommandResolutionError
 } from './error.ts'
 export { plugin } from './plugin/core.ts'
 export { ArgsValidationError, ArgsValidationErrorKeys } from 'args-tokens'
 
 export type { CommandContextParams } from './context.ts'
-export type { CommandNotFoundErrorCode, CommandNotFoundErrorOptions } from './error.ts'
+export type {
+  CommandNotFoundErrorCode,
+  CommandNotFoundErrorOptions,
+  CommandResolutionErrorCode,
+  CommandResolutionErrorOptions
+} from './error.ts'
 export type { ArgsValidationErrorCode } from 'args-tokens'
 export type { PluginContext } from './plugin/context.ts'
 export type {

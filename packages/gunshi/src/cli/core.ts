@@ -10,6 +10,8 @@ import { createDecorators } from '../decorators.ts'
 import {
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
+  CommandResolutionError,
+  CommandResolutionErrorKeys,
   hasPriorityValidationError
 } from '../error.ts'
 import { createPluginContext } from '../plugin/context.ts'
@@ -29,6 +31,7 @@ import type {
   ArgToken,
   Args,
   ArgSchema,
+  ArgValues,
   CliOptions,
   Command,
   CommandCallMode,
@@ -37,10 +40,13 @@ import type {
   CommandDecorator,
   CommandRunner,
   DefaultGunshiParams,
+  ExtractArgExplicitlyProvided,
   ExtractArgs,
   GunshiParamsConstraint,
   LazyCommand
 } from '../types.ts'
+
+import type { CommandResolutionErrorCode } from '../error.ts'
 
 type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 'subCommands'> & {
   // Internal type uses Command<G> | LazyCommand<G> for proper type safety within the implementation
@@ -108,7 +114,8 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 
   const tokens = parseArgs(argv)
 
-  const resolved = resolveCommandTree(tokens, entry, cliOptions)
+  const selection = resolveCommandSelection(tokens, entry, cliOptions, pluginContext.globalOptions)
+  const resolved = selection.context
   const { commandName: name, command, callMode, commandPath, depth, levelSubCommands } = resolved
 
   let targetCommand = command
@@ -118,7 +125,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   let targetDepth = depth
   let targetOmitted = resolved.omitted
   let targetLevelSubCommands = levelSubCommands
-  const additionalValidationErrors: Error[] = []
+  const additionalValidationErrors: Error[] = selection.error ? [selection.error] : []
 
   if (!targetCommand) {
     if (!resolved.parentCommand || !resolved.unresolvedCommandName) {
@@ -135,6 +142,12 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     additionalValidationErrors.push(createCommandNotFoundError(resolved))
   }
 
+  // Keep the declaration tree used for post-load consistency checks. The rendering environment
+  // below intentionally exposes only the current level, so it must not become the routing root.
+  const routingOptions = Object.assign(create<InternalCliOptions<G>>(), cliOptions, {
+    subCommands: new Map(cliOptions.subCommands)
+  }) as InternalCliOptions<G>
+
   // override subCommands with level-specific sub-commands for rendering
   if (targetLevelSubCommands) {
     cliOptions.subCommands = targetLevelSubCommands
@@ -144,6 +157,20 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const resolvedCommand = isLazyCommand<G>(targetCommand)
     ? await resolveLazyCommand<G>(targetCommand, targetCommandName, true)
     : targetCommand
+
+  if (selection.error == null && isLazyCommand<G>(targetCommand)) {
+    const loadedPositionals = getRoutingPositionals(
+      tokens,
+      pluginContext.globalOptions,
+      resolvedCommand
+    )
+    const loaded = resolveCommandTreeFromPositionals(loadedPositionals, entry, routingOptions)
+    if (loaded.commandPath.join('\u0000') !== targetCommandPath.join('\u0000')) {
+      additionalValidationErrors.push(
+        createLazySchemaMismatchError(targetCommandPath, loaded.commandPath)
+      )
+    }
+  }
 
   const commandArgs = getCommandArgs(resolvedCommand)
   const args = resolveCommandArgs<ExtractArgs<G>>(pluginContext.globalOptions, commandArgs)
@@ -162,14 +189,24 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   // depth=0 → -1 (no skip), depth=1 → 0 (skip 1, existing behavior), depth=2 → 1 (skip 2), etc.
   const skipPositional = targetDepth > 0 ? targetDepth - 1 : -1
 
-  const { explicit, values, positionals, rest, error } = resolveArgs(args, tokens, {
-    shortGrouping: true,
-    toKebab: resolvedCommand.toKebab,
-    skipPositional
-  })
+  const diagnostic = selection.diagnostic === true
+  const parsed = diagnostic
+    ? {
+        explicit: create<ExtractArgExplicitlyProvided<G>>(),
+        values: create<ArgValues<ExtractArgs<G>>>(),
+        positionals: [],
+        rest: [],
+        error: undefined
+      }
+    : resolveArgs(args, tokens, {
+        shortGrouping: true,
+        toKebab: resolvedCommand.toKebab,
+        skipPositional
+      })
+  const { explicit, values, positionals, rest, error } = parsed
   const validationError = mergeValidationErrors(error, [
     ...additionalValidationErrors,
-    ...(cliOptions.strict
+    ...(cliOptions.strict && !diagnostic
       ? createUnknownOptionErrors(
           findUnknownOptions(args, tokens, {
             toKebab: resolvedCommand.toKebab
@@ -518,10 +555,16 @@ function normalizeCliOptions<G extends GunshiParamsConstraint>(
 }
 
 function getPositionalTokens(tokens: ArgToken[]): string[] {
-  return tokens
-    .filter(t => t.kind === 'positional')
-    .map(t => t.value)
-    .filter((v): v is string => !!v)
+  const positionals: string[] = []
+  for (const token of tokens) {
+    if (token.kind === 'option-terminator') {
+      break
+    }
+    if (token.kind === 'positional' && token.value) {
+      positionals.push(token.value)
+    }
+  }
+  return positionals
 }
 
 type ResolveCommandContext<G extends GunshiParamsConstraint = DefaultGunshiParams> = {
@@ -544,8 +587,14 @@ function resolveCommandTree<G extends GunshiParamsConstraint>(
   entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   options: InternalCliOptions<G>
 ): ResolveCommandContext<G> {
-  const positionals = getPositionalTokens(tokens)
+  return resolveCommandTreeFromPositionals(getPositionalTokens(tokens), entry, options)
+}
 
+function resolveCommandTreeFromPositionals<G extends GunshiParamsConstraint>(
+  positionals: string[],
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  options: InternalCliOptions<G>
+): ResolveCommandContext<G> {
   function resolveAsEntry(): ResolveCommandContext<G> {
     if (typeof entry === 'function') {
       if (isLazyCommand<G>(entry)) {
@@ -710,6 +759,363 @@ function resolveCommandTree<G extends GunshiParamsConstraint>(
     omitted,
     levelSubCommands
   }
+}
+
+type RoutingCandidate<G extends GunshiParamsConstraint> = {
+  path: string[]
+  command: Command<G> | LazyCommand<G>
+}
+
+type RoutingEvaluation<G extends GunshiParamsConstraint> = RoutingCandidate<G> & {
+  positionals: string[]
+  result: ResolveCommandContext<G>
+}
+
+type CommandSelectionResult<G extends GunshiParamsConstraint> = {
+  context: ResolveCommandContext<G>
+  error?: CommandResolutionError
+  diagnostic?: boolean
+}
+
+/**
+ * Select a command while accounting for option values that args-tokens removes during resolution.
+ *
+ * The routing pass deliberately projects each candidate's schemas down to the metadata needed to
+ * classify tokens. It never copies `parse`, defaults, required checks, or other user code. A
+ * candidate is accepted only when routing its own declaration reaches the same Map-key path in the
+ * declaration tree.
+ */
+function resolveCommandSelection<G extends GunshiParamsConstraint>(
+  tokens: ArgToken[],
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  options: InternalCliOptions<G>,
+  globalOptions: ReadonlyMap<string, ArgSchema>
+): CommandSelectionResult<G> {
+  const rawPositionals = getPositionalTokens(tokens)
+  const legacy = resolveCommandTree(tokens, entry, options)
+
+  // The common path with no option tokens is the overwhelmingly frequent case. It also avoids
+  // walking declarations that cannot affect routing when args-tokens already gives us the final
+  // positional sequence.
+  if (!tokens.some(token => token.kind === 'option')) {
+    return { context: legacy }
+  }
+
+  const candidates = collectRoutingCandidates(rawPositionals, options.subCommands)
+  const evaluations = candidates.map(candidate => evaluateRoutingCandidate(candidate))
+  const validExplicit = evaluations.filter(
+    evaluation =>
+      evaluation.result.command != null &&
+      evaluation.result.unresolvedCommandName == null &&
+      sameCommandPath(evaluation.result.commandPath, evaluation.path) &&
+      evaluation.path.length > 0
+  )
+
+  // Preserve a legacy explicit choice whenever that choice also survives candidate routing. This
+  // is what keeps an existing command that owns a colliding option from being displaced.
+  if (
+    legacy.command != null &&
+    legacy.unresolvedCommandName == null &&
+    legacy.commandPath.length > 0
+  ) {
+    const legacyMatch = validExplicit.find(evaluation =>
+      sameCommandPath(evaluation.path, legacy.commandPath)
+    )
+    if (legacyMatch) {
+      return { context: legacyMatch.result }
+    }
+  }
+
+  if (validExplicit.length === 1) {
+    return { context: validExplicit[0].result }
+  }
+
+  if (validExplicit.length > 1) {
+    return createCommandResolutionResult(
+      options,
+      entry,
+      CommandResolutionErrorKeys.ambiguous,
+      validExplicit.map(evaluation => evaluation.path)
+    )
+  }
+
+  const entryEvaluation = evaluateRoutingCandidate({
+    path: [],
+    command: getEntryRoutingCommand(entry, options)
+  })
+  const entrySuccess =
+    entryEvaluation.result.command != null &&
+    entryEvaluation.result.unresolvedCommandName == null &&
+    entryEvaluation.result.commandPath.length === 0
+  if (entrySuccess) {
+    return { context: entryEvaluation.result }
+  }
+
+  // An option-aware interpretation may still produce an ordinary unknown command. Keep the
+  // existing parent metadata, selecting the deepest declaration that consistently explains the
+  // failure. A failure from a candidate is only relevant when that candidate is on the failing
+  // parent path; an option value must not manufacture a diagnostic for an unrelated branch.
+  const failures = evaluations
+    .filter(evaluation => {
+      const { result } = evaluation
+      if (!result.unresolvedCommandName) {
+        return false
+      }
+      const parentPath = result.parentCommandPath || []
+      return isPathPrefix(evaluation.path, parentPath)
+    })
+    .map(evaluation => evaluation.result)
+  if (entryEvaluation.result.unresolvedCommandName) {
+    failures.push(entryEvaluation.result)
+  }
+
+  const deepestFailures = selectDeepestFailures(failures)
+  if (deepestFailures.length === 1) {
+    return { context: deepestFailures[0] }
+  }
+  if (deepestFailures.length > 1) {
+    const paths = deepestFailures.map(result => result.parentCommandPath || [])
+    return createCommandResolutionResult(
+      options,
+      entry,
+      CommandResolutionErrorKeys.ambiguous,
+      paths
+    )
+  }
+
+  return createCommandResolutionResult(
+    options,
+    entry,
+    CommandResolutionErrorKeys.inconsistentOptions,
+    candidates.map(candidate => candidate.path)
+  )
+
+  function evaluateRoutingCandidate(candidate: RoutingCandidate<G>): RoutingEvaluation<G> {
+    const positionals = getRoutingPositionals(tokens, globalOptions, candidate.command)
+    return {
+      ...candidate,
+      positionals,
+      result: resolveCommandTreeFromPositionals(positionals, entry, options)
+    }
+  }
+}
+
+function collectRoutingCandidates<G extends GunshiParamsConstraint>(
+  rawPositionals: string[],
+  root: Map<string, Command<G> | LazyCommand<G>>
+): RoutingCandidate<G>[] {
+  const candidates: RoutingCandidate<G>[] = []
+  const seen = new Set<string>()
+
+  function collect(
+    commands: Map<string, Command<G> | LazyCommand<G>>,
+    offset: number,
+    parentPath: string[]
+  ): void {
+    for (let index = offset; index < rawPositionals.length; index++) {
+      const name = rawPositionals[index]
+      const command = commands.get(name)
+      if (command == null) {
+        continue
+      }
+
+      const path = [...parentPath, name]
+      const key = JSON.stringify(path)
+      const normalized = normalizeCommandReference(command, name)
+      if (!seen.has(key)) {
+        seen.add(key)
+        candidates.push({ path, command: normalized })
+      }
+
+      const nested = getCommandSubCommands<G>(normalized)
+      if (nested && nested.size > 0) {
+        collect(nested, index + 1, path)
+      }
+    }
+  }
+
+  collect(root, 0, [])
+  return candidates
+}
+
+function normalizeCommandReference<G extends GunshiParamsConstraint>(
+  command: Command<G> | LazyCommand<G>,
+  name: string
+): Command<G> | LazyCommand<G> {
+  if (typeof command === 'function' && (command as any).commandName == null) {
+    return Object.assign((...args: unknown[]) => (command as Function)(...args), command, {
+      commandName: name
+    }) as unknown as LazyCommand<G>
+  }
+  if (typeof command === 'object' && command.name == null) {
+    return Object.assign(create<Command<G>>(), command, { name }) as Command<G>
+  }
+  return command
+}
+
+function getEntryRoutingCommand<G extends GunshiParamsConstraint>(
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  options: InternalCliOptions<G>
+): Command<G> | LazyCommand<G> {
+  if (options.entryCommand) {
+    return options.entryCommand
+  }
+  if (typeof entry === 'function' && !isLazyCommand<G>(entry)) {
+    return { run: entry as CommandRunner<G>, entry: true }
+  }
+  return entry as Command<G> | LazyCommand<G>
+}
+
+function getRoutingPositionals<G extends GunshiParamsConstraint>(
+  tokens: ArgToken[],
+  globalOptions: ReadonlyMap<string, ArgSchema>,
+  command: Command<G> | LazyCommand<G>
+): string[] {
+  const effective = resolveCommandArgs<ExtractArgs<G>>(globalOptions, getCommandArgs(command))
+  const routingArgs = create<Args>()
+  for (const [name, schema] of Object.entries(effective)) {
+    if (schema.type === 'positional') {
+      continue
+    }
+    routingArgs[name] = {
+      type: schema.type === 'boolean' ? 'boolean' : 'string',
+      short: schema.short,
+      negatable: schema.negatable,
+      toKebab: schema.toKebab
+    }
+  }
+  return resolveArgs(routingArgs, tokens, {
+    shortGrouping: true,
+    toKebab: command.toKebab
+  }).positionals
+}
+
+function sameCommandPath(left: readonly string[], right: readonly string[]): boolean {
+  return left.length === right.length && left.every((name, index) => name === right[index])
+}
+
+function isPathPrefix(prefix: readonly string[], path: readonly string[]): boolean {
+  return prefix.length <= path.length && prefix.every((name, index) => name === path[index])
+}
+
+function selectDeepestFailures<G extends GunshiParamsConstraint>(
+  failures: ResolveCommandContext<G>[]
+): ResolveCommandContext<G>[] {
+  const unique = new Map<string, ResolveCommandContext<G>>()
+  for (const failure of failures) {
+    const path = failure.parentCommandPath || []
+    const key = JSON.stringify(path)
+    unique.set(key, failure)
+  }
+  const deepest = Math.max(
+    -1,
+    ...[...unique.values()].map(failure => (failure.parentCommandPath || []).length)
+  )
+  return [...unique.values()].filter(
+    failure => (failure.parentCommandPath || []).length === deepest
+  )
+}
+
+function createCommandResolutionResult<G extends GunshiParamsConstraint>(
+  options: InternalCliOptions<G>,
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  code: CommandResolutionErrorCode,
+  candidatePaths: readonly (readonly string[])[]
+): CommandSelectionResult<G> {
+  const normalizedPaths = candidatePaths.map(path => [...path])
+  const commandPath = commonCommandPath(normalizedPaths)
+  const parent = resolveCommandTreeFromPositionals(commandPath, entry, options)
+  const command = createDiagnosticCommand(parent.command, commandPath.at(-1))
+  const context: ResolveCommandContext<G> = {
+    ...parent,
+    command,
+    commandPath,
+    depth: commandPath.length,
+    commandName: parent.commandName || commandPath.at(-1),
+    callMode: commandPath.length > 0 ? 'subCommand' : 'entry',
+    omitted: false
+  }
+  const formattedPaths = normalizedPaths.map(path => path.join(' ')).join(', ')
+  const formattedPath = commandPath.join(' ')
+  const values = {
+    commandPath: formattedPath,
+    candidatePaths: formattedPaths,
+    candidates: formattedPaths
+  }
+  const message = createCommandResolutionMessage(code, formattedPath, formattedPaths)
+  const error = new CommandResolutionError(message, {
+    code,
+    values,
+    commandPath,
+    candidatePaths: normalizedPaths
+  })
+  return { context, error, diagnostic: true }
+}
+
+function commonCommandPath(paths: readonly (readonly string[])[]): string[] {
+  if (paths.length === 0) {
+    return []
+  }
+  const common = [...paths[0]]
+  for (const path of paths.slice(1)) {
+    let length = 0
+    while (length < common.length && length < path.length && common[length] === path[length]) {
+      length++
+    }
+    common.length = length
+  }
+  return common
+}
+
+function createDiagnosticCommand<G extends GunshiParamsConstraint>(
+  command: Command<G> | LazyCommand<G> | undefined,
+  name?: string
+): Command<G> {
+  if (typeof command === 'function') {
+    return Object.assign(create<Command<G>>(), command, {
+      name: command.commandName || name,
+      run: undefined
+    }) as Command<G>
+  }
+  return Object.assign(create<Command<G>>(), command || {}, {
+    name: command?.name || name,
+    run: undefined
+  }) as Command<G>
+}
+
+function createCommandResolutionMessage(
+  code: CommandResolutionErrorCode,
+  commandPath: string,
+  candidatePaths: string
+): string {
+  switch (code) {
+    case CommandResolutionErrorKeys.ambiguous:
+      return `Ambiguous command resolution. Move options after the command name: ${candidatePaths}`
+    case CommandResolutionErrorKeys.lazySchemaMismatch:
+      return `Lazy command schema mismatch at ${commandPath}. Declare leading options in the lazy definition or move options after the command name.`
+    default:
+      return 'The options do not identify a consistent command. Move options after the command name.'
+  }
+}
+
+function createLazySchemaMismatchError(
+  commandPath: readonly string[],
+  loadedPath: readonly string[]
+): CommandResolutionError {
+  const expected = [...commandPath]
+  const actual = [...loadedPath]
+  return new CommandResolutionError(
+    `Lazy command schema mismatch at ${expected.join(' ')}. Declare leading options in the lazy definition or move options after the command name.`,
+    {
+      code: CommandResolutionErrorKeys.lazySchemaMismatch,
+      values: {
+        commandPath: expected.join(' '),
+        loadedCommandPath: actual.join(' ')
+      },
+      commandPath: expected,
+      candidatePaths: [expected, actual]
+    }
+  )
 }
 
 function createCommandNotFoundError<G extends GunshiParamsConstraint>(

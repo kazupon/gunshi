@@ -3,7 +3,9 @@ import {
   ArgsValidationError,
   ArgsValidationErrorKeys,
   CommandNotFoundError,
-  CommandNotFoundErrorKeys
+  CommandNotFoundErrorKeys,
+  CommandResolutionError,
+  CommandResolutionErrorKeys
 } from '@gunshi/plugin'
 import { expect, test } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
@@ -127,6 +129,57 @@ test('command not found error uses i18n resource', async () => {
   ])
 
   await expect(renderValidationErrors(ctx, error)).resolves.toEqual('不明なコマンド: deployx')
+})
+
+test('command resolution error keeps the English fallback without i18n', async () => {
+  const ctx = await createCommandContext({
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    }
+  })
+  const error = new AggregateError([
+    new CommandResolutionError('Move options after the command name.', {
+      code: CommandResolutionErrorKeys.inconsistentOptions,
+      values: {},
+      commandPath: [],
+      candidatePaths: [['clean'], ['deploy']]
+    })
+  ])
+
+  await expect(renderValidationErrors(ctx, error)).resolves.toBe(
+    'Move options after the command name.'
+  )
+})
+
+test('command resolution error uses the localized resource', async () => {
+  const i18nPlugin = i18n({
+    locale: 'ja-JP',
+    builtinResources: {
+      'ja-JP': {
+        [CommandResolutionErrorKeys.inconsistentOptions]: 'オプションの解決に失敗しました'
+      }
+    }
+  })
+  const rendererPlugin = renderer()
+  const ctx = await createCommandContext({
+    command: { name: 'test', run: async () => {} },
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    }
+  })
+  const error = new AggregateError([
+    new CommandResolutionError('The options do not identify a consistent command.', {
+      code: CommandResolutionErrorKeys.inconsistentOptions,
+      values: {},
+      commandPath: [],
+      candidatePaths: []
+    })
+  ])
+
+  await expect(renderValidationErrors(ctx, error)).resolves.toBe('オプションの解決に失敗しました')
 })
 
 test('args validation error uses i18n resource', async () => {

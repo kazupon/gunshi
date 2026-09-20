@@ -23,6 +23,23 @@ export type CommandNotFoundErrorCode =
   (typeof CommandNotFoundErrorKeys)[keyof typeof CommandNotFoundErrorKeys]
 
 /**
+ * Command resolution error resource keys.
+ *
+ * These errors describe an ambiguity or inconsistency while choosing a command from arguments.
+ * They are kept separate from {@link CommandNotFoundError} so consumers can distinguish a typo
+ * from an input whose command interpretation is not unique.
+ */
+export const CommandResolutionErrorKeys = {
+  ambiguous: 'err:cmd:ambiguous',
+  inconsistentOptions: 'err:cmd:inconsistent-options',
+  lazySchemaMismatch: 'err:cmd:lazy-schema-mismatch'
+} as const
+
+/** Command resolution error code. */
+export type CommandResolutionErrorCode =
+  (typeof CommandResolutionErrorKeys)[keyof typeof CommandResolutionErrorKeys]
+
+/**
  * Options for {@link CommandNotFoundError}.
  */
 export type CommandNotFoundErrorOptions = {
@@ -52,6 +69,20 @@ export type CommandNotFoundErrorOptions = {
   cause?: unknown
 }
 
+/** Options for {@link CommandResolutionError}. */
+export type CommandResolutionErrorOptions = {
+  /** Localization resource key for the resolution failure. */
+  code?: CommandResolutionErrorCode
+  /** Values used when localizing the message. */
+  values?: Record<string, unknown>
+  /** Command path at which the resolution failed. */
+  commandPath?: readonly string[]
+  /** Candidate command paths considered by the resolver. */
+  candidatePaths?: readonly (readonly string[])[]
+  /** Underlying cause. */
+  cause?: unknown
+}
+
 /**
  * Brand that marks {@link CommandNotFoundError} instances.
  *
@@ -61,6 +92,8 @@ export type CommandNotFoundErrorOptions = {
  * another copy, where `instanceof` cannot match.
  */
 const COMMAND_NOT_FOUND_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandNotFoundError')
+
+const COMMAND_RESOLUTION_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandResolutionError')
 
 /**
  * Error raised when a command cannot be resolved.
@@ -102,6 +135,35 @@ export class CommandNotFoundError extends Error {
 }
 
 /**
+ * Error raised when command routing cannot produce one consistent command.
+ *
+ * The own registry brand is the cross-bundle contract. Unlike the legacy command-not-found
+ * guard, the new guard deliberately has no name-based fallback because this error type is new and
+ * must not classify arbitrary errors from older versions.
+ */
+export class CommandResolutionError extends Error {
+  readonly code?: CommandResolutionErrorCode
+  readonly values: Record<string, unknown>
+  readonly commandPath: readonly string[]
+  readonly candidatePaths: readonly (readonly string[])[]
+
+  constructor(message: string, options: CommandResolutionErrorOptions = {}) {
+    super(message, { cause: options.cause })
+    this.name = 'CommandResolutionError'
+    this.code = options.code
+    this.values = options.values || {}
+    this.commandPath = options.commandPath || []
+    this.candidatePaths = options.candidatePaths || []
+    Object.defineProperty(this, COMMAND_RESOLUTION_ERROR_BRAND, {
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+  }
+}
+
+/**
  * Check whether an error is a {@link CommandNotFoundError}.
  *
  * `instanceof` alone is not enough: `@gunshi/plugin` is bundled with its own copy of this
@@ -132,6 +194,20 @@ export function isCommandNotFoundError(error: unknown): error is CommandNotFound
   // NOTE(kazupon): Structural fallback for copies of gunshi older than the brand, which
   // only set `name`. Drop it in the next major.
   return error instanceof Error && error.name === 'CommandNotFoundError'
+}
+
+/** Check whether an error is a {@link CommandResolutionError}. */
+export function isCommandResolutionError(error: unknown): error is CommandResolutionError {
+  if (error instanceof CommandResolutionError) {
+    return true
+  }
+  if (!isRecord(error) || !hasCommandResolutionErrorShape(error)) {
+    return false
+  }
+  return (
+    Object.hasOwn(error, COMMAND_RESOLUTION_ERROR_BRAND) &&
+    error[COMMAND_RESOLUTION_ERROR_BRAND] === true
+  )
 }
 
 /**
@@ -201,6 +277,16 @@ function hasCommandNotFoundErrorShape(error: Record<PropertyKey, unknown>): bool
   )
 }
 
+function hasCommandResolutionErrorShape(error: Record<PropertyKey, unknown>): boolean {
+  return (
+    hasOptionalStringCode(error) &&
+    isRecord(error.values) &&
+    isStringArray(error.commandPath) &&
+    Array.isArray(error.candidatePaths) &&
+    error.candidatePaths.every(path => isStringArray(path))
+  )
+}
+
 function hasArgsValidationErrorShape(error: Record<PropertyKey, unknown>): boolean {
   return hasOptionalStringCode(error) && isRecord(error.values)
 }
@@ -216,6 +302,7 @@ export function hasPriorityValidationError(error: AggregateError | undefined): b
     error?.errors.some(
       (error: unknown) =>
         isCommandNotFoundError(error) ||
+        isCommandResolutionError(error) ||
         (isArgsValidationError(error) && error.code === ArgsValidationErrorKeys.unknownOption)
     ) ?? false
   )

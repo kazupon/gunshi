@@ -1,6 +1,6 @@
 import i18n from '@gunshi/plugin-i18n'
 import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
-import { cli, define, lazy } from 'gunshi'
+import { cli, define, lazy, plugin } from 'gunshi'
 import { describe, expect, test, vi } from 'vitest'
 import { defineMockLog } from '../../gunshi/test/utils.ts'
 import { defineSuggestNames, levenshtein, suggestion } from './index.ts'
@@ -69,6 +69,33 @@ describe('defineSuggestNames', () => {
 })
 
 describe('suggestion plugin', () => {
+  test('does not suggest a command for an option-resolution error', async () => {
+    const utils = await import('../../gunshi/src/utils.ts')
+    const log = defineMockLog(utils)
+    const global = plugin({
+      id: 'test:routing-global',
+      setup(ctx) {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+
+    await expect(
+      cli(['--config', 'clean', 'deploy'], define({ name: 'app', run: () => {} }), {
+        subCommands: {
+          clean: define({ name: 'clean', run: () => {} }),
+          deploy: define({
+            name: 'deploy',
+            args: { config: { type: 'boolean' } },
+            run: () => {}
+          })
+        },
+        plugins: [global, suggestion()]
+      })
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).not.toContain('Did you mean')
+  })
+
   test('suggests a known long option for an unknown option', async () => {
     const utils = await import('../../gunshi/src/utils.ts')
     const log = defineMockLog(utils)

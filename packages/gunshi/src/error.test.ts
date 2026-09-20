@@ -6,9 +6,12 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import {
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
+  CommandResolutionError,
+  CommandResolutionErrorKeys,
   hasPriorityValidationError,
   isArgsValidationError,
-  isCommandNotFoundError
+  isCommandNotFoundError,
+  isCommandResolutionError
 } from './error.ts'
 
 import type { Args } from 'args-tokens'
@@ -394,6 +397,69 @@ describe('hasPriorityValidationError', () => {
       new DuplicatedCommandNotFoundError('not found', 'lod', ['load'])
     ])
     expect(hasPriorityValidationError(error)).toBe(true)
+  })
+
+  test('detects a command-resolution error', () => {
+    const error = new AggregateError([
+      new CommandResolutionError('ambiguous', {
+        code: CommandResolutionErrorKeys.ambiguous,
+        commandPath: [],
+        candidatePaths: [['clean'], ['deploy']]
+      })
+    ])
+    expect(hasPriorityValidationError(error)).toBe(true)
+  })
+})
+
+describe('CommandResolutionError', () => {
+  const brand = Symbol.for('gunshi.CommandResolutionError')
+
+  test('stores structured routing metadata and its own brand', () => {
+    const error = new CommandResolutionError('ambiguous', {
+      code: CommandResolutionErrorKeys.ambiguous,
+      values: { candidatePaths: 'clean, deploy' },
+      commandPath: ['remote'],
+      candidatePaths: [
+        ['remote', 'clean'],
+        ['remote', 'deploy']
+      ]
+    })
+
+    expect(isCommandResolutionError(error)).toBe(true)
+    expect(error.code).toBe(CommandResolutionErrorKeys.ambiguous)
+    expect(error.commandPath).toEqual(['remote'])
+    expect(error.candidatePaths).toEqual([
+      ['remote', 'clean'],
+      ['remote', 'deploy']
+    ])
+    expect(Object.getOwnPropertyDescriptor(error, brand)).toMatchObject({
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+  })
+
+  test('recognizes a valid branded error from another copy without using name', () => {
+    const error: Record<PropertyKey, unknown> = {
+      [brand]: true,
+      name: 'ForeignError',
+      code: CommandResolutionErrorKeys.inconsistentOptions,
+      values: {},
+      commandPath: [],
+      candidatePaths: [['deploy']]
+    }
+
+    expect(isCommandResolutionError(error)).toBe(true)
+    expect(
+      isCommandResolutionError({
+        name: 'CommandResolutionError',
+        code: CommandResolutionErrorKeys.ambiguous,
+        values: {},
+        commandPath: [],
+        candidatePaths: []
+      })
+    ).toBe(false)
   })
 })
 

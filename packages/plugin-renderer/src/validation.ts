@@ -5,6 +5,7 @@
 
 import {
   ArgsValidationErrorKeys,
+  isCommandResolutionError,
   isArgsValidationError,
   isCommandNotFoundError
 } from '@gunshi/plugin'
@@ -42,6 +43,13 @@ async function renderValidationError<G extends GunshiParams = DefaultGunshiParam
   error: Error
 ): Promise<string> {
   if (isCommandNotFoundError(error) && error.code) {
+    const message = await localize(ctx, error.code, error.values)
+    if (message && message !== error.code) {
+      return message
+    }
+  }
+
+  if (isCommandResolutionError(error) && error.code) {
     const message = await localize(ctx, error.code, error.values)
     if (message && message !== error.code) {
       return message

@@ -94,6 +94,29 @@ The `helloLoader` function is never called.
 
 Only when the user runs `npx tsx cli.ts hello` does Gunshi execute the loader and run the command.
 
+When an option appears before a lazy command name, the second argument to `lazy()` must declare the
+option information needed to identify the command. Keep the routing fields (`type`, `short`,
+`negatable`, and `toKebab`) in the metadata; value conversion and validation still happen after the
+loader runs:
+
+```ts
+const deploy = lazy(loadDeploy, {
+  name: 'deploy',
+  args: {
+    config: { type: 'string', short: 'c' }
+  }
+})
+
+// Selects deploy, then loads it once.
+await cli(['--config', 'prod.json', 'deploy'], entry, {
+  subCommands: { deploy }
+})
+```
+
+If the loaded command changes the schema used to route a leading option, Gunshi reports a lazy
+schema-mismatch error instead of retrying another command. Moving the option after the command name
+is the compatibility path when the option is loader-only.
+
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!TIP]

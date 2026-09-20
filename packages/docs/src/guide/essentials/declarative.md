@@ -356,6 +356,30 @@ Unknown option: --alow-reload
 
 The error uses the `err:arg:unknown-option` resource key, so the message follows the same renderer and i18n behavior as other argument validation errors. Suggestions such as `Did you mean --allow-reload?` are intentionally left to suggestion plugins.
 
+#### Options before sub-commands
+
+Option values are removed before Gunshi chooses a sub-command. A string option can therefore appear
+before or after the command without turning its value into a command name:
+
+```ts
+await cli(['--config', 'prod.json', 'deploy'], entry, { subCommands })
+await cli(['--config=prod.json', 'deploy'], entry, { subCommands })
+await cli(['deploy', '--config', 'prod.json'], entry, { subCommands })
+await cli(['-c', 'prod.json', 'deploy'], entry, { subCommands })
+```
+
+All four calls select `deploy` and resolve `ctx.values.config` to `prod.json`. This also applies to
+nested paths such as `remote --config prod.json add origin`. A value that happens to equal a command
+name remains a value, so `--config clean deploy` selects `deploy` when `config` is a global string
+option.
+
+The command's own argument definition takes precedence when it declares the same long or short name.
+For example, a command that declares `config: { type: 'boolean' }` interprets `--config deploy` as
+`config: true` and selects `deploy`. If a lazy command needs an option before its name, declare the
+option in the lazy metadata as well; otherwise place the option after the command name. Ambiguous or
+inconsistent interpretations produce a command-resolution error and do not run a command. Use `--`
+to stop command exploration; values after it are passed through as `ctx.rest`.
+
 #### Command Not Found Handling
 
 When a sub-command cannot be resolved, Gunshi reports it as a structured `CommandNotFoundError` inside the validation error pipeline. This avoids brittle checks such as `error.message.startsWith('Command not found:')`.

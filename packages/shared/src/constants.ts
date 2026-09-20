@@ -70,6 +70,11 @@ export const ARG_ERROR_RESOURCE_KEYS = [
   'err:arg:unknown-option'
 ] as const
 
-export const COMMAND_ERROR_RESOURCE_KEYS = ['err:cmd:not-found'] as const
+export const COMMAND_ERROR_RESOURCE_KEYS = [
+  'err:cmd:not-found',
+  'err:cmd:ambiguous',
+  'err:cmd:inconsistent-options',
+  'err:cmd:lazy-schema-mismatch'
+] as const
 
 export const SUGGESTION_ERROR_RESOURCE_KEYS = ['err:suggestion:did-you-mean'] as const

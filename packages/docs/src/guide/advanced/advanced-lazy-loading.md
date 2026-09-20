@@ -261,6 +261,12 @@ export async function load<G extends GunshiParamsConstraint>(
 }
 ```
 
+When an option appears before a lazy command name or between nested command names, include its
+routing metadata in the lazy definition. Gunshi uses only `type`, `short`, `negatable`, and `toKebab`
+while selecting a path, then loads the selected command and performs normal value conversion once.
+Place loader-only options after the command name. If loading changes the interpretation of a leading
+option, Gunshi reports a lazy schema-mismatch error and does not retry another command.
+
 ## Performance Considerations
 
 When implementing advanced lazy loading, consider these performance optimizations:
