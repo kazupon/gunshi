@@ -217,7 +217,9 @@ export interface PluginOptions<
   >
 > {
   /**
-   * Plugin unique identifier
+   * Plugin unique identifier.
+   *
+   * Must be a non-empty string. {@linkcode plugin} and the installer both reject an empty id.
    */
   id: Id
   /**
@@ -417,6 +419,10 @@ export function plugin(options: any = {}): any {
     onExtension?: OnPluginExtension
     dependencies?: ReadonlyArray<string>
   } = options
+
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new Error('Plugin id must be a non-empty string')
+  }
 
   const extension = (options.extension || NOOP_EXTENSION) as PluginExtension
 

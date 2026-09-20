@@ -22,17 +22,18 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
 
   // build a map for quick lookup
   for (const plugin of plugins) {
-    if (plugin.id) {
-      if (pluginMap.has(plugin.id)) {
-        console.warn(`Duplicate plugin id detected: \`${plugin.id}\``)
-      }
-      pluginMap.set(plugin.id, plugin)
+    if (typeof plugin.id !== 'string' || plugin.id.length === 0) {
+      throw new Error('Plugin id must be a non-empty string')
     }
+    if (pluginMap.has(plugin.id)) {
+      console.warn(`Duplicate plugin id detected: \`${plugin.id}\``)
+    }
+    pluginMap.set(plugin.id, plugin)
   }
 
   function visit(plugin: Plugin<E>) {
-    if (!plugin.id) {
-      return
+    if (typeof plugin.id !== 'string' || plugin.id.length === 0) {
+      throw new Error('Plugin id must be a non-empty string')
     }
     if (visited.has(plugin.id)) {
       return

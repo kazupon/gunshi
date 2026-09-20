@@ -99,9 +99,28 @@ describe('resolveDependencies', () => {
     const pluginA = plugin({ id: 'a', name: 'a' })
     const pluginB = { id: '', name: '' } as Plugin
     const pluginC = plugin({ id: 'c', name: 'c', dependencies: ['a'] })
-    const result = resolveDependencies([pluginB, pluginC, pluginA])
 
-    expect(result.filter(p => p.id).map(p => p.id)).toEqual(['a', 'c'])
+    expect(() => resolveDependencies([pluginB, pluginC, pluginA])).toThrow(
+      'Plugin id must be a non-empty string'
+    )
+  })
+
+  test('a function with no id is rejected', () => {
+    const raw = (async () => {}) as unknown as Plugin
+    const pluginA = plugin({ id: 'a', name: 'a' })
+
+    expect(() => resolveDependencies([raw, pluginA])).toThrow(
+      'Plugin id must be a non-empty string'
+    )
+  })
+
+  test('a non-string id is rejected', () => {
+    const pluginA = plugin({ id: 'a', name: 'a' })
+    const bad = { id: 1, name: 'n' } as unknown as Plugin
+
+    expect(() => resolveDependencies([bad, pluginA])).toThrow(
+      'Plugin id must be a non-empty string'
+    )
   })
 
   test('handle PluginDependency objects array', () => {
