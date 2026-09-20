@@ -2652,17 +2652,28 @@ describe('github issues', () => {
       expect(run).not.toHaveBeenCalled()
     })
 
-    test('a schema identical to the global one is left to the global option', async () => {
+    test("a schema identical to the global one is still the command's", async () => {
       const run = vi.fn<CommandRunner>()
 
-      await expect(
-        createCli(
-          { version: { type: 'boolean', short: 'v', description: 'Display this version' } },
-          run,
-          ['--version']
-        )
-      ).resolves.toBe('9.9.9')
-      expect(run).not.toHaveBeenCalled()
+      await createCli(
+        { version: { type: 'boolean', short: 'v', description: 'Display this version' } },
+        run,
+        ['--version']
+      )
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { version: true } }))
+    })
+
+    test("an identical help schema is still the command's", async () => {
+      const run = vi.fn<CommandRunner>()
+
+      await createCli(
+        { help: { type: 'boolean', short: 'h', description: 'Display this help message' } },
+        run,
+        ['--help']
+      )
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ values: { help: true } }))
     })
   })
 
