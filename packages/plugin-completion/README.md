@@ -270,7 +270,9 @@ To remove completion support:
 
 ### Custom Completion Handlers
 
-You can provide custom completion handlers for specific arguments:
+You can provide custom completion handlers for arguments declared in the entry command or in a sub-command.
+
+A handler receives an object with an optional `locale` (`Intl.Locale`) and returns an array of completion candidates. Previous command-line arguments are not passed to the handler. A handler that does not use `locale` can omit its parameter:
 
 ```ts
 completion({
@@ -278,7 +280,7 @@ completion({
     entry: {
       args: {
         environment: {
-          handler: ({ locale }) => [
+          handler: () => [
             { value: 'production', description: 'Production environment' },
             { value: 'staging', description: 'Staging environment' },
             { value: 'development', description: 'Development environment' }
@@ -290,17 +292,7 @@ completion({
       deploy: {
         args: {
           region: {
-            handler: ({ previousArgs }) => {
-              // Dynamic completions based on previous arguments
-              const env = previousArgs.find(arg => arg.startsWith('--environment='))
-              if (env?.includes('production')) {
-                return [
-                  { value: 'us-east-1', description: 'US East (N. Virginia)' },
-                  { value: 'eu-west-1', description: 'EU (Ireland)' }
-                ]
-              }
-              return [{ value: 'local', description: 'Local development' }]
-            }
+            handler: () => [{ value: 'local', description: 'Local development' }]
           }
         }
       }
