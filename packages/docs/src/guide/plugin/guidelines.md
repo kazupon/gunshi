@@ -59,6 +59,26 @@ export const pluginId = '@company/auth' as const
 export const pluginId = 'g:i18n' as const
 ```
 
+### Short Names of Global Options
+
+A short name belongs to one global option for the whole CLI. `-h` and `-v` are taken by `@gunshi/plugin-global`, which is installed before anything else, and any plugin that reaches for a letter another plugin already registered gets its option registered without the short name — with a warning naming both of them. The long name always works.
+
+The plugins of a CLI know nothing of each other, so the author of the CLI is often in no position to resolve the collision. Prefer a plugin that leaves it to them:
+
+```ts
+export default function host(options: { short?: string } = {}) {
+  return plugin({
+    id: 'myorg:host',
+    setup: ctx => {
+      // no short name unless the CLI asks for one, and never `-h` by default
+      ctx.addGlobalOption('host', { type: 'string', short: options.short, description: 'Host' })
+    }
+  })
+}
+```
+
+An argument of a command is not subject to this: it claims the letter for itself, and the global option gives it up for that command.
+
 ### Package Names
 
 Follow consistent naming for plugin packages:
