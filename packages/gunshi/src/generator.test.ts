@@ -3,6 +3,7 @@ import register from '../test/fixtures/register.ts'
 import show from '../test/fixtures/show.ts'
 import { define } from './definition.ts'
 import { generate } from './generator.ts'
+import { plugin } from './plugin/core.ts'
 
 import type { GenerateOptions } from './generator.ts'
 import type { ArgSchema, Args, CommandRunner } from './types.ts'
@@ -31,6 +32,32 @@ test('subcomments', async () => {
   await expect(async () => {
     await generate('create', show, { subCommands, ...meta })
   }).rejects.toThrowError(/create/)
+})
+
+test('#768 includes the entry when a plugin adds commands', async () => {
+  const entryRun = vi.fn<CommandRunner>()
+  const cleanRun = vi.fn<CommandRunner>()
+  const entry = define({
+    name: 'build',
+    description: 'Build the project',
+    args: { target: { type: 'positional', description: 'Build target' } },
+    run: entryRun
+  })
+  const clean = define({ name: 'clean', description: 'Clean artifacts', run: cleanRun })
+  const tools = plugin({
+    id: 'issue-768-generator',
+    setup: ctx => ctx.addCommand('clean', clean)
+  })
+
+  const usage = await generate(null, entry, {
+    name: 'mycli',
+    plugins: [tools]
+  })
+
+  expect(usage).toContain('  [build] <target>')
+  expect(usage).toContain('  clean')
+  expect(entryRun).not.toHaveBeenCalled()
+  expect(cleanRun).not.toHaveBeenCalled()
 })
 
 describe('a command that declares an argument of its own', () => {

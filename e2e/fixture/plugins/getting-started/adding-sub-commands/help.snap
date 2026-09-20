@@ -1,0 +1,17 @@
+USAGE:
+  COMMAND [COMMANDS] <OPTIONS>
+
+COMMANDS:
+  [build]
+  clean [OPTIONS]          Clean build artifacts
+  lint                     Run linter
+
+For more info, run any command with the `--help` flag:
+  COMMAND --help
+  COMMAND clean --help
+  COMMAND lint --help
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+

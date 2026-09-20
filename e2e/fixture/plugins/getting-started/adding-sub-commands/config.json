@@ -1,4 +1,5 @@
 [
+  ["help", "node cli.js --help"],
   ["entry", "node cli.js"],
   ["clean", "node cli.js clean"],
   ["clean-cache", "node cli.js clean --cache"],

@@ -136,7 +136,7 @@ Available extensions:
 
 - **`text<K>(key: K, values?: Record<string, unknown>): Promise<string>`**: Render text with optional i18n support. Handles built-in keys, argument descriptions, and custom keys intelligently.
 
-- **`loadCommands<G>(): Promise<Command<G>[]>`**: Load and cache subcommands for rendering command lists. Results are cached after the first call for performance.
+- **`loadCommands<G>(): Promise<Command<G>[]>`**: Load and cache commands for rendering command lists. At the top level, the list also includes the CLI's entry command when plugins registered the subcommands without adding the entry to the registry. Results are cached after the first call for performance.
 
 - **`localizeCommandDescription(cmd): Promise<string>`**: Resolve the description of a command in the command list. Localized when `@gunshi/plugin-i18n` is installed and the command has a resource of its own; otherwise `Command.description`.
 
