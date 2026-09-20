@@ -331,7 +331,12 @@ const build = define({
 
 `my-cli build -v` sets `verbose`, while `my-cli build --version` still prints the version of the CLI, and its help lists it as `--version` alone. Other commands of the same CLI keep `-v` for `--version`.
 
-Two limits are worth knowing. A schema that is identical, field for field, to the one the plugin registers cannot be told apart from it, so it keeps the plugin's behaviour. And only `@gunshi/plugin-global` looks at whether the command took the name: `@gunshi/plugin-dryrun` still reads the value it finds, so a command that declares a truthy `dryRun` of its own also switches that plugin into dry-run mode.
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> Declaring the name is what takes a global option away — except when the schema is identical, field for field, to the one the plugin registered, which cannot be told apart from it and keeps the plugin's behaviour. A plugin is told which of its own options are still in effect; how each one reacts is part of that plugin's documentation. See [Plugin System](../plugin/introduction.md).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Strict Unknown Option Validation
 
