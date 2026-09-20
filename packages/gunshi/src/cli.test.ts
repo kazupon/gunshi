@@ -975,6 +975,28 @@ test('usageSilent', async () => {
   expect(stdout).toBe('')
 })
 
+test('usageSilent silences ctx.log but not console.log', async () => {
+  const utils = await import('./utils.ts')
+  const log = defineMockLog(utils)
+  const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => {})
+
+  await cli(
+    [],
+    {
+      name: 'cmd',
+      run: ctx => {
+        ctx.log('via ctx.log')
+        console.log('via console.log')
+      }
+    },
+    { name: 'my-cli', version: '0.0.0', usageSilent: true, renderHeader: null }
+  )
+
+  expect(log()).toBe('')
+  expect(consoleLog).toHaveBeenCalledTimes(1)
+  expect(consoleLog).toHaveBeenCalledWith('via console.log')
+})
+
 test('_ (rawArgs)', async () => {
   const args = ['--foo', 'bar', '--baz', 'qux']
   const fn = vi.fn<() => void>()

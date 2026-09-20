@@ -787,7 +787,7 @@ The `run` function receives a command context object (`ctx`) with:
 - `env`: The command environment settings (version, logger, renderers, etc.).
 - `callMode`: Command call mode ('entry', 'subCommand', or 'unexpected') indicating how the command was invoked.
 - `toKebab`: Boolean indicating whether camelCase argument names should be converted to kebab-case.
-- `log`: Function for outputting messages that respects the `usageSilent` setting.
+- `log`: Function for outputting messages that respects the `usageSilent` setting. Output that must still appear when `usageSilent` is set should use `console.log` / `console.warn`.
 - `extensions`: Command context extensions for plugin functionality (available in v0.27.0+).
 - `validationError`: Contains validation errors from argument parsing if any occurred.
 

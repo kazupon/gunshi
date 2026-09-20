@@ -98,7 +98,9 @@ Gunshi does not apply these policies automatically. Commands and plugins decide 
 
 ## Using it in a command
 
-This command requires `--target`, so an agent cannot be left waiting for an implicit prompt. When an agent is detected, the command emits a stable JSON object with an explicit status instead of human-oriented prose:
+This command requires `--target`, so an agent cannot be left waiting for an implicit prompt. When an agent is detected, the command emits a stable JSON object with an explicit status instead of human-oriented prose.
+
+`ctx.log` is silenced when `usageSilent` is set, so results that an agent or a script must still see go through `console.log`:
 
 ```ts
 import { define } from 'gunshi'
@@ -113,7 +115,8 @@ export default define({
     const profile = getAgentProfile()
 
     if (profile.isAgent) {
-      ctx.log(
+      // results must still appear when `usageSilent` is set; `ctx.log` would not
+      console.log(
         JSON.stringify({
           status: 'success',
           target: ctx.values.target
@@ -122,7 +125,7 @@ export default define({
       return
     }
 
-    ctx.log(`Deployed to ${ctx.values.target}`)
+    console.log(`Deployed to ${ctx.values.target}`)
   }
 })
 ```

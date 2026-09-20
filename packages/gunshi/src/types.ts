@@ -209,7 +209,11 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   usageOptionValue: boolean
   /**
-   * Whether to display the command usage.
+   * Whether to keep usage, header, version, and validation-error text off the terminal
+   * (they are still returned as strings) and to silence {@linkcode CommandContext.log}.
+   *
+   * Output that must still appear — machine-readable results for an agent, warnings for the
+   * CLI author — should use `console.log` / `console.warn`, not `ctx.log`.
    *
    * @default false
    * @see {@linkcode CliOptions.usageSilent}
@@ -332,7 +336,13 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    */
   usageOptionValue?: boolean
   /**
-   * Whether to display the command usage.
+   * Whether to keep usage, header, version, and validation-error text off the terminal
+   * (they are still returned as strings) and to silence {@linkcode CommandContext.log}.
+   *
+   * Output that must still appear — machine-readable results for an agent, warnings for the
+   * CLI author — should use `console.log` / `console.warn`, not `ctx.log`.
+   *
+   * @default false
    */
   usageSilent?: boolean
   /**
