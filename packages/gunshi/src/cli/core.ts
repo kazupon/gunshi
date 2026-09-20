@@ -47,6 +47,8 @@ type InternalCliOptions<G extends GunshiParamsConstraint> = Omit<CliOptions<G>, 
   subCommands: Map<string, Command<G> | LazyCommand<G>>
   // The entry command, which is exposed as `CommandEnvironment.entryCommand`
   entryCommand: Command<G> | LazyCommand<G> | undefined
+  // The global options in effect, which are exposed as `CommandEnvironment.globalOptions`
+  globalOptions?: ReadonlyMap<string, ArgSchema>
 }
 
 /**
@@ -143,9 +145,17 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     ? await resolveLazyCommand<G>(targetCommand, targetCommandName, true)
     : targetCommand
 
-  const args = resolveCommandArgs<ExtractArgs<G>>(
+  const commandArgs = getCommandArgs(resolvedCommand)
+  const args = resolveCommandArgs<ExtractArgs<G>>(pluginContext.globalOptions, commandArgs)
+
+  /**
+   * NOTE(kazupon): a plugin cannot tell on its own whether the global option it registered survived
+   * the merge, so the core says which ones are in effect for this command (#745).
+   */
+  cliOptions.globalOptions = resolveEffectiveGlobalOptions(
     pluginContext.globalOptions,
-    getCommandArgs(resolvedCommand)
+    commandArgs,
+    args
   )
 
   // skipPositional: how many leading positionals to skip (they're consumed as command names)
@@ -253,6 +263,32 @@ async function applyPlugins<G extends GunshiParamsConstraint>(
   }
 
   return sortedPlugins
+}
+
+/**
+ * Resolve the global options that are in effect for the command being executed.
+ *
+ * A global option is in effect unless the command declares an argument of its own under the same
+ * name, which replaces it. The schema is taken from the merged arguments, so it is the one in effect.
+ *
+ * @param globalOptions - The global options that plugins registered with `addGlobalOption`
+ * @param commandArgs - The arguments that the command declares
+ * @param args - The merged arguments
+ * @returns The global options in effect, keyed by name
+ */
+function resolveEffectiveGlobalOptions<G extends GunshiParamsConstraint>(
+  globalOptions: ReadonlyMap<string, ArgSchema>,
+  commandArgs: ExtractArgs<G>,
+  args: ExtractArgs<G>
+): ReadonlyMap<string, ArgSchema> {
+  const effective = new Map<string, ArgSchema>()
+  for (const name of globalOptions.keys()) {
+    // an own property only: a command declares its arguments, it does not inherit them
+    if (!Object.hasOwn(commandArgs, name)) {
+      effective.set(name, args[name])
+    }
+  }
+  return effective
 }
 
 function getCommandArgs<G extends GunshiParamsConstraint>(

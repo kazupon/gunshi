@@ -26,6 +26,11 @@ Context: [Object: null prototype] {
       name: 'build',
       run: [Function: run],
       entry: true
+    },
+    globalOptions: Map(3) {
+      'help' => [Object],
+      'version' => [Object],
+      'debug' => [Object]
     }
   },
   args: [Object: null prototype] {

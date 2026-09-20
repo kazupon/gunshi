@@ -176,7 +176,21 @@ export default function dryrun(
     dependencies,
 
     extension(ctx) {
-      const enabled = ctx.values[optionName] === true
+      /**
+       * NOTE(kazupon): the option of this plugin is a global option, and an argument that the command
+       * declares under the same name replaces it (#745). The value under the name is then the
+       * command's, and reading it as this plugin's flag would either skip real work that nobody asked
+       * to skip, or run for real after the user asked for a dry run. The core says which global
+       * options are in effect; when it says nothing, as when a command context is built on its own,
+       * the option is taken to be in effect.
+       */
+      const inEffect = ctx.env.globalOptions?.has(optionName) ?? true
+      if (!inEffect) {
+        console.warn(
+          `The command "${ctx.name ?? ''}" declares an argument called "${optionName}", which replaces the global option of @gunshi/plugin-dryrun. Dry-run mode stays off for this command. Rename either of them, for example with \`dryrun({ name: '...' })\`.`
+        )
+      }
+      const enabled = inEffect && ctx.values[optionName] === true
 
       function resolveMessage(fn: NamedFunction, message?: string): string {
         return message || fn.name || 'anonymous'

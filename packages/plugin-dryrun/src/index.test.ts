@@ -1,9 +1,11 @@
 import { describe, expect, test, vi } from 'vitest'
+import { cli } from '../../gunshi/src/cli.ts'
+import { define } from '../../gunshi/src/definition.ts'
 import { createDecorators } from '../../gunshi/src/decorators.ts'
 import { createPluginContext } from '../../gunshi/src/plugin/context.ts'
 import dryrun, { pluginId } from './index.ts'
 
-import type { Command, CommandContext, CommandContextCore } from '@gunshi/plugin'
+import type { ArgSchema, Command, CommandContext, CommandContextCore } from '@gunshi/plugin'
 import type { DryRunExtension, DryRunPluginOptions } from './index.ts'
 
 const defaultDescription = 'Show what would be executed without running side effects'
@@ -94,6 +96,111 @@ describe('onExtension', () => {
     )
 
     expect(result).toBeUndefined()
+  })
+})
+
+describe('#745 - the command declares an argument of the same name', () => {
+  test('the flag of the plugin is not read from the value of the command', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    // the core reports no global option in effect, because the command declared `dryRun` itself
+    const { extension } = await createDryRunExtension({
+      values: { dryRun: true },
+      globalOptions: new Map()
+    })
+
+    expect(extension.enabled).toBe(false)
+    warn.mockRestore()
+  })
+
+  test('a task is not skipped when nobody asked the plugin to skip it', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { extension, log } = await createDryRunExtension({
+      // the command's own `dryRun` defaults to `true`
+      values: { dryRun: true },
+      globalOptions: new Map()
+    })
+    const task = vi.fn<() => string>(() => 'actual')
+
+    expect(await extension.run(task, { result: 'fallback' })).toBe('actual')
+    expect(task).toHaveBeenCalledOnce()
+    expect(log).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  test('the collision is reported, so that the author of the cli notices', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    await createDryRunExtension({ values: { dryRun: true }, globalOptions: new Map() })
+
+    expect(warn).toHaveBeenCalledOnce()
+    const message = warn.mock.calls[0][0] as string
+    expect(message).toContain('dryRun')
+    expect(message).toContain('@gunshi/plugin-dryrun')
+    warn.mockRestore()
+  })
+
+  test('nothing is reported while the option is in effect', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const { extension } = await createDryRunExtension({ values: { dryRun: true } })
+
+    expect(extension.enabled).toBe(true)
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  test('a renamed option is looked up under the name it was given', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    // `dryrun({ name })` is the way out of the collision
+    const { extension } = await createDryRunExtension({
+      values: { pretend: true, dryRun: 'staging' },
+      options: { name: 'pretend' }
+    })
+
+    expect(extension.enabled).toBe(true)
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  test('the two halves are connected: the core tells the plugin, through `cli`', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    let enabled: boolean | undefined
+    const deploy = define({
+      name: 'deploy',
+      // the command declares the name of the global option for itself
+      args: { dryRun: { type: 'string', description: 'Dry-run profile' } },
+      run: ctx => {
+        enabled = (ctx.extensions as Record<string, DryRunExtension>)[pluginId].enabled
+      }
+    })
+
+    await cli(['deploy', '--dryRun', 'staging'], define({ name: 'root', run: () => {} }), {
+      name: 'my-cli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands: { deploy },
+      plugins: [dryrun()]
+    })
+
+    expect(enabled).toBe(false)
+    expect(warn).toHaveBeenCalledOnce()
+    warn.mockRestore()
+  })
+
+  test('the option is taken to be in effect when the core says nothing', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    // a command context built on its own, as in the tests of a plugin that depends on this one
+    const { extension } = await createDryRunExtension({
+      values: { dryRun: true },
+      globalOptions: undefined
+    })
+
+    expect(extension.enabled).toBe(true)
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
   })
 })
 
@@ -226,20 +333,32 @@ describe('extension', () => {
   })
 })
 
-async function createDryRunExtension({
-  values = {},
-  options = {}
-}: {
-  values?: Record<string, unknown>
-  options?: DryRunPluginOptions
-} = {}): Promise<{
+async function createDryRunExtension(
+  params: {
+    values?: Record<string, unknown>
+    options?: DryRunPluginOptions
+    // the global options in effect, as the core reports them (#745). The default has the option of
+    // this plugin in effect, which is the normal case
+    globalOptions?: ReadonlyMap<string, ArgSchema>
+  } = {}
+): Promise<{
   extension: DryRunExtension
   log: ReturnType<typeof vi.fn>
 }> {
+  const { values = {}, options = {} } = params
   const log = vi.fn<(message: string) => void>()
+  const optionName = options.name ?? 'dryRun'
   const core = {
+    name: 'test',
     values,
-    log
+    log,
+    env: {
+      // an explicit `undefined` is kept, so that the compatibility path can be exercised
+      globalOptions:
+        'globalOptions' in params
+          ? params.globalOptions
+          : new Map<string, ArgSchema>([[optionName, { type: 'boolean' }]])
+    }
   } as unknown as CommandContextCore
   const plugin = dryrun(options)
   const extension = await plugin.extension.factory(core, {} as Command)

@@ -12,7 +12,7 @@ import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
 import { hidden, string } from './combinators.ts'
 
-import type { Args } from 'args-tokens'
+import type { ArgSchema, Args } from 'args-tokens'
 import type { Mocked } from 'vitest'
 import type {
   CliOptions,
@@ -3512,6 +3512,72 @@ describe('nested sub-commands', () => {
     expect(commandError.commandPath).toEqual(['remote'])
     expect(commandError.candidates).toEqual(['add', 'remove'])
     expect(mockRemote).not.toHaveBeenCalled()
+  })
+})
+
+describe('global options in the command environment', () => {
+  async function envOf(
+    args: Args,
+    globals: Record<string, ArgSchema> = { token: { type: 'string', short: 't' } }
+  ): Promise<Readonly<CommandEnvironment> | undefined> {
+    let env: Readonly<CommandEnvironment> | undefined
+    const adds = plugin({
+      id: 'test:globals',
+      name: 'globals',
+      setup: ctx => {
+        for (const [name, schema] of Object.entries(globals)) {
+          ctx.addGlobalOption(name, schema)
+        }
+      }
+    })
+
+    await cli(
+      [],
+      define({
+        name: 'deploy',
+        args,
+        run: ctx => {
+          env = ctx.env
+        }
+      }),
+      { name: 'my-cli', version: '0.0.0', usageSilent: true, plugins: [adds] }
+    )
+
+    return env
+  }
+
+  test('the global options that a plugin added are in effect', async () => {
+    const env = await envOf({ output: { type: 'string' } })
+
+    expect([...(env?.globalOptions?.keys() ?? [])]).toEqual(['help', 'version', 'token'])
+    expect(env?.globalOptions?.get('token')).toEqual({ type: 'string', short: 't' })
+  })
+
+  test('an argument of the command takes its name out of the list', async () => {
+    // the command declares `token` itself, so the global option is not in effect (#745)
+    const env = await envOf({ token: { type: 'boolean', description: 'Use a token' } })
+
+    expect([...(env?.globalOptions?.keys() ?? [])]).toEqual(['help', 'version'])
+    expect(env?.globalOptions?.has('token')).toBe(false)
+  })
+
+  test('a global option that only gave up its short name is still in effect', async () => {
+    // the command claims `-t`, so the global `token` keeps its long name only (#730)
+    const env = await envOf({ tag: { type: 'string', short: 't', description: 'Tag' } })
+
+    expect(env?.globalOptions?.has('token')).toBe(true)
+    expect(env?.globalOptions?.get('token')).toEqual({ type: 'string', short: undefined })
+  })
+
+  test('a name that every object inherits is not read as a declaration', async () => {
+    // `constructor` is on the prototype of an object literal, and inheriting a name is not
+    // declaring an argument under it
+    const inherited = 'constructor'
+    const globals: Record<string, ArgSchema> = {}
+    globals[inherited] = { type: 'boolean', description: 'Odd but legal' }
+    const env = await envOf({ output: { type: 'string' } }, globals)
+
+    expect(env?.globalOptions?.has('constructor')).toBe(true)
   })
 })
 

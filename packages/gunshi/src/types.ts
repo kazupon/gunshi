@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { ArgExplicitlyProvided, ArgToken, Args, ArgValues } from 'args-tokens'
+import type { ArgExplicitlyProvided, ArgSchema, ArgToken, Args, ArgValues } from 'args-tokens'
 import type { Plugin } from './plugin/core.ts'
 
 export type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
@@ -236,6 +236,18 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    * It is not frozen, like the commands in {@linkcode CommandEnvironment.subCommands}.
    */
   entryCommand?: Command<any> | LazyCommand<any>
+  /**
+   * The global options that are in effect for the command being executed.
+   *
+   * A plugin registers a global option with `addGlobalOption`, and gunshi merges it into the arguments
+   * of the command that runs. An argument that the command declares under the same name replaces it,
+   * and the option is then not in effect: the value under that name is the command's, and the plugin
+   * that registered it must not read it as its own.
+   *
+   * The schema is the one in effect, which may have given up its short name to an argument of the
+   * command that claims the same letter.
+   */
+  globalOptions?: ReadonlyMap<string, ArgSchema>
   /**
    * Render function the command usage.
    */
