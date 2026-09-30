@@ -1,8 +1,11 @@
 import { ArgsValidationError, ArgsValidationErrorKeys, parseArgs } from 'args-tokens'
+import { cpSync, mkdtempSync, rmSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
+import { basename, dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { runInNewContext } from 'node:vm'
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterAll, afterEach, describe, expect, test, vi } from 'vitest'
 import {
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
@@ -464,27 +467,42 @@ describe('CommandResolutionError', () => {
 })
 
 describe('errors raised by another bundled copy of args-tokens', () => {
+  let foreignDir: string | undefined
+
+  afterAll(() => {
+    if (foreignDir !== undefined) {
+      rmSync(foreignDir, { recursive: true, force: true })
+    }
+  })
+
   /**
    * Load another copy of the `args-tokens` resolver, like the one bundled into `@gunshi/plugin`.
    *
    * `vi.resetModules()` does not duplicate externalized dependencies such as `args-tokens`,
-   * so the built resolver module is imported again with a query string. The module loader
-   * evaluates it as a separate module instance that defines its own error classes.
+   * so the built `lib` directory is copied to a temporary directory once, and the resolver
+   * module of the copy is imported. Every module of the copy, including the chunks that the
+   * resolver imports, has a URL of its own, so the module loader evaluates them as separate
+   * module instances that define their own error classes.
    *
    * @returns The foreign resolver module
    */
   async function loadForeignResolver(): Promise<typeof import('args-tokens/resolver')> {
     const require = createRequire(import.meta.url)
     const resolverPath = require.resolve('args-tokens/resolver')
+    // a query string on `resolver.js` alone does not reach the chunks that it imports
+    if (foreignDir === undefined) {
+      foreignDir = mkdtempSync(join(tmpdir(), 'args-tokens-foreign-'))
+      cpSync(dirname(resolverPath), foreignDir, { recursive: true })
+    }
     const foreign = (await import(
-      /* @vite-ignore */ `${pathToFileURL(resolverPath).href}?copy=foreign`
+      /* @vite-ignore */ pathToFileURL(join(foreignDir, basename(resolverPath))).href
     )) as typeof import('args-tokens/resolver')
     // guard the premise: otherwise the cross-copy tests would pass trivially
     expect(foreign.ArgsValidationError).not.toBe(ArgsValidationError)
     return foreign
   }
 
-  test.each<{ title: string; args: Args; argv: string[]; code: string | undefined }>([
+  test.each<{ title: string; args: Args; argv: string[]; code: string }>([
     {
       title: 'required option',
       args: { foo: { type: 'string', required: true } },
@@ -513,7 +531,25 @@ describe('errors raised by another bundled copy of args-tokens', () => {
       title: 'conflict',
       args: { summer: { type: 'boolean', conflicts: 'autumn' }, autumn: { type: 'boolean' } },
       argv: ['--summer', '--autumn'],
-      code: undefined
+      code: ArgsValidationErrorKeys.conflict
+    },
+    {
+      title: 'missing value',
+      args: { name: { type: 'string' } },
+      argv: ['--name'],
+      code: ArgsValidationErrorKeys.missingValue
+    },
+    {
+      title: 'unexpected value',
+      args: { color: { type: 'boolean', negatable: true } },
+      argv: ['--no-color=false'],
+      code: ArgsValidationErrorKeys.unexpectedValue
+    },
+    {
+      title: 'invalid default',
+      args: { level: { type: 'enum', choices: ['debug', 'info'], default: 'verbose' } },
+      argv: [],
+      code: ArgsValidationErrorKeys.invalidDefault
     }
   ])('recognizes $title errors', async ({ args, argv, code }) => {
     const foreign = await loadForeignResolver()

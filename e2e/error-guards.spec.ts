@@ -111,7 +111,7 @@ const argsValidationCases: {
   title: string
   args: Args
   argv: string[]
-  code: string | undefined
+  code: string
 }[] = [
   {
     title: 'required option',
@@ -141,7 +141,25 @@ const argsValidationCases: {
     title: 'conflict',
     args: { summer: { type: 'boolean', conflicts: 'autumn' }, autumn: { type: 'boolean' } },
     argv: ['--summer', '--autumn'],
-    code: undefined
+    code: 'err:arg:conflict'
+  },
+  {
+    title: 'missing value',
+    args: { name: { type: 'string' } },
+    argv: ['--name'],
+    code: 'err:arg:missing-value'
+  },
+  {
+    title: 'unexpected value',
+    args: { color: { type: 'boolean', negatable: true } },
+    argv: ['--no-color=false'],
+    code: 'err:arg:unexpected-value'
+  },
+  {
+    title: 'invalid default',
+    args: { level: { type: 'enum', choices: ['debug', 'info'], default: 'verbose' } },
+    argv: [],
+    code: 'err:arg:invalid-default'
   }
 ]
 
@@ -266,6 +284,29 @@ describe('@gunshi/bone with plugins built separately', () => {
 
     // without a cross-copy guard, the renderer falls back to the English message
     expect(rendered).toEqual(["オプション '--foo' は必須です"])
+  })
+
+  test('@gunshi/plugin-renderer localizes a missing value error with @gunshi/plugin-i18n', async () => {
+    const { capture, rendered } = captureValidationErrors()
+
+    await captureAggregateError(() =>
+      bone.cli(
+        ['--name'],
+        { name: 'app', args: { name: { type: 'string' } }, run: () => {} },
+        {
+          usageSilent: true,
+          plugins: [
+            global.default(),
+            i18n.default({ locale: 'ja-JP', builtinResources: resources.default }),
+            renderer.default(),
+            capture
+          ]
+        }
+      )
+    )
+
+    // the built `@gunshi/resources` ships a text for the code that args-tokens 1.0 adds
+    expect(rendered).toEqual(["オプション '--name' には値が必要です"])
   })
 
   test('@gunshi/plugin-suggestion suggests a known long option', async () => {

@@ -20,6 +20,10 @@ import type {
 test('exports args validation error types', () => {
   expectTypeOf(ArgsValidationError).toBeConstructibleWith('fallback message')
   expectTypeOf(ArgsValidationErrorKeys.requiredOption).toEqualTypeOf<'err:arg:required-option'>()
+  expectTypeOf(ArgsValidationErrorKeys.unexpectedValue).toEqualTypeOf<'err:arg:unexpected-value'>()
+  expectTypeOf(ArgsValidationErrorKeys.missingValue).toEqualTypeOf<'err:arg:missing-value'>()
+  expectTypeOf(ArgsValidationErrorKeys.conflict).toEqualTypeOf<'err:arg:conflict'>()
+  expectTypeOf(ArgsValidationErrorKeys.invalidDefault).toEqualTypeOf<'err:arg:invalid-default'>()
   expectTypeOf<ArgsValidationErrorCode>().toEqualTypeOf<
     (typeof ArgsValidationErrorKeys)[keyof typeof ArgsValidationErrorKeys]
   >()
