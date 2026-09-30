@@ -1,7 +1,7 @@
 {
   "name": "@gunshi/combinators",
   "description": "parser combinators for gunshi argument schema",
-  "version": "0.37.3",
+  "version": "1.0.0-beta.0",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
