@@ -38,6 +38,7 @@ export const advanced = {
   collapsed: false,
   items: [
     { text: 'Type System', link: '/guide/advanced/type-system' },
+    { text: 'Parser Combinators', link: '/guide/advanced/parser-combinators' },
     { text: 'Command Hooks', link: '/guide/advanced/command-hooks' },
     { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
     { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
@@ -53,12 +54,6 @@ export const advanced = {
       link: '/guide/advanced/nested-sub-commands'
     }
   ]
-}
-
-export const experimentals = {
-  text: 'Experimentals',
-  collapsed: false,
-  items: [{ text: 'Parser Combinators', link: '/guide/experimentals/parser-combinators' }]
 }
 
 export const plugin = {

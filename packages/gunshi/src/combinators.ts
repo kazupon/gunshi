@@ -23,8 +23,6 @@
  * })
  * ```
  *
- * @experimental This module is experimental and may change in future versions.
- *
  * @module combinators
  */
 

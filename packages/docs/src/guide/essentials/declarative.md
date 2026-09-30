@@ -175,8 +175,7 @@ Each option can have the following properties:
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> For a more type-safe and composable way to define arguments, see [Parser Combinators](../experimentals/parser-combinators.md).
-> Note that this feature is currently **experimental**.
+> For a more type-safe and composable way to define arguments, see [Parser Combinators](../advanced/parser-combinators.md).
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

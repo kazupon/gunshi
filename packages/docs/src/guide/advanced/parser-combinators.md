@@ -1,8 +1,5 @@
 # Parser Combinators
 
-> [!WARNING]
-> Parser Combinators are currently **experimental**. The API may change in future versions.
-
 Parser combinators provide a functional, composable approach to defining type-safe argument schemas in Gunshi. Instead of writing plain object configurations, you can use factory functions that generate schemas with full type inference.
 
 This approach brings several advantages:
@@ -968,7 +965,7 @@ $ serve index.html -v
 ```
 
 > [!TIP]
-> The complete example code is available [here](https://github.com/kazupon/gunshi/tree/main/playground/experimentals/combinators).
+> The complete example code is available [here](https://github.com/kazupon/gunshi/tree/main/playground/advanced/combinators).
 
 ## Type Inference
 

@@ -1,0 +1,4 @@
+# Parser Combinators moved from Experimentals to Advanced, when they became stable
+/guide/experimentals/parser-combinators /guide/advanced/parser-combinators 301
+/guide/experimentals/parser-combinators/ /guide/advanced/parser-combinators 301
+/guide/experimentals/parser-combinators.html /guide/advanced/parser-combinators 301
