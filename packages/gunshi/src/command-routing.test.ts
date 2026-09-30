@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
 import {
+  CommandNotFoundErrorKeys,
   CommandResolutionError,
   CommandResolutionErrorKeys,
   isCommandResolutionError
@@ -245,5 +246,133 @@ describe('command routing with option values', () => {
     expect(entry).toHaveBeenCalledWith(
       expect.objectContaining({ values: { config: 'prod.json' }, positionals: ['input.txt'] })
     )
+  })
+})
+
+describe('#781 - an empty argument is never a command name', () => {
+  // an entry command whose optional positional argument takes the empty argument
+  function entry(run = vi.fn()) {
+    return define({
+      name: 'app',
+      args: {
+        verbose: { type: 'boolean' },
+        file: { type: 'positional', required: false }
+      },
+      run
+    })
+  }
+
+  const subCommands = { deploy: define({ name: 'deploy', run: vi.fn() }) }
+
+  test.each([
+    ["--verbose ''", ['--verbose', ''], {}],
+    ["'' --verbose", ['', '--verbose'], {}],
+    ["--debug '' (a global option)", ['--debug', ''], {}],
+    ["--verbose '' (strict)", ['--verbose', ''], { strict: true }]
+  ])('%s runs the entry command with the empty argument', async (_label, argv, extra) => {
+    const run = vi.fn()
+
+    await cli(argv, entry(run), { ...options(), ...extra, subCommands })
+
+    expect(run).toHaveBeenCalledOnce()
+    expect(run).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: [],
+        omitted: true,
+        positionals: [''],
+        values: expect.objectContaining({ file: '' })
+      })
+    )
+  })
+
+  test("an empty argument after '--' does not stop the entry command either", async () => {
+    const run = vi.fn()
+
+    await cli(['--verbose', '--', ''], entry(run), { ...options(), subCommands })
+
+    // args-tokens 0.29.0 gives the argument to `positionals`, and 1.0 gives it to `rest`
+    // (kazupon/args-tokens#640), so this checks only which command runs
+    expect(run).toHaveBeenCalledOnce()
+    expect(run).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandPath: [],
+        values: expect.objectContaining({ verbose: true })
+      })
+    )
+  })
+
+  test('an empty argument before a command name does not hide the command', async () => {
+    const deploy = vi.fn()
+
+    await cli(['', 'deploy', '--config', 'prod.json'], entry(), {
+      ...options(),
+      subCommands: { deploy: define({ name: 'deploy', run: deploy }) }
+    })
+
+    expect(deploy).toHaveBeenCalledOnce()
+    expect(deploy).toHaveBeenCalledWith(
+      expect.objectContaining({ commandPath: ['deploy'], values: { config: 'prod.json' } })
+    )
+  })
+
+  test('an empty argument after a command that has sub-commands selects that command', async () => {
+    const remote = vi.fn()
+    const add = vi.fn()
+    const command = define({
+      name: 'remote',
+      args: { verbose: { type: 'boolean' } },
+      run: remote,
+      subCommands: { add: define({ name: 'add', run: add }) }
+    })
+
+    for (const argv of [
+      ['remote', '--verbose', ''],
+      ['remote', '', '--verbose']
+    ]) {
+      await cli(argv, entry(), { ...options(), subCommands: { remote: command } })
+    }
+
+    expect(remote).toHaveBeenCalledTimes(2)
+    expect(remote).toHaveBeenLastCalledWith(
+      expect.objectContaining({ commandPath: ['remote'], omitted: true, values: { verbose: true } })
+    )
+    expect(add).not.toHaveBeenCalled()
+  })
+
+  test('a lazy command that declares sub-commands is loaded and runs', async () => {
+    const run = vi.fn()
+    const load = vi.fn(async () =>
+      define({ name: 'group', args: { verbose: { type: 'boolean' } }, run })
+    )
+    const group = lazy(load, {
+      name: 'group',
+      args: { verbose: { type: 'boolean' } },
+      subCommands: { child: define({ name: 'child', run: vi.fn() }) }
+    })
+
+    await cli(['group', '--verbose', ''], entry(), { ...options(), subCommands: { group } })
+
+    expect(load).toHaveBeenCalledOnce()
+    expect(run).toHaveBeenCalledWith(
+      expect.objectContaining({ commandPath: ['group'], omitted: true, values: { verbose: true } })
+    )
+  })
+
+  test('--help with an empty argument renders the usage', async () => {
+    const run = vi.fn()
+
+    const rendered = await cli(['--help', ''], entry(run), { ...options(), subCommands })
+
+    expect(rendered).toContain('USAGE')
+    expect(run).not.toHaveBeenCalled()
+  })
+
+  test('a name that is not empty is still looked up as a command', async () => {
+    // regression watchdog: only an empty argument is skipped
+    await expect(
+      cli(['--verbose', 'nope'], entry(), { ...options(), subCommands })
+    ).rejects.toMatchObject({
+      errors: [expect.objectContaining({ code: CommandNotFoundErrorKeys.notFound })]
+    })
   })
 })
