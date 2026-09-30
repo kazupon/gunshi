@@ -10,7 +10,9 @@ const config: UserConfig = defineConfig({
   publint: true,
   dts: true,
   fixedExtension: false,
-  external: ['@gunshi/plugin'],
+  deps: {
+    neverBundle: ['@gunshi/plugin']
+  },
   plugins: [
     license({
       banner:

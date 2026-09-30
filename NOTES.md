@@ -12,41 +12,42 @@ The notes below describe how this is implemented in practice and the constraints
 
 How each package under `packages/*` handles `args-tokens`, based on actual inspection of build outputs (`lib/*.js`, `lib/*.d.ts`).
 
-Verified with: `tsdown@0.21.0` + `rolldown-plugin-dts@0.20.0` (pinned via `overrides` in `pnpm-workspace.yaml`).
+Verified with: `tsdown@0.22.14` + `rolldown-plugin-dts@0.27.14` (`tsdown@0.23` is not used yet; see [Why we stay on tsdown 0.22](#why-we-stay-on-tsdown-022)).
 
 #### Results
 
-| Package       | What `src/index.ts` mainly contains                             | Bundled into JS                                   | Inlined into `.d.ts` | Category         |
-| ------------- | --------------------------------------------------------------- | ------------------------------------------------- | -------------------- | ---------------- |
-| `gunshi`      | Core implementation (uses `parseArgs` / `resolveArgs` directly) | Yes (`combinators.js`, `core-*.js`, `utils-*.js`) | Yes                  | JS impl included |
-| `bone`        | `export * from 'gunshi/bone'`                                   | Yes (`index.js` contains parser/utils/resolver)   | Yes                  | JS impl included |
-| `combinators` | `export * from 'gunshi/combinators'`                            | Yes (`index.js` contains combinators)             | Yes                  | JS impl included |
-| `shared`      | `export * from 'gunshi/utils'` + own logic                      | Yes (`index.js` contains utils)                   | Yes                  | JS impl included |
-| `definition`  | Type-only references from `gunshi/context`                      | No                                                | Yes                  | Types only       |
-| `plugin`      | Type-only references from `gunshi`                              | No                                                | Yes                  | Types only       |
-| `plugin-i18n` | Type-only references from `gunshi` / `@gunshi/*`                | No                                                | Yes                  | Types only       |
+| Package           | What `src/index.ts` mainly contains                             | Bundled into JS                                   | Inlined into `.d.ts` | Category         |
+| ----------------- | --------------------------------------------------------------- | ------------------------------------------------- | -------------------- | ---------------- |
+| `gunshi`          | Core implementation (uses `parseArgs` / `resolveArgs` directly) | Yes (`combinators.js`, `core-*.js`, `utils-*.js`) | Yes                  | JS impl included |
+| `bone`            | `export * from 'gunshi/bone'`                                   | Yes (`index.js` contains parser/utils/resolver)   | Yes                  | JS impl included |
+| `combinators`     | `export * from 'gunshi/combinators'`                            | Yes (`index.js` contains combinators)             | Yes                  | JS impl included |
+| `shared`          | `export * from 'gunshi/utils'` + own logic                      | Yes (`index.js` contains utils)                   | Yes                  | JS impl included |
+| `definition`      | Type-only references from `gunshi/context`                      | No                                                | Yes                  | Types only       |
+| `plugin`          | Type-only references from `gunshi`                              | No                                                | Yes                  | Types only       |
+| `plugin-i18n`     | Type-only references from `gunshi` / `@gunshi/*`                | No                                                | Yes                  | Types only       |
+| `plugin-renderer` | Type-only references through the bundled `@gunshi/shared`       | No                                                | Yes                  | Types only       |
 
 #### How the bundling happens
 
 - **JS bundle**: `args-tokens` is declared under `devDependencies`, so tsdown bundles it by default (only `dependencies` / `peerDependencies` / `optionalDependencies` are auto-externalized).
-- **`.d.ts` inlining**: Each `tsdown.config.ts` explicitly inlines the types via `dts.resolve: ['args-tokens', ...]`.
+- **`.d.ts` inlining**: Since tsdown 0.22.1, declaration files follow the JS bundling by default, so the `args-tokens` types are inlined as well. Each `tsdown.config.ts` also lists them in `deps.dts.alwaysBundle` (`['args-tokens', ...]`), to state the intent and to keep the types inlined even if `args-tokens` becomes a dependency.
 
 #### Design intent
 
 The goal is to **completely hide `args-tokens` from the public API** of gunshi. Consumers should not need to install `args-tokens` separately — both runtime and types stay enclosed within `gunshi` / `@gunshi/*`.
 
 - "JS impl included" group (`gunshi` / `bone` / `combinators` / `shared`): both runtime and types are inlined.
-- "Types only" group (`definition` / `plugin` / `plugin-i18n`): does not use the `args-tokens` runtime internally, but the re-exported type chain references `args-tokens`, so only `.d.ts` inlining is required.
+- "Types only" group (`definition` / `plugin` / `plugin-i18n` / `plugin-renderer`): does not use the `args-tokens` runtime internally, but the re-exported type chain references `args-tokens`, so only `.d.ts` inlining is required.
 
-#### Why we pin the version
+#### Why we stay on tsdown 0.22
 
-- The array form of `dts.resolve` was removed in `rolldown-plugin-dts` v0.21.0 ([issue #106](https://github.com/sxzz/rolldown-plugin-dts/issues/106)).
-- A replacement API for "keep JS external while inlining only types" is not yet provided (tracked at [issue #199](https://github.com/sxzz/rolldown-plugin-dts/issues/199)).
-- For this reason, `pnpm-workspace.yaml` pins `tsdown>rolldown-plugin-dts: 0.20.0` via `overrides`.
+- `tsdown@0.23` uses `rolldown-plugin-dts@0.28`. Since `rolldown-plugin-dts@0.28.2`, a chunk whose exports are all inlined as `export declare …` / `export type …` gets no `export {}` marker ([issue #312](https://github.com/sxzz/rolldown-plugin-dts/issues/312)). In a `.d.ts` module without any export declaration, TypeScript treats every top-level declaration as exported, so internal declarations become importable at the type level, while the JS does not export them. Across the gunshi packages, 65 such names appear (for example `COMMON_ARGS` from `@gunshi/plugin-i18n`).
+- Until it is fixed, the catalog in `pnpm-workspace.yaml` pins `tsdown` to `0.22.14`.
+- History: up to `tsdown@0.21`, the types were inlined with the array form of `dts.resolve`, which was removed in `rolldown-plugin-dts` v0.21.0 ([issue #106](https://github.com/sxzz/rolldown-plugin-dts/issues/106)), so `rolldown-plugin-dts` was pinned to 0.20.0. [Issue #199](https://github.com/sxzz/rolldown-plugin-dts/issues/199) was resolved by the `deps.dts` option of `tsdown@0.22.1`.
 
 #### Future plans
 
-The current tsdown-based bundling setup is a workaround. We plan to revisit and improve it in the future — for example, by migrating to a newer `rolldown-plugin-dts` API once an equivalent of the array-form `dts.resolve` becomes available, or by adopting a different toolchain that better supports the "bundle JS, hide as type-only dependency" pattern. Until then, the version pin and `dts.resolve` configuration described above should be kept in place.
+Move to `tsdown@0.23` once issue #312 is fixed. Before moving, compare the public API of the built `.d.ts` files with the current ones: no name may be added or removed, and no `.d.ts` may import `args-tokens`.
 
 ## Package Manager
 
