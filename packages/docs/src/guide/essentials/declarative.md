@@ -338,6 +338,22 @@ const build = define({
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+#### Option Values That Start with a Dash
+
+An option that takes a value, such as a `string`, `number` or `enum` option, takes the next argument as its value, as in `--port 5000`. The exception is an argument that starts with a dash, since it looks like an option: `--port -5` does not take `-5`, and reports `--port` as missing a value (`err:arg:missing-value`). With a `string` option `name`, `--name --foo` is reported the same way. A lone `-` is still taken as a value.
+
+This only concerns options that take a value. A `boolean` option takes no value, so `--verbose --foo` sets `verbose` and goes on to read `--foo` as an option.
+
+To pass a value that starts with a dash, write it after `=`, or right after a short option:
+
+```sh
+app --port=-5
+app -p=-5
+app -p-5
+```
+
+Without the i18n plugin, the error message also suggests the form with `=`.
+
 #### Strict Unknown Option Validation
 
 By default, Gunshi keeps backward compatibility by ignoring option tokens that are not declared in the resolved command's `args` or installed global options. Enable `strict` when you want typos or unsupported options to fail before the command runner executes:
@@ -501,8 +517,11 @@ To enable this (e.g., allowing both `--verbose` and `--no-verbose`), add the `ne
 - If `-V` or `--verbose` is passed, the value will be `true`.
 - If `--no-verbose` is passed, the value will be `false`.
 - If neither is passed, the value will be `undefined` (unless a `default` is specified).
+- The negative form does not take a value: `--no-verbose=false` is reported as an `err:arg:unexpected-value` error.
 
 Without `negatable: true`, only the positive form (e.g., `--verbose`) is recognized, and passing it sets the value to `true`.
+
+The positive form of any boolean option, negatable or not, can also be given a value with `=`: `--verbose=true` sets the value to `true`, and `--verbose=false` sets it to `false`. Any other value, such as `--verbose=0` or `--verbose=`, is reported as an `err:arg:invalid-type` error.
 
 The description for the negatable option (e.g., `--no-verbose`) is automatically generated (e.g., "Negatable of --verbose"). You can customize this message using [internationalization resource files](../advanced/internationalization.md) by providing a translation for the specific `arg:no-<optionName>` key (e.g., `arg:no-verbose`).
 

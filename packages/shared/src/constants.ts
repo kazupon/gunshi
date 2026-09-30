@@ -67,7 +67,11 @@ export const ARG_ERROR_RESOURCE_KEYS = [
   'err:arg:invalid-type',
   'err:arg:invalid-choice',
   'err:arg:custom-parse',
-  'err:arg:unknown-option'
+  'err:arg:unknown-option',
+  'err:arg:unexpected-value',
+  'err:arg:missing-value',
+  'err:arg:conflict',
+  'err:arg:invalid-default'
 ] as const
 
 export const COMMAND_ERROR_RESOURCE_KEYS = [

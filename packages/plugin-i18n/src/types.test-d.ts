@@ -52,7 +52,12 @@ describe('I18nPluginOptions', () => {
     const options = {
       builtinResources: {
         'ja-JP': {
-          'err:arg:required-option': 'オプション {$displayName} は必須です'
+          'err:arg:required-option': 'オプション {$displayName} は必須です',
+          'err:arg:unexpected-value': 'オプション {$displayName} は値を取りません',
+          'err:arg:missing-value': 'オプション {$displayName} には値が必要です',
+          'err:arg:conflict': '{$displayName} と {$conflictDisplayName} は同時に指定できません',
+          'err:arg:invalid-default':
+            '{$displayName} の既定値 {$actual} は {$choices} のいずれでもありません'
         }
       }
     } satisfies I18nPluginOptions

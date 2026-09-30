@@ -1,13 +1,20 @@
 import { describe, expect, expectTypeOf, test } from 'vitest'
 
-import type { Args } from 'gunshi'
+import type { Args, ArgsValidationErrorCode } from 'gunshi'
 import type {
+  ArgErrorResourceKeys,
   CommandArgKeys,
   CommandBuiltinKeys,
   ErrorResourceKeys,
   ResolveTranslationKeys,
   Translation
 } from './types.ts'
+
+test('ArgErrorResourceKeys has a key for every args validation error code', () => {
+  // args-tokens adds a code in a minor release (four of them from 0.29.0 to 1.0.0-beta.1),
+  // and nothing else tells that `ARG_ERROR_RESOURCE_KEYS` has fallen behind
+  expectTypeOf<ArgErrorResourceKeys>().toEqualTypeOf<ArgsValidationErrorCode>()
+})
 
 test('CommandArgKeys', () => {
   const _args = {

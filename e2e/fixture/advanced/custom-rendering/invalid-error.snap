@@ -7,7 +7,7 @@ Version: 1.0.0
 
 ❌ ERROR:
 ═════════
-  • Optional argument '--add' or '-a' should be 'string'
+  • Optional argument '--add' or '-a' requires a value
 
 Please correct the above errors and try again.
 Run 'task-manager --help' for usage information.

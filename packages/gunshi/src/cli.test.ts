@@ -4072,6 +4072,130 @@ describe('entry command in the command environment', () => {
   })
 })
 
+describe('arguments read by args-tokens 1.0', () => {
+  interface Ran {
+    commandPath: string[]
+    values: Record<string, unknown>
+    positionals: string[]
+    rest: string[]
+  }
+
+  /**
+   * Run a CLI, and record which command ran with what, or which validation errors it rejected with.
+   *
+   * @param argv - Command line arguments
+   * @param subCommands - The sub-commands of the entry
+   * @param options - Other CLI options
+   * @returns The command that ran, or the codes of the validation errors
+   */
+  async function run(
+    argv: string[],
+    subCommands: Record<string, Command> = {
+      build: { name: 'build', args: { out: { type: 'string', short: 'o' } } }
+    },
+    options: CliOptions = {}
+  ): Promise<{ ran?: Ran; codes?: string[] }> {
+    let ran: Ran | undefined
+    const record: CommandRunner = ctx => {
+      ran = {
+        commandPath: [...ctx.commandPath],
+        values: { ...ctx.values },
+        positionals: [...ctx.positionals],
+        rest: [...ctx.rest]
+      }
+    }
+    const recorded = (command: Command): Command => ({
+      ...command,
+      run: record,
+      subCommands:
+        command.subCommands &&
+        Object.fromEntries(
+          Object.entries(command.subCommands as Record<string, Command>).map(([name, sub]) => [
+            name,
+            recorded(sub)
+          ])
+        )
+    })
+
+    try {
+      await cli(
+        argv,
+        recorded({
+          name: 'app',
+          args: {
+            quiet: { type: 'boolean', short: 'q' },
+            port: { type: 'number', short: 'p' },
+            config: { type: 'string', short: 'c' }
+          }
+        }),
+        {
+          usageSilent: true,
+          subCommands: Object.fromEntries(
+            Object.entries(subCommands).map(([name, command]) => [name, recorded(command)])
+          ),
+          ...options
+        }
+      )
+    } catch (error) {
+      if (error instanceof AggregateError) {
+        return {
+          codes: (error.errors as { code?: string }[]).map(e => e.code ?? e.constructor.name)
+        }
+      }
+      throw error
+    }
+    return { ran }
+  }
+
+  test('an option that takes a number but has no value is reported, not thrown', async () => {
+    // args-tokens 0.29.0 threw a `TypeError`, and the CLI rejected with it (args-tokens #619, #625)
+    expect(await run(['--port'])).toEqual({ codes: ['err:arg:missing-value'] })
+  })
+
+  test('a dash in a short option group starts the value of the option before it', async () => {
+    // `-o-` gives `-` to `-o`, so `build` is not taken as a value (args-tokens #641)
+    expect(await run(['-o-', 'build'])).toMatchObject({
+      ran: { commandPath: ['build'], values: { out: '-' } }
+    })
+  })
+
+  test.each([[['-c=', 'build']], [['--config', '--==', 'build']]])(
+    '%j does not give `build` to --config',
+    async argv => {
+      // an explicit empty value, or a long option without a name, is what `--config` gets
+      // (args-tokens #637, #645)
+      expect(await run(argv)).toMatchObject({ ran: { commandPath: ['build'] } })
+    }
+  )
+
+  test('an empty argument after `--` goes to the rest, not to the positional arguments', async () => {
+    // args-tokens 0.29.0 gave it to the positional arguments (args-tokens #640); the routing has
+    // skipped it since #781 either way, so what is left to see is where the value goes
+    expect(await run(['--quiet', '--', ''])).toEqual({
+      ran: { commandPath: [], values: { quiet: true }, positionals: [], rest: [''] }
+    })
+  })
+
+  test('an empty argument after `--` goes to the rest of a command that has sub-commands', async () => {
+    const parent: Command = {
+      name: 'parent',
+      args: { verbose: { type: 'boolean' } },
+      subCommands: { child: { name: 'child' } }
+    }
+
+    expect(await run(['parent', '--verbose', '--', ''], { parent })).toMatchObject({
+      ran: { commandPath: ['parent'], values: { verbose: true }, rest: [''] }
+    })
+  })
+
+  test('strict reports the options of the entry that the selected sub-command does not have', async () => {
+    // `-q-` is `-q` with the value `-`, so `build` is the command (args-tokens #641)
+    expect(await run(['-q-', 'build', '--nope'], undefined, { strict: true })).toEqual({
+      codes: ['err:arg:unknown-option', 'err:arg:unknown-option']
+    })
+  })
+})
+
 function findCommandNotFoundError(error: AggregateError | undefined): CommandNotFoundError {
   expect(error).toBeInstanceOf(AggregateError)
   const commandError = error?.errors.find((error: unknown) => isCommandNotFoundError(error))
