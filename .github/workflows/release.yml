@@ -49,6 +49,21 @@ jobs:
           ref: ${{ env.TAG }}
           persist-credentials: false
 
+      - name: Resolve dist-tag from tag
+        id: meta
+        # SemVer prerelease: publish it under its first identifier, such as `beta` for
+        # v1.0.0-beta.0, so that `latest` stays on the last stable release. Use `next` for an
+        # identifier that starts with a digit, since npm rejects a dist-tag that is a semver
+        # range, such as `0` of v1.0.0-0.
+        run: |
+          if [[ "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+-([A-Za-z][0-9A-Za-z-]*) ]]; then
+            echo "dist_tag=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          elif [[ "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+- ]]; then
+            echo "dist_tag=next" >> "$GITHUB_OUTPUT"
+          else
+            echo "dist_tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
@@ -70,6 +85,8 @@ jobs:
       - name: Publish each package to npm
         # OIDC trusted publisher — secret は不要、provenance も自動付与。
         # 既 publish 済 version は冪等に skip (workflow_dispatch リトライ用)。
+        env:
+          DIST_TAG: ${{ steps.meta.outputs.dist_tag }}
         run: |
           for PKG in packages/*/; do
             if [[ "$PKG" == "packages/docs/" ]]; then
@@ -85,8 +102,8 @@ jobs:
             if pnpm view "$name@$version" version > /dev/null 2>&1; then
               echo "↺ $name@$version already published, skipping"
             else
-              echo "⚡ Publishing $name@$version to npm"
-              pnpm publish --access public --no-git-checks --tag latest
+              echo "⚡ Publishing $name@$version to npm (dist-tag: $DIST_TAG)"
+              pnpm publish --access public --no-git-checks --tag "$DIST_TAG"
             fi
             popd > /dev/null
           done
