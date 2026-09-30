@@ -42,7 +42,7 @@ The goal is to **completely hide `args-tokens` from the public API** of gunshi. 
 #### Why we stay on tsdown 0.22
 
 - `tsdown@0.23` uses `rolldown-plugin-dts@0.28`. Since `rolldown-plugin-dts@0.28.2`, a chunk whose exports are all inlined as `export declare …` / `export type …` gets no `export {}` marker ([issue #312](https://github.com/sxzz/rolldown-plugin-dts/issues/312)). In a `.d.ts` module without any export declaration, TypeScript treats every top-level declaration as exported, so internal declarations become importable at the type level, while the JS does not export them. Across the gunshi packages, 65 such names appear (for example `COMMON_ARGS` from `@gunshi/plugin-i18n`).
-- Until it is fixed, the catalog in `pnpm-workspace.yaml` pins `tsdown` to `0.22.14`.
+- Until it is fixed, the catalog in `pnpm-workspace.yaml` pins `tsdown` to `0.22.14`, and `.github/renovate.json` holds Renovate below `0.23.0` (`allowedVersions`), since Renovate automerges the updates that pass CI.
 - History: up to `tsdown@0.21`, the types were inlined with the array form of `dts.resolve`, which was removed in `rolldown-plugin-dts` v0.21.0 ([issue #106](https://github.com/sxzz/rolldown-plugin-dts/issues/106)), so `rolldown-plugin-dts` was pinned to 0.20.0. [Issue #199](https://github.com/sxzz/rolldown-plugin-dts/issues/199) was resolved by the `deps.dts` option of `tsdown@0.22.1`.
 
 #### Future plans
