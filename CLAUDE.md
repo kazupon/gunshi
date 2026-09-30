@@ -75,7 +75,7 @@ The repository contains the following packages:
   - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers
   - Published to: npm, JSR
 
-- **`packages/combinators/`** - Parser combinators for argument schemas (`@gunshi/combinators`, experimental)
+- **`packages/combinators/`** - Parser combinators for argument schemas (`@gunshi/combinators`)
   - Composable factories such as `string`, `integer`, `required`, `withDefault`, `args`
   - Same exports as `gunshi/combinators`
   - Published to: npm, JSR
@@ -142,7 +142,7 @@ packages/gunshi/src/
 │   └── bone.ts           # Bone CLI logic
 ├── context.ts            # Command context creation and management
 ├── definition.ts         # Command definition helpers
-├── combinators.ts        # Parser combinators entry (`gunshi/combinators`, experimental)
+├── combinators.ts        # Parser combinators entry (`gunshi/combinators`)
 ├── decorators.ts         # Command runner decorators
 ├── error.ts              # Error classes and type guards (`CommandNotFoundError`, `isArgsValidationError`)
 ├── generator.ts          # Command generator utilities
@@ -176,9 +176,8 @@ packages/gunshi/src/
 ```sh
 playground/
 ├── essentials/           # Basic CLI examples
-├── advanced/             # Advanced features (sub-commands, lazy loading)
+├── advanced/             # Advanced features (sub-commands, lazy loading, parser combinators)
 ├── plugins/              # Plugin usage examples
-├── experimentals/        # Experimental features (parser combinators)
 ├── bun/                  # Bun runtime examples
 └── deno/                 # Deno runtime examples
 ```

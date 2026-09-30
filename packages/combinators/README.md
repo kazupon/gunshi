@@ -6,13 +6,6 @@
 
 > parser combinators for gunshi argument schema
 
-<!-- eslint-disable markdown/no-missing-label-refs -->
-
-> [!WARNING]
-> This package is currently **experimental**. The API may change in future versions.
-
-<!-- eslint-enable markdown/no-missing-label-refs -->
-
 This package provides composable factory functions for building type-safe argument schemas.
 
 - **Base combinators**: `string`, `number`, `integer`, `float`, `boolean`, `choice`, `positional`, `combinator`
@@ -96,8 +89,8 @@ export default define({
 
 About details, See the below official docs sections:
 
-- Experimentals:
-  - [Parser Combinators](https://gunshi.dev/guide/experimentals/parser-combinators)
+- Advanced:
+  - [Parser Combinators](https://gunshi.dev/guide/advanced/parser-combinators)
 
 ## ©️ License
 

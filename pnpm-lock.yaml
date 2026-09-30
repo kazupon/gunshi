@@ -579,6 +579,12 @@ importers:
         specifier: 'catalog:'
         version: 0.21.0(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(synckit@0.11.13)(typescript@6.0.3)
 
+  playground/advanced/combinators:
+    dependencies:
+      gunshi:
+        specifier: file:../../../packages/gunshi
+        version: link:../../../packages/gunshi
+
   playground/advanced/command-hooks:
     dependencies:
       gunshi:
@@ -755,12 +761,6 @@ importers:
         version: link:../../../../packages/gunshi
 
   playground/essentials/type-safe:
-    dependencies:
-      gunshi:
-        specifier: file:../../../packages/gunshi
-        version: link:../../../packages/gunshi
-
-  playground/experimentals/combinators:
     dependencies:
       gunshi:
         specifier: file:../../../packages/gunshi
