@@ -990,10 +990,15 @@ function getRoutingPositionals<G extends GunshiParamsConstraint>(
       toKebab: schema.toKebab
     }
   }
+  /**
+   * NOTE(kazupon): an empty argument is never a command name. `getPositionalTokens()` skips it when it
+   * collects the candidates, and the routing of each candidate must skip it too; otherwise the routing
+   * looks for a sub-command named `''`, and fails with `inconsistent-options` (#781).
+   */
   return resolveArgs(routingArgs, tokens, {
     shortGrouping: true,
     toKebab: command.toKebab
-  }).positionals
+  }).positionals.filter(value => value !== '')
 }
 
 function sameCommandPath(left: readonly string[], right: readonly string[]): boolean {
