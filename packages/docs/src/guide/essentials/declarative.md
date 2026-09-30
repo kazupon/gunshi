@@ -340,7 +340,7 @@ const build = define({
 
 #### Option Values That Start with a Dash
 
-An option that takes a value, such as a `string`, `number` or `enum` option, takes the next argument as its value, unless that argument looks like an option. `--port -5` therefore reports `--port` as missing a value (`err:arg:missing-value`), and so does `--name --foo`. A lone `-` is taken as a value.
+An option that takes a value, such as a `string`, `number` or `enum` option, takes the next argument as its value, as in `--port 5000`. The exception is an argument that starts with a dash, since it looks like an option: `--port -5` does not take `-5`, and reports `--port` as missing a value (`err:arg:missing-value`). So does `--name --foo`. A lone `-` is still taken as a value.
 
 To pass a value that starts with a dash, write it after `=`, or right after a short option:
 
