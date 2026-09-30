@@ -35,8 +35,6 @@ catalog:
   vitepress-api-references: ^0.3.0
   tsx: ^4.21.0
   args-tokens: 1.0.0-beta.1
-overrides:
-  vitepress>vite: npm:vite@8.3.0
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - deno
