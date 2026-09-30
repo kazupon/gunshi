@@ -25,6 +25,11 @@
         "bumpp"
       ],
       "minimumReleaseAge": null
+    },
+    {
+      "description": "Hold tsdown at 0.22.x until sxzz/rolldown-plugin-dts#312 is fixed. See NOTES.md",
+      "matchPackageNames": ["tsdown"],
+      "allowedVersions": "<0.23.0"
     }
   ]
 }

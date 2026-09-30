@@ -9,8 +9,10 @@ const config: UserConfig = defineConfig({
   publint: true,
   dts: true,
   fixedExtension: false,
-  noExternal: ['@gunshi/shared'],
-  external: ['@gunshi/plugin'],
+  deps: {
+    alwaysBundle: ['@gunshi/shared'],
+    neverBundle: ['@gunshi/plugin']
+  },
   hooks: {
     'build:done': lintJsrExports()
   }

@@ -8,17 +8,19 @@ const config: UserConfig = defineConfig({
   outDir: 'lib',
   publint: true,
   fixedExtension: false,
-  // dts: true,
-  // NOTE(kazupon): Inline `args-tokens` types into the bundled `.d.ts` so that
-  // `deno check` does not try to resolve `args-tokens` as a dependency, and to
-  // hide it as a transitive type dependency for consumers. Requires
-  // `rolldown-plugin-dts` <= 0.20 (the `resolve` array API was removed in
-  // 0.21). See `overrides` in pnpm-workspace.yaml.
-  dts: {
-    resolve: ['args-tokens']
+  dts: true,
+  deps: {
+    alwaysBundle: ['@gunshi/shared'],
+    neverBundle: ['@gunshi/plugin'],
+    // NOTE(kazupon): Inline `args-tokens` types into the bundled `.d.ts` so that `deno check` does
+    // not try to resolve `args-tokens` as a dependency, and to hide it as a transitive type
+    // dependency for consumers. Declarations follow the JS bundling by default (tsdown 0.22.1+),
+    // and `args-tokens` is not a dependency, so it is bundled anyway. `deps.dts` states the intent,
+    // and keeps the types inlined even if `args-tokens` becomes a dependency. See `NOTES.md`.
+    dts: {
+      alwaysBundle: ['args-tokens']
+    }
   },
-  noExternal: ['@gunshi/shared'],
-  external: ['@gunshi/plugin'],
   hooks: {
     'build:done': lintJsrExports()
   }
