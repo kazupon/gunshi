@@ -5,3 +5,9 @@ alow = "alow"
 lod = "lod"
 # Intentional misspelling used in the test for a near miss of a plugin command.
 healt = "healt"
+# Intentional misspelling used in the test for the candidates of an unknown option.
+outpu = "outpu"
+
+[default.extend-identifiers]
+# A type exported by @gunshi/shared. Renaming it would break the code that imports it.
+DeepWriteable = "DeepWriteable"
