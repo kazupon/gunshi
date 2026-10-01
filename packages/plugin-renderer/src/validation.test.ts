@@ -215,6 +215,93 @@ test('args validation error uses i18n resource', async () => {
   await expect(renderValidationErrors(ctx, error)).resolves.toEqual("必須オプション: '--id'")
 })
 
+async function createI18nContext(locale: string, resource?: Record<string, string>) {
+  const i18nPlugin = i18n({
+    locale,
+    builtinResources: resource ? { [locale]: resource } : undefined
+  })
+  const rendererPlugin = renderer()
+  return await createCommandContext({
+    command: { name: 'test', run: async () => {} } as Command,
+    extensions: {
+      [i18nPlugin.id]: i18nPlugin.extension,
+      [rendererPlugin.id]: rendererPlugin.extension
+    }
+  })
+}
+
+// what args-tokens gives for `--port -5`, and for `--port` at the end
+function createMissingValueError(withHint: boolean): AggregateError {
+  return new AggregateError([
+    new ArgsValidationError(
+      `Optional argument '--port' or '-p' requires a value${withHint ? " (to pass '-5' as its value, write '--port=-5')" : ''}`,
+      {
+        code: ArgsValidationErrorKeys.missingValue,
+        values: {
+          displayName: "'--port' or '-p'",
+          name: 'port',
+          expected: 'number',
+          ...(withHint ? { next: '-5', suggestion: '--port=-5' } : {})
+        }
+      }
+    )
+  ])
+}
+
+const jaMissingValue = {
+  'err:arg:missing-value': 'オプション {$displayName} には値が必要です',
+  'err:arg:missing-value:hint': "('{$next}' を値として渡すには '{$suggestion}' と書いてください)"
+}
+
+test('a translated missing value keeps the hint of args-tokens', async () => {
+  // the translation replaces the whole message, hint included (#791)
+  const ctx = await createI18nContext('ja-JP', jaMissingValue)
+
+  await expect(renderValidationErrors(ctx, createMissingValueError(true))).resolves.toBe(
+    "オプション '--port' or '-p' には値が必要です ('-5' を値として渡すには '--port=-5' と書いてください)"
+  )
+})
+
+test('a missing value in en-US reads as the message of args-tokens', async () => {
+  const ctx = await createI18nContext('en-US')
+  const error = createMissingValueError(true)
+
+  await expect(renderValidationErrors(ctx, error)).resolves.toBe((error.errors[0] as Error).message)
+})
+
+test('a missing value without a hint is translated without one', async () => {
+  const ctx = await createI18nContext('ja-JP', jaMissingValue)
+
+  await expect(renderValidationErrors(ctx, createMissingValueError(false))).resolves.toBe(
+    "オプション '--port' or '-p' には値が必要です"
+  )
+})
+
+test('the hint falls back to en-US when the locale does not translate it', async () => {
+  // as for any built-in key, a resource that lacks the key gets the text of en-US
+  const ctx = await createI18nContext('ja-JP', {
+    'err:arg:missing-value': 'オプション {$displayName} には値が必要です'
+  })
+
+  await expect(renderValidationErrors(ctx, createMissingValueError(true))).resolves.toBe(
+    "オプション '--port' or '-p' には値が必要です (to pass '-5' as its value, write '--port=-5')"
+  )
+})
+
+test('only a missing value gets the hint', async () => {
+  const ctx = await createI18nContext('ja-JP', {
+    'err:arg:invalid-type': '{$displayName} の値が不正です'
+  })
+  const error = new AggregateError([
+    new ArgsValidationError(`Optional argument '--port' should be 'number'`, {
+      code: ArgsValidationErrorKeys.invalidType,
+      values: { displayName: "'--port'", next: '-5', suggestion: '--port=-5' }
+    })
+  ])
+
+  await expect(renderValidationErrors(ctx, error)).resolves.toBe("'--port' の値が不正です")
+})
+
 test('custom parse reasonKey uses command resource', async () => {
   const i18nPlugin = i18n({
     locale: 'ja-JP',

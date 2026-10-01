@@ -74,6 +74,9 @@ export const ARG_ERROR_RESOURCE_KEYS = [
   'err:arg:invalid-default'
 ] as const
 
+// a hint follows the error of its code; it is not a code, so it stays out of `ARG_ERROR_RESOURCE_KEYS`
+export const ARG_ERROR_HINT_RESOURCE_KEYS = ['err:arg:missing-value:hint'] as const
+
 export const COMMAND_ERROR_RESOURCE_KEYS = [
   'err:cmd:not-found',
   'err:cmd:ambiguous',

@@ -20,6 +20,7 @@
   "err:arg:unknown-option": "Unknown option: {$rawName}",
   "err:arg:unexpected-value": "Optional argument {$displayName} does not take a value",
   "err:arg:missing-value": "Optional argument {$displayName} requires a value",
+  "err:arg:missing-value:hint": "(to pass '{$next}' as its value, write '{$suggestion}')",
   "err:arg:conflict": "{$displayName} conflicts with {$conflictDisplayName}",
   "err:arg:invalid-default": "Invalid default for {$displayName}: {$actual} is not one of {$choices}",
   "err:cmd:not-found": "Command not found: {$commandName}",

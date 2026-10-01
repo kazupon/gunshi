@@ -4,6 +4,7 @@
  */
 
 import {
+  ARG_ERROR_HINT_RESOURCE_KEYS,
   ARG_ERROR_RESOURCE_KEYS,
   ARG_PREFIX,
   BUILT_IN_KEY_SEPARATOR,
@@ -75,6 +76,11 @@ export type CommandBuiltinResourceKeys = (typeof COMMAND_BUILTIN_RESOURCE_KEYS)[
 export type ArgErrorResourceKeys = (typeof ARG_ERROR_RESOURCE_KEYS)[number]
 
 /**
+ * Resource keys of the hints that follow an args validation error.
+ */
+export type ArgErrorHintResourceKeys = (typeof ARG_ERROR_HINT_RESOURCE_KEYS)[number]
+
+/**
  * Command validation error resource keys.
  */
 export type CommandErrorResourceKeys = (typeof COMMAND_ERROR_RESOURCE_KEYS)[number]
@@ -89,6 +95,7 @@ export type SuggestionErrorResourceKeys = (typeof SUGGESTION_ERROR_RESOURCE_KEYS
  */
 export type ErrorResourceKeys =
   | ArgErrorResourceKeys
+  | ArgErrorHintResourceKeys
   | CommandErrorResourceKeys
   | SuggestionErrorResourceKeys
 
