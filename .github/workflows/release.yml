@@ -170,7 +170,7 @@ jobs:
 
       - name: Re-install with rewritten package.json
         # `--ignore-scripts` で esbuild 等の build script を skip
-        # (workspace の onlyBuiltDependencies は dlx context で読まれないため)。
+        # (workspace の allowBuilds は dlx context で読まれないため)。
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Publish each package to JSR
