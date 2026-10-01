@@ -81,9 +81,7 @@ import { cli } from 'gunshi'
 
 await cli(
   args,
-  {
-    /* your entry command */
-  },
+  {/* your entry command */},
   {
     plugins: [
       i18n({
