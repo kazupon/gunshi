@@ -2,12 +2,20 @@ packages:
   - packages/*
   - playground/**
   - "!playground/bun"
-onlyBuiltDependencies:
-  - deno
-  - esbuild
-  - oxc-resolver
-  - rolldown
-  - unrs-resolver
+allowBuilds:
+  deno: true
+  esbuild: true
+  oxc-resolver: true
+  rolldown: true
+  unrs-resolver: true
+# The packages depend on each other through devDependencies, for the tests and
+# the types (e.g. @gunshi/bone -> gunshi -> @gunshi/plugin-i18n -> @gunshi/bone).
+# pnpm 11 and later refuse to run recursive tasks across such cycles without
+# this. Each package bundles the others from their sources (`paths` of
+# tsconfig.json), so the build order within a cycle does not matter.
+ignoreWorkspaceCycles: true
+# moved from .npmrc, which pnpm 11 and later read only for the auth and registry settings
+shellEmulator: true
 # Ensure platform-specific optional bindings (e.g. @rolldown/binding-*) are
 # installed across all platforms we publish/run on. Without this, pnpm only
 # resolves the host platform's binding, which breaks CI on Linux when the
