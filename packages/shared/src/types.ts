@@ -21,7 +21,7 @@ type RemoveIndexSignature<T> = {
 }
 
 /**
- * Make all properties in T deeply writeable (not readonly)
+ * Make all properties in T deeply writable (not readonly)
  */
 export type DeepWriteable<T> = T extends (...args: any) => any
   ? T
