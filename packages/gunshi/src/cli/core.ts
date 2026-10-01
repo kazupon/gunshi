@@ -21,9 +21,9 @@ import {
   getCommandSubCommands,
   isLazyCommand,
   kebabnize,
-  resolveCommandArgs,
   resolveLazyCommand
 } from '../utils.ts'
+import { resolveCommandArgs } from './args.ts'
 
 import type { Decorators } from '../decorators.ts'
 import type { Plugin, PluginContext } from '../plugin.ts'

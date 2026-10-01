@@ -1,7 +1,14 @@
 import { describe, expect, test } from 'vitest'
-import { resolveArgKey, resolveDisplayName, resolveKey, resolveOptionNames } from './utils.ts'
+import { resolveCommandArgs as resolveCommandArgsOfCore } from '../../gunshi/src/cli/args.ts'
+import {
+  resolveArgKey,
+  resolveCommandArgs,
+  resolveDisplayName,
+  resolveKey,
+  resolveOptionNames
+} from './utils.ts'
 
-import type { Args } from 'gunshi'
+import type { ArgSchema, Args } from 'gunshi'
 
 const _args = {
   foo: {
@@ -97,5 +104,49 @@ describe('resolveOptionNames', () => {
     } satisfies Args)
 
     expect([...names]).toEqual(['dry-run', 'logLevel'])
+  })
+})
+
+describe('resolveCommandArgs', () => {
+  const globalOptions = new Map<string, ArgSchema>([
+    ['help', { type: 'boolean', short: 'h', description: 'Display this help message' }],
+    ['version', { type: 'boolean', short: 'v', description: 'Display this version' }]
+  ])
+
+  // `@gunshi/plugin-completion` completes the arguments with this copy, so it has to resolve them
+  // as the core does when it parses and renders them
+  test.each<[string, ReadonlyMap<string, ArgSchema> | undefined, Args | undefined]>([
+    [
+      'the command shadows a global option by name',
+      globalOptions,
+      { version: { type: 'string', description: 'Version to release' } }
+    ],
+    [
+      'the command claims the short name of a global option',
+      globalOptions,
+      { verbose: { type: 'boolean', short: 'v' } }
+    ],
+    [
+      'a positional argument claims no short name',
+      globalOptions,
+      // `short` means nothing on a positional argument
+      { value: { type: 'positional', short: 'v' } } as Args
+    ],
+    ['no global options', undefined, { port: { type: 'number' } }],
+    ['no arguments', globalOptions, undefined],
+    ['empty arguments', globalOptions, {}]
+  ])('%s: the same result as the core', (_, globals, args) => {
+    const resolved = resolveCommandArgs(globals, args)
+    const resolvedByCore = resolveCommandArgsOfCore(globals, args)
+
+    expect(Object.keys(resolved)).toEqual(Object.keys(resolvedByCore))
+    expect(resolved).toStrictEqual(resolvedByCore)
+    expect(Object.getPrototypeOf(resolved)).toBeNull()
+  })
+
+  test('the schema of the global option is not changed', () => {
+    resolveCommandArgs(globalOptions, { verbose: { type: 'boolean', short: 'v' } } satisfies Args)
+
+    expect(globalOptions.get('version')!.short).toEqual('v')
   })
 })
