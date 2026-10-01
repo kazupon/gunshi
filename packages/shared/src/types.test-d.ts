@@ -2,7 +2,9 @@ import { describe, expect, expectTypeOf, test } from 'vitest'
 
 import type { Args, ArgsValidationErrorCode } from 'gunshi'
 import type {
+  ArgErrorHintResourceKeys,
   ArgErrorResourceKeys,
+  BuiltinResourceKeys,
   CommandArgKeys,
   CommandBuiltinKeys,
   ErrorResourceKeys,
@@ -14,6 +16,14 @@ test('ArgErrorResourceKeys has a key for every args validation error code', () =
   // args-tokens adds a code in a minor release (four of them from 0.29.0 to 1.0.0-beta.1),
   // and nothing else tells that `ARG_ERROR_RESOURCE_KEYS` has fallen behind
   expectTypeOf<ArgErrorResourceKeys>().toEqualTypeOf<ArgsValidationErrorCode>()
+})
+
+test('the hint of a missing value is a built-in resource key, not an error code', () => {
+  expectTypeOf<ArgErrorHintResourceKeys>().toEqualTypeOf<'err:arg:missing-value:hint'>()
+  expectTypeOf<
+    Extract<BuiltinResourceKeys, ArgErrorHintResourceKeys>
+  >().toEqualTypeOf<'err:arg:missing-value:hint'>()
+  expectTypeOf<Extract<ArgsValidationErrorCode, ArgErrorHintResourceKeys>>().toEqualTypeOf<never>()
 })
 
 test('CommandArgKeys', () => {

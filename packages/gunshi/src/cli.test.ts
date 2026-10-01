@@ -1279,6 +1279,66 @@ describe('args validation i18n', () => {
 
     expect(log()).toEqual('カスタム解析エラー: Invalid port')
   })
+
+  test('translates a missing value, with the hint of args-tokens', async () => {
+    // the translation replaces the whole message of args-tokens, and took the hint with it (#791)
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        ['--port', '-5'],
+        {
+          args: {
+            port: {
+              type: 'number',
+              short: 'p'
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [
+            i18n({
+              locale: 'ja-JP',
+              builtinResources: { 'ja-JP': jsJPResource }
+            })
+          ]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual(
+      "オプション '--port' or '-p' には値が必要です ('-5' を値として渡すには '--port=-5' と書いてください)"
+    )
+  })
+
+  test('a missing value in en-US reads as the message of args-tokens', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        ['--port', '-5'],
+        {
+          args: {
+            port: {
+              type: 'number',
+              short: 'p'
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [i18n({ locale: 'en-US' })]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual(
+      "Optional argument '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+    )
+  })
 })
 
 describe('positional arguments', () => {

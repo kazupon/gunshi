@@ -17,8 +17,11 @@ import type {
   DefaultGunshiParams,
   GunshiParams
 } from '@gunshi/plugin'
+import type { ArgErrorHintResourceKeys } from '@gunshi/shared'
 
 const i18nPluginId = namespacedId('i18n')
+
+const missingValueHintKey = 'err:arg:missing-value:hint' satisfies ArgErrorHintResourceKeys
 
 /**
  * Render the validation errors.
@@ -60,11 +63,42 @@ async function renderValidationError<G extends GunshiParams = DefaultGunshiParam
     const values = await resolveValidationValues(ctx, error)
     const message = await localize(ctx, error.code, values)
     if (message && message !== error.code) {
-      return message
+      const hint = await localizeHint(ctx, error, values)
+      return hint ? `${message} ${hint}` : message
     }
   }
 
   return error.message
+}
+
+/**
+ * Localize the hint that args-tokens adds to the message of an error.
+ *
+ * A translation replaces the whole message, hint included, so the hint is translated by a key of
+ * its own and follows the translated error. args-tokens gives one today: for an option given without
+ * a value, when the argument after it may be the value, the long form with `=` (`--port=-5` for
+ * `--port -5`), in `values.next` and `values.suggestion`.
+ *
+ * @param ctx - A {@link CommandContext | command context}
+ * @param error - An args validation error
+ * @param values - The values of the error, as given to its translation
+ * @returns The localized hint, or `undefined` when the error has none.
+ */
+async function localizeHint<G extends GunshiParams = DefaultGunshiParams>(
+  ctx: CommandContext<G>,
+  error: ArgsValidationError,
+  values: Record<string, unknown>
+): Promise<string | undefined> {
+  if (
+    error.code !== ArgsValidationErrorKeys.missingValue ||
+    typeof values.next !== 'string' ||
+    typeof values.suggestion !== 'string'
+  ) {
+    return undefined
+  }
+
+  const hint = await localize(ctx, missingValueHintKey, values)
+  return hint && hint !== missingValueHintKey ? hint : undefined
 }
 
 async function resolveValidationValues<G extends GunshiParams = DefaultGunshiParams>(

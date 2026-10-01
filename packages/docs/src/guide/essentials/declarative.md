@@ -351,7 +351,7 @@ app -p=-5
 app -p-5
 ```
 
-Without the i18n plugin, the error message also suggests the form with `=`.
+The error message also suggests the form with `=`, such as `(to pass '-5' as its value, write '--port=-5')`. With the i18n plugin, the suggestion follows the translated error, and is translated by the built-in resource key `err:arg:missing-value:hint`.
 
 #### Strict Unknown Option Validation
 
