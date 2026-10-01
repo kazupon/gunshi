@@ -152,12 +152,7 @@ Since v0.27.0, commands support additional configuration properties:
 
 Each option can have the following properties:
 
-<!-- eslint-disable markdown/no-missing-label-refs -->
-
-- `type`: The data type ('string', 'number', 'boolean', 'positional', 'custom'[, 'enum' if supported])
-
-<!-- eslint-enable markdown/no-missing-label-refs -->
-
+- `type`: The data type: 'string', 'number', 'boolean', 'enum', 'positional' or 'custom'
 - `short`: A single-character alias for the option (e.g., `-n` as a shorthand for `--name`), making commands quicker to type for frequent use.
   <!-- eslint-disable markdown/no-missing-label-refs -->
   > [!TIP] Multiple boolean short option flags can be grouped together.
