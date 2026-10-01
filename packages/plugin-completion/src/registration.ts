@@ -190,7 +190,7 @@ export async function registerForCompletion({
   const commandIndexes: number[] = []
   let level: ReadonlyMap<string, Command | LazyCommand> | undefined = subCommands
   let walked = true
-  for (let i = 0; i < previousArgs.length; ) {
+  for (let i = 0; i < previousArgs.length;) {
     const arg = previousArgs[i]
     if (arg.startsWith('-')) {
       i++
