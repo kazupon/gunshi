@@ -85,7 +85,9 @@ jobs:
       - name: Publish each package to npm
         # OIDC trusted publisher: no secret is needed, and provenance is attached
         # automatically. Skip a version that is already published, so that a retry
-        # with workflow_dispatch is idempotent.
+        # with workflow_dispatch is idempotent. A version that npm is still
+        # scanning is not found by `pnpm view`, so do not retry this job until npm
+        # serves the versions; retry `jsr-publish` or `release-notes` instead.
         env:
           DIST_TAG: ${{ steps.meta.outputs.dist_tag }}
         run: |
@@ -170,9 +172,10 @@ jobs:
 
       - name: Wait until rewritten packages are visible on npm
         # jsr.ts pins workspace deps to the release version, so the next
-        # `pnpm install` fetches them from npm. npm can lag several seconds
-        # after `npm-publish`, which previously failed this job with
-        # ERR_PNPM_NO_MATCHING_VERSION for @gunshi/resources.
+        # `pnpm install` fetches them from npm. npm serves a new version only
+        # after its publish-time malware scan, usually about five minutes and
+        # sometimes much longer, so wait-npm.ts waits for up to 30 minutes. The
+        # release of v1.0.0-beta.2 timed out with the former 5 minutes.
         run: pnpm exec tsx ./scripts/wait-npm.ts
 
       - name: Re-install with rewritten package.json

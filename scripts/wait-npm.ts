@@ -5,8 +5,13 @@ import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
 
-const TIMEOUT_MS = 5 * 60 * 1000
-const INTERVAL_MS = 5_000
+/**
+ * NOTE(kazupon): npm scans a newly published version for malware before it serves it. Until the scan
+ * ends, the version is shown as "Validating" on npmjs.com and `npm view` does not find it. The scan
+ * usually takes about five minutes, and 15 minutes or more at peak times, so wait well beyond that.
+ */
+const TIMEOUT_MS = 30 * 60 * 1000
+const INTERVAL_MS = 15_000
 const SKIP_PACKAGES = new Set(['docs'])
 
 type NpmPackage = {
@@ -77,7 +82,11 @@ async function waitForNpmPackages(packages: readonly NpmPackage[]): Promise<void
     }
 
     if (Date.now() - start >= TIMEOUT_MS) {
-      throw new Error(`Timed out waiting for npm packages: ${[...pending].join(', ')}`)
+      throw new Error(
+        `Timed out waiting for npm packages: ${[...pending].join(', ')}. ` +
+          'Check their status on npmjs.com: a version may still be validated, held for review or blocked. ' +
+          'Once they are served, re-run this job with workflow_dispatch (job: jsr-publish).'
+      )
     }
 
     console.log(`waiting for ${[...pending].join(', ')}`)
