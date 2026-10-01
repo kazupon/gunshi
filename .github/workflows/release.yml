@@ -87,7 +87,8 @@ jobs:
         # automatically. Skip a version that is already published, so that a retry
         # with workflow_dispatch is idempotent. A version that npm is still
         # scanning is not found by `pnpm view`, so do not retry this job until npm
-        # serves the versions; retry `jsr-publish` or `release-notes` instead.
+        # serves the versions. `jsr-publish` waits for them, and `release-notes`
+        # should be retried only after both publish jobs succeed.
         env:
           DIST_TAG: ${{ steps.meta.outputs.dist_tag }}
         run: |
