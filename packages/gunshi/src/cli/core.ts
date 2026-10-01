@@ -185,9 +185,13 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     args
   )
 
-  // skipPositional: how many leading positionals to skip (they're consumed as command names)
-  // depth=0 → -1 (no skip), depth=1 → 0 (skip 1, existing behavior), depth=2 → 1 (skip 2), etc.
-  const skipPositional = targetDepth > 0 ? targetDepth - 1 : -1
+  // skipPositional: the index of the last positional argument to skip, which is the last command name
+  const skipPositional = resolveSkipPositional(
+    tokens,
+    pluginContext.globalOptions,
+    resolvedCommand,
+    targetDepth
+  )
 
   const diagnostic = selection.diagnostic === true
   const parsed = diagnostic
@@ -977,6 +981,30 @@ function getRoutingPositionals<G extends GunshiParamsConstraint>(
   globalOptions: ReadonlyMap<string, ArgSchema>,
   command: Command<G> | LazyCommand<G>
 ): string[] {
+  /**
+   * NOTE(kazupon): an empty argument is never a command name. `getPositionalTokens()` skips it when it
+   * collects the candidates, and the routing of each candidate must skip it too; otherwise the routing
+   * looks for a sub-command named `''`, and fails with `inconsistent-options` (#781).
+   */
+  return readPositionals(tokens, globalOptions, command).filter(value => value !== '')
+}
+
+/**
+ * Read the positional arguments as `resolveArgs()` reads them for a command, empty ones included.
+ *
+ * The schemas are projected down to the metadata that classifies the tokens, so no code of the user,
+ * such as `parse`, runs.
+ *
+ * @param tokens - Tokenized command-line arguments
+ * @param globalOptions - Global option schemas
+ * @param command - The command whose arguments classify the tokens
+ * @returns The positional arguments, in the order that `skipPositional` of args-tokens counts them
+ */
+function readPositionals<G extends GunshiParamsConstraint>(
+  tokens: ArgToken[],
+  globalOptions: ReadonlyMap<string, ArgSchema>,
+  command: Command<G> | LazyCommand<G>
+): string[] {
   const effective = resolveCommandArgs<ExtractArgs<G>>(globalOptions, getCommandArgs(command))
   const routingArgs = create<Args>()
   for (const [name, schema] of Object.entries(effective)) {
@@ -990,15 +1018,53 @@ function getRoutingPositionals<G extends GunshiParamsConstraint>(
       toKebab: schema.toKebab
     }
   }
-  /**
-   * NOTE(kazupon): an empty argument is never a command name. `getPositionalTokens()` skips it when it
-   * collects the candidates, and the routing of each candidate must skip it too; otherwise the routing
-   * looks for a sub-command named `''`, and fails with `inconsistent-options` (#781).
-   */
   return resolveArgs(routingArgs, tokens, {
     shortGrouping: true,
     toKebab: command.toKebab
-  }).positionals.filter(value => value !== '')
+  }).positionals
+}
+
+/**
+ * Resolve `skipPositional` of args-tokens: the index of the last positional argument to skip.
+ *
+ * NOTE(kazupon): the command names are the first positional arguments that are not empty, and the
+ * last one is at `depth - 1` only when no empty argument comes before it. `skipPositional` counts every
+ * positional argument, the empty ones too, so `app '' build x` gave `build` to the first positional
+ * argument of `build` (#793). The index is found in the reading of `resolveArgs()`, in which the values
+ * of the options are already taken out, so that an empty value of an option is not counted.
+ *
+ * @param tokens - Tokenized command-line arguments
+ * @param globalOptions - Global option schemas
+ * @param command - The command whose arguments are resolved
+ * @param depth - The number of command names
+ * @returns The index of the last command name among the positional arguments, or `-1` for the entry
+ */
+function resolveSkipPositional<G extends GunshiParamsConstraint>(
+  tokens: ArgToken[],
+  globalOptions: ReadonlyMap<string, ArgSchema>,
+  command: Command<G> | LazyCommand<G>,
+  depth: number
+): number {
+  if (depth === 0) {
+    return -1
+  }
+
+  // without an empty argument, the command names are the first positional arguments
+  if (!tokens.some(token => token.kind === 'positional' && token.value === '')) {
+    return depth - 1
+  }
+
+  let names = 0
+  for (const [index, value] of readPositionals(tokens, globalOptions, command).entries()) {
+    if (value === '') {
+      continue
+    }
+    names++
+    if (names === depth) {
+      return index
+    }
+  }
+  return depth - 1
 }
 
 function sameCommandPath(left: readonly string[], right: readonly string[]): boolean {
