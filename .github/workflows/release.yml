@@ -83,8 +83,9 @@ jobs:
         run: pnpm build
 
       - name: Publish each package to npm
-        # OIDC trusted publisher — secret は不要、provenance も自動付与。
-        # 既 publish 済 version は冪等に skip (workflow_dispatch リトライ用)。
+        # OIDC trusted publisher: no secret is needed, and provenance is attached
+        # automatically. Skip a version that is already published, so that a retry
+        # with workflow_dispatch is idempotent.
         env:
           DIST_TAG: ${{ steps.meta.outputs.dist_tag }}
         run: |
@@ -153,8 +154,8 @@ jobs:
         run: pnpm build
 
       - name: Rewrite workspace:* to pinned versions for JSR
-        # JSR は workspace:* を解決しないため、各 package の package.json で
-        # 依存を実 version に書き換える (scripts/jsr.ts が担当)。
+        # JSR does not resolve `workspace:*`, so `scripts/jsr.ts` rewrites the
+        # dependencies in the package.json of each package to the actual versions.
         run: |
           for PKG in packages/*/; do
             [[ "$PKG" == "packages/docs/" ]] && continue
@@ -169,12 +170,13 @@ jobs:
         run: pnpm exec tsx ./scripts/wait-npm.ts
 
       - name: Re-install with rewritten package.json
-        # `--ignore-scripts` で esbuild 等の build script を skip
-        # (workspace の allowBuilds は dlx context で読まれないため)。
+        # `--ignore-scripts` skips the build scripts of esbuild and others, since
+        # `allowBuilds` of the workspace is not read in the dlx context.
         run: pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Publish each package to JSR
-        # 既 publish 済 version は冪等に skip (workflow_dispatch リトライ用)。
+        # Skip a version that is already published, so that a retry with
+        # workflow_dispatch is idempotent.
         run: |
           for PKG in packages/*/; do
             [[ "$PKG" == "packages/docs/" ]] && continue
@@ -219,7 +221,8 @@ jobs:
           persist-credentials: false
 
       - name: Create GitHub Release
-        # 既存 Release があれば skip (workflow_dispatch リトライ時の冪等性)。
+        # Skip the release if it already exists, so that a retry with
+        # workflow_dispatch is idempotent.
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists, skipping creation"
