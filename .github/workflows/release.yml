@@ -128,6 +128,12 @@ jobs:
     permissions:
       contents: read
       id-token: write # JSR OIDC
+    env:
+      # Since pnpm 11, `pnpm exec` first installs the dependencies when they are
+      # out of date (`verifyDepsBeforeRun: install`), which fails on CI with the
+      # frozen lockfile. This job rewrites each package.json on purpose, and
+      # installs them again after that, so the check must not run in between.
+      pnpm_config_verify_deps_before_run: 'false'
     steps:
       - name: Checkout codes
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
