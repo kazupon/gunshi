@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { kebabnize } from 'gunshi/utils'
+import { create, kebabnize } from 'gunshi/utils'
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, PLUGIN_PREFIX } from './constants.ts'
 
 import type {
@@ -159,4 +159,55 @@ export function resolveOptionNames(args: Args, toKebab?: boolean): Set<string> {
     }
   }
   return names
+}
+
+/**
+ * Resolve the arguments of a command, the way gunshi parses and renders them.
+ *
+ * The global options belong to no command definition, so they are merged into the arguments of the
+ * command. An argument of the command shadows the global option of the same name, and it shadows the
+ * same way by short name: a global option gives up its short name to an argument of the command that
+ * claims the same letter, and keeps its long name.
+ *
+ * NOTE(kazupon): a copy of the function that the core of gunshi resolves the arguments with. The
+ * core does not export its own, to keep it out of the public API. `@gunshi/plugin-completion`
+ * completes the arguments with this copy, and the tests pin it to the results of the core.
+ *
+ * @param globalOptions - The global options that plugins registered with `addGlobalOption`.
+ * @param args - The {@linkcode Args | arguments} that the command declares.
+ * @returns The merged arguments.
+ */
+export function resolveCommandArgs<A extends Args = Args>(
+  globalOptions?: ReadonlyMap<string, ArgSchema>,
+  args?: A
+): A {
+  return Object.assign(create<A>(), resolveGlobalOptions(globalOptions, args), args)
+}
+
+function resolveGlobalOptions(
+  globalOptions: ReadonlyMap<string, ArgSchema> | undefined,
+  args: Args | undefined
+): Args | undefined {
+  if (!globalOptions) {
+    return undefined
+  }
+
+  const shortNames = new Set<string>()
+  for (const schema of Object.values(args || {})) {
+    if (schema.type !== 'positional' && schema.short) {
+      shortNames.add(schema.short)
+    }
+  }
+
+  const resolved = create<Args>()
+  for (const [name, schema] of globalOptions) {
+    /**
+     * NOTE(kazupon): a copy, because the schema is the one that the plugin registered, which every
+     * command of the CLI shares. Only this command gives up the short name.
+     */
+    resolved[name] =
+      schema.short && shortNames.has(schema.short) ? { ...schema, short: undefined } : schema
+  }
+
+  return resolved
 }
