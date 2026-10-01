@@ -1339,6 +1339,62 @@ describe('args validation i18n', () => {
       "Optional argument '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
     )
   })
+
+  test('translates a required positional by its display name', async () => {
+    // the translation named it by its key, `inputFile`, and the other errors by their display name (#792)
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        [],
+        {
+          toKebab: true,
+          args: {
+            inputFile: {
+              type: 'positional'
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [
+            i18n({
+              locale: 'ja-JP',
+              builtinResources: { 'ja-JP': jsJPResource }
+            })
+          ]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual("位置引数 'input-file' は必須です")
+  })
+
+  test('a required positional in en-US reads as the message of args-tokens', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(
+        [],
+        {
+          toKebab: true,
+          args: {
+            inputFile: {
+              type: 'positional'
+            }
+          },
+          run: vi.fn<() => void>()
+        },
+        {
+          plugins: [i18n({ locale: 'en-US' })]
+        }
+      )
+    ).rejects.toBeInstanceOf(AggregateError)
+
+    expect(log()).toEqual("Positional argument 'input-file' is required")
+  })
 })
 
 describe('positional arguments', () => {
