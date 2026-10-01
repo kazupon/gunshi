@@ -5,7 +5,7 @@ Render the validation errors.
 ## Signature
 
 ```ts
-export function renderValidationErrors<G extends GunshiParams = DefaultGunshiParams>(_ctx: CommandContext<G>, error: AggregateError): Promise<string>
+export async function renderValidationErrors<G extends GunshiParams = DefaultGunshiParams>(ctx: CommandContext<G>, error: AggregateError): Promise<string>
 ```
 
 ## Type Parameters
@@ -18,7 +18,7 @@ export function renderValidationErrors<G extends GunshiParams = DefaultGunshiPar
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `_ctx` | `CommandContext<G>` | A command context |
+| `ctx` | `CommandContext<G>` | A command context |
 | `error` | `AggregateError` | An AggregateError of option in `args-token` validation |
 
 ## Returns

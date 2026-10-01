@@ -7,7 +7,7 @@ Non-built-in keys are not prefixed with any special characters. If the command n
 ## Signature
 
 ```ts
-declare function resolveKey<T extends Record<string, string> = {}, K extends string = (keyof T extends string ? keyof T : string)>(key: K, name?: string): string
+declare function resolveKey<T extends Record<string, string> = {}, K extends string = keyof T extends string ? keyof T : string>(key: K, name?: string): string
 ```
 
 ## Type Parameters
@@ -15,7 +15,7 @@ declare function resolveKey<T extends Record<string, string> = {}, K extends str
 | Name | Description |
 | --- | --- |
 | `T` *extends* `Record<string, string>` = `{}` | The type of the non-built-in key to resolve. Defaults to string. |
-| `K` *extends* `string` = `(keyof T extends string ? keyof T : string)` | - |
+| `K` *extends* `string` = `keyof T extends string ? keyof T : string` | - |
 
 ## Parameters
 

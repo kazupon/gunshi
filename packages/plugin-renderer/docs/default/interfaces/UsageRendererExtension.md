@@ -20,6 +20,7 @@ export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGun
 | Name | Type | Description |
 | --- | --- | --- |
 | `loadCommands` | `() => Promise<Command<G>[]>` | Load commands |
+| `localizeCommandDescription` | `(cmd: Command) => Promise<string>` | Resolve the description of a command in the command list. The description is localized when `@gunshi/plugin-i18n` is installed and the command has a resource of its own, and falls back to Command.description otherwise. |
 | `text` | `(key: K, values?: Record<string, unknown>) => Promise<string>` | Render the text message. |
 
 ### loadCommands Type Parameters
@@ -30,7 +31,17 @@ export interface UsageRendererExtension<G extends GunshiParams<any> = DefaultGun
 
 ### loadCommands Returns
 
-`Promise<Command<G>[]>` — A list of commands loaded from the usage renderer plugin. At the top-level entry, the list includes the CLI entry command even when a plugin registered the other commands without adding the entry to `env.subCommands`; nested lists use their local entry.
+`Promise<Command<G>[]>` — A list of commands loaded from the usage renderer plugin. At the top-level entry, the list includes the CLI entry command even when a plugin registered the other commands without adding the entry to `env.subCommands`.
+
+### localizeCommandDescription Parameters
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `cmd` | `Command` | A command from [UsageRendererExtension.loadCommands](#property-loadcommands). |
+
+### localizeCommandDescription Returns
+
+`Promise<string>` — The description to show for the command.
 
 ### text Type Parameters
 

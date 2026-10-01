@@ -5,7 +5,7 @@ Command resource type for i18n plugin.
 ## Signature
 
 ```ts
-export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiParams> = { description: string } & { [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX>]?: string } & { [key: string]: string }
+export type CommandResource<G extends GunshiParamsConstraint = DefaultGunshiParams> = { description: string } & { [ Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<ExtractArgs<G>>>, typeof ARG_PREFIX> ]?: string } & { [key: string]: string }
 ```
 
 ## Type Parameters
