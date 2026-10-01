@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git"
   },
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@12.6.0",
   "engines": {
     "node": ">= 22"
   },
@@ -30,12 +30,12 @@
       {
         "name": "deno",
         "version": ">=2",
-        "onFail": "warn"
+        "onFail": "ignore"
       },
       {
         "name": "bun",
         "version": ">=1.1",
-        "onFail": "error"
+        "onFail": "ignore"
       }
     ]
   },
@@ -70,7 +70,7 @@
     "gen:importmap": "pnpm exec tsx scripts/importmap.ts",
     "lint": "pnpm run \"/^lint:/\"",
     "lint:eslint": "eslint . --cache",
-    "lint:jsr": "pnpm -r --if-present lint:jsr",
+    "lint:jsr": "pnpm -r --workspace-concurrency=1 --if-present lint:jsr",
     "lint:knip": "knip",
     "lint:oxfmt": "oxfmt . --check --config ./node_modules/@kazupon/prettier-config/index.json",
     "lint:oxlint": "oxlint --type-aware --type-check",
@@ -122,15 +122,6 @@
     "typescript-eslint": "^8.59.2",
     "vitepress-api-references": "catalog:",
     "vitest": "^5.0.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "deno",
-      "esbuild",
-      "oxc-resolver",
-      "rolldown",
-      "unrs-resolver"
-    ]
   },
   "lint-staged": {
     "*.ts?(x)": [

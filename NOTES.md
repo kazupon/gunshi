@@ -53,14 +53,14 @@ Move to `tsdown@0.23` once issue #312 is fixed. Before moving, compare the publi
 
 ### pnpm version
 
-The repository stays on pnpm v10. The exact version is pinned by the `packageManager` field in `package.json`.
+The repository uses pnpm v12. The exact version is pinned by the `packageManager` field in `package.json`, and in the `package.json` of each playground project.
 
-Do not upgrade to `pnpm@11` yet. CI started failing after the upgrade from `pnpm@10.33.2` to `pnpm@11.0.9` because `rolldown` could not resolve its Linux native optional dependency on GitHub Actions:
+pnpm v11 changed where it reads its settings, and pnpm v12 checks more when it installs. The settings that follow from it:
 
-```sh
-Cannot find module '@rolldown/binding-linux-x64-gnu'
-```
+- **`allowBuilds`** in `pnpm-workspace.yaml` lists the dependencies that may run install scripts. It replaces `onlyBuiltDependencies`, which pnpm v11 removed. `strictDepBuilds` is on by default, so an install fails when a dependency with an install script is not listed (`deno` and `esbuild` today)
+- **The settings live in `pnpm-workspace.yaml`.** pnpm v11 no longer reads the `pnpm` field of `package.json`, and reads only the auth and registry settings from `.npmrc`. `shellEmulator: true` moved from `.npmrc` for that reason
+- **`devEngines.runtime`** of the root `package.json` is checked on install. Deno and Bun are needed only by the E2E tests, and the E2E job installs them, so their `onFail` is `ignore`. With `error`, the CI jobs without Bun fail to install. With `warn`, pnpm prints the warning to stdout on every command, which breaks the snapshot tests of `plugin-completion` that run `pnpm exec`
+- **`ignoreWorkspaceCycles: true`**: the packages depend on each other through devDependencies (e.g. `@gunshi/bone` → `gunshi` → `@gunshi/plugin-i18n` → `@gunshi/bone`), and pnpm v11 and later refuse to run recursive tasks across such cycles without it. The order within a cycle does not matter for the build, since each package bundles the others from their sources (`paths` of `tsconfig.json`). The output is byte for byte the same in any order
+- **`lint:jsr` runs one package at a time** (`--workspace-concurrency=1`). With the cycles ignored, two packages start at once, and on a fresh install their `jsr publish --dry-run` download the JSR binary to the same place, which fails with `ENOENT`
 
-Adding `@rolldown/binding-linux-x64-gnu` directly as a root `optionalDependency` did not fix the issue, because `rolldown` still could not resolve the binding from its own package location under pnpm's install layout.
-
-Stay on pnpm v10 until pnpm v11's optional native dependency linking behavior is confirmed to work with `rolldown` in CI.
+pnpm v11.0.9 once failed on GitHub Actions because `rolldown` could not resolve its Linux native optional dependency (`Cannot find module '@rolldown/binding-linux-x64-gnu'`). This does not happen with pnpm v12.6.0: install and build pass on linux/amd64, and the output is the same as on macOS.
