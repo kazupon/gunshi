@@ -13,7 +13,7 @@
   "help": "このヘルプメッセージを表示",
   "version": "このバージョンを表示",
   "err:arg:required-option": "オプション {$displayName} は必須です",
-  "err:arg:required-positional": "位置引数 {$name} は必須です",
+  "err:arg:required-positional": "位置引数 {$displayName} は必須です",
   "err:arg:invalid-type": "{$displayName} の値が不正です。期待される型: {$expected}",
   "err:arg:invalid-choice": "{$displayName} の値が不正です。指定可能な値: {$choices}",
   "err:arg:custom-parse": "{$displayName} の値が不正です: {$reason}",
