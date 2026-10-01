@@ -101,7 +101,7 @@ const release = define({
 
 Other commands of the same CLI are unaffected, and so is the entry command unless it declares the name itself.
 
-One case is left to this plugin on purpose: a schema that is identical to the one this plugin registers, field for field, cannot be told apart from it, so `version: { type: 'boolean', short: 'v', description: 'Display this version' }` still prints the version of the CLI. Any difference at all — a description of your own, an extra property, another type — makes the argument the command's.
+This holds whatever the schema is, even one identical to the schema this plugin registers: a command that declares `version: { type: 'boolean', short: 'v', description: 'Display this version' }` receives `--version` and `-v` itself, and the version of the CLI is not printed. To keep the behaviour of this plugin on a command, leave the name out of its `args`.
 
 ## 🧩 Context Extensions
 
