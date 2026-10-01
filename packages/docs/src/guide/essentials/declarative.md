@@ -170,6 +170,7 @@ Each option can have the following properties:
 - `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
 - `hidden`: Set to `true` to hide the argument from generated help/usage output while keeping it parseable.
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
+- `choices`: The values that an `enum` option accepts. Required when `type` is 'enum', unless the option has a `parse` function, which then receives the value as it would for a 'string' option
 - `conflicts`: Specify mutually exclusive options that cannot be used together
 
 <!-- eslint-disable markdown/no-missing-label-refs -->

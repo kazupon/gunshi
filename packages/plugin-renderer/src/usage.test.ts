@@ -1362,6 +1362,71 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
   })
 })
 
+describe('#800 - an `enum` argument without `choices`', () => {
+  // with a `parse` function, args-tokens resolves an `enum` argument without `choices`
+  const parse = (value: string) => value.toUpperCase()
+
+  async function render(args: Args, usageOptionType = false, withI18n = false) {
+    const command = { args, name: 'main', description: 'Main', run: NOOP } as Command<
+      GunshiParams<{ args: Args }>
+    >
+    const ctx = await createCommandContext({
+      args,
+      callMode: 'subCommand',
+      command,
+      extensions: withI18n
+        ? {
+            [i18nPlugin.id]: i18nPlugin.extension,
+            [rendererPlugin.id]: rendererPlugin.extension
+          }
+        : { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { name: 'my-cli', version: '0.0.0', usageOptionType }
+    })
+    return withI18n
+      ? await renderUsage<WithI18nAndRenderer>(ctx)
+      : await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  test('is shown without a list of choices', async () => {
+    const usage = await render({ level: { type: 'enum', parse, description: 'Log level' } })
+
+    expect(usage).toMatch(/^ {2}--level <level>\s+Log level$/m)
+    expect(usage).not.toContain('choices')
+  })
+
+  test('shows its default alone', async () => {
+    const usage = await render({
+      level: { type: 'enum', parse, default: 'info', description: 'Log level' }
+    })
+
+    expect(usage).toMatch(/^ {2}--level \[level\]\s+Log level \(default: info\)$/m)
+  })
+
+  test('shows its type with `usageOptionType`', async () => {
+    const usage = await render({ level: { type: 'enum', parse, description: 'Log level' } }, true)
+
+    expect(usage).toMatch(/^ {2}--level <level>\s+\[enum\]\s+Log level$/m)
+  })
+
+  test('is shown without a list of choices with the i18n plugin', async () => {
+    const usage = await render(
+      { level: { type: 'enum', parse, description: 'Log level' } },
+      false,
+      true
+    )
+
+    expect(usage).toMatch(/^ {2}--level <level>\s+Log level$/m)
+  })
+
+  test('an argument with `choices` still lists them', async () => {
+    const usage = await render({
+      level: { type: 'enum', choices: ['debug', 'info'], default: 'info', description: 'Log level' }
+    })
+
+    expect(usage).toContain('Log level (default: info, choices: debug | info)')
+  })
+})
+
 describe('#743 - `toKebab` brings two keys under one name', () => {
   async function render(args: Args, toKebab = true): Promise<string> {
     const command = { args, name: 'main', description: 'Main', toKebab, run: NOOP } as Command<

@@ -524,7 +524,14 @@ async function resolveDisplayValue<
   if (schema.type === 'enum') {
     const _default =
       schema.default === undefined ? '' : await generateDefaultDisplayValue(ctx, schema)
-    const choices = `${await ctx.extensions[pluginId].text(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
+    /**
+     * NOTE(kazupon): an `enum` argument that has a `parse` function needs no `choices`, as args-tokens
+     * resolves its value with the function. There is no list to show then (#800).
+     */
+    if (!Array.isArray(schema.choices)) {
+      return _default ? `(${_default})` : ''
+    }
+    const choices = `${await ctx.extensions[pluginId].text(resolveBuiltInKey('CHOICES'))}: ${schema.choices.join(' | ')}`
     return `(${_default ? `${_default}, ${choices}` : choices})`
   }
 

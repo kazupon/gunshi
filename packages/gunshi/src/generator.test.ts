@@ -78,6 +78,22 @@ test('#769 generates usage for an unnamed lazy entry', async () => {
   expect(entryRun).not.toHaveBeenCalled()
 })
 
+test('#800 generates usage for an enum argument without choices', async () => {
+  const command = define({
+    name: 'app',
+    args: {
+      // with a `parse` function, args-tokens resolves an `enum` argument without `choices`
+      level: { type: 'enum', parse: value => value.toUpperCase(), description: 'Log level' }
+    },
+    run: () => {}
+  })
+
+  const usage = await generate(null, command, { name: 'mycli' })
+
+  expect(usage).toContain('--level <level>')
+  expect(usage).not.toContain('choices')
+})
+
 describe('a command that declares an argument of its own', () => {
   const entry = define({ name: 'main', description: 'Entry', run: () => {} })
 
