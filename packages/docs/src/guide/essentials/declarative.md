@@ -333,7 +333,7 @@ const build = define({
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> Declaring the name is what takes a global option away — except when the schema is identical, field for field, to the one the plugin registered, which cannot be told apart from it and keeps the plugin's behaviour. A plugin is told which of its own options are still in effect; how each one reacts is part of that plugin's documentation. See [Plugin System](../plugin/introduction.md).
+> Declaring the name is what takes a global option away, even with a schema identical, field for field, to the one the plugin registered. A plugin is told which of its own options are still in effect; how each one reacts is part of that plugin's documentation. See [Plugin System](../plugin/introduction.md).
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
