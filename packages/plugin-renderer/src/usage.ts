@@ -38,13 +38,13 @@ function isHiddenArg(schema: ArgSchema): boolean {
 
 function getVisibleOptionalArgs(args: Args): [string, ArgSchema][] {
   return Object.entries(args).filter(
-    ([_, schema]) => schema.type !== 'positional' && !isHiddenArg(schema)
+    ([, schema]) => schema.type !== 'positional' && !isHiddenArg(schema)
   )
 }
 
 function getVisiblePositionalArgs(args: Args): [string, ArgSchema][] {
   return Object.entries(args).filter(
-    ([_, schema]) => schema.type === 'positional' && !isHiddenArg(schema)
+    ([, schema]) => schema.type === 'positional' && !isHiddenArg(schema)
   )
 }
 
@@ -415,7 +415,7 @@ function hasAllDefaultOptions(args: Args): boolean {
    */
   return (
     visibleOptionalArgs.length > 0 &&
-    visibleOptionalArgs.every(([_, arg]) => arg.default !== undefined)
+    visibleOptionalArgs.every(([, arg]) => arg.default !== undefined)
   )
 }
 
@@ -549,7 +549,7 @@ async function generateOptionalArgsUsage<
     return ''
   }
 
-  const optionsMaxLength = Math.max(...optionsPairsEntries.map(([_, value]) => displayWidth(value)))
+  const optionsMaxLength = Math.max(...optionsPairsEntries.map(([, value]) => displayWidth(value)))
 
   const optionSchemaMaxLength = ctx.env.usageOptionType
     ? Math.max(...optionsPairsEntries.map(([key]) => displayWidth(resolveNegatableType(key, ctx))))
