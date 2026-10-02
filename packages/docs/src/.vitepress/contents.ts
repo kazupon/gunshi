@@ -98,6 +98,10 @@ export const releaseNotes = {
   collapsed: false,
   items: [
     {
+      text: 'Gunshi v1.0 Release Notes',
+      link: '/release/v1.0'
+    },
+    {
       text: 'Gunshi v0.27 Release Notes',
       link: '/release/v0.27'
     }
