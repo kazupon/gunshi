@@ -616,8 +616,8 @@ importers:
         specifier: 'catalog:'
         version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       messageformat:
-        specifier: 4.0.0
-        version: 4.0.0
+        specifier: 4.1.0
+        version: 4.1.0
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -4205,8 +4205,8 @@ packages:
     resolution: {integrity: sha512-/wQXC9iBxoGV8p3erbvaXs9h77VyLDBH6GdayVjj3hEcSQhFU4N1WUhUppotCEqlIxI2pRMwjwBSwTB1MfZBgQ==}
     engines: {node: '>=22.12.0'}
 
-  messageformat@4.0.0:
-    resolution: {integrity: sha512-XKmJ/ffTWToWOlHJzt85ZChQgVGC0LHzNWuNK8zuYpNySsB0nIEmytOdSAOW9ETKtkajAUJf520m5gFHHnrTYg==}
+  messageformat@4.1.0:
+    resolution: {integrity: sha512-ZLId0BYfsNhC6/MRwVFw1yTLgG9cbJwfTsjYSS2C59PdfJWVRsX7hthADvsXefBtTg2FKso0VAJmMJJOtnJ75w==}
     engines: {node: ^20.19 || ^22.12 || >=24}
 
   micromark-core-commonmark@2.0.3:
@@ -7893,7 +7893,7 @@ snapshots:
       ts-dedent: 2.2.0
       uuid: 14.0.0
 
-  messageformat@4.0.0: {}
+  messageformat@4.1.0: {}
 
   micromark-core-commonmark@2.0.3:
     dependencies:
