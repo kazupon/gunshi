@@ -1,7 +1,7 @@
 {
   "name": "sub-command",
   "private": true,
-  "packageManager": "pnpm@12.14.0",
+  "packageManager": "pnpm@12.15.0",
   "type": "module",
   "scripts": {
     "start": "node cli.ts"
