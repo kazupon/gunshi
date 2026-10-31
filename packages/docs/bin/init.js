@@ -71,7 +71,7 @@ async function fileExists(filePath) {
 // - Create skill file at .claude/skills/use-gunshi-cli/SKILL.md
 // - Update or create CLAUDE.md with instruction to use the skill
 //   (skip if Gunshi is already mentioned to avoid duplication)
-await x('mkdir', ['-p', path.dirname(CLAUDE_SKILL_PATH)])
+await fs.mkdir(path.dirname(CLAUDE_SKILL_PATH), { recursive: true })
 await fs.writeFile(CLAUDE_SKILL_PATH, SKILL_CONTENT, 'utf8')
 console.log(`Created Claude skill at ${CLAUDE_SKILL_PATH}`)
 
