@@ -32,7 +32,7 @@ alwaysApply: false
 ${USE_GUNSHI_PROMPT}
 `.trim()
 
-const CLAUDE_MD_GUNSHI_INSTRUCTION = `
+const GUNSHI_INSTRUCTION = `
 ## CLI Development
 
 When creating command-line interfaces, use the \`${SKILL_NAME}\` skill.
@@ -40,9 +40,10 @@ When creating command-line interfaces, use the \`${SKILL_NAME}\` skill.
 
 const cwd = process.cwd()
 const CLAUDE_SKILL_PATH = path.join(cwd, `.claude/skills/${SKILL_NAME}/SKILL.md`)
+const AGENTS_MD_FILEPATH = path.join(cwd, 'AGENTS.md')
 const CLAUDE_MD_FILEPATH = path.join(cwd, 'CLAUDE.md')
 
-// Helper function to check if CLAUDE.md already contains Gunshi instructions
+// Helper function to check if an instruction file already contains Gunshi instructions
 async function hasGunshiInstruction(filePath) {
   try {
     const content = await fs.readFile(filePath, 'utf8')
@@ -66,7 +67,7 @@ async function fileExists(filePath) {
 
 // Claude Code setup:
 // - Create skill file at .claude/skills/use-gunshi-cli/SKILL.md
-// - Update or create CLAUDE.md with instruction to use the skill
+// - Update AGENTS.md if it exists (Claude Code reads it), otherwise update or create CLAUDE.md
 //   (skip if Gunshi is already mentioned to avoid duplication)
 async function setupClaudeCode() {
   await fs.mkdir(path.dirname(CLAUDE_SKILL_PATH), { recursive: true })
@@ -80,23 +81,26 @@ async function setupClaudeCode() {
     return
   }
 
-  // Update or create CLAUDE.md with skill reference
-  const claudeMdExists = await fileExists(CLAUDE_MD_FILEPATH)
-  const alreadyHasGunshi = claudeMdExists && (await hasGunshiInstruction(CLAUDE_MD_FILEPATH))
+  const instructionFilePath = (await fileExists(AGENTS_MD_FILEPATH))
+    ? AGENTS_MD_FILEPATH
+    : CLAUDE_MD_FILEPATH
+  const instructionFileExists = await fileExists(instructionFilePath)
+  const alreadyHasGunshi =
+    instructionFileExists && (await hasGunshiInstruction(instructionFilePath))
 
   if (!alreadyHasGunshi) {
-    if (claudeMdExists) {
-      const existingContent = await fs.readFile(CLAUDE_MD_FILEPATH, 'utf8')
-      const newContent = existingContent.trimEnd() + '\n\n' + CLAUDE_MD_GUNSHI_INSTRUCTION + '\n'
-      await fs.writeFile(CLAUDE_MD_FILEPATH, newContent, 'utf8')
-      console.log(`Appended Gunshi instructions to ${CLAUDE_MD_FILEPATH}`)
+    if (instructionFileExists) {
+      const existingContent = await fs.readFile(instructionFilePath, 'utf8')
+      const newContent = existingContent.trimEnd() + '\n\n' + GUNSHI_INSTRUCTION + '\n'
+      await fs.writeFile(instructionFilePath, newContent, 'utf8')
+      console.log(`Appended Gunshi instructions to ${instructionFilePath}`)
     } else {
-      const newContent = '# CLAUDE.md\n\n' + CLAUDE_MD_GUNSHI_INSTRUCTION + '\n'
-      await fs.writeFile(CLAUDE_MD_FILEPATH, newContent, 'utf8')
-      console.log(`Created ${CLAUDE_MD_FILEPATH} with Gunshi instructions`)
+      const newContent = '# CLAUDE.md\n\n' + GUNSHI_INSTRUCTION + '\n'
+      await fs.writeFile(instructionFilePath, newContent, 'utf8')
+      console.log(`Created ${instructionFilePath} with Gunshi instructions`)
     }
   } else {
-    console.log(`Gunshi instructions already exist in ${CLAUDE_MD_FILEPATH}, skipping`)
+    console.log(`Gunshi instructions already exist in ${instructionFilePath}, skipping`)
   }
 }
 
