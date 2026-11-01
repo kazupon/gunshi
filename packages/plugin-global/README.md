@@ -143,11 +143,11 @@ const command = {
     // Access global extensions
     const { showVersion, showHeader } = ctx.extensions[globalId]
 
-    // Manually show version if needed
-    console.log(`Deploying with CLI version: ${showVersion()}`)
-
     // Show the custom header before the output of the command (it prints the header itself)
     await showHeader()
+
+    // Manually show version if needed
+    console.log(`Deploying with CLI version: ${showVersion()}`)
 
     // Your command logic here...
   }

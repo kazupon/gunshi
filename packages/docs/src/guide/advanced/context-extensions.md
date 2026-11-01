@@ -89,10 +89,8 @@ const command = define({
     // Show version information
     global.showVersion()
 
-    // Show command header
-    global.showHeader()
-
-    // Show usage information, with the header as its title
+    // Show usage information, with the header as its title.
+    // To show the header alone, such as before the output of a command, call `global.showHeader()`
     global.showUsage()
 
     // Show validation errors
