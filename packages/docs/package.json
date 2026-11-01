@@ -47,6 +47,7 @@
   ],
   "dependencies": {
     "@antfu/install-pkg": "^2.0.0",
+    "gunshi": "workspace:*",
     "tinyexec": "^1.0.2"
   },
   "devDependencies": {

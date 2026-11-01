@@ -6,6 +6,7 @@ import fs from 'node:fs/promises'
 import readline from 'node:readline'
 import { x } from 'tinyexec'
 import { installPackage } from '@antfu/install-pkg'
+import { cli, define } from 'gunshi'
 
 const { version } = JSON.parse(
   await fs.readFile(path.join(import.meta.dirname, '../package.json'), 'utf8')
@@ -41,10 +42,6 @@ const cwd = process.cwd()
 const CLAUDE_SKILL_PATH = path.join(cwd, `.claude/skills/${SKILL_NAME}/SKILL.md`)
 const CLAUDE_MD_FILEPATH = path.join(cwd, 'CLAUDE.md')
 
-const hasClaudeCode = await x('which', ['claude'], { throwOnError: false })
-  .then(({ stdout }) => stdout.trim().length > 0)
-  .catch(() => false)
-
 // Helper function to check if CLAUDE.md already contains Gunshi instructions
 async function hasGunshiInstruction(filePath) {
   try {
@@ -71,11 +68,18 @@ async function fileExists(filePath) {
 // - Create skill file at .claude/skills/use-gunshi-cli/SKILL.md
 // - Update or create CLAUDE.md with instruction to use the skill
 //   (skip if Gunshi is already mentioned to avoid duplication)
-await fs.mkdir(path.dirname(CLAUDE_SKILL_PATH), { recursive: true })
-await fs.writeFile(CLAUDE_SKILL_PATH, SKILL_CONTENT, 'utf8')
-console.log(`Created Claude skill at ${CLAUDE_SKILL_PATH}`)
+async function setupClaudeCode() {
+  await fs.mkdir(path.dirname(CLAUDE_SKILL_PATH), { recursive: true })
+  await fs.writeFile(CLAUDE_SKILL_PATH, SKILL_CONTENT, 'utf8')
+  console.log(`Created Claude skill at ${CLAUDE_SKILL_PATH}`)
 
-if (hasClaudeCode) {
+  const hasClaudeCode = await x('which', ['claude'], { throwOnError: false })
+    .then(({ stdout }) => stdout.trim().length > 0)
+    .catch(() => false)
+  if (!hasClaudeCode) {
+    return
+  }
+
   // Update or create CLAUDE.md with skill reference
   const claudeMdExists = await fileExists(CLAUDE_MD_FILEPATH)
   const alreadyHasGunshi = claudeMdExists && (await hasGunshiInstruction(CLAUDE_MD_FILEPATH))
@@ -96,23 +100,28 @@ if (hasClaudeCode) {
   }
 }
 
-// Ask user if they want to install gunshi and @gunshi/docs
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
-
-const askQuestion = question =>
-  new Promise(resolve => {
-    rl.question(question, answer => {
-      resolve(answer.toLowerCase().trim())
-    })
+async function confirmInstall() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
   })
+  const answer = await new Promise(resolve => {
+    rl.question('\nWould you like to install gunshi and @gunshi/docs? (y/N) ', resolve)
+  })
+  rl.close()
+  const normalized = answer.toLowerCase().trim()
+  return normalized === 'y' || normalized === 'yes'
+}
 
-const answer = await askQuestion('\nWould you like to install gunshi and @gunshi/docs? (y/N) ')
-rl.close()
+async function installPackages() {
+  if (!(await confirmInstall())) {
+    console.log('\nSkipped package installation.')
+    console.log('You can install manually with:')
+    console.log('  npm install gunshi')
+    console.log('  npm install -D @gunshi/docs')
+    return
+  }
 
-if (answer === 'y' || answer === 'yes') {
   console.log('\nInstalling gunshi and @gunshi/docs...')
   try {
     // Install gunshi as a production dependency
@@ -124,9 +133,21 @@ if (answer === 'y' || answer === 'yes') {
     console.error('Failed to install packages:', error.message)
     process.exit(1)
   }
-} else {
-  console.log('\nSkipped package installation.')
-  console.log('You can install manually with:')
-  console.log('  npm install gunshi')
-  console.log('  npm install -D @gunshi/docs')
 }
+
+const description = 'Set up Gunshi for AI coding agents in the current directory'
+
+const command = define({
+  name: 'gunshi-docs-init',
+  description,
+  run: async () => {
+    await setupClaudeCode()
+    await installPackages()
+  }
+})
+
+await cli(process.argv.slice(2), command, {
+  name: 'gunshi-docs-init',
+  version,
+  description
+})
