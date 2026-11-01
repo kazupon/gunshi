@@ -14,7 +14,7 @@ export interface GlobalExtension
 | Name | Type | Description |
 | --- | --- | --- |
 | `showHeader` | `() => Awaitable<string \| undefined>` | Show the header of the application. |
-| `showUsage` | `() => Awaitable<string \| undefined>` | Show the usage of the application. if `--help` option is specified, it will print the usage to the console. |
+| `showUsage` | `() => Awaitable<string \| undefined>` | Show the usage of the application, with the header as its title. if `--help` option is specified, it will print the usage to the console. |
 | `showValidationErrors` | `(error: AggregateError) => Awaitable<string \| undefined>` | Show validation errors. This is called when argument validation fails. |
 | `showVersion` | `() => string` | Show the version of the application. if `--version` option is specified, it will print the version to the console. |
 
@@ -24,7 +24,7 @@ export interface GlobalExtension
 
 ### showUsage Returns
 
-`Awaitable<string | undefined>` — The usage of the application, or `undefined` if the `renderUsage` is not specified.
+`Awaitable<string | undefined>` — The header and the usage of the application, or `undefined` if the `renderUsage` is not specified.
 
 ### showValidationErrors Parameters
 

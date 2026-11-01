@@ -92,7 +92,7 @@ const command = define({
     // Show command header
     global.showHeader()
 
-    // Show usage information
+    // Show usage information, with the header as its title
     global.showUsage()
 
     // Show validation errors
@@ -462,8 +462,7 @@ run: ctx => {
   // Or explicit checking for complex logic
   const globalExt = ctx.extensions[globalId]
   if (globalExt) {
-    // Plugin is available - use full features
-    globalExt.showHeader()
+    // Plugin is available - show the usage, with the header as its title
     globalExt.showUsage()
   } else {
     // Graceful fallback

@@ -108,6 +108,28 @@ describe('showUsage', () => {
     expect(rendered).toEqual(usage)
   })
 
+  test('with the header as its title', async () => {
+    const header = 'Test App (test-app v1.0.0)'
+    const usage = 'Usage: test-app [options]'
+    const ctx = await createCommandContext({
+      cliOptions: {
+        renderHeader: () => Promise.resolve(header),
+        renderUsage: () => Promise.resolve(usage),
+        usageSilent: true
+      },
+      extensions: {
+        [pluginId]: {
+          key: Symbol(pluginId),
+          factory: extension
+        }
+      }
+    })
+    const global = ctx.extensions[pluginId]
+    const rendered = await global.showUsage()
+
+    expect(rendered).toEqual([header, usage].join('\n'))
+  })
+
   test('no usage', async () => {
     const ctx = await createCommandContext({
       cliOptions: { renderUsage: null },

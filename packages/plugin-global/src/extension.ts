@@ -25,9 +25,9 @@ export interface GlobalExtension {
   showHeader: () => Awaitable<string | undefined>
 
   /**
-   * Show the usage of the application. if `--help` option is specified, it will print the usage to the console.
+   * Show the usage of the application, with the header as its title. if `--help` option is specified, it will print the usage to the console.
    *
-   * @returns The usage of the application, or `undefined` if the `renderUsage` is not specified.
+   * @returns The header and the usage of the application, or `undefined` if the `renderUsage` is not specified.
    */
   showUsage: () => Awaitable<string | undefined>
 
@@ -69,13 +69,25 @@ export default function extension(ctx: CommandContextCore<DefaultGunshiParams>):
     },
 
     showUsage: async () => {
-      if (ctx.env.renderUsage != null) {
-        const usage = await ctx.env.renderUsage(ctx)
-        if (usage) {
-          ctx.log(usage)
-          return usage
-        }
+      if (ctx.env.renderUsage == null) {
+        return
       }
+      const usage = await ctx.env.renderUsage(ctx)
+      if (!usage) {
+        return
+      }
+      /**
+       * NOTE(kazupon): the header is the title of the usage, so it comes with the usage, wherever the
+       * usage is shown: for `--help`, and when a command that takes `--help` itself shows it. It is not
+       * shown before a command runs, where it would come before what the command prints, such as JSON.
+       */
+      const header = ctx.env.renderHeader == null ? undefined : await ctx.env.renderHeader(ctx)
+      if (header) {
+        ctx.log(header)
+        ctx.log() // empty line after header
+      }
+      ctx.log(usage)
+      return header ? [header, usage].join('\n') : usage
     },
 
     showValidationErrors: async (error: AggregateError) => {

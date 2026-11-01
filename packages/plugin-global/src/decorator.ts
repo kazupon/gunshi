@@ -31,7 +31,7 @@ const decorator: CommandDecorator<{
     validationError,
     env: { globalOptions },
     extensions: {
-      [Global]: { showVersion, showHeader, showUsage, showValidationErrors }
+      [Global]: { showVersion, showUsage, showValidationErrors }
     }
   } = ctx
 
@@ -44,19 +44,8 @@ const decorator: CommandDecorator<{
     return showVersion()
   }
 
-  const buf: string[] = []
-  const header = await showHeader()
-  if (header) {
-    buf.push(header)
-  }
-
   if (values.help && globalOptions?.has('help')) {
-    const usage = await showUsage()
-    if (usage) {
-      buf.push(usage)
-      return buf.join('\n')
-    }
-    return
+    return await showUsage()
   }
 
   // check for validation errors before executing command
