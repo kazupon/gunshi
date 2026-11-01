@@ -113,8 +113,8 @@ async function confirmInstall() {
   return normalized === 'y' || normalized === 'yes'
 }
 
-async function installPackages() {
-  if (!(await confirmInstall())) {
+async function installPackages(yes) {
+  if (!yes && !(await confirmInstall())) {
     console.log('\nSkipped package installation.')
     console.log('You can install manually with:')
     console.log('  npm install gunshi')
@@ -140,9 +140,16 @@ const description = 'Set up Gunshi for AI coding agents in the current directory
 const command = define({
   name: 'gunshi-docs-init',
   description,
-  run: async () => {
+  args: {
+    yes: {
+      type: 'boolean',
+      short: 'y',
+      description: 'Install gunshi and @gunshi/docs without prompting'
+    }
+  },
+  run: async ctx => {
     await setupClaudeCode()
-    await installPackages()
+    await installPackages(ctx.values.yes)
   }
 })
 
