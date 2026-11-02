@@ -12,7 +12,7 @@ Nested sub-commands are useful when your CLI has command groups with related ope
 
 ## Basic Nested Sub-Commands
 
-You can nest sub-commands by adding a `subCommands` property to any command definition:
+You can nest sub-commands by adding a `subCommands` property to any command definition. It is an object or a Map keyed by the sub-command names, or an array of commands, keyed by their names:
 
 ```ts [cli.ts]
 import { cli, define } from 'gunshi'

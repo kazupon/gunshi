@@ -4485,3 +4485,286 @@ describe('reported validation errors', () => {
     expect(process.exitCode).toBe(1)
   })
 })
+
+describe('sub-commands on the entry command', () => {
+  function commands() {
+    const add = vi.fn<(...args: unknown[]) => void>()
+    const list = vi.fn<(...args: unknown[]) => void>()
+    const addCommand = define({
+      name: 'add',
+      description: 'Add an item',
+      args: { title: { type: 'positional', description: 'The title' } },
+      run: add
+    })
+    const listCommand = define({ name: 'list', description: 'List the items', run: list })
+    return { add, list, addCommand, listCommand }
+  }
+
+  test('runs a sub-command of the entry when cli() has no sub-commands', async () => {
+    const { add, list, addCommand, listCommand } = commands()
+    const entry = define({ name: 'todo', subCommands: { add: addCommand, list: listCommand } })
+
+    await cli(['add', 'milk'], entry)
+
+    expect(add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callMode: 'subCommand',
+        commandPath: ['add'],
+        values: { title: 'milk' }
+      })
+    )
+    expect(list).not.toHaveBeenCalled()
+  })
+
+  test('takes the sub-commands of the entry from a Map', async () => {
+    const { list, addCommand, listCommand } = commands()
+    const subCommands = new Map()
+    subCommands.set('add', addCommand)
+    subCommands.set('list', listCommand)
+    const entry = define({ name: 'todo', subCommands })
+
+    await cli(['list'], entry)
+
+    expect(list).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'subCommand' }))
+  })
+
+  test('takes the sub-commands of a lazy entry', async () => {
+    const { add, addCommand, listCommand } = commands()
+    const entryRun = vi.fn<() => void>()
+    const entry = lazy(() => entryRun, {
+      name: 'todo',
+      subCommands: { add: addCommand, list: listCommand }
+    })
+
+    await cli(['add', 'milk'], entry)
+
+    expect(add).toHaveBeenCalledWith(expect.objectContaining({ values: { title: 'milk' } }))
+    expect(entryRun).not.toHaveBeenCalled()
+  })
+
+  test('reports an unknown command instead of running the entry', async () => {
+    const { addCommand, listCommand } = commands()
+    const entryRun = vi.fn<() => void>()
+    const entry = define({
+      name: 'todo',
+      subCommands: { add: addCommand, list: listCommand },
+      run: entryRun
+    })
+    const stderr = defineMockErrorLog()
+
+    await expect(cli(['nope'], entry)).resolves.toBeUndefined()
+
+    expect(entryRun).not.toHaveBeenCalled()
+    expect(stderr()).toContain('Command not found: nope')
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('runs the entry without arguments', async () => {
+    const { addCommand } = commands()
+    const entryRun = vi.fn<() => void>()
+    const entry = define({ name: 'todo', subCommands: { add: addCommand }, run: entryRun })
+
+    await cli([], entry)
+
+    expect(entryRun).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
+  })
+
+  test('lists the sub-commands of the entry in the usage and in the environment', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const { addCommand, listCommand } = commands()
+    const entry = define({ name: 'todo', subCommands: { add: addCommand, list: listCommand } })
+
+    await cli(['--help'], entry, { name: 'todo' })
+
+    expect(log()).toContain('COMMANDS:')
+    expect(log()).toMatch(/^\s+add\b.+Add an item/m)
+    expect(log()).toMatch(/^\s+list\b.+List the items/m)
+
+    let names: string[] = []
+    const probe = define({
+      name: 'add',
+      run: ctx => {
+        names = [...(ctx.env.subCommands?.keys() ?? [])]
+      }
+    })
+    await cli(['add'], define({ name: 'todo', subCommands: { add: probe, list: listCommand } }))
+    expect(names).toEqual(['add', 'list', 'todo'])
+  })
+
+  test('generate() renders the sub-commands of the entry', async () => {
+    const { addCommand, listCommand } = commands()
+    const entry = define({ name: 'todo', subCommands: { add: addCommand, list: listCommand } })
+
+    const usage = await generate(null, entry, { name: 'todo' })
+
+    expect(usage).toContain('COMMANDS:')
+    expect(usage).toMatch(/^\s+add\b/m)
+    expect(usage).toMatch(/^\s+list\b/m)
+  })
+
+  test('runs a sub-command of the entry without plugins', async () => {
+    const { add, addCommand } = commands()
+    const entry = define({ name: 'todo', subCommands: { add: addCommand } })
+
+    await boneCli(['add', 'milk'], entry)
+
+    expect(add).toHaveBeenCalledWith(expect.objectContaining({ values: { title: 'milk' } }))
+  })
+
+  test('keeps the sub-commands of the entry when a plugin adds a command', async () => {
+    const { add, addCommand } = commands()
+    const extra = vi.fn<() => void>()
+    const addsCommand = plugin({
+      id: 'adds-command',
+      setup: ctx => {
+        ctx.addCommand('extra', { name: 'extra', run: extra })
+      }
+    })
+    const entry = define({ name: 'todo', subCommands: { add: addCommand } })
+    const stderr = defineMockErrorLog()
+
+    await cli(['add', 'milk'], entry, { plugins: [addsCommand] })
+    await cli(['extra'], entry, { plugins: [addsCommand] })
+    await cli(['nope'], entry, { plugins: [addsCommand] })
+
+    expect(add).toHaveBeenCalledWith(expect.objectContaining({ values: { title: 'milk' } }))
+    expect(extra).toHaveBeenCalled()
+    expect(stderr()).toContain('Command not found: nope')
+  })
+
+  test('the sub-commands of cli() come first, and those of the entry stay under its name', async () => {
+    const audit = vi.fn<() => void>()
+    const list = vi.fn<() => void>()
+    const snapshot = define({
+      name: 'snapshot',
+      subCommands: { list: define({ name: 'list', run: list }) },
+      run: vi.fn<() => void>()
+    })
+    const stderr = defineMockErrorLog()
+
+    await cli(['snapshot', 'list'], snapshot, {
+      subCommands: { audit: define({ name: 'audit', run: audit }) }
+    })
+    expect(list).toHaveBeenCalledTimes(1)
+
+    await cli(['audit'], snapshot, {
+      subCommands: { audit: define({ name: 'audit', run: audit }) }
+    })
+    expect(audit).toHaveBeenCalledTimes(1)
+
+    await cli(['list'], snapshot, { subCommands: { audit: define({ name: 'audit', run: audit }) } })
+    expect(list).toHaveBeenCalledTimes(1)
+    expect(stderr()).toContain('Command not found: list')
+  })
+})
+
+describe('an array of sub-commands', () => {
+  function commands() {
+    const add = vi.fn<(...args: unknown[]) => void>()
+    const list = vi.fn<(...args: unknown[]) => void>()
+    const addCommand = define({
+      name: 'add',
+      description: 'Add an item',
+      args: { title: { type: 'positional', description: 'The title' } },
+      run: add
+    })
+    const listCommand = define({ name: 'list', description: 'List the items', run: list })
+    return { add, list, addCommand, listCommand }
+  }
+
+  test('keys the commands by their names', async () => {
+    const { add, addCommand, listCommand } = commands()
+    const entry = define({ name: 'todo', run: vi.fn<() => void>() })
+    const stderr = defineMockErrorLog()
+
+    await cli(['add', 'milk'], entry, { subCommands: [addCommand, listCommand] })
+    expect(add).toHaveBeenCalledWith(
+      expect.objectContaining({ commandPath: ['add'], values: { title: 'milk' } })
+    )
+
+    await cli(['0'], entry, { subCommands: [addCommand, listCommand] })
+    expect(stderr()).toContain('Command not found: 0')
+  })
+
+  test('takes an array on the entry and in nested commands', async () => {
+    const { add, addCommand, listCommand } = commands()
+    const remoteAdd = vi.fn<() => void>()
+    const remote = define({
+      name: 'remote',
+      subCommands: [define({ name: 'add', run: remoteAdd })]
+    })
+    const entry = define({ name: 'todo', subCommands: [addCommand, listCommand, remote] })
+
+    await cli(['add', 'milk'], entry)
+    await cli(['remote', 'add'], entry)
+
+    expect(add).toHaveBeenCalledWith(expect.objectContaining({ values: { title: 'milk' } }))
+    expect(remoteAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ commandPath: ['remote', 'add'] })
+    )
+  })
+
+  test('keys a lazy command by its command name', async () => {
+    const { listCommand } = commands()
+    const run = vi.fn<() => void>()
+    const lazyAdd = lazy(() => run, { name: 'add' })
+
+    await cli(['add'], define({ name: 'todo', run: vi.fn<() => void>() }), {
+      subCommands: [lazyAdd, listCommand]
+    })
+
+    expect(run).toHaveBeenCalled()
+  })
+
+  test('lists the names in the usage', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const { addCommand, listCommand } = commands()
+
+    await cli(['--help'], define({ name: 'todo', run: vi.fn<() => void>() }), {
+      name: 'todo',
+      subCommands: [addCommand, listCommand]
+    })
+
+    expect(log()).toMatch(/^\s+add\b.+Add an item/m)
+    expect(log()).toMatch(/^\s+list\b.+List the items/m)
+  })
+
+  test('rejects a command without a name', async () => {
+    const { addCommand } = commands()
+
+    await expect(
+      cli(['add'], define({ name: 'todo', run: vi.fn<() => void>() }), {
+        subCommands: [addCommand, define({ run: vi.fn<() => void>() })]
+      })
+    ).rejects.toThrow(
+      new TypeError(`Sub-command name must be a non-empty string in an array of 'subCommands'`)
+    )
+  })
+
+  test('rejects a command whose name is not a string', async () => {
+    const run = vi.fn<() => void>()
+    // a JavaScript caller can give any name; it would be a key that no argument selects
+    const numbered = { name: 1, run } as unknown as Command
+
+    await expect(
+      cli(['1'], define({ name: 'todo', run: vi.fn<() => void>() }), { subCommands: [numbered] })
+    ).rejects.toThrow(
+      new TypeError(`Sub-command name must be a non-empty string in an array of 'subCommands'`)
+    )
+    expect(run).not.toHaveBeenCalled()
+  })
+
+  test('rejects two commands with the same name', async () => {
+    const { addCommand } = commands()
+
+    await expect(
+      cli(['add'], define({ name: 'todo', run: vi.fn<() => void>() }), {
+        subCommands: [addCommand, addCommand]
+      })
+    ).rejects.toThrow(
+      new TypeError(`Sub-command 'add' is given twice in an array of 'subCommands'`)
+    )
+  })
+})

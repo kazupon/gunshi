@@ -176,6 +176,25 @@ describe('nested sub-commands', () => {
   })
 })
 
+const ENTRY_SUBCOMMANDS_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/entry-subcommands.node.ts complete --`
+
+describe('sub-commands on the entry command, given as arrays', () => {
+  test('suggest the sub-commands of the entry', async () => {
+    const output = await runCommand(`${ENTRY_SUBCOMMANDS_SCRIPT}`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest the nested sub-commands of an array', async () => {
+    const output = await runCommand(`${ENTRY_SUBCOMMANDS_SCRIPT} remote ""`)
+    expect(output).toMatchSnapshot()
+  })
+
+  test('suggest the options of a sub-command', async () => {
+    const output = await runCommand(`${ENTRY_SUBCOMMANDS_SCRIPT} status --`)
+    expect(output).toMatchSnapshot()
+  })
+})
+
 const NESTED_I18N_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/nested-i18n.node.ts complete --`
 const NESTED_I18N_ENV = { MY_LOCALE: 'ja-JP' }
 

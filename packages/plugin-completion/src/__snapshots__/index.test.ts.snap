@@ -334,6 +334,27 @@ index.ts	Index file
 "
 `;
 
+exports[`sub-commands on the entry command, given as arrays > suggest the nested sub-commands of an array 1`] = `
+"add	Add a remote
+:4
+"
+`;
+
+exports[`sub-commands on the entry command, given as arrays > suggest the options of a sub-command 1`] = `
+"--help	Display this help message
+--version	Display this version
+--short	Short format
+:4
+"
+`;
+
+exports[`sub-commands on the entry command, given as arrays > suggest the sub-commands of the entry 1`] = `
+"remote	Manage remotes
+status	Show status
+:4
+"
+`;
+
 exports[`subcommand > keep suggesting the --port option if user typed partial but didn't end with space 1`] = `
 "--port	Specify port
 :4
