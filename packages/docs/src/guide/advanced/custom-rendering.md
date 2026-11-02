@@ -52,7 +52,7 @@ The diagram above illustrates Gunshi's three-level rendering customization syste
 
 Each level can independently control three rendering components:
 
-- **Header**: The title section of help text, typically showing the CLI name and version
+- **Header**: The title section of help text, typically showing the CLI name and version. It is shown with the usage, not before a command runs
 - **Usage/Help**: The main help content including command syntax, options, and arguments
 - **Validation Errors**: Error messages shown when command arguments fail validation
 

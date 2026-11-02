@@ -2,7 +2,7 @@
   "name": "gunshi-monorepo",
   "description": "Monorepo for gunshi - Modern javascript command-line library",
   "private": true,
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-rc.1",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git"
   },
-  "packageManager": "pnpm@12.6.0",
+  "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">= 22"
   },
@@ -98,7 +98,7 @@
     "@vitest/coverage-v8": "^5.0.0",
     "bumpp": "^12.0.0",
     "eslint": "^10.3.0",
-    "eslint-plugin-jsdoc": "^64.0.0",
+    "eslint-plugin-jsdoc": "^65.0.0",
     "eslint-plugin-jsonc": "^3.1.2",
     "eslint-plugin-markdown-preferences": "^0.42.0",
     "eslint-plugin-module-interop": "^0.4.0",
@@ -113,10 +113,10 @@
     "knip": "^6.12.2",
     "lint-staged": "^17.0.0",
     "mitata": "^1.0.34",
-    "oxfmt": "^0.70.0",
+    "oxfmt": "^0.74.0",
     "oxlint": "^1.86.0",
     "oxlint-tsgolint": "^7.0.2003",
-    "pkg-pr-new": "^0.0.88",
+    "pkg-pr-new": "^0.0.93",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "^8.59.2",

@@ -39,10 +39,10 @@ catalog:
   jsr-exports-lint: ^0.4.2
   publint: ^0.3.20
   tsdown: 0.22.14
-  "@types/node": ^25.6.2
-  vitepress-api-references: ^0.3.0
+  "@types/node": ^26.0.0
+  vitepress-api-references: ^0.4.0
   tsx: ^4.21.0
-  args-tokens: 1.0.0-beta.1
+  args-tokens: 1.0.0
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - deno

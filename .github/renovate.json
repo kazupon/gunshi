@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "automerge": true,
-  "extends": ["config:base", ":preserveSemverRanges"],
+  "extends": ["config:recommended", ":preserveSemverRanges"],
   "labels": ["deps"],
   "ignoreDeps": ["gunshi019"],
   "major": {

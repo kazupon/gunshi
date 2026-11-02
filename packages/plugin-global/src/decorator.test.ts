@@ -95,6 +95,27 @@ test('base runner execution', async () => {
   expect(result).toBe('command executed')
 })
 
+test('does not show the header before running a command', async () => {
+  const renderHeader = vi.fn<() => Promise<string>>(() =>
+    Promise.resolve('Test App (test-app v1.0.0)')
+  )
+  const ctx = await createCommandContext({
+    values: {},
+    cliOptions: { renderHeader, usageSilent: true } as CliOptions,
+    extensions: {
+      [pluginId]: {
+        key: Symbol(pluginId),
+        factory: extension
+      }
+    }
+  })
+  const baseRunner = vi.fn<() => string>(() => 'command executed')
+  const result = await decorator(baseRunner)(ctx)
+
+  expect(result).toBe('command executed')
+  expect(renderHeader).not.toHaveBeenCalled()
+})
+
 test('throws validation error after showing validation errors', async () => {
   const validationError = new AggregateError([new Error('missing id')], 'validation failed')
   const showValidationErrors = vi.fn<(error: AggregateError) => string>(() => 'validation failed')
