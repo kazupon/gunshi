@@ -117,16 +117,19 @@ test('does not show the header before running a command', async () => {
 })
 
 /**
- * Whether the error is in the set that tells `cli()` the plugin has reported it to the user.
+ * Prepare the set of reported errors for the run of a context, as the core does in `cli()`.
  *
- * @param error - An error
- * @returns `true` if the error is marked as reported
+ * @param ctx - The command context of the run
+ * @returns The set of the errors that the plugin reports during the run
  */
-function isReported(error: object): boolean {
-  const registry = (globalThis as unknown as Record<symbol, WeakSet<object> | undefined>)[
-    Symbol.for('gunshi.reported')
-  ]
-  return registry?.has(error) === true
+function trackReported(ctx: object): WeakSet<object> {
+  const registry = globalThis as unknown as Record<
+    symbol,
+    WeakMap<object, WeakSet<object>> | undefined
+  >
+  const reported = new WeakSet<object>()
+  ;(registry[Symbol.for('gunshi.reported')] ??= new WeakMap()).set(ctx, reported)
+  return reported
 }
 
 async function createValidationErrorContext(
@@ -160,6 +163,7 @@ test('reports the validation errors it shows: exit code 1, marked, and thrown', 
   })
   const { ctx, validationError, showValidationErrors } =
     await createValidationErrorContext('validation failed')
+  const reported = trackReported(ctx)
   const baseRunner = vi.fn<() => string>(() => 'command executed')
 
   // thrown, so that `onErrorCommand` sees it. `cli()` ends without rejecting, since it is marked
@@ -168,7 +172,7 @@ test('reports the validation errors it shows: exit code 1, marked, and thrown', 
   expect(showValidationErrors).toHaveBeenCalledWith(validationError)
   expect(baseRunner).not.toHaveBeenCalled()
   expect(process.exitCode).toBe(1)
-  expect(isReported(validationError)).toBe(true)
+  expect(reported.has(validationError)).toBe(true)
 })
 
 test.each([
@@ -182,13 +186,28 @@ test.each([
       process.exitCode = undefined
     })
     const { ctx, validationError } = await createValidationErrorContext(message, cliOptions)
+    const reported = trackReported(ctx)
 
     await expect(decorator(vi.fn<() => string>())(ctx)).rejects.toBe(validationError)
 
     expect(process.exitCode).toBeUndefined()
-    expect(isReported(validationError)).toBe(false)
+    expect(reported.has(validationError)).toBe(false)
   }
 )
+
+test('does not report the validation errors when the core keeps no set for the run', async () => {
+  onTestFinished(() => {
+    process.exitCode = undefined
+  })
+  // shown, but `cli()` would reject, so the exit code is left to the caller
+  const { ctx, validationError, showValidationErrors } =
+    await createValidationErrorContext('validation failed')
+
+  await expect(decorator(vi.fn<() => string>())(ctx)).rejects.toBe(validationError)
+
+  expect(showValidationErrors).toHaveBeenCalledWith(validationError)
+  expect(process.exitCode).toBeUndefined()
+})
 
 /**
  * The global options are merged into the arguments of the command that runs, where an argument of

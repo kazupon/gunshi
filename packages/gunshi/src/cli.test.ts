@@ -1,3 +1,5 @@
+import global from '@gunshi/plugin-global'
+import renderer from '@gunshi/plugin-renderer'
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { z } from 'zod/v4-mini'
@@ -4416,6 +4418,60 @@ describe('reported validation errors', () => {
         }
       })
     ).rejects.toBe(reported)
+  })
+
+  test('a nested cli() in onErrorCommand does not take the report of the outer run', async () => {
+    defineMockErrorLog()
+    let nested: unknown
+    await expect(
+      cli(
+        [],
+        { args, run: vi.fn<() => void>() },
+        {
+          onErrorCommand: async (_ctx, error) => {
+            // the nested command throws the error of the outer run, which the nested run did not report
+            nested = await cli([], {
+              run: () => {
+                throw error
+              }
+            }).catch((reason: unknown) => reason)
+          }
+        }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(nested).toBeInstanceOf(AggregateError)
+  })
+
+  test('an error that a decorator suppressed is not reported in a later run', async () => {
+    defineMockErrorLog()
+    let suppressed: unknown
+    // installed before the global options plugin, so its decorator wraps the one of the plugin
+    const suppress = plugin({
+      id: 'test:suppress',
+      setup: ctx => {
+        ctx.decorateCommand(runner => async commandContext => {
+          try {
+            return await runner(commandContext)
+          } catch (error: unknown) {
+            suppressed = error
+            return undefined
+          }
+        })
+      }
+    })
+    await expect(
+      boneCli([], { args, run: vi.fn<() => void>() }, { plugins: [suppress, global(), renderer()] })
+    ).resolves.toBeUndefined()
+    expect(suppressed).toBeInstanceOf(AggregateError)
+
+    await expect(
+      cli([], {
+        run: () => {
+          throw suppressed
+        }
+      })
+    ).rejects.toBe(suppressed)
   })
 
   test('a priority error is reported too', async () => {

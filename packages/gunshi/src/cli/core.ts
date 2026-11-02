@@ -236,6 +236,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     cliOptions: cliOptions
   })
 
+  const reported = trackReported(commandContext)
   try {
     return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
   } catch (error: unknown) {
@@ -246,7 +247,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
      * rejecting. Errors that nobody reported, such as when the app renders the validation errors itself
      * or an error thrown by a command, reject as before.
      */
-    if (consumeReported(error)) {
+    if (error != null && typeof error === 'object' && reported.has(error)) {
       return
     }
     throw error
@@ -254,21 +255,28 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 }
 
 /**
- * The key of the set of errors that a plugin has reported to the user. The global options plugin uses
- * the same registered symbol, since `gunshi` and the plugins bundle their own copies.
+ * The key of the registry that maps the command context of a run to the set of the errors that a plugin
+ * has reported to the user during the run. The global options plugin uses the same registered symbol,
+ * since `gunshi` and the plugins bundle their own copies.
  */
 const REPORTED = Symbol.for('gunshi.reported')
 
 /**
- * Whether a plugin has reported the error to the user. The mark is removed, so that it tells about
- * this run only: the same error thrown again later, such as by a command, is not a reported one.
+ * Prepare the set of the errors that a plugin reports to the user during a run. The set belongs to the
+ * command context of the run, so a report counts for this run only: not for a nested `cli()` in a hook,
+ * nor for a later run in which the same error is thrown again.
  *
- * @param error - An error thrown while running a command
- * @returns `true` if the error was marked as reported
+ * @param ctx - The command context of the run
+ * @returns The set of the errors that have been reported during the run
  */
-function consumeReported(error: unknown): boolean {
-  const registry = (globalThis as unknown as Record<symbol, WeakSet<object> | undefined>)[REPORTED]
-  return error != null && typeof error === 'object' && registry?.delete(error) === true
+function trackReported(ctx: object): WeakSet<object> {
+  const registry = globalThis as unknown as Record<
+    symbol,
+    WeakMap<object, WeakSet<object>> | undefined
+  >
+  const reported = new WeakSet<object>()
+  ;(registry[REPORTED] ??= new WeakMap()).set(ctx, reported)
+  return reported
 }
 
 /**
