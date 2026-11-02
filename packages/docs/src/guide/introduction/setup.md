@@ -41,7 +41,7 @@ The `gunshi` package ships an [agent skill](https://docs.anthropic.com/en/docs/c
 
 ### Manual Setup
 
-If your package manager does not link agent skills, install the documentation package as a dev dependency:
+If your package manager does not link agent skills, or your AI agent does not read them, install the documentation package as a dev dependency:
 
 ::: code-group
 
