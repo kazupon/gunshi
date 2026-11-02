@@ -4743,6 +4743,19 @@ describe('an array of sub-commands', () => {
     )
   })
 
+  test('rejects a command whose name is not a string', async () => {
+    const run = vi.fn<() => void>()
+    // a JavaScript caller can give any name; it would be a key that no argument selects
+    const numbered = { name: 1, run } as unknown as Command
+
+    await expect(
+      cli(['1'], define({ name: 'todo', run: vi.fn<() => void>() }), { subCommands: [numbered] })
+    ).rejects.toThrow(
+      new TypeError(`Sub-command name must be a non-empty string in an array of 'subCommands'`)
+    )
+    expect(run).not.toHaveBeenCalled()
+  })
+
   test('rejects two commands with the same name', async () => {
     const { addCommand } = commands()
 

@@ -157,8 +157,8 @@ export function getCommandSubCommands<G extends GunshiParamsConstraint = Default
     }
     const map = new Map<string, Command<G> | LazyCommand<G>>()
     for (const sub of subCommands as readonly (Command<G> | LazyCommand<G>)[]) {
-      const name = isLazyCommand<G>(sub) ? sub.commandName : sub?.name
-      if (!name) {
+      const name: unknown = isLazyCommand<G>(sub) ? sub.commandName : sub?.name
+      if (typeof name !== 'string' || name === '') {
         throw new TypeError(
           `Sub-command name must be a non-empty string in an array of 'subCommands'`
         )

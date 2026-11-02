@@ -129,6 +129,8 @@ test('sub-commands can be an array, on the entry and in the options', () => {
   const entry = define({ name: 'todo', subCommands: [add, list] })
   const subCommands: Command['subCommands'] = entry.subCommands
   expectTypeOf(subCommands).not.toBeNever()
+  const readonlySubCommands: Command['subCommands'] = [add, list] as const
+  expectTypeOf(readonlySubCommands).not.toBeNever()
 
   const readonlyCommands = [add, list] as const
   expectTypeOf(cli([], entry, { subCommands: readonlyCommands })).toEqualTypeOf<
