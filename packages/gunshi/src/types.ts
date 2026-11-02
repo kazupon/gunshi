@@ -236,7 +236,8 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    * The entry command of the CLI, marked with `entry: true`.
    *
    * It is available whether or not the CLI has sub-commands, while {@linkcode CommandEnvironment.subCommands}
-   * includes the entry command only when the sub-commands are given with {@linkcode CliOptions.subCommands}.
+   * includes the entry command only when the CLI has sub-commands, given with {@linkcode CliOptions.subCommands}
+   * or with {@linkcode Command.subCommands} of the entry command.
    * It is not frozen, like the commands in {@linkcode CommandEnvironment.subCommands}.
    */
   entryCommand?: Command<any> | LazyCommand<any>
@@ -317,8 +318,14 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   version?: string
   /**
    * Sub commands.
+   *
+   * An object or a Map keyed by the sub-command names, or an array of commands, which are keyed by their names.
+   * When this is not given, the {@linkcode Command.subCommands} of the entry command are the sub-commands.
    */
-  subCommands?: Record<string, SubCommandable> | Map<string, SubCommandable>
+  subCommands?:
+    | Record<string, SubCommandable>
+    | Map<string, SubCommandable>
+    | readonly SubCommandable[]
   /**
    * Left margin of the command output.
    */
@@ -668,10 +675,16 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    *
    * Allows building command trees like `git remote add`.
    * Each key is the sub-command name, and the value is a command or lazy command.
+   * An array of commands is keyed by the names of the commands.
+   *
+   * On the entry command, these are the top-level sub-commands when {@linkcode CliOptions.subCommands} is not given.
    *
    * @since v0.28.0
    */
-  subCommands?: Record<string, SubCommandable> | Map<string, SubCommandable>
+  subCommands?:
+    | Record<string, SubCommandable>
+    | Map<string, SubCommandable>
+    | readonly SubCommandable[]
 }
 
 /**
@@ -762,7 +775,7 @@ export interface SubCommandable {
    * @see {@link Command.subCommands}
    * @since v0.28.0
    */
-  subCommands?: Record<string, any> | Map<string, any>
+  subCommands?: Record<string, any> | Map<string, any> | readonly any[]
   /**
    * Index signature to allow additional properties
    */

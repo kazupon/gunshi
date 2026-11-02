@@ -122,3 +122,21 @@ test('cli() preserves values for an unnamed lazy entry', async () => {
     )
   )
 })
+
+test('sub-commands can be an array, on the entry and in the options', () => {
+  const add = define({ name: 'add', run: () => {} })
+  const list = define({ name: 'list', run: () => {} })
+  const entry = define({ name: 'todo', subCommands: [add, list] })
+  const subCommands: Command['subCommands'] = entry.subCommands
+  expectTypeOf(subCommands).not.toBeNever()
+  const readonlySubCommands: Command['subCommands'] = [add, list] as const
+  expectTypeOf(readonlySubCommands).not.toBeNever()
+
+  const readonlyCommands = [add, list] as const
+  expectTypeOf(cli([], entry, { subCommands: readonlyCommands })).toEqualTypeOf<
+    Promise<string | undefined>
+  >()
+  expectTypeOf(
+    cli([], entry, { subCommands: [add, lazy(() => () => {}, { name: 'lazy' })] })
+  ).toEqualTypeOf<Promise<string | undefined>>()
+})

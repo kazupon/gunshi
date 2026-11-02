@@ -125,8 +125,11 @@ export function log(...args: unknown[]): void {
 /**
  * Get the sub-commands of a command as a normalized Map.
  *
+ * An array of sub-commands is keyed by the names of the commands (`commandName` for a lazy command).
+ *
  * @param cmd - A command or lazy command
  * @returns A Map of sub-commands, or undefined if the command has no sub-commands.
+ * @throws {TypeError} If a command in an array has no name, or two commands in an array have the same name.
  */
 export function getCommandSubCommands<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   cmd: Commandable<G> | Command<G> | LazyCommand<G>
@@ -145,6 +148,27 @@ export function getCommandSubCommands<G extends GunshiParamsConstraint = Default
     return subCommands.size > 0
       ? (subCommands as Map<string, Command<G> | LazyCommand<G>>)
       : undefined
+  }
+
+  // an array of commands is keyed by the names of the commands
+  if (Array.isArray(subCommands)) {
+    if (subCommands.length === 0) {
+      return undefined
+    }
+    const map = new Map<string, Command<G> | LazyCommand<G>>()
+    for (const sub of subCommands as readonly (Command<G> | LazyCommand<G>)[]) {
+      const name: unknown = isLazyCommand<G>(sub) ? sub.commandName : sub?.name
+      if (typeof name !== 'string' || name === '') {
+        throw new TypeError(
+          `Sub-command name must be a non-empty string in an array of 'subCommands'`
+        )
+      }
+      if (map.has(name)) {
+        throw new TypeError(`Sub-command '${name}' is given twice in an array of 'subCommands'`)
+      }
+      map.set(name, sub)
+    }
+    return map
   }
 
   if (typeof subCommands === 'object') {

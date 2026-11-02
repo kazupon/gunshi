@@ -95,6 +95,39 @@ This structure provides:
 - Automatic help generation for each command level
 - Shared configuration across the command hierarchy
 
+## Other Ways to Give Sub-commands
+
+The sub-commands can also be given with `subCommands` of the main command, as with any other command definition.
+When the `subCommands` option of `cli()` is not given, they are the sub-commands of the CLI:
+
+```ts [cli.ts]
+const mainCommand = define({
+  name: 'manage',
+  description: 'Manage resources',
+  subCommands: {
+    create: createCommand,
+    list: listCommand
+  }
+})
+
+await cli(process.argv.slice(2), mainCommand, {
+  name: 'my-app',
+  version: '1.0.0'
+})
+```
+
+`subCommands` can also be an array of commands, keyed by their names. Every command in the array needs a `name`, and no two commands can have the same name:
+
+```ts [cli.ts]
+await cli(process.argv.slice(2), mainCommand, {
+  name: 'my-app',
+  version: '1.0.0',
+  subCommands: [createCommand, listCommand]
+})
+```
+
+When both are given, the `subCommands` option of `cli()` is used for the CLI, and the sub-commands of the main command are reached under its name, as [nested sub-commands](#nested-sub-commands).
+
 ## Automatic Help for Sub-commands
 
 Gunshi automatically generates help documentation for your sub-commands.

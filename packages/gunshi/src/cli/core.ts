@@ -508,8 +508,6 @@ function mergeValidationErrors(
   )
 }
 
-const isObject = (val: unknown): val is Record<any, any> => val !== null && typeof val === 'object'
-
 /**
  * Create the entry command that sub-commands and plugins can see.
  * The user-provided entry is copied, so that marking it with `entry: true` does not mutate it.
@@ -539,27 +537,26 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
   entryCommand: Command<G> | LazyCommand<G> | undefined
 ): Map<string, Command<G> | LazyCommand<G>> {
-  const hasSubCommands = options.subCommands
-    ? options.subCommands instanceof Map
-      ? options.subCommands.size > 0
-      : isObject(options.subCommands) && Object.keys(options.subCommands).length > 0
-    : false
-
   // NOTE(kazupon): SubCommandable is intentionally loose to accept any command type from user code.
-  // We cast to Command<G> | LazyCommand<G> here since we know the runtime structure is valid.
+  // The sub-commands of the options are normalized as the nested ones of a command are,
+  // so that an array of commands is keyed by their names here too.
   const subCommands = new Map<string, Command<G> | LazyCommand<G>>(
-    options.subCommands instanceof Map
-      ? (options.subCommands as Map<string, Command<G> | LazyCommand<G>>)
-      : []
+    getCommandSubCommands<G>({ subCommands: options.subCommands } as Command<G>) ?? []
   )
-  if (!(options.subCommands instanceof Map) && isObject(options.subCommands)) {
-    for (const [name, cmd] of Object.entries(options.subCommands)) {
-      subCommands.set(name, cmd as Command<G> | LazyCommand<G>)
+  const hasSubCommands = subCommands.size > 0
+
+  /**
+   * NOTE(kazupon): `subCommands` works for any command definition, the entry included.
+   * Without sub-commands in the options, the sub-commands of the entry are the top-level ones.
+   */
+  if (!hasSubCommands && entryCommand) {
+    for (const [name, cmd] of getCommandSubCommands<G>(entryCommand) ?? []) {
+      subCommands.set(name, cmd)
     }
   }
 
   // add entry command to sub commands if there are sub commands
-  if (hasSubCommands && entryCommand) {
+  if (subCommands.size > 0 && entryCommand) {
     subCommands.set(resolveEntryName(entryCommand), entryCommand)
   }
 
