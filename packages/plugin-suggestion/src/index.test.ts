@@ -2,7 +2,7 @@ import i18n from '@gunshi/plugin-i18n'
 import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { cli, define, lazy, plugin } from 'gunshi'
 import { describe, expect, test, vi } from 'vitest'
-import { defineMockLog } from '../../gunshi/test/utils.ts'
+import { defineMockErrorLog } from '../../gunshi/test/utils.ts'
 import { defineSuggestNames, levenshtein, suggestion } from './index.ts'
 
 import type { ResolvedSuggestionOptions } from './index.ts'
@@ -70,8 +70,7 @@ describe('defineSuggestNames', () => {
 
 describe('suggestion plugin', () => {
   test('does not suggest a command for an option-resolution error', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
     const global = plugin({
       id: 'test:routing-global',
       setup(ctx) {
@@ -91,14 +90,14 @@ describe('suggestion plugin', () => {
         },
         plugins: [global, suggestion()]
       })
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).not.toContain('Did you mean')
+    expect(stderr()).not.toBe('')
+    expect(stderr()).not.toContain('Did you mean')
   })
 
   test('suggests a known long option for an unknown option', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
     const run = vi.fn<() => void>()
 
     await expect(
@@ -119,15 +118,14 @@ describe('suggestion plugin', () => {
           plugins: [suggestion()]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
     expect(run).not.toHaveBeenCalled()
-    expect(log()).toBe('Unknown option: --alow-reload\nDid you mean --allow-reload?')
+    expect(stderr()).toBe('Unknown option: --alow-reload\nDid you mean --allow-reload?')
   })
 
   test('does not suggest options when includeOptions is false', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -147,14 +145,13 @@ describe('suggestion plugin', () => {
           plugins: [suggestion({ includeOptions: false })]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toBe('Unknown option: --alow-reload')
+    expect(stderr()).toBe('Unknown option: --alow-reload')
   })
 
   test('does not suggest short options by default', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -174,9 +171,9 @@ describe('suggestion plugin', () => {
           plugins: [suggestion()]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toBe('Unknown option: -x')
+    expect(stderr()).toBe('Unknown option: -x')
   })
 
   test('does not suggest unknown options when strict mode is disabled', async () => {
@@ -203,8 +200,7 @@ describe('suggestion plugin', () => {
   })
 
   test('suggests a top-level command from same-level candidates', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
     const run = vi.fn<() => void>()
 
     await expect(
@@ -215,15 +211,14 @@ describe('suggestion plugin', () => {
         },
         plugins: [suggestion()]
       })
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
     expect(run).not.toHaveBeenCalled()
-    expect(log()).toBe('Command not found: rn\nDid you mean run?')
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
   })
 
   test('uses nested command candidates from the parent command', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(['task', 'rn'], define({ name: 'main', run: () => {} }), {
@@ -239,14 +234,13 @@ describe('suggestion plugin', () => {
         },
         plugins: [suggestion()]
       })
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toBe('Command not found: rn\nDid you mean run?')
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
   })
 
   test('uses lazy parent command candidates', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(['task', 'rn'], define({ name: 'main', run: () => {} }), {
@@ -270,14 +264,13 @@ describe('suggestion plugin', () => {
         },
         plugins: [suggestion()]
       })
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toBe('Command not found: rn\nDid you mean run?')
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
   })
 
   test('does not suggest commands when includeCommands is false', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(['rn'], define({ name: 'main', run: () => {} }), {
@@ -286,9 +279,9 @@ describe('suggestion plugin', () => {
         },
         plugins: [suggestion({ includeCommands: false })]
       })
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toBe('Command not found: rn')
+    expect(stderr()).toBe('Command not found: rn')
   })
 
   test('does not suggest commands when fallbackToEntry handles the input', async () => {
@@ -306,8 +299,7 @@ describe('suggestion plugin', () => {
   })
 
   test('localizes unknown option suggestion hints with i18n', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -335,16 +327,15 @@ describe('suggestion plugin', () => {
           ]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toBe(
+    expect(stderr()).toBe(
       '未定義のオプションです: --alow-reload\n--allow-reload の指定ミスではありませんか？'
     )
   })
 
   test('localizes command suggestion hints with i18n', async () => {
-    const utils = await import('../../gunshi/src/utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(['rn'], define({ name: 'main', run: () => {} }), {
@@ -361,8 +352,8 @@ describe('suggestion plugin', () => {
           suggestion()
         ]
       })
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toBe('コマンドが見つかりません: rn\nrun の指定ミスではありませんか？')
+    expect(stderr()).toBe('コマンドが見つかりません: rn\nrun の指定ミスではありませんか？')
   })
 })

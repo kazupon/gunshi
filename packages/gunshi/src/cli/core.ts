@@ -236,7 +236,47 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     cliOptions: cliOptions
   })
 
-  return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
+  const reported = trackReported(commandContext)
+  try {
+    return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
+  } catch (error: unknown) {
+    /**
+     * NOTE(kazupon): a plugin that has reported the validation errors to the user marks them, as the
+     * global options plugin does after it prints them to stderr and sets the exit code. They have been
+     * dealt with, and `onErrorCommand` has seen them in `executeCommand`, so `cli()` ends without
+     * rejecting. Errors that nobody reported, such as when the app renders the validation errors itself
+     * or an error thrown by a command, reject as before.
+     */
+    if (error != null && typeof error === 'object' && reported.has(error)) {
+      return
+    }
+    throw error
+  }
+}
+
+/**
+ * The key of the registry that maps the command context of a run to the set of the errors that a plugin
+ * has reported to the user during the run. The global options plugin uses the same registered symbol,
+ * since `gunshi` and the plugins bundle their own copies.
+ */
+const REPORTED = Symbol.for('gunshi.reported')
+
+/**
+ * Prepare the set of the errors that a plugin reports to the user during a run. The set belongs to the
+ * command context of the run, so a report counts for this run only: not for a nested `cli()` in a hook,
+ * nor for a later run in which the same error is thrown again.
+ *
+ * @param ctx - The command context of the run
+ * @returns The set of the errors that have been reported during the run
+ */
+function trackReported(ctx: object): WeakSet<object> {
+  const registry = globalThis as unknown as Record<
+    symbol,
+    WeakMap<object, WeakSet<object>> | undefined
+  >
+  const reported = new WeakSet<object>()
+  ;(registry[REPORTED] ??= new WeakMap()).set(ctx, reported)
+  return reported
 }
 
 /**

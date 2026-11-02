@@ -26,9 +26,12 @@ graph TD
     L --> M{Success?}
     M -->|Yes| N[Return Result]
     M -->|Error| K
-    K --> O[Throw Error]
+    K --> Q{Validation error reported to stderr?}
+    Q -->|Yes| R[Resolve with exit code 1]
+    Q -->|No| O[Throw Error]
     N --> P([End])
     O --> P
+    R --> P
 
     style G fill:#468c56,color:white
     style L fill:#468c56,color:white
@@ -43,8 +46,9 @@ Gunshi provides three main lifecycle hooks:
 - **`onAfterCommand`**: Executes after successful command completion
 - **`onErrorCommand`**: Executes when a command throws an error
 
-Argument validation failures are also treated as command errors. Gunshi renders the validation
-error message first, then calls `onErrorCommand` and rejects the `cli()` promise.
+Argument validation failures are also treated as command errors. Gunshi prints the validation
+error message to stderr and sets the exit code to `1`, then calls `onErrorCommand`, and the
+`cli()` promise resolves. See [Handling Argument Validation Errors](#handling-argument-validation-errors).
 
 ## Basic Hook Usage
 
@@ -122,8 +126,12 @@ With an understanding of how hooks work and their parameters, let's explore how 
 
 ### Handling Argument Validation Errors
 
-When argument validation fails, Gunshi renders the validation error message before calling
-`onErrorCommand`. You can detect this case with `ctx.validationError`:
+When argument validation fails, Gunshi prints the validation error message to stderr, sets the
+exit code to `1`, and calls `onErrorCommand`. The `cli()` promise then resolves, so a plain
+`await cli(...)` ends with the message and exit code `1`, without a stack trace.
+
+In `onErrorCommand`, you can detect this case with `ctx.validationError`, for example to use
+another exit code:
 
 ```ts
 import { cli, define } from 'gunshi'
@@ -141,23 +149,35 @@ const command = define({
   }
 })
 
-let validationFailed = false
-
-try {
-  await cli(process.argv.slice(2), command, {
-    onErrorCommand: (ctx, error) => {
-      if (ctx.validationError === error) {
-        validationFailed = true
-        process.exitCode = 2
-      }
+await cli(process.argv.slice(2), command, {
+  onErrorCommand: (ctx, error) => {
+    if (ctx.validationError === error) {
+      process.exitCode = 2
     }
-  })
+  }
+})
+```
+
+To report the validation errors yourself, set `renderValidationErrors` to `null`. Gunshi then
+prints nothing and leaves the exit code alone, and the `cli()` promise rejects with the
+`AggregateError` that holds the errors:
+
+```ts
+try {
+  await cli(process.argv.slice(2), command, { renderValidationErrors: null })
 } catch (error) {
-  if (!validationFailed) {
+  if (!(error instanceof AggregateError)) {
     throw error
   }
+  for (const validationError of error.errors) {
+    console.error(`error: ${validationError.message}`)
+  }
+  process.exitCode = 2
 }
 ```
+
+A renderer that returns an empty message, and `usageSilent: true`, leave the validation errors
+to you in the same way.
 
 ## Hooks vs Decorators
 
@@ -199,7 +219,9 @@ graph TD
     H -->|Yes| I[Return Result]
     H -->|Error| G
 
-    G --> J[Throw Error]
+    G --> K{Validation error reported to stderr?}
+    K -->|Yes| L[Resolve with exit code 1]
+    K -->|No| J[Throw Error]
 
     style A fill:#468c56,color:white
     style F fill:#468c56,color:white

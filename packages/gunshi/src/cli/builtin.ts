@@ -30,6 +30,7 @@ import type {
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ * It is also `undefined` when the arguments fail validation and the errors are reported to stderr (see {@linkcode CliOptions.renderValidationErrors}).
  */
 export async function cli<G extends GunshiParamsConstraint>(
   args: string[],
@@ -46,6 +47,7 @@ export async function cli<G extends GunshiParamsConstraint>(
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ * It is also `undefined` when the arguments fail validation and the errors are reported to stderr (see {@linkcode CliOptions.renderValidationErrors}).
  */
 export async function cli<
   A extends Args = Args,
@@ -65,6 +67,7 @@ export async function cli<
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ * It is also `undefined` when the arguments fail validation and the errors are reported to stderr (see {@linkcode CliOptions.renderValidationErrors}).
  */
 export async function cli<
   E extends ExtendContext = ExtendContext,
@@ -84,6 +87,7 @@ export async function cli<
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ * It is also `undefined` when the arguments fail validation and the errors are reported to stderr (see {@linkcode CliOptions.renderValidationErrors}).
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   args: string[],
@@ -106,6 +110,7 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
  * @param entry - A command-like object (command, command runner, or lazy command)
  * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ * It is also `undefined` when the arguments fail validation and the errors are reported to stderr (see {@linkcode CliOptions.renderValidationErrors}).
  */
 export async function cli(
   args: string[],
@@ -122,6 +127,7 @@ export async function cli(
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
  * @param options - A {@link CliOptions | CLI options}
  * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ * It is also `undefined` when the arguments fail validation and the errors are reported to stderr (see {@linkcode CliOptions.renderValidationErrors}).
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   args: string[],
