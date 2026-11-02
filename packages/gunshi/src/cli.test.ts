@@ -4392,6 +4392,32 @@ describe('reported validation errors', () => {
     expect(process.exitCode).toBeUndefined()
   })
 
+  test('the mark of a reported error is used once', async () => {
+    defineMockErrorLog()
+    let reported: Error | undefined
+    await expect(
+      cli(
+        [],
+        { args, run: vi.fn<() => void>() },
+        {
+          onErrorCommand: (_ctx, error) => {
+            reported = error
+          }
+        }
+      )
+    ).resolves.toBeUndefined()
+    expect(reported).toBeInstanceOf(AggregateError)
+
+    // a command that throws the same error later is not a reported validation error
+    await expect(
+      cli([], {
+        run: () => {
+          throw reported
+        }
+      })
+    ).rejects.toBe(reported)
+  })
+
   test('a priority error is reported too', async () => {
     const stderr = defineMockErrorLog()
     const run = vi.fn<() => void>()

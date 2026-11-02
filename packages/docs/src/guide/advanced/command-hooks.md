@@ -26,9 +26,12 @@ graph TD
     L --> M{Success?}
     M -->|Yes| N[Return Result]
     M -->|Error| K
-    K --> O[Throw Error]
+    K --> Q{Validation error reported to stderr?}
+    Q -->|Yes| R[Resolve with exit code 1]
+    Q -->|No| O[Throw Error]
     N --> P([End])
     O --> P
+    R --> P
 
     style G fill:#468c56,color:white
     style L fill:#468c56,color:white
@@ -216,7 +219,9 @@ graph TD
     H -->|Yes| I[Return Result]
     H -->|Error| G
 
-    G --> J[Throw Error]
+    G --> K{Validation error reported to stderr?}
+    K -->|Yes| L[Resolve with exit code 1]
+    K -->|No| J[Throw Error]
 
     style A fill:#468c56,color:white
     style F fill:#468c56,color:white

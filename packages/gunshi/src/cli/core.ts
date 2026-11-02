@@ -246,7 +246,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
      * rejecting. Errors that nobody reported, such as when the app renders the validation errors itself
      * or an error thrown by a command, reject as before.
      */
-    if (isReported(error)) {
+    if (consumeReported(error)) {
       return
     }
     throw error
@@ -260,14 +260,15 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 const REPORTED = Symbol.for('gunshi.reported')
 
 /**
- * Whether a plugin has reported the error to the user.
+ * Whether a plugin has reported the error to the user. The mark is removed, so that it tells about
+ * this run only: the same error thrown again later, such as by a command, is not a reported one.
  *
  * @param error - An error thrown while running a command
- * @returns `true` if the error is marked as reported
+ * @returns `true` if the error was marked as reported
  */
-function isReported(error: unknown): boolean {
+function consumeReported(error: unknown): boolean {
   const registry = (globalThis as unknown as Record<symbol, WeakSet<object> | undefined>)[REPORTED]
-  return error != null && typeof error === 'object' && registry?.has(error) === true
+  return error != null && typeof error === 'object' && registry?.delete(error) === true
 }
 
 /**
