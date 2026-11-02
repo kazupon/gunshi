@@ -1,7 +1,7 @@
 {
   "name": "gunshi",
   "description": "Modern javascript command-line library",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
