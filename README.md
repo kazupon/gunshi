@@ -93,6 +93,40 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+Sub-commands are given with `subCommands`, keyed by their names:
+
+```js
+import { cli, define } from 'gunshi'
+
+const add = define({
+  name: 'add',
+  description: 'Add an item',
+  args: {
+    title: { type: 'positional', description: 'The title of the item' }
+  },
+  run: ctx => console.log(`Added: ${ctx.values.title}`)
+})
+
+const list = define({
+  name: 'list',
+  description: 'List the items',
+  run: () => console.log('No items')
+})
+
+const main = define({
+  name: 'todo',
+  description: 'Manage the items'
+})
+
+// `todo add milk`, `todo list` and `todo --help`
+await cli(process.argv.slice(2), main, {
+  version: '1.0.0',
+  subCommands: { add, list }
+})
+```
+
+`subCommands` can also be an array of commands (`[add, list]`), and can also be given on the main command (`define({ name: 'todo', subCommands: { add, list } })`).
+
 About more details and usage, see [documentations](https://gunshi.dev)
 
 ## Showcases
