@@ -395,25 +395,27 @@ to stop command exploration; values after it are passed through as `ctx.rest`.
 
 When a sub-command cannot be resolved, Gunshi reports it as a structured `CommandNotFoundError` inside the validation error pipeline. This avoids brittle checks such as `error.message.startsWith('Command not found:')`.
 
+Gunshi prints `Command not found: <name>` to stderr and sets the exit code to `1`, as it does for the other validation errors (see [Handling Argument Validation Errors](../advanced/command-hooks.md#handling-argument-validation-errors)). To add your own guidance, look the error up in `onErrorCommand`:
+
 ```js
 import { cli, define, isCommandNotFoundError } from 'gunshi'
 
-try {
-  await cli(process.argv.slice(2), define({ name: 'app', run: () => {} }), {
-    subCommands: {
-      deploy: define({ name: 'deploy', run: () => {} })
-    }
-  })
-} catch (error) {
-  if (error instanceof AggregateError) {
-    const commandError = error.errors.find(isCommandNotFoundError)
-    if (commandError) {
-      console.error(`Unknown command: ${commandError.commandName}`)
-      console.error(`Available commands: ${commandError.candidates.join(', ')}`)
+await cli(process.argv.slice(2), define({ name: 'app', run: () => {} }), {
+  subCommands: {
+    deploy: define({ name: 'deploy', run: () => {} })
+  },
+  onErrorCommand: (_ctx, error) => {
+    if (error instanceof AggregateError) {
+      const commandError = error.errors.find(isCommandNotFoundError)
+      if (commandError) {
+        console.error(`Available commands: ${commandError.candidates.join(', ')}`)
+      }
     }
   }
-}
+})
 ```
+
+To print everything yourself, set `renderValidationErrors` to `null`, and catch the `AggregateError` that `cli()` then rejects with.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 

@@ -129,7 +129,7 @@ Available extensions:
 
 - **`showUsage(): Awaitable<string | undefined>`**: Display the command usage information, with the header as its title. This is automatically called when `--help` is used. Returns `undefined` if no `renderUsage` function is provided.
 
-- **`showValidationErrors(error: AggregateError): Awaitable<string | undefined>`**: Display validation errors when argument validation fails. Returns `undefined` if `renderValidationErrors` is null.
+- **`showValidationErrors(error: AggregateError): Awaitable<string | undefined>`**: Display validation errors when argument validation fails. The rendered message is printed to stderr, unless it is empty or `usageSilent` is set. Returns `undefined` if `renderValidationErrors` is null.
 
 ### Usage Example
 

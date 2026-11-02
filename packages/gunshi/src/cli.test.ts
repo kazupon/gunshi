@@ -1,8 +1,10 @@
+import global from '@gunshi/plugin-global'
+import renderer from '@gunshi/plugin-renderer'
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
-import { defineMockLog } from '../test/utils.ts'
+import { defineMockErrorLog, defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
 import { define, lazy } from './definition.ts'
@@ -129,10 +131,11 @@ describe('execute command', () => {
     await cli(['command1'], lazyCommand, { subCommands })
     expect(mockCommand1).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'subCommand' }))
 
-    // check unknown command
-    await expect(async () => {
-      await cli(['unknown'], lazyCommand, { subCommands })
-    }).rejects.toThrowError('Command not found: unknown')
+    // check unknown command: reported to stderr with exit code 1, without rejecting
+    const stderr = defineMockErrorLog()
+    await expect(cli(['unknown'], lazyCommand, { subCommands })).resolves.toBeUndefined()
+    expect(stderr()).toContain('Command not found: unknown')
+    expect(process.exitCode).toBe(1)
   })
 
   test('entry strictly command + sub commands', async () => {
@@ -225,17 +228,20 @@ describe('execute command', () => {
       run: mockCommand2
     })
 
+    const stderr = defineMockErrorLog()
     await expect(
       cli(['position1'], show, {
         subCommands
       })
-    ).rejects.toThrowError('Command not found: position1')
+    ).resolves.toBeUndefined()
     await expect(
       cli(['position2'], show, {
         subCommands,
         fallbackToEntry: false
       })
-    ).rejects.toThrowError('Command not found: position2')
+    ).resolves.toBeUndefined()
+    expect(stderr()).toContain('Command not found: position1')
+    expect(stderr()).toContain('Command not found: position2')
     await expect(
       cli(['position3'], show, {
         subCommands,
@@ -294,13 +300,16 @@ describe('execute command', () => {
   })
 
   test('command not found', async () => {
+    const stderr = defineMockErrorLog()
     const subCommands = new Map()
     subCommands.set('foo', {
       run: vi.fn<() => void>()
     })
-    await expect(async () => {
-      await cli(['show'], { run: vi.fn<() => void>() }, { subCommands })
-    }).rejects.toThrowError('Command not found: show')
+    await expect(
+      cli(['show'], { run: vi.fn<() => void>() }, { subCommands })
+    ).resolves.toBeUndefined()
+    expect(stderr()).toContain('Command not found: show')
+    expect(process.exitCode).toBe(1)
   })
 
   test('command not found exposes structured metadata', async () => {
@@ -314,6 +323,7 @@ describe('execute command', () => {
       ['init', define({ name: 'init', run: vi.fn<() => void>() })]
     ])
 
+    const stderr = defineMockErrorLog()
     let capturedError: AggregateError | undefined
     await expect(
       cli(['missing'], entry, {
@@ -325,7 +335,8 @@ describe('execute command', () => {
           expect(ctx.validationError).toBe(error)
         }
       })
-    ).rejects.toThrowError('Command not found: missing')
+    ).resolves.toBeUndefined()
+    expect(stderr()).toContain('Command not found: missing')
 
     const commandError = findCommandNotFoundError(capturedError)
     expect(commandError).toBeInstanceOf(CommandNotFoundError)
@@ -922,12 +933,11 @@ describe('custom generate usage', () => {
     // usage
     await cli(['-h'], entry, options)
 
-    // validation errors
-    try {
-      await cli([''], entry, options)
-    } catch {}
+    // validation errors, reported to stderr
+    const stderr = defineMockErrorLog()
+    await expect(cli([''], entry, options)).resolves.toBeUndefined()
 
-    const message = log()
+    const message = [log(), stderr()].join('\n')
     expect(message).toMatchSnapshot()
   })
 })
@@ -1104,8 +1114,7 @@ test('negatable options', async () => {
 })
 
 test('enum optional argument', async () => {
-  const utils = await import('./utils.ts')
-  const log = defineMockLog(utils)
+  const stderr = defineMockErrorLog()
 
   // success case
   const args = {
@@ -1131,17 +1140,16 @@ test('enum optional argument', async () => {
       args,
       run: vi.fn<() => void>()
     })
-  ).rejects.toBeInstanceOf(AggregateError)
-  const stdout = log()
-  expect(stdout).toEqual(
+  ).resolves.toBeUndefined()
+  expect(process.exitCode).toBe(1)
+  expect(stderr()).toEqual(
     `Optional argument '--foo' should be chosen from 'enum' ["a", "b", "c"] values`
   )
 })
 
 describe('args validation i18n', () => {
   test('translates required option', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1168,14 +1176,13 @@ describe('args validation i18n', () => {
           ]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual("必須オプション: '--id'")
+    expect(stderr()).toEqual("必須オプション: '--id'")
   })
 
   test('translates required positional', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1201,14 +1208,13 @@ describe('args validation i18n', () => {
           ]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual('必須位置引数: file')
+    expect(stderr()).toEqual('必須位置引数: file')
   })
 
   test('translates invalid type and invalid choice', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1239,14 +1245,13 @@ describe('args validation i18n', () => {
           ]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual(["型エラー: '--count'", "選択エラー: '--level'"].join('\n'))
+    expect(stderr()).toEqual(["型エラー: '--count'", "選択エラー: '--level'"].join('\n'))
   })
 
   test('translates custom parse wrapper', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1275,15 +1280,14 @@ describe('args validation i18n', () => {
           ]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual('カスタム解析エラー: Invalid port')
+    expect(stderr()).toEqual('カスタム解析エラー: Invalid port')
   })
 
   test('translates a missing value, with the hint of args-tokens', async () => {
     // the translation replaces the whole message of args-tokens, and took the hint with it (#791)
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1306,16 +1310,15 @@ describe('args validation i18n', () => {
           ]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual(
+    expect(stderr()).toEqual(
       "オプション '--port' or '-p' には値が必要です ('-5' を値として渡すには '--port=-5' と書いてください)"
     )
   })
 
   test('a missing value in en-US reads as the message of args-tokens', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1333,17 +1336,16 @@ describe('args validation i18n', () => {
           plugins: [i18n({ locale: 'en-US' })]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual(
+    expect(stderr()).toEqual(
       "Optional argument '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
     )
   })
 
   test('translates a required positional by its display name', async () => {
     // the translation named it by its key, `inputFile`, and the other errors by their display name (#792)
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1366,14 +1368,13 @@ describe('args validation i18n', () => {
           ]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual("位置引数 'input-file' は必須です")
+    expect(stderr()).toEqual("位置引数 'input-file' は必須です")
   })
 
   test('a required positional in en-US reads as the message of args-tokens', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     await expect(
       cli(
@@ -1391,16 +1392,15 @@ describe('args validation i18n', () => {
           plugins: [i18n({ locale: 'en-US' })]
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    expect(log()).toEqual("Positional argument 'input-file' is required")
+    expect(stderr()).toEqual("Positional argument 'input-file' is required")
   })
 })
 
 describe('positional arguments', () => {
   test('basic', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     // success case
     const args = {
@@ -1428,9 +1428,8 @@ describe('positional arguments', () => {
         args,
         run: vi.fn<() => void>()
       })
-    ).rejects.toBeInstanceOf(AggregateError)
-    const stdout = log()
-    expect(stdout).toEqual(`Positional argument 'bar' is required`)
+    ).resolves.toBeUndefined()
+    expect(stderr()).toEqual(`Positional argument 'bar' is required`)
   })
 
   test('optional positional arguments', async () => {
@@ -1494,8 +1493,7 @@ describe('positional arguments', () => {
   })
 
   test('sub commands', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
     const mockFn1 = vi.fn<() => void>()
     const mockFn2 = vi.fn<() => void>()
 
@@ -1556,9 +1554,8 @@ describe('positional arguments', () => {
           subCommands
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
-    const stdout = log()
-    expect(stdout).toEqual(`Positional argument 'bar' is required`)
+    ).resolves.toBeUndefined()
+    expect(stderr()).toEqual(`Positional argument 'bar' is required`)
   })
 })
 
@@ -1717,8 +1714,7 @@ describe('custom type arguments', () => {
   })
 
   test('custom type with validation error', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
 
     const args = {
       port: {
@@ -1740,10 +1736,9 @@ describe('custom type arguments', () => {
         args,
         run: vi.fn<() => void>()
       })
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
-    const stdout = log()
-    expect(stdout).toContain('Invalid port: 80. Must be a number between 1024 and 65535')
+    expect(stderr()).toContain('Invalid port: 80. Must be a number between 1024 and 65535')
   })
 
   test('multiple custom type values', async () => {
@@ -1972,8 +1967,7 @@ describe('command lifecycle hooks', () => {
   })
 
   test('onErrorCommand hook with validation error', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
     const executionOrder: string[] = []
     const mockCommand = vi.fn<() => void>()
     const args = {
@@ -2003,12 +1997,13 @@ describe('command lifecycle hooks', () => {
           }
         }
       )
-    ).rejects.toBeInstanceOf(AggregateError)
+    ).resolves.toBeUndefined()
 
     expect(executionOrder).toEqual(['before', 'error'])
     expect(mockCommand).not.toHaveBeenCalled()
     expect(capturedError).toBeInstanceOf(AggregateError)
-    expect(log()).toBe(`Optional argument '--id' is required`)
+    expect(stderr()).toBe(`Optional argument '--id' is required`)
+    expect(process.exitCode).toBe(1)
   })
 
   describe('strict option validation', () => {
@@ -2022,8 +2017,7 @@ describe('command lifecycle hooks', () => {
     })
 
     test('reports unknown long options before command execution', async () => {
-      const utils = await import('./utils.ts')
-      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
       const mockCommand = vi.fn<() => void>()
       let capturedError: AggregateError | undefined
 
@@ -2046,7 +2040,7 @@ describe('command lifecycle hooks', () => {
             }
           }
         )
-      ).rejects.toBeInstanceOf(AggregateError)
+      ).resolves.toBeUndefined()
 
       expect(mockCommand).not.toHaveBeenCalled()
       expect(
@@ -2056,7 +2050,7 @@ describe('command lifecycle hooks', () => {
         name: 'alow-reload',
         candidates: ['--help', '--version', '--allow-reload']
       })
-      expect(log()).toBe('Unknown option: --alow-reload')
+      expect(stderr()).toBe('Unknown option: --alow-reload')
     })
 
     test('allows declared long, short, negatable, and kebab-case options', async () => {
@@ -2245,8 +2239,7 @@ describe('command lifecycle hooks', () => {
     })
 
     test('merges unknown option errors with existing validation errors', async () => {
-      const utils = await import('./utils.ts')
-      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
       const mockCommand = vi.fn<() => void>()
       let capturedError: AggregateError | undefined
 
@@ -2269,19 +2262,18 @@ describe('command lifecycle hooks', () => {
             }
           }
         )
-      ).rejects.toBeInstanceOf(AggregateError)
+      ).resolves.toBeUndefined()
 
       expect(mockCommand).not.toHaveBeenCalled()
       expect(capturedError?.errors.map((error: Error) => error.message)).toEqual([
         `Optional argument '--id' is required`,
         'Unknown option: --bad'
       ])
-      expect(log()).toBe(`Optional argument '--id' is required\nUnknown option: --bad`)
+      expect(stderr()).toBe(`Optional argument '--id' is required\nUnknown option: --bad`)
     })
 
     test('localizes unknown option validation errors with i18n plugin', async () => {
-      const utils = await import('./utils.ts')
-      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
       const mockCommand = vi.fn<() => void>()
 
       await expect(
@@ -2300,15 +2292,14 @@ describe('command lifecycle hooks', () => {
             ]
           }
         )
-      ).rejects.toBeInstanceOf(AggregateError)
+      ).resolves.toBeUndefined()
 
       expect(mockCommand).not.toHaveBeenCalled()
-      expect(log()).toBe('未定義のオプションです: --alow-reload')
+      expect(stderr()).toBe('未定義のオプションです: --alow-reload')
     })
 
     test('localizes command not found validation errors with i18n plugin', async () => {
-      const utils = await import('./utils.ts')
-      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
       const mockCommand = vi.fn<() => void>()
 
       await expect(
@@ -2335,10 +2326,10 @@ describe('command lifecycle hooks', () => {
             ]
           }
         )
-      ).rejects.toBeInstanceOf(AggregateError)
+      ).resolves.toBeUndefined()
 
       expect(mockCommand).not.toHaveBeenCalled()
-      expect(log()).toBe('コマンドが見つかりません: missing')
+      expect(stderr()).toBe('コマンドが見つかりません: missing')
     })
   })
 
@@ -2554,12 +2545,13 @@ describe('github issues', () => {
     test.each(['runner', 'command'] as const)(
       'loader that returns a %s: validate the arguments of the definition',
       async shape => {
+        const stderr = defineMockErrorLog()
         const run = vi.fn<CommandRunner>()
 
-        await expect(cli(['deploy'], entry, createOptions(shape, run))).rejects.toBeInstanceOf(
-          AggregateError
-        )
+        await expect(cli(['deploy'], entry, createOptions(shape, run))).resolves.toBeUndefined()
         expect(run).not.toHaveBeenCalled()
+        expect(stderr()).toContain("'--env'")
+        expect(process.exitCode).toBe(1)
       }
     )
 
@@ -3749,6 +3741,7 @@ describe('nested sub-commands', () => {
       run: mockRemote
     })
 
+    const stderr = defineMockErrorLog()
     let capturedError: AggregateError | undefined
     await expect(
       cli(
@@ -3768,7 +3761,8 @@ describe('nested sub-commands', () => {
           }
         }
       )
-    ).rejects.toThrowError('Command not found: ad')
+    ).resolves.toBeUndefined()
+    expect(stderr()).toContain('Command not found: ad')
 
     const commandError = findCommandNotFoundError(capturedError)
     expect(commandError.commandName).toBe('ad')
@@ -3957,6 +3951,7 @@ describe('nested sub-commands', () => {
       }
     )
 
+    const stderr = defineMockErrorLog()
     let capturedError: AggregateError | undefined
     await expect(
       cli(
@@ -3976,7 +3971,8 @@ describe('nested sub-commands', () => {
           }
         }
       )
-    ).rejects.toThrowError('Command not found: ad')
+    ).resolves.toBeUndefined()
+    expect(stderr()).toContain('Command not found: ad')
 
     const commandError = findCommandNotFoundError(capturedError)
     expect(commandError.commandName).toBe('ad')
@@ -4318,3 +4314,174 @@ function findCommandNotFoundError(error: AggregateError | undefined): CommandNot
   expect(commandError).toBeInstanceOf(CommandNotFoundError)
   return commandError as CommandNotFoundError
 }
+
+describe('reported validation errors', () => {
+  const args = {
+    id: {
+      type: 'string',
+      required: true
+    }
+  } satisfies Args
+
+  beforeEach(() => {
+    // the tests check the exit code, which other tests may have left
+    process.exitCode = undefined
+  })
+
+  test('resolve with undefined, with the message on stderr and exit code 1', async () => {
+    const utils = await import('./utils.ts')
+    const stdout = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+
+    await expect(cli([], { args, run })).resolves.toBeUndefined()
+
+    expect(run).not.toHaveBeenCalled()
+    expect(stderr()).toBe(`Optional argument '--id' is required`)
+    expect(stdout()).toBe('')
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('onErrorCommand sees the errors after the exit code is set, and can change it', async () => {
+    defineMockErrorLog()
+    const onErrorCommand = vi.fn<NonNullable<CliOptions['onErrorCommand']>>((ctx, error) => {
+      expect(process.exitCode).toBe(1)
+      expect(error).toBe(ctx.validationError)
+      process.exitCode = 2
+    })
+
+    await expect(
+      cli([], { args, run: vi.fn<() => void>() }, { onErrorCommand })
+    ).resolves.toBeUndefined()
+
+    expect(onErrorCommand).toHaveBeenCalledWith(expect.anything(), expect.any(AggregateError))
+    expect(process.exitCode).toBe(2)
+  })
+
+  test.each([
+    ['`renderValidationErrors: null`', { renderValidationErrors: null }],
+    [
+      'a renderer that returns an empty message',
+      { renderValidationErrors: () => Promise.resolve('') }
+    ],
+    ['`usageSilent`', { usageSilent: true }]
+  ] as const)(
+    'reject with the errors for %s, for the caller to report them',
+    async (_, options) => {
+      const stderr = defineMockErrorLog()
+
+      await expect(cli([], { args, run: vi.fn<() => void>() }, options)).rejects.toBeInstanceOf(
+        AggregateError
+      )
+
+      expect(stderr()).toBe('')
+      expect(process.exitCode).toBeUndefined()
+    }
+  )
+
+  test('an error thrown by a command still rejects', async () => {
+    defineMockErrorLog()
+    const error = new Error('boom')
+
+    await expect(
+      cli([], {
+        run: () => {
+          throw error
+        }
+      })
+    ).rejects.toBe(error)
+
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('the mark of a reported error is used once', async () => {
+    defineMockErrorLog()
+    let reported: Error | undefined
+    await expect(
+      cli(
+        [],
+        { args, run: vi.fn<() => void>() },
+        {
+          onErrorCommand: (_ctx, error) => {
+            reported = error
+          }
+        }
+      )
+    ).resolves.toBeUndefined()
+    expect(reported).toBeInstanceOf(AggregateError)
+
+    // a command that throws the same error later is not a reported validation error
+    await expect(
+      cli([], {
+        run: () => {
+          throw reported
+        }
+      })
+    ).rejects.toBe(reported)
+  })
+
+  test('a nested cli() in onErrorCommand does not take the report of the outer run', async () => {
+    defineMockErrorLog()
+    let nested: unknown
+    await expect(
+      cli(
+        [],
+        { args, run: vi.fn<() => void>() },
+        {
+          onErrorCommand: async (_ctx, error) => {
+            // the nested command throws the error of the outer run, which the nested run did not report
+            nested = await cli([], {
+              run: () => {
+                throw error
+              }
+            }).catch((reason: unknown) => reason)
+          }
+        }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(nested).toBeInstanceOf(AggregateError)
+  })
+
+  test('an error that a decorator suppressed is not reported in a later run', async () => {
+    defineMockErrorLog()
+    let suppressed: unknown
+    // installed before the global options plugin, so its decorator wraps the one of the plugin
+    const suppress = plugin({
+      id: 'test:suppress',
+      setup: ctx => {
+        ctx.decorateCommand(runner => async commandContext => {
+          try {
+            return await runner(commandContext)
+          } catch (error: unknown) {
+            suppressed = error
+            return undefined
+          }
+        })
+      }
+    })
+    await expect(
+      boneCli([], { args, run: vi.fn<() => void>() }, { plugins: [suppress, global(), renderer()] })
+    ).resolves.toBeUndefined()
+    expect(suppressed).toBeInstanceOf(AggregateError)
+
+    await expect(
+      cli([], {
+        run: () => {
+          throw suppressed
+        }
+      })
+    ).rejects.toBe(suppressed)
+  })
+
+  test('a priority error is reported too', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+
+    await expect(cli(['--nope'], { args, run }, { strict: true })).resolves.toBeUndefined()
+
+    expect(run).not.toHaveBeenCalled()
+    expect(stderr()).toContain('Unknown option: --nope')
+    expect(process.exitCode).toBe(1)
+  })
+})

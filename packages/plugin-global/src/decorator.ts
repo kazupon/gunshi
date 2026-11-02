@@ -12,6 +12,46 @@ import type { GlobalExtension } from './extension.ts'
 import type { PluginId } from './types.ts'
 
 /**
+ * The key of the registry in which the core keeps, for the command context of each run, the set of the
+ * errors that have been reported to the user. An error in the set tells `cli()` to end without
+ * rejecting. The errors are frozen with the command context, so they are not marked themselves. The key
+ * is a registered symbol, since `gunshi` and the plugins bundle their own copies.
+ */
+const REPORTED = Symbol.for('gunshi.reported')
+
+/**
+ * Mark an error as reported to the user, in the set that the core keeps for the run of the context.
+ *
+ * @param ctx - The command context of the run
+ * @param error - The error that has been reported
+ * @returns `true` if the error is marked, `false` if the core keeps no set for the run
+ */
+function markReported(ctx: object, error: object): boolean {
+  const registry = (
+    globalThis as unknown as Record<symbol, WeakMap<object, WeakSet<object>> | undefined>
+  )[REPORTED]
+  const reported = registry?.get(ctx)
+  if (reported === undefined) {
+    return false
+  }
+  reported.add(error)
+  return true
+}
+
+/**
+ * Set the exit code of the process, where the runtime has one (Node.js, Bun and Deno 2 have `process`).
+ * The core does not call the APIs of a runtime, so the plugin, which reports the errors, sets it.
+ *
+ * @param code - The exit code
+ */
+function setExitCode(code: number): void {
+  const proc = (globalThis as { process?: { exitCode?: number | string } }).process
+  if (proc != null && typeof proc === 'object') {
+    proc.exitCode = code
+  }
+}
+
+/**
  * Decorator function to extend the command with global options.
  *
  * @param baseRunner - The base command runner
@@ -35,9 +75,26 @@ const decorator: CommandDecorator<{
     }
   } = ctx
 
+  /**
+   * NOTE(kazupon): when the plugin has shown the validation errors to the user, they have been
+   * reported: the exit code is 1, and `cli()` ends without rejecting, as the other CLI libraries end
+   * without a stack trace. They are still thrown, so that the `onErrorCommand` hook sees them. When
+   * nothing was shown (`renderValidationErrors: null`, an empty message, or `usageSilent`), `cli()`
+   * rejects with them, for the app to report them. So it does when the core keeps no set of reported
+   * errors for the run, and then the exit code is left alone.
+   *
+   * @param error - The aggregate error of the validation errors
+   */
+  const report = async (error: AggregateError): Promise<never> => {
+    const message = await showValidationErrors(error)
+    if (message && !ctx.env.usageSilent && markReported(ctx, error)) {
+      setExitCode(1)
+    }
+    throw error
+  }
+
   if (hasPriorityValidationError(validationError)) {
-    await showValidationErrors(validationError!)
-    throw validationError
+    return await report(validationError!)
   }
 
   if (values.version && globalOptions?.has('version')) {
@@ -50,8 +107,7 @@ const decorator: CommandDecorator<{
 
   // check for validation errors before executing command
   if (validationError) {
-    await showValidationErrors(validationError)
-    throw validationError
+    return await report(validationError)
   }
 
   // normal command execution

@@ -32,7 +32,8 @@
   },
   "type": "module",
   "files": [
-    "lib"
+    "lib",
+    "skills"
   ],
   "module": "lib/index.js",
   "exports": {
