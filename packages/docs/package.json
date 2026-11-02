@@ -33,11 +33,7 @@
     "documentation",
     "llms"
   ],
-  "bin": {
-    "gunshi-docs-init": "./bin/init.js"
-  },
   "files": [
-    "bin",
     "README.md",
     "src/api",
     "src/guide",
@@ -45,11 +41,6 @@
     "src/index.md",
     "src/showcase.md"
   ],
-  "dependencies": {
-    "@antfu/install-pkg": "^2.0.0",
-    "gunshi": "workspace:*",
-    "tinyexec": "^1.0.2"
-  },
   "devDependencies": {
     "@gunshi/plugin-i18n": "workspace:*",
     "@gunshi/plugin-renderer": "workspace:*",

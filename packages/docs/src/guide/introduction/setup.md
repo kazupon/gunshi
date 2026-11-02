@@ -35,35 +35,13 @@ bun add gunshi
 
 Gunshi provides tooling to integrate with AI coding assistants such as [Claude Code](https://claude.ai/code).
 
-### Automatic Setup (Recommended)
+### Agent Skill
 
-You can quickly set up LLM-assisted development for your project using the CLI tool:
-
-::: code-group
-
-```sh [npm]
-npx @gunshi/docs
-```
-
-```sh [pnpm]
-pnpm dlx @gunshi/docs
-```
-
-```sh [yarn]
-yarn dlx @gunshi/docs
-```
-
-```sh [bun]
-bun x @gunshi/docs
-```
-
-:::
-
-This command automatically configures [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) for Claude Code.
+The `gunshi` package ships an [agent skill](https://docs.anthropic.com/en/docs/claude-code/skills) at `skills/gunshi/SKILL.md`. Package managers that link agent skills from dependencies, such as pnpm v12, make it available to your AI agent once `gunshi` is installed. The skill tells the agent how to install `@gunshi/docs` and how to point your agent instructions at it.
 
 ### Manual Setup
 
-If you prefer manual configuration, install the documentation package as a dev dependency:
+If your package manager does not link agent skills, install the documentation package as a dev dependency:
 
 ::: code-group
 
