@@ -41,6 +41,7 @@ export const advanced = {
     { text: 'Parser Combinators', link: '/guide/advanced/parser-combinators' },
     { text: 'Command Hooks', link: '/guide/advanced/command-hooks' },
     { text: 'Context Extensions', link: '/guide/advanced/context-extensions' },
+    { text: 'Global Options', link: '/guide/advanced/global-options' },
     { text: 'Custom Rendering', link: '/guide/advanced/custom-rendering' },
     { text: 'Internationalization', link: '/guide/advanced/internationalization' },
     { text: 'AI Agent Detection', link: '/guide/advanced/ai-agent-detection' },

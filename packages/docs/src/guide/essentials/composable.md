@@ -128,6 +128,57 @@ await cli(process.argv.slice(2), mainCommand, {
 
 When both are given, the `subCommands` option of `cli()` is used for the CLI, and the sub-commands of the main command are reached under its name, as [nested sub-commands](#nested-sub-commands).
 
+## Options for Every Command
+
+To give every command the same option, such as `--file` or `--verbose`, define the arguments once and spread them into the `args` of each command.
+Declare the shared object `as const` (or with `satisfies Args`), so that `ctx.values` is typed in every command:
+
+```ts [cli.ts]
+import { cli, define } from 'gunshi'
+
+const common = {
+  file: { type: 'string', short: 'f', default: 'todo.json', description: 'The data file' }
+} as const
+
+const add = define({
+  name: 'add',
+  description: 'Add an item',
+  args: {
+    ...common,
+    title: { type: 'positional', description: 'The title of the item' }
+  },
+  run: ctx => console.log(`Add ${ctx.values.title} to ${ctx.values.file}`)
+})
+
+const list = define({
+  name: 'list',
+  description: 'List the items',
+  args: { ...common },
+  run: ctx => console.log(`List the items in ${ctx.values.file}`)
+})
+
+const main = define({
+  name: 'todo',
+  description: 'Manage the items'
+})
+
+await cli(process.argv.slice(2), main, {
+  subCommands: { add, list }
+})
+```
+
+Each command takes the option whether it is written before or after the command name (`todo --file work.json add milk` and `todo add milk --file work.json`), and shows it in its usage.
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> The `args` of the main command are the arguments of the main command only: the sub-commands do not see them.
+> Without `strict: true`, an option that a sub-command does not take is ignored, so spread the shared arguments into every command that reads them.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+To declare an option only once for every command, the main command included, add it as a global option with a plugin, as described in [Global Options](../advanced/global-options.md).
+
 ## Automatic Help for Sub-commands
 
 Gunshi automatically generates help documentation for your sub-commands.
