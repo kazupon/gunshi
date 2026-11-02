@@ -274,20 +274,14 @@ This option enables flexible command handling:
 ```sh
 # Runs the create sub-command
 npx tsx src/cli.ts create --name resource
-resource-manager (resource-manager v1.0.0)
-
 Creating default resource: resource
 
 # Runs the list sub-command
 npx tsx src/cli.ts list --filter active
-resource-manager (resource-manager v1.0.0)
-
 Listing resources with filter: active
 
 # Falls back to main command when "unknown" sub-command is not found
 npx tsx src/cli.ts unknown --flag value
-resource-manager (resource-manager v1.0.0)
-
 Use a sub-command
 Run "resource-manager --help" for available commands
 
