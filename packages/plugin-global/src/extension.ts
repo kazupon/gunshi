@@ -32,7 +32,7 @@ export interface GlobalExtension {
   showUsage: () => Awaitable<string | undefined>
 
   /**
-   * Show validation errors. This is called when argument validation fails.
+   * Show validation errors. This is called when argument validation fails. The rendered message is printed to stderr, unless it is empty or `usageSilent` is set.
    *
    * @param error - The aggregate error containing validation failures
    * @returns The rendered error message, or `undefined` if `renderValidationErrors` is null
@@ -96,7 +96,13 @@ export default function extension(ctx: CommandContextCore<DefaultGunshiParams>):
       }
       if (ctx.env.renderValidationErrors !== undefined) {
         const message = await ctx.env.renderValidationErrors(ctx, error)
-        ctx.log(message)
+        /**
+         * NOTE(kazupon): the validation errors are diagnostics, not the output of the command, so they
+         * go to stderr, as the other CLI libraries do. stdout stays for what a command prints, such as JSON.
+         */
+        if (message && !ctx.env.usageSilent) {
+          console.error(message)
+        }
         return message
       }
     }

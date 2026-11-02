@@ -12,6 +12,37 @@ import type { GlobalExtension } from './extension.ts'
 import type { PluginId } from './types.ts'
 
 /**
+ * The key of the set of errors that have been reported to the user, which tells `cli()` to end without
+ * rejecting: the core looks the error up with the same key. The errors are frozen with the command
+ * context, so they are not marked themselves. The key is a registered symbol, since `gunshi` and the
+ * plugins bundle their own copies, and the set is a `WeakSet`, which does not keep the errors alive.
+ */
+const REPORTED = Symbol.for('gunshi.reported')
+
+/**
+ * Mark an error as reported to the user.
+ *
+ * @param error - The error that has been reported
+ */
+function markReported(error: object): void {
+  const registry = globalThis as unknown as Record<symbol, WeakSet<object> | undefined>
+  ;(registry[REPORTED] ??= new WeakSet()).add(error)
+}
+
+/**
+ * Set the exit code of the process, where the runtime has one (Node.js, Bun and Deno 2 have `process`).
+ * The core does not call the APIs of a runtime, so the plugin, which reports the errors, sets it.
+ *
+ * @param code - The exit code
+ */
+function setExitCode(code: number): void {
+  const proc = (globalThis as { process?: { exitCode?: number | string } }).process
+  if (proc != null && typeof proc === 'object') {
+    proc.exitCode = code
+  }
+}
+
+/**
  * Decorator function to extend the command with global options.
  *
  * @param baseRunner - The base command runner
@@ -35,9 +66,26 @@ const decorator: CommandDecorator<{
     }
   } = ctx
 
+  /**
+   * NOTE(kazupon): when the plugin has shown the validation errors to the user, they have been
+   * reported: the exit code is 1, and `cli()` ends without rejecting, as the other CLI libraries end
+   * without a stack trace. They are still thrown, so that the `onErrorCommand` hook sees them. When
+   * nothing was shown (`renderValidationErrors: null`, an empty message, or `usageSilent`), `cli()`
+   * rejects with them, for the app to report them.
+   *
+   * @param error - The aggregate error of the validation errors
+   */
+  const report = async (error: AggregateError): Promise<never> => {
+    const message = await showValidationErrors(error)
+    if (message && !ctx.env.usageSilent) {
+      setExitCode(1)
+      markReported(error)
+    }
+    throw error
+  }
+
   if (hasPriorityValidationError(validationError)) {
-    await showValidationErrors(validationError!)
-    throw validationError
+    return await report(validationError!)
   }
 
   if (values.version && globalOptions?.has('version')) {
@@ -50,8 +98,7 @@ const decorator: CommandDecorator<{
 
   // check for validation errors before executing command
   if (validationError) {
-    await showValidationErrors(validationError)
-    throw validationError
+    return await report(validationError)
   }
 
   // normal command execution

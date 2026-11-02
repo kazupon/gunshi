@@ -342,6 +342,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Output that must still appear — machine-readable results for an agent, warnings for the
    * CLI author — should use `console.log` / `console.warn`, not `ctx.log`.
    *
+   * The validation errors are not printed either, so `cli()` rejects with them, for the caller to
+   * report them (see {@linkcode CliOptions.renderValidationErrors}).
+   *
    * @default false
    */
   usageSilent?: boolean
@@ -365,6 +368,12 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   renderHeader?: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null
   /**
    * Render function the validation errors.
+   *
+   * With the global options plugin, the rendered message is printed to stderr, the exit code is set
+   * to `1`, {@linkcode CliOptions.onErrorCommand} is called, and `cli()` resolves with `undefined`.
+   * Set it to `null` to report the validation errors yourself: nothing is printed, and `cli()` rejects
+   * with the `AggregateError`. A renderer that returns an empty message, and
+   * {@linkcode CliOptions.usageSilent}, also leave them to the caller.
    */
   renderValidationErrors?:
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
@@ -398,10 +407,14 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    */
   onAfterCommand?: (ctx: Readonly<CommandContext<G>>, result: string | undefined) => Awaitable<void>
   /**
-   * Hook that runs when a command throws an error
+   * Hook that runs when a command throws an error, or when the arguments fail validation
+   *
+   * For the validation errors that the global options plugin has printed, the exit code is already `1`
+   * when the hook runs, so the hook can set another one, and `cli()` resolves after it. Any other
+   * error rejects `cli()` after the hook.
    *
    * @param ctx - The command context
-   * @param error - The error thrown during execution
+   * @param error - The error thrown during execution, or the `AggregateError` of the validation errors
    * @since v0.27.0
    */
   onErrorCommand?: (ctx: Readonly<CommandContext<G>>, error: Error) => Awaitable<void>
@@ -583,9 +596,11 @@ export interface RenderingOptions<G extends GunshiParamsConstraint = DefaultGuns
 
   /**
    * Validation errors rendering configuration
-   * - `null`: Disable rendering
+   * - `null`: Disable rendering. `cli()` rejects with the validation errors, for the caller to report them
    * - `function`: Use custom renderer
    * - `undefined` (when omitted): Use default renderer
+   *
+   * See {@linkcode CliOptions.renderValidationErrors} for where the rendered message goes.
    */
   validationErrors?:
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)

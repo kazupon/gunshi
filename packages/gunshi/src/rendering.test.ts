@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { defineMockLog } from '../test/utils.ts'
+import { defineMockErrorLog, defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
 import { plugin } from './plugin/core.ts'
@@ -166,8 +166,7 @@ describe('Command rendering options', () => {
     })
 
     test('use custom validation errors renderer', async () => {
-      const utils = await import('./utils.ts')
-      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
 
       const cmd: Command = define({
         name: 'test',
@@ -186,10 +185,9 @@ describe('Command rendering options', () => {
         }
       })
 
-      await expect(cli([], cmd, { name: 'test-cli' })).rejects.toBeInstanceOf(AggregateError)
+      await expect(cli([], cmd, { name: 'test-cli' })).resolves.toBeUndefined()
 
-      const stdout = log()
-      expect(stdout).toContain('ERROR: ')
+      expect(stderr()).toContain('ERROR: ')
     })
   })
 
@@ -306,14 +304,11 @@ describe('Command rendering options', () => {
     })
 
     test.each(sources)('validation errors by %s', async source => {
-      const utils = await import('./utils.ts')
-      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
 
-      await expect(cli(['test'], entry, createOptions(source))).rejects.toBeInstanceOf(
-        AggregateError
-      )
+      await expect(cli(['test'], entry, createOptions(source))).resolves.toBeUndefined()
 
-      expect(log()).toBe('Custom validation errors')
+      expect(stderr()).toBe('Custom validation errors')
     })
   })
 })

@@ -1,5 +1,5 @@
 import { COMMON_ARGS, resolveCommandArgs } from '@gunshi/shared'
-import { expect, test, vi } from 'vitest'
+import { expect, onTestFinished, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
@@ -116,12 +116,29 @@ test('does not show the header before running a command', async () => {
   expect(renderHeader).not.toHaveBeenCalled()
 })
 
-test('throws validation error after showing validation errors', async () => {
+/**
+ * Whether the error is in the set that tells `cli()` the plugin has reported it to the user.
+ *
+ * @param error - An error
+ * @returns `true` if the error is marked as reported
+ */
+function isReported(error: object): boolean {
+  const registry = (globalThis as unknown as Record<symbol, WeakSet<object> | undefined>)[
+    Symbol.for('gunshi.reported')
+  ]
+  return registry?.has(error) === true
+}
+
+async function createValidationErrorContext(
+  message: string | undefined,
+  cliOptions: Partial<CliOptions> = {}
+) {
   const validationError = new AggregateError([new Error('missing id')], 'validation failed')
-  const showValidationErrors = vi.fn<(error: AggregateError) => string>(() => 'validation failed')
+  const showValidationErrors = vi.fn<(error: AggregateError) => string | undefined>(() => message)
   const ctx = await createCommandContext({
     values: {},
     validationError,
+    cliOptions: cliOptions as CliOptions,
     extensions: {
       [pluginId]: {
         key: Symbol(pluginId),
@@ -134,13 +151,44 @@ test('throws validation error after showing validation errors', async () => {
       }
     }
   })
+  return { ctx, validationError, showValidationErrors }
+}
+
+test('reports the validation errors it shows: exit code 1, marked, and thrown', async () => {
+  onTestFinished(() => {
+    process.exitCode = undefined
+  })
+  const { ctx, validationError, showValidationErrors } =
+    await createValidationErrorContext('validation failed')
   const baseRunner = vi.fn<() => string>(() => 'command executed')
 
+  // thrown, so that `onErrorCommand` sees it. `cli()` ends without rejecting, since it is marked
   await expect(decorator(baseRunner)(ctx)).rejects.toBe(validationError)
 
   expect(showValidationErrors).toHaveBeenCalledWith(validationError)
   expect(baseRunner).not.toHaveBeenCalled()
+  expect(process.exitCode).toBe(1)
+  expect(isReported(validationError)).toBe(true)
 })
+
+test.each([
+  ['nothing is rendered (`renderValidationErrors: null`)', undefined, {}],
+  ['the rendered message is empty', '', {}],
+  ['the output is silenced (`usageSilent`)', 'validation failed', { usageSilent: true }]
+] as const)(
+  'does not report the validation errors when %s',
+  async (_, message, cliOptions: Partial<CliOptions>) => {
+    onTestFinished(() => {
+      process.exitCode = undefined
+    })
+    const { ctx, validationError } = await createValidationErrorContext(message, cliOptions)
+
+    await expect(decorator(vi.fn<() => string>())(ctx)).rejects.toBe(validationError)
+
+    expect(process.exitCode).toBeUndefined()
+    expect(isReported(validationError)).toBe(false)
+  }
+)
 
 /**
  * The global options are merged into the arguments of the command that runs, where an argument of

@@ -236,7 +236,38 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     cliOptions: cliOptions
   })
 
-  return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
+  try {
+    return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
+  } catch (error: unknown) {
+    /**
+     * NOTE(kazupon): a plugin that has reported the validation errors to the user marks them, as the
+     * global options plugin does after it prints them to stderr and sets the exit code. They have been
+     * dealt with, and `onErrorCommand` has seen them in `executeCommand`, so `cli()` ends without
+     * rejecting. Errors that nobody reported, such as when the app renders the validation errors itself
+     * or an error thrown by a command, reject as before.
+     */
+    if (isReported(error)) {
+      return
+    }
+    throw error
+  }
+}
+
+/**
+ * The key of the set of errors that a plugin has reported to the user. The global options plugin uses
+ * the same registered symbol, since `gunshi` and the plugins bundle their own copies.
+ */
+const REPORTED = Symbol.for('gunshi.reported')
+
+/**
+ * Whether a plugin has reported the error to the user.
+ *
+ * @param error - An error thrown while running a command
+ * @returns `true` if the error is marked as reported
+ */
+function isReported(error: unknown): boolean {
+  const registry = (globalThis as unknown as Record<symbol, WeakSet<object> | undefined>)[REPORTED]
+  return error != null && typeof error === 'object' && registry?.has(error) === true
 }
 
 /**
