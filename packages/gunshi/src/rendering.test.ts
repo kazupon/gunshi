@@ -8,18 +8,15 @@ import type { Args, Command, CommandRunner, RenderingOptions } from './types.ts'
 
 describe('Command rendering options', () => {
   describe('header rendering', () => {
-    test('disable header when header is null', async () => {
+    test('the header is not shown before what a command prints', async () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
       const cmd: Command = define({
         name: 'test',
         description: 'Test command',
-        rendering: {
-          header: null
-        },
         run: ctx => {
-          ctx.log('Command executed')
+          ctx.log('{"ok":true}')
         }
       })
 
@@ -29,7 +26,31 @@ describe('Command rendering options', () => {
       })
 
       const stdout = log()
-      expect(stdout).toBe('Command executed')
+      expect(stdout).toBe('{"ok":true}')
+    })
+
+    test('the header comes with the usage that a command shows itself', async () => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+
+      const cmd: Command = define({
+        name: 'test',
+        description: 'Test command',
+        run: async ctx => {
+          await (
+            ctx.extensions as Record<string, { showUsage: () => Promise<string | undefined> }>
+          )['g:global']!.showUsage()
+        }
+      })
+
+      await cli([], cmd, {
+        name: 'test-cli',
+        renderHeader: () => Promise.resolve('Default header')
+      })
+
+      const stdout = log()
+      expect(stdout).toContain('Default header')
+      expect(stdout).toContain('USAGE')
     })
 
     test('use custom header renderer', async () => {
@@ -47,11 +68,11 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli([], cmd, { name: 'test-cli' })
+      await cli(['--help'], cmd, { name: 'test-cli' })
 
       const stdout = log()
       expect(stdout).toContain('=== TEST ===')
-      expect(stdout).toContain('Command executed')
+      expect(stdout).toContain('OPTIONS')
     })
 
     test('use default renderer when header is undefined', async () => {
@@ -67,14 +88,14 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli([], cmd, {
+      await cli(['--help'], cmd, {
         name: 'test-cli',
         renderHeader: () => Promise.resolve('Default header')
       })
 
       const stdout = log()
       expect(stdout).toContain('Default header')
-      expect(stdout).toContain('Command executed')
+      expect(stdout).toContain('OPTIONS')
     })
   })
 
@@ -196,11 +217,11 @@ describe('Command rendering options', () => {
         }
       })
 
-      await cli([], cmd, { name: 'test-cli', plugins: [rendererPlugin] })
+      await cli(['--help'], cmd, { name: 'test-cli', plugins: [rendererPlugin] })
 
       const stdout = log()
-      expect(stdout).toBe('Command executed')
       expect(stdout).not.toContain('Plugin header')
+      expect(stdout).toContain('OPTIONS')
     })
   })
 
@@ -268,9 +289,11 @@ describe('Command rendering options', () => {
       const utils = await import('./utils.ts')
       const log = defineMockLog(utils)
 
-      await cli(['test', '--env', 'prod'], entry, createOptions(source))
+      await cli(['test', '--help'], entry, createOptions(source))
 
-      expect(log()).toBe('Command executed')
+      const stdout = log()
+      expect(stdout).not.toContain('Default header')
+      expect(stdout).toContain('Custom usage')
     })
 
     test.each(sources)('usage by %s', async source => {

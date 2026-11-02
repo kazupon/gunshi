@@ -127,7 +127,7 @@ Available extensions:
 
 - **`showHeader(): Awaitable<string | undefined>`**: Display the application header. Returns `undefined` if no `renderHeader` function is provided in the CLI configuration.
 
-- **`showUsage(): Awaitable<string | undefined>`**: Display the command usage information. This is automatically called when `--help` is used. Returns `undefined` if no `renderUsage` function is provided.
+- **`showUsage(): Awaitable<string | undefined>`**: Display the command usage information, with the header as its title. This is automatically called when `--help` is used. Returns `undefined` if no `renderUsage` function is provided.
 
 - **`showValidationErrors(error: AggregateError): Awaitable<string | undefined>`**: Display validation errors when argument validation fails. Returns `undefined` if `renderValidationErrors` is null.
 
@@ -143,14 +143,11 @@ const command = {
     // Access global extensions
     const { showVersion, showHeader } = ctx.extensions[globalId]
 
+    // Show the custom header before the output of the command (it prints the header itself)
+    await showHeader()
+
     // Manually show version if needed
     console.log(`Deploying with CLI version: ${showVersion()}`)
-
-    // Show custom header
-    const header = await showHeader()
-    if (header) {
-      console.log(header)
-    }
 
     // Your command logic here...
   }

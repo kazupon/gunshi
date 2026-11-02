@@ -13,8 +13,4 @@ OPTIONS:
 "
 `;
 
-exports[`@gunshi/bone > combination with gunshi plugins and extension 1`] = `
-"app-bone is a @gunshi/bone example (app-bone v1.0.0)
-
-1.0.0"
-`;
+exports[`@gunshi/bone > combination with gunshi plugins and extension 1`] = `"1.0.0"`;
