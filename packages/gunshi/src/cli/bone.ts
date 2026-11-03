@@ -17,7 +17,8 @@ import type {
 } from '../types.ts'
 
 /**
- * Run the command.
+ * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
+ * To have them, use `cli` from `gunshi`.
  *
  * @typeParam A - The type of {@linkcode Args | arguments} defined in the command and cli options.
  *
@@ -36,7 +37,8 @@ export async function cli<
 ): Promise<string | undefined>
 
 /**
- * Run the command.
+ * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
+ * To have them, use `cli` from `gunshi`.
  *
  * @typeParam E - An {@linkcode ExtendContext} type to specify the shape of command and cli options.
  *
@@ -55,7 +57,8 @@ export async function cli<
 ): Promise<string | undefined>
 
 /**
- * Run the command.
+ * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
+ * To have them, use `cli` from `gunshi`.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
  *
@@ -71,7 +74,8 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 ): Promise<string | undefined>
 
 /**
- * Run the command.
+ * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
+ * To have them, use `cli` from `gunshi`.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
  *

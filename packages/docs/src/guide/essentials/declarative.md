@@ -135,7 +135,7 @@ When you run this command with `--help`, Gunshi automatically generates comprehe
 
 ### Additional Command Properties
 
-Since v0.27.0, commands support additional configuration properties:
+Commands also support these configuration properties:
 
 - `internal`: Boolean flag to mark commands as internal (default: `false`). Internal commands are hidden from help usage but remain fully functional. This is useful for debug commands, administrative functions, or implementation details that shouldn't be exposed to end users.
 - `entry`: Boolean flag that marks the main command when subcommands exist (default: `undefined`). This property is typically set automatically by the framework. When used with the `fallbackToEntry` CLI option, it enables fallback behavior for unmatched subcommands.
@@ -828,7 +828,7 @@ The `run` function receives a command context object (`ctx`) with:
 - `callMode`: Command call mode ('entry', 'subCommand', or 'unexpected') indicating how the command was invoked.
 - `toKebab`: Boolean indicating whether camelCase argument names should be converted to kebab-case.
 - `log`: Function for outputting messages that respects the `usageSilent` setting. Output that must still appear when `usageSilent` is set should use `console.log` / `console.warn`.
-- `extensions`: Command context extensions for plugin functionality (available in v0.27.0+).
+- `extensions`: Command context extensions for plugin functionality.
 - `validationError`: Contains validation errors from argument parsing if any occurred.
 
 #### Tracking Explicitly Provided Arguments
