@@ -58,24 +58,24 @@ Before writing any Gunshi code, first read `node_modules/gunshi/AGENTS.md`
 
 ### Guides and API References
 
-The guide for coding agents links to the guides and the API references of `@gunshi/docs`. To let your AI agent read them in Markdown, install the documentation package as a dev dependency, at the same version as `gunshi`:
+The guide for coding agents links to the guides and the API references of `@gunshi/docs`. To let your AI agent read them in Markdown, install the documentation package as a dev dependency, at the same version as `gunshi`. Replace `<gunshi version>` with the `version` of `node_modules/gunshi/package.json`:
 
 ::: code-group
 
 ```sh [npm]
-npm install --save-dev @gunshi/docs
+npm install --save-dev @gunshi/docs@<gunshi version>
 ```
 
 ```sh [pnpm]
-pnpm add -D @gunshi/docs
+pnpm add -D @gunshi/docs@<gunshi version>
 ```
 
 ```sh [yarn]
-yarn add -D @gunshi/docs
+yarn add -D @gunshi/docs@<gunshi version>
 ```
 
 ```sh [bun]
-bun add -D @gunshi/docs
+bun add -D @gunshi/docs@<gunshi version>
 ```
 
 :::
