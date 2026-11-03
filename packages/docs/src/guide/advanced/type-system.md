@@ -1,8 +1,8 @@
 # Type System
 
-Gunshi v0.27 introduces a powerful type parameter system that provides comprehensive type safety across all core functions: `cli`, `define`, `lazy`, and `plugin`.
+Gunshi has a type parameter system that provides type safety across its core functions: `cli`, `define`, `lazy`, and `plugin`.
 
-This enhancement brings TypeScript's full type-checking capabilities to your CLI applications, ensuring compile-time safety for command arguments and plugin extensions.
+It brings TypeScript's type checking to your CLI applications, ensuring compile-time safety for command arguments and plugin extensions.
 
 This guide focuses on type safety for command definitions and their arguments. If you're creating custom plugins and need to understand the `plugin` function's type system, refer to the [Plugin Type System](../plugin/type-system.md) guide.
 
@@ -13,9 +13,9 @@ This guide focuses on type safety for command definitions and their arguments. I
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
-## Overview of v0.27 Type System
+## Overview of the Type System
 
-The v0.27 release provides comprehensive type safety through:
+The type system provides type safety through:
 
 - **Core Functions**: `define` and `lazy` provide excellent type inference for standard commands
 - **Plugin Extension Support**: `defineWithTypes` and `lazyWithTypes` enable type declarations for plugin extensions
