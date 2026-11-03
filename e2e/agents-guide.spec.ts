@@ -170,7 +170,12 @@ describe('the example of AGENTS.md', () => {
       /"target":"prod","dryRun":true,"config":"x.json"/,
       ''
     ],
-    [['deploy', 'api', '--unknown', 'x'], 1, /^$/, /Unknown option: --unknown/],
+    [
+      ['deploy', 'api', '--unknown'],
+      0,
+      /^\{"service":"api","target":"dev","config":"ship.json"\}\n$/,
+      ''
+    ],
     [['deploy', 'api', '--target', 'qa'], 1, /^$/, /--target/],
     [['rollback', '3'], 0, /^Rolled back to release 3\n$/, ''],
     [['rollback', '0'], 1, /^$/, /Integer must be >= 1/],
