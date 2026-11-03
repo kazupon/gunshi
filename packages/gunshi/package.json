@@ -32,6 +32,7 @@
   },
   "type": "module",
   "files": [
+    "AGENTS.md",
     "lib",
     "skills"
   ],
