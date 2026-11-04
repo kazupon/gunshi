@@ -78,8 +78,8 @@ await cli(process.argv.slice(2), main, {
 - A command without `run` prints nothing when it is run by itself. Give a command that only groups sub-commands a `run` that says how to use them, as `ship` above
 - The `args` of a command are its own, so the sub-commands do not see the `args` of the main command. For an option of every command, spread shared arguments as above
 - Give `name` and `version` to `cli()`. The usage shows the name (`COMMAND` without it), and `--version` prints the version
-- An option that a command does not declare is ignored. To report it as an error, give `strict: true` to `cli()`
-- Gunshi prints the errors of the arguments (a missing or invalid argument, an unknown command, and with `strict: true`, an unknown option) to stderr, sets the exit code to 1, and calls the `onErrorCommand` option of `cli()` with them. To use another exit code, such as 2 for a usage error, set `process.exitCode` in `onErrorCommand`
+- An option that a command does not declare is not an error by default: Gunshi ignores it. When the CLI must report an unknown option, such as a typo, as an error, give `strict: true` to `cli()`
+- Gunshi prints the errors of the arguments to stderr: a missing or invalid argument and an unknown command, and an unknown option only with `strict: true`. It sets the exit code to 1, and calls the `onErrorCommand` option of `cli()` with them. To use another exit code, such as 2 for a usage error, set `process.exitCode` in `onErrorCommand`. When the usage errors include an unknown option, also give `strict: true`
 - For your own errors, print the message with `console.error()`, set `process.exitCode = 1`, and return. An error thrown from `run` ends in a stack trace
 - Gunshi does not read environment variables. To fall back to one, give the option no `default`, and write the order yourself: `ctx.values.region ?? process.env.SHIP_REGION ?? 'us-east-1'`
 - `cli()` prints the usage for `--help` and the version for `--version` itself, and also returns that text. Do not print what it returns
