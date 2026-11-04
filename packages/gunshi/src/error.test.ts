@@ -340,7 +340,7 @@ describe('isArgsValidationError', () => {
       code = ArgsValidationErrorKeys.requiredOption
       values = { name: 'foo' }
       constructor() {
-        super("Optional argument '--foo' is required")
+        super("Option '--foo' is required")
         this.name = 'foo'
         Object.defineProperty(this, ARGS_VALIDATION_ERROR_BRAND, { value: true })
       }
@@ -352,7 +352,7 @@ describe('isArgsValidationError', () => {
   })
 
   test('does not match an unbranded subclass that overrides name', () => {
-    const error = Object.assign(new Error("Optional argument '--foo' is required"), {
+    const error = Object.assign(new Error("Option '--foo' is required"), {
       name: 'foo',
       code: ArgsValidationErrorKeys.requiredOption,
       values: { name: 'foo' }

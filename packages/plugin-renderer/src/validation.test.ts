@@ -23,15 +23,12 @@ test('basic', async () => {
     }
   })
   const error = new AggregateError([
-    new Error(`Optional argument '--dependency' or '-d' is required`),
-    new Error(`Optional argument '--alias' or '-a' is required`)
+    new Error(`Option '--dependency' or '-d' is required`),
+    new Error(`Option '--alias' or '-a' is required`)
   ])
 
   await expect(renderValidationErrors(ctx, error)).resolves.toEqual(
-    [
-      `Optional argument '--dependency' or '-d' is required`,
-      `Optional argument '--alias' or '-a' is required`
-    ].join('\n')
+    [`Option '--dependency' or '-d' is required`, `Option '--alias' or '-a' is required`].join('\n')
   )
 })
 
@@ -204,7 +201,7 @@ test('args validation error uses i18n resource', async () => {
     }
   })
   const error = new AggregateError([
-    new ArgsValidationError(`Optional argument '--id' is required`, {
+    new ArgsValidationError(`Option '--id' is required`, {
       code: ArgsValidationErrorKeys.requiredOption,
       values: {
         displayName: "'--id'"
@@ -234,7 +231,7 @@ async function createI18nContext(locale: string, resource?: Record<string, strin
 function createMissingValueError(withHint: boolean): AggregateError {
   return new AggregateError([
     new ArgsValidationError(
-      `Optional argument '--port' or '-p' requires a value${withHint ? " (to pass '-5' as its value, write '--port=-5')" : ''}`,
+      `Option '--port' or '-p' requires a value${withHint ? " (to pass '-5' as its value, write '--port=-5')" : ''}`,
       {
         code: ArgsValidationErrorKeys.missingValue,
         values: {
@@ -293,7 +290,7 @@ test('only a missing value gets the hint', async () => {
     'err:arg:invalid-type': '{$displayName} の値が不正です'
   })
   const error = new AggregateError([
-    new ArgsValidationError(`Optional argument '--port' should be 'number'`, {
+    new ArgsValidationError(`Invalid value for '--port': expected number`, {
       code: ArgsValidationErrorKeys.invalidType,
       values: { displayName: "'--port'", next: '-5', suggestion: '--port=-5' }
     })

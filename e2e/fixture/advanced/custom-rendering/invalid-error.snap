@@ -1,6 +1,6 @@
 ❌ ERROR:
 ═════════
-  • Optional argument '--add' or '-a' requires a value
+  • Option '--add' or '-a' requires a value
 
 Please correct the above errors and try again.
 Run 'task-manager --help' for usage information.
