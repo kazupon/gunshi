@@ -64,7 +64,6 @@
     "fix:oxlint": "oxlint --type-aware --type-check --fix",
     "lint": "pnpm run \"/^lint:/\"",
     "lint:eslint": "eslint . --cache",
-    "lint:jsr": "pnpm -r --workspace-concurrency=1 --if-present lint:jsr",
     "lint:knip": "knip",
     "lint:oxfmt": "oxfmt . --check --config ./node_modules/@kazupon/prettier-config/index.json",
     "lint:oxlint": "oxlint --type-aware --type-check",

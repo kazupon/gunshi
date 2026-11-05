@@ -33,8 +33,6 @@ supportedArchitectures:
 catalog:
   typescript: ^6.0.3
   zod: ^4.4.3
-  jsr: ^0.14.3
-  jsr-exports-lint: ^0.4.2
   publint: ^0.3.20
   tsdown: 0.22.14
   "@types/node": ^26.0.0

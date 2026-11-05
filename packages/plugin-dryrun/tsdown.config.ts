@@ -1,4 +1,3 @@
-import { lintJsrExports } from 'jsr-exports-lint/tsdown'
 import { defineConfig } from 'tsdown'
 
 import type { UserConfig } from 'tsdown'
@@ -12,9 +11,6 @@ const config: UserConfig = defineConfig({
   fixedExtension: false,
   deps: {
     neverBundle: ['@gunshi/plugin']
-  },
-  hooks: {
-    'build:done': lintJsrExports()
   }
 })
 

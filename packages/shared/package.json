@@ -51,14 +51,11 @@
   },
   "scripts": {
     "build": "tsdown",
-    "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build"
   },
   "devDependencies": {
     "@gunshi/resources": "workspace:*",
     "gunshi": "workspace:*",
-    "jsr": "catalog:",
-    "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
     "tsdown": "catalog:"
   }

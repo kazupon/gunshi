@@ -111,7 +111,6 @@
   },
   "scripts": {
     "build": "tsdown",
-    "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build"
   },
   "devDependencies": {
@@ -122,8 +121,6 @@
     "@gunshi/shared": "workspace:*",
     "@types/node": "catalog:",
     "args-tokens": "catalog:",
-    "jsr": "catalog:",
-    "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
     "std-env": "^4.1.0",
     "tsdown": "catalog:",

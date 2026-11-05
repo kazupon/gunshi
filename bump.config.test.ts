@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import config from './bump.config.ts'
 
 test('bumpp config writes generated notes before the release commit', () => {
-  expect(config.files).toEqual(['package.json', 'packages/**/package.json', 'packages/**/jsr.json'])
+  expect(config.files).toEqual(['package.json', 'packages/**/package.json'])
   expect(config.all).toBe(true)
   expect(config.commit).toBe('release: v%s')
   expect(config.tag).toBe(true)

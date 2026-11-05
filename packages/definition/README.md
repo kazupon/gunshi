@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > utilities for gunshi command definition
 
@@ -81,6 +80,4 @@ About details, See the below official docs sections:
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/definition?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/definition@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/definition
-[jsr-href]: https://jsr.io/@gunshi/definition
 [install-size-src]: https://pkg-size.dev/badge/install/23122

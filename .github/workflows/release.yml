@@ -19,7 +19,6 @@ on:
         options:
           - all
           - npm-publish
-          - jsr-publish
           - release-notes
       tag:
         description: Existing tag to release (e.g. v0.30.9). Required for workflow_dispatch.
@@ -87,8 +86,7 @@ jobs:
         # automatically. Skip a version that is already published, so that a retry
         # with workflow_dispatch is idempotent. A version that npm is still
         # scanning is not found by `pnpm view`, so do not retry this job until npm
-        # serves the versions. `jsr-publish` waits for them, and `release-notes`
-        # should be retried only after both publish jobs succeed.
+        # serves the versions. Retry `release-notes` only after this job succeeds.
         env:
           DIST_TAG: ${{ steps.meta.outputs.dist_tag }}
         run: |
@@ -112,113 +110,21 @@ jobs:
             popd > /dev/null
           done
 
-  jsr-publish:
-    name: Publish to JSR
-    # JSR cannot resolve `workspace:*` directly, so `scripts/jsr.ts` rewrites
-    # each package.json to pin internal deps to the release version. The
-    # subsequent `pnpm install` then has to fetch (for example) `gunshi@0.32.0`
-    # from npm — which only exists once `npm-publish` has finished. Make this
-    # job depend on `npm-publish` and only run after it succeeds (or, for
-    # workflow_dispatch retry, skip the `needs` check via `always()`).
-    needs: [npm-publish]
-    if: >-
-      always() && (
-        (github.event_name == 'push' && needs.npm-publish.result == 'success') ||
-        (github.event_name == 'workflow_dispatch' &&
-          (inputs.job == 'all' || inputs.job == 'jsr-publish'))
-      )
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # JSR OIDC
-    env:
-      # Since pnpm 11, `pnpm exec` first installs the dependencies when they are
-      # out of date (`verifyDepsBeforeRun: install`), which fails on CI with the
-      # frozen lockfile. This job rewrites each package.json on purpose, and
-      # installs them again after that, so the check must not run in between.
-      pnpm_config_verify_deps_before_run: 'false'
-    steps:
-      - name: Checkout codes
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ env.TAG }}
-          persist-credentials: false
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Setup node.js
-        # zizmor: ignore[cache-poisoning] cache key is the pnpm-lock.yaml hash
-        # and `pnpm install --frozen-lockfile` re-verifies integrity, so a
-        # poisoned cache cannot influence what gets published to JSR.
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 26
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
-      - name: Rewrite workspace:* to pinned versions for JSR
-        # JSR does not resolve `workspace:*`, so `scripts/jsr.ts` rewrites the
-        # dependencies in the package.json of each package to the actual versions.
-        run: |
-          for PKG in packages/*/; do
-            [[ "$PKG" == "packages/docs/" ]] && continue
-            pnpm exec tsx ./scripts/jsr.ts --package "${PKG%/}" --tag latest
-          done
-
-      - name: Wait until rewritten packages are visible on npm
-        # jsr.ts pins workspace deps to the release version, so the next
-        # `pnpm install` fetches them from npm. npm serves a new version only
-        # after its publish-time malware scan, usually about five minutes and
-        # sometimes much longer, so wait-npm.ts waits for up to 30 minutes. The
-        # release of v1.0.0-beta.2 timed out with the former 5 minutes.
-        run: pnpm exec tsx ./scripts/wait-npm.ts
-
-      - name: Re-install with rewritten package.json
-        # `--ignore-scripts` skips the build scripts of esbuild and others, since
-        # `allowBuilds` of the workspace is not read in the dlx context.
-        run: pnpm install --no-frozen-lockfile --ignore-scripts
-
-      - name: Publish each package to JSR
-        # Skip a version that is already published, so that a retry with
-        # workflow_dispatch is idempotent.
-        run: |
-          for PKG in packages/*/; do
-            [[ "$PKG" == "packages/docs/" ]] && continue
-            pushd "$PKG" > /dev/null
-            scope=$(node -p "require('./jsr.json').name")
-            version=$(node -p "require('./jsr.json').version")
-            if pnpm exec jsr show "$scope@$version" > /dev/null 2>&1; then
-              echo "↺ $scope@$version already published, skipping"
-            else
-              echo "⚡ Publishing $scope@$version to JSR"
-              pnpm exec jsr publish -c jsr.json --allow-dirty
-            fi
-            popd > /dev/null
-          done
-
   release-notes:
     name: Create GitHub Release
-    needs: [npm-publish, jsr-publish]
+    needs: [npm-publish]
     # Runs when:
-    # - tag push and both publish jobs succeeded, OR
-    # - workflow_dispatch with job=release-notes (publish jobs are skipped), OR
-    # - workflow_dispatch with job=all and both publish jobs succeeded
+    # - tag push and the publish job succeeded, OR
+    # - workflow_dispatch with job=release-notes (the publish job is skipped), OR
+    # - workflow_dispatch with job=all and the publish job succeeded
     # CHANGELOG.md is already in the tagged commit from `pnpm release`.
     if: >-
       always() && (
         (github.event_name == 'push' &&
-          needs.npm-publish.result == 'success' &&
-          needs.jsr-publish.result == 'success') ||
+          needs.npm-publish.result == 'success') ||
         (github.event_name == 'workflow_dispatch' && inputs.job == 'release-notes') ||
         (github.event_name == 'workflow_dispatch' && inputs.job == 'all' &&
-          needs.npm-publish.result == 'success' &&
-          needs.jsr-publish.result == 'success')
+          needs.npm-publish.result == 'success')
       )
     runs-on: ubuntu-latest
     permissions:

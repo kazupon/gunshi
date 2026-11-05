@@ -30,7 +30,7 @@ pnpm test:plugin-i18n           # i18n plugin
 pnpm test:plugin-renderer       # Renderer plugin
 pnpm test:plugin-completion     # Completion plugin
 
-# Run linters (oxlint, ESLint, oxfmt, Knip, JSR checks)
+# Run linters (oxlint, ESLint, oxfmt, Knip)
 pnpm lint
 
 # Auto-fix lint and formatting issues (oxlint, ESLint, oxfmt, Knip)
@@ -62,25 +62,25 @@ The repository contains the following packages:
 
 - **`packages/gunshi/`** - Main library with CLI runtime, command system, and built-in plugins
   - Exports: `cli`, `define`, `defineWithTypes`, `lazy`, `lazyWithTypes`, `plugin`, `createCommandContext`
-  - Published to: npm, JSR
+  - Published to: npm
 
 - **`packages/bone/`** - Minimal gunshi distribution without plugins (`@gunshi/bone`)
   - Smaller bundle size for lightweight CLIs
-  - Published to: npm, JSR
+  - Published to: npm
 
 - **`packages/definition/`** - Command definition utilities (`@gunshi/definition`)
   - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers
-  - Published to: npm, JSR
+  - Published to: npm
 
 - **`packages/combinators/`** - Parser combinators for argument schemas (`@gunshi/combinators`)
   - Composable factories such as `string`, `integer`, `required`, `withDefault`, `args`
   - Same exports as `gunshi/combinators`
-  - Published to: npm, JSR
+  - Published to: npm
 
 - **`packages/plugin/`** - Plugin development kit (`@gunshi/plugin`)
   - Type definitions and APIs for creating plugins
   - Same exports as `gunshi/plugin` but with smaller footprint
-  - Published to: npm, JSR
+  - Published to: npm
 
 ### Support Packages
 
@@ -218,7 +218,6 @@ When creating plugins:
    - ESLint for JSDoc, comments, Markdown, JSON, YAML, and Vue files
    - oxfmt for formatting, using the Prettier config from `@kazupon/prettier-config`
    - Knip for unused files, exports, and dependencies
-   - JSR export validation
 
 ### Testing Requirements
 
@@ -275,7 +274,6 @@ When creating plugins:
 - Features:
   - TypeScript compilation with declaration files
   - Publint validation
-  - JSR export validation
   - Multi-entry support
 
 ### Build Commands
@@ -290,8 +288,7 @@ pnpm build:plugin:global        # Build specific plugin
 
 Packages are published to:
 
-- **npm**: For Node.js users (`npm install gunshi`)
-- **JSR**: For Deno/Bun users (`deno add jsr:@kazupon/gunshi`)
+- **npm**: For Node.js and Bun users (`npm install gunshi`)
 
 ## Important Notes
 

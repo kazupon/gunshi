@@ -55,7 +55,6 @@
   "scripts": {
     "build": "tsdown",
     "build:docs": "tsx ../../scripts/api-references.ts",
-    "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build"
   },
   "dependencies": {
@@ -66,8 +65,6 @@
   },
   "devDependencies": {
     "@gunshi/shared": "workspace:*",
-    "jsr": "catalog:",
-    "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
     "tsdown": "catalog:"
   }
