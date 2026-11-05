@@ -92,14 +92,11 @@ const command = define({
     // Show usage information, with the header as its title.
     // To show the header alone, such as before the output of a command, call `global.showHeader()`
     global.showUsage()
-
-    // Show validation errors
-    if (ctx.validationError) {
-      global.showValidationErrors(ctx.validationError)
-    }
   }
 })
 ```
+
+The extension also has `showValidationErrors()`, which the plugin calls itself to report the errors of the arguments before the command would run. A command does not run when its arguments are wrong, so it never sees those errors in `ctx.validationError`. To act on them, such as to use another exit code, use the [`onErrorCommand` hook](./command-hooks.md#handling-argument-validation-errors).
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
