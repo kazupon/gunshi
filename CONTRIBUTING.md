@@ -74,7 +74,7 @@ GH_TOKEN="$(gh auth token)" pnpm release
 
 Do not leave unrelated tracked changes: bumpp commits every tracked dirty file (`all: true`). `CHANGELOG.md` must already be tracked. The future tag must not exist locally or remotely.
 
-`pnpm release` generates changelog notes for the current `HEAD` (the commit before the release commit). GitHub Actions then publishes npm/JSR from the tag and creates the GitHub Release. It does not rewrite or commit `CHANGELOG.md`.
+`pnpm release` generates changelog notes for the current `HEAD` (the commit before the release commit). GitHub Actions then publishes the packages to npm from the tag and creates the GitHub Release. It does not rewrite or commit `CHANGELOG.md`.
 
 If GitHub Release creation fails after publish, re-run the Release workflow with `job=release-notes` and the existing tag. The `"changelog"` script (`gh-changelogen --repo=kazupon/gunshi`) is published-release mode for manual recovery and requires `--tag`.
 

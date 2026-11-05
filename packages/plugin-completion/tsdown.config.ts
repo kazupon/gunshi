@@ -1,4 +1,3 @@
-import { lintJsrExports } from 'jsr-exports-lint/tsdown'
 import license from 'rollup-plugin-license'
 import { defineConfig } from 'tsdown'
 
@@ -18,10 +17,7 @@ const config: UserConfig = defineConfig({
       banner:
         '/*! license ISC \n * @author Bombshell team and Bombshell contributors\n * Bombshell related codes are forked from @bombsh/tab\n */\n'
     })
-  ],
-  hooks: {
-    'build:done': lintJsrExports()
-  }
+  ]
 })
 
 export default config

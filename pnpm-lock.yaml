@@ -170,12 +170,6 @@ catalogs:
     args-tokens:
       specifier: 1.0.2
       version: 1.0.2
-    jsr:
-      specifier: ^0.14.3
-      version: 0.14.3
-    jsr-exports-lint:
-      specifier: ^0.4.2
-      version: 0.4.2
     publint:
       specifier: ^0.3.20
       version: 0.3.21
@@ -313,12 +307,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -331,12 +319,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -349,12 +331,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -427,12 +403,6 @@ importers:
       args-tokens:
         specifier: 'catalog:'
         version: 1.0.2
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -451,12 +421,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -488,12 +452,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -510,12 +468,6 @@ importers:
         specifier: workspace:*
         version: link:../plugin
     devDependencies:
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -532,12 +484,6 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -572,12 +518,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       messageformat:
         specifier: 4.1.0
         version: 4.1.0
@@ -600,12 +540,6 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -628,12 +562,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -646,12 +574,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -667,12 +589,6 @@ importers:
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -3877,22 +3793,6 @@ packages:
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
-  jsr-exports-lint@0.4.2:
-    resolution: {integrity: sha512-CyMLNmmq1PKOPr2VtcwvDZF67jkkOq+DVhPdAi/kzr5N1HGZ/iNqSJq2z3eG000BANzi8EKkLOLZqGijm+2VwQ==}
-    engines: {node: '>= 20'}
-    peerDependencies:
-      tsdown: '>=0.9.6'
-      unbuild: '>=1.0.0'
-    peerDependenciesMeta:
-      tsdown:
-        optional: true
-      unbuild:
-        optional: true
-
-  jsr@0.14.3:
-    resolution: {integrity: sha512-PGxnDepx7vwJoZQe2SHbyBiFfpGwsOKmX4kn/wZZqfMafV7fjXqTxSaX6lp9QHYkSTLKkER+P/wmrZY3gVJNzg==}
-    hasBin: true
-
   katex@0.16.47:
     resolution: {integrity: sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==}
     hasBin: true
@@ -4248,10 +4148,6 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  node-stream-zip@1.15.0:
-    resolution: {integrity: sha512-LN4fydt9TqhZhThkZIVQnF9cwjU3qmUH9h78Mx/K7d3VvfRqqwthLwJEUOEL0QPZ0XQmNN7be5Ggit5+4dq3Bw==}
-    engines: {node: '>=0.12.0'}
-
   non-layered-tidy-tree-layout@2.0.2:
     resolution: {integrity: sha512-gkXMxRzUH+PB0ax9dUN0yYF0S25BqeAYqhgMaLUFmpXLEk7Fcu8f4emJuOAY0V8kjDICxROIKsTAKsV/v355xw==}
 
@@ -4545,10 +4441,6 @@ packages:
   section-matter@1.0.0:
     resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}
     engines: {node: '>=4'}
-
-  semiver@1.1.0:
-    resolution: {integrity: sha512-QNI2ChmuioGC1/xjyYwyZYADILWyW6AmS1UH6gDj/SFUUUS4MBAWs/7mxnkRPc/F4iHezDP+O8t0dO8WHiEOdg==}
-    engines: {node: '>=6'}
 
   semver@7.8.2:
     resolution: {integrity: sha512-c8jsqUZm3omBOI66G90z1Dyw5z622G8oLG+omfsHBJf3CWQTlOcwOjvOG6wtiNfW6anKm/eA39LMwMtMez2TiQ==}
@@ -7433,17 +7325,6 @@ snapshots:
 
   jsonc-parser@3.3.1: {}
 
-  jsr-exports-lint@0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13))):
-    dependencies:
-      picocolors: 1.1.1
-    optionalDependencies:
-      tsdown: 0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13))
-
-  jsr@0.14.3:
-    dependencies:
-      node-stream-zip: 1.15.0
-      semiver: 1.1.0
-
   katex@0.16.47:
     dependencies:
       commander: 8.3.0
@@ -8010,8 +7891,6 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  node-stream-zip@1.15.0: {}
-
   non-layered-tidy-tree-layout@2.0.2:
     optional: true
 
@@ -8445,8 +8324,6 @@ snapshots:
     dependencies:
       extend-shallow: 2.0.1
       kind-of: 6.0.3
-
-  semiver@1.1.0: {}
 
   semver@7.8.2: {}
 

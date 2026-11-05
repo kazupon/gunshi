@@ -6,7 +6,6 @@
 [![Version][npm-version-src]][npm-version-href]
 [![CI][ci-src]][ci-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 Gunshi is a modern javascript command-line library
 
@@ -167,8 +166,6 @@ The development of Gunshi is supported by my OSS sponsors!
 
 [npm-version-src]: https://img.shields.io/npm/v/gunshi?style=flat
 [npm-version-href]: https://npmjs.com/package/gunshi
-[jsr-src]: https://jsr.io/badges/@gunshi/gunshi
-[jsr-href]: https://jsr.io/@gunshi/gunshi
 [install-size-src]: https://pkg-size.dev/badge/install/72346
 [ci-src]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml/badge.svg
 [ci-href]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml

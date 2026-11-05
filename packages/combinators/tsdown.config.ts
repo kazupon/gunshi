@@ -1,4 +1,3 @@
-import { lintJsrExports } from 'jsr-exports-lint/tsdown'
 import { defineConfig } from 'tsdown'
 
 import type { UserConfig } from 'tsdown'
@@ -19,9 +18,6 @@ const config: UserConfig = defineConfig({
     dts: {
       alwaysBundle: ['args-tokens', 'args-tokens/combinators']
     }
-  },
-  hooks: {
-    'build:done': lintJsrExports()
   }
 })
 

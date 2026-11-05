@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > internationalization (i18n) plugin for gunshi.
 
@@ -758,6 +757,4 @@ See the [API References](./docs/index.md)
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-i18n?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/plugin-i18n@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/plugin-i18n
-[jsr-href]: https://jsr.io/@gunshi/plugin-i18n
 [install-size-src]: https://pkg-size.dev/badge/install/67599

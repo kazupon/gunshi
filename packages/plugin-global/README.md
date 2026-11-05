@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > global options plugin for gunshi.
 
@@ -178,6 +177,4 @@ See the [API References](./docs/index.md)
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-global?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/plugin-global@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/plugin-global
-[jsr-href]: https://jsr.io/@gunshi/plugin-global
 [install-size-src]: https://pkg-size.dev/badge/install/39632
