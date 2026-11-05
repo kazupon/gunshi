@@ -1142,9 +1142,7 @@ test('enum optional argument', async () => {
     })
   ).resolves.toBeUndefined()
   expect(process.exitCode).toBe(1)
-  expect(stderr()).toEqual(
-    `Optional argument '--foo' should be chosen from 'enum' ["a", "b", "c"] values`
-  )
+  expect(stderr()).toEqual(`Invalid value for '--foo': expected one of "a", "b", "c"`)
 })
 
 describe('args validation i18n', () => {
@@ -1339,7 +1337,7 @@ describe('args validation i18n', () => {
     ).resolves.toBeUndefined()
 
     expect(stderr()).toEqual(
-      "Optional argument '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+      "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
     )
   })
 
@@ -2002,7 +2000,7 @@ describe('command lifecycle hooks', () => {
     expect(executionOrder).toEqual(['before', 'error'])
     expect(mockCommand).not.toHaveBeenCalled()
     expect(capturedError).toBeInstanceOf(AggregateError)
-    expect(stderr()).toBe(`Optional argument '--id' is required`)
+    expect(stderr()).toBe(`Option '--id' is required`)
     expect(process.exitCode).toBe(1)
   })
 
@@ -2266,10 +2264,10 @@ describe('command lifecycle hooks', () => {
 
       expect(mockCommand).not.toHaveBeenCalled()
       expect(capturedError?.errors.map((error: Error) => error.message)).toEqual([
-        `Optional argument '--id' is required`,
+        `Option '--id' is required`,
         'Unknown option: --bad'
       ])
-      expect(stderr()).toBe(`Optional argument '--id' is required\nUnknown option: --bad`)
+      expect(stderr()).toBe(`Option '--id' is required\nUnknown option: --bad`)
     })
 
     test('localizes unknown option validation errors with i18n plugin', async () => {
@@ -3075,7 +3073,7 @@ describe('github issues', () => {
 
       await expect(cli([], command, options)).rejects.toMatchObject({
         errors: expect.arrayContaining([
-          expect.objectContaining({ message: "Optional argument '--target' is required" })
+          expect.objectContaining({ message: "Option '--target' is required" })
         ])
       })
 
@@ -4337,7 +4335,7 @@ describe('reported validation errors', () => {
     await expect(cli([], { args, run })).resolves.toBeUndefined()
 
     expect(run).not.toHaveBeenCalled()
-    expect(stderr()).toBe(`Optional argument '--id' is required`)
+    expect(stderr()).toBe(`Option '--id' is required`)
     expect(stdout()).toBe('')
     expect(process.exitCode).toBe(1)
   })

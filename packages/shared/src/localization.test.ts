@@ -75,7 +75,7 @@ describe('without translation function', () => {
       await localize('err:arg:required-option', {
         displayName: "'--id'"
       })
-    ).toEqual("Optional argument '--id' is required")
+    ).toEqual("Option '--id' is required")
     expect(await localize('err:arg:not-found')).toEqual('err:arg:not-found')
   })
 

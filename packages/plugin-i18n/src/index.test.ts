@@ -77,7 +77,7 @@ describe('extension: translate', () => {
         extension.translate('err:arg:required-option', {
           displayName: "'--id'"
         })
-      ).toEqual("Optional argument '--id' is required")
+      ).toEqual("Option '--id' is required")
       expect(
         extension.translate('err:suggestion:did-you-mean', {
           name: '--allow-reload'
