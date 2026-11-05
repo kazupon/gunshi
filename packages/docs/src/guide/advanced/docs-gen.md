@@ -288,7 +288,6 @@ You can automate documentation generation as part of your build process:
 > [!NOTE]
 > The following example uses Node.js-specific `__dirname` approach. For cross-runtime compatibility:
 >
-> - **Deno**: Use `import.meta.dirname` or `fromFileUrl(import.meta.url)`
 > - **Bun**: Use `import.meta.dir` or Node.js-compatible approach
 
 <!-- eslint-enable markdown/no-missing-label-refs -->

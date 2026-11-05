@@ -34,7 +34,6 @@ packages/docs/README.md
 generated-docs
 playground/advanced/docs-gen/**/*.md
 playground/advanced/docs-gen/**/*.1
-importmap.json
 
 .todo.md
 .notes/**

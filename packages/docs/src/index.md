@@ -20,7 +20,7 @@ hero:
 features:
   - icon: 📏
     title: Simple & Universal
-    details: Run commands with simple API and support for universal runtime (Node.js, Deno, Bun).
+    details: Run commands with simple API and support for universal runtime (Node.js, Bun).
 
   - icon: ⚙️
     title: Declarative & Type Safe

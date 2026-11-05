@@ -20,9 +20,6 @@ pnpm add @gunshi/plugin-i18n
 # yarn
 yarn add @gunshi/plugin-i18n
 
-# deno
-deno add jsr:@gunshi/plugin-i18n
-
 # bun
 bun add @gunshi/plugin-i18n
 ```

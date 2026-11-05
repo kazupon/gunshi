@@ -3,10 +3,11 @@
  * @license MIT
  */
 
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import {
   detectRuntimeFromGlobals,
   joinExecParts,
+  quoteExec,
   resolveBunExecParts,
   resolveNodeExecParts,
   shellQuote
@@ -52,6 +53,20 @@ describe('detectRuntimeFromGlobals', () => {
         process: createProcess()
       })
     ).toBe('node')
+  })
+})
+
+describe('quoteExec', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  test('throws on Deno', () => {
+    vi.stubGlobal('Deno', {})
+
+    expect(() => quoteExec()).toThrow(
+      new Error('Deno runtime is not supported for completion script generation.')
+    )
   })
 })
 

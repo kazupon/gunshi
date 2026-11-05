@@ -39,7 +39,7 @@ function markReported(ctx: object, error: object): boolean {
 }
 
 /**
- * Set the exit code of the process, where the runtime has one (Node.js, Bun and Deno 2 have `process`).
+ * Set the exit code of the process, where the runtime has one (Node.js and Bun have `process`).
  * The core does not call the APIs of a runtime, so the plugin, which reports the errors, sets it.
  *
  * @param code - The exit code

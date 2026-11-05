@@ -55,8 +55,7 @@
     "build": "tsdown",
     "build:docs": "tsx ../../scripts/api-references.ts",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
-    "prepack": "pnpm build",
-    "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@gunshi/plugin": "workspace:*"
@@ -67,7 +66,6 @@
   "devDependencies": {
     "@gunshi/plugin-i18n": "workspace:*",
     "@gunshi/resources": "workspace:*",
-    "deno": "catalog:",
     "gunshi": "workspace:*",
     "jsr": "catalog:",
     "jsr-exports-lint": "catalog:",

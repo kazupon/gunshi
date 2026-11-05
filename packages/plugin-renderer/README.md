@@ -20,9 +20,6 @@ pnpm add @gunshi/plugin-renderer
 # yarn
 yarn add @gunshi/plugin-renderer
 
-# deno
-deno add jsr:@gunshi/plugin-renderer
-
 # bun
 bun add @gunshi/plugin-renderer
 ```

@@ -20,9 +20,6 @@ pnpm add @gunshi/plugin-global
 # yarn
 yarn add @gunshi/plugin-global
 
-# deno
-deno add jsr:@gunshi/plugin-global
-
 # bun
 bun add @gunshi/plugin-global
 ```

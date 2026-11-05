@@ -93,10 +93,6 @@ pnpm add @gunshi/plugin
 yarn add @gunshi/plugin
 ```
 
-```sh [deno]
-deno add jsr:@gunshi/plugin
-```
-
 ```sh [bun]
 bun add @gunshi/plugin
 ```

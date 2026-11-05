@@ -35,9 +35,6 @@ pnpm add @gunshi/bone
 ## yarn
 yarn add @gunshi/bone
 
-## deno
-deno add jsr:@gunshi/bone
-
 ## bun
 bun add @gunshi/bone
 ```

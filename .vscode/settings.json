@@ -15,6 +15,5 @@
   },
   "typescript.referencesCodeLens.enabled": false,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "deno.enable": false,
   "typescript.experimental.useTsgo": false
 }

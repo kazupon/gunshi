@@ -230,7 +230,7 @@ export function quoteExec(): string {
       return joinExecParts(resolveNodeExecParts(globals.process!))
     }
     case 'deno': {
-      throw new Error('Deno runtime is not supported for completion script generation yet.')
+      throw new Error('Deno runtime is not supported for completion script generation.')
     }
     case 'bun': {
       return joinExecParts(resolveBunExecParts(globals.process!))

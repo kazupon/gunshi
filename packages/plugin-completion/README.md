@@ -13,7 +13,7 @@ This completion plugin is powered by [`@bomb.sh/tab`](https://github.com/bombshe
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!WARNING]
-> This package supports Node.js and Bun runtimes only. Deno support is not available yet.
+> This package supports Node.js and Bun runtimes only.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -28,9 +28,6 @@ pnpm add @gunshi/plugin-completion
 
 # yarn
 yarn add @gunshi/plugin-completion
-
-# deno
-deno add jsr:@gunshi/plugin-completion
 
 # bun
 bun add @gunshi/plugin-completion

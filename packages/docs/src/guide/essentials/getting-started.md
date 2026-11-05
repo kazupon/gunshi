@@ -202,20 +202,6 @@ function entry() {
 await cli(process.argv.slice(2), entry)
 ```
 
-### Deno
-
-In Deno, use `Deno.args` to access command-line arguments:
-
-```ts [cli.ts]
-import { cli } from '@gunshi/gunshi'
-
-function entry() {
-  console.log('Hello, Gunshi with Deno!')
-}
-
-await cli(Deno.args, entry)
-```
-
 ### Bun
 
 Bun also provides `Bun.argv` similar to Node.js:

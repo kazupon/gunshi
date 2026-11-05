@@ -170,9 +170,6 @@ catalogs:
     args-tokens:
       specifier: 1.0.2
       version: 1.0.2
-    deno:
-      specifier: ^2.7.14
-      version: 2.8.2
     jsr:
       specifier: ^0.14.3
       version: 0.14.3
@@ -313,9 +310,6 @@ importers:
       '@gunshi/plugin-renderer':
         specifier: workspace:*
         version: link:../plugin-renderer
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -334,9 +328,6 @@ importers:
 
   packages/combinators:
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -355,9 +346,6 @@ importers:
 
   packages/definition:
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -439,9 +427,6 @@ importers:
       args-tokens:
         specifier: 'catalog:'
         version: 1.0.2
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       jsr:
         specifier: 'catalog:'
         version: 0.14.3
@@ -463,9 +448,6 @@ importers:
 
   packages/plugin:
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -503,9 +485,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -531,9 +510,6 @@ importers:
         specifier: workspace:*
         version: link:../plugin
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       jsr:
         specifier: 'catalog:'
         version: 0.14.3
@@ -556,9 +532,6 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       jsr:
         specifier: 'catalog:'
         version: 0.14.3
@@ -596,9 +569,6 @@ importers:
       '@intlify/core-base':
         specifier: 12.0.0-alpha.7
         version: 12.0.0-alpha.7
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -630,9 +600,6 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       jsr:
         specifier: 'catalog:'
         version: 0.14.3
@@ -658,9 +625,6 @@ importers:
       '@gunshi/resources':
         specifier: workspace:*
         version: link:../resources
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -682,9 +646,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       jsr:
         specifier: 'catalog:'
         version: 0.14.3
@@ -703,9 +664,6 @@ importers:
       '@gunshi/resources':
         specifier: workspace:*
         version: link:../resources
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -1073,38 +1031,6 @@ packages:
 
   '@chevrotain/utils@11.1.2':
     resolution: {integrity: sha512-4mudFAQ6H+MqBTfqLmU7G1ZwRzCLfJEooL/fsF6rCX5eePMbGhoy5n4g+G4vlh2muDcsCTJtL+uKbOzWxs5LHA==}
-
-  '@deno/darwin-arm64@2.8.2':
-    resolution: {integrity: sha512-uKMHut+8weqKm4x5tQUrosaPye3mxYQ1RdHx8i8dnassdvjbGMudPCbQm/x/CmC8EWw32NmDNkCnqdm0vd2Tww==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@deno/darwin-x64@2.8.2':
-    resolution: {integrity: sha512-W+GmuIpoZGxhWMC18cWodhxMW/akh4DcLSttagHbbThLQ6I5P74VA89zebng/RR5Zb3kuF2xlwZRPcxaLjBywA==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@deno/linux-arm64-glibc@2.8.2':
-    resolution: {integrity: sha512-rTh+olsxsrJhe+rEbdeJh3OvVBH9q0TrFMkxPMiIs+DnZsQm3l4dZHfZf3B9rveLHOx1I0tLdGs02dxAgx2TPA==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@deno/linux-x64-glibc@2.8.2':
-    resolution: {integrity: sha512-T04G8j2mGwkaYhtmpTwoGJnfFSDpM8GB8yxSmQMQLgqDFDeyHUy8OZKCOC2P7ZwMduBu/4TBjYQzohQHjkKjNg==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@deno/win32-arm64@2.8.2':
-    resolution: {integrity: sha512-ezzlZBJ1tBktrpcu+v8gc4Obn2zF/wVKSI+50410PUwW6y3d7h2EngUN29Rp1czeu/rDNZuboSrCWHOYsIMNxQ==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@deno/win32-x64@2.8.2':
-    resolution: {integrity: sha512-34GQ/W3hy5TTl6VQ7tTXcnDckLyh2AK//ig7ELDT8UpUj2e7HvIhrX1ve0wz+fXYXrxft5+4f4dlMGDQUEKu+Q==}
-    cpu: [x64]
-    os: [win32]
 
   '@docsearch/css@4.7.0':
     resolution: {integrity: sha512-Sk5xkdRFeE7PeWjG9l4AfTwdvMfr9wHiwNNCpHXT4v4SNyNMKdHGvEILc31BgaVFGDDNbv5u/a73tofRiwbEZw==}
@@ -3458,10 +3384,6 @@ packages:
   delaunator@5.1.0:
     resolution: {integrity: sha512-AGrQ4QSgssa1NGmWmLPqN5NY2KajF5MqxetNEO+o0n3ZwZZeTmt7bBnvzHWrmkZFxGgr4HdyFgelzgi06otLuQ==}
 
-  deno@2.8.2:
-    resolution: {integrity: sha512-IMcdZBfJpzVEfc3N7obg+irBAHNKD3igwE7rX6I2MB3BiA9exHOh7DzH6XrOJgIp9nszyHfKyYL+EFBryVxPOA==}
-    hasBin: true
-
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
@@ -5237,24 +5159,6 @@ snapshots:
 
   '@chevrotain/utils@11.1.2': {}
 
-  '@deno/darwin-arm64@2.8.2':
-    optional: true
-
-  '@deno/darwin-x64@2.8.2':
-    optional: true
-
-  '@deno/linux-arm64-glibc@2.8.2':
-    optional: true
-
-  '@deno/linux-x64-glibc@2.8.2':
-    optional: true
-
-  '@deno/win32-arm64@2.8.2':
-    optional: true
-
-  '@deno/win32-x64@2.8.2':
-    optional: true
-
   '@docsearch/css@4.7.0': {}
 
   '@docsearch/js@4.7.0': {}
@@ -7016,15 +6920,6 @@ snapshots:
   delaunator@5.1.0:
     dependencies:
       robust-predicates: 3.0.3
-
-  deno@2.8.2:
-    optionalDependencies:
-      '@deno/darwin-arm64': 2.8.2
-      '@deno/darwin-x64': 2.8.2
-      '@deno/linux-arm64-glibc': 2.8.2
-      '@deno/linux-x64-glibc': 2.8.2
-      '@deno/win32-arm64': 2.8.2
-      '@deno/win32-x64': 2.8.2
 
   dequal@2.0.3: {}
 
