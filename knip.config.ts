@@ -27,16 +27,9 @@ export default {
       ]
     }
   },
-  ignore: [
-    'playground/deno/main.ts',
-    '**/src/**.test-d.ts',
-    'bench/**',
-    'design/**/*.ts',
-    'playground/**'
-  ],
+  ignore: ['**/src/**.test-d.ts', 'bench/**', 'design/**/*.ts', 'playground/**'],
   ignoreDependencies: [
     'lint-staged',
-    'deno',
     'mitata',
     'gunshi019',
     '@kazupon/prettier-config',

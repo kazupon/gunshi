@@ -3,7 +3,6 @@ packages:
   - playground/**
   - "!playground/bun"
 allowBuilds:
-  deno: true
   esbuild: true
   oxc-resolver: true
   rolldown: true
@@ -34,7 +33,6 @@ supportedArchitectures:
 catalog:
   typescript: ^6.0.3
   zod: ^4.4.3
-  deno: ^2.7.14
   jsr: ^0.14.3
   jsr-exports-lint: ^0.4.2
   publint: ^0.3.20
@@ -45,7 +43,6 @@ catalog:
   args-tokens: 1.0.2
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
-  - deno
   - zod
   - knip
   - publint

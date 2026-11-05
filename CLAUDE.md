@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Gunshi is a modern JavaScript command-line library for creating CLI applications. It supports multiple JavaScript runtimes (Node.js, Deno, Bun) and provides features like declarative command configuration, type safety, composable sub-commands, lazy loading, internationalization, and a powerful plugin system.
+Gunshi is a modern JavaScript command-line library for creating CLI applications. It supports multiple JavaScript runtimes (Node.js, Bun) and provides features like declarative command configuration, type safety, composable sub-commands, lazy loading, internationalization, and a powerful plugin system.
 
 This is a **pnpm workspace monorepo** containing the core library, plugins, utilities, and documentation. The project emphasizes type safety, runtime compatibility, minimal dependencies, and extensibility through a well-designed plugin architecture.
 
@@ -30,16 +30,13 @@ pnpm test:plugin-i18n           # i18n plugin
 pnpm test:plugin-renderer       # Renderer plugin
 pnpm test:plugin-completion     # Completion plugin
 
-# Run linters (oxlint, ESLint, oxfmt, Knip, JSR checks, Deno type checks)
+# Run linters (oxlint, ESLint, oxfmt, Knip, JSR checks)
 pnpm lint
 
 # Auto-fix lint and formatting issues (oxlint, ESLint, oxfmt, Knip)
 pnpm fix
 
-# Run type checking
-pnpm lint:typecheck             # Run all typecheck:* scripts (currently typecheck:deno)
-pnpm typecheck:deno             # Deno-specific type checking
-# TypeScript diagnostics are also reported by `pnpm test` (vitest --typecheck)
+# Type checking: TypeScript diagnostics are reported by `pnpm test` (vitest --typecheck)
 # and `pnpm lint` (oxlint --type-check)
 
 # Run benchmarks
@@ -169,7 +166,7 @@ packages/gunshi/src/
 - **Type Safety**: Full TypeScript support with type inference for arguments and context
 - **Plugin System**: Extensible architecture with dependency management, lifecycle hooks, and context extensions
 - **Lazy Loading**: Commands can be lazily loaded for better performance
-- **Runtime Agnostic**: Works across Node.js, Deno, and Bun; the core receives `argv` from the caller instead of calling runtime-specific APIs
+- **Runtime Agnostic**: Works across Node.js and Bun; the core receives `argv` from the caller instead of calling runtime-specific APIs
 
 ### Playground Examples
 
@@ -178,8 +175,7 @@ playground/
 ├── essentials/           # Basic CLI examples
 ├── advanced/             # Advanced features (sub-commands, lazy loading, parser combinators)
 ├── plugins/              # Plugin usage examples
-├── bun/                  # Bun runtime examples
-└── deno/                 # Deno runtime examples
+└── bun/                  # Bun runtime examples
 ```
 
 ## Plugin System
@@ -223,7 +219,6 @@ When creating plugins:
    - oxfmt for formatting, using the Prettier config from `@kazupon/prettier-config`
    - Knip for unused files, exports, and dependencies
    - JSR export validation
-   - Deno type checking
 
 ### Testing Requirements
 
@@ -302,11 +297,10 @@ Packages are published to:
 
 ### Multi-Runtime Support
 
-- The project supports Node.js, Deno, and Bun
-- The core does not call runtime-specific APIs directly. Callers pass the arguments, e.g. `process.argv.slice(2)`, `Deno.args`, or `Bun.argv.slice(2)`
+- The project supports Node.js and Bun
+- The core does not call runtime-specific APIs directly. Callers pass the arguments, e.g. `process.argv.slice(2)` or `Bun.argv.slice(2)`
 - Plugins that need runtime detection implement it themselves (e.g. `packages/plugin-completion/src/utils.ts`)
 - Always test changes across all supported runtimes when modifying core functionality
-- Use `pnpm typecheck:deno` for Deno-specific type checking
 
 ### Parser & Resolver Changes
 

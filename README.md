@@ -21,7 +21,7 @@ Gunshi is a modern javascript command-line library
 
 Gunshi is designed to simplify the creation of modern command-line interfaces:
 
-- 📏 **Simple & Universal**: Run commands with simple API and support for universal runtime (Node.js, Deno, Bun).
+- 📏 **Simple & Universal**: Run commands with simple API and support for universal runtime (Node.js, Bun).
 - ⚙️ **Declarative & Type Safe**: Configure commands declaratively with full TypeScript support and type-safe argument parsing by [args-tokens](https://github.com/kazupon/args-tokens)
 - 🧩 **Composable & Lazy**: Create modular sub-commands with context sharing and lazy loading for better performance.
 - 🎨 **Flexible Rendering**: Customize usage generation, validation errors, and help messages with pluggable renderers.
@@ -40,9 +40,6 @@ pnpm add gunshi
 
 ## yarn
 yarn add gunshi
-
-## deno
-deno add jsr:@gunshi/gunshi
 
 ## bun
 bun add gunshi

@@ -32,9 +32,6 @@ pnpm add @gunshi/combinators
 ## yarn
 yarn add @gunshi/combinators
 
-## deno
-deno add jsr:@gunshi/combinators
-
 ## bun
 bun add @gunshi/combinators
 ```

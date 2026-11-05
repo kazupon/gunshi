@@ -16,9 +16,6 @@ pnpm add @gunshi/resources
 # yarn
 yarn add @gunshi/resources
 
-# deno
-deno add jsr:@gunshi/resources
-
 # bun
 bun add @gunshi/resources
 ```

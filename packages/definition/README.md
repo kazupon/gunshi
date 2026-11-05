@@ -32,9 +32,6 @@ pnpm add @gunshi/definition
 ## yarn
 yarn add @gunshi/definition
 
-## deno
-deno add jsr:@gunshi/definition
-
 ## bun
 bun add @gunshi/definition
 ```

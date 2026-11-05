@@ -28,11 +28,6 @@
         "onFail": "error"
       },
       {
-        "name": "deno",
-        "version": ">=2",
-        "onFail": "ignore"
-      },
-      {
         "name": "bun",
         "version": ">=1.1",
         "onFail": "ignore"
@@ -67,15 +62,13 @@
     "fix:knip": "knip --fix --no-exit-code",
     "fix:oxfmt": "oxfmt . --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
     "fix:oxlint": "oxlint --type-aware --type-check --fix",
-    "gen:importmap": "pnpm exec tsx scripts/importmap.ts",
     "lint": "pnpm run \"/^lint:/\"",
     "lint:eslint": "eslint . --cache",
     "lint:jsr": "pnpm -r --workspace-concurrency=1 --if-present lint:jsr",
     "lint:knip": "knip",
     "lint:oxfmt": "oxfmt . --check --config ./node_modules/@kazupon/prettier-config/index.json",
     "lint:oxlint": "oxlint --type-aware --type-check",
-    "lint:typecheck": "pnpm run \"/^typecheck:/\"",
-    "prepare": "git config --local core.hooksPath .githooks && pnpm run gen:importmap",
+    "prepare": "git config --local core.hooksPath .githooks",
     "preview:docs": "pnpm -F @gunshi/docs preview",
     "release": "bumpp",
     "test": "vitest --typecheck run",
@@ -85,8 +78,7 @@
     "test:plugin-global": "vitest --typecheck run packages/plugin-global",
     "test:plugin-i18n": "vitest --typecheck run packages/plugin-i18n",
     "test:plugin-renderer": "vitest --typecheck run packages/plugin-renderer",
-    "test:plugin-suggestion": "vitest --typecheck run packages/plugin-suggestion",
-    "typecheck:deno": "pnpm -r --if-present typecheck:deno"
+    "test:plugin-suggestion": "vitest --typecheck run packages/plugin-suggestion"
   },
   "devDependencies": {
     "@eslint/markdown": "^8.0.1",

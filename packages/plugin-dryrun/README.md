@@ -20,9 +20,6 @@ pnpm add @gunshi/plugin-dryrun
 # yarn
 yarn add @gunshi/plugin-dryrun
 
-# deno
-deno add jsr:@gunshi/plugin-dryrun
-
 # bun
 bun add @gunshi/plugin-dryrun
 ```
