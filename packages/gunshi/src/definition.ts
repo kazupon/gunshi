@@ -6,6 +6,8 @@
  * - `defineWithTypes`: A function to define a command with specific type parameters.
  * - `lazy`: A function to lazily load a command.
  * - `lazyWithTypes`: A function to lazily load a command with specific type parameters.
+ * - `CommandError` and `isCommandError`: An error for the failures that a command expects, and its guard.
+ * - `jsonArgs`: The argument that a command spreads into its `args` to support `--json`.
  * - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
  *
  * @example
@@ -44,12 +46,15 @@ import type {
   ExtractArgs,
   ExtractExtensions,
   GunshiParamsConstraint,
+  HasJsonArgs,
   LazyCommand,
   NormalizeToGunshiParams,
   Prettify
 } from './types.ts'
 
 export { createCommandContext } from './context.ts'
+export { CommandError, isCommandError } from './error.ts'
+export { jsonArgs } from './json.ts'
 
 export type {
   Args,
@@ -58,13 +63,17 @@ export type {
   Command,
   CommandLoader,
   CommandRunner,
+  CommandRunnerResult,
   DefaultGunshiParams,
   ExtendContext,
   GunshiParams,
-  LazyCommand
+  JsonResult,
+  LazyCommand,
+  SubCommandable
 } from './types.ts'
 
 export type { CommandContextParams } from './context.ts'
+export type { CommandErrorOptions } from './error.ts'
 
 /**
  * The result type of the {@link define} function
@@ -200,6 +209,18 @@ export function defineWithTypes<G extends GunshiParamsConstraint>(): DefineWithT
 }
 
 /**
+ * A definition that does not spread `jsonArgs`. A definition that does is checked by the overload that ties the
+ * runner to its arguments.
+ *
+ * @internal
+ */
+type WithoutJsonArgs<D> = D extends { args: infer A }
+  ? HasJsonArgs<A> extends true
+    ? never
+    : unknown
+  : unknown
+
+/**
  * Define a {@link LazyCommand | lazy command}.
  *
  * @example
@@ -273,7 +294,7 @@ export function lazy<
 export function lazy<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
   D extends Partial<Command<G>> = Partial<Command<G>>
->(loader: CommandLoader<G>, definition?: D): LazyCommand<G, D>
+>(loader: CommandLoader<G>, definition?: D & WithoutJsonArgs<D>): LazyCommand<G, D>
 
 /**
  * Define a {@link LazyCommand | lazy command} with or without definition.

@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > internationalization (i18n) plugin for gunshi.
 
@@ -19,9 +18,6 @@ pnpm add @gunshi/plugin-i18n
 
 # yarn
 yarn add @gunshi/plugin-i18n
-
-# deno
-deno add jsr:@gunshi/plugin-i18n
 
 # bun
 bun add @gunshi/plugin-i18n
@@ -112,6 +108,7 @@ This means:
 - If you're using the globals plugin (which adds `--help` and `--version` options), the i18n plugin will automatically handle their translations
 - The translations for "Display this help message" and "Display this version" will be available in your configured locale
 - You can override these translations by providing your own `help` and `version` keys in your built-in resources
+- The description of `--json` of a command that spreads `jsonArgs` ("Output the result as JSON") is translated by the `json` key of the built-in resources in the same way, unless the resource of the command has its own `arg:json`
 
 Example with globals plugin:
 
@@ -761,6 +758,4 @@ See the [API References](./docs/index.md)
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-i18n?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/plugin-i18n@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/plugin-i18n
-[jsr-href]: https://jsr.io/@gunshi/plugin-i18n
 [install-size-src]: https://pkg-size.dev/badge/install/67599

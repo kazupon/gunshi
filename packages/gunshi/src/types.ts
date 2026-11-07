@@ -3,6 +3,7 @@
  * @license MIT
  */
 
+import type { JSON_ARG } from './constants.ts'
 import type { ArgExplicitlyProvided, ArgSchema, ArgToken, Args, ArgValues } from 'args-tokens'
 import type { Plugin } from './plugin/core.ts'
 
@@ -213,7 +214,11 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    * (they are still returned as strings) and to silence {@linkcode CommandContext.log}.
    *
    * Output that must still appear — machine-readable results for an agent, warnings for the
-   * CLI author — should use `console.log` / `console.warn`, not `ctx.log`.
+   * CLI author — should use `console.log` / `console.warn`, not `ctx.log`. A command that spreads
+   * `jsonArgs` and is given `--json` prints its result, and its errors, as JSON even with it.
+   *
+   * The validation errors, and a `CommandError` that the command throws, are not printed either, so
+   * `cli()` rejects with them, for the caller to report them.
    *
    * @default false
    * @see {@linkcode CliOptions.usageSilent}
@@ -276,7 +281,8 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   onBeforeCommand: ((ctx: Readonly<CommandContext<G>>) => Awaitable<void>) | undefined
   /**
-   * Hook that runs after successful command execution
+   * Hook that runs after successful command execution. It receives the result of the command only
+   * when it is a string.
    *
    * @see {@linkcode CliOptions.onAfterCommand}
    * @since v0.27.0
@@ -347,10 +353,12 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * (they are still returned as strings) and to silence {@linkcode CommandContext.log}.
    *
    * Output that must still appear — machine-readable results for an agent, warnings for the
-   * CLI author — should use `console.log` / `console.warn`, not `ctx.log`.
+   * CLI author — should use `console.log` / `console.warn`, not `ctx.log`. A command that spreads
+   * `jsonArgs` and is given `--json` prints its result, and its errors, as JSON even with it.
    *
-   * The validation errors are not printed either, so `cli()` rejects with them, for the caller to
-   * report them (see {@linkcode CliOptions.renderValidationErrors}).
+   * The validation errors, and a `CommandError` that the command throws, are not printed either, so
+   * `cli()` rejects with them, for the caller to report them (see
+   * {@linkcode CliOptions.renderValidationErrors}). The exit code is left alone.
    *
    * @default false
    */
@@ -361,6 +369,10 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * When enabled, option tokens that are not declared by the resolved command
    * arguments or installed global options are reported as validation errors
    * before the command runner is executed.
+   *
+   * `--json` is not reported, since gunshi knows what it means: given to a command that does not
+   * spread `jsonArgs`, the global options plugin reports `json_not_supported` for it instead, with or
+   * without `strict`. `--json=false` asks for no JSON, and is reported.
    *
    * @default false
    */
@@ -381,6 +393,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Set it to `null` to report the validation errors yourself: nothing is printed, and `cli()` rejects
    * with the `AggregateError`. A renderer that returns an empty message, and
    * {@linkcode CliOptions.usageSilent}, also leave them to the caller.
+   *
+   * With `--json`, the plugin prints the validation errors as one line of JSON, and does not call
+   * the renderer. `null` and {@linkcode CliOptions.usageSilent} still leave them to the caller.
    */
   renderValidationErrors?:
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
@@ -409,15 +424,17 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Hook that runs after successful command execution
    *
    * @param ctx - The command context
-   * @param result - The command execution result
+   * @param result - The result of the command, when it is a string. The result of a command that
+   * prints JSON with `--json` is printed, not passed, so it is `undefined`
    * @since v0.27.0
    */
   onAfterCommand?: (ctx: Readonly<CommandContext<G>>, result: string | undefined) => Awaitable<void>
   /**
    * Hook that runs when a command throws an error, or when the arguments fail validation
    *
-   * For the validation errors that the global options plugin has printed, the exit code is already `1`
-   * when the hook runs, so the hook can set another one, and `cli()` resolves after it. Any other
+   * For the validation errors and a `CommandError` that the global options plugin has printed, the
+   * exit code is already set when the hook runs (`1` for the validation errors, and the `exitCode` of
+   * a `CommandError`), so the hook can set another one, and `cli()` resolves after it. Any other
    * error rejects `cli()` after the hook.
    *
    * @param ctx - The command context
@@ -521,9 +538,11 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    */
   toKebab?: boolean
   /**
-   * Output a message.
+   * Output a message for people.
    *
-   * If {@linkcode CommandEnvironment.usageSilent} is true, the message is not output.
+   * If {@linkcode CommandEnvironment.usageSilent} is true, the message is not output. Nor is it when a
+   * command that spreads `jsonArgs` is asked for JSON with `--json`, so that stdout has the JSON only:
+   * the hooks and the plugins get the same function.
    *
    * @param message - an output message, see {@linkcode console.log}
    * @param optionalParams - an optional parameters, see {@linkcode console.log}
@@ -800,11 +819,49 @@ export type CommandExamplesFetcher<G extends GunshiParamsConstraint = DefaultGun
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *
  * @param ctx - A {@link CommandContext | command context}
- * @returns void or string (for CLI output)
+ * @returns The result of a command that spreads `jsonArgs`, an object keyed by a noun, which is printed
+ * as JSON with `--json`. For any other command, a string, which `cli()` returns, or nothing. See
+ * {@linkcode CommandRunnerResult}.
  */
 export type CommandRunner<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
   ctx: Readonly<CommandContext<G>>
-) => Awaitable<string | void>
+) => CommandRunnerResult<G>
+
+/**
+ * The result of a command that supports `--json`: an object keyed by a noun, such as
+ * `{ project }` or `{ projects }`, so that fields can be added later. The global options plugin prints
+ * it with `JSON.stringify`, so convert what JSON cannot hold, such as a `Map` or a `BigInt`, yourself.
+ */
+export type JsonResult = Record<string, unknown>
+
+/**
+ * Whether the arguments have the `json` of `jsonArgs`.
+ *
+ * @typeParam A - The arguments of a command
+ */
+export type HasJsonArgs<A> = [A] extends [{ readonly json: { readonly [JSON_ARG]: true } }]
+  ? true
+  : false
+
+/**
+ * What the runner of a command returns: its result for a command that spreads `jsonArgs`, otherwise a string or
+ * nothing.
+ *
+ * @typeParam G - A type extending {@linkcode GunshiParams}
+ */
+export type CommandRunnerResult<G extends GunshiParamsConstraint = DefaultGunshiParams> =
+  IsAnyArgs<ExtractArgs<G>> extends true
+    ? Awaitable<string | void | JsonResult>
+    : HasJsonArgs<ExtractArgs<G>> extends true
+      ? Awaitable<JsonResult>
+      : Awaitable<string | void>
+
+/**
+ * Whether the arguments are `any`, as in `CommandRunner<any>`. Then a runner may return anything it could before.
+ *
+ * @internal
+ */
+type IsAnyArgs<A> = 0 extends 1 & A ? true : false
 
 /**
  * Command loader.
@@ -825,6 +882,10 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
  *
  * A function that wraps a command runner to add or modify its behavior.
  *
+ * The decorated runner returns what the base runner returns, as it is: the result of a command that
+ * spreads `jsonArgs` must reach the global options plugin, which prints it as JSON with `--json`. A
+ * decorator prints with `ctx.log`, which is silenced then.
+ *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context.
  *
  * @param baseRunner - The base command runner to decorate
@@ -833,8 +894,8 @@ export type CommandLoader<G extends GunshiParamsConstraint = DefaultGunshiParams
  * @since v0.27.0
  */
 export type CommandDecorator<G extends GunshiParamsConstraint = DefaultGunshiParams> = (
-  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>
-) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void>
+  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void | JsonResult>
+) => (ctx: Readonly<CommandContext<G>>) => Awaitable<string | void | JsonResult>
 
 /**
  * Renderer decorator type.

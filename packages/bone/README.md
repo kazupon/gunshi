@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > gunshi minimum
 
@@ -34,9 +33,6 @@ pnpm add @gunshi/bone
 
 ## yarn
 yarn add @gunshi/bone
-
-## deno
-deno add jsr:@gunshi/bone
 
 ## bun
 bun add @gunshi/bone
@@ -74,6 +70,4 @@ await cli(process.argv.slice(2), entry, {
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/bone?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/bone@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/bone
-[jsr-href]: https://jsr.io/@gunshi/bone
 [install-size-src]: https://pkg-size.dev/badge/install/57026

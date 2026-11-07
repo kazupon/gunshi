@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > plugin development kit for gunshi
 
@@ -26,6 +25,4 @@ About details, See [the plugin development guides](https://gunshi.dev/guide/plug
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/plugin@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/plugin
-[jsr-href]: https://jsr.io/@gunshi/plugin
 [install-size-src]: https://pkg-size.dev/badge/install/27672

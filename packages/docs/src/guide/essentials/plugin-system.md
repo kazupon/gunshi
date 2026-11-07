@@ -108,11 +108,6 @@ pnpm add @gunshi/plugin-i18n
 yarn add @gunshi/plugin-i18n
 ```
 
-```sh [deno]
-# For Deno projects, you can add Gunshi from JSR:
-deno add jsr:@gunshi/plugin-i18n
-```
-
 ```sh [bun]
 bun add @gunshi/plugin-i18n
 ```
@@ -222,10 +217,6 @@ pnpm add @gunshi/plugin-suggestion
 yarn add @gunshi/plugin-suggestion
 ```
 
-```sh [deno]
-deno add jsr:@gunshi/plugin-suggestion
-```
-
 ```sh [bun]
 bun add @gunshi/plugin-suggestion
 ```
@@ -305,7 +296,7 @@ yarn add @gunshi/plugin-completion
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!IMPORTANT]
-> Shell completion supports Node.js and Bun, including Bun single-file executables built with `bun build --compile`. The completion feature is not available yet when running your CLI with Deno.
+> Shell completion supports Node.js and Bun, including Bun single-file executables built with `bun build --compile`. The completion feature is not supported on Deno.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -402,10 +393,6 @@ pnpm add @gunshi/plugin-dryrun
 
 ```sh [yarn]
 yarn add @gunshi/plugin-dryrun
-```
-
-```sh [deno]
-deno add jsr:@gunshi/plugin-dryrun
 ```
 
 ```sh [bun]

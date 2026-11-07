@@ -2,11 +2,10 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > global options plugin for gunshi.
 
-This plugin provides standard global options (`--help` and `--version`) for all commands in your CLI application. It's installed by default in gunshi, ensuring consistent behavior across all CLI applications.
+This plugin provides standard global options (`--help` and `--version`) for all commands in your CLI application, and the JSON output of `--json` for the commands that spread `jsonArgs`. It's installed by default in gunshi, ensuring consistent behavior across all CLI applications.
 
 ## 💿 Installation
 
@@ -19,9 +18,6 @@ pnpm add @gunshi/plugin-global
 
 # yarn
 yarn add @gunshi/plugin-global
-
-# deno
-deno add jsr:@gunshi/plugin-global
 
 # bun
 bun add @gunshi/plugin-global
@@ -78,6 +74,16 @@ When these options are used:
 - **With `--help`**: The command execution is bypassed, and the usage information is displayed instead
 - **With `--version`**: The command execution is bypassed, and only the version number is printed
 
+### JSON Output
+
+A command that spreads `jsonArgs` from `gunshi` into its arguments accepts `--json`. With it, this plugin:
+
+- prints the result that the command returns from `run`, an object keyed by a noun, as one JSON document to stdout
+- prints an error as one line of JSON to stderr, with `status`, `reason`, `message`, `next` and `data`, and leaves stdout empty
+- stops a command that does not spread `jsonArgs` before it runs, with `json_not_supported`, when `--json` is given to it
+
+`--json` is not a global option: the commands that support it declare it. For the details, see [JSON Output](https://gunshi.dev/guide/essentials/json-output).
+
 ### Commands That Take the Name
 
 `help` and `version` are not reserved. A command may declare an argument of its own under either name, and gunshi merges the arguments of a command over the global options, so the command's argument wins:
@@ -122,6 +128,8 @@ Available extensions:
 > The `Awaitable<T>` type used in the method signatures below is equivalent to `T | Promise<T>`, meaning the methods can return either a value directly or a Promise that resolves to that value.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
+
+`showVersion()`, `showHeader()` and `showUsage()` print with `ctx.log`. When a command that spreads `jsonArgs` is asked for JSON with `--json`, they print nothing and return the text only.
 
 - **`showVersion(): string`**: Display the application version. Returns `'unknown'` if no version is specified in the CLI configuration.
 
@@ -181,6 +189,4 @@ See the [API References](./docs/index.md)
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-global?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/plugin-global@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/plugin-global
-[jsr-href]: https://jsr.io/@gunshi/plugin-global
 [install-size-src]: https://pkg-size.dev/badge/install/39632

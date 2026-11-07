@@ -1,6 +1,8 @@
+import { parseArgs, resolveArgs } from 'args-tokens'
 import { describe, expect, test } from 'vitest'
 import { lazy } from './definition.ts'
-import { isLazyCommand, resolveLazyCommand } from './utils.ts'
+import { jsonArgs } from './json.ts'
+import { isJsonArg, isLazyCommand, resolveJsonRequest, resolveLazyCommand } from './utils.ts'
 
 import type { Args, Command, CommandRunner } from './types.ts'
 
@@ -206,5 +208,83 @@ describe('resolveLazyCommand', () => {
     expect(resolved.args).toEqual({ target: { type: 'string' } })
     expect(resolved.name).toBeUndefined()
     expect(resolved.run).toBeUndefined()
+  })
+})
+
+describe('isJsonArg', () => {
+  test('recognizes the json argument of jsonArgs by its mark', () => {
+    expect(isJsonArg(jsonArgs.json)).toBe(true)
+    // spreading keeps the mark, so a short name can be added
+    expect(isJsonArg({ ...jsonArgs.json, short: 'j' })).toBe(true)
+  })
+
+  test.each([
+    { title: 'a json argument of its own', schema: { type: 'boolean' } },
+    { title: 'the mark set to a string', schema: { type: 'boolean', '~gunshi.json-arg': 'true' } },
+    { title: 'undefined', schema: undefined },
+    { title: 'null', schema: null }
+  ])('does not recognize $title', ({ schema }) => {
+    expect(isJsonArg(schema)).toBe(false)
+  })
+})
+
+describe('resolveJsonRequest', () => {
+  /**
+   * Resolve the request for a command line, as the core and the global options plugin see it.
+   *
+   * @param args - The arguments of the command
+   * @param argv - The command line
+   * @param withTokens - Whether to pass the raw tokens, as the global options plugin does
+   * @returns The request
+   */
+  function resolve(args: Args, argv: string[], withTokens = true) {
+    const tokens = parseArgs(argv)
+    // as the core resolves them
+    const { values } = resolveArgs(args, tokens, { shortGrouping: true })
+    return resolveJsonRequest(args, values, withTokens ? tokens : undefined)
+  }
+
+  const short = {
+    json: { ...jsonArgs.json, short: 'j' },
+    verbose: { type: 'boolean', short: 'v' }
+  } satisfies Args
+
+  test.each([
+    { argv: ['--json'], expected: 'declared' },
+    { argv: ['--json=true'], expected: 'declared' },
+    { argv: ['-j'], expected: 'declared' },
+    { argv: ['-vj'], expected: 'declared' },
+    { argv: ['-j', '--', 'x'], expected: 'declared' },
+    { argv: ['--json=false'], expected: undefined },
+    { argv: ['--', '--json'], expected: undefined },
+    { argv: [], expected: undefined }
+  ])('a command that spreads jsonArgs: $argv is $expected', ({ argv, expected }) => {
+    expect(resolve(short, argv)).toBe(expected)
+    // the core passes no tokens, and comes to the same answer
+    expect(resolve(short, argv, false)).toBe(expected)
+  })
+
+  test.each([
+    { argv: ['--json'], expected: 'undeclared' },
+    { argv: ['--json=true'], expected: 'undeclared' },
+    { argv: ['--json=false'], expected: undefined },
+    { argv: ['--', '--json'], expected: undefined },
+    // without a declaration, a short name of --json is not known
+    { argv: ['-j'], expected: undefined }
+  ])('a command without a json argument: $argv is $expected', ({ argv, expected }) => {
+    expect(resolve({ verbose: { type: 'boolean' } }, argv)).toBe(expected)
+    // the core passes no tokens, and never takes --json for a request of such a command
+    expect(resolve({ verbose: { type: 'boolean' } }, argv, false)).toBeUndefined()
+  })
+
+  test("a json argument of its own is the command's", () => {
+    expect(resolve({ json: { type: 'boolean' } }, ['--json'])).toBeUndefined()
+  })
+
+  test('reads the raw tokens when the core left the values empty', () => {
+    // the core cannot resolve the command, and leaves the values empty then
+    const tokens = parseArgs(['--json'])
+    expect(resolveJsonRequest({ ...jsonArgs }, {}, tokens)).toBe('declared')
+    expect(resolveJsonRequest({ ...jsonArgs }, {})).toBeUndefined()
   })
 })

@@ -3,7 +3,11 @@
  * @license MIT
  */
 
+import { JSON_ARG } from './constants.ts'
+
 import type {
+  Args,
+  ArgToken,
   Command,
   Commandable,
   DefaultGunshiParams,
@@ -12,6 +16,84 @@ import type {
 } from './types.ts'
 
 export { kebabnize } from 'args-tokens/utils'
+
+/**
+ * How `--json` asks a command for JSON.
+ *
+ * - `'declared'`: the command spreads `jsonArgs` into its arguments, and `--json` asks it for JSON
+ * - `'undeclared'`: the command has no `json` argument, and `--json` is given to it
+ */
+export type JsonRequest = 'declared' | 'undeclared'
+
+/**
+ * Check whether an argument schema is the `json` argument of `jsonArgs`, by its mark.
+ *
+ * @param schema - An argument schema
+ * @returns `true` if the schema has the mark of `jsonArgs`
+ */
+export function isJsonArg(schema: unknown): boolean {
+  return (
+    typeof schema === 'object' &&
+    schema !== null &&
+    (schema as Record<string, unknown>)[JSON_ARG] === true
+  )
+}
+
+/**
+ * Resolve whether `--json` asks a command for JSON.
+ *
+ * A command that spreads `jsonArgs` is asked for JSON when the resolved value of its `json` is `true`:
+ * with `--json`, or with a short name that the command gives it, but not with `--json=false`, nor with
+ * `--json` after `--`. The raw tokens are read only when they are given, and only when there is no
+ * value to read: when the command has no `json` argument, and when the core could not resolve the
+ * command and left the values empty. A `json` argument without the mark belongs to the command, and
+ * `--json` is never taken for a request then.
+ *
+ * @param args - The arguments of the command, the global options included
+ * @param values - The resolved values of the arguments
+ * @param tokens - The raw tokens of the arguments, to find a `--json` that no argument declares
+ * @returns How the command is asked for JSON, or `undefined` when it is not
+ */
+export function resolveJsonRequest(
+  args: Readonly<Args>,
+  values: Readonly<Record<string, unknown>>,
+  tokens?: readonly ArgToken[]
+): JsonRequest | undefined {
+  const schema = Object.hasOwn(args, 'json') ? args.json : undefined
+  if (schema === undefined) {
+    return tokens !== undefined && hasJsonOption(tokens) ? 'undeclared' : undefined
+  }
+  if (!isJsonArg(schema)) {
+    return undefined
+  }
+  if (values.json !== undefined) {
+    return values.json === true ? 'declared' : undefined
+  }
+  return tokens !== undefined && hasJsonOption(tokens) ? 'declared' : undefined
+}
+
+/**
+ * Check whether the raw tokens have a `--json` that asks for JSON: `--json` or `--json=true`, before
+ * `--`. Without a declaration, a short name of `--json` is not known.
+ *
+ * @param tokens - The raw tokens of the arguments
+ * @returns `true` if a `--json` asks for JSON
+ */
+function hasJsonOption(tokens: readonly ArgToken[]): boolean {
+  for (const token of tokens) {
+    if (token.kind === 'option-terminator') {
+      return false
+    }
+    if (
+      token.kind === 'option' &&
+      token.rawName === '--json' &&
+      (token.value === undefined || token.value === 'true')
+    ) {
+      return true
+    }
+  }
+  return false
+}
 
 /**
  * Check if the given command is a {@link LazyCommand}.

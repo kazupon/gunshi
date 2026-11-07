@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > usage renderer plugin for gunshi.
 
@@ -19,9 +18,6 @@ pnpm add @gunshi/plugin-renderer
 
 # yarn
 yarn add @gunshi/plugin-renderer
-
-# deno
-deno add jsr:@gunshi/plugin-renderer
 
 # bun
 bun add @gunshi/plugin-renderer
@@ -119,7 +115,7 @@ EXAMPLES:
 
 - **`renderHeader(ctx: CommandContext): Promise<string>`**: Renders the command header section
 - **`renderUsage(ctx: CommandContext): Promise<string>`**: Renders the complete usage/help information
-- **`renderValidationErrors(ctx: CommandContext, error: AggregateError): Promise<string>`**: Renders validation errors
+- **`renderValidationErrors(ctx: CommandContext, error: AggregateError): Promise<string>`**: Renders validation errors. With `--json`, the global options plugin prints the validation errors as one line of JSON, and does not call the renderer of the validation errors
 
 ## 🧩 Context Extensions
 
@@ -270,6 +266,4 @@ See the [API References](./docs/index.md)
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-renderer?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/plugin-renderer@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/plugin-renderer
-[jsr-href]: https://jsr.io/@gunshi/plugin-renderer
 [install-size-src]: https://pkg-size.dev/badge/install/101075

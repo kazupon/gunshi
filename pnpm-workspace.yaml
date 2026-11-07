@@ -3,7 +3,6 @@ packages:
   - playground/**
   - "!playground/bun"
 allowBuilds:
-  deno: true
   esbuild: true
   oxc-resolver: true
   rolldown: true
@@ -34,18 +33,14 @@ supportedArchitectures:
 catalog:
   typescript: ^6.0.3
   zod: ^4.4.3
-  deno: ^2.7.14
-  jsr: ^0.14.3
-  jsr-exports-lint: ^0.4.2
   publint: ^0.3.20
   tsdown: 0.22.14
   "@types/node": ^26.0.0
   vitepress-api-references: ^0.4.0
   tsx: ^4.21.0
-  args-tokens: 1.0.0
+  args-tokens: 1.0.2
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
-  - deno
   - zod
   - knip
   - publint

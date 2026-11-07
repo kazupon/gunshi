@@ -98,39 +98,34 @@ Gunshi does not apply these policies automatically. Commands and plugins decide 
 
 ## Using it in a command
 
-This command requires `--target`, so an agent cannot be left waiting for an implicit prompt. When an agent is detected, the command emits a stable JSON object with an explicit status instead of human-oriented prose.
-
-`ctx.log` is silenced when `usageSilent` is set, so results that an agent or a script must still see go through `console.log`:
+This command requires `--target`, so an agent cannot be left waiting for an implicit prompt. The format of the output is explicit: the command spreads `jsonArgs`, so a caller that wants JSON passes `--json` (see [JSON Output](../essentials/json-output.md)). Agent detection only chooses a default: the command does not ask for a confirmation when an agent runs it.
 
 ```ts
-import { define } from 'gunshi'
+import { CommandError, define, jsonArgs } from 'gunshi'
 import { getAgentProfile } from 'gunshi/agent'
+import { confirm } from './prompt.ts'
 
 export default define({
   name: 'deploy',
   args: {
-    target: { type: 'string', required: true }
+    ...jsonArgs,
+    target: { type: 'string', required: true },
+    yes: { type: 'boolean', short: 'y', description: 'Skip the confirmation' }
   },
-  run: ctx => {
-    const profile = getAgentProfile()
-
-    if (profile.isAgent) {
-      // results must still appear when `usageSilent` is set; `ctx.log` would not
-      console.log(
-        JSON.stringify({
-          status: 'success',
-          target: ctx.values.target
-        })
-      )
-      return
+  run: async ctx => {
+    // an agent cannot answer a prompt, and a prompt would break the JSON of --json
+    const interactive = !getAgentProfile().isAgent && !ctx.values.json && !ctx.values.yes
+    if (interactive && !(await confirm(`Deploy to ${ctx.values.target}?`))) {
+      throw new CommandError('Deployment cancelled', { code: 'cancelled' })
     }
 
-    console.log(`Deployed to ${ctx.values.target}`)
+    ctx.log(`Deployed to ${ctx.values.target}`)
+    return { deployment: { target: ctx.values.target }, outcome: 'deployed' }
   }
 })
 ```
 
-Keep the JSON shape stable once consumers depend on it. Do not catch and discard command failures; map them to documented non-zero exit statuses in your runtime entry point so agents, scripts, and people receive the same unambiguous result.
+With `--json`, the result is printed as one JSON document, and a failure as one line of JSON on stderr, whoever runs the command. Keep the shape of the result stable once consumers depend on it. Report the failures that the command expects with `CommandError`, so that agents, scripts, and people receive the same unambiguous exit code.
 
 ## Using it in a plugin
 

@@ -7,153 +7,153 @@ importers:
     configDependencies: {}
     packageManagerDependencies:
       pnpm:
-        specifier: 12.16.0
-        version: 12.16.0
+        specifier: 12.17.0
+        version: 12.17.0
 
 packages:
 
-  '@pnpm/exe.android-arm64@12.16.0':
-    resolution: {integrity: sha512-Air4kk1RA4C8PGkkIH91eme/ERTV6xEmPfJS+OO1UMMzx7ZDeM44WGfcizGPnQbWiqfJ0l7TSttzYzQ0FvRLIA==}
+  '@pnpm/exe.android-arm64@12.17.0':
+    resolution: {integrity: sha512-gwu/F5YyoJp1bIbrIBl7B8JO3rkjkGlKikwQg9s0aVa5xWaBYIqPX+ZJqQ7I4D1YfbdI/Omfze0+6vnYiWHG6A==}
     cpu: [arm64]
     os: [android]
 
-  '@pnpm/exe.android-x64@12.16.0':
-    resolution: {integrity: sha512-MHQdX7J3b12gsBbKSV4phbGZaIAYxhIbXRS2E56XgVXpcL9R+HiQ/Aq9PDkJtNVaOaGfrFR9kzGMLF4PXk6jRw==}
+  '@pnpm/exe.android-x64@12.17.0':
+    resolution: {integrity: sha512-qUNhCvWyeBrUByNWkqqQ3Koy1gIAQ8UV5HDHXxoo5NUWVTde0Ld2BxweNwWJw8CNKpqEGceCUdjZ506JYpTjJg==}
     cpu: [x64]
     os: [android]
 
-  '@pnpm/exe.darwin-arm64@12.16.0':
-    resolution: {integrity: sha512-0kMENoYlVTxiCPWf7fXEF3EtYXUySilIC+UAe5Z7kC8keY8+ul8ddhuHjSU0e85qlKDIJfIxDYACse/Lx8It/Q==}
+  '@pnpm/exe.darwin-arm64@12.17.0':
+    resolution: {integrity: sha512-0nkEqRLIbrm7dWl+p2EPpmyNKyM0bbdPEovdtMhHYbhkO+Vls38S+6emkx8kSTAr75BNXYXkCl4RtGinGG4Erg==}
     cpu: [arm64]
     os: [darwin]
 
-  '@pnpm/exe.darwin-x64@12.16.0':
-    resolution: {integrity: sha512-jsS6Q5gTjRD4TOyyFazO/3ctRHfigGtLatfV2ZxCGd0/ZD/m/9RIT8P38oyo+r3ARHhgL7YPT8dXmj5UGd9iSA==}
+  '@pnpm/exe.darwin-x64@12.17.0':
+    resolution: {integrity: sha512-w89cboNi4KCzmt/dSKrE4ijVNKICKiZsE9TcIWf77Tz+VpoDfuhPSmWPZK+iCHBvlI/9dIN+M3HiPPVsFnAx4Q==}
     cpu: [x64]
     os: [darwin]
 
-  '@pnpm/exe.freebsd-x64@12.16.0':
-    resolution: {integrity: sha512-Rs8pV7jAhRnAzKdJWU20ECeRB4KUdV5xChUvmXyaHq+60+UfUhYVJjL0btApxX/AIBscrK/+tjP3w6RTb9RDCA==}
+  '@pnpm/exe.freebsd-x64@12.17.0':
+    resolution: {integrity: sha512-DJ0FOaUDXc71icSgiuBFEvqReqoSiS/rmnC6kltoiC3MzPyw3awcGbT/7FnnYzi/ziuoTC7v6vfBh0Vzv7VKOQ==}
     cpu: [x64]
     os: [freebsd]
 
-  '@pnpm/exe.linux-arm64-musl@12.16.0':
-    resolution: {integrity: sha512-1p8s61byKqiaDi+TatmMoxFVFPXpLwrHBI4CZBJlH2A58hi3EfqfDgWB5w2IutciGrBQ5DxVFE8VsbITnpqfUQ==}
+  '@pnpm/exe.linux-arm64-musl@12.17.0':
+    resolution: {integrity: sha512-w5ZwZ4j8S804DGhMYlLLpc+G3Kkc+5GlDO++LLvO/nDIXBTHRhdxPfQBQU08q31k0JYfp3wXCQk0Y7DnsuVF6w==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/exe.linux-arm64@12.16.0':
-    resolution: {integrity: sha512-6vwpzcLhopnnz/x537ET62PBFh8QxWsE9miRT8lhHXYuq0WVXxT6L6W0BcjZNVEQyp1WggdHq4qt8LXrdk2RFQ==}
+  '@pnpm/exe.linux-arm64@12.17.0':
+    resolution: {integrity: sha512-Cj2nIzWTVm6ZuhQHqL9SiJ11scBnEGxJyNg7tYQPzh9fVF5UVRkv+LbyfwdftnAtJerK/7HDpK/55WeQqp8OkA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-ppc64@12.16.0':
-    resolution: {integrity: sha512-58n7z+x7M/gWK+lhoRrABp0X2dYvUGhdjKb1S0UCm1I7v1KwltEvAIlWgYSyq9/jOqTp/uCtZE9dU1sP/fqs3Q==}
+  '@pnpm/exe.linux-ppc64@12.17.0':
+    resolution: {integrity: sha512-Gb//Wm15fXl+qWcxjNQmwlYDjGiJOnLU/A9uRZYmtkyZie2Yx8AHI6XkUIJioQz99TwVDKQ87ywD5Jtk8zcgyg==}
     cpu: [ppc64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-riscv64@12.16.0':
-    resolution: {integrity: sha512-N81hKRql41PisaxO0EJcmBVvGjQ+aY8vgprPhB6DFaCzohuT0EAfsc5icM/NZkdFLLaglYja8zAk3E59ToNUaA==}
+  '@pnpm/exe.linux-riscv64@12.17.0':
+    resolution: {integrity: sha512-+kItEcFjdVZEDzODsc7icb8cB+3AouCrEzOCezzxLITRhw86m9t3J/qyPdcFELBjeMnS+IXV8sJaSCQcpSqfgA==}
     cpu: [riscv64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-s390x@12.16.0':
-    resolution: {integrity: sha512-8UfyGGA9o8IqdoPtCg9c/t7Ht/ArO+T318Yomlp36WvImnBj3etnO0GKh0CPOp7fG+AvNcspxCXIr5vNjYo84w==}
+  '@pnpm/exe.linux-s390x@12.17.0':
+    resolution: {integrity: sha512-jf5ghD2uDeknWQgK/EsCFNwlyL7BYLWfXe687g5UMVFclPLt524CREZ8Yl5hf4u7p3evCIPBN/m5I1QXUmJpHw==}
     cpu: [s390x]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.linux-x64-musl@12.16.0':
-    resolution: {integrity: sha512-BCp9UPPqS9wyZmfB1CeX8ODpUaY3icHPNQvnlutDUymexM0frPxgd1Qf1iWfC+IhvszevGnVlkUqEITSMowHNw==}
+  '@pnpm/exe.linux-x64-musl@12.17.0':
+    resolution: {integrity: sha512-JGxrGSxkDkqRAUD49T9dOnKyJkQ3bWBeHnYH4o4mvj09R9eUzhWFi8oa6WPNyCO0/7/Max2gsSfgXOHj3QW7ug==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@pnpm/exe.linux-x64@12.16.0':
-    resolution: {integrity: sha512-NSZrQRBatoGG4C14DBYyQHnUGQA1fejrwoiKRnqyzFFXPFbydK8avYcLu3evb9Nry8iGIQujRnwysdCNmSFBlg==}
+  '@pnpm/exe.linux-x64@12.17.0':
+    resolution: {integrity: sha512-vQAusDzMofc/Ee4KOUYjE6FWeHOlMGQyvhR7W39QSamVeJWS16co/n+bhjdjwjI3UFh8IWOpamvTS+b4lvQUog==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@pnpm/exe.win32-arm64@12.16.0':
-    resolution: {integrity: sha512-RsPE7hktWUn+oCi5IlnpMGBBMO+Lgf+VUUgiqrBHsdmdpTk3KDOM9TA0xOgK+xwvQdLtvc28JwigR4HmGMNyIQ==}
+  '@pnpm/exe.win32-arm64@12.17.0':
+    resolution: {integrity: sha512-qDQh8rmyK5sxlaCSCADcmPrvytJabMCbxtJ0nCitzRo2j3/8BhzLjlOcWF3C6iPGhR5CbIb+btNy+VCVhd06mQ==}
     cpu: [arm64]
     os: [win32]
 
-  '@pnpm/exe.win32-x64@12.16.0':
-    resolution: {integrity: sha512-mphDCqBvSu7o8j3DqnVDkpCf0HKaKJjEdlN6ymfpxh4VUYw5SW4zQLGmvjdxUUZZb6nuU/R8bTn2rAdJdYCk5w==}
+  '@pnpm/exe.win32-x64@12.17.0':
+    resolution: {integrity: sha512-qCo1OQlE3WrFZIAUK0O5EoupLaQ1fST7zNX8Qd+Tc4ojWgCvYA/ze0uP9hox8mSFC/JPAGRSG5o8gUBSq2rRxw==}
     cpu: [x64]
     os: [win32]
 
-  pnpm@12.16.0:
-    resolution: {integrity: sha512-6czJGguNUtopfBaEH57gXz3dYxvXV+8mohFofUo43mU8YURTZJKUQ4xYvnTCumLVPmM6ThU3CMASKW0PPuJ7Ng==}
+  pnpm@12.17.0:
+    resolution: {integrity: sha512-uNIj6+wEtYContIG2qcdG8y2oe4dUu+pXMOw23UnFWHfjw2OLEOt05xewIAYr3qKlRCOcJD5Win4hye3pA/VPQ==}
     engines: {node: '>=18'}
     hasBin: true
 
 snapshots:
 
-  '@pnpm/exe.android-arm64@12.16.0':
+  '@pnpm/exe.android-arm64@12.17.0':
     optional: true
 
-  '@pnpm/exe.android-x64@12.16.0':
+  '@pnpm/exe.android-x64@12.17.0':
     optional: true
 
-  '@pnpm/exe.darwin-arm64@12.16.0':
+  '@pnpm/exe.darwin-arm64@12.17.0':
     optional: true
 
-  '@pnpm/exe.darwin-x64@12.16.0':
+  '@pnpm/exe.darwin-x64@12.17.0':
     optional: true
 
-  '@pnpm/exe.freebsd-x64@12.16.0':
+  '@pnpm/exe.freebsd-x64@12.17.0':
     optional: true
 
-  '@pnpm/exe.linux-arm64-musl@12.16.0':
+  '@pnpm/exe.linux-arm64-musl@12.17.0':
     optional: true
 
-  '@pnpm/exe.linux-arm64@12.16.0':
+  '@pnpm/exe.linux-arm64@12.17.0':
     optional: true
 
-  '@pnpm/exe.linux-ppc64@12.16.0':
+  '@pnpm/exe.linux-ppc64@12.17.0':
     optional: true
 
-  '@pnpm/exe.linux-riscv64@12.16.0':
+  '@pnpm/exe.linux-riscv64@12.17.0':
     optional: true
 
-  '@pnpm/exe.linux-s390x@12.16.0':
+  '@pnpm/exe.linux-s390x@12.17.0':
     optional: true
 
-  '@pnpm/exe.linux-x64-musl@12.16.0':
+  '@pnpm/exe.linux-x64-musl@12.17.0':
     optional: true
 
-  '@pnpm/exe.linux-x64@12.16.0':
+  '@pnpm/exe.linux-x64@12.17.0':
     optional: true
 
-  '@pnpm/exe.win32-arm64@12.16.0':
+  '@pnpm/exe.win32-arm64@12.17.0':
     optional: true
 
-  '@pnpm/exe.win32-x64@12.16.0':
+  '@pnpm/exe.win32-x64@12.17.0':
     optional: true
 
-  pnpm@12.16.0:
+  pnpm@12.17.0:
     optionalDependencies:
-      '@pnpm/exe.android-arm64': 12.16.0
-      '@pnpm/exe.android-x64': 12.16.0
-      '@pnpm/exe.darwin-arm64': 12.16.0
-      '@pnpm/exe.darwin-x64': 12.16.0
-      '@pnpm/exe.freebsd-x64': 12.16.0
-      '@pnpm/exe.linux-arm64': 12.16.0
-      '@pnpm/exe.linux-arm64-musl': 12.16.0
-      '@pnpm/exe.linux-ppc64': 12.16.0
-      '@pnpm/exe.linux-riscv64': 12.16.0
-      '@pnpm/exe.linux-s390x': 12.16.0
-      '@pnpm/exe.linux-x64': 12.16.0
-      '@pnpm/exe.linux-x64-musl': 12.16.0
-      '@pnpm/exe.win32-arm64': 12.16.0
-      '@pnpm/exe.win32-x64': 12.16.0
+      '@pnpm/exe.android-arm64': 12.17.0
+      '@pnpm/exe.android-x64': 12.17.0
+      '@pnpm/exe.darwin-arm64': 12.17.0
+      '@pnpm/exe.darwin-x64': 12.17.0
+      '@pnpm/exe.freebsd-x64': 12.17.0
+      '@pnpm/exe.linux-arm64': 12.17.0
+      '@pnpm/exe.linux-arm64-musl': 12.17.0
+      '@pnpm/exe.linux-ppc64': 12.17.0
+      '@pnpm/exe.linux-riscv64': 12.17.0
+      '@pnpm/exe.linux-s390x': 12.17.0
+      '@pnpm/exe.linux-x64': 12.17.0
+      '@pnpm/exe.linux-x64-musl': 12.17.0
+      '@pnpm/exe.win32-arm64': 12.17.0
+      '@pnpm/exe.win32-x64': 12.17.0
 
 ---
 lockfileVersion: '9.0'
@@ -168,17 +168,8 @@ catalogs:
       specifier: ^26.0.0
       version: 26.6.4
     args-tokens:
-      specifier: 1.0.0
-      version: 1.0.0
-    deno:
-      specifier: ^2.7.14
-      version: 2.8.2
-    jsr:
-      specifier: ^0.14.3
-      version: 0.14.3
-    jsr-exports-lint:
-      specifier: ^0.4.2
-      version: 0.4.2
+      specifier: 1.0.2
+      version: 1.0.2
     publint:
       specifier: ^0.3.20
       version: 0.3.21
@@ -313,18 +304,9 @@ importers:
       '@gunshi/plugin-renderer':
         specifier: workspace:*
         version: link:../plugin-renderer
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -334,18 +316,9 @@ importers:
 
   packages/combinators:
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -355,18 +328,9 @@ importers:
 
   packages/definition:
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -390,7 +354,7 @@ importers:
         version: 15.0.0(vue@3.5.43(typescript@6.0.3))
       args-tokens:
         specifier: 'catalog:'
-        version: 1.0.0
+        version: 1.0.2
       mermaid:
         specifier: ^12.0.0
         version: 12.0.0
@@ -438,16 +402,7 @@ importers:
         version: 26.6.4
       args-tokens:
         specifier: 'catalog:'
-        version: 1.0.0
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
+        version: 1.0.2
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -463,18 +418,9 @@ importers:
 
   packages/plugin:
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -503,18 +449,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -531,15 +468,6 @@ importers:
         specifier: workspace:*
         version: link:../plugin
     devDependencies:
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -556,15 +484,6 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -596,18 +515,9 @@ importers:
       '@intlify/core-base':
         specifier: 12.0.0-alpha.7
         version: 12.0.0-alpha.7
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       messageformat:
         specifier: 4.1.0
         version: 4.1.0
@@ -630,15 +540,6 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -658,18 +559,9 @@ importers:
       '@gunshi/resources':
         specifier: workspace:*
         version: link:../resources
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -682,15 +574,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -700,21 +583,15 @@ importers:
 
   packages/shared:
     devDependencies:
+      '@gunshi/plugin':
+        specifier: workspace:*
+        version: link:../plugin
       '@gunshi/resources':
         specifier: workspace:*
         version: link:../resources
-      deno:
-        specifier: 'catalog:'
-        version: 2.8.2
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
-      jsr:
-        specifier: 'catalog:'
-        version: 0.14.3
-      jsr-exports-lint:
-        specifier: 'catalog:'
-        version: 0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13)))
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -861,6 +738,12 @@ importers:
         specifier: file:../../../packages/gunshi
         version: link:../../../packages/gunshi
 
+  playground/essentials/errors:
+    dependencies:
+      gunshi:
+        specifier: file:../../../packages/gunshi
+        version: link:../../../packages/gunshi
+
   playground/essentials/getting-started/context:
     dependencies:
       gunshi:
@@ -878,6 +761,12 @@ importers:
       gunshi:
         specifier: file:../../../../packages/gunshi
         version: link:../../../../packages/gunshi
+
+  playground/essentials/json-output:
+    dependencies:
+      gunshi:
+        specifier: file:../../../packages/gunshi
+        version: link:../../../packages/gunshi
 
   playground/essentials/lazy-async/async:
     dependencies:
@@ -1073,38 +962,6 @@ packages:
 
   '@chevrotain/utils@11.1.2':
     resolution: {integrity: sha512-4mudFAQ6H+MqBTfqLmU7G1ZwRzCLfJEooL/fsF6rCX5eePMbGhoy5n4g+G4vlh2muDcsCTJtL+uKbOzWxs5LHA==}
-
-  '@deno/darwin-arm64@2.8.2':
-    resolution: {integrity: sha512-uKMHut+8weqKm4x5tQUrosaPye3mxYQ1RdHx8i8dnassdvjbGMudPCbQm/x/CmC8EWw32NmDNkCnqdm0vd2Tww==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@deno/darwin-x64@2.8.2':
-    resolution: {integrity: sha512-W+GmuIpoZGxhWMC18cWodhxMW/akh4DcLSttagHbbThLQ6I5P74VA89zebng/RR5Zb3kuF2xlwZRPcxaLjBywA==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@deno/linux-arm64-glibc@2.8.2':
-    resolution: {integrity: sha512-rTh+olsxsrJhe+rEbdeJh3OvVBH9q0TrFMkxPMiIs+DnZsQm3l4dZHfZf3B9rveLHOx1I0tLdGs02dxAgx2TPA==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@deno/linux-x64-glibc@2.8.2':
-    resolution: {integrity: sha512-T04G8j2mGwkaYhtmpTwoGJnfFSDpM8GB8yxSmQMQLgqDFDeyHUy8OZKCOC2P7ZwMduBu/4TBjYQzohQHjkKjNg==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@deno/win32-arm64@2.8.2':
-    resolution: {integrity: sha512-ezzlZBJ1tBktrpcu+v8gc4Obn2zF/wVKSI+50410PUwW6y3d7h2EngUN29Rp1czeu/rDNZuboSrCWHOYsIMNxQ==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@deno/win32-x64@2.8.2':
-    resolution: {integrity: sha512-34GQ/W3hy5TTl6VQ7tTXcnDckLyh2AK//ig7ELDT8UpUj2e7HvIhrX1ve0wz+fXYXrxft5+4f4dlMGDQUEKu+Q==}
-    cpu: [x64]
-    os: [win32]
 
   '@docsearch/css@4.7.0':
     resolution: {integrity: sha512-Sk5xkdRFeE7PeWjG9l4AfTwdvMfr9wHiwNNCpHXT4v4SNyNMKdHGvEILc31BgaVFGDDNbv5u/a73tofRiwbEZw==}
@@ -3155,8 +3012,8 @@ packages:
     resolution: {integrity: sha512-kWceoEa1zXbcBvgy+BT1ddTLyB7B51u32EhOK/ZMY324nxmQAm767HD+g+9avBEPVmoDjWIYLvsSCQqtbcph/g==}
     engines: {node: '>= 20'}
 
-  args-tokens@1.0.0:
-    resolution: {integrity: sha512-Y66kJfJWAwldtu7PNDNKgyhgSIPidvZJGQ/sm723gDe1uT9NzEMISlTl2ZkG187o+vx1oM7ImpxV924n1V9gCw==}
+  args-tokens@1.0.2:
+    resolution: {integrity: sha512-6Ocv+qD5WY+8gIicrBgGWZiPIzM5WQ/CJEYm9KvcmUuYGU40cfVvVYePeT0prhWndcwATKZzJkKv4FavyvJkvA==}
     engines: {node: '>= 22'}
 
   array-find-index@1.0.2:
@@ -3457,10 +3314,6 @@ packages:
 
   delaunator@5.1.0:
     resolution: {integrity: sha512-AGrQ4QSgssa1NGmWmLPqN5NY2KajF5MqxetNEO+o0n3ZwZZeTmt7bBnvzHWrmkZFxGgr4HdyFgelzgi06otLuQ==}
-
-  deno@2.8.2:
-    resolution: {integrity: sha512-IMcdZBfJpzVEfc3N7obg+irBAHNKD3igwE7rX6I2MB3BiA9exHOh7DzH6XrOJgIp9nszyHfKyYL+EFBryVxPOA==}
-    hasBin: true
 
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
@@ -3955,22 +3808,6 @@ packages:
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
-  jsr-exports-lint@0.4.2:
-    resolution: {integrity: sha512-CyMLNmmq1PKOPr2VtcwvDZF67jkkOq+DVhPdAi/kzr5N1HGZ/iNqSJq2z3eG000BANzi8EKkLOLZqGijm+2VwQ==}
-    engines: {node: '>= 20'}
-    peerDependencies:
-      tsdown: '>=0.9.6'
-      unbuild: '>=1.0.0'
-    peerDependenciesMeta:
-      tsdown:
-        optional: true
-      unbuild:
-        optional: true
-
-  jsr@0.14.3:
-    resolution: {integrity: sha512-PGxnDepx7vwJoZQe2SHbyBiFfpGwsOKmX4kn/wZZqfMafV7fjXqTxSaX6lp9QHYkSTLKkER+P/wmrZY3gVJNzg==}
-    hasBin: true
-
   katex@0.16.47:
     resolution: {integrity: sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==}
     hasBin: true
@@ -4326,10 +4163,6 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  node-stream-zip@1.15.0:
-    resolution: {integrity: sha512-LN4fydt9TqhZhThkZIVQnF9cwjU3qmUH9h78Mx/K7d3VvfRqqwthLwJEUOEL0QPZ0XQmNN7be5Ggit5+4dq3Bw==}
-    engines: {node: '>=0.12.0'}
-
   non-layered-tidy-tree-layout@2.0.2:
     resolution: {integrity: sha512-gkXMxRzUH+PB0ax9dUN0yYF0S25BqeAYqhgMaLUFmpXLEk7Fcu8f4emJuOAY0V8kjDICxROIKsTAKsV/v355xw==}
 
@@ -4623,10 +4456,6 @@ packages:
   section-matter@1.0.0:
     resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}
     engines: {node: '>=4'}
-
-  semiver@1.1.0:
-    resolution: {integrity: sha512-QNI2ChmuioGC1/xjyYwyZYADILWyW6AmS1UH6gDj/SFUUUS4MBAWs/7mxnkRPc/F4iHezDP+O8t0dO8WHiEOdg==}
-    engines: {node: '>=6'}
 
   semver@7.8.2:
     resolution: {integrity: sha512-c8jsqUZm3omBOI66G90z1Dyw5z622G8oLG+omfsHBJf3CWQTlOcwOjvOG6wtiNfW6anKm/eA39LMwMtMez2TiQ==}
@@ -5236,24 +5065,6 @@ snapshots:
   '@chevrotain/types@11.1.2': {}
 
   '@chevrotain/utils@11.1.2': {}
-
-  '@deno/darwin-arm64@2.8.2':
-    optional: true
-
-  '@deno/darwin-x64@2.8.2':
-    optional: true
-
-  '@deno/linux-arm64-glibc@2.8.2':
-    optional: true
-
-  '@deno/linux-x64-glibc@2.8.2':
-    optional: true
-
-  '@deno/win32-arm64@2.8.2':
-    optional: true
-
-  '@deno/win32-x64@2.8.2':
-    optional: true
 
   '@docsearch/css@4.7.0': {}
 
@@ -6705,7 +6516,7 @@ snapshots:
 
   args-tokens@0.17.1: {}
 
-  args-tokens@1.0.0: {}
+  args-tokens@1.0.2: {}
 
   array-find-index@1.0.2: {}
 
@@ -7016,15 +6827,6 @@ snapshots:
   delaunator@5.1.0:
     dependencies:
       robust-predicates: 3.0.3
-
-  deno@2.8.2:
-    optionalDependencies:
-      '@deno/darwin-arm64': 2.8.2
-      '@deno/darwin-x64': 2.8.2
-      '@deno/linux-arm64-glibc': 2.8.2
-      '@deno/linux-x64-glibc': 2.8.2
-      '@deno/win32-arm64': 2.8.2
-      '@deno/win32-x64': 2.8.2
 
   dequal@2.0.3: {}
 
@@ -7537,17 +7339,6 @@ snapshots:
       semver: 7.8.2
 
   jsonc-parser@3.3.1: {}
-
-  jsr-exports-lint@0.4.2(tsdown@0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13))):
-    dependencies:
-      picocolors: 1.1.1
-    optionalDependencies:
-      tsdown: 0.22.14(@typescript/native-preview@7.0.0-dev.20260707.2)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)(typescript@6.0.3)(unrun@0.2.39(synckit@0.11.13))
-
-  jsr@0.14.3:
-    dependencies:
-      node-stream-zip: 1.15.0
-      semiver: 1.1.0
 
   katex@0.16.47:
     dependencies:
@@ -8115,8 +7906,6 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  node-stream-zip@1.15.0: {}
-
   non-layered-tidy-tree-layout@2.0.2:
     optional: true
 
@@ -8550,8 +8339,6 @@ snapshots:
     dependencies:
       extend-shallow: 2.0.1
       kind-of: 6.0.3
-
-  semiver@1.1.0: {}
 
   semver@7.8.2: {}
 

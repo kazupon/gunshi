@@ -1,4 +1,3 @@
-import { lintJsrExports } from 'jsr-exports-lint/tsdown'
 import { defineConfig } from 'tsdown'
 
 import type { UserConfig } from 'tsdown'
@@ -8,10 +7,7 @@ const config: UserConfig = defineConfig({
   outDir: 'lib',
   publint: true,
   fixedExtension: false,
-  dts: true,
-  hooks: {
-    'build:done': lintJsrExports()
-  }
+  dts: true
 })
 
 export default config

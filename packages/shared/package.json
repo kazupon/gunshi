@@ -1,7 +1,7 @@
 {
   "name": "@gunshi/shared",
   "description": "shared utils for gunshi",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.5",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
@@ -51,16 +51,12 @@
   },
   "scripts": {
     "build": "tsdown",
-    "lint:jsr": "jsr publish --dry-run --allow-dirty",
-    "prepack": "pnpm build",
-    "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
+    "prepack": "pnpm build"
   },
   "devDependencies": {
+    "@gunshi/plugin": "workspace:*",
     "@gunshi/resources": "workspace:*",
-    "deno": "catalog:",
     "gunshi": "workspace:*",
-    "jsr": "catalog:",
-    "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
     "tsdown": "catalog:"
   }

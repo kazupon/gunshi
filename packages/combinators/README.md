@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > parser combinators for gunshi argument schema
 
@@ -31,9 +30,6 @@ pnpm add @gunshi/combinators
 
 ## yarn
 yarn add @gunshi/combinators
-
-## deno
-deno add jsr:@gunshi/combinators
 
 ## bun
 bun add @gunshi/combinators
@@ -100,6 +96,4 @@ About details, See the below official docs sections:
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/combinators?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/combinators@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/combinators
-[jsr-href]: https://jsr.io/@gunshi/combinators
 [install-size-src]: https://pkg-size.dev/badge/install/23122

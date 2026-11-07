@@ -92,14 +92,13 @@ const command = define({
     // Show usage information, with the header as its title.
     // To show the header alone, such as before the output of a command, call `global.showHeader()`
     global.showUsage()
-
-    // Show validation errors
-    if (ctx.validationError) {
-      global.showValidationErrors(ctx.validationError)
-    }
   }
 })
 ```
+
+`showVersion()`, `showHeader()` and `showUsage()` print with `ctx.log`. When a command that spreads `jsonArgs` is asked for JSON with `--json`, they print nothing and return the text only, so that stdout has the JSON only (see [JSON Output](../essentials/json-output.md)).
+
+The extension also has `showValidationErrors()`, which the plugin calls itself to report the errors of the arguments before the command would run. A command does not run when its arguments are wrong, so it never sees those errors in `ctx.validationError`. To act on them, such as to use another exit code, use the [`onErrorCommand` hook](./command-hooks.md#handling-argument-validation-errors).
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
@@ -373,7 +372,7 @@ The following example demonstrates a comprehensive approach to handling logging,
 
 ```ts
 // Note: These are hypothetical example plugins for illustration purposes
-import { define } from 'gunshi'
+import { CommandError, define } from 'gunshi'
 import { pluginId as loggerId } from '@my/plugin-logger'
 import { pluginId as authId } from '@my/plugin-auth'
 import { pluginId as metricsId } from '@my/plugin-metrics'
@@ -390,7 +389,7 @@ const command = define({
     // Check authentication
     if (!auth?.isAuthenticated()) {
       logger?.error('Authentication required')
-      throw new Error('Please login first')
+      throw new CommandError('Please login first')
     }
 
     try {

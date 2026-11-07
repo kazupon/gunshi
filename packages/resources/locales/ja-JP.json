@@ -10,8 +10,13 @@
   "NEGATABLE": "否定可能な",
   "DEFAULT": "デフォルト",
   "CHOICES": "選択肢",
+  "CAUSEDBY": "原因",
   "help": "このヘルプメッセージを表示",
   "version": "このバージョンを表示",
+  "json": "結果を JSON で出力する",
+  "json:invalid-arguments": "{$count} 個の引数が不正です",
+  "json:next:help": "コマンドの引数を確認する",
+  "json:next:help-placeholder": "<COMMAND> を、この CLI を実行したときのコマンドに置き換えて、コマンドの引数を確認する",
   "err:arg:required-option": "オプション {$displayName} は必須です",
   "err:arg:required-positional": "位置引数 {$displayName} は必須です",
   "err:arg:invalid-type": "{$displayName} の値が不正です。期待される型: {$expected}",
@@ -27,5 +32,8 @@
   "err:cmd:ambiguous": "コマンドを一意に解決できません。オプションをコマンド名の後ろに移してください: {$candidatePaths}",
   "err:cmd:inconsistent-options": "オプションからコマンドを一意に解決できません。オプションをコマンド名の後ろに移してください。",
   "err:cmd:lazy-schema-mismatch": "lazy コマンドの定義とロード後のオプションが一致しません。前置きするオプションを lazy の定義に記載するか、コマンド名の後ろに移してください: {$commandPath}",
+  "err:json:not-supported": "このコマンドは --json に対応していません",
+  "err:json:invalid-result": "コマンドは終了しましたが、JSON として出力するオブジェクトを返しませんでした。コマンドを包み込む plugin が結果を落とした可能性があります",
+  "err:json:unserializable-result": "コマンドは終了しましたが、結果を JSON に変換できません: {$message}",
   "err:suggestion:did-you-mean": "{$name} の指定ミスではありませんか？"
 }

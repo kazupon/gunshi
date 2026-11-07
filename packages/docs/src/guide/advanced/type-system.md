@@ -114,6 +114,47 @@ export const serverCommand = define<{ args: typeof serverArgs }>({
 
 This advanced approach is particularly useful when you want to reuse argument definitions across multiple commands or need to export types for use in other modules.
 
+### The Return Type of `run`
+
+What `run` may return depends on the arguments. A command that spreads `jsonArgs` returns its result as an object (`JsonResult`), which Gunshi prints as JSON with `--json`. Any other command returns a string, which `cli()` returns, or nothing:
+
+```ts
+import { define, jsonArgs } from 'gunshi'
+
+const list = define({
+  name: 'list',
+  args: { ...jsonArgs },
+  // an object keyed by a noun: returning nothing, a string or an array is a type error
+  run: () => ({ projects: ['acme'] })
+})
+
+const greet = define({
+  name: 'greet',
+  // a string or nothing: returning an object is a type error
+  run: () => 'Hello!'
+})
+```
+
+The type of the result is `CommandRunnerResult`. For the type errors and how to fix them, see [JSON Output](../essentials/json-output.md#type-errors).
+
+### Collecting Commands
+
+To collect commands into an object, a `Map` or an array, type it with `SubCommandable`, the type that the `subCommands` of `cli()` takes. `Command` without type arguments does not take a command that spreads `jsonArgs`, since its arguments are not known:
+
+```ts
+import type { Command, SubCommandable } from 'gunshi'
+
+const commands: Record<string, SubCommandable> = { list, greet }
+
+// to type one command, give the type of its arguments
+const listArgs = { ...jsonArgs }
+const typed: Command<{ args: typeof listArgs }> = {
+  name: 'list',
+  args: listArgs,
+  run: () => ({ projects: [] })
+}
+```
+
 ### The `lazy` Function
 
 The `lazy` function enables code-splitting while maintaining type safety. Like `define`, it works well with automatic type inference for most cases. Advanced usage provides explicit type control when needed.
@@ -227,7 +268,7 @@ When your command needs to use plugin extensions, use these specialized function
 Use `defineWithTypes` when your command needs plugin extensions. It uses a currying approach where you specify the extensions type, and args are automatically inferred:
 
 ```ts [commands/server.ts]
-import { defineWithTypes } from 'gunshi'
+import { CommandError, defineWithTypes } from 'gunshi'
 import type { AuthExtension } from '../plugin.ts'
 
 // Define your extensions type
@@ -251,7 +292,7 @@ export const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()
     // ctx.extensions is typed as ServerExtensions
     // Optional chaining (?.) is used because plugins may not be installed
     if (!ctx.extensions.auth?.isAuthenticated()) {
-      throw new Error('Please login first')
+      throw new CommandError('Please login first')
     }
 
     const user = ctx.extensions.auth?.getUser()
@@ -500,7 +541,7 @@ export default defineWithTypes<{ extensions: CombinedExtensions }>()({
 Custom plugins provide plugin IDs and types. Import both to create fully type-safe command definitions:
 
 ```ts [commands/query.ts]
-import { defineWithTypes } from 'gunshi'
+import { CommandError, defineWithTypes } from 'gunshi'
 import { pluginId as authId } from '../plugins/auth.ts'
 import { pluginId as databaseId } from '../plugins/database.ts'
 import { pluginId as loggerId } from '../plugins/logger.ts'
@@ -525,7 +566,7 @@ export default defineWithTypes<{ extensions: CombinedExtensions }>()({
 
     // Check read permissions for the specific table
     if (!ctx.extensions[authId]?.hasPermission('read', ctx.values.table)) {
-      throw new Error(`No read access to table: ${ctx.values.table}`)
+      throw new CommandError(`No read access to table: ${ctx.values.table}`)
     }
 
     // Perform the query using the database extension

@@ -50,6 +50,9 @@ Argument validation failures are also treated as command errors. Gunshi prints t
 error message to stderr and sets the exit code to `1`, then calls `onErrorCommand`, and the
 `cli()` promise resolves. See [Handling Argument Validation Errors](#handling-argument-validation-errors).
 
+So does a `CommandError` that a command throws for a failure it expects, with the exit code of the
+error. See [Handling Expected Failures](#handling-expected-failures).
+
 ## Basic Hook Usage
 
 ### Setting Up Hooks
@@ -122,6 +125,14 @@ The `CommandContext` parameter is read-only and contains all command metadata, w
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+`onAfterCommand` receives the result only when the command returns a string. The result of a command that prints JSON with `--json` is printed, not passed: the hook receives `undefined`.
+
+### Hooks and `--json`
+
+When a command that spreads `jsonArgs` is asked for JSON with `--json`, stdout must have the JSON only, so the hooks must not print to stdout or stderr. Print with `ctx.log`, which Gunshi silences then (see [JSON Output](../essentials/json-output.md)).
+
+When `--json` is given to a command that does not spread `jsonArgs`, the hooks still run: Gunshi stops the command with `json_not_supported` in the command decorators, after `onBeforeCommand`. `ctx.values.json` is not set then, and `ctx.log` is not silenced.
+
 With an understanding of how hooks work and their parameters, let's explore how they differ from and interact with plugin decorators.
 
 ### Handling Argument Validation Errors
@@ -179,6 +190,46 @@ try {
 A renderer that returns an empty message, and `usageSilent: true`, leave the validation errors
 to you in the same way.
 
+### Handling Expected Failures
+
+When a command throws a `CommandError` for a failure that it expects, Gunshi prints the message of
+the error to stderr, without a stack trace, and sets the exit code to the `exitCode` of the error.
+It then calls `onErrorCommand` with the error, and the `cli()` promise resolves.
+
+The hook can change the exit code, and tell the error with `isCommandError()`:
+
+```ts
+import { cli, CommandError, define, isCommandError } from 'gunshi'
+
+const command = define({
+  name: 'show',
+  args: {
+    project: {
+      type: 'positional'
+    }
+  },
+  run: ctx => {
+    throw new CommandError(`Project ${ctx.values.project} not found`, { code: 'not_found' })
+  }
+})
+
+await cli(process.argv.slice(2), command, {
+  onErrorCommand: (ctx, error) => {
+    if (isCommandError(error) && error.code === 'not_found') {
+      process.exitCode = 3
+    }
+  }
+})
+```
+
+Gunshi prints a `CommandError` thrown from the command, or from a command decorator of a plugin.
+It does not print one thrown from a hook: the hooks run outside the command, and the `cli()`
+promise rejects with the error. To stop a command from running, such as when the user has not
+logged in, check it in a command decorator (see [Validation and Guards](#validation-and-guards)).
+
+With `usageSilent: true`, Gunshi prints nothing, leaves the exit code alone, and the `cli()`
+promise rejects with the `CommandError`. For more, see [Errors and Exit Codes](../essentials/errors.md).
+
 ## Hooks vs Decorators
 
 Gunshi provides two distinct mechanisms for controlling command execution:
@@ -219,8 +270,8 @@ graph TD
     H -->|Yes| I[Return Result]
     H -->|Error| G
 
-    G --> K{Validation error reported to stderr?}
-    K -->|Yes| L[Resolve with exit code 1]
+    G --> K{Validation error or CommandError reported to stderr?}
+    K -->|Yes| L[Resolve with the exit code set]
     K -->|No| J[Throw Error]
 
     style A fill:#468c56,color:white
@@ -257,10 +308,10 @@ export default plugin({
         const start = Date.now()
         try {
           const result = await baseRunner(commandCtx)
-          console.log(`Execution time: ${Date.now() - start}ms`)
+          commandCtx.log(`Execution time: ${Date.now() - start}ms`)
           return result
         } catch (error) {
-          console.log(`Failed after: ${Date.now() - start}ms`)
+          commandCtx.log(`Failed after: ${Date.now() - start}ms`)
           throw error
         }
       }
@@ -268,6 +319,8 @@ export default plugin({
   }
 })
 ```
+
+The decorator prints with `commandCtx.log`, not with `console.log`, so that it prints nothing when the command prints JSON with `--json`, and it returns the result of the command as it is.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
@@ -391,58 +444,65 @@ await cli(process.argv.slice(2), commands, {
 
 ### Validation and Guards
 
-Use hooks to implement global validation or access control:
+To implement access control, check it in a command decorator of a plugin, and throw a `CommandError` to stop the command.
 
-```ts
-import { cli } from 'gunshi'
-import auth, { pluginId as authId } from '@my/plugin-auth'
+Gunshi prints the message of the error without a stack trace, and the hooks handle the rest:
+
+```ts [auth.ts]
+import { CommandError, plugin } from 'gunshi/plugin'
+import { readToken, verifyToken } from './token.ts'
+
+export const pluginId = 'my:auth'
+
+export default function auth({ publicCommands }: { publicCommands: string[] }) {
+  return plugin({
+    id: pluginId,
+    setup: ctx => {
+      // The decorator runs only when a command runs, so `--help` and `--version` work without login
+      ctx.decorateCommand(baseRunner => async commandCtx => {
+        // Skip auth for public commands
+        if (publicCommands.includes(commandCtx.name ?? '')) {
+          return baseRunner(commandCtx)
+        }
+
+        // Verify authentication
+        const token = await readToken()
+        if (!token) {
+          throw new CommandError('Authentication required. Please run "login" first.', {
+            code: 'auth_required'
+          })
+        }
+
+        const user = await verifyToken(token)
+        if (!user) {
+          throw new CommandError('Invalid or expired token. Please login again.', {
+            code: 'auth_expired'
+          })
+        }
+
+        return baseRunner(commandCtx)
+      })
+    }
+  })
+}
+```
+
+```ts [cli.ts]
+import { cli, isCommandError } from 'gunshi'
+import audit, { pluginId as auditId } from '@my/plugin-audit'
+import auth from './auth.ts'
 
 await cli(process.argv.slice(2), commands, {
   name: 'my-app',
 
-  // Install auth plugin
-  plugins: [
-    auth({
-      publicCommands: ['help', 'version', 'login'],
-      tokenSource: ['env:AUTH_TOKEN', 'args:token']
-    })
-  ],
-
-  onBeforeCommand: async ctx => {
-    const auth = ctx.extensions[authId]
-
-    // Skip auth for public commands
-    if (auth?.isPublicCommand(ctx.name)) {
-      return
-    }
-
-    // Verify authentication
-    const token = auth?.getToken()
-    if (!token) {
-      throw new Error('Authentication required. Please run "login" first.')
-    }
-
-    const user = await auth?.verifyToken(token)
-    if (!user) {
-      throw new Error('Invalid or expired token. Please login again.')
-    }
-
-    // Store user info for command use
-    await auth?.setCurrentUser(user)
-  },
-
-  onAfterCommand: async ctx => {
-    const auth = ctx.extensions[authId]
-    // Clean up sensitive data after command execution
-    await auth?.clearSession()
-  },
+  // Install the auth plugin, and a plugin to record the security events
+  plugins: [auth({ publicCommands: ['login'] }), audit()],
 
   onErrorCommand: async (ctx, error) => {
-    const auth = ctx.extensions[authId]
-    // Log security-related errors
-    if (error.message.includes('Authentication') || error.message.includes('token')) {
-      await auth?.logSecurityEvent({
-        type: 'auth_failure',
+    // Gunshi has printed the error: record the failures of the authentication
+    if (isCommandError(error) && error.code?.startsWith('auth_')) {
+      await ctx.extensions[auditId]?.logSecurityEvent({
+        type: error.code,
         command: ctx.name,
         timestamp: new Date().toISOString()
       })
@@ -450,6 +510,8 @@ await cli(process.argv.slice(2), commands, {
   }
 })
 ```
+
+Do not throw the `CommandError` from `onBeforeCommand`: Gunshi does not print an error thrown from a hook, and the `cli()` promise rejects with it, so the user sees a stack trace. The hook also runs for `--help` and `--version`.
 
 ### Transaction Management
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Gunshi is a modern JavaScript command-line library for creating CLI applications. It supports multiple JavaScript runtimes (Node.js, Deno, Bun) and provides features like declarative command configuration, type safety, composable sub-commands, lazy loading, internationalization, and a powerful plugin system.
+Gunshi is a modern JavaScript command-line library for creating CLI applications. It supports multiple JavaScript runtimes (Node.js, Bun) and provides features like declarative command configuration, type safety, composable sub-commands, lazy loading, internationalization, and a powerful plugin system.
 
 This is a **pnpm workspace monorepo** containing the core library, plugins, utilities, and documentation. The project emphasizes type safety, runtime compatibility, minimal dependencies, and extensibility through a well-designed plugin architecture.
 
@@ -30,16 +30,13 @@ pnpm test:plugin-i18n           # i18n plugin
 pnpm test:plugin-renderer       # Renderer plugin
 pnpm test:plugin-completion     # Completion plugin
 
-# Run linters (oxlint, ESLint, oxfmt, Knip, JSR checks, Deno type checks)
+# Run linters (oxlint, ESLint, oxfmt, Knip)
 pnpm lint
 
 # Auto-fix lint and formatting issues (oxlint, ESLint, oxfmt, Knip)
 pnpm fix
 
-# Run type checking
-pnpm lint:typecheck             # Run all typecheck:* scripts (currently typecheck:deno)
-pnpm typecheck:deno             # Deno-specific type checking
-# TypeScript diagnostics are also reported by `pnpm test` (vitest --typecheck)
+# Type checking: TypeScript diagnostics are reported by `pnpm test` (vitest --typecheck)
 # and `pnpm lint` (oxlint --type-check)
 
 # Run benchmarks
@@ -64,26 +61,26 @@ The repository contains the following packages:
 ### Core Packages
 
 - **`packages/gunshi/`** - Main library with CLI runtime, command system, and built-in plugins
-  - Exports: `cli`, `define`, `defineWithTypes`, `lazy`, `lazyWithTypes`, `plugin`, `createCommandContext`
-  - Published to: npm, JSR
+  - Exports: `cli`, `define`, `defineWithTypes`, `lazy`, `lazyWithTypes`, `plugin`, `createCommandContext`, `jsonArgs`, `CommandError`, `isCommandError`, `JsonOutputError`, `isJsonOutputError`
+  - Published to: npm
 
 - **`packages/bone/`** - Minimal gunshi distribution without plugins (`@gunshi/bone`)
   - Smaller bundle size for lightweight CLIs
-  - Published to: npm, JSR
+  - Published to: npm
 
 - **`packages/definition/`** - Command definition utilities (`@gunshi/definition`)
-  - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers
-  - Published to: npm, JSR
+  - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers, `jsonArgs`, and `CommandError` and `isCommandError`
+  - Published to: npm
 
 - **`packages/combinators/`** - Parser combinators for argument schemas (`@gunshi/combinators`)
   - Composable factories such as `string`, `integer`, `required`, `withDefault`, `args`
   - Same exports as `gunshi/combinators`
-  - Published to: npm, JSR
+  - Published to: npm
 
 - **`packages/plugin/`** - Plugin development kit (`@gunshi/plugin`)
   - Type definitions and APIs for creating plugins
   - Same exports as `gunshi/plugin` but with smaller footprint
-  - Published to: npm, JSR
+  - Published to: npm
 
 ### Support Packages
 
@@ -99,6 +96,7 @@ The repository contains the following packages:
 
 - **`packages/plugin-global/`** - Global options plugin (`@gunshi/plugin-global`)
   - Provides `--version`, `--help` options
+  - Prints the result and the errors of the commands that spread `jsonArgs` as JSON with `--json`, and stops the other commands with `json_not_supported`
   - Header/usage rendering utilities
 
 - **`packages/plugin-i18n/`** - Internationalization plugin (`@gunshi/plugin-i18n`)
@@ -144,8 +142,9 @@ packages/gunshi/src/
 ├── definition.ts         # Command definition helpers
 ├── combinators.ts        # Parser combinators entry (`gunshi/combinators`)
 ├── decorators.ts         # Command runner decorators
-├── error.ts              # Error classes and type guards (`CommandNotFoundError`, `isArgsValidationError`)
+├── error.ts              # Error classes and type guards (`CommandError`, `CommandNotFoundError`, `JsonOutputError`, `isCommandError`, `isArgsValidationError`)
 ├── generator.ts          # Command generator utilities
+├── json.ts               # `jsonArgs`, the argument that a command spreads to support `--json`
 ├── renderer.ts           # Usage/help rendering
 ├── agent.ts              # AI agent detection (`gunshi/agent`)
 ├── utils.ts              # Command utilities (lazy command resolution, sub-command lookup)
@@ -169,7 +168,7 @@ packages/gunshi/src/
 - **Type Safety**: Full TypeScript support with type inference for arguments and context
 - **Plugin System**: Extensible architecture with dependency management, lifecycle hooks, and context extensions
 - **Lazy Loading**: Commands can be lazily loaded for better performance
-- **Runtime Agnostic**: Works across Node.js, Deno, and Bun; the core receives `argv` from the caller instead of calling runtime-specific APIs
+- **Runtime Agnostic**: Works across Node.js and Bun; the core receives `argv` from the caller instead of calling runtime-specific APIs
 
 ### Playground Examples
 
@@ -178,8 +177,7 @@ playground/
 ├── essentials/           # Basic CLI examples
 ├── advanced/             # Advanced features (sub-commands, lazy loading, parser combinators)
 ├── plugins/              # Plugin usage examples
-├── bun/                  # Bun runtime examples
-└── deno/                 # Deno runtime examples
+└── bun/                  # Bun runtime examples
 ```
 
 ## Plugin System
@@ -222,8 +220,6 @@ When creating plugins:
    - ESLint for JSDoc, comments, Markdown, JSON, YAML, and Vue files
    - oxfmt for formatting, using the Prettier config from `@kazupon/prettier-config`
    - Knip for unused files, exports, and dependencies
-   - JSR export validation
-   - Deno type checking
 
 ### Testing Requirements
 
@@ -280,7 +276,6 @@ When creating plugins:
 - Features:
   - TypeScript compilation with declaration files
   - Publint validation
-  - JSR export validation
   - Multi-entry support
 
 ### Build Commands
@@ -295,18 +290,16 @@ pnpm build:plugin:global        # Build specific plugin
 
 Packages are published to:
 
-- **npm**: For Node.js users (`npm install gunshi`)
-- **JSR**: For Deno/Bun users (`deno add jsr:@kazupon/gunshi`)
+- **npm**: For Node.js and Bun users (`npm install gunshi`)
 
 ## Important Notes
 
 ### Multi-Runtime Support
 
-- The project supports Node.js, Deno, and Bun
-- The core does not call runtime-specific APIs directly. Callers pass the arguments, e.g. `process.argv.slice(2)`, `Deno.args`, or `Bun.argv.slice(2)`
+- The project supports Node.js and Bun
+- The core does not call runtime-specific APIs directly. Callers pass the arguments, e.g. `process.argv.slice(2)` or `Bun.argv.slice(2)`
 - Plugins that need runtime detection implement it themselves (e.g. `packages/plugin-completion/src/utils.ts`)
 - Always test changes across all supported runtimes when modifying core functionality
-- Use `pnpm typecheck:deno` for Deno-specific type checking
 
 ### Parser & Resolver Changes
 

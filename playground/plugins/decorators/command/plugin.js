@@ -2,14 +2,15 @@ import { plugin } from 'gunshi/plugin'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+// The decorators print with `ctx.log`, which gunshi silences when a command prints JSON with `--json`
 export default plugin({
   id: 'multi-decorator',
   setup(ctx) {
     // First decorator: Logging
     ctx.decorateCommand(runner => async ctx => {
-      console.log('[LOG] Command started:', ctx.name)
+      ctx.log('[LOG] Command started:', ctx.name)
       const result = await runner(ctx)
-      console.log('[LOG] Command completed')
+      ctx.log('[LOG] Command completed')
       return result
     })
 
@@ -22,17 +23,20 @@ export default plugin({
       if (process.env.GUNSHI_E2E) {
         return result
       }
-      console.log(`[TIME] Execution: ${Date.now() - start}ms`)
+      ctx.log(`[TIME] Execution: ${Date.now() - start}ms`)
       return result
     })
 
     // Third decorator: Error wrapper
     ctx.decorateCommand(runner => async ctx => {
       try {
-        console.log('[ERROR] Monitoring enabled')
+        ctx.log('[ERROR] Monitoring enabled')
         return await runner(ctx)
       } catch (error) {
-        console.error('[ERROR] Command failed:', error.message)
+        // with --json, gunshi prints the error as JSON
+        if (!ctx.values.json) {
+          console.error('[ERROR] Command failed:', error.message)
+        }
         throw error
       }
     })

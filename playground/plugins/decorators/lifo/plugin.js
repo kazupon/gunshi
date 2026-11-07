@@ -1,5 +1,7 @@
 import { plugin } from 'gunshi/plugin'
 
+// The decorators print with `console.log` to show the order. A real plugin prints with `ctx.log`,
+// which gunshi silences when a command prints JSON with `--json`
 export default plugin({
   id: 'my-plugin',
   setup(ctx) {

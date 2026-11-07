@@ -7,14 +7,19 @@ import { pathToFileURL } from 'node:url'
 import { runInNewContext } from 'node:vm'
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest'
 import {
+  CommandError,
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
   CommandResolutionError,
   CommandResolutionErrorKeys,
   hasPriorityValidationError,
   isArgsValidationError,
+  isCommandError,
   isCommandNotFoundError,
-  isCommandResolutionError
+  isCommandResolutionError,
+  isJsonOutputError,
+  JsonOutputError,
+  JsonOutputErrorKeys
 } from './error.ts'
 
 import type { Args } from 'args-tokens'
@@ -340,7 +345,7 @@ describe('isArgsValidationError', () => {
       code = ArgsValidationErrorKeys.requiredOption
       values = { name: 'foo' }
       constructor() {
-        super("Optional argument '--foo' is required")
+        super("Option '--foo' is required")
         this.name = 'foo'
         Object.defineProperty(this, ARGS_VALIDATION_ERROR_BRAND, { value: true })
       }
@@ -352,7 +357,7 @@ describe('isArgsValidationError', () => {
   })
 
   test('does not match an unbranded subclass that overrides name', () => {
-    const error = Object.assign(new Error("Optional argument '--foo' is required"), {
+    const error = Object.assign(new Error("Option '--foo' is required"), {
       name: 'foo',
       code: ArgsValidationErrorKeys.requiredOption,
       values: { name: 'foo' }
@@ -463,6 +468,289 @@ describe('CommandResolutionError', () => {
         candidatePaths: []
       })
     ).toBe(false)
+  })
+})
+
+describe('CommandError', () => {
+  // the registry key is the contract shared with other bundled copies of gunshi
+  const brand = Symbol.for('gunshi.CommandError')
+
+  test('has the message and the defaults without options', () => {
+    const error = new CommandError('Project acme not found')
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error.name).toBe('CommandError')
+    expect(error.message).toBe('Project acme not found')
+    expect(error.code).toBeUndefined()
+    expect(error.exitCode).toBe(1)
+    expect(error.cause).toBeUndefined()
+  })
+
+  test('has the code, the exit code and the cause of the options', () => {
+    const cause = new Error('ENOENT: no such file or directory')
+    const error = new CommandError('Project acme not found', {
+      code: 'not_found',
+      exitCode: 2,
+      cause
+    })
+
+    expect(error.code).toBe('not_found')
+    expect(error.exitCode).toBe(2)
+    expect(error.cause).toBe(cause)
+  })
+
+  test.each([1, 2, 3, 255])('keeps the exit code %s', exitCode => {
+    expect(new CommandError('failed', { exitCode }).exitCode).toBe(exitCode)
+  })
+
+  // a failure never ends with 0, and the exit code of a process is an integer from 0 to 255
+  test.each([0, -1, 256, 1.5, Number.NaN, Number.POSITIVE_INFINITY, '2' as unknown as number])(
+    'replaces the exit code %s with 1',
+    exitCode => {
+      expect(new CommandError('failed', { exitCode }).exitCode).toBe(1)
+    }
+  )
+
+  test('has an own, non-enumerable and immutable brand', () => {
+    const error = new CommandError('Project acme not found', { code: 'not_found' })
+
+    expect(Object.getOwnPropertyDescriptor(error, brand)).toEqual({
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+    expect(Object.keys(error)).not.toContain(brand)
+    // copying own enumerable properties (string and symbol keys) must not carry the brand
+    expect(brand in Object.assign({}, error)).toBe(false)
+  })
+
+  test('is recognized when a subclass changes the name', () => {
+    class ProjectNotFoundError extends CommandError {
+      constructor(project: string) {
+        super(`Project ${project} not found`, { code: 'not_found' })
+        this.name = 'ProjectNotFoundError'
+      }
+    }
+
+    expect(isCommandError(new ProjectNotFoundError('acme'))).toBe(true)
+  })
+})
+
+describe('isCommandError', () => {
+  const brand = Symbol.for('gunshi.CommandError')
+
+  /**
+   * Create a plain object with the brand and the shape that every copy of `CommandError` sets,
+   * with some properties overridden.
+   *
+   * @param overrides - Properties to override, where `undefined` removes the property
+   * @returns The branded object
+   */
+  function brandedCommandError(overrides: Record<string, unknown> = {}): object {
+    const value: Record<PropertyKey, unknown> = {
+      [brand]: true,
+      message: 'Project acme not found',
+      code: 'not_found',
+      exitCode: 1,
+      ...overrides
+    }
+    for (const [key, override] of Object.entries(overrides)) {
+      if (override === undefined) {
+        delete value[key]
+      }
+    }
+    return value
+  }
+
+  test('matches an instance of the class', () => {
+    expect(isCommandError(new CommandError('Project acme not found'))).toBe(true)
+  })
+
+  test('recognizes a branded error from a foreign class without using name', () => {
+    class ForeignCommandError extends Error {
+      code = undefined
+      exitCode = 2
+      constructor() {
+        super('Project acme not found')
+        this.name = 'SomethingElse'
+        Object.defineProperty(this, brand, { value: true })
+      }
+    }
+
+    const error = new ForeignCommandError()
+    expect(error).not.toBeInstanceOf(CommandError)
+    expect(isCommandError(error)).toBe(true)
+  })
+
+  test('recognizes a branded error created in another realm', () => {
+    const error: unknown = runInNewContext(`
+      const error = new Error('Project acme not found')
+      Object.defineProperty(error, Symbol.for('gunshi.CommandError'), { value: true })
+      error.code = undefined
+      error.exitCode = 1
+      error
+    `)
+
+    // the global symbol registry is shared across realms, while `Error` is not
+    expect(error).not.toBeInstanceOf(Error)
+    expect(isCommandError(error)).toBe(true)
+  })
+
+  test('recognizes a branded plain object with a valid shape', () => {
+    // the control for the rejection cases below
+    expect(isCommandError(brandedCommandError())).toBe(true)
+  })
+
+  test('does not read the properties of an error without the brand', () => {
+    // the global options plugin checks every error that a command throws
+    const error = new Error('boom')
+    for (const key of ['code', 'exitCode']) {
+      Object.defineProperty(error, key, {
+        get() {
+          throw new Error(`the getter of ${key}`)
+        }
+      })
+    }
+
+    expect(isCommandError(error)).toBe(false)
+  })
+
+  test('does not match an error of the app that has the same name', () => {
+    class AppCommandError extends Error {
+      code = 'not_found'
+      exitCode = 1
+      constructor(message: string) {
+        super(message)
+        this.name = 'CommandError'
+      }
+    }
+
+    expect(isCommandError(new AppCommandError('Project acme not found'))).toBe(false)
+  })
+
+  test.each([
+    { title: 'a plain error', value: new Error('Project acme not found') },
+    { title: 'undefined', value: undefined },
+    { title: 'null', value: null },
+    { title: 'a string', value: 'Project acme not found' },
+    { title: 'brand without message', value: brandedCommandError({ message: undefined }) },
+    { title: 'brand with a non-string message', value: brandedCommandError({ message: 1 }) },
+    { title: 'brand without code', value: brandedCommandError({ code: undefined }) },
+    { title: 'brand with a non-string code', value: brandedCommandError({ code: 404 }) },
+    { title: 'brand without exitCode', value: brandedCommandError({ exitCode: undefined }) },
+    { title: 'brand with exitCode 0', value: brandedCommandError({ exitCode: 0 }) },
+    { title: 'brand with exitCode 256', value: brandedCommandError({ exitCode: 256 }) },
+    { title: 'brand with a fractional exitCode', value: brandedCommandError({ exitCode: 1.5 }) },
+    { title: 'brand with a string exitCode', value: brandedCommandError({ exitCode: '1' }) },
+    {
+      title: 'brand set to a string',
+      value: { ...brandedCommandError(), [brand]: 'true' }
+    },
+    {
+      title: 'brand keyed by a non-registry symbol',
+      value: {
+        message: 'Project acme not found',
+        code: undefined,
+        exitCode: 1,
+        [Symbol('gunshi.CommandError')]: true
+      }
+    },
+    {
+      title: 'inherited brand',
+      value: Object.assign(Object.create({ [brand]: true }) as object, {
+        message: 'Project acme not found',
+        code: undefined,
+        exitCode: 1
+      })
+    }
+  ])('rejects $title', ({ value }) => {
+    expect(isCommandError(value)).toBe(false)
+  })
+})
+
+describe('JsonOutputError', () => {
+  const brand = Symbol.for('gunshi.JsonOutputError')
+
+  test('has the code, the values and the cause of the options, and an own brand', () => {
+    const cause = new TypeError('Do not know how to serialize a BigInt')
+    const error = new JsonOutputError('The result cannot be converted to JSON', {
+      code: JsonOutputErrorKeys.unserializableResult,
+      values: { message: cause.message },
+      cause
+    })
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error.name).toBe('JsonOutputError')
+    expect(error.code).toBe('err:json:unserializable-result')
+    expect(error.values).toEqual({ message: cause.message })
+    expect(error.cause).toBe(cause)
+    expect(Object.getOwnPropertyDescriptor(error, brand)).toEqual({
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+    expect(isJsonOutputError(error)).toBe(true)
+  })
+
+  test('has empty values without them', () => {
+    const error = new JsonOutputError('This command does not support --json', {
+      code: JsonOutputErrorKeys.notSupported
+    })
+    expect(error.values).toEqual({})
+  })
+
+  test('has the codes that are the keys of the resources', () => {
+    expect(JsonOutputErrorKeys).toEqual({
+      notSupported: 'err:json:not-supported',
+      invalidResult: 'err:json:invalid-result',
+      unserializableResult: 'err:json:unserializable-result'
+    })
+  })
+})
+
+describe('isJsonOutputError', () => {
+  const brand = Symbol.for('gunshi.JsonOutputError')
+
+  test('recognizes a branded error from another copy without using name', () => {
+    const error = Object.assign(new Error('This command does not support --json'), {
+      [brand]: true,
+      name: 'SomethingElse',
+      code: 'err:json:not-supported',
+      values: {}
+    })
+    expect(isJsonOutputError(error)).toBe(true)
+  })
+
+  test('does not read the properties of an error without the brand', () => {
+    const error = new Error('boom')
+    Object.defineProperty(error, 'code', {
+      get() {
+        throw new Error('the getter of code')
+      }
+    })
+    expect(isJsonOutputError(error)).toBe(false)
+  })
+
+  test.each([
+    { title: 'a plain error', value: new Error('boom') },
+    { title: 'null', value: null },
+    {
+      title: 'an error of the app with the same name',
+      value: Object.assign(new Error('boom'), {
+        name: 'JsonOutputError',
+        code: 'err:json:not-supported',
+        values: {}
+      })
+    },
+    {
+      title: 'brand with a code that is not one of the keys',
+      value: { [brand]: true, code: 'err:json:other', values: {} }
+    },
+    { title: 'brand without values', value: { [brand]: true, code: 'err:json:not-supported' } }
+  ])('rejects $title', ({ value }) => {
+    expect(isJsonOutputError(value)).toBe(false)
   })
 })
 
@@ -636,5 +924,17 @@ describe('errors thrown by another bundled copy of gunshi', () => {
 
     notFound.name = 'RenamedError'
     expect(isCommandNotFoundError(notFound)).toBe(true)
+  })
+
+  test('recognizes a CommandError, and the other copy recognizes ours', async () => {
+    vi.resetModules()
+    const foreign = await import('./error.ts')
+    // guard the premise: otherwise the cross-copy tests would pass trivially
+    expect(foreign.CommandError).not.toBe(CommandError)
+
+    const theirs = new foreign.CommandError('Project acme not found', { exitCode: 2 })
+    expect(theirs).not.toBeInstanceOf(CommandError)
+    expect(isCommandError(theirs)).toBe(true)
+    expect(foreign.isCommandError(new CommandError('Project acme not found'))).toBe(true)
   })
 })

@@ -1,7 +1,7 @@
 {
   "name": "gunshi",
   "description": "Modern javascript command-line library",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.5",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
@@ -111,9 +111,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "lint:jsr": "jsr publish --dry-run --allow-dirty",
-    "prepack": "pnpm build",
-    "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
+    "prepack": "pnpm build"
   },
   "devDependencies": {
     "@gunshi/plugin-global": "workspace:*",
@@ -123,9 +121,6 @@
     "@gunshi/shared": "workspace:*",
     "@types/node": "catalog:",
     "args-tokens": "catalog:",
-    "deno": "catalog:",
-    "jsr": "catalog:",
-    "jsr-exports-lint": "catalog:",
     "publint": "catalog:",
     "std-env": "^4.1.0",
     "tsdown": "catalog:",

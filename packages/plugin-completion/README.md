@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > shell completion plugin for gunshi.
 
@@ -13,7 +12,7 @@ This completion plugin is powered by [`@bomb.sh/tab`](https://github.com/bombshe
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!WARNING]
-> This package supports Node.js and Bun runtimes only. Deno support is not available yet.
+> This package supports Node.js and Bun runtimes only.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -28,9 +27,6 @@ pnpm add @gunshi/plugin-completion
 
 # yarn
 yarn add @gunshi/plugin-completion
-
-# deno
-deno add jsr:@gunshi/plugin-completion
 
 # bun
 bun add @gunshi/plugin-completion
@@ -491,6 +487,4 @@ Thank you!
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-completion?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/plugin-completion@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/plugin-completion
-[jsr-href]: https://jsr.io/@gunshi/plugin-completion
 [install-size-src]: https://pkg-size.dev/badge/install/30875

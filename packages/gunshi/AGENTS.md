@@ -61,9 +61,7 @@ const main = define({
 await cli(process.argv.slice(2), main, {
   name: 'ship',
   version: '1.0.0',
-  subCommands: { deploy, rollback },
-  // report an option that a command does not declare, such as a typo, as an error
-  strict: true
+  subCommands: { deploy, rollback }
 })
 ```
 
@@ -80,8 +78,8 @@ await cli(process.argv.slice(2), main, {
 - A command without `run` prints nothing when it is run by itself. Give a command that only groups sub-commands a `run` that says how to use them, as `ship` above
 - The `args` of a command are its own, so the sub-commands do not see the `args` of the main command. For an option of every command, spread shared arguments as above
 - Give `name` and `version` to `cli()`. The usage shows the name (`COMMAND` without it), and `--version` prints the version
-- Without `strict: true`, an option that a command does not declare is ignored. With it, as above, the option is an error
-- Gunshi prints the errors of the arguments (a missing or invalid argument, an unknown command, and with `strict: true`, an unknown option) to stderr, sets the exit code to 1, and calls the `onErrorCommand` option of `cli()` with them. To use another exit code, such as 2 for a usage error, set `process.exitCode` in `onErrorCommand`
+- Gunshi ignores an option that a command does not declare. Keep this default unless the requirements say that an unknown option is an error: then give `strict: true` to `cli()`
+- Gunshi prints the errors of the arguments to stderr: a missing or invalid argument and an unknown command, and an unknown option only with `strict: true`. It sets the exit code to 1, and calls the `onErrorCommand` option of `cli()` with them. To use another exit code, such as 2 for a usage error, set `process.exitCode` in `onErrorCommand`. If the requirements make an unknown option one of these errors too, give `strict: true` as well
 - For your own errors, print the message with `console.error()`, set `process.exitCode = 1`, and return. An error thrown from `run` ends in a stack trace
 - Gunshi does not read environment variables. To fall back to one, give the option no `default`, and write the order yourself: `ctx.values.region ?? process.env.SHIP_REGION ?? 'us-east-1'`
 - `cli()` prints the usage for `--help` and the version for `--version` itself, and also returns that text. Do not print what it returns

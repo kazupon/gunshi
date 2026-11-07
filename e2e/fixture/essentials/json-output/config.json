@@ -1,0 +1,7 @@
+[
+  ["list", "node cli.js list"],
+  ["list-json", "node cli.js list --json"],
+  ["show-json", "node cli.js show acme-api --json"],
+  ["not-found-json", "node cli.js show nope --json 2>&1; echo \"exit code: $?\""],
+  ["help", "node cli.js list --help"]
+]

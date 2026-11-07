@@ -20,11 +20,6 @@ pnpm add gunshi
 yarn add gunshi
 ```
 
-```sh [deno]
-# For deno projects, you can add Gunshi from JSR:
-deno add jsr:@gunshi/gunshi
-```
-
 ```sh [bun]
 bun add gunshi
 ```
@@ -88,7 +83,6 @@ Gunshi requires:
 
 - **JavaScript Runtime**:
   - **Node.js**: v22 or later
-  - **Deno**: v2 or later
   - **Bun**: v1.1 or later
-- **ES Modules**: `"type": "module"` in `package.json` (if using Node.js and Bun)
+- **ES Modules**: `"type": "module"` in `package.json`
 - **TypeScript**: Version 5.0 or higher (if using TypeScript)

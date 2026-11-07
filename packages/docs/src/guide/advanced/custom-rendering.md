@@ -312,6 +312,8 @@ await cli(process.argv.slice(2), command, {
 
 > [!NOTE]
 > `renderValidationErrors` customizes how validation errors are displayed. Gunshi prints the rendered message to stderr, sets the exit code to `1`, and passes the errors to `onErrorCommand`, and the `cli()` promise resolves. Set `renderValidationErrors` to `null`, or return an empty message, to report the errors yourself: Gunshi prints nothing, and the `cli()` promise rejects with the `AggregateError`. For examples, see [Handling Argument Validation Errors](./command-hooks.md#handling-argument-validation-errors).
+>
+> With `--json`, Gunshi prints the validation errors as one line of JSON instead, and does not call `renderValidationErrors`: an empty message cannot tell Gunshi to leave them to you then. To report them yourself with `--json` as well, set `renderValidationErrors` to `null`. See [JSON Output](../essentials/json-output.md#reporting-errors-yourself).
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

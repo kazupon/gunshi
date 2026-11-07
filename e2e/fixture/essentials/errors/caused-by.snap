@@ -1,0 +1,3 @@
+Could not read the projects from missing.json
+Caused by: ENOENT: no such file or directory, open 'missing.json'
+exit code: 1

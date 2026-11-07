@@ -2,7 +2,6 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![InstallSize][install-size-src]][install-size-src]
-[![JSR][jsr-src]][jsr-href]
 
 > utilities for gunshi command definition
 
@@ -10,6 +9,9 @@ This package exports the bellow APIs and types.
 
 - `define`: A function to define a command.
 - `lazy`: A function to lazily load a command.
+- `CommandError` and `isCommandError`: An error for the failures that a command expects, printed without a stack trace, and its guard.
+- `jsonArgs`: The argument that a command spreads into its `args` to support `--json`.
+- `SubCommandable`: The type of a command to collect into the sub-commands, with or without `jsonArgs`.
 - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
@@ -31,9 +33,6 @@ pnpm add @gunshi/definition
 
 ## yarn
 yarn add @gunshi/definition
-
-## deno
-deno add jsr:@gunshi/definition
 
 ## bun
 bun add @gunshi/definition
@@ -84,6 +83,4 @@ About details, See the below official docs sections:
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/definition?style=flat
 [npm-version-href]: https://npmjs.com/package/@gunshi/definition@alpha
-[jsr-src]: https://jsr.io/badges/@gunshi/definition
-[jsr-href]: https://jsr.io/@gunshi/definition
 [install-size-src]: https://pkg-size.dev/badge/install/23122

@@ -155,7 +155,7 @@ describe('showValidationErrors', () => {
     const utils = await import('../../gunshi/src/utils.ts')
     const stdout = defineMockLog(utils)
     const stderr = defineMockErrorLog()
-    const message = "Optional argument '--id' is required"
+    const message = "Option '--id' is required"
     const ctx = await createCommandContext({
       cliOptions: { renderValidationErrors: () => Promise.resolve(message) },
       extensions: {

@@ -28,10 +28,11 @@ import { resolveCommandArgs } from './args.ts'
 import type { Decorators } from '../decorators.ts'
 import type { Plugin, PluginContext } from '../plugin.ts'
 import type {
-  ArgToken,
   Args,
   ArgSchema,
+  ArgToken,
   ArgValues,
+  Awaitable,
   CliOptions,
   Command,
   CommandCallMode,
@@ -43,6 +44,7 @@ import type {
   ExtractArgExplicitlyProvided,
   ExtractArgs,
   GunshiParamsConstraint,
+  JsonResult,
   LazyCommand
 } from '../types.ts'
 
@@ -1278,7 +1280,7 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
   decorators: Readonly<CommandDecorator<G>[]>
 ): Promise<string | undefined> {
   const commandRunner = cmd.run || NOOP
-  const baseRunner: CommandRunner<G> = ctx => {
+  const baseRunner = (ctx: Readonly<CommandContext<G>>): Awaitable<string | void | JsonResult> => {
     if (hasPriorityValidationError(ctx.validationError)) {
       throw ctx.validationError
     }
@@ -1302,7 +1304,7 @@ async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
 
     // execute onAfterCommand hook only on success
     if (ctx.env.onAfterCommand) {
-      await ctx.env.onAfterCommand(ctx, result as string | undefined)
+      await ctx.env.onAfterCommand(ctx, typeof result === 'string' ? result : undefined)
     }
 
     // return string if one was returned

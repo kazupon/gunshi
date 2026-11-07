@@ -58,7 +58,8 @@ export const COMMAND_BUILTIN_RESOURCE_KEYS = [
   'FORMORE',
   'NEGATABLE',
   'DEFAULT',
-  'CHOICES'
+  'CHOICES',
+  'CAUSEDBY'
 ] as const
 
 export const ARG_ERROR_RESOURCE_KEYS = [
@@ -85,3 +86,17 @@ export const COMMAND_ERROR_RESOURCE_KEYS = [
 ] as const
 
 export const SUGGESTION_ERROR_RESOURCE_KEYS = ['err:suggestion:did-you-mean'] as const
+
+// the description of the `json` argument of `jsonArgs`, and the texts that only the JSON errors print
+export const JSON_RESOURCE_KEYS = [
+  'json',
+  'json:invalid-arguments',
+  'json:next:help',
+  'json:next:help-placeholder'
+] as const
+
+export const JSON_ERROR_RESOURCE_KEYS = [
+  'err:json:not-supported',
+  'err:json:invalid-result',
+  'err:json:unserializable-result'
+] as const

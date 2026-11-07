@@ -7,6 +7,7 @@ import { namespacedId, resolveArgKey, resolveBuiltInKey, resolveKey } from '@gun
 import { MessageFormat } from 'messageformat'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../gunshi/src/context.ts'
+import { jsonArgs } from '../../gunshi/src/json.ts'
 import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2
@@ -77,7 +78,7 @@ describe('extension: translate', () => {
         extension.translate('err:arg:required-option', {
           displayName: "'--id'"
         })
-      ).toEqual("Optional argument '--id' is required")
+      ).toEqual("Option '--id' is required")
       expect(
         extension.translate('err:suggestion:did-you-mean', {
           name: '--allow-reload'
@@ -408,6 +409,65 @@ describe('extension: loadResource', () => {
 
     expect(loaded).toBe(false)
     expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('これはコマンド1です')
+  })
+})
+
+describe('extension: loadResource with jsonArgs', () => {
+  const LOCALE = 'ja-JP'
+
+  async function loadJsonCommand(
+    resource: { description: string; 'arg:json'?: string },
+    options: I18nPluginOptions = {}
+  ) {
+    const jaJPResource = await import('@gunshi/resources/ja-JP', { with: { type: 'json' } }).then(
+      m => m.default || m
+    )
+    const plugin = i18n({
+      locale: LOCALE,
+      builtinResources: { 'ja-JP': jaJPResource },
+      ...options
+    })
+    const extension = await plugin.extension.factory(await createCommandContext({}), {} as Command)
+    const command = defineI18n({
+      name: 'list',
+      args: { ...jsonArgs },
+      run: () => ({ projects: [] }),
+      resource: () => Promise.resolve(resource)
+    })
+    const ctx = await createCommandContext({
+      args: command.args,
+      command,
+      callMode: 'subCommand'
+    })
+    // the plugins pass the commands of `env.subCommands`, which are typed loosely, to `loadResource`
+    await extension.loadResource(LOCALE, ctx, command as unknown as Command)
+    return extension
+  }
+
+  test('the json argument of jsonArgs is described by the built-in resources', async () => {
+    const extension = await loadJsonCommand({ description: '一覧' })
+
+    expect(extension.translate(resolveArgKey('json', 'list'))).toEqual('結果を JSON で出力する')
+  })
+
+  test('the resource of the command describes it, when it has its own', async () => {
+    const extension = await loadJsonCommand({ description: '一覧', 'arg:json': 'JSON で出す' })
+
+    expect(extension.translate(resolveArgKey('json', 'list'))).toEqual('JSON で出す')
+  })
+
+  test('the texts that only the JSON errors print are translated', async () => {
+    const extension = await loadJsonCommand({ description: '一覧' })
+
+    expect(extension.translate('err:json:not-supported')).toEqual(
+      'このコマンドは --json に対応していません'
+    )
+    expect(extension.translate(resolveBuiltInKey('json:invalid-arguments'), { count: 2 })).toEqual(
+      '2 個の引数が不正です'
+    )
+    expect(extension.translate(resolveBuiltInKey('json:next:help'))).toEqual(
+      'コマンドの引数を確認する'
+    )
   })
 })
 

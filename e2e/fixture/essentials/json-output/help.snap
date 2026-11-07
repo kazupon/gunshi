@@ -1,0 +1,13 @@
+A CLI that prints its results as JSON with --json (projects v1.0.0)
+
+List the projects
+
+USAGE:
+  projects list <OPTIONS>
+
+OPTIONS:
+  -h, --help               Display this help message
+  -v, --version            Display this version
+  --json                   Output the result as JSON
+  --limit [limit]          How many projects to list (default: 10)
+

@@ -8,8 +8,14 @@ import { defineMockErrorLog, defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
 import { define, lazy } from './definition.ts'
-import { CommandNotFoundError, CommandNotFoundErrorKeys, isCommandNotFoundError } from './error.ts'
+import {
+  CommandError,
+  CommandNotFoundError,
+  CommandNotFoundErrorKeys,
+  isCommandNotFoundError
+} from './error.ts'
 import { generate } from './generator.ts'
+import { jsonArgs } from './json.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
 import { hidden, string } from './combinators.ts'
@@ -1142,9 +1148,7 @@ test('enum optional argument', async () => {
     })
   ).resolves.toBeUndefined()
   expect(process.exitCode).toBe(1)
-  expect(stderr()).toEqual(
-    `Optional argument '--foo' should be chosen from 'enum' ["a", "b", "c"] values`
-  )
+  expect(stderr()).toEqual(`Invalid value for '--foo': expected one of "a", "b", "c"`)
 })
 
 describe('args validation i18n', () => {
@@ -1339,7 +1343,7 @@ describe('args validation i18n', () => {
     ).resolves.toBeUndefined()
 
     expect(stderr()).toEqual(
-      "Optional argument '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+      "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
     )
   })
 
@@ -2002,7 +2006,7 @@ describe('command lifecycle hooks', () => {
     expect(executionOrder).toEqual(['before', 'error'])
     expect(mockCommand).not.toHaveBeenCalled()
     expect(capturedError).toBeInstanceOf(AggregateError)
-    expect(stderr()).toBe(`Optional argument '--id' is required`)
+    expect(stderr()).toBe(`Option '--id' is required`)
     expect(process.exitCode).toBe(1)
   })
 
@@ -2266,10 +2270,10 @@ describe('command lifecycle hooks', () => {
 
       expect(mockCommand).not.toHaveBeenCalled()
       expect(capturedError?.errors.map((error: Error) => error.message)).toEqual([
-        `Optional argument '--id' is required`,
+        `Option '--id' is required`,
         'Unknown option: --bad'
       ])
-      expect(stderr()).toBe(`Optional argument '--id' is required\nUnknown option: --bad`)
+      expect(stderr()).toBe(`Option '--id' is required\nUnknown option: --bad`)
     })
 
     test('localizes unknown option validation errors with i18n plugin', async () => {
@@ -3075,7 +3079,7 @@ describe('github issues', () => {
 
       await expect(cli([], command, options)).rejects.toMatchObject({
         errors: expect.arrayContaining([
-          expect.objectContaining({ message: "Optional argument '--target' is required" })
+          expect.objectContaining({ message: "Option '--target' is required" })
         ])
       })
 
@@ -4337,7 +4341,7 @@ describe('reported validation errors', () => {
     await expect(cli([], { args, run })).resolves.toBeUndefined()
 
     expect(run).not.toHaveBeenCalled()
-    expect(stderr()).toBe(`Optional argument '--id' is required`)
+    expect(stderr()).toBe(`Option '--id' is required`)
     expect(stdout()).toBe('')
     expect(process.exitCode).toBe(1)
   })
@@ -4482,6 +4486,325 @@ describe('reported validation errors', () => {
 
     expect(run).not.toHaveBeenCalled()
     expect(stderr()).toContain('Unknown option: --nope')
+    expect(process.exitCode).toBe(1)
+  })
+})
+
+describe('reported command errors', () => {
+  beforeEach(() => {
+    // the tests check the exit code, which other tests may have left
+    process.exitCode = undefined
+  })
+
+  test('resolve with undefined, with the message on stderr and the exit code of the error', async () => {
+    const utils = await import('./utils.ts')
+    const stdout = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli([], {
+        run: () => {
+          throw new CommandError('Project acme not found', { code: 'not_found', exitCode: 2 })
+        }
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Project acme not found')
+    expect(stdout()).toBe('')
+    expect(process.exitCode).toBe(2)
+  })
+
+  test('onErrorCommand sees the error after the exit code is set, and can change it', async () => {
+    defineMockErrorLog()
+    const error = new CommandError('Project acme not found')
+    const onErrorCommand = vi.fn<NonNullable<CliOptions['onErrorCommand']>>(() => {
+      expect(process.exitCode).toBe(1)
+      process.exitCode = 3
+    })
+
+    await expect(
+      cli(
+        [],
+        {
+          run: () => {
+            throw error
+          }
+        },
+        { onErrorCommand }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(onErrorCommand).toHaveBeenCalledWith(expect.anything(), error)
+    expect(process.exitCode).toBe(3)
+  })
+
+  test('a CommandError thrown by a decorator of another plugin is reported', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    const auth = plugin({
+      id: 'test:auth',
+      setup: ctx => {
+        ctx.decorateCommand(() => () => {
+          throw new CommandError('Not logged in. Run `demo login` first', { exitCode: 4 })
+        })
+      }
+    })
+
+    await expect(cli([], { run }, { plugins: [auth] })).resolves.toBeUndefined()
+
+    expect(run).not.toHaveBeenCalled()
+    expect(stderr()).toBe('Not logged in. Run `demo login` first')
+    expect(process.exitCode).toBe(4)
+  })
+
+  test('a CommandError thrown by a function of an extension that the command calls is reported', async () => {
+    const stderr = defineMockErrorLog()
+    const api = plugin({
+      id: 'test:api',
+      extension: () => ({
+        fetchProject: (name: string): never => {
+          throw new CommandError(`Project ${name} not found`)
+        }
+      })
+    })
+
+    await expect(
+      cli(
+        [],
+        {
+          run: ctx => {
+            ;(
+              ctx.extensions as unknown as Record<string, { fetchProject: (name: string) => never }>
+            )['test:api'].fetchProject('acme')
+          }
+        },
+        { plugins: [api] }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Project acme not found')
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('the heading of the causes is translated by the i18n plugin', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(
+        [],
+        {
+          run: () => {
+            throw new CommandError('プロジェクトが見つかりません: acme', {
+              cause: new Error('connect ECONNREFUSED 127.0.0.1:5432')
+            })
+          }
+        },
+        { plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })] }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      'プロジェクトが見つかりません: acme\n原因: connect ECONNREFUSED 127.0.0.1:5432'
+    )
+  })
+
+  test('the heading of the causes is English when the resources of the locale lack it', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(
+        [],
+        {
+          run: () => {
+            throw new CommandError('Could not deploy acme', { cause: new Error('Request failed') })
+          }
+        },
+        // resources made before the key, which the i18n plugin fills in with the English ones
+        { plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': { USAGE: '使い方' } } })] }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Could not deploy acme\nCaused by: Request failed')
+  })
+
+  test.each<{ title: string; setup: (error: CommandError) => Parameters<typeof cli> }>([
+    {
+      title: 'with `usageSilent`, for the caller to report it',
+      setup: error => [
+        [],
+        {
+          run: () => {
+            throw error
+          }
+        },
+        { usageSilent: true }
+      ]
+    },
+    {
+      title: 'from onBeforeCommand',
+      setup: error => [
+        [],
+        { run: vi.fn<() => void>() },
+        {
+          onBeforeCommand: () => {
+            throw error
+          }
+        }
+      ]
+    },
+    {
+      title: 'from onAfterCommand',
+      setup: error => [
+        [],
+        { run: vi.fn<() => void>() },
+        {
+          onAfterCommand: () => {
+            throw error
+          }
+        }
+      ]
+    },
+    {
+      title: 'while a plugin extends the command context',
+      setup: error => [
+        [],
+        { run: vi.fn<() => void>() },
+        {
+          plugins: [
+            plugin({
+              id: 'test:config',
+              extension: () => {
+                throw error
+              }
+            })
+          ]
+        }
+      ]
+    },
+    {
+      title: 'while a lazy command loads',
+      setup: error => [
+        [],
+        lazy(
+          () => {
+            throw error
+          },
+          { name: 'demo' }
+        )
+      ]
+    }
+  ])('reject with a CommandError thrown $title, without printing it', async ({ setup }) => {
+    const stderr = defineMockErrorLog()
+    const error = new CommandError('Project acme not found', { exitCode: 2 })
+
+    await expect(cli(...setup(error))).rejects.toBe(error)
+
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('an error whose properties throw when they are read still rejects with it', async () => {
+    const stderr = defineMockErrorLog()
+    const error = new Error('boom')
+    Object.defineProperty(error, 'code', {
+      get() {
+        throw new Error('the getter of code')
+      }
+    })
+
+    await expect(
+      cli([], {
+        run: () => {
+          throw error
+        }
+      })
+    ).rejects.toBe(error)
+
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('gunshi/bone rejects with a CommandError, without the global options plugin', async () => {
+    const stderr = defineMockErrorLog()
+    const error = new CommandError('Project acme not found')
+
+    await expect(
+      boneCli([], {
+        run: () => {
+          throw error
+        }
+      })
+    ).rejects.toBe(error)
+
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+})
+
+describe('--json', () => {
+  beforeEach(() => {
+    // the tests check the exit code, which other tests may have left
+    process.exitCode = undefined
+  })
+
+  test('prints the result as JSON, with the human output and the hooks silenced', async () => {
+    const stdout = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const onAfterCommand = vi.fn<NonNullable<CliOptions['onAfterCommand']>>()
+    try {
+      const result = await cli(
+        ['list', '--json'],
+        { name: 'demo', run: () => {} },
+        {
+          name: 'demo',
+          subCommands: {
+            list: define({
+              name: 'list',
+              args: { ...jsonArgs },
+              run: ctx => {
+                ctx.log('Projects:')
+                return { projects: ['acme'] }
+              }
+            })
+          },
+          onBeforeCommand: ctx => {
+            ctx.log('before the command')
+          },
+          onAfterCommand
+        }
+      )
+
+      expect(result).toBeUndefined()
+      expect(stdout.mock.calls).toEqual([['{"projects":["acme"]}']])
+      // the hook gets no data: the result is printed, not returned
+      expect(onAfterCommand).toHaveBeenCalledWith(expect.anything(), undefined)
+    } finally {
+      stdout.mockRestore()
+    }
+  })
+
+  test('onAfterCommand gets the result only when it is a string', async () => {
+    const onAfterCommand = vi.fn<NonNullable<CliOptions['onAfterCommand']>>()
+
+    await cli([], { run: () => 'text' }, { onAfterCommand })
+    // a runner written in JavaScript may return anything
+    await cli([], { run: (() => ({ ok: true })) as unknown as CommandRunner }, { onAfterCommand })
+
+    expect(onAfterCommand.mock.calls.map(([, result]) => result)).toEqual(['text', undefined])
+  })
+
+  test('a command without jsonArgs is stopped with json_not_supported, after the hook', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    const onBeforeCommand = vi.fn<NonNullable<CliOptions['onBeforeCommand']>>()
+
+    await expect(
+      cli(['--json'], { name: 'legacy', run }, { name: 'demo', onBeforeCommand })
+    ).resolves.toBeUndefined()
+
+    expect(run).not.toHaveBeenCalled()
+    // the hooks run before the decorators, so the hook runs for it
+    expect(onBeforeCommand).toHaveBeenCalled()
+    expect(JSON.parse(stderr())).toMatchObject({ reason: 'json_not_supported' })
     expect(process.exitCode).toBe(1)
   })
 })

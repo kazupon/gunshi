@@ -230,18 +230,24 @@ Clear, actionable error messages reduce debugging time by pointing developers to
 
 When errors provide specific context, possible causes, and concrete next steps, developers can more easily diagnose and fix issues independently.
 
-This example shows how to provide helpful error messages with context and solutions:
+This example shows how to provide helpful error messages with context and solutions.
+
+It throws a `CommandError`, so when a command calls the function from `run`, Gunshi prints every line of the message to the user, without a stack trace:
 
 <!-- eslint-skip -->
 
 ```ts
+import { CommandError } from '@gunshi/plugin'
+
+// ...
+
 extension: ctx => ({
   connect: async (url: string) => {
     try {
       return await establishConnection(url)
     } catch (error) {
       // Provide context and solution
-      throw new Error(
+      throw new CommandError(
         `Failed to connect to ${url}.\n` +
           `Possible causes:\n` +
           `  - Network connectivity issues\n` +
@@ -497,22 +503,28 @@ For more `extension` lifecycle details, see [Plugin Extensions](./extensions.md)
 
 User input should be validated and sanitized before use.
 
-The following example demonstrates how to validate file paths and extensions to prevent directory traversal attacks and restrict file types:
+The following example demonstrates how to validate file paths and extensions to prevent directory traversal attacks and restrict file types.
+
+The input comes from the user, so it throws a `CommandError` for an input that the user got wrong. When a command calls the function from `run`, Gunshi prints the message to the user without a stack trace:
 
 <!-- eslint-skip -->
 
 ```ts
+import { CommandError } from '@gunshi/plugin'
+
+// ...
+
 extension: () => ({
   readFile: async (path: string) => {
     // Prevent path traversal
     if (path.includes('..') || path.startsWith('/')) {
-      throw new Error('Invalid file path')
+      throw new CommandError('Invalid file path')
     }
 
     // Validate file extension
     const allowed = ['.json', '.yaml', '.yml']
     if (!allowed.some(ext => path.endsWith(ext))) {
-      throw new Error('Unsupported file type')
+      throw new CommandError('Unsupported file type')
     }
 
     return await fs.readFile(path, 'utf8')
@@ -524,9 +536,13 @@ extension: () => ({
 
 Avoid exposing sensitive information in logs or error messages.
 
-This example shows how to handle API keys securely in a plugin, validating them without logging sensitive data:
+This example shows how to handle API keys securely in a plugin, validating them without logging sensitive data.
+
+A `CommandError` reaches the user as it is: Gunshi prints its message, and the message of each cause down the chain. So the example builds the message itself, and does not pass the error of `fetch` as the `cause`, whose own causes may carry details of the connection that you did not choose to show:
 
 ```ts
+import { CommandError, plugin } from '@gunshi/plugin'
+
 export default function auth(apiKey: string) {
   // Validate but don't log the key
   if (!apiKey || apiKey.length < 32) {
@@ -542,8 +558,9 @@ export default function auth(apiKey: string) {
             headers: { Authorization: `Bearer ${apiKey}` }
           })
         } catch (error) {
-          // Don't include the API key in errors
-          throw new Error(`Request failed: ${error.message}`)
+          // Don't include the API key in errors, and don't pass the error as the `cause`:
+          // Gunshi prints the message of every cause as it is
+          throw new CommandError(`Request failed: ${error.message}`)
         }
       }
     })

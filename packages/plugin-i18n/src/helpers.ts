@@ -11,7 +11,8 @@ import type {
   ExtractArgs,
   ExtractExtensions,
   GunshiParamsConstraint,
-  Prettify
+  Prettify,
+  SubCommandable
 } from '@gunshi/plugin'
 import type { CommandResourceFetcher, I18nCommand } from './types.ts'
 
@@ -39,7 +40,7 @@ type I18nCommandDefinitionResult<
  */
 type WithI18nResourceResult<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
-  C extends Command<G> = Command<G>
+  C extends Command<G> | SubCommandable = Command<G>
 > = Prettify<
   C & { resource: CommandResourceFetcher<G> } & {
     [K in Exclude<keyof I18nCommand<G>, keyof C | 'resource'>]?: I18nCommand<G>[K]
@@ -212,10 +213,10 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
  * @param resource - A {@link CommandResourceFetcher | resource fetcher} for the command
  * @returns A {@link I18nCommand | command} with i18n resource support
  */
-export function withI18nResource<G extends GunshiParamsConstraint, C extends Command<G>>(
-  command: C,
-  resource: CommandResourceFetcher<G>
-): WithI18nResourceResult<G, C> {
+export function withI18nResource<
+  G extends GunshiParamsConstraint,
+  C extends Command<G> | SubCommandable
+>(command: C, resource: CommandResourceFetcher<G>): WithI18nResourceResult<G, C> {
   return {
     ...command,
     resource

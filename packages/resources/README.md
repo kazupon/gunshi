@@ -16,9 +16,6 @@ pnpm add @gunshi/resources
 # yarn
 yarn add @gunshi/resources
 
-# deno
-deno add jsr:@gunshi/resources
-
 # bun
 bun add @gunshi/resources
 ```
@@ -59,6 +56,10 @@ Keys for built-in functionalities are handled by Gunshi's default locales. The c
 - `NEGATABLE` - Prefix for negatable options (e.g., "Negatable of --verbose")
 - `DEFAULT` - Prefix for default values (e.g., "default: 5")
 - `CHOICES` - Prefix for available choices (e.g., "choices: red, green, blue")
+- `CAUSEDBY` - Heading of the lines of the causes of a `CommandError` (e.g., "Caused by: connect ECONNREFUSED 127.0.0.1:5432")
+- `json` - Description for the `--json` option of `jsonArgs` ("Output the result as JSON")
+- `json:invalid-arguments`, `json:next:help`, `json:next:help-placeholder` - Texts that only the JSON errors of `--json` print
+- `err:json:not-supported`, `err:json:invalid-result`, `err:json:unserializable-result` - Messages of the errors of the JSON output
 - `help` - Description for the help option ("Display this help message")
 - `version` - Description for the version option ("Display this version")
   The following keys are provided for each locale:

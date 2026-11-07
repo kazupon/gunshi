@@ -29,6 +29,8 @@ export const essentials = {
     { text: 'Composable', link: '/guide/essentials/composable' },
     { text: 'Lazy & Async', link: '/guide/essentials/lazy-async' },
     { text: 'Auto Usage Generation', link: '/guide/essentials/auto-usage' },
+    { text: 'Errors and Exit Codes', link: '/guide/essentials/errors' },
+    { text: 'JSON Output', link: '/guide/essentials/json-output' },
     { text: 'Plugin System', link: '/guide/essentials/plugin-system' }
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "name": "errors",
+  "private": true,
+  "packageManager": "pnpm@12.17.0",
+  "type": "module",
+  "scripts": {
+    "start": "node cli.js"
+  },
+  "dependencies": {
+    "gunshi": "file:../../../packages/gunshi"
+  }
+}

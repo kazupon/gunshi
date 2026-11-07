@@ -40,6 +40,20 @@ export type CommandResolutionErrorCode =
   (typeof CommandResolutionErrorKeys)[keyof typeof CommandResolutionErrorKeys]
 
 /**
+ * The resource keys of the errors of the JSON output, which are the codes of {@link JsonOutputError}.
+ */
+export const JsonOutputErrorKeys = {
+  notSupported: 'err:json:not-supported',
+  invalidResult: 'err:json:invalid-result',
+  unserializableResult: 'err:json:unserializable-result'
+} as const
+
+/**
+ * The code of a {@link JsonOutputError}.
+ */
+export type JsonOutputErrorCode = (typeof JsonOutputErrorKeys)[keyof typeof JsonOutputErrorKeys]
+
+/**
  * Options for {@link CommandNotFoundError}.
  */
 export type CommandNotFoundErrorOptions = {
@@ -84,6 +98,32 @@ export type CommandResolutionErrorOptions = {
 }
 
 /**
+ * Options for {@link CommandError}. All of them are optional.
+ */
+export type CommandErrorOptions = {
+  /**
+   * The name of the failure, for programs to read, such as `not_found`. snake_case is recommended.
+   *
+   * It is not printed to the user. With `--json`, it is the `reason` of the JSON error, as it is.
+   */
+  code?: string
+  /**
+   * The exit code of the process, an integer from 1 to 255. Defaults to 1, and any other value is
+   * replaced with 1, since the command has failed.
+   */
+  exitCode?: number
+  /**
+   * The error that caused the failure.
+   *
+   * Its message is printed as is, on a `Caused by:` line after the message of the
+   * {@link CommandError}, and so is the message of its own cause. With `--json`, the messages are in
+   * `data.causes` of the JSON error. Do not pass an error whose message may contain a secret, such as
+   * a token in a URL: write the message of the {@link CommandError} yourself instead.
+   */
+  cause?: unknown
+}
+
+/**
  * Brand that marks {@link CommandNotFoundError} instances.
  *
  * The brand is looked up in the global symbol registry with `Symbol.for`, so it stays
@@ -94,6 +134,10 @@ export type CommandResolutionErrorOptions = {
 const COMMAND_NOT_FOUND_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandNotFoundError')
 
 const COMMAND_RESOLUTION_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandResolutionError')
+
+const COMMAND_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandError')
+
+const JSON_OUTPUT_ERROR_BRAND: unique symbol = Symbol.for('gunshi.JsonOutputError')
 
 /**
  * Error raised when a command cannot be resolved.
@@ -170,6 +214,75 @@ export class CommandResolutionError extends Error {
 }
 
 /**
+ * Error for a failure that a command expects, such as a project that does not exist.
+ *
+ * When a command throws it from `run`, or a plugin throws it from a command decorator, the global
+ * options plugin prints its message to stderr, followed by a `Caused by:` line for each cause,
+ * without a stack trace. It sets the exit code of the process to {@link CommandError.exitCode},
+ * and `cli()` resolves with `undefined`. `onErrorCommand` is still called with the error, after the
+ * exit code is set, so the hook can change it.
+ *
+ * It is not printed, and `cli()` rejects with it, in these cases:
+ *
+ * - `usageSilent` is set, for the caller to report it
+ * - it is thrown from a hook, while a plugin extends the command context, or while a lazy command
+ *   loads, outside the command decorators
+ * - the CLI runs without the global options plugin, as `gunshi/bone` does
+ *
+ * Any other error thrown from a command is not printed either, and `cli()` rejects with it.
+ *
+ * Each package of gunshi (`gunshi`, `@gunshi/plugin`, `@gunshi/definition`) bundles its own copy of
+ * this class, so `instanceof` does not match an error from another copy. Use
+ * {@link isCommandError} to tell it.
+ *
+ * @example
+ * ```js
+ * import { CommandError, define } from 'gunshi'
+ *
+ * export default define({
+ *   name: 'show',
+ *   args: { project: { type: 'positional', description: 'Project name' } },
+ *   run: async ctx => {
+ *     const project = await findProject(ctx.values.project)
+ *     if (!project) {
+ *       throw new CommandError(`Project ${ctx.values.project} not found`, { code: 'not_found' })
+ *     }
+ *     ctx.log(project.description)
+ *   }
+ * })
+ * ```
+ */
+export class CommandError extends Error {
+  /**
+   * The name of the failure, for programs to read. See {@link CommandErrorOptions.code}.
+   */
+  readonly code?: string
+  /**
+   * The exit code of the process, an integer from 1 to 255.
+   */
+  readonly exitCode: number
+
+  /**
+   * Create an error for a failure that a command expects.
+   *
+   * @param message - The message printed to the user. It may have more than one line.
+   * @param options - The code, the exit code and the cause of the failure
+   */
+  constructor(message: string, options: CommandErrorOptions = {}) {
+    super(message, { cause: options.cause })
+    this.name = 'CommandError'
+    this.code = options.code
+    this.exitCode = isFailureExitCode(options.exitCode) ? options.exitCode : 1
+    Object.defineProperty(this, COMMAND_ERROR_BRAND, {
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+  }
+}
+
+/**
  * Check whether an error is a {@link CommandNotFoundError}.
  *
  * `instanceof` alone is not enough: `@gunshi/plugin` is bundled with its own copy of this
@@ -219,6 +332,122 @@ export function isCommandResolutionError(error: unknown): error is CommandResolu
     Object.hasOwn(error, COMMAND_RESOLUTION_ERROR_BRAND) &&
     error[COMMAND_RESOLUTION_ERROR_BRAND] === true
   )
+}
+
+/**
+ * Check whether an error is a {@link CommandError}.
+ *
+ * An error from another copy of gunshi is recognized through the `Symbol.for('gunshi.CommandError')`
+ * brand. It is not recognized by `error.name`, so an error of the app that is also named
+ * `CommandError` is not taken for one.
+ *
+ * @param error - An unknown error
+ * @returns `true` if the error is a {@link CommandError}
+ */
+export function isCommandError(error: unknown): error is CommandError {
+  if (error instanceof CommandError) {
+    return true
+  }
+  // The global options plugin checks every error that a command throws, so the brand comes first:
+  // reading the properties of any other error could run a getter that throws, and the error that
+  // the command threw would be lost.
+  if (
+    !isRecord(error) ||
+    !Object.hasOwn(error, COMMAND_ERROR_BRAND) ||
+    error[COMMAND_ERROR_BRAND] !== true
+  ) {
+    return false
+  }
+  // the global options plugin prints `message` and sets the exit code to `exitCode`, so an error
+  // from another copy must have the shape that this type predicate promises
+  return hasCommandErrorShape(error)
+}
+
+/**
+ * Options for {@link JsonOutputError}.
+ */
+export type JsonOutputErrorOptions = {
+  /**
+   * The code of the error, which is also the resource key of its message.
+   */
+  code: JsonOutputErrorCode
+  /**
+   * Values used when localizing the message.
+   */
+  values?: Record<string, unknown>
+  /**
+   * Underlying cause, such as the error of `JSON.stringify`.
+   */
+  cause?: unknown
+}
+
+/**
+ * Error raised by the global options plugin for the JSON output, when a command is given `--json`.
+ *
+ * - `err:json:not-supported`: the command does not spread `jsonArgs`. It is raised before the command
+ *   runs, and thrown in an `AggregateError`, as the argument errors are.
+ * - `err:json:invalid-result`: the command finished, but did not return an object to output as JSON
+ * - `err:json:unserializable-result`: the command finished, but its result cannot be converted to
+ *   JSON, such as an object with a `BigInt`
+ *
+ * The plugin prints it as one line of JSON to stderr, and `cli()` resolves with `undefined`. For
+ * `err:json:not-supported`, with `renderValidationErrors: null` or `usageSilent`, nothing is printed
+ * and `cli()` rejects with the `AggregateError`, as it does for the argument errors.
+ *
+ * Use {@link isJsonOutputError} to tell it, since each package bundles its own copy of this class.
+ */
+export class JsonOutputError extends Error {
+  /**
+   * The code of the error, which is also the resource key of its message.
+   */
+  readonly code: JsonOutputErrorCode
+  /**
+   * Values used when localizing the message.
+   */
+  readonly values: Record<string, unknown>
+
+  /**
+   * Create an error of the JSON output.
+   *
+   * @param message - Fallback error message
+   * @param options - The code of the error, and the values of its message
+   */
+  constructor(message: string, options: JsonOutputErrorOptions) {
+    super(message, { cause: options.cause })
+    this.name = 'JsonOutputError'
+    this.code = options.code
+    this.values = options.values || {}
+    Object.defineProperty(this, JSON_OUTPUT_ERROR_BRAND, {
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+  }
+}
+
+/**
+ * Check whether an error is a {@link JsonOutputError}.
+ *
+ * An error from another copy of gunshi is recognized through the
+ * `Symbol.for('gunshi.JsonOutputError')` brand, not by `error.name`.
+ *
+ * @param error - An unknown error
+ * @returns `true` if the error is a {@link JsonOutputError}
+ */
+export function isJsonOutputError(error: unknown): error is JsonOutputError {
+  if (error instanceof JsonOutputError) {
+    return true
+  }
+  // the brand comes first, as for `isCommandError`: the error may be any error of a command
+  if (
+    !isRecord(error) ||
+    !Object.hasOwn(error, JSON_OUTPUT_ERROR_BRAND) ||
+    error[JSON_OUTPUT_ERROR_BRAND] !== true
+  ) {
+    return false
+  }
+  return hasJsonOutputErrorShape(error)
 }
 
 /**
@@ -300,6 +529,30 @@ function hasCommandResolutionErrorShape(error: Record<PropertyKey, unknown>): bo
 
 function hasArgsValidationErrorShape(error: Record<PropertyKey, unknown>): boolean {
   return hasOptionalStringCode(error) && isRecord(error.values)
+}
+
+function hasCommandErrorShape(error: Record<PropertyKey, unknown>): boolean {
+  return (
+    hasOptionalStringCode(error) &&
+    typeof error.message === 'string' &&
+    isFailureExitCode(error.exitCode)
+  )
+}
+
+function hasJsonOutputErrorShape(error: Record<PropertyKey, unknown>): boolean {
+  return (
+    (Object.values(JsonOutputErrorKeys) as unknown[]).includes(error.code) && isRecord(error.values)
+  )
+}
+
+/**
+ * Check whether a value is an exit code of a failure: an integer from 1 to 255.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is an exit code of a failure
+ */
+function isFailureExitCode(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 1 && (value as number) <= 255
 }
 
 /**
