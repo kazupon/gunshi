@@ -2,6 +2,8 @@
 
 Scripts and coding agents run a CLI and read what it prints. With `--json`, a command of Gunshi prints its result as one JSON document to stdout, and a failure as one line of JSON to stderr, so a program can read them without parsing text for people.
 
+`--json` is designed for AI agents first. An agent that runs your CLI reads the result as data, not as text for people. When the command fails, the error tells the agent whether it can fix the input (`status`), why the command failed (`reason`), which argument is wrong (`field`), and which command to run next (`next`), so the agent can correct the command by itself. See [Errors](#errors).
+
 ## Supporting `--json`
 
 A command supports `--json` when it spreads `jsonArgs` into its arguments. It returns its result from `run`, as an object keyed by a noun, and prints the output for people with `ctx.log`:
