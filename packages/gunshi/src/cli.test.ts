@@ -8,7 +8,12 @@ import { defineMockErrorLog, defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
 import { define, lazy } from './definition.ts'
-import { CommandNotFoundError, CommandNotFoundErrorKeys, isCommandNotFoundError } from './error.ts'
+import {
+  CommandError,
+  CommandNotFoundError,
+  CommandNotFoundErrorKeys,
+  isCommandNotFoundError
+} from './error.ts'
 import { generate } from './generator.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
@@ -4481,6 +4486,236 @@ describe('reported validation errors', () => {
     expect(run).not.toHaveBeenCalled()
     expect(stderr()).toContain('Unknown option: --nope')
     expect(process.exitCode).toBe(1)
+  })
+})
+
+describe('reported command errors', () => {
+  beforeEach(() => {
+    // the tests check the exit code, which other tests may have left
+    process.exitCode = undefined
+  })
+
+  test('resolve with undefined, with the message on stderr and the exit code of the error', async () => {
+    const utils = await import('./utils.ts')
+    const stdout = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli([], {
+        run: () => {
+          throw new CommandError('Project acme not found', { code: 'not_found', exitCode: 2 })
+        }
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Project acme not found')
+    expect(stdout()).toBe('')
+    expect(process.exitCode).toBe(2)
+  })
+
+  test('onErrorCommand sees the error after the exit code is set, and can change it', async () => {
+    defineMockErrorLog()
+    const error = new CommandError('Project acme not found')
+    const onErrorCommand = vi.fn<NonNullable<CliOptions['onErrorCommand']>>(() => {
+      expect(process.exitCode).toBe(1)
+      process.exitCode = 3
+    })
+
+    await expect(
+      cli(
+        [],
+        {
+          run: () => {
+            throw error
+          }
+        },
+        { onErrorCommand }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(onErrorCommand).toHaveBeenCalledWith(expect.anything(), error)
+    expect(process.exitCode).toBe(3)
+  })
+
+  test('a CommandError thrown by a decorator of another plugin is reported', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    const auth = plugin({
+      id: 'test:auth',
+      setup: ctx => {
+        ctx.decorateCommand(() => () => {
+          throw new CommandError('Not logged in. Run `demo login` first', { exitCode: 4 })
+        })
+      }
+    })
+
+    await expect(cli([], { run }, { plugins: [auth] })).resolves.toBeUndefined()
+
+    expect(run).not.toHaveBeenCalled()
+    expect(stderr()).toBe('Not logged in. Run `demo login` first')
+    expect(process.exitCode).toBe(4)
+  })
+
+  test('a CommandError thrown by a function of an extension that the command calls is reported', async () => {
+    const stderr = defineMockErrorLog()
+    const api = plugin({
+      id: 'test:api',
+      extension: () => ({
+        fetchProject: (name: string): never => {
+          throw new CommandError(`Project ${name} not found`)
+        }
+      })
+    })
+
+    await expect(
+      cli(
+        [],
+        {
+          run: ctx => {
+            ;(
+              ctx.extensions as unknown as Record<string, { fetchProject: (name: string) => never }>
+            )['test:api'].fetchProject('acme')
+          }
+        },
+        { plugins: [api] }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Project acme not found')
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('the heading of the causes is translated by the i18n plugin', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(
+        [],
+        {
+          run: () => {
+            throw new CommandError('プロジェクトが見つかりません: acme', {
+              cause: new Error('connect ECONNREFUSED 127.0.0.1:5432')
+            })
+          }
+        },
+        { plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })] }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      'プロジェクトが見つかりません: acme\n原因: connect ECONNREFUSED 127.0.0.1:5432'
+    )
+  })
+
+  test('the heading of the causes is English when the resources of the locale lack it', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(
+        [],
+        {
+          run: () => {
+            throw new CommandError('Could not deploy acme', { cause: new Error('Request failed') })
+          }
+        },
+        // resources made before the key, which the i18n plugin fills in with the English ones
+        { plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': { USAGE: '使い方' } } })] }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Could not deploy acme\nCaused by: Request failed')
+  })
+
+  test.each<{ title: string; setup: (error: CommandError) => Parameters<typeof cli> }>([
+    {
+      title: 'with `usageSilent`, for the caller to report it',
+      setup: error => [
+        [],
+        {
+          run: () => {
+            throw error
+          }
+        },
+        { usageSilent: true }
+      ]
+    },
+    {
+      title: 'from onBeforeCommand',
+      setup: error => [
+        [],
+        { run: vi.fn<() => void>() },
+        {
+          onBeforeCommand: () => {
+            throw error
+          }
+        }
+      ]
+    },
+    {
+      title: 'from onAfterCommand',
+      setup: error => [
+        [],
+        { run: vi.fn<() => void>() },
+        {
+          onAfterCommand: () => {
+            throw error
+          }
+        }
+      ]
+    },
+    {
+      title: 'while a plugin extends the command context',
+      setup: error => [
+        [],
+        { run: vi.fn<() => void>() },
+        {
+          plugins: [
+            plugin({
+              id: 'test:config',
+              extension: () => {
+                throw error
+              }
+            })
+          ]
+        }
+      ]
+    },
+    {
+      title: 'while a lazy command loads',
+      setup: error => [
+        [],
+        lazy(
+          () => {
+            throw error
+          },
+          { name: 'demo' }
+        )
+      ]
+    }
+  ])('reject with a CommandError thrown $title, without printing it', async ({ setup }) => {
+    const stderr = defineMockErrorLog()
+    const error = new CommandError('Project acme not found', { exitCode: 2 })
+
+    await expect(cli(...setup(error))).rejects.toBe(error)
+
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('gunshi/bone rejects with a CommandError, without the global options plugin', async () => {
+    const stderr = defineMockErrorLog()
+    const error = new CommandError('Project acme not found')
+
+    await expect(
+      boneCli([], {
+        run: () => {
+          throw error
+        }
+      })
+    ).rejects.toBe(error)
+
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
   })
 })
 

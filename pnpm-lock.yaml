@@ -735,6 +735,12 @@ importers:
         specifier: file:../../../packages/gunshi
         version: link:../../../packages/gunshi
 
+  playground/essentials/errors:
+    dependencies:
+      gunshi:
+        specifier: file:../../../packages/gunshi
+        version: link:../../../packages/gunshi
+
   playground/essentials/getting-started/context:
     dependencies:
       gunshi:

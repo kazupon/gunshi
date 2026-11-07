@@ -10,6 +10,7 @@
   "NEGATABLE": "否定可能な",
   "DEFAULT": "デフォルト",
   "CHOICES": "選択肢",
+  "CAUSEDBY": "原因",
   "help": "このヘルプメッセージを表示",
   "version": "このバージョンを表示",
   "err:arg:required-option": "オプション {$displayName} は必須です",

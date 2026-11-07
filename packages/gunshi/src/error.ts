@@ -84,6 +84,32 @@ export type CommandResolutionErrorOptions = {
 }
 
 /**
+ * Options for {@link CommandError}. All of them are optional.
+ */
+export type CommandErrorOptions = {
+  /**
+   * The name of the failure, for programs to read, such as `not_found`. snake_case is recommended.
+   *
+   * It is not printed to the user.
+   */
+  code?: string
+  /**
+   * The exit code of the process, an integer from 1 to 255. Defaults to 1, and any other value is
+   * replaced with 1, since the command has failed.
+   */
+  exitCode?: number
+  /**
+   * The error that caused the failure.
+   *
+   * Its message is printed as is, on a `Caused by:` line after the message of the
+   * {@link CommandError}, and so is the message of its own cause. Do not pass an error whose message
+   * may contain a secret, such as a token in a URL: write the message of the {@link CommandError}
+   * yourself instead.
+   */
+  cause?: unknown
+}
+
+/**
  * Brand that marks {@link CommandNotFoundError} instances.
  *
  * The brand is looked up in the global symbol registry with `Symbol.for`, so it stays
@@ -94,6 +120,8 @@ export type CommandResolutionErrorOptions = {
 const COMMAND_NOT_FOUND_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandNotFoundError')
 
 const COMMAND_RESOLUTION_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandResolutionError')
+
+const COMMAND_ERROR_BRAND: unique symbol = Symbol.for('gunshi.CommandError')
 
 /**
  * Error raised when a command cannot be resolved.
@@ -170,6 +198,75 @@ export class CommandResolutionError extends Error {
 }
 
 /**
+ * Error for a failure that a command expects, such as a project that does not exist.
+ *
+ * When a command throws it from `run`, or a plugin throws it from a command decorator, the global
+ * options plugin prints its message to stderr, followed by a `Caused by:` line for each cause,
+ * without a stack trace. It sets the exit code of the process to {@link CommandError.exitCode},
+ * and `cli()` resolves with `undefined`. `onErrorCommand` is still called with the error, after the
+ * exit code is set, so the hook can change it.
+ *
+ * It is not printed, and `cli()` rejects with it, in these cases:
+ *
+ * - `usageSilent` is set, for the caller to report it
+ * - it is thrown from a hook, while a plugin extends the command context, or while a lazy command
+ *   loads, outside the command decorators
+ * - the CLI runs without the global options plugin, as `gunshi/bone` does
+ *
+ * Any other error thrown from a command is not printed either, and `cli()` rejects with it.
+ *
+ * Each package of gunshi (`gunshi`, `@gunshi/plugin`, `@gunshi/definition`) bundles its own copy of
+ * this class, so `instanceof` does not match an error from another copy. Use
+ * {@link isCommandError} to tell it.
+ *
+ * @example
+ * ```js
+ * import { CommandError, define } from 'gunshi'
+ *
+ * export default define({
+ *   name: 'show',
+ *   args: { project: { type: 'positional', description: 'Project name' } },
+ *   run: async ctx => {
+ *     const project = await findProject(ctx.values.project)
+ *     if (!project) {
+ *       throw new CommandError(`Project ${ctx.values.project} not found`, { code: 'not_found' })
+ *     }
+ *     ctx.log(project.description)
+ *   }
+ * })
+ * ```
+ */
+export class CommandError extends Error {
+  /**
+   * The name of the failure, for programs to read. See {@link CommandErrorOptions.code}.
+   */
+  readonly code?: string
+  /**
+   * The exit code of the process, an integer from 1 to 255.
+   */
+  readonly exitCode: number
+
+  /**
+   * Create an error for a failure that a command expects.
+   *
+   * @param message - The message printed to the user. It may have more than one line.
+   * @param options - The code, the exit code and the cause of the failure
+   */
+  constructor(message: string, options: CommandErrorOptions = {}) {
+    super(message, { cause: options.cause })
+    this.name = 'CommandError'
+    this.code = options.code
+    this.exitCode = isFailureExitCode(options.exitCode) ? options.exitCode : 1
+    Object.defineProperty(this, COMMAND_ERROR_BRAND, {
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+  }
+}
+
+/**
  * Check whether an error is a {@link CommandNotFoundError}.
  *
  * `instanceof` alone is not enough: `@gunshi/plugin` is bundled with its own copy of this
@@ -219,6 +316,28 @@ export function isCommandResolutionError(error: unknown): error is CommandResolu
     Object.hasOwn(error, COMMAND_RESOLUTION_ERROR_BRAND) &&
     error[COMMAND_RESOLUTION_ERROR_BRAND] === true
   )
+}
+
+/**
+ * Check whether an error is a {@link CommandError}.
+ *
+ * An error from another copy of gunshi is recognized through the `Symbol.for('gunshi.CommandError')`
+ * brand. It is not recognized by `error.name`, so an error of the app that is also named
+ * `CommandError` is not taken for one.
+ *
+ * @param error - An unknown error
+ * @returns `true` if the error is a {@link CommandError}
+ */
+export function isCommandError(error: unknown): error is CommandError {
+  if (error instanceof CommandError) {
+    return true
+  }
+  // the global options plugin prints `message` and sets the exit code to `exitCode`, so an error
+  // from another copy must have the shape that this type predicate promises
+  if (!isRecord(error) || !hasCommandErrorShape(error)) {
+    return false
+  }
+  return Object.hasOwn(error, COMMAND_ERROR_BRAND) && error[COMMAND_ERROR_BRAND] === true
 }
 
 /**
@@ -300,6 +419,24 @@ function hasCommandResolutionErrorShape(error: Record<PropertyKey, unknown>): bo
 
 function hasArgsValidationErrorShape(error: Record<PropertyKey, unknown>): boolean {
   return hasOptionalStringCode(error) && isRecord(error.values)
+}
+
+function hasCommandErrorShape(error: Record<PropertyKey, unknown>): boolean {
+  return (
+    hasOptionalStringCode(error) &&
+    typeof error.message === 'string' &&
+    isFailureExitCode(error.exitCode)
+  )
+}
+
+/**
+ * Check whether a value is an exit code of a failure: an integer from 1 to 255.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is an exit code of a failure
+ */
+function isFailureExitCode(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 1 && (value as number) <= 255
 }
 
 /**

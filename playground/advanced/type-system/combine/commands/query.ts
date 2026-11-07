@@ -2,7 +2,7 @@ import { pluginId as authId } from '../plugins/auth.ts'
 import { pluginId as databaseId } from '../plugins/database.ts'
 import { pluginId as loggerId } from '../plugins/logger.ts'
 
-import { defineWithTypes } from 'gunshi'
+import { CommandError, defineWithTypes } from 'gunshi'
 import type { AuthExtension, PluginId as AuthId } from '../plugins/auth.ts'
 import type { DatabaseExtension, PluginId as DatabaseId } from '../plugins/database.ts'
 import type { LoggerExtension, PluginId as LoggerId } from '../plugins/logger.ts'
@@ -23,7 +23,7 @@ export default defineWithTypes<{ extensions: CombinedExtensions }>()({
 
     // Check read permissions for the specific table
     if (!ctx.extensions[authId]?.hasPermission('read', ctx.values.table)) {
-      throw new Error(`No read access to table: ${ctx.values.table}`)
+      throw new CommandError(`No read access to table: ${ctx.values.table}`)
     }
 
     // Perform the query using the database extension

@@ -215,6 +215,9 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    * Output that must still appear — machine-readable results for an agent, warnings for the
    * CLI author — should use `console.log` / `console.warn`, not `ctx.log`.
    *
+   * The validation errors, and a `CommandError` that the command throws, are not printed either, so
+   * `cli()` rejects with them, for the caller to report them.
+   *
    * @default false
    * @see {@linkcode CliOptions.usageSilent}
    */
@@ -349,8 +352,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Output that must still appear — machine-readable results for an agent, warnings for the
    * CLI author — should use `console.log` / `console.warn`, not `ctx.log`.
    *
-   * The validation errors are not printed either, so `cli()` rejects with them, for the caller to
-   * report them (see {@linkcode CliOptions.renderValidationErrors}).
+   * The validation errors, and a `CommandError` that the command throws, are not printed either, so
+   * `cli()` rejects with them, for the caller to report them (see
+   * {@linkcode CliOptions.renderValidationErrors}). The exit code is left alone.
    *
    * @default false
    */
@@ -416,8 +420,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   /**
    * Hook that runs when a command throws an error, or when the arguments fail validation
    *
-   * For the validation errors that the global options plugin has printed, the exit code is already `1`
-   * when the hook runs, so the hook can set another one, and `cli()` resolves after it. Any other
+   * For the validation errors and a `CommandError` that the global options plugin has printed, the
+   * exit code is already set when the hook runs (`1` for the validation errors, and the `exitCode` of
+   * a `CommandError`), so the hook can set another one, and `cli()` resolves after it. Any other
    * error rejects `cli()` after the hook.
    *
    * @param ctx - The command context

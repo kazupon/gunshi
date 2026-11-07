@@ -9,6 +9,7 @@ This package exports the bellow APIs and types.
 
 - `define`: A function to define a command.
 - `lazy`: A function to lazily load a command.
+- `CommandError` and `isCommandError`: An error for the failures that a command expects, printed without a stack trace, and its guard.
 - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->

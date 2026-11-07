@@ -1,4 +1,4 @@
-import { defineWithTypes } from 'gunshi'
+import { CommandError, defineWithTypes } from 'gunshi'
 
 import type { AuthExtension } from '../plugin.ts'
 
@@ -23,7 +23,7 @@ export const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()
     // ctx.extensions is typed as ServerExtensions
     // Optional chaining (?.) is used because plugins may not be installed
     if (!ctx.extensions.auth?.isAuthenticated()) {
-      throw new Error('Please login first')
+      throw new CommandError('Please login first')
     }
 
     const user = ctx.extensions.auth.getUser()

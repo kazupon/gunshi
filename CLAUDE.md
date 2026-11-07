@@ -61,7 +61,7 @@ The repository contains the following packages:
 ### Core Packages
 
 - **`packages/gunshi/`** - Main library with CLI runtime, command system, and built-in plugins
-  - Exports: `cli`, `define`, `defineWithTypes`, `lazy`, `lazyWithTypes`, `plugin`, `createCommandContext`
+  - Exports: `cli`, `define`, `defineWithTypes`, `lazy`, `lazyWithTypes`, `plugin`, `createCommandContext`, `CommandError`, `isCommandError`
   - Published to: npm
 
 - **`packages/bone/`** - Minimal gunshi distribution without plugins (`@gunshi/bone`)
@@ -69,7 +69,7 @@ The repository contains the following packages:
   - Published to: npm
 
 - **`packages/definition/`** - Command definition utilities (`@gunshi/definition`)
-  - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers
+  - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers, and `CommandError` and `isCommandError`
   - Published to: npm
 
 - **`packages/combinators/`** - Parser combinators for argument schemas (`@gunshi/combinators`)
@@ -141,7 +141,7 @@ packages/gunshi/src/
 ├── definition.ts         # Command definition helpers
 ├── combinators.ts        # Parser combinators entry (`gunshi/combinators`)
 ├── decorators.ts         # Command runner decorators
-├── error.ts              # Error classes and type guards (`CommandNotFoundError`, `isArgsValidationError`)
+├── error.ts              # Error classes and type guards (`CommandError`, `CommandNotFoundError`, `isCommandError`, `isArgsValidationError`)
 ├── generator.ts          # Command generator utilities
 ├── renderer.ts           # Usage/help rendering
 ├── agent.ts              # AI agent detection (`gunshi/agent`)

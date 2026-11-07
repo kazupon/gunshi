@@ -26,12 +26,14 @@
 export { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT } from './constants.ts'
 export { createCommandContext } from './context.ts'
 export {
+  CommandError,
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
   CommandResolutionError,
   CommandResolutionErrorKeys,
   hasPriorityValidationError,
   isArgsValidationError,
+  isCommandError,
   isCommandNotFoundError,
   isCommandResolutionError
 } from './error.ts'
@@ -40,6 +42,7 @@ export { ArgsValidationError, ArgsValidationErrorKeys } from 'args-tokens'
 
 export type { CommandContextParams } from './context.ts'
 export type {
+  CommandErrorOptions,
   CommandNotFoundErrorCode,
   CommandNotFoundErrorOptions,
   CommandResolutionErrorCode,

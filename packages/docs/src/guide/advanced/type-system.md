@@ -227,7 +227,7 @@ When your command needs to use plugin extensions, use these specialized function
 Use `defineWithTypes` when your command needs plugin extensions. It uses a currying approach where you specify the extensions type, and args are automatically inferred:
 
 ```ts [commands/server.ts]
-import { defineWithTypes } from 'gunshi'
+import { CommandError, defineWithTypes } from 'gunshi'
 import type { AuthExtension } from '../plugin.ts'
 
 // Define your extensions type
@@ -251,7 +251,7 @@ export const serverCommand = defineWithTypes<{ extensions: ServerExtensions }>()
     // ctx.extensions is typed as ServerExtensions
     // Optional chaining (?.) is used because plugins may not be installed
     if (!ctx.extensions.auth?.isAuthenticated()) {
-      throw new Error('Please login first')
+      throw new CommandError('Please login first')
     }
 
     const user = ctx.extensions.auth?.getUser()
@@ -500,7 +500,7 @@ export default defineWithTypes<{ extensions: CombinedExtensions }>()({
 Custom plugins provide plugin IDs and types. Import both to create fully type-safe command definitions:
 
 ```ts [commands/query.ts]
-import { defineWithTypes } from 'gunshi'
+import { CommandError, defineWithTypes } from 'gunshi'
 import { pluginId as authId } from '../plugins/auth.ts'
 import { pluginId as databaseId } from '../plugins/database.ts'
 import { pluginId as loggerId } from '../plugins/logger.ts'
@@ -525,7 +525,7 @@ export default defineWithTypes<{ extensions: CombinedExtensions }>()({
 
     // Check read permissions for the specific table
     if (!ctx.extensions[authId]?.hasPermission('read', ctx.values.table)) {
-      throw new Error(`No read access to table: ${ctx.values.table}`)
+      throw new CommandError(`No read access to table: ${ctx.values.table}`)
     }
 
     // Perform the query using the database extension
