@@ -20,7 +20,7 @@ Gunshi is a modern javascript command-line library
 
 Gunshi is designed to simplify the creation of modern command-line interfaces:
 
-- 📏 **Simple & AI agent friendly**: Commands with simple API. AI agents read their output and errors as JSON with [`--json`](https://gunshi.dev/guide/essentials/json-output), commands report failures with [`CommandError`](https://gunshi.dev/guide/essentials/errors) without a stack trace, and [`gunshi/agent`](https://gunshi.dev/guide/advanced/ai-agent-detection) detects AI agents.
+- 📏 **Simple & AI agent friendly**: Commands with simple API. [`--json`](https://gunshi.dev/guide/essentials/json-output), [`CommandError`](https://gunshi.dev/guide/essentials/errors) and [`gunshi/agent`](https://gunshi.dev/guide/advanced/ai-agent-detection) for AI agents.
 - ⚙️ **Declarative & Type Safe**: Configure commands declaratively with full TypeScript support and type-safe argument parsing by [args-tokens](https://github.com/kazupon/args-tokens)
 - 🧩 **Composable & Lazy**: Create modular sub-commands with context sharing and lazy loading for better performance.
 - 🎨 **Flexible Rendering**: Customize usage generation, validation errors, and help messages with pluggable renderers.
