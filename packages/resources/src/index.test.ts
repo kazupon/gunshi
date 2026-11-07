@@ -1,6 +1,12 @@
 import fs from 'node:fs/promises'
-import { assert, test } from 'vitest'
+import { assert, expect, test } from 'vitest'
 import master from '../locales/en-US.json' with { type: 'json' }
+import resources from './index.ts'
+
+test('has the heading of the causes of a CommandError', () => {
+  expect(resources['en-US'].CAUSEDBY).toBe('Caused by')
+  expect(resources['ja-JP'].CAUSEDBY).toBe('原因')
+})
 
 test('validate keys', async () => {
   const keys = Object.keys(master)

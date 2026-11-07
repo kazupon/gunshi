@@ -181,6 +181,7 @@ await cli(process.argv.slice(2), command, {
 // - USAGE, OPTIONS, COMMANDS
 // - Help and version descriptions
 // - Error messages
+// - The `Caused by` heading of the causes of a `CommandError` (CAUSEDBY)
 ```
 
 ## Loading Translations from Files

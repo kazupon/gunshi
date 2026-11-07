@@ -1,0 +1,5 @@
+[
+  ["basic", "node cli.js acme"],
+  ["not-found", "node cli.js nope 2>&1; echo \"exit code: $?\""],
+  ["caused-by", "node cli.js acme --file missing.json 2>&1; echo \"exit code: $?\""]
+]

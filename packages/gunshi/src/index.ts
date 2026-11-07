@@ -11,6 +11,7 @@
  * - `createCommandContext`: A function to create a command context, mainly for testing purposes.
  * - `args-tokens` utilities: `parseArgs`, `resolveArgs`, `ArgsValidationError`, `ArgsValidationErrorKeys`, and `ArgsValidationErrorCode` for parsing and validating command line arguments.
  * - Structured error utilities: `CommandNotFoundError`, `CommandNotFoundErrorKeys`, `CommandNotFoundErrorCode`, `CommandNotFoundErrorOptions`, `CommandResolutionError`, `CommandResolutionErrorKeys`, `CommandResolutionErrorCode`, `CommandResolutionErrorOptions`, `isCommandNotFoundError`, `isCommandResolutionError`, `isArgsValidationError`, and `hasPriorityValidationError`.
+ * - `CommandError`, `CommandErrorOptions`, and `isCommandError`: An error for the failures that a command expects, printed without a stack trace.
  * - Some basic type definitions, such as `CommandContext`, `Plugin`, `PluginContext`, etc.
  *
  * @example
@@ -33,12 +34,14 @@ export { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 export { createCommandContext } from './context.ts'
 export { define, defineWithTypes, lazy, lazyWithTypes } from './definition.ts'
 export {
+  CommandError,
   CommandNotFoundError,
   CommandNotFoundErrorKeys,
   CommandResolutionError,
   CommandResolutionErrorKeys,
   hasPriorityValidationError,
   isArgsValidationError,
+  isCommandError,
   isCommandNotFoundError,
   isCommandResolutionError
 } from './error.ts'
@@ -46,6 +49,7 @@ export { plugin } from './plugin/core.ts'
 
 export type { CommandContextParams } from './context.ts'
 export type {
+  CommandErrorOptions,
   CommandNotFoundErrorCode,
   CommandNotFoundErrorOptions,
   CommandResolutionErrorCode,

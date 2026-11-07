@@ -58,7 +58,8 @@ export const COMMAND_BUILTIN_RESOURCE_KEYS = [
   'FORMORE',
   'NEGATABLE',
   'DEFAULT',
-  'CHOICES'
+  'CHOICES',
+  'CAUSEDBY'
 ] as const
 
 export const ARG_ERROR_RESOURCE_KEYS = [
