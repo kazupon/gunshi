@@ -114,6 +114,47 @@ export const serverCommand = define<{ args: typeof serverArgs }>({
 
 This advanced approach is particularly useful when you want to reuse argument definitions across multiple commands or need to export types for use in other modules.
 
+### The Return Type of `run`
+
+What `run` may return depends on the arguments. A command that spreads `jsonArgs` returns its result as an object (`JsonResult`), which Gunshi prints as JSON with `--json`. Any other command returns a string, which `cli()` returns, or nothing:
+
+```ts
+import { define, jsonArgs } from 'gunshi'
+
+const list = define({
+  name: 'list',
+  args: { ...jsonArgs },
+  // an object keyed by a noun: returning nothing, a string or an array is a type error
+  run: () => ({ projects: ['acme'] })
+})
+
+const greet = define({
+  name: 'greet',
+  // a string or nothing: returning an object is a type error
+  run: () => 'Hello!'
+})
+```
+
+The type of the result is `CommandRunnerResult`. For the type errors and how to fix them, see [JSON Output](../essentials/json-output.md#type-errors).
+
+### Collecting Commands
+
+To collect commands into an object, a `Map` or an array, type it with `SubCommandable`, the type that the `subCommands` of `cli()` takes. `Command` without type arguments does not take a command that spreads `jsonArgs`, since its arguments are not known:
+
+```ts
+import type { Command, SubCommandable } from 'gunshi'
+
+const commands: Record<string, SubCommandable> = { list, greet }
+
+// to type one command, give the type of its arguments
+const listArgs = { ...jsonArgs }
+const typed: Command<{ args: typeof listArgs }> = {
+  name: 'list',
+  args: listArgs,
+  run: () => ({ projects: [] })
+}
+```
+
 ### The `lazy` Function
 
 The `lazy` function enables code-splitting while maintaining type safety. Like `define`, it works well with automatic type inference for most cases. Advanced usage provides explicit type control when needed.

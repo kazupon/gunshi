@@ -23,7 +23,7 @@ import type { AgentName } from 'std-env'
  * AI coding agent.
  *
  * The shape is intentionally minimal so that callers can use it as a UX hint
- * (for example, to switch output format) without coupling to specific agent
+ * (for example, to skip a prompt) without coupling to specific agent
  * names. To get the type, use `ReturnType<typeof getAgentProfile>`.
  */
 interface AgentProfile {
@@ -60,7 +60,8 @@ interface AgentProfile {
  * const profile = getAgentProfile()
  *
  * if (profile.isAgent) {
- *   // adjust output for AI agent execution
+ *   // choose the defaults for an AI agent, such as no prompts.
+ *   // The format of the output is asked for explicitly, such as with `--json`
  * }
  * ```
  */

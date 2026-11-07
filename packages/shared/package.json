@@ -54,6 +54,7 @@
     "prepack": "pnpm build"
   },
   "devDependencies": {
+    "@gunshi/plugin": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "gunshi": "workspace:*",
     "publint": "catalog:",

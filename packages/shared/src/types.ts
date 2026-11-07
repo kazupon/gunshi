@@ -12,6 +12,8 @@ import {
   COMMAND_ERROR_RESOURCE_KEYS,
   COMMAND_BUILTIN_RESOURCE_KEYS,
   COMMON_ARGS,
+  JSON_ERROR_RESOURCE_KEYS,
+  JSON_RESOURCE_KEYS,
   SUGGESTION_ERROR_RESOURCE_KEYS
 } from './constants.ts'
 
@@ -91,6 +93,17 @@ export type CommandErrorResourceKeys = (typeof COMMAND_ERROR_RESOURCE_KEYS)[numb
 export type SuggestionErrorResourceKeys = (typeof SUGGESTION_ERROR_RESOURCE_KEYS)[number]
 
 /**
+ * Resource keys of the errors of the JSON output.
+ */
+export type JsonErrorResourceKeys = (typeof JSON_ERROR_RESOURCE_KEYS)[number]
+
+/**
+ * Resource keys of the description of the `json` argument of `jsonArgs`, and of the texts that only
+ * the JSON errors print.
+ */
+export type JsonResourceKeys = (typeof JSON_RESOURCE_KEYS)[number]
+
+/**
  * Error resource keys.
  */
 export type ErrorResourceKeys =
@@ -98,6 +111,7 @@ export type ErrorResourceKeys =
   | ArgErrorHintResourceKeys
   | CommandErrorResourceKeys
   | SuggestionErrorResourceKeys
+  | JsonErrorResourceKeys
 
 /**
  * Built-in resource keys.
@@ -106,6 +120,7 @@ export type BuiltinResourceKeys =
   | ErrorResourceKeys
   | CommandBuiltinArgsKeys
   | CommandBuiltinResourceKeys
+  | JsonResourceKeys
 
 /**
  * Built-in resource.

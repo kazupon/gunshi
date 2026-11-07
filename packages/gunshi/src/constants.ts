@@ -30,3 +30,11 @@ export const CLI_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   plugins: undefined,
   fallbackToEntry: false
 }
+
+/**
+ * The key of the mark on the `json` argument of `jsonArgs`. A string key, not a symbol: `gunshi` and the other
+ * packages bundle their own copies of the types, and each copy of a `unique symbol` is a different type.
+ *
+ * @internal
+ */
+export const JSON_ARG = '~gunshi.json-arg'

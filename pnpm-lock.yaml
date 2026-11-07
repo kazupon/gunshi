@@ -583,6 +583,9 @@ importers:
 
   packages/shared:
     devDependencies:
+      '@gunshi/plugin':
+        specifier: workspace:*
+        version: link:../plugin
       '@gunshi/resources':
         specifier: workspace:*
         version: link:../resources
@@ -758,6 +761,12 @@ importers:
       gunshi:
         specifier: file:../../../../packages/gunshi
         version: link:../../../../packages/gunshi
+
+  playground/essentials/json-output:
+    dependencies:
+      gunshi:
+        specifier: file:../../../packages/gunshi
+        version: link:../../../packages/gunshi
 
   playground/essentials/lazy-async/async:
     dependencies:

@@ -22,7 +22,8 @@ import type {
   Command,
   DefaultGunshiParams,
   GunshiParamsConstraint,
-  LazyCommand
+  LazyCommand,
+  SubCommandable
 } from './types.ts'
 
 /**
@@ -44,7 +45,7 @@ export type GenerateOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
  */
 export async function generate<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   command: string | string[] | null,
-  entry: Command<G> | LazyCommand<G>,
+  entry: Command<G> | LazyCommand<G> | SubCommandable,
   options: GenerateOptions<G> = {}
 ): Promise<string> {
   const args: string[] = []
@@ -53,7 +54,7 @@ export async function generate<G extends GunshiParamsConstraint = DefaultGunshiP
     args.push(...parts)
   }
   return (
-    (await cliUsage(args, entry, {
+    (await cliUsage(args, entry as Command<G> | LazyCommand<G>, {
       ...create<GenerateOptions<G>>(), // default options
       ...options, // caller-supplied overrides
       usageSilent: true // force silent usage

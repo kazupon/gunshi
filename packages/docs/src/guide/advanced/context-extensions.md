@@ -96,6 +96,8 @@ const command = define({
 })
 ```
 
+`showVersion()`, `showHeader()` and `showUsage()` print with `ctx.log`. When a command that spreads `jsonArgs` is asked for JSON with `--json`, they print nothing and return the text only, so that stdout has the JSON only (see [JSON Output](../essentials/json-output.md)).
+
 The extension also has `showValidationErrors()`, which the plugin calls itself to report the errors of the arguments before the command would run. A command does not run when its arguments are wrong, so it never sees those errors in `ctx.validationError`. To act on them, such as to use another exit code, use the [`onErrorCommand` hook](./command-hooks.md#handling-argument-validation-errors).
 
 <!-- eslint-disable markdown/no-missing-label-refs -->

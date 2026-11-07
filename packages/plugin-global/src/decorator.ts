@@ -5,11 +5,40 @@
 
 import { pluginId as Global } from './types.ts'
 
-import { hasPriorityValidationError, isCommandError } from '@gunshi/plugin'
-import { DefaultResource, namespacedId, resolveBuiltInKey } from '@gunshi/shared'
+import {
+  ArgsValidationErrorKeys,
+  hasPriorityValidationError,
+  isArgsValidationError,
+  isCommandError,
+  JsonOutputError,
+  JsonOutputErrorKeys
+} from '@gunshi/plugin'
+import {
+  DefaultResource,
+  formatResource,
+  log,
+  namespacedId,
+  resolveBuiltInKey,
+  resolveJsonRequest
+} from '@gunshi/shared'
+import { writeUsage, writeVersion } from './extension.ts'
+import {
+  collectCauses,
+  createNotSupportedFailure,
+  createResultFailure,
+  createRunFailure,
+  createValidationFailure,
+  messageOf
+} from './json.ts'
 
-import type { CommandDecorator, CommandError, DefaultGunshiParams } from '@gunshi/plugin'
-import type { GlobalExtension } from './extension.ts'
+import type {
+  CommandDecorator,
+  CommandError,
+  DefaultGunshiParams,
+  JsonOutputErrorCode
+} from '@gunshi/plugin'
+import type { GlobalExtension, Writer } from './extension.ts'
+import type { JsonFailure } from './json.ts'
 import type { PluginId } from './types.ts'
 
 /**
@@ -29,6 +58,8 @@ const CAUSED_BY = resolveBuiltInKey('CAUSEDBY')
  * is a registered symbol, since `gunshi` and the plugins bundle their own copies.
  */
 const REPORTED = Symbol.for('gunshi.reported')
+
+const NOOP: Writer = () => {}
 
 /**
  * Mark an error as reported to the user, in the set that the core keeps for the run of the context.
@@ -63,6 +94,53 @@ function setExitCode(code: number): void {
 }
 
 /**
+ * The part of the stdout of the runtime that the plugin reads: Node.js and Bun have it.
+ */
+interface Stdout {
+  isTTY?: boolean
+  writableLength?: number
+  once?: (event: string, listener: () => void) => unknown
+  removeListener?: (event: string, listener: () => void) => unknown
+}
+
+function getStdout(): Stdout | undefined {
+  const stdout = (globalThis as { process?: { stdout?: Stdout } }).process?.stdout
+  return stdout != null && typeof stdout === 'object' ? stdout : undefined
+}
+
+/**
+ * Wait until stdout has written what it holds, when it holds something: it drains, fails, or closes.
+ *
+ * NOTE(kazupon): Node.js writes to a pipe later, and `process.exit()` does not wait for it, so a large
+ * JSON document is cut at 64KB or so when the app calls `process.exit()` after `cli()`. The wait has no
+ * limit: a limit would cut the document only when the reader is slow. It does not keep the process
+ * alive any longer than the write does.
+ */
+async function flushStdout(): Promise<void> {
+  const stdout = getStdout()
+  if (
+    stdout === undefined ||
+    typeof stdout.writableLength !== 'number' ||
+    stdout.writableLength === 0 ||
+    typeof stdout.once !== 'function'
+  ) {
+    return
+  }
+  const once = stdout.once.bind(stdout)
+  await new Promise<void>(resolve => {
+    const done = () => {
+      for (const event of ['drain', 'error', 'close']) {
+        stdout.removeListener?.(event, done)
+      }
+      resolve()
+    }
+    for (const event of ['drain', 'error', 'close']) {
+      once(event, done)
+    }
+  })
+}
+
+/**
  * Translate the heading of the causes of a {@linkcode CommandError}, with the i18n plugin when it is
  * installed.
  *
@@ -83,26 +161,6 @@ function translateCausedBy(extensions: object): string {
 }
 
 /**
- * Get the message of a cause of a {@linkcode CommandError}. A cause may be any value: a value without a
- * message, such as a string, is converted to a string.
- *
- * @param cause - The cause
- * @returns The message of the cause
- */
-function messageOf(cause: unknown): string {
-  const message = (cause as { message?: unknown }).message
-  if (typeof message === 'string' && message !== '') {
-    return message
-  }
-  try {
-    return String(cause)
-  } catch {
-    // an object without a prototype has no `toString`
-    return Object.prototype.toString.call(cause)
-  }
-}
-
-/**
  * Render a {@linkcode CommandError} for the user: its message, followed by a `Caused by:` line for each
  * cause in the chain. The stack traces and the code are not rendered.
  *
@@ -111,25 +169,55 @@ function messageOf(cause: unknown): string {
  * @returns The rendered error
  */
 function renderCommandError(error: CommandError, extensions: object): string {
-  const lines = [error.message]
-  let cause: unknown = error.cause
-  if (cause != null) {
-    const heading = translateCausedBy(extensions)
-    // a cause may point back to an error in the chain
-    const seen = new Set<unknown>([error])
-    // a cause may be any value, with a getter that throws: the chain ends there, and the error is
-    // still reported
-    while (cause != null && !seen.has(cause)) {
-      seen.add(cause)
-      try {
-        lines.push(`${heading}: ${messageOf(cause)}`)
-        cause = typeof cause === 'object' ? (cause as { cause?: unknown }).cause : undefined
-      } catch {
-        break
-      }
-    }
+  const causes = collectCauses(error)
+  if (causes.length === 0) {
+    return error.message
   }
-  return lines.join('\n')
+  const heading = translateCausedBy(extensions)
+  return [error.message, ...causes.map(cause => `${heading}: ${cause}`)].join('\n')
+}
+
+/**
+ * Create a {@linkcode JsonOutputError}, with the English message.
+ *
+ * @param code - The code of the error
+ * @param values - The values of the message
+ * @param cause - The cause of the error
+ * @returns The error
+ */
+function createJsonOutputError(
+  code: JsonOutputErrorCode,
+  values?: Record<string, unknown>,
+  cause?: unknown
+): JsonOutputError {
+  const message = formatResource((DefaultResource as Record<string, string>)[code], values) || code
+  return new JsonOutputError(message, { code, values, cause })
+}
+
+/**
+ * Leave out the unknown-option errors of a `--json` that asks for JSON, which `strict` reports for a
+ * command without a `json` argument. `--json` is the option of gunshi, so it is not unknown to it: the
+ * plugin reports `json_not_supported` for it instead, with or without `strict`.
+ *
+ * @param error - The aggregate error of the validation errors
+ * @returns The aggregate error without them, or `undefined` when no error is left
+ */
+function withoutJsonOption(error: AggregateError | undefined): AggregateError | undefined {
+  if (error === undefined) {
+    return undefined
+  }
+  const errors = (error.errors as unknown[]).filter(
+    err =>
+      !(
+        isArgsValidationError(err) &&
+        err.code === ArgsValidationErrorKeys.unknownOption &&
+        err.values.rawName === '--json'
+      )
+  )
+  if (errors.length === error.errors.length) {
+    return error
+  }
+  return errors.length === 0 ? undefined : new AggregateError(errors, error.message)
 }
 
 /**
@@ -149,12 +237,35 @@ const decorator: CommandDecorator<{
    */
   const {
     values,
-    validationError,
     env: { globalOptions },
     extensions: {
-      [Global]: { showVersion, showUsage, showValidationErrors }
+      [Global]: { showValidationErrors }
     }
   } = ctx
+
+  /**
+   * NOTE(kazupon): whether `--json` asks for JSON. `'declared'` for a command that spreads `jsonArgs`,
+   * by the resolved value of its `json`, and `'undeclared'` for a command without a `json` argument, by
+   * the raw tokens. Either way, the errors are printed as JSON. A command with a `json` of its own
+   * handles `--json` itself.
+   */
+  const request = resolveJsonRequest(ctx.args, values, ctx.tokens)
+  const validationError =
+    request === undefined ? ctx.validationError : withoutJsonOption(ctx.validationError)
+
+  /**
+   * Print a JSON error to stderr, and mark the error as reported, with the exit code.
+   *
+   * @param error - The error
+   * @param failure - The JSON error
+   * @param exitCode - The exit code
+   */
+  const printFailure = (error: unknown, failure: JsonFailure, exitCode: number): void => {
+    console.error(JSON.stringify(failure))
+    if (typeof error === 'object' && error !== null && markReported(ctx, error)) {
+      setExitCode(exitCode)
+    }
+  }
 
   /**
    * NOTE(kazupon): when the plugin has shown the validation errors to the user, they have been
@@ -164,9 +275,23 @@ const decorator: CommandDecorator<{
    * rejects with them, for the app to report them. So it does when the core keeps no set of reported
    * errors for the run, and then the exit code is left alone.
    *
+   * With `--json`, they are printed as JSON, and the renderer of the validation errors is not called.
+   * `renderValidationErrors: null` and `usageSilent` still leave them to the app.
+   *
    * @param error - The aggregate error of the validation errors
+   * @param createFailure - The function that creates the JSON error, for an error that is not one of
+   * the validation errors
    */
-  const report = async (error: AggregateError): Promise<never> => {
+  const report = async (
+    error: AggregateError,
+    createFailure: () => Promise<JsonFailure> = () => createValidationFailure(ctx, error)
+  ): Promise<never> => {
+    if (request !== undefined) {
+      if (ctx.env.renderValidationErrors !== null && !ctx.env.usageSilent) {
+        printFailure(error, await createFailure(), 1)
+      }
+      throw error
+    }
     const message = await showValidationErrors(error)
     if (message && !ctx.env.usageSilent && markReported(ctx, error)) {
       setExitCode(1)
@@ -178,12 +303,30 @@ const decorator: CommandDecorator<{
     return await report(validationError!)
   }
 
+  /**
+   * NOTE(kazupon): `--help` and `--version` print with `log`, not with `ctx.log`, which is silenced when
+   * the command is asked for JSON: the text of the help is what was asked for. `usageSilent` still
+   * silences them.
+   */
+  const write: Writer = ctx.env.usageSilent ? NOOP : log
+
   if (values.version && globalOptions?.has('version')) {
-    return showVersion()
+    return writeVersion(ctx, write)
   }
 
   if (values.help && globalOptions?.has('help')) {
-    return await showUsage()
+    return await writeUsage(ctx, write)
+  }
+
+  /**
+   * NOTE(kazupon): `--json` given to a command that does not spread `jsonArgs` stops it before it runs,
+   * as an argument error does, so that the caller does not take its text for JSON.
+   */
+  if (request === 'undeclared') {
+    return await report(
+      new AggregateError([createJsonOutputError(JsonOutputErrorKeys.notSupported)]),
+      () => createNotSupportedFailure(ctx)
+    )
   }
 
   // check for validation errors before executing command
@@ -192,18 +335,27 @@ const decorator: CommandDecorator<{
   }
 
   // normal command execution
+  let result: Awaited<ReturnType<typeof baseRunner>>
   try {
-    return await baseRunner(ctx)
+    result = await baseRunner(ctx)
   } catch (error: unknown) {
-    /**
-     * NOTE(kazupon): a `CommandError` thrown from the command, or from a decorator of another plugin, is
-     * a failure that the command expects. It is reported as the validation errors are: the message is
-     * printed to stderr without a stack trace, the exit code is the one of the error, and `cli()` ends
-     * without rejecting. It is still thrown, so that the `onErrorCommand` hook sees it after the exit
-     * code is set. With `usageSilent`, nothing is printed, and `cli()` rejects with it, for the app to
-     * report it. Any other error is thrown as before, and `cli()` rejects with it.
-     */
-    if (isCommandError(error) && !ctx.env.usageSilent) {
+    if (request === 'declared') {
+      /**
+       * NOTE(kazupon): with `--json`, any error of the command is printed as JSON, so that the caller
+       * always gets JSON: the `code` of a `CommandError` is the reason, with the exit code of the error,
+       * and any other error is `command_failed`, with exit code 1. It is printed with `usageSilent` too,
+       * since it is not a text for people.
+       */
+      printFailure(error, createRunFailure(error), isCommandError(error) ? error.exitCode : 1)
+    } else if (isCommandError(error) && !ctx.env.usageSilent) {
+      /**
+       * NOTE(kazupon): a `CommandError` thrown from the command, or from a decorator of another plugin,
+       * is a failure that the command expects. It is reported as the validation errors are: the message
+       * is printed to stderr without a stack trace, the exit code is the one of the error, and `cli()`
+       * ends without rejecting. It is still thrown, so that the `onErrorCommand` hook sees it after the
+       * exit code is set. With `usageSilent`, nothing is printed, and `cli()` rejects with it, for the
+       * app to report it. Any other error is thrown as before, and `cli()` rejects with it.
+       */
       console.error(renderCommandError(error, ctx.extensions))
       if (markReported(ctx, error)) {
         setExitCode(error.exitCode)
@@ -211,6 +363,54 @@ const decorator: CommandDecorator<{
     }
     throw error
   }
+
+  if (request !== 'declared') {
+    return result
+  }
+
+  /**
+   * Report a result that cannot be printed as JSON, and throw the error. The command has finished, so the
+   * message says so.
+   *
+   * @param code - The code of the error
+   * @param messageValues - The values of the message
+   * @param cause - The cause of the error
+   */
+  const fail = async (
+    code:
+      | typeof JsonOutputErrorKeys.invalidResult
+      | typeof JsonOutputErrorKeys.unserializableResult,
+    messageValues?: Record<string, unknown>,
+    cause?: unknown
+  ): Promise<never> => {
+    const error = createJsonOutputError(code, messageValues, cause)
+    printFailure(error, await createResultFailure(ctx, code, messageValues), 1)
+    throw error
+  }
+  /**
+   * NOTE(kazupon): the result is printed as one JSON document to stdout: indented on a terminal, on one
+   * line otherwise. It is checked first, for the code written in JavaScript and the types cast away: it
+   * must be an object, which `JSON.stringify` turns into an object.
+   */
+  if (result === null || typeof result !== 'object' || Array.isArray(result)) {
+    return await fail(JsonOutputErrorKeys.invalidResult)
+  }
+  let text: string | undefined
+  try {
+    text = JSON.stringify(result, null, getStdout()?.isTTY === true ? 2 : undefined)
+  } catch (error: unknown) {
+    return await fail(
+      JsonOutputErrorKeys.unserializableResult,
+      { message: messageOf(error) },
+      error
+    )
+  }
+  // a `Date`, or an object whose `toJSON` returns a string or `undefined`, is not an object then
+  if (typeof text !== 'string' || !text.startsWith('{')) {
+    return await fail(JsonOutputErrorKeys.invalidResult)
+  }
+  log(text)
+  await flushStdout()
 }
 
 export default decorator

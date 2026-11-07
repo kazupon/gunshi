@@ -8,6 +8,24 @@ test('has the heading of the causes of a CommandError', () => {
   expect(resources['ja-JP'].CAUSEDBY).toBe('原因')
 })
 
+test('has the texts of the JSON output', () => {
+  for (const locale of ['en-US', 'ja-JP'] as const) {
+    for (const key of [
+      'json',
+      'json:invalid-arguments',
+      'json:next:help',
+      'json:next:help-placeholder',
+      'err:json:not-supported',
+      'err:json:invalid-result',
+      'err:json:unserializable-result'
+    ] as const) {
+      expect(resources[locale][key], `${locale}: ${key}`).toBeTypeOf('string')
+    }
+  }
+  // the placeholder of the name of the CLI stays as it is in every locale
+  expect(resources['ja-JP']['json:next:help-placeholder']).toContain('<COMMAND>')
+})
+
 test('validate keys', async () => {
   const keys = Object.keys(master)
   const localeFiles = await fs.readdir(new URL('../locales', import.meta.url))

@@ -16,7 +16,10 @@ import {
   isArgsValidationError,
   isCommandError,
   isCommandNotFoundError,
-  isCommandResolutionError
+  isCommandResolutionError,
+  isJsonOutputError,
+  JsonOutputError,
+  JsonOutputErrorKeys
 } from './error.ts'
 
 import type { Args } from 'args-tokens'
@@ -663,6 +666,91 @@ describe('isCommandError', () => {
     }
   ])('rejects $title', ({ value }) => {
     expect(isCommandError(value)).toBe(false)
+  })
+})
+
+describe('JsonOutputError', () => {
+  const brand = Symbol.for('gunshi.JsonOutputError')
+
+  test('has the code, the values and the cause of the options, and an own brand', () => {
+    const cause = new TypeError('Do not know how to serialize a BigInt')
+    const error = new JsonOutputError('The result cannot be converted to JSON', {
+      code: JsonOutputErrorKeys.unserializableResult,
+      values: { message: cause.message },
+      cause
+    })
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error.name).toBe('JsonOutputError')
+    expect(error.code).toBe('err:json:unserializable-result')
+    expect(error.values).toEqual({ message: cause.message })
+    expect(error.cause).toBe(cause)
+    expect(Object.getOwnPropertyDescriptor(error, brand)).toEqual({
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: false
+    })
+    expect(isJsonOutputError(error)).toBe(true)
+  })
+
+  test('has empty values without them', () => {
+    const error = new JsonOutputError('This command does not support --json', {
+      code: JsonOutputErrorKeys.notSupported
+    })
+    expect(error.values).toEqual({})
+  })
+
+  test('has the codes that are the keys of the resources', () => {
+    expect(JsonOutputErrorKeys).toEqual({
+      notSupported: 'err:json:not-supported',
+      invalidResult: 'err:json:invalid-result',
+      unserializableResult: 'err:json:unserializable-result'
+    })
+  })
+})
+
+describe('isJsonOutputError', () => {
+  const brand = Symbol.for('gunshi.JsonOutputError')
+
+  test('recognizes a branded error from another copy without using name', () => {
+    const error = Object.assign(new Error('This command does not support --json'), {
+      [brand]: true,
+      name: 'SomethingElse',
+      code: 'err:json:not-supported',
+      values: {}
+    })
+    expect(isJsonOutputError(error)).toBe(true)
+  })
+
+  test('does not read the properties of an error without the brand', () => {
+    const error = new Error('boom')
+    Object.defineProperty(error, 'code', {
+      get() {
+        throw new Error('the getter of code')
+      }
+    })
+    expect(isJsonOutputError(error)).toBe(false)
+  })
+
+  test.each([
+    { title: 'a plain error', value: new Error('boom') },
+    { title: 'null', value: null },
+    {
+      title: 'an error of the app with the same name',
+      value: Object.assign(new Error('boom'), {
+        name: 'JsonOutputError',
+        code: 'err:json:not-supported',
+        values: {}
+      })
+    },
+    {
+      title: 'brand with a code that is not one of the keys',
+      value: { [brand]: true, code: 'err:json:other', values: {} }
+    },
+    { title: 'brand without values', value: { [brand]: true, code: 'err:json:not-supported' } }
+  ])('rejects $title', ({ value }) => {
+    expect(isJsonOutputError(value)).toBe(false)
   })
 })
 

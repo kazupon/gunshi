@@ -367,6 +367,8 @@ Unknown option: --alow-reload
 
 The error uses the `err:arg:unknown-option` resource key, so the message follows the same renderer and i18n behavior as other argument validation errors. Suggestions such as `Did you mean --allow-reload?` are intentionally left to suggestion plugins.
 
+`--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`. With `strict`, it is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
+
 #### Options before sub-commands
 
 Option values are removed before Gunshi chooses a sub-command. A string option can therefore appear
@@ -827,7 +829,7 @@ The `run` function receives a command context object (`ctx`) with:
 - `env`: The command environment settings (version, logger, renderers, etc.).
 - `callMode`: Command call mode ('entry', 'subCommand', or 'unexpected') indicating how the command was invoked.
 - `toKebab`: Boolean indicating whether camelCase argument names should be converted to kebab-case.
-- `log`: Function for outputting messages that respects the `usageSilent` setting. Output that must still appear when `usageSilent` is set should use `console.log` / `console.warn`.
+- `log`: Function for outputting messages for people, which respects the `usageSilent` setting. It is silenced too when a command that spreads `jsonArgs` is asked for JSON with `--json`, so that stdout has the JSON only (see [JSON Output](./json-output.md)). Output that must still appear when `usageSilent` is set should use `console.log` / `console.warn`.
 - `extensions`: Command context extensions for plugin functionality.
 - `validationError`: Contains validation errors from argument parsing if any occurred.
 

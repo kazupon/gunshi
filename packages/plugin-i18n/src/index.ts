@@ -41,6 +41,7 @@ import {
   DefaultResource,
   ERROR_PREFIX_AND_KEY_SEPARATOR,
   formatResource,
+  isJsonArg,
   namespacedId,
   resolveArgKey,
   resolveBuiltInKey,
@@ -230,6 +231,20 @@ export default function i18n(
         const resource = originalResource
           ? await normalizeResource(originalResource, ctx)
           : (Object.create(null) as Record<string, string>)
+        /**
+         * NOTE(kazupon): the `json` argument of `jsonArgs` is described by the built-in resources, as the
+         * global options are, unless the resource of the command describes it. A command without a
+         * translation of its own keeps the English description of `jsonArgs`.
+         */
+        if (isJsonArg(ctx.args.json)) {
+          const jsonKey = resolveArgKey('json', ctx.name)
+          const description = (
+            builtinResources[localeStr] as Record<string, string | undefined> | undefined
+          )?.json
+          if (resource[jsonKey] === undefined && description) {
+            resource[jsonKey] = description
+          }
+        }
         for (const globalOption of getGlobalOptions()) {
           if (globalOptionResources.has(globalOption)) {
             const optionResource = globalOptionResources.get(globalOption)!

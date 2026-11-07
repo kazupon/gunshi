@@ -92,6 +92,8 @@ The plugin does not detect unknown options or unknown commands by itself.
 Gunshi core creates structured validation errors and provides candidate metadata.
 This plugin only decorates validation error rendering and appends suggestion hints.
 
+With `--json`, gunshi prints the validation errors as one line of JSON, without the renderer of the validation errors, so no hint is added. The JSON error points to the help of the command instead, in `next`.
+
 ## 📚 API References
 
 See the [API References](./docs/index.md)

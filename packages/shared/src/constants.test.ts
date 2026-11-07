@@ -3,6 +3,8 @@ import {
   ARG_ERROR_RESOURCE_KEYS,
   COMMAND_BUILTIN_RESOURCE_KEYS,
   COMMAND_ERROR_RESOURCE_KEYS,
+  JSON_ERROR_RESOURCE_KEYS,
+  JSON_RESOURCE_KEYS,
   SUGGESTION_ERROR_RESOURCE_KEYS
 } from './constants.ts'
 import DefaultResource from './resource.ts'
@@ -15,7 +17,9 @@ test('the default resource has a text for every built-in key', () => {
       ...COMMAND_BUILTIN_RESOURCE_KEYS,
       ...ARG_ERROR_RESOURCE_KEYS,
       ...COMMAND_ERROR_RESOURCE_KEYS,
-      ...SUGGESTION_ERROR_RESOURCE_KEYS
+      ...SUGGESTION_ERROR_RESOURCE_KEYS,
+      ...JSON_RESOURCE_KEYS,
+      ...JSON_ERROR_RESOURCE_KEYS
     ])
   )
 })
