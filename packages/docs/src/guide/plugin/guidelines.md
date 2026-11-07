@@ -538,7 +538,7 @@ Avoid exposing sensitive information in logs or error messages.
 
 This example shows how to handle API keys securely in a plugin, validating them without logging sensitive data.
 
-A `CommandError` reaches the user as it is: Gunshi prints its message, and the message of each of its causes. So the example writes the message of the error itself, and does not pass the error of `fetch` as the `cause`:
+A `CommandError` reaches the user as it is: Gunshi prints its message, and the message of each cause down the chain. So the example builds the message itself, and does not pass the error of `fetch` as the `cause`, whose own causes may carry details of the connection that you did not choose to show:
 
 ```ts
 import { CommandError, plugin } from '@gunshi/plugin'

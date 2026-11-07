@@ -13,12 +13,21 @@ const PROJECTS = {
  * @returns {Promise<Record<string, string>>} The descriptions of the projects, keyed by their names
  */
 async function readProjects(file) {
+  let projects
   try {
-    return JSON.parse(await readFile(file, 'utf8'))
+    projects = JSON.parse(await readFile(file, 'utf8'))
   } catch (error) {
-    // The error of `readFile` is the cause: gunshi prints its message on a `Caused by:` line
+    // The error of `readFile` or `JSON.parse` is the cause: gunshi prints its message on a
+    // `Caused by:` line
     throw new CommandError(`Could not read the projects from ${file}`, { cause: error })
   }
+
+  // A file that does not hold an object is a failure that the command expects, too
+  if (projects === null || typeof projects !== 'object' || Array.isArray(projects)) {
+    throw new CommandError(`${file} does not hold the descriptions of the projects`)
+  }
+
+  return projects
 }
 
 const command = define({

@@ -117,10 +117,16 @@ function renderCommandError(error: CommandError, extensions: object): string {
     const heading = translateCausedBy(extensions)
     // a cause may point back to an error in the chain
     const seen = new Set<unknown>([error])
+    // a cause may be any value, with a getter that throws: the chain ends there, and the error is
+    // still reported
     while (cause != null && !seen.has(cause)) {
       seen.add(cause)
-      lines.push(`${heading}: ${messageOf(cause)}`)
-      cause = typeof cause === 'object' ? (cause as { cause?: unknown }).cause : undefined
+      try {
+        lines.push(`${heading}: ${messageOf(cause)}`)
+        cause = typeof cause === 'object' ? (cause as { cause?: unknown }).cause : undefined
+      } catch {
+        break
+      }
     }
   }
   return lines.join('\n')

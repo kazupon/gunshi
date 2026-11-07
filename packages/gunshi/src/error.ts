@@ -332,12 +332,19 @@ export function isCommandError(error: unknown): error is CommandError {
   if (error instanceof CommandError) {
     return true
   }
-  // the global options plugin prints `message` and sets the exit code to `exitCode`, so an error
-  // from another copy must have the shape that this type predicate promises
-  if (!isRecord(error) || !hasCommandErrorShape(error)) {
+  // The global options plugin checks every error that a command throws, so the brand comes first:
+  // reading the properties of any other error could run a getter that throws, and the error that
+  // the command threw would be lost.
+  if (
+    !isRecord(error) ||
+    !Object.hasOwn(error, COMMAND_ERROR_BRAND) ||
+    error[COMMAND_ERROR_BRAND] !== true
+  ) {
     return false
   }
-  return Object.hasOwn(error, COMMAND_ERROR_BRAND) && error[COMMAND_ERROR_BRAND] === true
+  // the global options plugin prints `message` and sets the exit code to `exitCode`, so an error
+  // from another copy must have the shape that this type predicate promises
+  return hasCommandErrorShape(error)
 }
 
 /**

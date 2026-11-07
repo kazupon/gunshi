@@ -599,6 +599,20 @@ describe('isCommandError', () => {
     expect(isCommandError(brandedCommandError())).toBe(true)
   })
 
+  test('does not read the properties of an error without the brand', () => {
+    // the global options plugin checks every error that a command throws
+    const error = new Error('boom')
+    for (const key of ['code', 'exitCode']) {
+      Object.defineProperty(error, key, {
+        get() {
+          throw new Error(`the getter of ${key}`)
+        }
+      })
+    }
+
+    expect(isCommandError(error)).toBe(false)
+  })
+
   test('does not match an error of the app that has the same name', () => {
     class AppCommandError extends Error {
       code = 'not_found'

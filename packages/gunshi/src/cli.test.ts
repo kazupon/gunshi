@@ -4702,6 +4702,27 @@ describe('reported command errors', () => {
     expect(process.exitCode).toBeUndefined()
   })
 
+  test('an error whose properties throw when they are read still rejects with it', async () => {
+    const stderr = defineMockErrorLog()
+    const error = new Error('boom')
+    Object.defineProperty(error, 'code', {
+      get() {
+        throw new Error('the getter of code')
+      }
+    })
+
+    await expect(
+      cli([], {
+        run: () => {
+          throw error
+        }
+      })
+    ).rejects.toBe(error)
+
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
   test('gunshi/bone rejects with a CommandError, without the global options plugin', async () => {
     const stderr = defineMockErrorLog()
     const error = new CommandError('Project acme not found')

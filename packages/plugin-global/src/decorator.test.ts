@@ -387,6 +387,44 @@ describe('CommandError', () => {
     expect(stderr.mock.calls).toEqual([['Could not deploy acme\nCaused by: Request failed']])
   })
 
+  test('stops at a cause that throws when it is read, and still reports the error', async () => {
+    const stderr = captureStderr()
+    const { ctx, reported } = await createRun()
+    const cause = new Error('Request failed')
+    Object.defineProperty(cause, 'cause', {
+      get() {
+        throw new Error('the getter of cause')
+      }
+    })
+    const inner = {}
+    Object.defineProperty(inner, 'message', {
+      get() {
+        throw new Error('the getter of message')
+      }
+    })
+    const error = new CommandError('Could not deploy acme', { exitCode: 2, cause })
+    const other = new CommandError('Could not deploy acme', { exitCode: 2, cause: inner })
+
+    await expect(
+      decorator(() => {
+        throw error
+      })(ctx)
+    ).rejects.toBe(error)
+    await expect(
+      decorator(() => {
+        throw other
+      })(ctx)
+    ).rejects.toBe(other)
+
+    expect(stderr.mock.calls).toEqual([
+      ['Could not deploy acme\nCaused by: Request failed'],
+      ['Could not deploy acme']
+    ])
+    expect(process.exitCode).toBe(2)
+    expect(reported.has(error)).toBe(true)
+    expect(reported.has(other)).toBe(true)
+  })
+
   test('translates the heading of the causes with the i18n plugin', async () => {
     const stderr = captureStderr()
     const translate = vi.fn<(key: string) => string>(key => (key === '_:CAUSEDBY' ? '原因' : key))
