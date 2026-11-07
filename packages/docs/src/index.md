@@ -20,7 +20,7 @@ hero:
 features:
   - icon: 📏
     title: Simple & AI agent friendly
-    details: Commands with simple API, AI agents read their output with JSON.
+    details: Commands with simple APIs. output as JSON, and detects AI agents.
 
   - icon: ⚙️
     title: Declarative & Type Safe
