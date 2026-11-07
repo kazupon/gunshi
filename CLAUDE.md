@@ -61,7 +61,7 @@ The repository contains the following packages:
 ### Core Packages
 
 - **`packages/gunshi/`** - Main library with CLI runtime, command system, and built-in plugins
-  - Exports: `cli`, `define`, `defineWithTypes`, `lazy`, `lazyWithTypes`, `plugin`, `createCommandContext`, `CommandError`, `isCommandError`
+  - Exports: `cli`, `define`, `defineWithTypes`, `lazy`, `lazyWithTypes`, `plugin`, `createCommandContext`, `jsonArgs`, `CommandError`, `isCommandError`, `JsonOutputError`, `isJsonOutputError`
   - Published to: npm
 
 - **`packages/bone/`** - Minimal gunshi distribution without plugins (`@gunshi/bone`)
@@ -69,7 +69,7 @@ The repository contains the following packages:
   - Published to: npm
 
 - **`packages/definition/`** - Command definition utilities (`@gunshi/definition`)
-  - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers, and `CommandError` and `isCommandError`
+  - Provides `define`, `defineWithTypes`, `lazy`, `lazyWithTypes` helpers, `jsonArgs`, and `CommandError` and `isCommandError`
   - Published to: npm
 
 - **`packages/combinators/`** - Parser combinators for argument schemas (`@gunshi/combinators`)
@@ -96,6 +96,7 @@ The repository contains the following packages:
 
 - **`packages/plugin-global/`** - Global options plugin (`@gunshi/plugin-global`)
   - Provides `--version`, `--help` options
+  - Prints the result and the errors of the commands that spread `jsonArgs` as JSON with `--json`, and stops the other commands with `json_not_supported`
   - Header/usage rendering utilities
 
 - **`packages/plugin-i18n/`** - Internationalization plugin (`@gunshi/plugin-i18n`)
@@ -141,8 +142,9 @@ packages/gunshi/src/
 ├── definition.ts         # Command definition helpers
 ├── combinators.ts        # Parser combinators entry (`gunshi/combinators`)
 ├── decorators.ts         # Command runner decorators
-├── error.ts              # Error classes and type guards (`CommandError`, `CommandNotFoundError`, `isCommandError`, `isArgsValidationError`)
+├── error.ts              # Error classes and type guards (`CommandError`, `CommandNotFoundError`, `JsonOutputError`, `isCommandError`, `isArgsValidationError`)
 ├── generator.ts          # Command generator utilities
+├── json.ts               # `jsonArgs`, the argument that a command spreads to support `--json`
 ├── renderer.ts           # Usage/help rendering
 ├── agent.ts              # AI agent detection (`gunshi/agent`)
 ├── utils.ts              # Command utilities (lazy command resolution, sub-command lookup)

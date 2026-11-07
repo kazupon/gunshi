@@ -15,6 +15,7 @@ import {
   isCommandNotFoundError
 } from './error.ts'
 import { generate } from './generator.ts'
+import { jsonArgs } from './json.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
 import { hidden, string } from './combinators.ts'
@@ -4737,6 +4738,74 @@ describe('reported command errors', () => {
 
     expect(stderr()).toBe('')
     expect(process.exitCode).toBeUndefined()
+  })
+})
+
+describe('--json', () => {
+  beforeEach(() => {
+    // the tests check the exit code, which other tests may have left
+    process.exitCode = undefined
+  })
+
+  test('prints the result as JSON, with the human output and the hooks silenced', async () => {
+    const stdout = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const onAfterCommand = vi.fn<NonNullable<CliOptions['onAfterCommand']>>()
+    try {
+      const result = await cli(
+        ['list', '--json'],
+        { name: 'demo', run: () => {} },
+        {
+          name: 'demo',
+          subCommands: {
+            list: define({
+              name: 'list',
+              args: { ...jsonArgs },
+              run: ctx => {
+                ctx.log('Projects:')
+                return { projects: ['acme'] }
+              }
+            })
+          },
+          onBeforeCommand: ctx => {
+            ctx.log('before the command')
+          },
+          onAfterCommand
+        }
+      )
+
+      expect(result).toBeUndefined()
+      expect(stdout.mock.calls).toEqual([['{"projects":["acme"]}']])
+      // the hook gets no data: the result is printed, not returned
+      expect(onAfterCommand).toHaveBeenCalledWith(expect.anything(), undefined)
+    } finally {
+      stdout.mockRestore()
+    }
+  })
+
+  test('onAfterCommand gets the result only when it is a string', async () => {
+    const onAfterCommand = vi.fn<NonNullable<CliOptions['onAfterCommand']>>()
+
+    await cli([], { run: () => 'text' }, { onAfterCommand })
+    // a runner written in JavaScript may return anything
+    await cli([], { run: (() => ({ ok: true })) as unknown as CommandRunner }, { onAfterCommand })
+
+    expect(onAfterCommand.mock.calls.map(([, result]) => result)).toEqual(['text', undefined])
+  })
+
+  test('a command without jsonArgs is stopped with json_not_supported, after the hook', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    const onBeforeCommand = vi.fn<NonNullable<CliOptions['onBeforeCommand']>>()
+
+    await expect(
+      cli(['--json'], { name: 'legacy', run }, { name: 'demo', onBeforeCommand })
+    ).resolves.toBeUndefined()
+
+    expect(run).not.toHaveBeenCalled()
+    // the hooks run before the decorators, so the hook runs for it
+    expect(onBeforeCommand).toHaveBeenCalled()
+    expect(JSON.parse(stderr())).toMatchObject({ reason: 'json_not_supported' })
+    expect(process.exitCode).toBe(1)
   })
 })
 

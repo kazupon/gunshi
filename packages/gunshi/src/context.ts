@@ -16,7 +16,7 @@
  */
 
 import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from './constants.ts'
-import { create, deepFreeze, isLazyCommand, log } from './utils.ts'
+import { create, deepFreeze, isLazyCommand, log, resolveJsonRequest } from './utils.ts'
 
 import type {
   Args,
@@ -36,7 +36,8 @@ import type {
   ExtractArgs,
   GunshiParams,
   GunshiParamsConstraint,
-  LazyCommand
+  LazyCommand,
+  SubCommandable
 } from './types.ts'
 
 /**
@@ -71,7 +72,7 @@ type CommandContextResult<
 export interface CommandContextParams<
   G extends GunshiParams | { args: Args } | { extensions: ExtendContext },
   V extends ArgValues<ExtractArgs<G>>,
-  C extends Command<G> | LazyCommand<G> = Command<G>,
+  C extends Command<G> | LazyCommand<G> | SubCommandable = Command<G>,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > {
   /**
@@ -143,7 +144,7 @@ export interface CommandContextParams<
 export async function createCommandContext<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
   V extends ArgValues<ExtractArgs<G>> = ArgValues<ExtractArgs<G>>,
-  C extends Command<G> | LazyCommand<G> = Command<G>,
+  C extends Command<G> | LazyCommand<G> | SubCommandable = Command<G>,
   E extends Record<string, CommandContextExtension> = {}
 >({
   args = {} as ExtractArgs<G>,
@@ -199,6 +200,15 @@ export async function createCommandContext<
    * create the command context
    */
 
+  /**
+   * NOTE(kazupon): a command that spreads `jsonArgs` and is asked for JSON prints its result as JSON, so
+   * the human output of `ctx.log` is silenced, as it is with `usageSilent`. The hooks and the decorators
+   * get the same context, so their `ctx.log` is silenced too. Only the resolved value of the `json`
+   * argument counts here, not the raw tokens: a command that does not support `--json` keeps its output,
+   * and the global options plugin reports the `--json` given to it.
+   */
+  const silent = cliOptions.usageSilent || resolveJsonRequest(_args, values) === 'declared'
+
   const core = Object.assign(create<CommandContext<G>>(), {
     name: getCommandName(command as Command),
     description: command.description,
@@ -214,7 +224,7 @@ export async function createCommandContext<
     _: argv,
     tokens,
     toKebab: command.toKebab,
-    log: cliOptions.usageSilent ? NOOP : log,
+    log: silent ? NOOP : log,
     validationError
   })
 

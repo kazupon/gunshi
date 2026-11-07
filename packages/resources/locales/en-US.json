@@ -13,6 +13,10 @@
   "CAUSEDBY": "Caused by",
   "help": "Display this help message",
   "version": "Display this version",
+  "json": "Output the result as JSON",
+  "json:invalid-arguments": "{$count} arguments are invalid",
+  "json:next:help": "See the arguments of the command",
+  "json:next:help-placeholder": "Replace <COMMAND> with how you ran this CLI, to see the arguments of the command",
   "err:arg:required-option": "Option {$displayName} is required",
   "err:arg:required-positional": "Positional argument {$displayName} is required",
   "err:arg:invalid-type": "Invalid value for {$displayName}: expected {$expected}",
@@ -28,5 +32,8 @@
   "err:cmd:ambiguous": "The command is ambiguous. Move options after the command name: {$candidatePaths}",
   "err:cmd:inconsistent-options": "The options do not identify a consistent command. Move options after the command name.",
   "err:cmd:lazy-schema-mismatch": "The lazy command definition does not match its loaded options. Declare leading options in the lazy definition or move options after the command name: {$commandPath}",
+  "err:json:not-supported": "This command does not support --json",
+  "err:json:invalid-result": "The command finished, but did not return an object to output as JSON. A plugin that decorates the command may have dropped its result",
+  "err:json:unserializable-result": "The command finished, but its result cannot be converted to JSON: {$message}",
   "err:suggestion:did-you-mean": "Did you mean {$name}?"
 }

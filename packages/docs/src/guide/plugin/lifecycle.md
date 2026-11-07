@@ -113,7 +113,7 @@ const pluginD = plugin({
 
 The `setup` function of each plugin is called in dependency order.
 
-This example shows what actions a plugin can perform during setup:
+This example shows what actions a plugin can perform during setup. The examples of this page print with `console.log` to show the order of the phases. A real plugin prints with `ctx.log` in a command decorator, which is silenced when the command prints JSON with `--json`.
 
 ```js
 import { plugin } from 'gunshi/plugin'
@@ -287,7 +287,7 @@ This sequence shows:
 
 ## Complete Lifecycle Example
 
-Here's a complete example showing all lifecycle phases including Command Hooks.
+Here's a complete example showing all lifecycle phases including Command Hooks. It prints with `console.log` to show the order: a real plugin prints with `ctx.log`, which is silenced with `--json`.
 
 Plugin Codes:
 

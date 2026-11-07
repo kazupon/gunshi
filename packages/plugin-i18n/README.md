@@ -108,6 +108,7 @@ This means:
 - If you're using the globals plugin (which adds `--help` and `--version` options), the i18n plugin will automatically handle their translations
 - The translations for "Display this help message" and "Display this version" will be available in your configured locale
 - You can override these translations by providing your own `help` and `version` keys in your built-in resources
+- The description of `--json` of a command that spreads `jsonArgs` ("Output the result as JSON") is translated by the `json` key of the built-in resources in the same way, unless the resource of the command has its own `arg:json`
 
 Example with globals plugin:
 

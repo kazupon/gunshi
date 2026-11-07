@@ -470,3 +470,28 @@ describe('CommandError across the copies', () => {
     ])
   })
 })
+
+describe('JsonOutputError across the copies', () => {
+  test('@gunshi/plugin recognizes the error that gunshi throws for --json', async () => {
+    // usageSilent leaves the error to the caller, in an AggregateError, as the argument errors
+    const error = await captureAggregateError(() =>
+      gunshi.cli(['--json'], { name: 'app', run: () => {} }, { usageSilent: true })
+    )
+    const [notSupported] = error.errors
+
+    expect(notSupported).not.toBeInstanceOf(plugin.JsonOutputError)
+    expect(plugin.isJsonOutputError(notSupported)).toBe(true)
+    expect((notSupported as InstanceType<PluginModule['JsonOutputError']>).code).toBe(
+      'err:json:not-supported'
+    )
+  })
+
+  test('gunshi recognizes the error of @gunshi/plugin', () => {
+    const error = new plugin.JsonOutputError('This command does not support --json', {
+      code: 'err:json:not-supported'
+    })
+
+    expect(error).not.toBeInstanceOf(gunshi.JsonOutputError)
+    expect(gunshi.isJsonOutputError(error)).toBe(true)
+  })
+})

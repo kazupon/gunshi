@@ -8,5 +8,6 @@ export * from './constants.ts'
 export * from './localization.ts'
 export { default as DefaultResource } from './resource.ts'
 export * from './utils.ts'
+export * from './validation.ts'
 
 export type * from './types.ts'

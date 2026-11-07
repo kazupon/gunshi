@@ -15,7 +15,9 @@ import type {
   LazyCommand,
   MergeGunshiExtensions,
   RendererDecorator,
-  ValidationErrorsDecorator
+  SubCommandable,
+  ValidationErrorsDecorator,
+  JsonResult
 } from '../types.ts'
 
 /**
@@ -54,7 +56,7 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
    * @param name - Command name
    * @param command - Command definition
    */
-  addCommand(name: string, command: Command<G> | LazyCommand<G>): void
+  addCommand(name: string, command: SubCommandable): void
 
   /**
    * Check if a command exists.
@@ -125,8 +127,10 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
     decorator: (
       baseRunner: (
         ctx: Readonly<CommandContext<MergeGunshiExtensions<G, L>>>
-      ) => Awaitable<void | string>
-    ) => (ctx: Readonly<CommandContext<MergeGunshiExtensions<G, L>>>) => Awaitable<void | string>
+      ) => Awaitable<void | string | JsonResult>
+    ) => (
+      ctx: Readonly<CommandContext<MergeGunshiExtensions<G, L>>>
+    ) => Awaitable<void | string | JsonResult>
   ): void
 }
 
@@ -190,14 +194,14 @@ export function createPluginContext<G extends GunshiParamsConstraint = DefaultGu
       return new Map(subCommands)
     },
 
-    addCommand(name: string, command: Command<G> | LazyCommand<G>): void {
+    addCommand(name: string, command: SubCommandable): void {
       if (!name) {
         throw new Error('Command name must be a non-empty string')
       }
       if (subCommands.has(name)) {
         throw new Error(`Command '${name}' is already registered`)
       }
-      subCommands.set(name, command)
+      subCommands.set(name, command as Command<G> | LazyCommand<G>)
     },
 
     hasCommand(name: string): boolean {
@@ -245,8 +249,10 @@ export function createPluginContext<G extends GunshiParamsConstraint = DefaultGu
       decorator: (
         baseRunner: (
           ctx: Readonly<CommandContext<MergeGunshiExtensions<G, L>>>
-        ) => Awaitable<void | string>
-      ) => (ctx: Readonly<CommandContext<MergeGunshiExtensions<G, L>>>) => Awaitable<void | string>
+        ) => Awaitable<void | string | JsonResult>
+      ) => (
+        ctx: Readonly<CommandContext<MergeGunshiExtensions<G, L>>>
+      ) => Awaitable<void | string | JsonResult>
     ): void {
       decorators.addCommandDecorator(decorator as unknown as CommandDecorator<G>)
     }

@@ -8,6 +8,10 @@ import type { Awaitable, CommandContextCore, DefaultGunshiParams } from '@gunshi
 /**
  * Extended command context which provides utilities via global options plugin.
  * These utilities are available via `CommandContext.extensions['g:global']`.
+ *
+ * The functions that show the version, the header and the usage print with `ctx.log`. So they print
+ * nothing when `ctx.log` is silenced, with `usageSilent` or when a command that spreads `jsonArgs` is
+ * asked for JSON with `--json`, and return the text only.
  */
 export interface GlobalExtension {
   /**
@@ -41,6 +45,55 @@ export interface GlobalExtension {
 }
 
 /**
+ * A function that prints a line, such as `ctx.log`.
+ */
+export type Writer = (...args: unknown[]) => void
+
+/**
+ * Print the version of the application.
+ *
+ * @param ctx - The command context
+ * @param write - The function to print with
+ * @returns The version of the application, or `unknown` if the version is not specified
+ */
+export function writeVersion(ctx: CommandContextCore<DefaultGunshiParams>, write: Writer): string {
+  const version = ctx.env.version || 'unknown'
+  write(version)
+  return version
+}
+
+/**
+ * Print the usage of the application, with the header as its title.
+ *
+ * NOTE(kazupon): the header is the title of the usage, so it comes with the usage, wherever the usage is
+ * shown: for `--help`, and when a command that takes `--help` itself shows it. It is not shown before a
+ * command runs, where it would come before what the command prints, such as JSON.
+ *
+ * @param ctx - The command context
+ * @param write - The function to print with
+ * @returns The header and the usage of the application, or `undefined` if the `renderUsage` is not specified
+ */
+export async function writeUsage(
+  ctx: CommandContextCore<DefaultGunshiParams>,
+  write: Writer
+): Promise<string | undefined> {
+  if (ctx.env.renderUsage == null) {
+    return
+  }
+  const usage = await ctx.env.renderUsage(ctx)
+  if (!usage) {
+    return
+  }
+  const header = ctx.env.renderHeader == null ? undefined : await ctx.env.renderHeader(ctx)
+  if (header) {
+    write(header)
+    write() // empty line after header
+  }
+  write(usage)
+  return header ? [header, usage].join('\n') : usage
+}
+
+/**
  * Extends the command context for global options plugin.
  *
  * @param ctx - The {@linkcode CommandContextCore | command context} core
@@ -48,13 +101,7 @@ export interface GlobalExtension {
  */
 export default function extension(ctx: CommandContextCore<DefaultGunshiParams>): GlobalExtension {
   return {
-    showVersion: () => {
-      const version = ctx.env.version || 'unknown'
-      if (!ctx.env.usageSilent) {
-        ctx.log(version)
-      }
-      return version
-    },
+    showVersion: () => writeVersion(ctx, ctx.log),
 
     showHeader: async () => {
       let header: string | undefined
@@ -68,27 +115,7 @@ export default function extension(ctx: CommandContextCore<DefaultGunshiParams>):
       return header
     },
 
-    showUsage: async () => {
-      if (ctx.env.renderUsage == null) {
-        return
-      }
-      const usage = await ctx.env.renderUsage(ctx)
-      if (!usage) {
-        return
-      }
-      /**
-       * NOTE(kazupon): the header is the title of the usage, so it comes with the usage, wherever the
-       * usage is shown: for `--help`, and when a command that takes `--help` itself shows it. It is not
-       * shown before a command runs, where it would come before what the command prints, such as JSON.
-       */
-      const header = ctx.env.renderHeader == null ? undefined : await ctx.env.renderHeader(ctx)
-      if (header) {
-        ctx.log(header)
-        ctx.log() // empty line after header
-      }
-      ctx.log(usage)
-      return header ? [header, usage].join('\n') : usage
-    },
+    showUsage: async () => await writeUsage(ctx, ctx.log),
 
     showValidationErrors: async (error: AggregateError) => {
       if (ctx.env.renderValidationErrors === null) {

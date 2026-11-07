@@ -115,7 +115,7 @@ EXAMPLES:
 
 - **`renderHeader(ctx: CommandContext): Promise<string>`**: Renders the command header section
 - **`renderUsage(ctx: CommandContext): Promise<string>`**: Renders the complete usage/help information
-- **`renderValidationErrors(ctx: CommandContext, error: AggregateError): Promise<string>`**: Renders validation errors
+- **`renderValidationErrors(ctx: CommandContext, error: AggregateError): Promise<string>`**: Renders validation errors. With `--json`, the global options plugin prints the validation errors as one line of JSON, and does not call the renderer of the validation errors
 
 ## 🧩 Context Extensions
 

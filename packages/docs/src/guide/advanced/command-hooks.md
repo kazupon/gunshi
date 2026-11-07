@@ -125,6 +125,14 @@ The `CommandContext` parameter is read-only and contains all command metadata, w
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+`onAfterCommand` receives the result only when the command returns a string. The result of a command that prints JSON with `--json` is printed, not passed: the hook receives `undefined`.
+
+### Hooks and `--json`
+
+When a command that spreads `jsonArgs` is asked for JSON with `--json`, stdout must have the JSON only, so the hooks must not print to stdout or stderr. Print with `ctx.log`, which Gunshi silences then (see [JSON Output](../essentials/json-output.md)).
+
+When `--json` is given to a command that does not spread `jsonArgs`, the hooks still run: Gunshi stops the command with `json_not_supported` in the command decorators, after `onBeforeCommand`. `ctx.values.json` is not set then, and `ctx.log` is not silenced.
+
 With an understanding of how hooks work and their parameters, let's explore how they differ from and interact with plugin decorators.
 
 ### Handling Argument Validation Errors
@@ -300,10 +308,10 @@ export default plugin({
         const start = Date.now()
         try {
           const result = await baseRunner(commandCtx)
-          console.log(`Execution time: ${Date.now() - start}ms`)
+          commandCtx.log(`Execution time: ${Date.now() - start}ms`)
           return result
         } catch (error) {
-          console.log(`Failed after: ${Date.now() - start}ms`)
+          commandCtx.log(`Failed after: ${Date.now() - start}ms`)
           throw error
         }
       }
@@ -311,6 +319,8 @@ export default plugin({
   }
 })
 ```
+
+The decorator prints with `commandCtx.log`, not with `console.log`, so that it prints nothing when the command prints JSON with `--json`, and it returns the result of the command as it is.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 

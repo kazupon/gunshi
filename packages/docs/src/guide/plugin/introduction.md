@@ -241,13 +241,15 @@ Plugins can intercept and modify command execution using decorators:
 ```js
 setup: ctx => {
   ctx.decorateCommand(baseRunner => async ctx => {
-    console.log('Before command')
+    ctx.log('Before command')
     const result = await baseRunner(ctx)
-    console.log('After command')
+    ctx.log('After command')
     return result
   })
 }
 ```
+
+A decorator returns the result of the command as it is, and prints with `ctx.log`, which is silenced when the command prints JSON with `--json`.
 
 ## Getting Started
 

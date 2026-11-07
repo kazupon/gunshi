@@ -12,6 +12,8 @@
  * - `args-tokens` utilities: `parseArgs`, `resolveArgs`, `ArgsValidationError`, `ArgsValidationErrorKeys`, and `ArgsValidationErrorCode` for parsing and validating command line arguments.
  * - Structured error utilities: `CommandNotFoundError`, `CommandNotFoundErrorKeys`, `CommandNotFoundErrorCode`, `CommandNotFoundErrorOptions`, `CommandResolutionError`, `CommandResolutionErrorKeys`, `CommandResolutionErrorCode`, `CommandResolutionErrorOptions`, `isCommandNotFoundError`, `isCommandResolutionError`, `isArgsValidationError`, and `hasPriorityValidationError`.
  * - `CommandError`, `CommandErrorOptions`, and `isCommandError`: An error for the failures that a command expects, printed without a stack trace.
+ * - `jsonArgs`: The argument that a command spreads into its `args` to support `--json`.
+ * - `JsonOutputError`, `JsonOutputErrorKeys`, `JsonOutputErrorCode`, `JsonOutputErrorOptions`, and `isJsonOutputError`: The errors of the JSON output.
  * - Some basic type definitions, such as `CommandContext`, `Plugin`, `PluginContext`, etc.
  *
  * @example
@@ -33,6 +35,7 @@ export * from './cli.ts'
 export { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 export { createCommandContext } from './context.ts'
 export { define, defineWithTypes, lazy, lazyWithTypes } from './definition.ts'
+export { jsonArgs } from './json.ts'
 export {
   CommandError,
   CommandNotFoundError,
@@ -43,7 +46,10 @@ export {
   isArgsValidationError,
   isCommandError,
   isCommandNotFoundError,
-  isCommandResolutionError
+  isCommandResolutionError,
+  isJsonOutputError,
+  JsonOutputError,
+  JsonOutputErrorKeys
 } from './error.ts'
 export { plugin } from './plugin/core.ts'
 
@@ -53,7 +59,9 @@ export type {
   CommandNotFoundErrorCode,
   CommandNotFoundErrorOptions,
   CommandResolutionErrorCode,
-  CommandResolutionErrorOptions
+  CommandResolutionErrorOptions,
+  JsonOutputErrorCode,
+  JsonOutputErrorOptions
 } from './error.ts'
 export type { ArgsValidationErrorCode } from 'args-tokens'
 export type { PluginContext } from './plugin/context.ts'

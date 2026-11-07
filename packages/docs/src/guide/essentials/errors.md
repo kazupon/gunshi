@@ -70,11 +70,11 @@ The message may have more than one line, such as a line that tells the user what
 
 `CommandError` takes these options, and all of them are optional:
 
-| Option     | Description                                                                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `code`     | The name of the failure, for programs to read, such as `not_found` or `network_error`. Write it in snake_case. Gunshi does not print it to users. |
-| `exitCode` | The exit code of the process, an integer from `1` to `255`. Defaults to `1`, and any other value is replaced with `1`.                            |
-| `cause`    | The error that caused the failure. Gunshi prints its message after the message of the `CommandError`.                                             |
+| Option     | Description                                                                                                                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `code`     | The name of the failure, for programs to read, such as `not_found` or `network_error`. Write it in snake_case. Gunshi does not print it to users: with `--json`, it is the `reason` of the JSON error, as it is. |
+| `exitCode` | The exit code of the process, an integer from `1` to `255`. Defaults to `1`, and any other value is replaced with `1`.                                                                                           |
+| `cause`    | The error that caused the failure. Gunshi prints its message after the message of the `CommandError`, and in `data.causes` with `--json`.                                                                        |
 
 ### Causes
 
@@ -103,7 +103,7 @@ The [i18n plugin](../advanced/internationalization.md) translates the `Caused by
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!WARNING]
-> Gunshi prints the message of the cause as it is. Do not pass an error whose message may contain a secret, such as a URL with a token, as the `cause`. Write a message that is safe to print in the `CommandError` instead.
+> Gunshi prints the message of the cause as it is, for people and in the JSON error of `--json`. Do not pass an error whose message may contain a secret, such as a URL with a token, as the `cause`. Write a message that is safe to print in the `CommandError` instead.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -118,9 +118,20 @@ It does not print a `CommandError` thrown from a [hook](../advanced/command-hook
 
 These run outside the command, and the `cli()` promise rejects with the error, as it does with an [unexpected error](#unexpected-errors). Throw the failures that a command expects from `run`.
 
+## With `--json`
+
+A command that spreads `jsonArgs` prints its errors as one line of JSON to stderr with `--json`, and stdout is empty. The `code` of a `CommandError` is the `reason` of the JSON error, and its exit code is kept:
+
+```sh
+$ node cli.js show nope --json
+{"status":"error","reason":"not_found","message":"Project nope not found"}
+```
+
+Any other error that the command throws is printed as JSON too, as `command_failed` with exit code `1`, and the `cli()` promise resolves. For the shape of the JSON errors, see [JSON Output](./json-output.md).
+
 ## Unexpected Errors
 
-Gunshi does not print an error other than `CommandError`.
+Without `--json`, Gunshi does not print an error other than `CommandError`.
 
 The `cli()` promise rejects with the error, and unless the app catches it, the runtime prints the stack trace and ends with exit code `1`.
 

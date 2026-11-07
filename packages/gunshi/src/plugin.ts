@@ -35,7 +35,10 @@ export {
   isArgsValidationError,
   isCommandError,
   isCommandNotFoundError,
-  isCommandResolutionError
+  isCommandResolutionError,
+  isJsonOutputError,
+  JsonOutputError,
+  JsonOutputErrorKeys
 } from './error.ts'
 export { plugin } from './plugin/core.ts'
 export { ArgsValidationError, ArgsValidationErrorKeys } from 'args-tokens'
@@ -46,7 +49,9 @@ export type {
   CommandNotFoundErrorCode,
   CommandNotFoundErrorOptions,
   CommandResolutionErrorCode,
-  CommandResolutionErrorOptions
+  CommandResolutionErrorOptions,
+  JsonOutputErrorCode,
+  JsonOutputErrorOptions
 } from './error.ts'
 export type { ArgsValidationErrorCode } from 'args-tokens'
 export type { PluginContext } from './plugin/context.ts'
@@ -73,16 +78,19 @@ export type {
   CommandDecorator,
   CommandExamplesFetcher,
   CommandRunner,
+  CommandRunnerResult,
   DefaultGunshiParams,
   ExtendContext,
   ExtractArgs,
   ExtractExtensions,
   GunshiParams,
   GunshiParamsConstraint,
+  JsonResult,
   LazyCommand,
   MergeGunshiExtensions,
   NormalizeToGunshiParams,
   Prettify,
   RendererDecorator,
+  SubCommandable,
   ValidationErrorsDecorator
 } from './types.ts'

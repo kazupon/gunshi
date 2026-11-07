@@ -2,9 +2,11 @@ import { describe, expect, test, vi } from 'vitest'
 import { hasPrototype } from '../test/utils.ts'
 import { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 import { createCommandContext } from './context.ts'
+import { jsonArgs } from './json.ts'
 
 import type {
   Args,
+  ArgValues,
   Command,
   CommandContextCore,
   CommandContextExtension,
@@ -506,5 +508,50 @@ describe('CommandContextExtension type', () => {
 
     expect(typeof db.query).toBe('function')
     expect(typeof db.transaction).toBe('function')
+  })
+})
+
+describe('ctx.log with --json', () => {
+  /**
+   * Create a command context and call `ctx.log`, capturing what it prints.
+   *
+   * @param args - The arguments of the command
+   * @param values - The resolved values of the arguments
+   * @param usageSilent - Whether to silence the output
+   * @returns What `ctx.log` printed
+   */
+  async function logWith(args: Args, values: ArgValues<Args>, usageSilent = false) {
+    const stdout = vi.spyOn(console, 'log').mockImplementation(() => {})
+    try {
+      const ctx = await createCommandContext({ args, values, cliOptions: { usageSilent } })
+      ctx.log('human output')
+      return stdout.mock.calls
+    } finally {
+      stdout.mockRestore()
+    }
+  }
+
+  test('is silenced when a command that spreads jsonArgs is asked for JSON', async () => {
+    expect(await logWith({ ...jsonArgs }, { json: true })).toEqual([])
+  })
+
+  test.each([
+    { title: 'without --json', args: { ...jsonArgs }, values: {} },
+    { title: 'with --json=false', args: { ...jsonArgs }, values: { json: false } },
+    // the command handles its own --json
+    {
+      title: 'with a json argument of its own',
+      args: { json: { type: 'boolean' } },
+      values: { json: true }
+    }
+  ] satisfies { title: string; args: Args; values: ArgValues<Args> }[])(
+    'prints $title',
+    async ({ args, values }) => {
+      expect(await logWith(args, values)).toEqual([['human output']])
+    }
+  )
+
+  test('is silenced with usageSilent, as before', async () => {
+    expect(await logWith({}, {}, true)).toEqual([])
   })
 })

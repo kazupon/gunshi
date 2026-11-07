@@ -182,6 +182,8 @@ await cli(process.argv.slice(2), command, {
 // - Help and version descriptions
 // - Error messages
 // - The `Caused by` heading of the causes of a `CommandError` (CAUSEDBY)
+// - The description of `--json` of `jsonArgs` (json), and the texts of the JSON errors
+//   (err:json:*, json:invalid-arguments, json:next:help, json:next:help-placeholder)
 ```
 
 ## Loading Translations from Files

@@ -28,17 +28,20 @@ Each decorator receives a runner function (the next decorator or original comman
 ```js
 ctx.decorateCommand(runner => async ctx => {
   // Pre-execution logic
-  console.log('Before command')
+  ctx.log('Before command')
 
   // Call the next decorator or original command
   const result = await runner(ctx)
 
   // Post-execution logic
-  console.log('After command')
+  ctx.log('After command')
 
+  // Return the result as it is
   return result
 })
 ```
+
+A decorator returns what the runner returns, as it is: the result of a command that prints JSON with `--json` must reach Gunshi, or the command fails with `invalid_result`. A decorator prints with `ctx.log`, which Gunshi silences when the command prints JSON, so that stdout has the JSON only (see [JSON Output](../essentials/json-output.md)). A warning for the author of the CLI about a misconfiguration may still go to stderr.
 
 ### Command Decorator Execution Order
 
@@ -63,7 +66,7 @@ graph TB
 
 ### Basic Command Decorator Example
 
-The following example demonstrates the execution order when using `reduceRight`:
+The following example demonstrates the execution order when using `reduceRight`. It prints with `console.log` to show the order: a real plugin prints with `ctx.log`, which is silenced with `--json`.
 
 ```js [plugin.js]
 import { plugin } from 'gunshi/plugin'
@@ -149,9 +152,9 @@ export default plugin({
   setup(ctx) {
     // First decorator: Logging
     ctx.decorateCommand(runner => async ctx => {
-      console.log('[LOG] Command started:', ctx.name)
+      ctx.log('[LOG] Command started:', ctx.name)
       const result = await runner(ctx)
-      console.log('[LOG] Command completed')
+      ctx.log('[LOG] Command completed')
       return result
     })
 
@@ -160,17 +163,20 @@ export default plugin({
       const start = Date.now()
       await sleep(10)
       const result = await runner(ctx)
-      console.log(`[TIME] Execution: ${Date.now() - start}ms`)
+      ctx.log(`[TIME] Execution: ${Date.now() - start}ms`)
       return result
     })
 
     // Third decorator: Error wrapper
     ctx.decorateCommand(runner => async ctx => {
       try {
-        console.log('[ERROR] Monitoring enabled')
+        ctx.log('[ERROR] Monitoring enabled')
         return await runner(ctx)
       } catch (error) {
-        console.error('[ERROR] Command failed:', error.message)
+        // with --json, gunshi prints the error as JSON
+        if (!ctx.values.json) {
+          console.error('[ERROR] Command failed:', error.message)
+        }
         throw error
       }
     })
@@ -242,6 +248,8 @@ export default plugin({
 The decorator of `@gunshi/plugin-global` wraps the decorators of the other plugins, so it receives the error. It prints the message to stderr without a stack trace, sets the exit code to the `exitCode` of the error, and the `cli()` promise resolves. It does the same for a `CommandError` that the command throws through your decorator, so a decorator that catches the errors of the command, such as the error wrapper above, should throw them again.
 
 To tell a `CommandError`, use `isCommandError()` rather than `instanceof`: the packages of Gunshi, such as `gunshi` and `@gunshi/plugin`, bundle their own copies of the class. For more, see [Errors and Exit Codes](../essentials/errors.md).
+
+With `--json`, Gunshi prints the `CommandError` as one line of JSON instead, with its `code` as the reason. An error of the JSON output itself, such as `json_not_supported` for a command that does not support `--json`, is a `JsonOutputError`: tell it with `isJsonOutputError()`.
 
 ## Renderer Decorators
 
