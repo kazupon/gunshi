@@ -1,7 +1,7 @@
 {
   "name": "@gunshi/shared",
   "description": "shared utils for gunshi",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0-rc.6",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
