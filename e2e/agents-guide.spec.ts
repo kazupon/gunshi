@@ -499,12 +499,13 @@ await cli(process.argv.slice(2), define({ name: 'cloud', run: () => {} }), {
 })
 `
     )
-    expect(run(file, ['remove', 'db'])).toEqual({
+    const withCheck = envWith({ ALL: undefined })
+    expect(run(file, ['remove', 'db'], withCheck)).toEqual({
       code: 1,
       stdout: '',
       stderr: 'Database db not found\n'
     })
-    expect(run(file, ['remove'])).toMatchObject({ code: 2, stdout: '' })
+    expect(run(file, ['remove'], withCheck)).toMatchObject({ code: 2, stdout: '' })
     // without the check, the exit code of the CommandError is overwritten
     expect(run(file, ['remove', 'db'], envWith({ ALL: '1' })).code).toBe(2)
   })
