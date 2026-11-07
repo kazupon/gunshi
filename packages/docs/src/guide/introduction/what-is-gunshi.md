@@ -10,14 +10,11 @@ The name "gunshi" (軍師) refers to a position in ancient Japanese samurai batt
 
 Gunshi is designed with several powerful features to make CLI development easier and more maintainable:
 
-- 📏 **Simple & AI agent friendly**: Commands with simple API, AI agents read their output with JSON.
+- 📏 **Simple & AI agent friendly**: Commands with simple API. AI agents read their output and errors as JSON with [`--json`](../essentials/json-output.md), commands report failures with [`CommandError`](../essentials/errors.md) without a stack trace, and [`gunshi/agent`](../advanced/ai-agent-detection.md) detects AI agents.
 - ⚙️ **Declarative & Type Safe**: Configure commands declaratively with full TypeScript support and type-safe argument parsing by [args-tokens](https://github.com/kazupon/args-tokens)
 - 🧩 **Composable & Lazy**: Create modular sub-commands with context sharing and lazy loading for better performance.
 - 🎨 **Flexible Rendering**: Customize usage generation, validation errors, and help messages with pluggable renderers.
 - 🌍 **Internationalization**: Built with global users in mind, featuring locale-aware design, resource management, and multi-language support.
-- 🚦 **Expected Failures**: Throw [`CommandError`](../essentials/errors.md) to print a message without a stack trace, with the exit code of your choice.
-- 🤖 **Agent-aware**: Detect AI coding-agent environments through the stable [`gunshi/agent`](../advanced/ai-agent-detection.md) utility without changing CLI behavior automatically.
-- 🧾 **JSON Output for AI Agents**: Designed for AI agents first, [`--json`](../essentials/json-output.md) prints the result of a command as one JSON document, and its errors as one line of JSON that tells the agent what to fix.
 - 🔌 **Pluggable**: Extensible plugin system with dependency management and lifecycle hooks for modular CLI development.
 
 ## Why Gunshi?
