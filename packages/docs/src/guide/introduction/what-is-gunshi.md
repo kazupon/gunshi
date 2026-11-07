@@ -10,7 +10,7 @@ The name "gunshi" (軍師) refers to a position in ancient Japanese samurai batt
 
 Gunshi is designed with several powerful features to make CLI development easier and more maintainable:
 
-- 📏 **Simple & Universal**: Run commands with simple API and support for universal runtime (Node.js, Bun).
+- 📏 **Simple & AI agent friendly**: Commands with simple APIs, output as JSON, and detects AI agents.
 - ⚙️ **Declarative & Type Safe**: Configure commands declaratively with full TypeScript support and type-safe argument parsing by [args-tokens](https://github.com/kazupon/args-tokens)
 - 🧩 **Composable & Lazy**: Create modular sub-commands with context sharing and lazy loading for better performance.
 - 🎨 **Flexible Rendering**: Customize usage generation, validation errors, and help messages with pluggable renderers.
