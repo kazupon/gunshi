@@ -245,7 +245,7 @@ export function collectCauses(error: unknown): string[] {
  *
  * @param value - The error or the cause
  * @returns The message
- * @throws The error of a getter of `message` that throws
+ * @throws {unknown} The error of a getter of `message` that throws
  */
 export function messageOf(value: unknown): string {
   const message = (value as { message?: unknown } | null | undefined)?.message
