@@ -687,9 +687,9 @@ describe('--json given to a command that does not spread jsonArgs', () => {
       args: {},
       values: {},
       validationError: new AggregateError([
-        new CommandNotFoundError('Command not found: buidl', {
+        new CommandNotFoundError('Command not found: lod', {
           code: CommandNotFoundErrorKeys.notFound,
-          commandName: 'buidl'
+          commandName: 'lod'
         }),
         new ArgsValidationError('Unknown option: --json', {
           code: ArgsValidationErrorKeys.unknownOption,
@@ -703,7 +703,7 @@ describe('--json given to a command that does not spread jsonArgs', () => {
     const [failure] = output.json() as { reason: string; data: { issues: object[] } }[]
     expect(failure.reason).toBe('unknown_command')
     expect(failure.data.issues).toEqual([
-      { field: 'buidl', reason: 'unknown_command', message: 'Command not found: buidl' }
+      { field: 'lod', reason: 'unknown_command', message: 'Command not found: lod' }
     ])
   })
 
