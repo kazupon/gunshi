@@ -370,7 +370,7 @@ The following example demonstrates a comprehensive approach to handling logging,
 
 ```ts
 // Note: These are hypothetical example plugins for illustration purposes
-import { define } from 'gunshi'
+import { CommandError, define } from 'gunshi'
 import { pluginId as loggerId } from '@my/plugin-logger'
 import { pluginId as authId } from '@my/plugin-auth'
 import { pluginId as metricsId } from '@my/plugin-metrics'
@@ -387,7 +387,7 @@ const command = define({
     // Check authentication
     if (!auth?.isAuthenticated()) {
       logger?.error('Authentication required')
-      throw new Error('Please login first')
+      throw new CommandError('Please login first')
     }
 
     try {

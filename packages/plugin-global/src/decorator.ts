@@ -5,11 +5,22 @@
 
 import { pluginId as Global } from './types.ts'
 
-import { hasPriorityValidationError } from '@gunshi/plugin'
+import { hasPriorityValidationError, isCommandError } from '@gunshi/plugin'
+import { DefaultResource, namespacedId, resolveBuiltInKey } from '@gunshi/shared'
 
-import type { CommandDecorator, DefaultGunshiParams } from '@gunshi/plugin'
+import type { CommandDecorator, CommandError, DefaultGunshiParams } from '@gunshi/plugin'
 import type { GlobalExtension } from './extension.ts'
 import type { PluginId } from './types.ts'
+
+/**
+ * The id of the i18n plugin, which translates the heading of the causes of a {@linkcode CommandError}.
+ */
+const I18n = namespacedId('i18n')
+
+/**
+ * The key of the built-in resource for the heading of the causes of a {@linkcode CommandError}.
+ */
+const CAUSED_BY = resolveBuiltInKey('CAUSEDBY')
 
 /**
  * The key of the registry in which the core keeps, for the command context of each run, the set of the
@@ -49,6 +60,76 @@ function setExitCode(code: number): void {
   if (proc != null && typeof proc === 'object') {
     proc.exitCode = code
   }
+}
+
+/**
+ * Translate the heading of the causes of a {@linkcode CommandError}, with the i18n plugin when it is
+ * installed.
+ *
+ * NOTE(kazupon): the i18n plugin depends on this plugin, so this plugin cannot depend on it, and reads
+ * its extension as the renderer plugin does. The i18n plugin translates a built-in key that the
+ * resources of the app lack in English, and an older one returns the key itself: then the heading is
+ * the English one of this plugin.
+ *
+ * @param extensions - The extensions of the command context
+ * @returns The heading
+ */
+function translateCausedBy(extensions: object): string {
+  const i18n = (extensions as Record<string, { translate?: (key: string) => string } | undefined>)[
+    I18n
+  ]
+  const heading = i18n?.translate?.(CAUSED_BY)
+  return heading && heading !== CAUSED_BY ? heading : DefaultResource.CAUSEDBY
+}
+
+/**
+ * Get the message of a cause of a {@linkcode CommandError}. A cause may be any value: a value without a
+ * message, such as a string, is converted to a string.
+ *
+ * @param cause - The cause
+ * @returns The message of the cause
+ */
+function messageOf(cause: unknown): string {
+  const message = (cause as { message?: unknown }).message
+  if (typeof message === 'string' && message !== '') {
+    return message
+  }
+  try {
+    return String(cause)
+  } catch {
+    // an object without a prototype has no `toString`
+    return Object.prototype.toString.call(cause)
+  }
+}
+
+/**
+ * Render a {@linkcode CommandError} for the user: its message, followed by a `Caused by:` line for each
+ * cause in the chain. The stack traces and the code are not rendered.
+ *
+ * @param error - The error
+ * @param extensions - The extensions of the command context, to translate the heading of the causes
+ * @returns The rendered error
+ */
+function renderCommandError(error: CommandError, extensions: object): string {
+  const lines = [error.message]
+  let cause: unknown = error.cause
+  if (cause != null) {
+    const heading = translateCausedBy(extensions)
+    // a cause may point back to an error in the chain
+    const seen = new Set<unknown>([error])
+    // a cause may be any value, with a getter that throws: the chain ends there, and the error is
+    // still reported
+    while (cause != null && !seen.has(cause)) {
+      seen.add(cause)
+      try {
+        lines.push(`${heading}: ${messageOf(cause)}`)
+        cause = typeof cause === 'object' ? (cause as { cause?: unknown }).cause : undefined
+      } catch {
+        break
+      }
+    }
+  }
+  return lines.join('\n')
 }
 
 /**
@@ -111,7 +192,25 @@ const decorator: CommandDecorator<{
   }
 
   // normal command execution
-  return baseRunner(ctx)
+  try {
+    return await baseRunner(ctx)
+  } catch (error: unknown) {
+    /**
+     * NOTE(kazupon): a `CommandError` thrown from the command, or from a decorator of another plugin, is
+     * a failure that the command expects. It is reported as the validation errors are: the message is
+     * printed to stderr without a stack trace, the exit code is the one of the error, and `cli()` ends
+     * without rejecting. It is still thrown, so that the `onErrorCommand` hook sees it after the exit
+     * code is set. With `usageSilent`, nothing is printed, and `cli()` rejects with it, for the app to
+     * report it. Any other error is thrown as before, and `cli()` rejects with it.
+     */
+    if (isCommandError(error) && !ctx.env.usageSilent) {
+      console.error(renderCommandError(error, ctx.extensions))
+      if (markReported(ctx, error)) {
+        setExitCode(error.exitCode)
+      }
+    }
+    throw error
+  }
 }
 
 export default decorator

@@ -1,21 +1,23 @@
 /**
  * Error guards across built package copies.
  *
- * `gunshi`, `@gunshi/plugin` and `@gunshi/bone` each bundle their own copy of the error classes
- * and of `args-tokens`, so `instanceof` cannot match an error thrown by another package.
- * These tests import the built packages under `packages/<name>/lib`, so run `pnpm build` first.
+ * `gunshi`, `@gunshi/plugin`, `@gunshi/definition` and `@gunshi/bone` each bundle their own copy of
+ * the error classes and of `args-tokens`, so `instanceof` cannot match an error thrown by another
+ * package. These tests import the built packages under `packages/<name>/lib`, so run `pnpm build`
+ * first.
  */
 
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { beforeAll, describe, expect, test } from 'vitest'
+import { beforeAll, describe, expect, onTestFinished, test, vi } from 'vitest'
 
 import type { Args, CliOptions, Command } from '../packages/gunshi/src/index.ts'
 
 type GunshiModule = typeof import('../packages/gunshi/src/index.ts')
 type BoneModule = typeof import('../packages/bone/src/index.ts')
 type PluginModule = typeof import('../packages/plugin/src/index.ts')
+type DefinitionModule = typeof import('../packages/definition/src/index.ts')
 type GlobalPluginModule = typeof import('../packages/plugin-global/src/index.ts')
 type RendererPluginModule = typeof import('../packages/plugin-renderer/src/index.ts')
 type I18nPluginModule = typeof import('../packages/plugin-i18n/src/index.ts')
@@ -61,6 +63,7 @@ async function captureAggregateError(run: () => Promise<unknown>): Promise<Aggre
 let gunshi: GunshiModule
 let bone: BoneModule
 let plugin: PluginModule
+let definition: DefinitionModule
 let global: GlobalPluginModule
 let renderer: RendererPluginModule
 let i18n: I18nPluginModule
@@ -71,6 +74,7 @@ beforeAll(async () => {
   gunshi = await importBuilt<GunshiModule>('gunshi')
   bone = await importBuilt<BoneModule>('bone')
   plugin = await importBuilt<PluginModule>('plugin')
+  definition = await importBuilt<DefinitionModule>('definition')
   global = await importBuilt<GlobalPluginModule>('plugin-global')
   renderer = await importBuilt<RendererPluginModule>('plugin-renderer')
   i18n = await importBuilt<I18nPluginModule>('plugin-i18n')
@@ -343,5 +347,126 @@ describe('@gunshi/bone with plugins built separately', () => {
     )
 
     expect(rendered).toEqual(['Command not found: lod\nDid you mean load?'])
+  })
+})
+
+/**
+ * A command imports `CommandError` from `gunshi`, or from `@gunshi/definition` when it is written in
+ * a package of its own, and a plugin imports it from `@gunshi/plugin`.
+ */
+describe('CommandError across the copies', () => {
+  type CommandErrorCopy = Pick<GunshiModule, 'CommandError' | 'isCommandError'>
+  const copies = (): Record<string, CommandErrorCopy> => ({
+    gunshi,
+    '@gunshi/plugin': plugin,
+    '@gunshi/definition': definition
+  })
+  const names = ['gunshi', '@gunshi/plugin', '@gunshi/definition']
+  const pairs = names.flatMap(thrower =>
+    names.filter(guard => guard !== thrower).map(guard => ({ thrower, guard }))
+  )
+
+  /**
+   * Capture what is printed to stderr, and restore the exit code after the test.
+   *
+   * @returns The spy of `console.error`
+   */
+  function captureStderr() {
+    const stderr = vi.spyOn(console, 'error').mockImplementation(() => {})
+    onTestFinished(() => {
+      stderr.mockRestore()
+      process.exitCode = undefined
+    })
+    return stderr
+  }
+
+  test('the packages ship separate copies of CommandError', () => {
+    // guard the premise: otherwise every test below would pass trivially
+    expect(gunshi.CommandError).not.toBe(plugin.CommandError)
+    expect(gunshi.CommandError).not.toBe(definition.CommandError)
+    expect(plugin.CommandError).not.toBe(definition.CommandError)
+  })
+
+  test.each(pairs)(
+    'isCommandError of $guard recognizes a CommandError of $thrower',
+    ({ thrower, guard }) => {
+      const error = new (copies()[thrower].CommandError)('Project acme not found', {
+        code: 'not_found',
+        exitCode: 2
+      })
+
+      expect(error).not.toBeInstanceOf(copies()[guard].CommandError)
+      expect(copies()[guard].isCommandError(error)).toBe(true)
+    }
+  )
+
+  test.each(['@gunshi/plugin', '@gunshi/definition'])(
+    'gunshi reports a CommandError of %s',
+    async name => {
+      const stderr = captureStderr()
+      const { CommandError } = copies()[name]
+
+      await expect(
+        gunshi.cli([], {
+          name: 'app',
+          run: () => {
+            throw new CommandError('Project acme not found', { exitCode: 2 })
+          }
+        })
+      ).resolves.toBeUndefined()
+
+      expect(stderr.mock.calls).toEqual([['Project acme not found']])
+      expect(process.exitCode).toBe(2)
+    }
+  )
+
+  test('@gunshi/bone with @gunshi/plugin-global reports a CommandError of @gunshi/definition', async () => {
+    const stderr = captureStderr()
+
+    await expect(
+      bone.cli(
+        [],
+        {
+          name: 'app',
+          run: () => {
+            throw new definition.CommandError('Could not deploy acme', {
+              cause: new Error('Request failed')
+            })
+          }
+        },
+        { plugins: [global.default()] }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr.mock.calls).toEqual([['Could not deploy acme\nCaused by: Request failed']])
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('@gunshi/plugin-global translates the heading of the causes with @gunshi/plugin-i18n', async () => {
+    const stderr = captureStderr()
+
+    await expect(
+      bone.cli(
+        [],
+        {
+          name: 'app',
+          run: () => {
+            throw new definition.CommandError('プロジェクトが見つかりません: acme', {
+              cause: new Error('connect ECONNREFUSED 127.0.0.1:5432')
+            })
+          }
+        },
+        {
+          plugins: [
+            global.default(),
+            i18n.default({ locale: 'ja-JP', builtinResources: resources.default })
+          ]
+        }
+      )
+    ).resolves.toBeUndefined()
+
+    expect(stderr.mock.calls).toEqual([
+      ['プロジェクトが見つかりません: acme\n原因: connect ECONNREFUSED 127.0.0.1:5432']
+    ])
   })
 })

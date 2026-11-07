@@ -6,6 +6,7 @@
  * - `defineWithTypes`: A function to define a command with specific type parameters.
  * - `lazy`: A function to lazily load a command.
  * - `lazyWithTypes`: A function to lazily load a command with specific type parameters.
+ * - `CommandError` and `isCommandError`: An error for the failures that a command expects, and its guard.
  * - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
  *
  * @example
@@ -50,6 +51,7 @@ import type {
 } from './types.ts'
 
 export { createCommandContext } from './context.ts'
+export { CommandError, isCommandError } from './error.ts'
 
 export type {
   Args,
@@ -65,6 +67,7 @@ export type {
 } from './types.ts'
 
 export type { CommandContextParams } from './context.ts'
+export type { CommandErrorOptions } from './error.ts'
 
 /**
  * The result type of the {@link define} function

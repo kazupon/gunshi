@@ -219,6 +219,30 @@ Running `node cli.js` outputs:
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
+### Stopping a Command with an Error
+
+To stop a command for a failure that you expect, such as a user who has not logged in, throw a `CommandError` from the decorator:
+
+```js [plugin.js]
+import { CommandError, plugin } from 'gunshi/plugin'
+
+export default plugin({
+  id: 'require-login',
+  setup(ctx) {
+    ctx.decorateCommand(runner => async ctx => {
+      if (!process.env.API_TOKEN) {
+        throw new CommandError('Not logged in. Run `my-app login` first', { exitCode: 4 })
+      }
+      return runner(ctx)
+    })
+  }
+})
+```
+
+The decorator of `@gunshi/plugin-global` wraps the decorators of the other plugins, so it receives the error. It prints the message to stderr without a stack trace, sets the exit code to the `exitCode` of the error, and the `cli()` promise resolves. It does the same for a `CommandError` that the command throws through your decorator, so a decorator that catches the errors of the command, such as the error wrapper above, should throw them again.
+
+To tell a `CommandError`, use `isCommandError()` rather than `instanceof`: the packages of Gunshi, such as `gunshi` and `@gunshi/plugin`, bundle their own copies of the class. For more, see [Errors and Exit Codes](../essentials/errors.md).
+
 ## Renderer Decorators
 
 Gunshi provides a powerful API for customizing how your CLI displays information through renderer decorators.
