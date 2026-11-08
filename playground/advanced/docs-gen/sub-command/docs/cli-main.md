@@ -6,12 +6,10 @@ USAGE:
   my-cli [COMMANDS] <OPTIONS>
 
 COMMANDS:
-  [manage]                  Manage resources
   create <OPTIONS>          Create a new resource
   list <OPTIONS>            List all resources
 
 For more info, run any command with the `--help` flag:
-  my-cli --help
   my-cli create --help
   my-cli list --help
 

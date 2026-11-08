@@ -32,6 +32,7 @@
 import { ANONYMOUS_COMMAND_NAME, createCommandContext, plugin } from '@gunshi/plugin'
 import { localizable, namespacedId, resolveKey, resolveLazyCommand } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
+import { recordRunner } from './runner.ts'
 import { pluginId as id } from './types.ts'
 import { renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'
@@ -85,7 +86,9 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
 
         const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
         const allCommands = await Promise.all(
-          subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
+          subCommands.map(async ([name, cmd]) =>
+            recordRunner(cmd, await resolveLazyCommand(cmd, name))
+          )
         )
 
         // Plugins can add sub-commands without registering the CLI's entry in the command map.
@@ -97,7 +100,12 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
           entryCommand &&
           !subCommands.some(([, command]) => command === entryCommand)
         ) {
-          allCommands.push(await resolveLazyCommand<G>(entryCommand, ANONYMOUS_COMMAND_NAME))
+          allCommands.push(
+            recordRunner(
+              entryCommand,
+              await resolveLazyCommand<G>(entryCommand, ANONYMOUS_COMMAND_NAME)
+            )
+          )
         }
 
         // filter out internal commands
