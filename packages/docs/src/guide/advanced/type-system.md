@@ -114,6 +114,40 @@ export const serverCommand = define<{ args: typeof serverArgs }>({
 
 This advanced approach is particularly useful when you want to reuse argument definitions across multiple commands or need to export types for use in other modules.
 
+#### Keys of Your Own
+
+`define` takes the keys of a command only. Any other key is a type error, which TypeScript reports at the key:
+
+```ts
+import { define } from 'gunshi'
+
+export const deploy = define({
+  name: 'deploy',
+  // a typo of `description`: Type 'string' is not assignable to type 'never'.
+  desc: 'Deploy the app',
+  run: () => {}
+})
+```
+
+To give your commands a key of your own, such as the team that owns a command, add the key to the `Command` interface with module augmentation. The declaration repeats the type parameter of `Command`:
+
+```ts
+import { define } from 'gunshi'
+import type { DefaultGunshiParams, GunshiParamsConstraint } from 'gunshi'
+
+declare module 'gunshi' {
+  interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams> {
+    owner?: string
+  }
+}
+
+export const deploy = define({ name: 'deploy', owner: 'infra', run: () => {} })
+```
+
+`define`, `lazy` and `cli()` then take the key, and `deploy.owner` is typed as `string`.
+
+`@gunshi/definition` and `@gunshi/plugin` each have a `Command` of their own. When you import `define` from `@gunshi/definition`, declare the key in `@gunshi/definition` instead, with the types imported from it. For the helpers of `@gunshi/plugin-i18n`, such as `defineI18n`, declare it in `@gunshi/plugin`, whose `Command` they take.
+
 ### The Return Type of `run`
 
 What `run` may return depends on the arguments. A command that spreads `jsonArgs` returns its result as an object (`JsonResult`), which Gunshi prints as JSON with `--json`. Any other command returns a string, which `cli()` returns, or nothing:

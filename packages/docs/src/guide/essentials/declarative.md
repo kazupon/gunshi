@@ -148,6 +148,8 @@ Commands also support these configuration properties:
 
   <!-- eslint-enable markdown/no-missing-label-refs -->
 
+These, with `name`, `description`, `args`, `examples`, `run`, `toKebab` and `subCommands`, are all the keys of a command. Any other key is a type error in the definition that you give to `define`, `lazy` and the other helpers, and in an object that you give to `cli()` as a command or as a sub-command. So a typo, such as `subcommands` for `subCommands`, is reported instead of being ignored. A sub-command that you write as an object in the `subCommands` of a definition is not checked, so define it with `define` too. To give your commands a key of your own, see [Keys of Your Own](../advanced/type-system.md#keys-of-your-own).
+
 ### Command Options
 
 Each option can have the following properties:

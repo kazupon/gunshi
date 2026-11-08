@@ -329,9 +329,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * When this is not given, the {@linkcode Command.subCommands} of the entry command are the sub-commands.
    */
   subCommands?:
-    | Record<string, SubCommandable>
-    | Map<string, SubCommandable>
-    | readonly SubCommandable[]
+    | Record<string, SubCommandable | SubCommandLoader>
+    | Map<string, SubCommandable | SubCommandLoader>
+    | readonly (SubCommandable | SubCommandLoader)[]
   /**
    * Left margin of the command output.
    */
@@ -708,9 +708,9 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * @since v0.28.0
    */
   subCommands?:
-    | Record<string, SubCommandable>
-    | Map<string, SubCommandable>
-    | readonly SubCommandable[]
+    | Record<string, SubCommandable | SubCommandLoader>
+    | Map<string, SubCommandable | SubCommandLoader>
+    | readonly (SubCommandable | SubCommandLoader)[]
 }
 
 /**
@@ -745,6 +745,14 @@ export type LazyCommand<
 export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
   | Command<G>
   | LazyCommand<G, {}>
+
+/**
+ * A function given as a sub-command, which the CLI loads as a lazy command named after its key:
+ * it returns the command, or its runner
+ *
+ * @internal
+ */
+type SubCommandLoader = () => Awaitable<SubCommandable | ((...args: any[]) => any)>
 
 /**
  * Sub-command entry type for use in subCommands.
@@ -802,10 +810,6 @@ export interface SubCommandable {
    * @since v0.28.0
    */
   subCommands?: Record<string, any> | Map<string, any> | readonly any[]
-  /**
-   * Index signature to allow additional properties
-   */
-  [key: string]: any
 }
 
 /**
