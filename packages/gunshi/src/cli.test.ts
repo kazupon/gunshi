@@ -2913,36 +2913,27 @@ describe('github issues', () => {
       })
     }
 
-    test.each([1, 2])(
-      'matches subCommands help with %s plugin command(s), but [COMMANDS]',
-      async count => {
-        const options = {
-          name: 'mycli',
-          renderHeader: null,
-          usageSilent: true
-        } satisfies CliOptions
-        const commands = createCommands(count)
-        const userHelp = await cli(['--help'], createEntry(), {
-          ...options,
-          subCommands: commands
-        })
-        const mapHelp = await cli(['--help'], createEntry(), {
-          ...options,
-          subCommands: new Map(Object.entries(commands))
-        })
-        const pluginHelp = await cli(['--help'], createEntry(), {
-          ...options,
-          plugins: [addCommands(createCommands(count))]
-        })
+    test.each([1, 2])('matches subCommands help with %s plugin command(s)', async count => {
+      const options = { name: 'mycli', renderHeader: null, usageSilent: true } satisfies CliOptions
+      const commands = createCommands(count)
+      const userHelp = await cli(['--help'], createEntry(), {
+        ...options,
+        subCommands: commands
+      })
+      const mapHelp = await cli(['--help'], createEntry(), {
+        ...options,
+        subCommands: new Map(Object.entries(commands))
+      })
+      const pluginHelp = await cli(['--help'], createEntry(), {
+        ...options,
+        plugins: [addCommands(createCommands(count))]
+      })
 
-        expect(mapHelp).toBe(userHelp)
-        // the CLI has no commands of its own, so its usage line has no `[COMMANDS]`
-        expect(pluginHelp).toBe(userHelp!.replace('mycli [COMMANDS] <OPTIONS>', 'mycli <OPTIONS>'))
-        expect(pluginHelp).not.toBe(userHelp)
-        expect(pluginHelp).toContain('  [build] <target>')
-        expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
-      }
-    )
+      expect(mapHelp).toBe(userHelp)
+      expect(pluginHelp).toBe(userHelp)
+      expect(pluginHelp).toContain('  [build] <target>')
+      expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
+    })
 
     test('does not add the entry to the command registry', async () => {
       let env: Readonly<CommandEnvironment> | undefined
@@ -5123,7 +5114,7 @@ describe('a command without run that has sub-commands', () => {
     const printed = log()
 
     expect(usage).toBe(await cli(['records', '--help'], entry, { ...options, usageSilent: true }))
-    expect(printed).toContain('USAGE:\n  demo records <OPTIONS>')
+    expect(printed).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
     expect(printed).toContain('COMMANDS:\n  add')
     expect(process.exitCode).toBeUndefined()
   })
@@ -5183,7 +5174,7 @@ describe('a command without run that has sub-commands', () => {
 
     const usage = await cli(['records'], entry, { ...options, usageSilent: true })
 
-    expect(usage).toContain('USAGE:\n  demo records <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
     expect(log()).toBe('')
   })
 
@@ -5200,7 +5191,7 @@ describe('a command without run that has sub-commands', () => {
       onAfterCommand
     })
 
-    expect(usage).toContain('USAGE:\n  demo records <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
     expect(onBeforeCommand).toHaveBeenCalledTimes(1)
     expect(onAfterCommand).toHaveBeenCalledWith(expect.anything(), usage)
   })
@@ -5258,7 +5249,7 @@ describe('a command without run that has sub-commands', () => {
 
     expect(run).toHaveBeenCalledTimes(1)
     expect(innerResult).toBeUndefined()
-    expect(usage).toContain('USAGE:\n  demo records <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
   })
 
   test('@gunshi/bone prints nothing, as before', async () => {

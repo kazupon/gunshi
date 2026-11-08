@@ -51,7 +51,7 @@ Square brackets indicate optional elements or parameters with default values:
 - `[name]` - An option parameter with a default value
 - `[<positional>]` - An optional positional argument
 - `[<positional> ...]` - Optional multiple positional arguments
-- `[COMMANDS]` - Sub-command selection (when multiple commands exist)
+- `[COMMANDS]` - A sub-command, shown when the COMMANDS section lists commands
 - `[commandName]` - A default command that runs when no sub-command is specified
 
 Example:
