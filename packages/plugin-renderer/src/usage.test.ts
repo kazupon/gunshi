@@ -2133,4 +2133,39 @@ describe('the usage of a group', () => {
 
     expect(commandRows(usage!)).toEqual(['[demo]', 'add', 'list'])
   })
+
+  test('each row is checked against its own command', async () => {
+    // a sub-command marked as an entry, with a run of its own, in a group without run
+    const special = define({ name: 'special', description: 'Special', entry: true, run: NOOP })
+    const records = define({
+      name: 'records',
+      description: 'Manage records',
+      subCommands: { add, special }
+    })
+
+    expect(commandRows(await usageOfGroup(records))).toEqual(['[special]', 'add'])
+  })
+
+  test('an entry without run leaves the row of a plugin command marked as an entry', async () => {
+    const entry = define({ name: 'demo', description: 'Demo CLI' })
+    const marked = define({ name: 'marked', description: 'Marked', entry: true, run: NOOP })
+    const usage = await cli(['--help'], entry, {
+      ...options,
+      plugins: [addCommands({ marked })]
+    })
+
+    expect(commandRows(usage!)).toEqual(['[marked]'])
+  })
+
+  test('renders no commands section when no row is left', async () => {
+    const entry = define({ name: 'demo', description: 'Demo CLI' })
+    const marked = define({ name: 'marked', description: 'Marked', entry: true })
+    const usage = await cli(['--help'], entry, {
+      ...options,
+      plugins: [addCommands({ marked })]
+    })
+
+    expect(usage).not.toContain('COMMANDS')
+    expect(usageLine(usage!)).toBe('demo <OPTIONS>')
+  })
 })

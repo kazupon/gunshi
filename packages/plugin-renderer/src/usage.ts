@@ -15,6 +15,7 @@ import {
   resolveKey,
   resolveOptionNames
 } from '@gunshi/shared'
+import { isResolvedWithoutRun } from './runner.ts'
 import { pluginId } from './types.ts'
 import { displayWidth, padEndToWidth } from './width.ts'
 
@@ -221,7 +222,7 @@ async function renderCommandsSection<
     `${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}:`
   ]
   const loadedCommands = ((await ctx.extensions?.[pluginId].loadCommands<G>()) || []).filter(
-    cmd => !isEntryWithoutRun(ctx, cmd)
+    cmd => !isEntryWithoutRun(cmd)
   )
   const commandSymbols = await Promise.all(
     loadedCommands.map(async cmd => await makeCommandSymbol(ctx, cmd))
@@ -370,39 +371,26 @@ async function resolveExamples<
 }
 
 /**
- * Check if a command of the commands section is the command itself, without `run`
+ * Check if a row of the commands section is an entry command without `run`
  *
  * NOTE(kazupon): the core lists the command itself among its sub-commands, marked with `entry`, for the
  * command that runs when no sub-command is given. A command without `run` runs nothing then, so its row
- * would name a command that does not exist. The rows are resolved without the loader of a lazy command,
- * so `run` is looked up on the command that was given: a lazy command always has a runner, which its
- * loader returns.
+ * would name a command that does not exist. Each row is checked against its own command, which
+ * `loadCommands` records: a lazy command always has a runner, which its loader returns.
  *
- * @param ctx - A {@link CommandContext | command context}
  * @param cmd - A command from `loadCommands`
- * @returns True if the row stands for the command itself, and the command has no `run`
+ * @returns True if the row is an entry command, and the command has no `run`
  */
-function isEntryWithoutRun<
-  G extends GunshiParams<{
-    args: Args
-    extensions: Extensions
-  }>
->(ctx: Readonly<CommandContext<G>>, cmd: Command<G>): boolean {
-  if (!cmd.entry) {
-    return false
-  }
-  const given =
-    [...(ctx.env.subCommands?.values() ?? [])].find(command => command.entry) ??
-    ctx.env.entryCommand
-  return typeof given === 'object' && given !== null && given.run == null
+function isEntryWithoutRun(cmd: Command): boolean {
+  return cmd.entry === true && isResolvedWithoutRun(cmd)
 }
 
 /**
  * Check if the command has sub commands
  *
- * NOTE(kazupon): the list has the command itself too, so it has sub-commands with two or more. The row
- * of the command itself is left out of the section when the command has no `run`, but the command still
- * has its sub-commands.
+ * NOTE(kazupon): the list has the command itself too, so it has sub-commands with two or more. The rows
+ * of the entry commands without `run` are left out of the section, so it is rendered only when a row is
+ * left, and no empty section and no `[COMMANDS]` are rendered.
  *
  * @param ctx - A {@link CommandContext | command context}
  * @returns True if the command has sub commands
@@ -414,7 +402,7 @@ async function hasCommands<
   }>
 >(ctx: CommandContext<G>): Promise<boolean> {
   const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
-  return loadedCommands.length > 1
+  return loadedCommands.length > 1 && loadedCommands.some(cmd => !isEntryWithoutRun(cmd))
 }
 
 /**
