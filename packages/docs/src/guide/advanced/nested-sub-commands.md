@@ -85,7 +85,7 @@ $ npx tsx cli.ts remote --help
 Manage remotes
 
 USAGE:
-  git remote <OPTIONS>
+  git remote [COMMANDS] <OPTIONS>
 
 COMMANDS:
   add <OPTIONS>          Add a remote

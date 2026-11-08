@@ -72,7 +72,7 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
   messages.push(...(await renderUsageSection(ctx)), '')
 
   // render commands section
-  if (ctx.omitted && (await hasCommands(ctx))) {
+  if (await listsCommands(ctx)) {
     messages.push(...(await renderCommandsSection(ctx)), '')
   }
 
@@ -187,19 +187,12 @@ async function makeUsageSymbols<
   /**
    * NOTE(kazupon): the usage line of a sub-command names its full path, a group run without a
    * sub-command included: `demo records`, not `demo`, which reads as if the sub-commands of the group
-   * were the commands of the CLI. The commands section lists the sub-commands, so the usage line of a
-   * group has `[COMMANDS]` only when one of them has sub-commands of its own, and the path goes further.
-   * The usage line of the entry has `[COMMANDS]` when the CLI has commands of its own: a CLI of the entry
-   * only, to which plugins add commands, has none. The section lists the commands either way.
+   * were the commands of the CLI. `[COMMANDS]` goes with the commands section (see `listsCommands`).
    */
   if (ctx.callMode === 'subCommand') {
     messages.push(` ${await resolveSubCommand(ctx)}`)
   }
-  if (
-    ctx.omitted &&
-    (await hasCommands(ctx)) &&
-    (ctx.callMode === 'subCommand' ? await hasNestedCommands(ctx) : hasOwnCommands(ctx))
-  ) {
+  if (await listsCommands(ctx)) {
     messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
   }
   const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args)
@@ -417,64 +410,24 @@ async function hasCommands<
 }
 
 /**
- * Check if a sub-command of the command has sub-commands of its own
+ * Check if the usage lists commands: the commands section, and `[COMMANDS]` in the usage line
  *
- * NOTE(kazupon): the rows of the commands section have the sub-commands that their definitions
- * declare, a lazy command included, since the definition that is given to `lazy` is copied without
- * running the loader. The row of the command itself is not one of its sub-commands.
+ * NOTE(kazupon): the section and `[COMMANDS]` go together, at every level, so that the usage line
+ * takes a command whenever the section lists one, and the rows read as the commands that follow the
+ * path, not as the commands of the CLI (#870). Where the commands come from does not matter: a command
+ * that a plugin adds runs as one that the CLI declares (#768, #869). Both parts ask this one function,
+ * so that a change to one of them does not leave the other behind.
  *
  * @param ctx - A {@link CommandContext | command context}
- * @returns True if a sub-command of the command has sub-commands
+ * @returns True if the usage lists commands
  */
-async function hasNestedCommands<
+async function listsCommands<
   G extends GunshiParams<{
     args: Args
     extensions: Extensions
   }>
->(ctx: CommandContext<G>): Promise<boolean> {
-  const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
-  return loadedCommands.some(cmd => !cmd.entry && declaresSubCommands(cmd))
-}
-
-/**
- * Check if the CLI has commands of its own, besides the ones that plugins add
- *
- * NOTE(kazupon): the core lists the entry command among the sub-commands when the CLI has
- * sub-commands of its own, given to `cli()` or declared by the entry command. A CLI of the entry only,
- * to which plugins add commands, such as `complete`, does not list it, and `loadCommands` adds the
- * entry to the rows instead. Without the entry command, as for a context that is not created by
- * `cli()`, the commands are taken as the CLI's own.
- *
- * @param ctx - A {@link CommandContext | command context}
- * @returns True if the CLI has commands of its own
- */
-function hasOwnCommands<
-  G extends GunshiParams<{
-    args: Args
-    extensions: Extensions
-  }>
->(ctx: Readonly<CommandContext<G>>): boolean {
-  const entry = ctx.env.entryCommand
-  return entry === undefined || [...(ctx.env.subCommands?.values() ?? [])].includes(entry)
-}
-
-/**
- * Check if a command declares sub-commands: an object, a `Map` or an array of them
- *
- * @param cmd - A command from `loadCommands`
- * @returns True if the command declares one or more sub-commands
- */
-function declaresSubCommands(cmd: Command): boolean {
-  const subCommands: unknown = cmd.subCommands
-  if (subCommands instanceof Map) {
-    return subCommands.size > 0
-  }
-  if (Array.isArray(subCommands)) {
-    return subCommands.length > 0
-  }
-  return (
-    typeof subCommands === 'object' && subCommands !== null && Object.keys(subCommands).length > 0
-  )
+>(ctx: Readonly<CommandContext<G>>): Promise<boolean> {
+  return ctx.omitted && (await hasCommands(ctx))
 }
 
 /**
