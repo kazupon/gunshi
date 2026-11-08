@@ -123,15 +123,13 @@ const subSubCommand = define({
 const level2Command = define({
   name: 'level2',
   description: 'Second level',
-  subCommands: { 'sub-sub': subSubCommand },
-  run: () => {}
+  subCommands: { 'sub-sub': subSubCommand }
 })
 
 const level1Command = define({
   name: 'level1',
   description: 'First level',
-  subCommands: { level2: level2Command },
-  run: () => {}
+  subCommands: { level2: level2Command }
 })
 ```
 

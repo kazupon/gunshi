@@ -201,8 +201,8 @@ OPTIONS:
 
 > [!NOTE]
 > The brackets in `[manage]` indicate it's the default command that runs when no sub-command is specified.
-> A command without `run` has no default command, so it lists only its sub-commands, and it prints this usage
-> when it runs without a sub-command. A lazy command has a default command, since its loader returns the
+> A command that has sub-commands and no `run` has no default command, so it lists only its sub-commands, and it
+> prints this usage when it runs without a sub-command. A lazy command has a default command, since its loader returns the
 > runner, and so does a function given to `cli()` as the entry.
 > Each row describes the arguments that its own command declares, so a command with no options of its own
 > has no `<OPTIONS>` next to it.
