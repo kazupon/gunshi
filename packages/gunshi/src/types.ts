@@ -516,6 +516,9 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
   tokens: ArgToken[]
   /**
    * Whether the currently executing command has been executed with the sub-command name omitted.
+   *
+   * A command that has sub-commands and no {@linkcode Command.run | run} prints its usage then, with
+   * the global options plugin, as `--help` does.
    */
   omitted: boolean
   /**
@@ -661,6 +664,10 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
   examples?: string | CommandExamplesFetcher<G>
   /**
    * Command runner. it's the command to be executed
+   *
+   * A command that has sub-commands needs no runner: run without a sub-command, it prints its usage,
+   * with the global options plugin, as `--help` does. A command with a runner runs it then, with
+   * {@linkcode CommandContext.omitted | omitted} set to `true`.
    */
   run?: CommandRunner<G>
   /**

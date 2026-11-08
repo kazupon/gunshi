@@ -36,7 +36,8 @@ const removeRemoteCommand = define({
 })
 
 /**
- * Intermediate command with nested sub-commands
+ * Intermediate command with nested sub-commands.
+ * It has no `run`: `git remote` without a sub-command prints its usage, as `git remote --help` does.
  */
 
 const remoteCommand = define({
@@ -45,14 +46,6 @@ const remoteCommand = define({
   subCommands: {
     add: addRemoteCommand,
     remove: removeRemoteCommand
-  },
-  run: ctx => {
-    if (ctx.omitted) {
-      // User ran 'git remote' without specifying a sub-command
-      // Help will be displayed automatically
-      return
-    }
-    console.log('Remote management')
   }
 })
 
@@ -97,25 +90,17 @@ const branchCommand = define({
   description: 'Manage branches',
   subCommands: {
     create: lazyBranchCommand
-  },
-  run: ctx => {
-    if (ctx.omitted) {
-      return
-    }
-    console.log('Branch management')
   }
 })
 
 /**
- * Entry point
+ * Entry point.
+ * It has no `run` either: `git` without a command prints the usage.
  */
 
 const entry = define({
   name: 'main',
-  description: 'A Git-like CLI demonstrating nested sub-commands',
-  run: () => {
-    console.log('Run --help for available commands')
-  }
+  description: 'A Git-like CLI demonstrating nested sub-commands'
 })
 
 await cli(process.argv.slice(2), entry, {

@@ -195,7 +195,7 @@ describe('the example of AGENTS.md', () => {
   })
 
   const cases: [string[], number, RegExp, RegExp | ''][] = [
-    [[], 0, /Run `ship --help`/, ''],
+    [[], 0, /USAGE:\n {2}ship \[COMMANDS\]/, ''],
     [['--help'], 0, /USAGE:\n {2}ship \[COMMANDS\]/, ''],
     [
       ['deploy', '--help'],
@@ -344,17 +344,17 @@ await cli(process.argv.slice(2), define({ name: 'todo', run: () => console.log('
     expect(run(file, ['tag', 'add', 'u'])).toMatchObject({ code: 0, stdout: 'add u\n' })
   })
 
-  test('a command without run prints nothing when it is run by itself', () => {
+  test('a command that only groups sub-commands prints its usage when it is run by itself', () => {
     const file = write('group-without-run.mjs', withGroup())
-    expect(run(file, ['tag'])).toEqual({ code: 0, stdout: '', stderr: '' })
+    const result = run(file, ['tag'])
+    expect(result).toMatchObject({ code: 0, stderr: '' })
+    expect(result.stdout).toMatch(/USAGE:\n {2}bm tag <OPTIONS>/)
+    expect(result.stdout).toBe(run(file, ['tag', '--help']).stdout)
   })
 
-  test('a command that groups sub-commands can say how to use them in its run', () => {
-    const file = write(
-      'group-with-run.mjs',
-      withGroup(", run: () => console.log('Run `bm tag --help` to see the commands')")
-    )
-    expect(run(file, ['tag']).stdout).toBe('Run `bm tag --help` to see the commands\n')
+  test('a command that groups sub-commands runs its run, when it has one', () => {
+    const file = write('group-with-run.mjs', withGroup(", run: () => console.log('tag')"))
+    expect(run(file, ['tag']).stdout).toBe('tag\n')
     expect(run(file, ['tag', 'add', 'u']).stdout).toBe('add u\n')
   })
 

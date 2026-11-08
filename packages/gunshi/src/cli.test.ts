@@ -1,7 +1,7 @@
 import global from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest'
 import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockErrorLog, defineMockLog } from '../test/utils.ts'
@@ -2913,27 +2913,36 @@ describe('github issues', () => {
       })
     }
 
-    test.each([1, 2])('matches subCommands help with %s plugin command(s)', async count => {
-      const options = { name: 'mycli', renderHeader: null, usageSilent: true } satisfies CliOptions
-      const commands = createCommands(count)
-      const userHelp = await cli(['--help'], createEntry(), {
-        ...options,
-        subCommands: commands
-      })
-      const mapHelp = await cli(['--help'], createEntry(), {
-        ...options,
-        subCommands: new Map(Object.entries(commands))
-      })
-      const pluginHelp = await cli(['--help'], createEntry(), {
-        ...options,
-        plugins: [addCommands(createCommands(count))]
-      })
+    test.each([1, 2])(
+      'matches subCommands help with %s plugin command(s), but [COMMANDS]',
+      async count => {
+        const options = {
+          name: 'mycli',
+          renderHeader: null,
+          usageSilent: true
+        } satisfies CliOptions
+        const commands = createCommands(count)
+        const userHelp = await cli(['--help'], createEntry(), {
+          ...options,
+          subCommands: commands
+        })
+        const mapHelp = await cli(['--help'], createEntry(), {
+          ...options,
+          subCommands: new Map(Object.entries(commands))
+        })
+        const pluginHelp = await cli(['--help'], createEntry(), {
+          ...options,
+          plugins: [addCommands(createCommands(count))]
+        })
 
-      expect(mapHelp).toBe(userHelp)
-      expect(pluginHelp).toBe(userHelp)
-      expect(pluginHelp).toContain('  [build] <target>')
-      expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
-    })
+        expect(mapHelp).toBe(userHelp)
+        // the CLI has no commands of its own, so its usage line has no `[COMMANDS]`
+        expect(pluginHelp).toBe(userHelp!.replace('mycli [COMMANDS] <OPTIONS>', 'mycli <OPTIONS>'))
+        expect(pluginHelp).not.toBe(userHelp)
+        expect(pluginHelp).toContain('  [build] <target>')
+        expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
+      }
+    )
 
     test('does not add the entry to the command registry', async () => {
       let env: Readonly<CommandEnvironment> | undefined
@@ -5089,5 +5098,176 @@ describe('an array of sub-commands', () => {
     ).rejects.toThrow(
       new TypeError(`Sub-command 'add' is given twice in an array of 'subCommands'`)
     )
+  })
+})
+
+describe('a command without run that has sub-commands', () => {
+  const add = define({ name: 'add', description: 'Add a record', run: () => {} })
+  const list = define({ name: 'list', description: 'List the records', run: () => {} })
+  const records = define({
+    name: 'records',
+    description: 'Manage records',
+    subCommands: { add, list }
+  })
+  const entry = define({ name: 'demo', run: vi.fn<() => void>() })
+  const options = { name: 'demo', version: '1.0.0', subCommands: { records } }
+
+  test('prints its usage when it runs without a sub-command, as --help does', async () => {
+    onTestFinished(() => {
+      process.exitCode = undefined
+    })
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const usage = await cli(['records'], entry, options)
+    const printed = log()
+
+    expect(usage).toBe(await cli(['records', '--help'], entry, { ...options, usageSilent: true }))
+    expect(printed).toContain('USAGE:\n  demo records <OPTIONS>')
+    expect(printed).toContain('COMMANDS:\n  add')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('an entry without run prints its usage when it runs without a sub-command', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+    const main = define({ name: 'demo', description: 'Demo CLI' })
+    const mainOptions = { name: 'demo', subCommands: { add, list }, usageSilent: true }
+
+    const usage = await cli([], main, mainOptions)
+
+    expect(usage).toBe(await cli(['--help'], main, mainOptions))
+    expect(usage).toContain('USAGE:\n  demo [COMMANDS] <OPTIONS>')
+  })
+
+  test('a command with run runs it, with omitted set to true', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const run = vi.fn<() => void>()
+    const group = define({ name: 'records', subCommands: { add, list }, run })
+
+    const result = await cli(['records'], entry, { name: 'demo', subCommands: { records: group } })
+
+    expect(run).toHaveBeenCalledWith(expect.objectContaining({ omitted: true }))
+    expect(result).toBeUndefined()
+    expect(log()).toBe('')
+  })
+
+  test('a command without sub-commands prints nothing, as before', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const result = await cli([], define({ name: 'demo' }), { name: 'demo' })
+
+    expect(result).toBeUndefined()
+    expect(log()).toBe('')
+  })
+
+  test('an entry without run that takes a word with fallbackToEntry prints nothing, as before', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const result = await cli(['foo'], define({ name: 'demo' }), {
+      name: 'demo',
+      subCommands: { add, list },
+      fallbackToEntry: true
+    })
+
+    expect(result).toBeUndefined()
+    expect(log()).toBe('')
+  })
+
+  test('prints nothing with usageSilent, and returns the usage', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const usage = await cli(['records'], entry, { ...options, usageSilent: true })
+
+    expect(usage).toContain('USAGE:\n  demo records <OPTIONS>')
+    expect(log()).toBe('')
+  })
+
+  test('the hooks are called, and onAfterCommand gets the usage', async () => {
+    const utils = await import('./utils.ts')
+    defineMockLog(utils)
+    const onBeforeCommand = vi.fn<() => void>()
+    const onAfterCommand = vi.fn<(ctx: unknown, result: string | undefined) => void>()
+
+    const usage = await cli(['records'], entry, {
+      ...options,
+      usageSilent: true,
+      onBeforeCommand,
+      onAfterCommand
+    })
+
+    expect(usage).toContain('USAGE:\n  demo records <OPTIONS>')
+    expect(onBeforeCommand).toHaveBeenCalledTimes(1)
+    expect(onAfterCommand).toHaveBeenCalledWith(expect.anything(), usage)
+  })
+
+  test('the errors of the arguments are reported first', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const errorLog = defineMockErrorLog()
+
+    const result = await cli(['records', '--verbose'], entry, { ...options, strict: true })
+
+    expect(result).toBeUndefined()
+    expect(errorLog()).toContain('Unknown option: --verbose')
+    expect(process.exitCode).toBe(1)
+    expect(log()).toBe('')
+  })
+
+  test('does not print its usage with --json, which it does not support', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const errorLog = defineMockErrorLog()
+
+    await cli(['records', '--json'], entry, options)
+
+    expect(JSON.parse(errorLog())).toMatchObject({ reason: 'json_not_supported' })
+    expect(process.exitCode).toBe(1)
+    expect(log()).toBe('')
+  })
+
+  test('does not print its usage with --json when it spreads jsonArgs', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const errorLog = defineMockErrorLog()
+    const group = define({ name: 'records', args: { ...jsonArgs }, subCommands: { add, list } })
+
+    await cli(['records', '--json'], entry, { name: 'demo', subCommands: { records: group } })
+
+    expect(JSON.parse(errorLog())).toMatchObject({ reason: 'invalid_result' })
+    expect(process.exitCode).toBe(1)
+    expect(log()).toBe('')
+  })
+
+  test('a nested cli() in a hook is a run of its own', async () => {
+    const run = vi.fn<() => void>()
+    const inner = define({ name: 'inner', run })
+    let innerResult: string | undefined
+
+    const usage = await cli(['records'], entry, {
+      ...options,
+      usageSilent: true,
+      onBeforeCommand: async () => {
+        innerResult = await cli([], inner, { usageSilent: true })
+      }
+    })
+
+    expect(run).toHaveBeenCalledTimes(1)
+    expect(innerResult).toBeUndefined()
+    expect(usage).toContain('USAGE:\n  demo records <OPTIONS>')
+  })
+
+  test('@gunshi/bone prints nothing, as before', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const result = await boneCli(['records'], entry, options)
+
+    expect(result).toBeUndefined()
+    expect(log()).toBe('')
   })
 })
