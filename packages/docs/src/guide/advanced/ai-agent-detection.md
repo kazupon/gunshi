@@ -129,7 +129,7 @@ With `--json`, the result is printed as one JSON document, and a failure as one 
 
 ## Using it in a plugin
 
-`gunshi/agent` itself is not a plugin, but you can build one on top of it. This plugin decides in one place whether the command may ask, so that the commands do not read the terminals and the environment variables themselves. It adds a `--non-interactive` option. Without the option, the command does not ask with `--json`, when the `CI` environment variable is not empty, when an agent runs the CLI, or when stdin or stderr is not a terminal. `--non-interactive=false` asks again in a terminal, for a person whose environment looks like an agent's, but not with `--json`:
+`gunshi/agent` itself is not a plugin, but you can build one on top of it. This plugin decides in one place whether the command may ask, so that the commands do not read the terminals and the environment variables themselves. It adds a `--non-interactive` option. Without the option, the command does not ask with `--json`, when the `CI` environment variable is not empty, when an agent runs the CLI, or when stdin or stderr is not a terminal. `--non-interactive=false` asks again in a terminal, for a person whose environment looks like an agent's, but not with `--json` or in CI:
 
 ```ts
 import process from 'node:process'
@@ -154,12 +154,14 @@ export default function mode() {
       // true with --non-interactive, false with --non-interactive=false, and undefined without it
       const option = ctx.values['non-interactive']
       const terminal = process.stdin.isTTY === true && process.stderr.isTTY === true
-      const detected = Boolean(process.env.CI) || getAgentProfile().isAgent
+      const ci = Boolean(process.env.CI)
       return {
         interactive:
           terminal &&
           ctx.values.json !== true &&
-          (option === undefined ? !detected : option === false)
+          !ci &&
+          // --non-interactive=false only overrides the agent detection
+          (option === undefined ? !getAgentProfile().isAgent : option === false)
       }
     }
   })
