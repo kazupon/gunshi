@@ -183,14 +183,16 @@ async function makeUsageSymbols<
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string> {
   const messages = [await resolveEntry(ctx)]
-  if (ctx.omitted) {
-    if (await hasCommands(ctx)) {
-      messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
-    } else {
-      messages.push(`${ctx.callMode === 'subCommand' ? ` ${await resolveSubCommand(ctx)}` : ''}`)
-    }
-  } else {
-    messages.push(`${ctx.callMode === 'subCommand' ? ` ${await resolveSubCommand(ctx)}` : ''}`)
+  /**
+   * NOTE(kazupon): the usage line names the full path of the command, for a group run without a
+   * sub-command too: `demo records [COMMANDS]`, not `demo [COMMANDS]`, which reads as if the
+   * sub-commands of the group were the commands of the CLI.
+   */
+  if (ctx.callMode === 'subCommand') {
+    messages.push(` ${await resolveSubCommand(ctx)}`)
+  }
+  if (ctx.omitted && (await hasCommands(ctx))) {
+    messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
   }
   const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args)
   if (optionsSymbols) {
@@ -218,7 +220,9 @@ async function renderCommandsSection<
   const messages: string[] = [
     `${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}:`
   ]
-  const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
+  const loadedCommands = ((await ctx.extensions?.[pluginId].loadCommands<G>()) || []).filter(
+    cmd => !isEntryWithoutRun(ctx, cmd)
+  )
   const commandSymbols = await Promise.all(
     loadedCommands.map(async cmd => await makeCommandSymbol(ctx, cmd))
   )
@@ -366,7 +370,39 @@ async function resolveExamples<
 }
 
 /**
+ * Check if a command of the commands section is the command itself, without `run`
+ *
+ * NOTE(kazupon): the core lists the command itself among its sub-commands, marked with `entry`, for the
+ * command that runs when no sub-command is given. A command without `run` runs nothing then, so its row
+ * would name a command that does not exist. The rows are resolved without the loader of a lazy command,
+ * so `run` is looked up on the command that was given: a lazy command always has a runner, which its
+ * loader returns.
+ *
+ * @param ctx - A {@link CommandContext | command context}
+ * @param cmd - A command from `loadCommands`
+ * @returns True if the row stands for the command itself, and the command has no `run`
+ */
+function isEntryWithoutRun<
+  G extends GunshiParams<{
+    args: Args
+    extensions: Extensions
+  }>
+>(ctx: Readonly<CommandContext<G>>, cmd: Command<G>): boolean {
+  if (!cmd.entry) {
+    return false
+  }
+  const given =
+    [...(ctx.env.subCommands?.values() ?? [])].find(command => command.entry) ??
+    ctx.env.entryCommand
+  return typeof given === 'object' && given !== null && given.run == null
+}
+
+/**
  * Check if the command has sub commands
+ *
+ * NOTE(kazupon): the list has the command itself too, so it has sub-commands with two or more. The row
+ * of the command itself is left out of the section when the command has no `run`, but the command still
+ * has its sub-commands.
  *
  * @param ctx - A {@link CommandContext | command context}
  * @returns True if the command has sub commands

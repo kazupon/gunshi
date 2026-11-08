@@ -1992,3 +1992,145 @@ describe('#749 - the columns are aligned by the width a terminal draws', () => {
     expect(new Set(indents).size).toEqual(1)
   })
 })
+
+describe('the usage of a group', () => {
+  const add = define({ name: 'add', description: 'Add a record', run: NOOP })
+  const list = define({ name: 'list', description: 'List the records', run: NOOP })
+  const options = { name: 'demo', renderHeader: null, usageSilent: true }
+
+  function usageLine(usage: string): string {
+    const lines = usage.split('\n')
+    return lines[lines.indexOf('USAGE:') + 1].trim()
+  }
+
+  function commandRows(usage: string): string[] {
+    const lines = usage.split('\n')
+    const start = lines.indexOf('COMMANDS:')
+    const end = lines.indexOf('', start)
+    return start === -1 || end === -1
+      ? []
+      : lines.slice(start + 1, end).map(line => line.trim().split(/\s{2,}/)[0])
+  }
+
+  function forMoreLines(usage: string): string[] {
+    const lines = usage.split('\n')
+    const start = lines.findIndex(line => line.trim().endsWith(':') && line.includes('--help'))
+    const rest = lines.slice(start + 1)
+    const end = rest.findIndex(line => line.trim() === '')
+    return (end === -1 ? rest : rest.slice(0, end)).map(line => line.trim())
+  }
+
+  async function usageOfGroup(
+    records: Command | LazyCommand,
+    args: string[] = ['records', '--help']
+  ): Promise<string> {
+    const entry = define({ name: 'demo', description: 'Demo CLI', run: NOOP })
+    return (await cli(args, entry, { ...options, subCommands: { records } }))!
+  }
+
+  function addCommands(selected: Record<string, Command>): ReturnType<typeof plugin> {
+    return plugin({
+      id: 'group-usage-tools',
+      setup(ctx) {
+        for (const [name, command] of Object.entries(selected)) {
+          ctx.addCommand(name, command)
+        }
+      }
+    })
+  }
+
+  test('the usage line of a nested group names the path of the group', async () => {
+    const records = define({
+      name: 'records',
+      description: 'Manage records',
+      subCommands: { add, list },
+      run: NOOP
+    })
+
+    expect(usageLine(await usageOfGroup(records))).toBe('demo records [COMMANDS] <OPTIONS>')
+  })
+
+  test('the usage line of a sub-command of a group is unchanged', async () => {
+    const records = define({ name: 'records', subCommands: { add, list }, run: NOOP })
+
+    expect(usageLine(await usageOfGroup(records, ['records', 'add', '--help']))).toBe(
+      'demo records add <OPTIONS>'
+    )
+  })
+
+  test('the usage line of the entry is unchanged', async () => {
+    const entry = define({ name: 'demo', run: NOOP })
+    const usage = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
+
+    expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+  })
+
+  test('a group with run lists itself, as the command that runs without a sub-command', async () => {
+    const records = define({
+      name: 'records',
+      description: 'Manage records',
+      subCommands: { add, list },
+      run: NOOP
+    })
+    const usage = await usageOfGroup(records)
+
+    expect(commandRows(usage)).toEqual(['[records]', 'add', 'list'])
+    expect(forMoreLines(usage)).toEqual([
+      'demo records --help',
+      'demo records add --help',
+      'demo records list --help'
+    ])
+  })
+
+  test('a group without run lists only its sub-commands', async () => {
+    const records = define({
+      name: 'records',
+      description: 'Manage records',
+      subCommands: { add, list }
+    })
+    const usage = await usageOfGroup(records)
+
+    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(commandRows(usage)).toEqual(['add', 'list'])
+    expect(forMoreLines(usage)).toEqual(['demo records add --help', 'demo records list --help'])
+  })
+
+  test('an entry without run lists only its sub-commands', async () => {
+    const entry = define({ name: 'demo', description: 'Demo CLI' })
+    const usage = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
+
+    expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+    expect(commandRows(usage!)).toEqual(['add', 'list'])
+    expect(forMoreLines(usage!)).toEqual(['demo add --help', 'demo list --help'])
+  })
+
+  test('an entry without run is not listed among the commands that plugins add', async () => {
+    const entry = define({ name: 'demo', description: 'Demo CLI' })
+    const usage = await cli(['--help'], entry, {
+      ...options,
+      plugins: [addCommands({ add, list })]
+    })
+
+    expect(commandRows(usage!)).toEqual(['add', 'list'])
+  })
+
+  test('a lazy group lists itself, since its loader returns a runner', async () => {
+    const records = lazy(() => NOOP, {
+      name: 'records',
+      description: 'Manage records',
+      args: {},
+      subCommands: { add, list }
+    })
+
+    expect(commandRows(await usageOfGroup(records))).toEqual(['[records]', 'add', 'list'])
+  })
+
+  test('an entry given as a runner lists itself', async () => {
+    const usage = await cli(['--help'], async () => {}, {
+      ...options,
+      subCommands: { add, list }
+    })
+
+    expect(commandRows(usage!)).toEqual(['[demo]', 'add', 'list'])
+  })
+})
