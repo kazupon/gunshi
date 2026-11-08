@@ -199,6 +199,54 @@ export const plain: Command[] = [list, deploy]
 
 await cli([], define({ name: 'demo', run: () => {} }), { subCommands: record })
 await cli([], define({ name: 'demo', run: () => {} }), { subCommands: map })
+`,
+
+  // a key that a command does not have is a type error with the helpers of each package and with cli() (#871)
+  'unknown-keys.ts': `import { cli, define, defineWithTypes, lazy, lazyWithTypes } from 'gunshi'
+import type { SubCommandable } from 'gunshi'
+import { define as defineFromDefinition, lazy as lazyFromDefinition } from '@gunshi/definition'
+import { defineI18n, defineI18nWithTypes, withI18nResource } from '@gunshi/plugin-i18n'
+
+const run = () => {}
+const resource = async () => ({ description: 'A command' })
+
+// @ts-expect-error \`desc\` is not a key of a command
+define({ name: 'a', desc: 'A', run })
+// @ts-expect-error \`desc\` is not a key of a command
+defineWithTypes<{ extensions: {} }>()({ name: 'a', desc: 'A', run })
+// @ts-expect-error \`desc\` is not a key of a command
+lazy(() => run, { name: 'a', desc: 'A' })
+// @ts-expect-error \`desc\` is not a key of a command
+lazyWithTypes<{ extensions: {} }>()(() => run, { name: 'a', desc: 'A' })
+// @ts-expect-error \`desc\` is not a key of a command
+defineFromDefinition({ name: 'a', desc: 'A', run })
+// @ts-expect-error \`desc\` is not a key of a command
+lazyFromDefinition(() => run, { name: 'a', desc: 'A' })
+// @ts-expect-error \`desc\` is not a key of a command
+defineI18n({ name: 'a', desc: 'A', resource, run })
+// @ts-expect-error \`desc\` is not a key of a command
+defineI18nWithTypes<{ extensions: {} }>()({ name: 'a', desc: 'A', resource, run })
+// @ts-expect-error \`desc\` is not a key of a command
+withI18nResource({ name: 'a', desc: 'A', run }, resource)
+// @ts-expect-error \`desc\` is not a key of a command
+await cli([], { name: 'a', desc: 'A', run })
+// @ts-expect-error \`desc\`, in a sub-command
+await cli([], define({ name: 'a', run }), { subCommands: { b: { name: 'b', desc: 'B', run } } })
+// @ts-expect-error an array keys its commands by their names, and a loader has none
+await cli([], define({ name: 'a', run }), { subCommands: [() => define({ name: 'b', run })] })
+
+const typed = defineWithTypes<{ extensions: { logger: { log: (message: string) => void } } }>()({
+  name: 'typed',
+  run: ctx => ctx.extensions.logger.log('typed')
+})
+const show = lazy(() => run, { name: 'show', args: {}, resource })
+const fromDefinition = defineFromDefinition({ name: 'definition', run })
+const translated = defineI18n({ name: 'translated', resource, run })
+const entry: SubCommandable = { name: 'entry', run }
+export const wrapped = withI18nResource(entry, resource)
+await cli([], define({ name: 'app', description: 'An app', run }), {
+  subCommands: { typed, show, fromDefinition, translated, load: () => define({ name: 'load', run }) }
+})
 `
 }
 

@@ -758,43 +758,14 @@ export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> 
 type SubCommandLoader = () => Awaitable<SubCommandable | ((...args: any[]) => any)>
 
 /**
- * The keys of a command that {@linkcode SubCommandable} declares with loose types
- *
- * @internal
- */
-type SubCommandableKeys =
-  | 'name'
-  | 'description'
-  | 'args'
-  | 'examples'
-  | 'run'
-  | 'toKebab'
-  | 'internal'
-  | 'entry'
-  | 'rendering'
-  | 'subCommands'
-
-/**
- * The other keys of a command, with any value
- *
- * NOTE(kazupon): an app adds a key of its own to {@linkcode Command} with module augmentation (#871).
- * A sub-command takes the key too, so that an object with it can be written in the table of the
- * sub-commands. Without such a key, this has no key.
- *
- * @internal
- */
-type OtherCommandKeys = Partial<Record<Exclude<keyof Command, SubCommandableKeys>, unknown>>
-
-/**
  * Sub-command entry type for use in subCommands.
  *
  * This type uses a loose structural match to bypass TypeScript's contravariance issues
  * with function parameters, allowing any Command or LazyCommand to be used as a sub-command.
- * It also takes the keys that module augmentation adds to {@linkcode Command}.
  *
  * @since v0.27.1
  */
-export interface SubCommandable extends OtherCommandKeys {
+export interface SubCommandable {
   /**
    * see {@link Command.name}
    */

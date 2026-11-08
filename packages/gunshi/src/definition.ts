@@ -67,7 +67,6 @@ export type {
   DefaultGunshiParams,
   ExtendContext,
   GunshiParams,
-  GunshiParamsConstraint,
   JsonResult,
   LazyCommand,
   SubCommandable
