@@ -2047,6 +2047,20 @@ describe('the usage of a group', () => {
       run: NOOP
     })
 
+    expect(usageLine(await usageOfGroup(records))).toBe('demo records <OPTIONS>')
+  })
+
+  test('the usage line of a nested group has [COMMANDS] when a sub-command has sub-commands', async () => {
+    const tags = define({ name: 'tags', description: 'Manage tags', subCommands: { list } })
+    const records = define({ name: 'records', subCommands: { add, tags }, run: NOOP })
+
+    expect(usageLine(await usageOfGroup(records))).toBe('demo records [COMMANDS] <OPTIONS>')
+  })
+
+  test('a lazy sub-command counts by the sub-commands of its definition', async () => {
+    const tags = lazy(() => NOOP, { name: 'tags', args: {}, subCommands: { list } })
+    const records = define({ name: 'records', subCommands: { add, tags } })
+
     expect(usageLine(await usageOfGroup(records))).toBe('demo records [COMMANDS] <OPTIONS>')
   })
 
@@ -2090,7 +2104,7 @@ describe('the usage of a group', () => {
     })
     const usage = await usageOfGroup(records)
 
-    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage)).toBe('demo records <OPTIONS>')
     expect(commandRows(usage)).toEqual(['add', 'list'])
     expect(forMoreLines(usage)).toEqual(['demo records add --help', 'demo records list --help'])
   })
@@ -2180,7 +2194,7 @@ describe('the usage of a group', () => {
     })
     const usage = await usageOfGroup(records)
 
-    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage)).toBe('demo records <OPTIONS>')
     expect(commandRows(usage)).toEqual(['add'])
   })
 

@@ -3,7 +3,7 @@ A Git-like CLI (git v1.0.0)
 Manage branches
 
 USAGE:
-  git branch [COMMANDS] <OPTIONS>
+  git branch <OPTIONS>
 
 COMMANDS:
   [branch]               Manage branches

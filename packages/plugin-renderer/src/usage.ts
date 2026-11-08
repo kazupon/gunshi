@@ -185,14 +185,20 @@ async function makeUsageSymbols<
 >(ctx: Readonly<CommandContext<G>>): Promise<string> {
   const messages = [await resolveEntry(ctx)]
   /**
-   * NOTE(kazupon): the usage line names the full path of the command, for a group run without a
-   * sub-command too: `demo records [COMMANDS]`, not `demo [COMMANDS]`, which reads as if the
-   * sub-commands of the group were the commands of the CLI.
+   * NOTE(kazupon): the usage line of a sub-command names its full path, a group run without a
+   * sub-command included: `demo records`, not `demo`, which reads as if the sub-commands of the group
+   * were the commands of the CLI. The commands section lists the sub-commands of a group, so the usage
+   * line of a group has `[COMMANDS]` only when its sub-commands have sub-commands of their own, and the
+   * path goes further. The usage line of the entry has `[COMMANDS]` whenever it has sub-commands.
    */
   if (ctx.callMode === 'subCommand') {
     messages.push(` ${await resolveSubCommand(ctx)}`)
   }
-  if (ctx.omitted && (await hasCommands(ctx))) {
+  if (
+    ctx.omitted &&
+    (await hasCommands(ctx)) &&
+    (ctx.callMode !== 'subCommand' || (await hasNestedCommands(ctx)))
+  ) {
     messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
   }
   const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args)
@@ -406,6 +412,45 @@ async function hasCommands<
   return (
     (loadedCommands.length > 1 || loadedCommands.some(cmd => !cmd.entry)) &&
     loadedCommands.some(cmd => !isEntryWithoutRun(cmd))
+  )
+}
+
+/**
+ * Check if a sub-command of the command has sub-commands of its own
+ *
+ * NOTE(kazupon): the rows of the commands section have the sub-commands that their definitions
+ * declare, a lazy command included, since the definition that is given to `lazy` is copied without
+ * running the loader. The row of the command itself is not one of its sub-commands.
+ *
+ * @param ctx - A {@link CommandContext | command context}
+ * @returns True if a sub-command of the command has sub-commands
+ */
+async function hasNestedCommands<
+  G extends GunshiParams<{
+    args: Args
+    extensions: Extensions
+  }>
+>(ctx: CommandContext<G>): Promise<boolean> {
+  const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
+  return loadedCommands.some(cmd => !cmd.entry && declaresSubCommands(cmd))
+}
+
+/**
+ * Check if a command declares sub-commands: an object, a `Map` or an array of them
+ *
+ * @param cmd - A command from `loadCommands`
+ * @returns True if the command declares one or more sub-commands
+ */
+function declaresSubCommands(cmd: Command): boolean {
+  const subCommands: unknown = cmd.subCommands
+  if (subCommands instanceof Map) {
+    return subCommands.size > 0
+  }
+  if (Array.isArray(subCommands)) {
+    return subCommands.length > 0
+  }
+  return (
+    typeof subCommands === 'object' && subCommands !== null && Object.keys(subCommands).length > 0
   )
 }
 
