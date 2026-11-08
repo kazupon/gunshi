@@ -320,6 +320,11 @@ describe('the keys that a command does not have (#871)', () => {
     define({ name: 'list', args: { ...jsonArgs }, desc: 'List', run: () => ({ ok: true }) })
   })
 
+  test('an array of sub-commands does not take a loader, which has no name', () => {
+    // @ts-expect-error an array keys its commands by their names, and a loader has none
+    define({ name: 'remote', subCommands: [() => define({ name: 'add', run })], run })
+  })
+
   test('define rejects them in a variable, and in a spread of it', () => {
     const base = { name: 'deploy', meta: 1, run }
     // @ts-expect-error `meta` is not a key of a command

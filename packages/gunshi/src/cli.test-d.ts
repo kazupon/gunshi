@@ -154,6 +154,8 @@ test('cli() rejects the keys that a command does not have (#871)', async () => {
   await cli([], entry, { subCommands: { remote: { name: 'remote', desc: 'Remote', run } } })
   // @ts-expect-error a function as a sub-command is a loader, which returns the command
   await cli([], entry, { subCommands: { remote: async () => {} } })
+  // @ts-expect-error an array keys its commands by their names, and a loader has none
+  await cli([], entry, { subCommands: [() => define({ name: 'remote', run })] })
 })
 
 test('cli() takes the commands of other types as the sub-commands', async () => {

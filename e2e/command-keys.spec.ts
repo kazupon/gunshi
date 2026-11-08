@@ -59,6 +59,8 @@ withI18nResource({ name: 'a', desc: 'A', run }, resource)
 await cli([], { name: 'a', desc: 'A', run })
 // @ts-expect-error \`desc\`, in a sub-command
 await cli([], define({ name: 'a', run }), { subCommands: { b: { name: 'b', desc: 'B', run } } })
+// @ts-expect-error an array keys its commands by their names, and a loader has none
+await cli([], define({ name: 'a', run }), { subCommands: [() => define({ name: 'b', run })] })
 
 const typed = defineWithTypes<{ extensions: { logger: { log: (message: string) => void } } }>()({
   name: 'typed',
@@ -76,7 +78,7 @@ await cli([], define({ name: 'app', description: 'An app', run }), {
 
   // a key of its own, added to the Command of gunshi
   'augment-gunshi.ts': `import { cli, define, lazy } from 'gunshi'
-import type { DefaultGunshiParams, GunshiParamsConstraint } from 'gunshi'
+import type { DefaultGunshiParams, GunshiParamsConstraint, SubCommandable } from 'gunshi'
 
 declare module 'gunshi' {
   interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams> {
@@ -89,8 +91,12 @@ export const deploy = define({ name: 'deploy', owner: 'infra', run })
 export const owner: string = deploy.owner
 export const show = lazy(() => run, { name: 'show', owner: 'infra' })
 await cli([], { name: 'app', owner: 'infra', run }, { subCommands: { deploy, show } })
+await cli([], deploy, { subCommands: { status: { name: 'status', owner: 'infra', run } } })
+export const status: SubCommandable = { name: 'status', owner: 'infra', run }
 // @ts-expect-error \`desc\` is not a key of a command
 define({ name: 'a', desc: 'A', run })
+// @ts-expect-error \`desc\` is not a key of a command, in a sub-command too
+await cli([], deploy, { subCommands: { status: { name: 'status', desc: 'A', run } } })
 `,
 
   // a key of its own, added to the Command of @gunshi/definition

@@ -326,12 +326,14 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Sub commands.
    *
    * An object or a Map keyed by the sub-command names, or an array of commands, which are keyed by their names.
+   * A value of the object or the Map may also be a loader, a function that returns the command or its runner,
+   * which runs as a lazy command named after its key.
    * When this is not given, the {@linkcode Command.subCommands} of the entry command are the sub-commands.
    */
   subCommands?:
     | Record<string, SubCommandable | SubCommandLoader>
     | Map<string, SubCommandable | SubCommandLoader>
-    | readonly (SubCommandable | SubCommandLoader)[]
+    | readonly SubCommandable[]
   /**
    * Left margin of the command output.
    */
@@ -700,7 +702,8 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * Nested sub-commands for this command.
    *
    * Allows building command trees like `git remote add`.
-   * Each key is the sub-command name, and the value is a command or lazy command.
+   * Each key is the sub-command name, and the value is a command, a lazy command, or a loader, a function that
+   * returns the command or its runner, which runs as a lazy command named after its key.
    * An array of commands is keyed by the names of the commands.
    *
    * On the entry command, these are the top-level sub-commands when {@linkcode CliOptions.subCommands} is not given.
@@ -710,7 +713,7 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
   subCommands?:
     | Record<string, SubCommandable | SubCommandLoader>
     | Map<string, SubCommandable | SubCommandLoader>
-    | readonly (SubCommandable | SubCommandLoader)[]
+    | readonly SubCommandable[]
 }
 
 /**
@@ -755,14 +758,43 @@ export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> 
 type SubCommandLoader = () => Awaitable<SubCommandable | ((...args: any[]) => any)>
 
 /**
+ * The keys of a command that {@linkcode SubCommandable} declares with loose types
+ *
+ * @internal
+ */
+type SubCommandableKeys =
+  | 'name'
+  | 'description'
+  | 'args'
+  | 'examples'
+  | 'run'
+  | 'toKebab'
+  | 'internal'
+  | 'entry'
+  | 'rendering'
+  | 'subCommands'
+
+/**
+ * The other keys of a command, with any value
+ *
+ * NOTE(kazupon): an app adds a key of its own to {@linkcode Command} with module augmentation (#871).
+ * A sub-command takes the key too, so that an object with it can be written in the table of the
+ * sub-commands. Without such a key, this has no key.
+ *
+ * @internal
+ */
+type OtherCommandKeys = Partial<Record<Exclude<keyof Command, SubCommandableKeys>, unknown>>
+
+/**
  * Sub-command entry type for use in subCommands.
  *
  * This type uses a loose structural match to bypass TypeScript's contravariance issues
  * with function parameters, allowing any Command or LazyCommand to be used as a sub-command.
+ * It also takes the keys that module augmentation adds to {@linkcode Command}.
  *
  * @since v0.27.1
  */
-export interface SubCommandable {
+export interface SubCommandable extends OtherCommandKeys {
   /**
    * see {@link Command.name}
    */
