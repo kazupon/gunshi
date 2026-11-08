@@ -155,7 +155,7 @@ export function isInteractive(values: { json?: boolean; 'non-interactive'?: bool
 }
 ```
 
-Spread `nonInteractiveArgs` next to `jsonArgs` in each command that may ask, and check `isInteractive(ctx.values)` before it asks. In the `deploy` command above, the check becomes `isInteractive(ctx.values) && !ctx.values.yes`. A command that does not spread `nonInteractiveArgs` ignores `--non-interactive`, and may still ask. Show the prompts, the spinners, and the redraws on stderr, which the function checks: stdout is for the results, and may be redirected to a file. The function does not change the format of the output: the command prints JSON only with `--json`, and the output for people otherwise.
+Spread `nonInteractiveArgs` next to `jsonArgs` in each command that may ask, and check `isInteractive(ctx.values)` before it asks. In the `deploy` command above, the check becomes `isInteractive(ctx.values) && !ctx.values.yes`. A command that does not spread `nonInteractiveArgs` ignores `--non-interactive` by default, and may still ask. With [`strict: true`](../essentials/declarative.md#strict-unknown-option-validation), Gunshi stops it before it runs, with `Unknown option: --non-interactive`. Show the prompts, the spinners, and the redraws on stderr, which the function checks: stdout is for the results, and may be redirected to a file. The function does not change the format of the output: the command prints JSON only with `--json`, and the output for people otherwise.
 
 ## Branching strategy
 
