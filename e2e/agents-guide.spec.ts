@@ -348,7 +348,7 @@ await cli(process.argv.slice(2), define({ name: 'todo', run: () => console.log('
     const file = write('group-without-run.mjs', withGroup())
     const result = run(file, ['tag'])
     expect(result).toMatchObject({ code: 0, stderr: '' })
-    expect(result.stdout).toMatch(/USAGE:\n {2}bm tag <OPTIONS>/)
+    expect(result.stdout).toMatch(/USAGE:\n {2}bm tag \[COMMANDS\] <OPTIONS>/)
     expect(result.stdout).toBe(run(file, ['tag', '--help']).stdout)
   })
 
