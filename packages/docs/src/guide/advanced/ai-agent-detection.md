@@ -127,48 +127,35 @@ export default define({
 
 With `--json`, the result is printed as one JSON document, and a failure as one line of JSON on stderr, whoever runs the command. Keep the shape of the result stable once consumers depend on it. Report the failures that the command expects with `CommandError`, so that agents, scripts, and people receive the same unambiguous exit code.
 
-## Using it in a plugin
+## Using it across commands
 
-`gunshi/agent` itself is not a plugin, but you can build one on top of it. This plugin decides in one place whether the command may ask, so that the commands do not read the terminals and the environment variables themselves. It adds a `--non-interactive` option. Without the option, the command does not ask with `--json`, when the `CI` environment variable is not empty, when an agent runs the CLI, or when stdin or stderr is not a terminal. `--non-interactive=false` asks again in a terminal, for a person whose environment looks like an agent's, but not with `--json` or in CI:
+When several commands may ask, decide in one place whether they may, so that the commands do not read the terminals and the environment variables themselves. This module, `mode.ts`, provides a `--non-interactive` option that the commands spread, like `jsonArgs`, and a function that decides. Without the option, the command does not ask with `--json`, when the `CI` environment variable is not empty, when an agent runs the CLI, or when stdin or stderr is not a terminal. `--non-interactive=false` asks again in a terminal, for a person whose environment looks like an agent's, but not with `--json` or in CI:
 
 ```ts
 import process from 'node:process'
-import { plugin } from 'gunshi/plugin'
 import { getAgentProfile } from 'gunshi/agent'
 
-export interface ModeExtension {
-  // whether the command may ask, or show a spinner or redraw on stderr
-  interactive: boolean
-}
+export const nonInteractiveArgs = {
+  'non-interactive': { type: 'boolean', description: 'Do not ask, and do not show spinners' }
+} as const
 
-export default function mode() {
-  return plugin({
-    id: 'app:mode',
-    setup: ctx => {
-      ctx.addGlobalOption('non-interactive', {
-        type: 'boolean',
-        description: 'Do not ask, and do not show spinners'
-      })
-    },
-    extension: (ctx): ModeExtension => {
-      // true with --non-interactive, false with --non-interactive=false, and undefined without it
-      const option = ctx.values['non-interactive']
-      const terminal = process.stdin.isTTY === true && process.stderr.isTTY === true
-      const ci = Boolean(process.env.CI)
-      return {
-        interactive:
-          terminal &&
-          ctx.values.json !== true &&
-          !ci &&
-          // --non-interactive=false only overrides the agent detection
-          (option === undefined ? !getAgentProfile().isAgent : option === false)
-      }
-    }
-  })
+// whether the command may ask, or show a spinner or redraw on stderr
+export function isInteractive(values: { json?: boolean; 'non-interactive'?: boolean }): boolean {
+  // true with --non-interactive, false with --non-interactive=false, and undefined without it
+  const option = values['non-interactive']
+  const terminal = process.stdin.isTTY === true && process.stderr.isTTY === true
+  const ci = Boolean(process.env.CI)
+  return (
+    terminal &&
+    values.json !== true &&
+    !ci &&
+    // --non-interactive=false only overrides the agent detection
+    (option === undefined ? !getAgentProfile().isAgent : option === false)
+  )
 }
 ```
 
-Register it with `cli(process.argv.slice(2), command, { plugins: [mode()] })`, and check `ctx.extensions['app:mode'].interactive` in a command before it asks. Show the prompts, the spinners, and the redraws on stderr, which the plugin checks: stdout is for the results, and may be redirected to a file. The plugin does not change the format of the output: the command prints JSON only with `--json`, and the output for people otherwise.
+Spread `nonInteractiveArgs` next to `jsonArgs` in each command that may ask, and check `isInteractive(ctx.values)` before it asks. In the `deploy` command above, the check becomes `isInteractive(ctx.values) && !ctx.values.yes`. A command that does not spread `nonInteractiveArgs` ignores `--non-interactive`, and may still ask. Show the prompts, the spinners, and the redraws on stderr, which the function checks: stdout is for the results, and may be redirected to a file. The function does not change the format of the output: the command prints JSON only with `--json`, and the output for people otherwise.
 
 ## Branching strategy
 
@@ -197,7 +184,7 @@ Agent-specific branches are appropriate only when you need to work around a know
 3. **Backward compatibility**: Existing CLIs should not silently change their output when run under an agent.
 4. **Explicit opt-in**: Renderers, commands, and plugins can opt into agent-aware behavior where it actually matters.
 
-Gunshi already prints the result and the errors as JSON with `--json`, for the commands that spread `jsonArgs` (see [JSON Output](../essentials/json-output.md)). For the other modes, such as a `--non-interactive` option, build a plugin on top of `getAgentProfile()`, as above. A first-party plugin that decides the modes, such as whether to ask and whether to use colors, in one place may be added in the future once its shape is clearer.
+Gunshi already prints the result and the errors as JSON with `--json`, for the commands that spread `jsonArgs` (see [JSON Output](../essentials/json-output.md)). For the other modes, such as a `--non-interactive` option, decide them in one place on top of `getAgentProfile()`, as above. A first-party plugin that decides the modes, such as whether to ask and whether to use colors, in one place may be added in the future once its shape is clearer.
 
 ## Need the raw `std-env` API?
 
