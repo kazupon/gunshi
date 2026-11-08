@@ -239,6 +239,9 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   })
 
   const reported = trackReported(commandContext)
+  if (resolvedCommand.run == null) {
+    markWithoutRun(commandContext)
+  }
   try {
     return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
   } catch (error: unknown) {
@@ -279,6 +282,28 @@ function trackReported(ctx: object): WeakSet<object> {
   const reported = new WeakSet<object>()
   ;(registry[REPORTED] ??= new WeakMap()).set(ctx, reported)
   return reported
+}
+
+/**
+ * The key of the registry of the command contexts whose command has no `run`. The global options plugin
+ * reads it with the same registered symbol, since `gunshi` and the plugins bundle their own copies.
+ */
+const WITHOUT_RUN = Symbol.for('gunshi.withoutRun')
+
+/**
+ * Mark the command context of a run whose command has no `run`.
+ *
+ * NOTE(kazupon): the global options plugin prints the usage of a command that has sub-commands and no
+ * `run`, when it runs without a sub-command, as `--help` does. The plugin cannot tell it from the context,
+ * nor from the runner that it decorates, which the core always wraps, so the core tells it. A lazy command
+ * always has a runner, which its loader returns. The registry is weak, and holds the context of this run
+ * only: a nested `cli()` in a hook has a context of its own.
+ *
+ * @param ctx - The command context of the run
+ */
+function markWithoutRun(ctx: object): void {
+  const registry = globalThis as unknown as Record<symbol, WeakSet<object> | undefined>
+  ;(registry[WITHOUT_RUN] ??= new WeakSet()).add(ctx)
 }
 
 /**

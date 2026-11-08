@@ -414,14 +414,12 @@ const addCommand = define({
 const remoteCommand = define({
   name: 'remote',
   description: 'Manage remotes',
-  subCommands: { add: addCommand },
-  run: () => console.log('Use: remote add')
+  subCommands: { add: addCommand }
 })
 
 const entry = define({
   name: 'main',
-  description: 'Git-like CLI',
-  run: () => console.log('Run --help for available commands')
+  description: 'Git-like CLI'
 })
 
 await cli(process.argv.slice(2), entry, {
@@ -429,6 +427,8 @@ await cli(process.argv.slice(2), entry, {
   subCommands: { remote: remoteCommand }
 })
 ```
+
+`remote` and the entry only group sub-commands, so they have no `run`: run without a sub-command, such as `git remote`, a command without `run` prints its usage, as `--help` does.
 
 For more details on nested sub-commands, including lazy loading, intermediate command handling, and `commandPath`, see the [Nested Sub-Commands](../advanced/nested-sub-commands.md) guide.
 

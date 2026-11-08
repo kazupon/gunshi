@@ -74,6 +74,8 @@ When these options are used:
 - **With `--help`**: The command execution is bypassed, and the usage information is displayed instead
 - **With `--version`**: The command execution is bypassed, and only the version number is printed
 
+A command that has sub-commands and no `run`, run without a sub-command, displays its usage too, as with `--help`, instead of doing nothing.
+
 ### JSON Output
 
 A command that spreads `jsonArgs` from `gunshi` into its arguments accepts `--json`. With it, this plugin:

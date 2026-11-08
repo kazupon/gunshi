@@ -1,6 +1,8 @@
 [
   ["top-level-help", "node cli.ts --help"],
+  ["top-level-exec", "node cli.ts"],
   ["remote-help", "node cli.ts remote --help"],
+  ["remote-exec", "node cli.ts remote"],
   ["remote-add-help", "node cli.ts remote add --help"],
   ["remote-add-exec", "node cli.ts remote add --url https://example.com"],
   ["remote-remove-exec", "node cli.ts remote remove origin"],

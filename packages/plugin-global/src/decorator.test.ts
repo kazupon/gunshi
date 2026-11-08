@@ -695,3 +695,60 @@ test('a shadowing argument with no value runs the command, as it did before', as
 
   expect(await decorator(baseRunner)(ctx)).toBe('command executed')
 })
+
+/**
+ * Mark the context of a run whose command has no `run`, as the core does in `cli()`.
+ *
+ * @param ctx - The command context of the run
+ */
+function markWithoutRun(ctx: object): void {
+  const registry = globalThis as unknown as Record<symbol, WeakSet<object> | undefined>
+  ;(registry[Symbol.for('gunshi.withoutRun')] ??= new WeakSet()).add(ctx)
+}
+
+describe('a command without run', () => {
+  const usage = 'Usage: test [COMMANDS]'
+
+  async function createGroupContext(omitted: boolean) {
+    return await createCommandContext({
+      cliOptions: {
+        renderUsage: () => Promise.resolve(usage),
+        usageSilent: true,
+        globalOptions: new Map(Object.entries(COMMON_ARGS))
+      } as CliOptions,
+      values: {},
+      omitted,
+      extensions: {
+        [pluginId]: {
+          key: Symbol(pluginId),
+          factory: extension
+        }
+      }
+    })
+  }
+
+  test('prints its usage when it runs without a sub-command', async () => {
+    const ctx = await createGroupContext(true)
+    markWithoutRun(ctx)
+    const baseRunner = vi.fn<() => undefined>()
+
+    expect(await decorator(baseRunner)(ctx)).toBe(usage)
+    expect(baseRunner).not.toHaveBeenCalled()
+  })
+
+  test('runs when the core did not mark it, as a command with run does', async () => {
+    const ctx = await createGroupContext(true)
+    const baseRunner = vi.fn<() => string>(() => 'command executed')
+
+    expect(await decorator(baseRunner)(ctx)).toBe('command executed')
+  })
+
+  test('runs when it is not run without a sub-command', async () => {
+    const ctx = await createGroupContext(false)
+    markWithoutRun(ctx)
+    const baseRunner = vi.fn<() => undefined>()
+
+    expect(await decorator(baseRunner)(ctx)).toBeUndefined()
+    expect(baseRunner).toHaveBeenCalledTimes(1)
+  })
+})
