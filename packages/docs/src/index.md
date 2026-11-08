@@ -19,8 +19,8 @@ hero:
 
 features:
   - icon: 📏
-    title: Simple & Universal
-    details: Run commands with simple API and support for universal runtime (Node.js, Bun).
+    title: Simple & AI agent friendly
+    details: Commands with simple APIs, output as JSON, and detects AI agents.
 
   - icon: ⚙️
     title: Declarative & Type Safe
