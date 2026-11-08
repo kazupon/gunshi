@@ -6,7 +6,7 @@ The `gunshi/agent` entry point and its profile shape are stable. Detection itsel
 
 ## Why a separate utility?
 
-AI coding agents typically benefit from terser, machine-friendly CLI output, while human users expect rich, interactive output. `getAgentProfile()` gives you a single switch you can branch on, without spreading environment variable checks across your code.
+AI coding agents cannot answer a prompt, and gain nothing from a spinner, while people expect both. `getAgentProfile()` lets your CLI stop asking and animating when an agent runs it, without spreading environment variable checks across your code. It does not choose the format of the output: print JSON only when the caller asks for it with `--json`.
 
 `gunshi/agent` is intentionally small:
 
@@ -87,14 +87,14 @@ getAgentProfile()
 
 ## Turn detection into behavior
 
-Detection is useful when it changes an observable CLI behavior. Common agent-friendly choices include:
+Detection decides one thing: whether your CLI may ask. When an agent runs it:
 
-- Emit deterministic, machine-readable output with a documented schema.
-- Require all necessary values as arguments instead of opening a hidden interactive prompt.
-- Keep successful and failed outcomes distinguishable through stable result fields and exit statuses.
-- Avoid ANSI colors and terminal-only decoration in machine-readable output.
+- Ask nothing. Take every value from the arguments and the options, and when one is missing, fail with an error that names it, instead of opening a prompt that the agent cannot see.
+- Drop prompts, spinners, and redraws. Keep the results, the completion, the warnings, and how to recover.
+- Keep the output for people. Print JSON only with `--json` (see [JSON Output](../essentials/json-output.md)), whoever runs the command.
+- Leave colors to the terminal. Drop them when the stream is not a TTY or `NO_COLOR` is set, not because an agent is detected.
 
-Gunshi does not apply these policies automatically. Commands and plugins decide which adaptations are appropriate for their CLI. Prefer explicit options such as `--json` or `--no-interactive` when your CLI exposes them, and use agent detection only to choose their defaults.
+Gunshi does not apply these policies automatically. Commands and plugins decide which adaptations are appropriate for their CLI. Prefer explicit options such as `--non-interactive` when your CLI exposes them, and use agent detection only to choose whether the CLI may ask. The caller chooses the format with `--json`.
 
 ## Using it in a command
 
@@ -129,31 +129,41 @@ With `--json`, the result is printed as one JSON document, and a failure as one 
 
 ## Using it in a plugin
 
-`gunshi/agent` itself is not a plugin, but you can build one on top of it.
+`gunshi/agent` itself is not a plugin, but you can build one on top of it. This plugin decides in one place whether the command may ask, so that the commands do not read the terminals and the environment variables themselves. It adds a `--non-interactive` option, and also stops asking with `--json`, in CI, when an agent runs the CLI, and when stdin or stderr is not a terminal:
 
 ```ts
+import process from 'node:process'
 import { plugin } from 'gunshi/plugin'
 import { getAgentProfile } from 'gunshi/agent'
 
-export default function agentAwareRenderer() {
+export interface ModeExtension {
+  // whether the command may ask, show a spinner, or redraw the screen
+  interactive: boolean
+}
+
+export default function mode() {
   return plugin({
-    id: 'g:agent-aware-renderer',
+    id: 'app:mode',
     setup: ctx => {
-      const profile = getAgentProfile()
-
-      if (!profile.isAgent) {
-        return
-      }
-
-      ctx.decorateUsageRenderer(async base => {
-        const rendered = await base()
-        // for example, drop ANSI colors and decorations for agent output
-        return rendered.replaceAll(/\u001B\[[0-9;]*m/g, '')
+      ctx.addGlobalOption('non-interactive', {
+        type: 'boolean',
+        description: 'Do not ask, and do not show spinners'
       })
-    }
+    },
+    extension: (ctx): ModeExtension => ({
+      interactive:
+        ctx.values['non-interactive'] !== true &&
+        ctx.values.json !== true &&
+        !process.env.CI &&
+        !getAgentProfile().isAgent &&
+        process.stdin.isTTY === true &&
+        process.stderr.isTTY === true
+    })
   })
 }
 ```
+
+A command checks `ctx.extensions['app:mode'].interactive` before it asks. The plugin does not change the format of the output: the command prints JSON only with `--json`, and the output for people otherwise.
 
 ## Branching strategy
 
@@ -162,12 +172,12 @@ Prefer the broad `isAgent` flag over agent-specific names:
 ```ts
 // ✅ Recommended
 if (profile.isAgent) {
-  emitJson()
+  skipPrompts()
 }
 
 // ⚠️ Avoid unless you have a known agent-specific constraint
 if (profile.name === 'codex' || profile.name === 'claude') {
-  emitJson()
+  skipPrompts()
 }
 ```
 
@@ -178,11 +188,11 @@ Agent-specific branches are appropriate only when you need to work around a know
 `getAgentProfile()` is a hint. Gunshi's core does not switch usage / validation error / prompt rendering on its own, even when an agent is detected. There are several reasons:
 
 1. **Spoofable**: Agent detection relies on environment variables and is not a security signal.
-2. **App-specific**: The "right" agent-friendly output differs per CLI (JSON, NDJSON, plain text, etc.).
+2. **The caller chooses the format**: An agent that wants JSON passes `--json`, and the output for people stays readable when an agent runs the CLI. Switching the format on detection would surprise an agent that reads the output for people.
 3. **Backward compatibility**: Existing CLIs should not silently change their output when run under an agent.
 4. **Explicit opt-in**: Renderers, commands, and plugins can opt into agent-aware behavior where it actually matters.
 
-If you need a richer integration (custom renderer decoration, a `--json` flag, etc.), build it on top of `getAgentProfile()` in a plugin. A first-party `@gunshi/plugin-agent` may be added in the future once the desired shape is clearer.
+Gunshi already prints the result and the errors as JSON with `--json`, for the commands that spread `jsonArgs` (see [JSON Output](../essentials/json-output.md)). For the other modes, such as a `--non-interactive` option, build a plugin on top of `getAgentProfile()`, as above. A first-party plugin that decides the modes, such as whether to ask and whether to use colors, in one place may be added in the future once its shape is clearer.
 
 ## Need the raw `std-env` API?
 
