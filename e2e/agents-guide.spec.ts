@@ -479,6 +479,37 @@ await cli(process.argv.slice(2), main, {
     expect(run(file, ['create', 'db', '--replicas', '2'], envWith({ TWO: '1' })).code).toBe(0)
   })
 
+  test('onErrorCommand is called with a CommandError too, and isCommandError leaves its exit code alone', () => {
+    const file = write(
+      'exit-code-command-error.mjs',
+      `import { cli, CommandError, define, isCommandError } from 'gunshi'
+const remove = define({
+  name: 'remove',
+  args: { name: { type: 'positional' } },
+  run: ctx => {
+    throw new CommandError('Database ' + ctx.values.name + ' not found', { code: 'not_found' })
+  }
+})
+await cli(process.argv.slice(2), define({ name: 'cloud', run: () => {} }), {
+  name: 'cloud',
+  subCommands: { remove },
+  onErrorCommand: (ctx, error) => {
+    if (process.env.ALL === '1' || !isCommandError(error)) process.exitCode = 2
+  }
+})
+`
+    )
+    const withCheck = envWith({ ALL: undefined })
+    expect(run(file, ['remove', 'db'], withCheck)).toEqual({
+      code: 1,
+      stdout: '',
+      stderr: 'Database db not found\n'
+    })
+    expect(run(file, ['remove'], withCheck)).toMatchObject({ code: 2, stdout: '' })
+    // without the check, the exit code of the CommandError is overwritten
+    expect(run(file, ['remove', 'db'], envWith({ ALL: '1' })).code).toBe(2)
+  })
+
   test('a CommandError prints its message to stderr without a stack trace, and sets the exit code', () => {
     const file = write(
       'command-error.mjs',
@@ -619,6 +650,12 @@ declare function find(): Project
         `export const c = lazy(async () => define({ name: 'c', args: { ...jsonArgs }, run: () => ({ project: find() }) }), { name: 'c' })`,
         'No overload matches this call',
         'No overload matches this call'
+      ],
+      [
+        'returns-an-object-without-json-args.ts',
+        `export const c = define({ name: 'c', run: () => ({ project: find() }) })`,
+        "is not assignable to type 'Awaitable<string | void>'",
+        "is not assignable to type 'Awaitable<string | void>'"
       ]
     ]
     for (const [file, code] of cases) {
