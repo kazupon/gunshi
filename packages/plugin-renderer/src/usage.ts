@@ -388,9 +388,10 @@ function isEntryWithoutRun(cmd: Command): boolean {
 /**
  * Check if the command has sub commands
  *
- * NOTE(kazupon): the list has the command itself too, so it has sub-commands with two or more. The rows
- * of the entry commands without `run` are left out of the section, so it is rendered only when a row is
- * left, and no empty section and no `[COMMANDS]` are rendered.
+ * NOTE(kazupon): the list has the command itself too, unless the command is internal, so it has
+ * sub-commands with two or more rows, or with a row that is not an entry: a lone entry is the command
+ * itself. The rows of the entry commands without `run` are left out of the section, so it is rendered
+ * only when a row is left, and no empty section and no `[COMMANDS]` are rendered.
  *
  * @param ctx - A {@link CommandContext | command context}
  * @returns True if the command has sub commands
@@ -402,7 +403,10 @@ async function hasCommands<
   }>
 >(ctx: CommandContext<G>): Promise<boolean> {
   const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
-  return loadedCommands.length > 1 && loadedCommands.some(cmd => !isEntryWithoutRun(cmd))
+  return (
+    (loadedCommands.length > 1 || loadedCommands.some(cmd => !cmd.entry)) &&
+    loadedCommands.some(cmd => !isEntryWithoutRun(cmd))
+  )
 }
 
 /**

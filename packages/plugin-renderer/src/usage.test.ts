@@ -2168,4 +2168,27 @@ describe('the usage of a group', () => {
     expect(usage).not.toContain('COMMANDS')
     expect(usageLine(usage!)).toBe('demo <OPTIONS>')
   })
+
+  test('an internal group lists its only visible sub-command', async () => {
+    // the row of the group itself is internal too, so the only row left is the sub-command
+    const records = define({
+      name: 'records',
+      description: 'Manage records',
+      internal: true,
+      subCommands: { add },
+      run: NOOP
+    })
+    const usage = await usageOfGroup(records)
+
+    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(commandRows(usage)).toEqual(['add'])
+  })
+
+  test('a group whose sub-commands are all internal renders no commands section', async () => {
+    const hidden = define({ name: 'hidden', internal: true, run: NOOP })
+    const records = define({ name: 'records', subCommands: { hidden }, run: NOOP })
+    const usage = await usageOfGroup(records)
+
+    expect(usage).not.toContain('COMMANDS')
+  })
 })
