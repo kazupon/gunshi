@@ -214,7 +214,7 @@ ARGUMENTS:
 
 exports[`sub commands 1`] = `
 "USAGE:
-  cmd1 [COMMANDS] <OPTIONS> <positional1>
+  cmd1 <OPTIONS> <positional1>
 
 COMMANDS:
   command1 <OPTIONS>                    this is command1

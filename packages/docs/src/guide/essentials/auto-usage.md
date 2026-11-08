@@ -51,7 +51,7 @@ Square brackets indicate optional elements or parameters with default values:
 - `[name]` - An option parameter with a default value
 - `[<positional>]` - An optional positional argument
 - `[<positional> ...]` - Optional multiple positional arguments
-- `[COMMANDS]` - Sub-command selection (when multiple commands exist)
+- `[COMMANDS]` - Sub-command selection, when a sub-command has sub-commands of its own. The `COMMANDS` section lists the sub-commands either way
 - `[commandName]` - A default command that runs when no sub-command is specified
 
 Example:
@@ -62,6 +62,7 @@ USAGE:
 
 COMMANDS:
   [manage]    Default command for managing resources
+  remote      Manage remotes, with sub-commands of its own
 
 OPTIONS:
   -t, --type [type]    Resource type (default: standard)
@@ -180,7 +181,7 @@ When users run the main command with `--help`:
 resource-manager (resource-manager v1.0.0)
 
 USAGE:
-  resource-manager [COMMANDS] <OPTIONS>
+  resource-manager <OPTIONS>
 
 COMMANDS:
   [manage]                  Manage resources

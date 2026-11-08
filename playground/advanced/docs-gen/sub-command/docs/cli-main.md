@@ -3,7 +3,7 @@
 ```sh
 My CLI tool (my-cli v1.0.0)
 USAGE:
-  my-cli [COMMANDS] <OPTIONS>
+  my-cli <OPTIONS>
 
 COMMANDS:
   create <OPTIONS>          Create a new resource

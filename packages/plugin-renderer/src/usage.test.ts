@@ -2072,11 +2072,14 @@ describe('the usage of a group', () => {
     )
   })
 
-  test('the usage line of the entry is unchanged', async () => {
+  test('the usage line of the entry has [COMMANDS] only when a sub-command has sub-commands', async () => {
     const entry = define({ name: 'demo', run: NOOP })
-    const usage = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
+    const leaves = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
+    const tags = define({ name: 'tags', subCommands: { list } })
+    const nested = await cli(['--help'], entry, { ...options, subCommands: { add, tags } })
 
-    expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+    expect(usageLine(leaves!)).toBe('demo <OPTIONS>')
+    expect(usageLine(nested!)).toBe('demo [COMMANDS] <OPTIONS>')
   })
 
   test('a group with run lists itself, as the command that runs without a sub-command', async () => {
@@ -2113,7 +2116,7 @@ describe('the usage of a group', () => {
     const entry = define({ name: 'demo', description: 'Demo CLI' })
     const usage = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
 
-    expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo <OPTIONS>')
     expect(commandRows(usage!)).toEqual(['add', 'list'])
     expect(forMoreLines(usage!)).toEqual(['demo add --help', 'demo list --help'])
   })

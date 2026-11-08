@@ -1,7 +1,7 @@
 my-cli (my-cli v1.0.0)
 
 USAGE:
-  my-cli [COMMANDS] <OPTIONS>
+  my-cli <OPTIONS>
 
 COMMANDS:
   [my-cli]          CLI with dynamic commands

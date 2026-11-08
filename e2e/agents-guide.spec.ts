@@ -196,7 +196,7 @@ describe('the example of AGENTS.md', () => {
 
   const cases: [string[], number, RegExp, RegExp | ''][] = [
     [[], 0, /Run `ship --help`/, ''],
-    [['--help'], 0, /USAGE:\n {2}ship \[COMMANDS\]/, ''],
+    [['--help'], 0, /USAGE:\n {2}ship <OPTIONS>/, ''],
     [
       ['deploy', '--help'],
       0,

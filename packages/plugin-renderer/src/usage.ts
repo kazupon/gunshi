@@ -187,18 +187,15 @@ async function makeUsageSymbols<
   /**
    * NOTE(kazupon): the usage line of a sub-command names its full path, a group run without a
    * sub-command included: `demo records`, not `demo`, which reads as if the sub-commands of the group
-   * were the commands of the CLI. The commands section lists the sub-commands of a group, so the usage
-   * line of a group has `[COMMANDS]` only when its sub-commands have sub-commands of their own, and the
-   * path goes further. The usage line of the entry has `[COMMANDS]` whenever it has sub-commands.
+   * were the commands of the CLI. The commands section lists the sub-commands, so the usage line has
+   * `[COMMANDS]` only when one of them has sub-commands of its own, and the path goes further: for the
+   * entry as for a group. The section lists the sub-commands either way, a command that a plugin adds
+   * included.
    */
   if (ctx.callMode === 'subCommand') {
     messages.push(` ${await resolveSubCommand(ctx)}`)
   }
-  if (
-    ctx.omitted &&
-    (await hasCommands(ctx)) &&
-    (ctx.callMode !== 'subCommand' || (await hasNestedCommands(ctx)))
-  ) {
+  if (ctx.omitted && (await hasCommands(ctx)) && (await hasNestedCommands(ctx))) {
     messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
   }
   const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args)

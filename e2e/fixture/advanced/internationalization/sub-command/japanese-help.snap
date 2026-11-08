@@ -1,7 +1,7 @@
 resource-cli (resource-cli v1.0.0)
 
 使い方:
-  resource-cli [コマンド] <オプション>
+  resource-cli <オプション>
 
 コマンド:
   [resource-manager]           Resource management tool

@@ -374,7 +374,7 @@ npx tsx src/cli.ts --help
 resource-manager (resource-manager v1.0.0)
 
 USAGE:
-  resource-manager [COMMANDS] <OPTIONS>
+  resource-manager <OPTIONS>
 
 COMMANDS:
   [manage]                  Manage resources
