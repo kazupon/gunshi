@@ -40,26 +40,21 @@ const removeCommand = define({
   }
 })
 
-// Define an intermediate command with nested sub-commands
+// Define an intermediate command with nested sub-commands. It needs no `run`:
+// `git remote` without a sub-command prints its usage
 const remoteCommand = define({
   name: 'remote',
   description: 'Manage remotes',
   subCommands: {
     add: addCommand,
     remove: removeCommand
-  },
-  run: () => {
-    console.log('Use: git remote add|remove')
   }
 })
 
-// Define the entry command
+// Define the entry command, which only groups the commands too
 const entry = define({
   name: 'main',
-  description: 'Git-like CLI',
-  run: () => {
-    console.log('Run --help for available commands')
-  }
+  description: 'Git-like CLI'
 })
 
 await cli(process.argv.slice(2), entry, {
@@ -85,7 +80,7 @@ Now users can run:
 $ npx tsx cli.ts remote add --url https://example.com
 Adding remote: https://example.com
 
-# Show help for intermediate command
+# Show help for intermediate command (`npx tsx cli.ts remote` prints the same)
 $ npx tsx cli.ts remote --help
 Manage remotes
 
@@ -93,12 +88,10 @@ USAGE:
   git remote <OPTIONS>
 
 COMMANDS:
-  [remote]               Manage remotes
   add <OPTIONS>          Add a remote
   remove <name>          Remove a remote
 
 For more info, run any command with the `--help` flag:
-  git remote --help
   git remote add --help
   git remote remove --help
 
@@ -130,15 +123,13 @@ const subSubCommand = define({
 const level2Command = define({
   name: 'level2',
   description: 'Second level',
-  subCommands: { 'sub-sub': subSubCommand },
-  run: () => {}
+  subCommands: { 'sub-sub': subSubCommand }
 })
 
 const level1Command = define({
   name: 'level1',
   description: 'First level',
-  subCommands: { level2: level2Command },
-  run: () => {}
+  subCommands: { level2: level2Command }
 })
 ```
 
@@ -165,7 +156,17 @@ const addCommand = define({
 
 ## Intermediate Commands
 
-When a user invokes an intermediate command (one that has nested sub-commands) without specifying a child, the intermediate command's `run` function is called with `omitted: true`. In this case, the built-in help system automatically shows a COMMANDS section listing the available nested sub-commands:
+When a user invokes an intermediate command (one that has nested sub-commands) without specifying a child, Gunshi prints the usage of the intermediate command, with a COMMANDS section that lists its nested sub-commands, as `cli remote --help` does, and the exit code is `0`. An intermediate command needs no `run` for it:
+
+```ts
+const remoteCommand = define({
+  name: 'remote',
+  description: 'Manage remotes',
+  subCommands: { add: addCommand }
+})
+```
+
+Give an intermediate command a `run` only when it has something to do without a child, as `git remote` lists the remotes. Gunshi then calls the `run`, with `ctx.omitted` set to `true`, instead of printing the usage:
 
 ```ts
 const remoteCommand = define({
@@ -173,11 +174,8 @@ const remoteCommand = define({
   description: 'Manage remotes',
   subCommands: { add: addCommand },
   run: ctx => {
-    if (ctx.omitted) {
-      // User ran `cli remote` without specifying a sub-command
-      // Help is shown automatically with COMMANDS section
-      console.log('Please specify a sub-command: add, remove')
-    }
+    // `cli remote` without a sub-command: `ctx.omitted` is `true`
+    console.log('origin')
   }
 })
 ```
