@@ -1,7 +1,7 @@
 my-app (my-app v1.0.0)
 
 USAGE:
-  my-app <OPTIONS>
+  my-app [COMMANDS] <OPTIONS>
 
 COMMANDS:
   [manage]                  Manage resources

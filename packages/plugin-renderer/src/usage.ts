@@ -187,15 +187,19 @@ async function makeUsageSymbols<
   /**
    * NOTE(kazupon): the usage line of a sub-command names its full path, a group run without a
    * sub-command included: `demo records`, not `demo`, which reads as if the sub-commands of the group
-   * were the commands of the CLI. The commands section lists the sub-commands, so the usage line has
-   * `[COMMANDS]` only when one of them has sub-commands of its own, and the path goes further: for the
-   * entry as for a group. The section lists the sub-commands either way, a command that a plugin adds
-   * included.
+   * were the commands of the CLI. The commands section lists the sub-commands, so the usage line of a
+   * group has `[COMMANDS]` only when one of them has sub-commands of its own, and the path goes further.
+   * The usage line of the entry has `[COMMANDS]` when the CLI has commands of its own: a CLI of the entry
+   * only, to which plugins add commands, has none. The section lists the commands either way.
    */
   if (ctx.callMode === 'subCommand') {
     messages.push(` ${await resolveSubCommand(ctx)}`)
   }
-  if (ctx.omitted && (await hasCommands(ctx)) && (await hasNestedCommands(ctx))) {
+  if (
+    ctx.omitted &&
+    (await hasCommands(ctx)) &&
+    (ctx.callMode === 'subCommand' ? await hasNestedCommands(ctx) : hasOwnCommands(ctx))
+  ) {
     messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
   }
   const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args)
@@ -430,6 +434,28 @@ async function hasNestedCommands<
 >(ctx: CommandContext<G>): Promise<boolean> {
   const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
   return loadedCommands.some(cmd => !cmd.entry && declaresSubCommands(cmd))
+}
+
+/**
+ * Check if the CLI has commands of its own, besides the ones that plugins add
+ *
+ * NOTE(kazupon): the core lists the entry command among the sub-commands when the CLI has
+ * sub-commands of its own, given to `cli()` or declared by the entry command. A CLI of the entry only,
+ * to which plugins add commands, such as `complete`, does not list it, and `loadCommands` adds the
+ * entry to the rows instead. Without the entry command, as for a context that is not created by
+ * `cli()`, the commands are taken as the CLI's own.
+ *
+ * @param ctx - A {@link CommandContext | command context}
+ * @returns True if the CLI has commands of its own
+ */
+function hasOwnCommands<
+  G extends GunshiParams<{
+    args: Args
+    extensions: Extensions
+  }>
+>(ctx: Readonly<CommandContext<G>>): boolean {
+  const entry = ctx.env.entryCommand
+  return entry === undefined || [...(ctx.env.subCommands?.values() ?? [])].includes(entry)
 }
 
 /**

@@ -1,7 +1,7 @@
 mycli (mycli v1.0.0)
 
 USAGE:
-  mycli <OPTIONS>
+  mycli [COMMANDS] <OPTIONS>
 
 COMMANDS:
   [entry]

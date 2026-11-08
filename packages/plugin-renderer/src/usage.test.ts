@@ -970,21 +970,26 @@ describe('#768 - plugin-added commands include the entry in top-level help', () 
       : lines.slice(start + 1, end).map(line => line.trim().split(/\s{2,}/)[0])
   }
 
-  test.each([1, 2])('matches user-registered help with %s plugin command(s)', async count => {
-    const selected = Object.fromEntries(Object.entries(commands).slice(0, count))
-    const options = { name: 'mycli', renderHeader: null, usageSilent: true }
-    const userHelp = await cli(['--help'], entry, {
-      ...options,
-      subCommands: selected
-    })
-    const pluginHelp = await cli(['--help'], entry, {
-      ...options,
-      plugins: [addCommands(selected)]
-    })
+  test.each([1, 2])(
+    'matches user-registered help with %s plugin command(s), but [COMMANDS]',
+    async count => {
+      const selected = Object.fromEntries(Object.entries(commands).slice(0, count))
+      const options = { name: 'mycli', renderHeader: null, usageSilent: true }
+      const userHelp = await cli(['--help'], entry, {
+        ...options,
+        subCommands: selected
+      })
+      const pluginHelp = await cli(['--help'], entry, {
+        ...options,
+        plugins: [addCommands(selected)]
+      })
 
-    expect(pluginHelp).toBe(userHelp)
-    expect(commandRows(pluginHelp!)).toEqual(['[build] <target>', ...Object.keys(selected)])
-  })
+      // the CLI has no commands of its own, so its usage line has no `[COMMANDS]`
+      expect(pluginHelp).toBe(userHelp!.replace('mycli [COMMANDS] <OPTIONS>', 'mycli <OPTIONS>'))
+      expect(pluginHelp).not.toBe(userHelp)
+      expect(commandRows(pluginHelp!)).toEqual(['[build] <target>', ...Object.keys(selected)])
+    }
+  )
 
   test('does not add the root entry to nested help', async () => {
     const remote = define({
@@ -2072,14 +2077,24 @@ describe('the usage of a group', () => {
     )
   })
 
-  test('the usage line of the entry has [COMMANDS] only when a sub-command has sub-commands', async () => {
+  test('the usage line of the entry has [COMMANDS] when the CLI has commands of its own', async () => {
     const entry = define({ name: 'demo', run: NOOP })
-    const leaves = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
-    const tags = define({ name: 'tags', subCommands: { list } })
-    const nested = await cli(['--help'], entry, { ...options, subCommands: { add, tags } })
+    const own = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
+    const declared = await cli(
+      ['--help'],
+      define({ name: 'demo', subCommands: { add, list }, run: NOOP }),
+      options
+    )
+    const pluginOnly = await cli(['--help'], entry, {
+      ...options,
+      plugins: [addCommands({ add })]
+    })
 
-    expect(usageLine(leaves!)).toBe('demo <OPTIONS>')
-    expect(usageLine(nested!)).toBe('demo [COMMANDS] <OPTIONS>')
+    expect(usageLine(own!)).toBe('demo [COMMANDS] <OPTIONS>')
+    expect(usageLine(declared!)).toBe('demo [COMMANDS] <OPTIONS>')
+    // a CLI of the entry only: the commands that a plugin adds are listed, without [COMMANDS]
+    expect(usageLine(pluginOnly!)).toBe('demo <OPTIONS>')
+    expect(commandRows(pluginOnly!)).toEqual(['[demo]', 'add'])
   })
 
   test('a group with run lists itself, as the command that runs without a sub-command', async () => {
@@ -2116,7 +2131,7 @@ describe('the usage of a group', () => {
     const entry = define({ name: 'demo', description: 'Demo CLI' })
     const usage = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
 
-    expect(usageLine(usage!)).toBe('demo <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
     expect(commandRows(usage!)).toEqual(['add', 'list'])
     expect(forMoreLines(usage!)).toEqual(['demo add --help', 'demo list --help'])
   })

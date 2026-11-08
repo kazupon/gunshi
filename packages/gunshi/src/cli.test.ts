@@ -2913,27 +2913,36 @@ describe('github issues', () => {
       })
     }
 
-    test.each([1, 2])('matches subCommands help with %s plugin command(s)', async count => {
-      const options = { name: 'mycli', renderHeader: null, usageSilent: true } satisfies CliOptions
-      const commands = createCommands(count)
-      const userHelp = await cli(['--help'], createEntry(), {
-        ...options,
-        subCommands: commands
-      })
-      const mapHelp = await cli(['--help'], createEntry(), {
-        ...options,
-        subCommands: new Map(Object.entries(commands))
-      })
-      const pluginHelp = await cli(['--help'], createEntry(), {
-        ...options,
-        plugins: [addCommands(createCommands(count))]
-      })
+    test.each([1, 2])(
+      'matches subCommands help with %s plugin command(s), but [COMMANDS]',
+      async count => {
+        const options = {
+          name: 'mycli',
+          renderHeader: null,
+          usageSilent: true
+        } satisfies CliOptions
+        const commands = createCommands(count)
+        const userHelp = await cli(['--help'], createEntry(), {
+          ...options,
+          subCommands: commands
+        })
+        const mapHelp = await cli(['--help'], createEntry(), {
+          ...options,
+          subCommands: new Map(Object.entries(commands))
+        })
+        const pluginHelp = await cli(['--help'], createEntry(), {
+          ...options,
+          plugins: [addCommands(createCommands(count))]
+        })
 
-      expect(mapHelp).toBe(userHelp)
-      expect(pluginHelp).toBe(userHelp)
-      expect(pluginHelp).toContain('  [build] <target>')
-      expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
-    })
+        expect(mapHelp).toBe(userHelp)
+        // the CLI has no commands of its own, so its usage line has no `[COMMANDS]`
+        expect(pluginHelp).toBe(userHelp!.replace('mycli [COMMANDS] <OPTIONS>', 'mycli <OPTIONS>'))
+        expect(pluginHelp).not.toBe(userHelp)
+        expect(pluginHelp).toContain('  [build] <target>')
+        expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
+      }
+    )
 
     test('does not add the entry to the command registry', async () => {
       let env: Readonly<CommandEnvironment> | undefined

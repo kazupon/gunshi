@@ -2,7 +2,7 @@ Database plugin initialized
 An example CLI demonstrating advanced type system with combined plugins (advanced-combine)
 
 USAGE:
-  advanced-combine <OPTIONS>
+  advanced-combine [COMMANDS] <OPTIONS>
 
 COMMANDS:
   [entry]

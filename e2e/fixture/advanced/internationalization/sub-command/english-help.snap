@@ -1,7 +1,7 @@
 resource-cli (resource-cli v1.0.0)
 
 USAGE:
-  resource-cli <OPTIONS>
+  resource-cli [COMMANDS] <OPTIONS>
 
 COMMANDS:
   [resource-manager]          Resource management tool
