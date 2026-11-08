@@ -6,7 +6,7 @@ The `gunshi/agent` entry point and its profile shape are stable. Detection itsel
 
 ## Why a separate utility?
 
-AI coding agents cannot answer a prompt, and gain nothing from a spinner, while people expect both. `getAgentProfile()` lets your CLI stop asking and animating when an agent runs it, without spreading environment variable checks across your code. It does not choose the format of the output: print JSON only when the caller asks for it with `--json`.
+An AI coding agent usually cannot answer a prompt, and gains nothing from a spinner, while people expect both. `getAgentProfile()` lets your CLI choose not to ask and not to animate by default when an agent runs it, without spreading environment variable checks across your code. It does not choose the format of the output: print JSON only when the caller asks for it with `--json`.
 
 `gunshi/agent` is intentionally small:
 
@@ -87,7 +87,7 @@ getAgentProfile()
 
 ## Turn detection into behavior
 
-Detection decides one thing: whether your CLI may ask. When an agent runs it:
+Detection chooses one default: whether your CLI may ask. When an agent runs it, and the caller does not say otherwise:
 
 - Ask nothing. Take every value from the arguments and the options, and when one is missing, fail with an error that names it, instead of opening a prompt that the agent cannot see.
 - Drop prompts, spinners, and redraws. Keep the results, the completion, the warnings, and how to recover.
@@ -129,7 +129,7 @@ With `--json`, the result is printed as one JSON document, and a failure as one 
 
 ## Using it in a plugin
 
-`gunshi/agent` itself is not a plugin, but you can build one on top of it. This plugin decides in one place whether the command may ask, so that the commands do not read the terminals and the environment variables themselves. It adds a `--non-interactive` option, and also stops asking with `--json`, in CI, when an agent runs the CLI, and when stdin or stderr is not a terminal:
+`gunshi/agent` itself is not a plugin, but you can build one on top of it. This plugin decides in one place whether the command may ask, so that the commands do not read the terminals and the environment variables themselves. It adds a `--non-interactive` option. Without the option, the command does not ask with `--json`, when the `CI` environment variable is set, when an agent runs the CLI, or when stdin or stderr is not a terminal. `--non-interactive=false` asks again in a terminal, for a person whose environment looks like an agent's:
 
 ```ts
 import process from 'node:process'
@@ -137,7 +137,7 @@ import { plugin } from 'gunshi/plugin'
 import { getAgentProfile } from 'gunshi/agent'
 
 export interface ModeExtension {
-  // whether the command may ask, show a spinner, or redraw the screen
+  // whether the command may ask, or show a spinner or redraw on stderr
   interactive: boolean
 }
 
@@ -150,20 +150,23 @@ export default function mode() {
         description: 'Do not ask, and do not show spinners'
       })
     },
-    extension: (ctx): ModeExtension => ({
-      interactive:
-        ctx.values['non-interactive'] !== true &&
-        ctx.values.json !== true &&
-        !process.env.CI &&
-        !getAgentProfile().isAgent &&
-        process.stdin.isTTY === true &&
-        process.stderr.isTTY === true
-    })
+    extension: (ctx): ModeExtension => {
+      // true with --non-interactive, false with --non-interactive=false, and undefined without it
+      const option = ctx.values['non-interactive']
+      const terminal = process.stdin.isTTY === true && process.stderr.isTTY === true
+      const detected = Boolean(process.env.CI) || getAgentProfile().isAgent
+      return {
+        interactive:
+          terminal &&
+          ctx.values.json !== true &&
+          (option === undefined ? !detected : option === false)
+      }
+    }
   })
 }
 ```
 
-A command checks `ctx.extensions['app:mode'].interactive` before it asks. The plugin does not change the format of the output: the command prints JSON only with `--json`, and the output for people otherwise.
+Register it with `cli(process.argv.slice(2), command, { plugins: [mode()] })`, and check `ctx.extensions['app:mode'].interactive` in a command before it asks. Show the prompts, the spinners, and the redraws on stderr, which the plugin checks: stdout is for the results, and may be redirected to a file. The plugin does not change the format of the output: the command prints JSON only with `--json`, and the output for people otherwise.
 
 ## Branching strategy
 
