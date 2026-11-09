@@ -116,12 +116,12 @@ USAGE:
   app [OPTIONS]
 
 OPTIONS:
+  -h, --help                           Display this help message
+  -v, --version                        Display this version
   -p, --path <path>                    File or directory path to operate on
   -r, --recursive                      Operate recursively on directories
   --no-recursive                       Negate -r, --recursive
   -o, --operation <operation>          Operation to perform: list, copy, move, or delete
-  -h, --help                           Display this help message
-  -v, --version                        Display this version
 
 EXAMPLES:
   # List files in current directory
@@ -159,12 +159,12 @@ This adds type information to each option:
 
 ```sh
 OPTIONS:
-  -p, --path <path>              [string]   File or directory path to operate on
-  -r, --recursive                [boolean]  Operate recursively on directories
-  --no-recursive                 [boolean]  Negate -r, --recursive
-  -o, --operation <operation>    [string]   Operation to perform: list, copy, move, or delete
-  -h, --help                     [boolean]  Display this help message
-  -v, --version                  [boolean]  Display this version
+  -h, --help                           [boolean] Display this help message
+  -v, --version                        [boolean] Display this version
+  -p, --path <path>                    [string]  File or directory path to operate on
+  -r, --recursive                      [boolean] Operate recursively on directories
+  --no-recursive                       [boolean] Negate -r, --recursive
+  -o, --operation <operation>          [string]  Operation to perform: list, copy, move, or delete
 ```
 
 ## Sub-command Help Generation

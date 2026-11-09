@@ -148,9 +148,17 @@ async function renderExamplesSection<
 
   const resolvedExamples = await resolveExamples(ctx)
   if (resolvedExamples) {
+    /**
+     * NOTE(kazupon): an empty line of the examples, such as the one between two examples, is not
+     * indented, so that it does not end with spaces (#893). A line is padded only for what follows
+     * it, as a row without a description is (#727, #872). The lines are split at a CRLF line break
+     * too, so that a blank line of examples written with CRLF is empty as well.
+     */
     const examples = resolvedExamples
-      .split('\n')
-      .map((example: string) => example.padStart(ctx.env.leftMargin + example.length))
+      .split(/\r?\n/)
+      .map((example: string) =>
+        example === '' ? example : example.padStart(ctx.env.leftMargin + example.length)
+      )
     messages.push(
       `${await ctx.extensions[pluginId].text(resolveBuiltInKey('EXAMPLES'))}:`,
       ...examples
