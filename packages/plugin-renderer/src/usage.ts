@@ -151,10 +151,11 @@ async function renderExamplesSection<
     /**
      * NOTE(kazupon): an empty line of the examples, such as the one between two examples, is not
      * indented, so that it does not end with spaces (#893). A line is padded only for what follows
-     * it, as a row without a description is (#727, #872).
+     * it, as a row without a description is (#727, #872). The lines are split at a CRLF line break
+     * too, so that a blank line of examples written with CRLF is empty as well.
      */
     const examples = resolvedExamples
-      .split('\n')
+      .split(/\r?\n/)
       .map((example: string) =>
         example === '' ? example : example.padStart(ctx.env.leftMargin + example.length)
       )

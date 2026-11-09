@@ -2573,6 +2573,37 @@ $ app copy`
     ])
   })
 
+  test('a blank line of examples written with CRLF is empty too', async () => {
+    const help = await helpOf(
+      define({ name: 'app', examples: EXAMPLES.replaceAll('\n', '\r\n'), run: NOOP })
+    )
+
+    expect(examplesOf(help)).toEqual([
+      '  # List the files',
+      '  $ app list',
+      '',
+      '  # Copy the files',
+      '  $ app copy'
+    ])
+  })
+
+  test('the spaces that the author writes at the end of a line are left as they are', async () => {
+    const help = await helpOf(
+      define({
+        name: 'app',
+        examples: '# List the files  \n$ app list\n\n# Copy the files',
+        run: NOOP
+      })
+    )
+
+    expect(examplesOf(help)).toEqual([
+      '  # List the files  ',
+      '  $ app list',
+      '',
+      '  # Copy the files'
+    ])
+  })
+
   test('the examples of a translation are rendered in the same way', async () => {
     const command = {
       name: 'app',
