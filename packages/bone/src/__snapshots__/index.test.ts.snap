@@ -4,7 +4,7 @@ exports[`@gunshi/bone > combination with gunshi plugins 1`] = `
 "app-bone is a @gunshi/bone example (app-bone v1.0.0)
 
 USAGE:
-  app-bone <OPTIONS>
+  app-bone [OPTIONS]
 
 OPTIONS:
   -h, --help             Display this help message

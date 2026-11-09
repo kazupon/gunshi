@@ -655,7 +655,7 @@ English:
 
 ```sh
 USAGE:
-  COMMAND <OPTIONS>
+  COMMAND [OPTIONS]
 
 OPTIONS:
   -n, --name <name>      Name to greet
@@ -668,7 +668,7 @@ Japanese (with proper locale):
 
 ```sh
 使用法:
-  COMMAND <オプション>
+  COMMAND [オプション]
 
 オプション:
   -n, --name <name>     挨拶する相手の名前

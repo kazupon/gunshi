@@ -195,7 +195,7 @@ async function makeUsageSymbols<
   if (await listsCommands(ctx)) {
     messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}]`)
   }
-  const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args)
+  const optionsSymbols = await generateOptionsSymbols(ctx, ctx.args, ctx.toKebab)
   if (optionsSymbols) {
     messages.push(' ', optionsSymbols)
   }
@@ -276,7 +276,7 @@ async function makeCommandSymbol<
    * list does not run the loader.
    */
   const args = cmd.args || {}
-  const optionSymbol = await generateOptionsSymbols(ctx, args)
+  const optionSymbol = await generateOptionsSymbols(ctx, args, cmd.toKebab)
   const positionalSymbol = generatePositionalSymbols(args)
   let commandStr = cmd.entry
     ? cmd.name === undefined || cmd.name === ANONYMOUS_COMMAND_NAME
@@ -451,24 +451,6 @@ function hasPositionalArgs(args: Args): boolean {
 }
 
 /**
- * Check if all options have default values
- *
- * @param args - An {@link Args | command argument}
- * @returns True if all options have default values
- */
-function hasAllDefaultOptions(args: Args): boolean {
-  const visibleOptionalArgs = getVisibleOptionalArgs(args)
-  /**
-   * NOTE(kazupon): an argument has a default when one is declared, whatever its value. `0`, `''` and
-   * `false` are defaults like any other, and an option that has one is not required (#750).
-   */
-  return (
-    visibleOptionalArgs.length > 0 &&
-    visibleOptionalArgs.every(([, arg]) => arg.default !== undefined)
-  )
-}
-
-/**
  * Make the symbol of the value that an option takes
  *
  * NOTE(kazupon): the value is in angle brackets whether the option has a default or not, because the
@@ -490,8 +472,15 @@ function makeValueSymbol(name: string, schema: ArgSchema, toKebab?: boolean): st
 /**
  * Generate options symbols for usage
  *
+ * NOTE(kazupon): `[OPTIONS]` stands for the options that may be left out, as in the usage of other CLIs,
+ * and each required option is spelled out after it, as a required positional argument is, so that the
+ * usage tells what a command needs. An option with a default, and a boolean, is required only when its
+ * schema says so. `<OPTIONS>`, which meant that an option had no default, said nothing that the reader
+ * could act on: the `--help` and `--version` of the global options have none.
+ *
  * @param ctx - A {@link CommandContext | command context}
  * @param args - {@link Args | command arguments}
+ * @param toKebab - Whether the names of the options are converted to kebab-case
  * @returns Options symbols for usage
  */
 async function generateOptionsSymbols<
@@ -499,14 +488,22 @@ async function generateOptionsSymbols<
     args: Args
     extensions: Extensions
   }>
->(ctx: CommandContext<G>, args: Args): Promise<string> {
+>(ctx: CommandContext<G>, args: Args, toKebab?: boolean): Promise<string> {
   const visibleOptionalArgs = getVisibleOptionalArgs(args)
-
-  return visibleOptionalArgs.length > 0
-    ? hasAllDefaultOptions(args)
-      ? `[${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}]`
-      : `<${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}>`
-    : ''
+  const symbols: string[] = []
+  if (visibleOptionalArgs.some(([, schema]) => !schema.required)) {
+    symbols.push(`[${await ctx.extensions[pluginId].text(resolveBuiltInKey('OPTIONS'))}]`)
+  }
+  for (const [name, schema] of visibleOptionalArgs) {
+    if (!schema.required) {
+      continue
+    }
+    const option = `--${resolveDisplayName(name, schema, toKebab)}`
+    symbols.push(
+      schema.type === 'boolean' ? option : `${option} ${makeValueSymbol(name, schema, toKebab)}`
+    )
+  }
+  return symbols.join(' ')
 }
 
 /**

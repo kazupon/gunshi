@@ -1,7 +1,7 @@
 [custom-a] Decorating usage
 [custom-b] Decorating usage
 USAGE:
-  my-cli <OPTIONS>
+  my-cli [OPTIONS]
 
 OPTIONS:
   -h, --help             Display this help message

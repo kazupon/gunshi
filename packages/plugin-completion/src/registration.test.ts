@@ -2541,7 +2541,7 @@ describe('#875 - the `complete` command in the help', () => {
   test('is not listed for a CLI of a single command', async () => {
     const help = await helpOf(app(), [completion()])
 
-    expect(help).toContain('USAGE:\n  app <OPTIONS> <file>')
+    expect(help).toContain('USAGE:\n  app [OPTIONS] <file>')
     expect(help).not.toContain('COMMANDS:')
     expect(help).not.toContain('complete')
   })
@@ -2552,28 +2552,28 @@ describe('#875 - the `complete` command in the help', () => {
       entry: app(),
       plugins: [completion()],
       subCommands: { add, list },
-      usage: 'app [COMMANDS] <OPTIONS> <file>'
+      usage: 'app [COMMANDS] [OPTIONS] <file>'
     },
     {
       label: 'a plugin adds the commands of an entry without run',
       entry: defineCommand({ name: 'app', description: 'An app' }),
       plugins: [adds('add'), completion()],
       subCommands: undefined,
-      usage: 'app [COMMANDS] <OPTIONS>'
+      usage: 'app [COMMANDS] [OPTIONS]'
     },
     {
       label: 'another plugin adds a command before it',
       entry: app(),
       plugins: [adds('lint'), completion()],
       subCommands: undefined,
-      usage: 'app [COMMANDS] <OPTIONS> <file>'
+      usage: 'app [COMMANDS] [OPTIONS] <file>'
     },
     {
       label: 'another plugin adds a command after it',
       entry: app(),
       plugins: [completion(), adds('lint')],
       subCommands: undefined,
-      usage: 'app [COMMANDS] <OPTIONS> <file>'
+      usage: 'app [COMMANDS] [OPTIONS] <file>'
     }
   ])(
     'is listed alongside the other commands when $label',

@@ -4,7 +4,7 @@ An example CLI demonstrating advanced type system with combined plugins (advance
 Query database tables
 
 USAGE:
-  advanced-combine query <OPTIONS>
+  advanced-combine query [OPTIONS] --table <table>
 
 OPTIONS:
   -h, --help               Display this help message

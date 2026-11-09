@@ -3,7 +3,7 @@ my-cli (my-cli v1.0.0)
 Config command (debug: false)
 
 USAGE:
-  my-cli config <OPTIONS>
+  my-cli config [OPTIONS]
 
 OPTIONS:
   -h, --help             Display this help message

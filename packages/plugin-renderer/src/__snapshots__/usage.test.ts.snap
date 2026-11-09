@@ -4,7 +4,7 @@ exports[`basic 1`] = `
 "A test command
 
 USAGE:
-  cmd1 test <OPTIONS>
+  cmd1 test [OPTIONS] --qux <qux>
 
 OPTIONS:
   -f, --foo <foo>          The foo option
@@ -24,7 +24,7 @@ exports[`enable usageOptionType 1`] = `
 "A test command
 
 USAGE:
-    cmd1 test <OPTIONS>
+    cmd1 test [OPTIONS] --qux <qux>
 
 OPTIONS:
     -f, --foo <foo>            [string]  The foo option
@@ -44,7 +44,7 @@ exports[`kebab-case arguments with Command.toKebab option 1`] = `
 "A test command with kebab-case arguments
 
 USAGE:
-  cmd1 test <OPTIONS>
+  cmd1 test [OPTIONS] --kebab-case-required <kebab-case-required>
 
 OPTIONS:
   -f, --foo-bar <foo-bar>                                  The fooBar option
@@ -64,7 +64,7 @@ exports[`kebab-case arguments with toKebab option 1`] = `
 "A test command with kebab-case arguments
 
 USAGE:
-  cmd1 test <OPTIONS>
+  cmd1 test [OPTIONS] --kebab-case-required <kebab-case-required>
 
 OPTIONS:
   -f, --foo-bar <foo-bar>                                  The fooBar option
@@ -85,7 +85,7 @@ exports[`mixed positionals and optionals 1`] = `
 "A test command
 
 USAGE:
-  cmd1 test <OPTIONS> <foo> <baz>
+  cmd1 test [OPTIONS] <foo> <baz>
 
 ARGUMENTS:
   foo           The foo argument
@@ -139,7 +139,7 @@ exports[`no examples 1`] = `
 "A test command
 
 USAGE:
-  cmd1 test <OPTIONS>
+  cmd1 test [OPTIONS] --qux <qux>
 
 OPTIONS:
   -f, --foo <foo>          The foo option
@@ -153,7 +153,7 @@ exports[`no required on optional arguments 1`] = `
 "A test command
 
 USAGE:
-  cmd1 test <OPTIONS>
+  cmd1 test [OPTIONS]
 
 OPTIONS:
   -f, --foo <foo>          The foo option
@@ -166,7 +166,7 @@ exports[`not install i18n plugin 1`] = `
 "A show command
 
 USAGE:
-  cmd1 show <OPTIONS> <positional1>
+  cmd1 show [OPTIONS] --qux <qux> <positional1>
 
 ARGUMENTS:
   positional1           The positional argument 1
@@ -214,12 +214,12 @@ ARGUMENTS:
 
 exports[`sub commands 1`] = `
 "USAGE:
-  cmd1 [COMMANDS] <OPTIONS> <positional1>
+  cmd1 [COMMANDS] [OPTIONS] --qux <qux> <positional1>
 
 COMMANDS:
-  command1 <OPTIONS>                    this is command1
+  command1 [OPTIONS]                                this is command1
   command2
-  show <OPTIONS> <positional1>          A show command
+  show [OPTIONS] --qux <qux> <positional1>          A show command
 
 For more info, run any command with the \`--help\` flag:
   cmd1 command1 --help

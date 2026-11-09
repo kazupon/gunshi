@@ -417,7 +417,7 @@ function renderManPageUsage(ctx: CommandContext) {
 
   // SYNOPSIS
   lines.push('## SYNOPSIS')
-  lines.push(`${ctx.env.name} <OPTIONS>`, '')
+  lines.push(`${ctx.env.name} [OPTIONS]`, '')
 
   // DESCRIPTION
   lines.push('## DESCRIPTION')

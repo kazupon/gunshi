@@ -3,7 +3,7 @@
 ```sh
 My CLI tool (my-cli v1.0.0)
 USAGE:
-  my-cli <OPTIONS>
+  my-cli [OPTIONS]
 
 OPTIONS:
   -h, --help                     Display this help message

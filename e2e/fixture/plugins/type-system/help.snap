@@ -1,7 +1,7 @@
 my-cli (my-cli v1.0.0)
 
 USAGE:
-  my-cli <OPTIONS>
+  my-cli [OPTIONS] --endpoint <endpoint>
 
 OPTIONS:
   -h, --help                     Display this help message

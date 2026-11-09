@@ -2945,7 +2945,7 @@ describe('github issues', () => {
       const usage = await cli([], define({ name: 'app' }), options)
 
       expect(run).toHaveBeenCalledTimes(1)
-      expect(usage).toContain('USAGE:\n  app [COMMANDS] <OPTIONS>')
+      expect(usage).toContain('USAGE:\n  app [COMMANDS] [OPTIONS]')
     })
 
     test.each([
@@ -5195,7 +5195,7 @@ describe('a command without run and without sub-commands (#879)', () => {
 
     await cli(['status', '--help'], entry, { name: 'demo', subCommands: { status } })
 
-    expect(log()).toContain('demo status <OPTIONS>')
+    expect(log()).toContain('demo status [OPTIONS]')
   })
 
   test('fails as a lazy command whose loader returns a command without run does', async () => {
@@ -5303,7 +5303,7 @@ describe('the errors of loading a lazy command (#885)', () => {
     })
 
     expect(log()).toContain('Deploy the app')
-    expect(log()).toContain('USAGE:\n  demo deploy <OPTIONS>')
+    expect(log()).toContain('USAGE:\n  demo deploy [OPTIONS]')
   })
 
   test('a loaded command without run fails where it runs, and --help prints its usage', async () => {
@@ -5332,7 +5332,7 @@ describe('the errors of loading a lazy command (#885)', () => {
     await cli(['records'], entry, { name: 'demo', subCommands: { records } })
 
     expect(log()).toContain('Manage the records')
-    expect(log()).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
+    expect(log()).toContain('USAGE:\n  demo records [COMMANDS] [OPTIONS]')
   })
 
   test('@gunshi/bone calls onErrorCommand, and rejects', async () => {
@@ -5353,7 +5353,7 @@ describe('the errors of loading a lazy command (#885)', () => {
     })
 
     expect(usage).toContain('Deploy the app')
-    expect(usage).toContain('USAGE:\n  demo deploy <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo deploy [OPTIONS]')
   })
 })
 
@@ -5379,7 +5379,7 @@ describe('a command without run that has sub-commands', () => {
     const printed = log()
 
     expect(usage).toBe(await cli(['records', '--help'], entry, { ...options, usageSilent: true }))
-    expect(printed).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
+    expect(printed).toContain('USAGE:\n  demo records [COMMANDS] [OPTIONS]')
     expect(printed).toContain('COMMANDS:\n  add')
     expect(process.exitCode).toBeUndefined()
   })
@@ -5393,7 +5393,7 @@ describe('a command without run that has sub-commands', () => {
     const usage = await cli([], main, mainOptions)
 
     expect(usage).toBe(await cli(['--help'], main, mainOptions))
-    expect(usage).toContain('USAGE:\n  demo [COMMANDS] <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo [COMMANDS] [OPTIONS]')
   })
 
   test('a command with run runs it, with omitted set to true', async () => {
@@ -5439,7 +5439,7 @@ describe('a command without run that has sub-commands', () => {
 
     const usage = await cli(['records'], entry, { ...options, usageSilent: true })
 
-    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] [OPTIONS]')
     expect(log()).toBe('')
   })
 
@@ -5456,7 +5456,7 @@ describe('a command without run that has sub-commands', () => {
       onAfterCommand
     })
 
-    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] [OPTIONS]')
     expect(onBeforeCommand).toHaveBeenCalledTimes(1)
     expect(onAfterCommand).toHaveBeenCalledWith(expect.anything(), usage)
   })
@@ -5514,7 +5514,7 @@ describe('a command without run that has sub-commands', () => {
 
     expect(run).toHaveBeenCalledTimes(1)
     expect(innerResult).toBeUndefined()
-    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
+    expect(usage).toContain('USAGE:\n  demo records [COMMANDS] [OPTIONS]')
   })
 
   test('@gunshi/bone prints nothing, as before', async () => {

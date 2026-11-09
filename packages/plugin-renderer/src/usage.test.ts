@@ -371,7 +371,7 @@ test('hidden optional args are omitted from usage and options', async () => {
 
   const usage = await renderUsage<WithI18nAndRenderer>(ctx)
 
-  expect(usage).toContain('USAGE:\n  cmd1 test <OPTIONS>')
+  expect(usage).toContain('USAGE:\n  cmd1 test [OPTIONS]')
   expect(usage).toContain('The visible option')
   expect(usage).not.toContain('--hidden')
   expect(usage).not.toContain('The hidden option')
@@ -1137,7 +1137,7 @@ describe('#727 - the commands section describes each listed command', () => {
     )
 
     expect(symbolsOf(rows)).toEqual([
-      '[greet] <OPTIONS> <name>',
+      '[greet] [OPTIONS] <name>',
       'push <remote>',
       'status',
       'tidy [OPTIONS]'
@@ -1177,7 +1177,7 @@ describe('#727 - the commands section describes each listed command', () => {
       ENTRY
     )
 
-    expect(symbolsOf(rows)).toEqual(['[greet] <OPTIONS> <name>', 'secret', 'status'])
+    expect(symbolsOf(rows)).toEqual(['[greet] [OPTIONS] <name>', 'secret', 'status'])
   })
 
   test('a lazy command is described by the definition, without running its loader', async () => {
@@ -1696,13 +1696,13 @@ describe('#750 - a falsy default is a default', () => {
     expect(usage).toContain('app [OPTIONS]')
   })
 
-  test('the usage line stays `<OPTIONS>` while one option has no default', async () => {
+  test('the usage line is `[OPTIONS]` while one option has no default', async () => {
     const usage = await render({
       retries: { type: 'number', default: 0 },
       name: { type: 'string' }
     })
 
-    expect(usage).toContain('app <OPTIONS>')
+    expect(usage).toContain('app [OPTIONS]')
   })
 
   test('the row shows the default that the option has', async () => {
@@ -2140,7 +2140,7 @@ describe('the usage of a group', () => {
       run: NOOP
     })
 
-    expect(usageLine(await usageOfGroup(records))).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(await usageOfGroup(records))).toBe('demo records [COMMANDS] [OPTIONS]')
   })
 
   test('the usage line of a nested group has [COMMANDS] whenever it lists its sub-commands (#870)', async () => {
@@ -2157,7 +2157,7 @@ describe('the usage of a group', () => {
 
     for (const records of groups) {
       const usage = await usageOfGroup(records)
-      expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+      expect(usageLine(usage)).toBe('demo records [COMMANDS] [OPTIONS]')
       expect(commandRows(usage)).toContain('add')
     }
   })
@@ -2166,7 +2166,7 @@ describe('the usage of a group', () => {
     const records = define({ name: 'records', subCommands: { add, list }, run: NOOP })
 
     expect(usageLine(await usageOfGroup(records, ['records', 'add', '--help']))).toBe(
-      'demo records add <OPTIONS>'
+      'demo records add [OPTIONS]'
     )
   })
 
@@ -2200,7 +2200,7 @@ describe('the usage of a group', () => {
       pluginOnlyWithoutRun,
       pluginOnlyWithoutFallback
     ]) {
-      expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+      expect(usageLine(usage!)).toBe('demo [COMMANDS] [OPTIONS]')
     }
     expect(commandRows(pluginOnly!)).toEqual(['[demo]', 'add'])
     expect(commandRows(pluginOnlyWithoutRun!)).toEqual(['add', 'list'])
@@ -2209,7 +2209,7 @@ describe('the usage of a group', () => {
   test('the usage line of the entry without commands has no [COMMANDS]', async () => {
     const usage = await cli(['--help'], define({ name: 'demo', run: NOOP }), options)
 
-    expect(usageLine(usage!)).toBe('demo <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo [OPTIONS]')
     expect(commandRows(usage!)).toEqual([])
   })
 
@@ -2238,7 +2238,7 @@ describe('the usage of a group', () => {
     })
     const usage = await usageOfGroup(records)
 
-    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage)).toBe('demo records [COMMANDS] [OPTIONS]')
     expect(commandRows(usage)).toEqual(['add', 'list'])
     expect(forMoreLines(usage)).toEqual(['demo records add --help', 'demo records list --help'])
   })
@@ -2247,7 +2247,7 @@ describe('the usage of a group', () => {
     const entry = define({ name: 'demo', description: 'Demo CLI' })
     const usage = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
 
-    expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo [COMMANDS] [OPTIONS]')
     expect(commandRows(usage!)).toEqual(['add', 'list'])
     expect(forMoreLines(usage!)).toEqual(['demo add --help', 'demo list --help'])
   })
@@ -2314,7 +2314,7 @@ describe('the usage of a group', () => {
     })
 
     expect(usage).not.toContain('COMMANDS')
-    expect(usageLine(usage!)).toBe('demo <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo [OPTIONS]')
   })
 
   test('an internal group lists its only visible sub-command', async () => {
@@ -2328,7 +2328,7 @@ describe('the usage of a group', () => {
     })
     const usage = await usageOfGroup(records)
 
-    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage)).toBe('demo records [COMMANDS] [OPTIONS]')
     expect(commandRows(usage)).toEqual(['add'])
   })
 
@@ -2389,16 +2389,68 @@ describe('the usage of a group', () => {
 describe('the symbols of the usage', () => {
   type TestCommand = Command<GunshiParams<{ args: Args }>>
 
-  async function usageOf(args: Args): Promise<string> {
-    const command = { args, name: 'app', description: 'App', run: NOOP } as TestCommand
+  async function usageOf(
+    args: Args,
+    options: { subCommands?: Map<string, TestCommand>; toKebab?: true } = {}
+  ): Promise<string> {
+    const command = {
+      args,
+      name: 'app',
+      description: 'App',
+      toKebab: options.toKebab,
+      run: NOOP
+    } as TestCommand
     const ctx = await createCommandContext({
       args,
+      omitted: options.subCommands !== undefined,
       command,
       extensions: { [rendererPlugin.id]: rendererPlugin.extension },
-      cliOptions: { cwd: '/path/to/app', name: 'app', version: '0.0.0' }
+      cliOptions: {
+        cwd: '/path/to/app',
+        name: 'app',
+        version: '0.0.0',
+        subCommands: options.subCommands
+      }
     })
     return await renderUsage<WithRendererOnly>(ctx)
   }
+
+  function usageLineOf(usage: string): string {
+    const lines = usage.split('\n')
+    return lines[lines.indexOf('USAGE:') + 1].trim()
+  }
+
+  test('the usage line has [OPTIONS] for the options that may be left out, and spells out each required one', async () => {
+    const usage = await usageOf({
+      name: { type: 'string', short: 'n', required: true, description: 'Name' },
+      confirm: { type: 'boolean', required: true, description: 'Confirm' },
+      channel: {
+        type: 'enum',
+        choices: ['stable', 'beta'],
+        required: true,
+        description: 'Channel'
+      },
+      token: { type: 'string', required: true, hidden: true },
+      verbose: { type: 'boolean', description: 'Print more' }
+    })
+
+    expect(usageLineOf(usage)).toBe('app [OPTIONS] --name <name> --confirm --channel <channel>')
+  })
+
+  test('the usage line has no [OPTIONS] when every option is required', async () => {
+    const usage = await usageOf({ name: { type: 'string', required: true, description: 'Name' } })
+
+    expect(usageLineOf(usage)).toBe('app --name <name>')
+  })
+
+  test('a required option is named as it is rendered with toKebab', async () => {
+    const usage = await usageOf(
+      { outputDir: { type: 'string', required: true, description: 'Output' } },
+      { toKebab: true }
+    )
+
+    expect(usageLineOf(usage)).toBe('app --output-dir <output-dir>')
+  })
 
   test('the value of an option is in angle brackets, with or without a default', async () => {
     const usage = await usageOf({
@@ -2417,12 +2469,42 @@ describe('the symbols of the usage', () => {
         type: 'custom',
         parse: (value: string) => Number(value),
         metavar: 'integer',
+        required: true,
         description: 'Port'
       },
       root: { type: 'string', metavar: 'PATH', default: '.', description: 'Root' }
     })
 
+    expect(usageLineOf(usage)).toBe('app [OPTIONS] --port <port>')
     expect(usage).toMatch(/^ {2}--port <port>\s+Port$/m)
     expect(usage).toMatch(/^ {2}--root <root>\s+Root \(default: \.\)$/m)
+  })
+
+  test('a row of the commands section has the symbols of its own command', async () => {
+    const push = {
+      name: 'push',
+      description: 'Push',
+      args: { remote: { type: 'string', required: true } },
+      run: NOOP
+    } as TestCommand
+    const tidy = {
+      name: 'tidy',
+      description: 'Tidy',
+      args: { dry: { type: 'boolean' } },
+      run: NOOP
+    } as TestCommand
+
+    const usage = await usageOf(
+      {},
+      {
+        subCommands: new Map([
+          ['push', push],
+          ['tidy', tidy]
+        ])
+      }
+    )
+
+    expect(usage).toMatch(/^ {2}push --remote <remote>\s+Push$/m)
+    expect(usage).toMatch(/^ {2}tidy \[OPTIONS\]\s+Tidy$/m)
   })
 })

@@ -96,7 +96,7 @@ When a user runs `--help`, the output looks like:
 deploy - Deploy your application
 
 USAGE:
-  deploy <OPTIONS> <environment> [<region>]
+  deploy [OPTIONS] <environment> [<region>]
 
 ARGUMENTS:
   environment          Target environment

@@ -1,7 +1,7 @@
 mycli (mycli v1.0.0)
 
 USAGE:
-  mycli server <OPTIONS>
+  mycli server [OPTIONS]
 
 OPTIONS:
   -h, --help             Display this help message

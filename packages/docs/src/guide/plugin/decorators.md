@@ -348,7 +348,7 @@ node cli.js --help
 my-cli (my-cli v1.0.0)
 
 USAGE:
-  my-cli <OPTIONS>
+  my-cli [OPTIONS] --output <output>
 
 OPTIONS:
   -h, --help                 Display this help message
@@ -511,7 +511,7 @@ And the final rendered output:
 
 ```sh
 USAGE:
-  my-cli <OPTIONS>
+  my-cli [OPTIONS]
 
 OPTIONS:
   -h, --help             Display this help message

@@ -3,7 +3,7 @@ A CLI that prints its results as JSON with --json (projects v1.0.0)
 List the projects
 
 USAGE:
-  projects list <OPTIONS>
+  projects list [OPTIONS]
 
 OPTIONS:
   -h, --help               Display this help message
