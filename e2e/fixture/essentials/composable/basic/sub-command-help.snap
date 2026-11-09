@@ -3,7 +3,7 @@ my-app (my-app v1.0.0)
 Create a new resource
 
 USAGE:
-  my-app create <OPTIONS>
+  my-app create [OPTIONS] --name <name>
 
 OPTIONS:
   -h, --help                 Display this help message

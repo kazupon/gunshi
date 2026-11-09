@@ -255,7 +255,7 @@ Version: 1.0.0
 
 
 USAGE:
-  my-app <OPTIONS>
+  my-app [OPTIONS]
 
 OPTIONS:
   -n, --name <name>          Name to use

@@ -6,6 +6,7 @@
 import { createCommandContext } from '@gunshi/plugin'
 import {
   ARG_NEGATABLE_PREFIX,
+  composeNegatableDescription,
   getCommandSubCommands,
   localizable,
   makeShortLongOptionPair,
@@ -369,7 +370,12 @@ export async function registerCompletion({
               : (await localizeDescription(
                   resolveArgKey(`${ARG_NEGATABLE_PREFIX}${key}`, ctx.name)
                 )) ||
-                  `${await localizeDescription(resolveBuiltInKey('NEGATABLE'))} ${makeShortLongOptionPair(schema, key, ctx.toKebab)}`
+                  composeNegatableDescription(
+                    await localizeDescription(resolveBuiltInKey('NEGATABLE'), {
+                      option: makeShortLongOptionPair(schema, key, ctx.toKebab)
+                    }),
+                    makeShortLongOptionPair(schema, key, ctx.toKebab)
+                  )
           )
         }
       } else {

@@ -1,5 +1,5 @@
 USAGE:
-  COMMAND <OPTIONS>
+  COMMAND [OPTIONS]
 
 OPTIONS:
   -h, --help             Display this help message

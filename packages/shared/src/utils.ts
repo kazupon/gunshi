@@ -130,6 +130,22 @@ export function makeShortLongOptionPair(
 }
 
 /**
+ * Compose the description of the negated form of a negatable option.
+ *
+ * The `NEGATABLE` built-in resource places the option with `{$option}`, so that a language can put it
+ * where it reads naturally, as `Negate --force` and `--force を打ち消す` do. A resource without the
+ * placeholder, such as one that an app gives to the i18n plugin for its own locale, is read as a
+ * prefix of the option, as before.
+ *
+ * @param text - The `NEGATABLE` built-in resource, formatted with `{ option }`.
+ * @param option - The option that the negated form negates, as rendered (`-f, --force`).
+ * @returns The description of the negated form.
+ */
+export function composeNegatableDescription(text: string, option: string): string {
+  return text.includes(option) ? text : `${text} ${option}`.trim()
+}
+
+/**
  * Resolve the name that an argument is parsed and rendered under.
  *
  * @param name - The key of the argument.

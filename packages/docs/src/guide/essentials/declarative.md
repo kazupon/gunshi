@@ -524,7 +524,7 @@ Without `negatable: true`, only the positive form (e.g., `--verbose`) is recogni
 
 The positive form of any boolean option, negatable or not, can also be given a value with `=`: `--verbose=true` sets the value to `true`, and `--verbose=false` sets it to `false`. Any other value, such as `--verbose=0` or `--verbose=`, is reported as an `err:arg:invalid-type` error.
 
-The description for the negatable option (e.g., `--no-verbose`) is automatically generated (e.g., "Negatable of --verbose"). You can customize this message using [internationalization resource files](../advanced/internationalization.md) by providing a translation for the specific `arg:no-<optionName>` key (e.g., `arg:no-verbose`).
+The description for the negatable option (e.g., `--no-verbose`) is automatically generated (e.g., "Negate --verbose"). You can customize this message using [internationalization resource files](../advanced/internationalization.md) by providing a translation for the specific `arg:no-<optionName>` key (e.g., `arg:no-verbose`).
 
 `no-` is not reserved: an argument may be named `no-cache` or `no-emoji`, and it is then an option of its own, described by its own `description`. Declaring both `cache: { type: 'boolean', negatable: true }` and a separate `no-cache` argument is best avoided, though — a single `--no-cache` on the command line then sets a value for both of them.
 

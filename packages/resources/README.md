@@ -53,7 +53,7 @@ Keys for built-in functionalities are handled by Gunshi's default locales. The c
 - `COMMANDS` - Commands section header
 - `EXAMPLES` - Examples section header
 - `FORMORE` - Footer text for additional help
-- `NEGATABLE` - Prefix for negatable options (e.g., "Negatable of --verbose")
+- `NEGATABLE` - Description of the negated form of an option, which places the option with `{$option}` (e.g., "Negate --verbose"). A text without `{$option}` has the option put after it
 - `DEFAULT` - Prefix for default values (e.g., "default: 5")
 - `CHOICES` - Prefix for available choices (e.g., "choices: red, green, blue")
 - `CAUSEDBY` - Heading of the lines of the causes of a `CommandError` (e.g., "Caused by: connect ECONNREFUSED 127.0.0.1:5432")

@@ -417,7 +417,7 @@ function renderManPageUsage(ctx: CommandContext) {
 
   // SYNOPSIS
   lines.push('## SYNOPSIS')
-  lines.push(`${ctx.env.name} <OPTIONS>`, '')
+  lines.push(`${ctx.env.name} [OPTIONS]`, '')
 
   // DESCRIPTION
   lines.push('## DESCRIPTION')
@@ -432,7 +432,7 @@ function renderManPageUsage(ctx: CommandContext) {
     }
     let value = ''
     if (schema.type !== 'boolean') {
-      value = schema.default ? `[${name}]` : `<${name}>`
+      value = `<${name}>`
     }
     lines.push(`- ${options.join(', ')}${value ? ` ${value}` : ''}`)
     lines.push(`  ${schema.description || ''}`)

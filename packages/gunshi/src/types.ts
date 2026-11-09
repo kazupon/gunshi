@@ -407,9 +407,10 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    *
    * When it is not set, it is `true` for a CLI that declares no sub-commands and to which a plugin adds
    * commands, such as the `complete` command of `@gunshi/plugin-completion`, so that the positional
-   * arguments of the entry command are not taken for command names. It stays `false` when the entry
-   * command has no `run`: the commands of the plugins are then the commands of the CLI, and an argument
-   * that is not one of them is reported.
+   * arguments of the entry command are not taken for command names. This is so when the entry command
+   * has something to run: a command object with `run`, a lazy command, whose loader gives the runner,
+   * or a runner given to `cli()`. For a command object without `run`, it stays `false`: the commands of
+   * the plugins are then the commands of the CLI, and an argument that is not one of them is reported.
    *
    * @default false
    * @since v0.27.0

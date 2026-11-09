@@ -10,7 +10,12 @@ import {
   ERROR_PREFIX_AND_KEY_SEPARATOR
 } from './constants.ts'
 import DefaultResource from './resource.ts'
-import { makeShortLongOptionPair, resolveExamples, resolveKey } from './utils.ts'
+import {
+  composeNegatableDescription,
+  makeShortLongOptionPair,
+  resolveExamples,
+  resolveKey
+} from './utils.ts'
 
 import type { Args, Command, CommandContext } from 'gunshi'
 import type { ResolveTranslationKeys, Translation } from './types.ts'
@@ -83,7 +88,11 @@ export function localizable<
         const negatedKey = argKey.slice(ARG_NEGATABLE_PREFIX.length)
         const schema = ctx.args[negatedKey as keyof typeof ctx.args]
         if (schema && schema.type === 'boolean' && schema.negatable) {
-          return `${DefaultResource['NEGATABLE']} ${makeShortLongOptionPair(schema, negatedKey, ctx.toKebab)}`
+          const option = makeShortLongOptionPair(schema, negatedKey, ctx.toKebab)
+          return composeNegatableDescription(
+            formatResource(DefaultResource['NEGATABLE'], { option }) || '',
+            option
+          )
         }
       }
 

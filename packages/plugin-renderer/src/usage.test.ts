@@ -371,7 +371,7 @@ test('hidden optional args are omitted from usage and options', async () => {
 
   const usage = await renderUsage<WithI18nAndRenderer>(ctx)
 
-  expect(usage).toContain('USAGE:\n  cmd1 test <OPTIONS>')
+  expect(usage).toContain('USAGE:\n  cmd1 test [OPTIONS]')
   expect(usage).toContain('The visible option')
   expect(usage).not.toContain('--hidden')
   expect(usage).not.toContain('The hidden option')
@@ -1137,7 +1137,7 @@ describe('#727 - the commands section describes each listed command', () => {
     )
 
     expect(symbolsOf(rows)).toEqual([
-      '[greet] <OPTIONS> <name>',
+      '[greet] [OPTIONS] <name>',
       'push <remote>',
       'status',
       'tidy [OPTIONS]'
@@ -1177,7 +1177,7 @@ describe('#727 - the commands section describes each listed command', () => {
       ENTRY
     )
 
-    expect(symbolsOf(rows)).toEqual(['[greet] <OPTIONS> <name>', 'secret', 'status'])
+    expect(symbolsOf(rows)).toEqual(['[greet] [OPTIONS] <name>', 'secret', 'status'])
   })
 
   test('a lazy command is described by the definition, without running its loader', async () => {
@@ -1311,7 +1311,7 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
     )
 
     expect(usage).toContain('--no-widgets')
-    expect(usage).not.toContain('Negatable of')
+    expect(usage).not.toContain('Negate ')
   })
 
   test('is typed by its own schema', async () => {
@@ -1348,7 +1348,7 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
     })
 
     expect(usage).toContain('Skip the cache')
-    expect(usage).toMatch(/--no-no-cache\s+Negatable of --no-cache/)
+    expect(usage).toMatch(/--no-no-cache\s+Negate --no-cache/)
   })
 
   test('the negated form of a negatable option is unchanged', async () => {
@@ -1358,7 +1358,7 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
       false
     )
 
-    expect(usage).toMatch(/--no-force\s+Negatable of -f, --force/)
+    expect(usage).toMatch(/--no-force\s+Negate -f, --force/)
   })
 })
 
@@ -1399,7 +1399,7 @@ describe('#800 - an `enum` argument without `choices`', () => {
       level: { type: 'enum', parse, default: 'info', description: 'Log level' }
     })
 
-    expect(usage).toMatch(/^ {2}--level \[level\]\s+Log level \(default: info\)$/m)
+    expect(usage).toMatch(/^ {2}--level <level>\s+Log level \(default: info\)$/m)
   })
 
   test('shows its type with `usageOptionType`', async () => {
@@ -1466,7 +1466,7 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
 
     expect(negatedRows(usage)).toHaveLength(1)
     expect(negatedRows(usage)[0]).toContain('Never run for real')
-    expect(usage).not.toContain('Negatable of')
+    expect(usage).not.toContain('Negate ')
   })
 
   test('the order in which the two are declared makes no difference', async () => {
@@ -1511,7 +1511,7 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
     })
 
     expect(negatedRows(usage)).toHaveLength(1)
-    expect(negatedRows(usage)[0]).toContain('Negatable of -d, --dry-run')
+    expect(negatedRows(usage)[0]).toContain('Negate -d, --dry-run')
   })
 
   test('without `toKebab` the two are different names, and both are listed', async () => {
@@ -1524,7 +1524,7 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
     )
 
     expect(usage).toMatch(/--noDryRun\s+Never run for real/)
-    expect(usage).toMatch(/--no-dryRun\s+Negatable of -d, --dryRun/)
+    expect(usage).toMatch(/--no-dryRun\s+Negate -d, --dryRun/)
   })
 })
 
@@ -1671,14 +1671,16 @@ describe('#750 - a falsy default is a default', () => {
     ['a number default of `0`', { retries: { type: 'number', default: 0 } }, 'retries'],
     ['an empty string default', { tag: { type: 'string', default: '' } }, 'tag'],
     ['a custom default of `0`', { size: { type: 'custom', default: 0 } }, 'size']
-  ])('is shown with square brackets (%s)', async (_, args, name) => {
+  ])('is shown as the default of the option (%s)', async (_, args, name) => {
     const usage = await render(args as Args)
+    const row = usage.split('\n').find(line => line.includes(`--${name}`))!
 
-    expect(usage).toContain(`--${name} [${name}]`)
-    expect(usage).not.toContain(`--${name} <${name}>`)
+    // the value is in angle brackets whether the option has a default or not, and the default follows
+    expect(row).toContain(`--${name} <${name}>`)
+    expect(row).toContain('(default: ')
   })
 
-  test('an argument with no default keeps its angle brackets', async () => {
+  test('an argument with no default has its value in angle brackets too', async () => {
     const usage = await render({ name: { type: 'string', description: 'Name' } })
 
     expect(usage).toContain('--name <name>')
@@ -1694,20 +1696,20 @@ describe('#750 - a falsy default is a default', () => {
     expect(usage).toContain('app [OPTIONS]')
   })
 
-  test('the usage line stays `<OPTIONS>` while one option has no default', async () => {
+  test('the usage line is `[OPTIONS]` while one option has no default', async () => {
     const usage = await render({
       retries: { type: 'number', default: 0 },
       name: { type: 'string' }
     })
 
-    expect(usage).toContain('app <OPTIONS>')
+    expect(usage).toContain('app [OPTIONS]')
   })
 
-  test('the row no longer contradicts the default it prints', async () => {
+  test('the row shows the default that the option has', async () => {
     const usage = await render({ retries: { type: 'number', default: 0, description: 'Retries' } })
     const row = usage.split('\n').find(line => line.includes('--retries'))!
 
-    expect(row).toContain('[retries]')
+    expect(row).toContain('<retries>')
     expect(row).toContain('(default: 0)')
   })
 
@@ -2138,7 +2140,7 @@ describe('the usage of a group', () => {
       run: NOOP
     })
 
-    expect(usageLine(await usageOfGroup(records))).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(await usageOfGroup(records))).toBe('demo records [COMMANDS] [OPTIONS]')
   })
 
   test('the usage line of a nested group has [COMMANDS] whenever it lists its sub-commands (#870)', async () => {
@@ -2155,7 +2157,7 @@ describe('the usage of a group', () => {
 
     for (const records of groups) {
       const usage = await usageOfGroup(records)
-      expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+      expect(usageLine(usage)).toBe('demo records [COMMANDS] [OPTIONS]')
       expect(commandRows(usage)).toContain('add')
     }
   })
@@ -2164,7 +2166,7 @@ describe('the usage of a group', () => {
     const records = define({ name: 'records', subCommands: { add, list }, run: NOOP })
 
     expect(usageLine(await usageOfGroup(records, ['records', 'add', '--help']))).toBe(
-      'demo records add <OPTIONS>'
+      'demo records add [OPTIONS]'
     )
   })
 
@@ -2198,7 +2200,7 @@ describe('the usage of a group', () => {
       pluginOnlyWithoutRun,
       pluginOnlyWithoutFallback
     ]) {
-      expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+      expect(usageLine(usage!)).toBe('demo [COMMANDS] [OPTIONS]')
     }
     expect(commandRows(pluginOnly!)).toEqual(['[demo]', 'add'])
     expect(commandRows(pluginOnlyWithoutRun!)).toEqual(['add', 'list'])
@@ -2207,7 +2209,7 @@ describe('the usage of a group', () => {
   test('the usage line of the entry without commands has no [COMMANDS]', async () => {
     const usage = await cli(['--help'], define({ name: 'demo', run: NOOP }), options)
 
-    expect(usageLine(usage!)).toBe('demo <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo [OPTIONS]')
     expect(commandRows(usage!)).toEqual([])
   })
 
@@ -2236,7 +2238,7 @@ describe('the usage of a group', () => {
     })
     const usage = await usageOfGroup(records)
 
-    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage)).toBe('demo records [COMMANDS] [OPTIONS]')
     expect(commandRows(usage)).toEqual(['add', 'list'])
     expect(forMoreLines(usage)).toEqual(['demo records add --help', 'demo records list --help'])
   })
@@ -2245,7 +2247,7 @@ describe('the usage of a group', () => {
     const entry = define({ name: 'demo', description: 'Demo CLI' })
     const usage = await cli(['--help'], entry, { ...options, subCommands: { add, list } })
 
-    expect(usageLine(usage!)).toBe('demo [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo [COMMANDS] [OPTIONS]')
     expect(commandRows(usage!)).toEqual(['add', 'list'])
     expect(forMoreLines(usage!)).toEqual(['demo add --help', 'demo list --help'])
   })
@@ -2312,7 +2314,7 @@ describe('the usage of a group', () => {
     })
 
     expect(usage).not.toContain('COMMANDS')
-    expect(usageLine(usage!)).toBe('demo <OPTIONS>')
+    expect(usageLine(usage!)).toBe('demo [OPTIONS]')
   })
 
   test('an internal group lists its only visible sub-command', async () => {
@@ -2326,7 +2328,7 @@ describe('the usage of a group', () => {
     })
     const usage = await usageOfGroup(records)
 
-    expect(usageLine(usage)).toBe('demo records [COMMANDS] <OPTIONS>')
+    expect(usageLine(usage)).toBe('demo records [COMMANDS] [OPTIONS]')
     expect(commandRows(usage)).toEqual(['add'])
   })
 
@@ -2381,5 +2383,136 @@ describe('the usage of a group', () => {
     }
     // the shapes cover both sides
     expect(Object.values(usages).filter(usage => usage!.includes('COMMANDS:'))).toHaveLength(6)
+  })
+})
+
+describe('the symbols of the usage', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  async function usageOf(
+    args: Args,
+    options: { subCommands?: Map<string, TestCommand>; toKebab?: true } = {}
+  ): Promise<string> {
+    const command = {
+      args,
+      name: 'app',
+      description: 'App',
+      toKebab: options.toKebab,
+      run: NOOP
+    } as TestCommand
+    const ctx = await createCommandContext({
+      args,
+      omitted: options.subCommands !== undefined,
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: {
+        cwd: '/path/to/app',
+        name: 'app',
+        version: '0.0.0',
+        subCommands: options.subCommands
+      }
+    })
+    return await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  function usageLineOf(usage: string): string {
+    const lines = usage.split('\n')
+    return lines[lines.indexOf('USAGE:') + 1].trim()
+  }
+
+  test('the usage line has [OPTIONS] for the options that may be left out, and spells out each required one', async () => {
+    const usage = await usageOf({
+      name: { type: 'string', short: 'n', required: true, description: 'Name' },
+      confirm: { type: 'boolean', required: true, description: 'Confirm' },
+      channel: {
+        type: 'enum',
+        choices: ['stable', 'beta'],
+        required: true,
+        description: 'Channel'
+      },
+      token: { type: 'string', required: true, hidden: true },
+      verbose: { type: 'boolean', description: 'Print more' }
+    })
+
+    expect(usageLineOf(usage)).toBe('app [OPTIONS] --name <name> --confirm --channel <channel>')
+  })
+
+  test('the usage line has no [OPTIONS] when every option is required', async () => {
+    const usage = await usageOf({ name: { type: 'string', required: true, description: 'Name' } })
+
+    expect(usageLineOf(usage)).toBe('app --name <name>')
+  })
+
+  test('a required option is named as it is rendered with toKebab', async () => {
+    const usage = await usageOf(
+      { outputDir: { type: 'string', required: true, description: 'Output' } },
+      { toKebab: true }
+    )
+
+    expect(usageLineOf(usage)).toBe('app --output-dir <output-dir>')
+  })
+
+  test('the value of an option is in angle brackets, with or without a default', async () => {
+    const usage = await usageOf({
+      count: { type: 'number', default: 1, description: 'Count' },
+      name: { type: 'string', description: 'Name' }
+    })
+
+    expect(usage).toMatch(/^ {2}--count <count>\s+Count \(default: 1\)$/m)
+    expect(usage).toMatch(/^ {2}--name <name>\s+Name$/m)
+  })
+
+  test('the value is named by the option, not by the metavar of its schema', async () => {
+    // the combinators give every schema a metavar, the name of its type, such as `integer()` gives this
+    const usage = await usageOf({
+      port: {
+        type: 'custom',
+        parse: (value: string) => Number(value),
+        metavar: 'integer',
+        required: true,
+        description: 'Port'
+      },
+      root: { type: 'string', metavar: 'PATH', default: '.', description: 'Root' }
+    })
+
+    expect(usageLineOf(usage)).toBe('app [OPTIONS] --port <port>')
+    expect(usage).toMatch(/^ {2}--port <port>\s+Port$/m)
+    expect(usage).toMatch(/^ {2}--root <root>\s+Root \(default: \.\)$/m)
+  })
+
+  test('a row of the commands section has the symbols of its own command', async () => {
+    const push = {
+      name: 'push',
+      description: 'Push',
+      args: { remote: { type: 'string', required: true } },
+      run: NOOP
+    } as TestCommand
+    const tidy = {
+      name: 'tidy',
+      description: 'Tidy',
+      args: { dry: { type: 'boolean' } },
+      run: NOOP
+    } as TestCommand
+
+    const usage = await usageOf(
+      {},
+      {
+        subCommands: new Map([
+          ['push', push],
+          ['tidy', tidy]
+        ])
+      }
+    )
+
+    expect(usage).toMatch(/^ {2}push --remote <remote>\s+Push$/m)
+    expect(usage).toMatch(/^ {2}tidy \[OPTIONS\]\s+Tidy$/m)
+  })
+
+  test('the negated form of a negatable option is described with the option it negates', async () => {
+    const usage = await usageOf({
+      recursive: { type: 'boolean', short: 'r', negatable: true, description: 'Recursive' }
+    })
+
+    expect(usage).toMatch(/^ {2}--no-recursive\s+Negate -r, --recursive$/m)
   })
 })

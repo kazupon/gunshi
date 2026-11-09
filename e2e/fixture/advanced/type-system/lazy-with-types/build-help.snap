@@ -3,7 +3,7 @@ mycli (mycli v1.0.0)
 Build the project
 
 USAGE:
-  mycli build <OPTIONS>
+  mycli build [OPTIONS] --target <target>
 
 OPTIONS:
   -h, --help                 Display this help message

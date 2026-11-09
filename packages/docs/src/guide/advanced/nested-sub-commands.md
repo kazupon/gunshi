@@ -85,11 +85,11 @@ $ npx tsx cli.ts remote --help
 Manage remotes
 
 USAGE:
-  git remote [COMMANDS] <OPTIONS>
+  git remote [COMMANDS] [OPTIONS]
 
 COMMANDS:
-  add <OPTIONS>          Add a remote
-  remove <name>          Remove a remote
+  add --url <url>          Add a remote
+  remove <name>            Remove a remote
 
 For more info, run any command with the `--help` flag:
   git remote add --help
@@ -100,7 +100,7 @@ $ npx tsx cli.ts remote add --help
 Add a remote
 
 USAGE:
-  git remote add <OPTIONS>
+  git remote add [OPTIONS] --url <url>
 
 OPTIONS:
   --url <url>          Remote URL
