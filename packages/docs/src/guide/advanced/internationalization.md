@@ -649,32 +649,36 @@ For detailed implementation guidance and examples, see the [Custom Translation A
 
 The i18n plugin automatically uses your translations for help messages.
 
-When users run `--help` with different locales, they'll see help messages in their language:
+When users run `--help` with different locales, they'll see help messages in their language. For the example in [Basic Internationalization](#basic-internationalization):
 
-English:
+English (`node cli.ts --help`):
 
 ```sh
+i18n-example (i18n-example v1.0.0)
+
 USAGE:
-  COMMAND [OPTIONS]
+  i18n-example [OPTIONS]
 
 OPTIONS:
-  -n, --name <name>      Name to greet
-  -f, --formal           Use formal greeting
-  -h, --help             Display this help message
-  -v, --version          Display version
+  -h, --help                 Display this help message
+  -v, --version              Display this version
+  -n, --name <name>          Name to greet
+  -f, --formal               Use formal greeting
 ```
 
-Japanese (with proper locale):
+Japanese (`MY_LANG=ja-JP node cli.ts --help`):
 
 ```sh
-使用法:
-  COMMAND [オプション]
+i18n-example (i18n-example v1.0.0)
+
+使い方:
+  i18n-example [オプション]
 
 オプション:
-  -n, --name <name>     挨拶する相手の名前
-  -f, --formal          丁寧な挨拶を使用する
-  -h, --help            このヘルプメッセージを表示
-  -v, --version         バージョンを表示
+  -h, --help                 このヘルプメッセージを表示
+  -v, --version              このバージョンを表示
+  -n, --name <name>          挨拶する相手の名前
+  -f, --formal               丁寧な挨拶を使用する
 ```
 
 ## Important Notes on Custom Keys
