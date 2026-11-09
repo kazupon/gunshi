@@ -9,7 +9,7 @@ USAGE:
 OPTIONS:
   -h, --help             Display this help message
   -v, --version          Display this version
-  --say [say]            say something (default: hello!)
+  --say <say>            say something (default: hello!)
 "
 `;
 

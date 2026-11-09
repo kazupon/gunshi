@@ -1399,7 +1399,7 @@ describe('#800 - an `enum` argument without `choices`', () => {
       level: { type: 'enum', parse, default: 'info', description: 'Log level' }
     })
 
-    expect(usage).toMatch(/^ {2}--level \[level\]\s+Log level \(default: info\)$/m)
+    expect(usage).toMatch(/^ {2}--level <level>\s+Log level \(default: info\)$/m)
   })
 
   test('shows its type with `usageOptionType`', async () => {
@@ -1671,14 +1671,16 @@ describe('#750 - a falsy default is a default', () => {
     ['a number default of `0`', { retries: { type: 'number', default: 0 } }, 'retries'],
     ['an empty string default', { tag: { type: 'string', default: '' } }, 'tag'],
     ['a custom default of `0`', { size: { type: 'custom', default: 0 } }, 'size']
-  ])('is shown with square brackets (%s)', async (_, args, name) => {
+  ])('is shown as the default of the option (%s)', async (_, args, name) => {
     const usage = await render(args as Args)
+    const row = usage.split('\n').find(line => line.includes(`--${name}`))!
 
-    expect(usage).toContain(`--${name} [${name}]`)
-    expect(usage).not.toContain(`--${name} <${name}>`)
+    // the value is in angle brackets whether the option has a default or not, and the default follows
+    expect(row).toContain(`--${name} <${name}>`)
+    expect(row).toContain('(default: ')
   })
 
-  test('an argument with no default keeps its angle brackets', async () => {
+  test('an argument with no default has its value in angle brackets too', async () => {
     const usage = await render({ name: { type: 'string', description: 'Name' } })
 
     expect(usage).toContain('--name <name>')
@@ -1703,11 +1705,11 @@ describe('#750 - a falsy default is a default', () => {
     expect(usage).toContain('app <OPTIONS>')
   })
 
-  test('the row no longer contradicts the default it prints', async () => {
+  test('the row shows the default that the option has', async () => {
     const usage = await render({ retries: { type: 'number', default: 0, description: 'Retries' } })
     const row = usage.split('\n').find(line => line.includes('--retries'))!
 
-    expect(row).toContain('[retries]')
+    expect(row).toContain('<retries>')
     expect(row).toContain('(default: 0)')
   })
 
@@ -2381,5 +2383,46 @@ describe('the usage of a group', () => {
     }
     // the shapes cover both sides
     expect(Object.values(usages).filter(usage => usage!.includes('COMMANDS:'))).toHaveLength(6)
+  })
+})
+
+describe('the symbols of the usage', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  async function usageOf(args: Args): Promise<string> {
+    const command = { args, name: 'app', description: 'App', run: NOOP } as TestCommand
+    const ctx = await createCommandContext({
+      args,
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { cwd: '/path/to/app', name: 'app', version: '0.0.0' }
+    })
+    return await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  test('the value of an option is in angle brackets, with or without a default', async () => {
+    const usage = await usageOf({
+      count: { type: 'number', default: 1, description: 'Count' },
+      name: { type: 'string', description: 'Name' }
+    })
+
+    expect(usage).toMatch(/^ {2}--count <count>\s+Count \(default: 1\)$/m)
+    expect(usage).toMatch(/^ {2}--name <name>\s+Name$/m)
+  })
+
+  test('the value is named by the option, not by the metavar of its schema', async () => {
+    // the combinators give every schema a metavar, the name of its type, such as `integer()` gives this
+    const usage = await usageOf({
+      port: {
+        type: 'custom',
+        parse: (value: string) => Number(value),
+        metavar: 'integer',
+        description: 'Port'
+      },
+      root: { type: 'string', metavar: 'PATH', default: '.', description: 'Root' }
+    })
+
+    expect(usage).toMatch(/^ {2}--port <port>\s+Port$/m)
+    expect(usage).toMatch(/^ {2}--root <root>\s+Root \(default: \.\)$/m)
   })
 })

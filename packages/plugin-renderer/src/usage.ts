@@ -469,6 +469,25 @@ function hasAllDefaultOptions(args: Args): boolean {
 }
 
 /**
+ * Make the symbol of the value that an option takes
+ *
+ * NOTE(kazupon): the value is in angle brackets whether the option has a default or not, because the
+ * value must follow the option whenever the option is given: the default is shown as
+ * `(default: VALUE)`. Square brackets would read as a value that may be left out, as in other CLIs.
+ * The value is named by the option, not by the `metavar` of the schema: the combinators give every
+ * schema a `metavar`, the name of its type such as `string` and `custom`, which would name the values
+ * of the options that they build unlike those of the others.
+ *
+ * @param name - The name of the option
+ * @param schema - The {@link ArgSchema | schema} of the option
+ * @param toKebab - Whether the name is converted to kebab-case
+ * @returns The symbol of the value
+ */
+function makeValueSymbol(name: string, schema: ArgSchema, toKebab?: boolean): string {
+  return `<${resolveDisplayName(name, schema, toKebab)}>`
+}
+
+/**
  * Generate options symbols for usage
  *
  * @param ctx - A {@link CommandContext | command context}
@@ -512,8 +531,7 @@ function getOptionalArgsPairs<G extends GunshiParams>(
       const displayName = resolveDisplayName(name, schema, ctx.toKebab)
       let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
       if (schema.type !== 'boolean') {
-        // an argument with a default is optional, whatever the value of that default is (#750)
-        key = schema.default === undefined ? `${key} <${displayName}>` : `${key} [${displayName}]`
+        key = `${key} ${makeValueSymbol(name, schema, ctx.toKebab)}`
       }
       acc[name] = key
       if (schema.type === 'boolean' && schema.negatable && !COMMON_ARGS_KEYS.includes(name)) {

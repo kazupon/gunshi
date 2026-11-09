@@ -20,10 +20,10 @@ Gunshi uses consistent bracket notation throughout the generated usage to indica
 
 ### Angle Brackets `<>` - Required Elements
 
-Angle brackets indicate required elements or parameters without default values:
+Angle brackets indicate elements that must be given:
 
 - `<OPTIONS>` - The command has required options (at least one option without a default value)
-- `<name>` - An option parameter that must be provided (no default value)
+- `<name>` - The value that an option takes, such as `--name <name>`. It is in angle brackets even when the option has a default, because the value cannot be left out when the option is given. The default is shown as `(default: VALUE)` in the description
 - `<positional>` - A required positional argument
 
 Example:
@@ -46,9 +46,8 @@ It is left out of the other places a user could discover it, too: shell completi
 
 ### Square Brackets `[]` - Optional Elements
 
-Square brackets indicate optional elements or parameters with default values:
+Square brackets indicate optional elements:
 
-- `[name]` - An option parameter with a default value
 - `[<positional>]` - An optional positional argument
 - `[<positional> ...]` - Optional multiple positional arguments
 - `[COMMANDS]` - A sub-command, shown when the COMMANDS section lists commands
@@ -64,7 +63,7 @@ COMMANDS:
   [manage]    Default command for managing resources
 
 OPTIONS:
-  -t, --type [type]    Resource type (default: standard)
+  -t, --type <type>    Resource type (default: standard)
 ```
 
 This notation provides immediate visual feedback about what users must provide versus what they can omit, making your CLI more intuitive to use.
@@ -225,7 +224,7 @@ OPTIONS:
   -h, --help                 Display this help message
   -v, --version              Display this version
   -n, --name <name>          Name of the resource
-  -t, --type [type]          Type of resource (default: default)
+  -t, --type <type>          Type of resource (default: default)
 ```
 
 ### Positional Arguments Display

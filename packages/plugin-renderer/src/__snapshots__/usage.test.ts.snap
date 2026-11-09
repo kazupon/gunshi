@@ -9,7 +9,7 @@ USAGE:
 OPTIONS:
   -f, --foo <foo>          The foo option
   --bar                    The bar option
-  -b, --baz [baz]          The baz option (default: 42)
+  -b, --baz <baz>          The baz option (default: 42)
   -q, --qux <qux>          The qux option
 
 EXAMPLES:
@@ -29,7 +29,7 @@ USAGE:
 OPTIONS:
     -f, --foo <foo>            [string]  The foo option
     --bar                      [boolean] The bar option
-    -b, --baz [baz]            [number]  The baz option (default: 42)
+    -b, --baz <baz>            [number]  The baz option (default: 42)
     -q, --qux <qux>            [string]  The qux option
 
 EXAMPLES:
@@ -49,7 +49,7 @@ USAGE:
 OPTIONS:
   -f, --foo-bar <foo-bar>                                  The fooBar option
   --baz-qux                                                The bazQux option
-  -c, --camel-case [camel-case]                            The camelCase option (default: 42)
+  -c, --camel-case <camel-case>                            The camelCase option (default: 42)
   -k, --kebab-case-required <kebab-case-required>          The kebabCaseRequired option
 
 EXAMPLES:
@@ -70,7 +70,7 @@ OPTIONS:
   -f, --foo-bar <foo-bar>                                  The fooBar option
   --baz-qux                                                The bazQux option
   --no-baz-qux                                             Negatable of --baz-qux
-  -c, --camel-case [camel-case]                            The camelCase option (default: 42)
+  -c, --camel-case <camel-case>                            The camelCase option (default: 42)
   -k, --kebab-case-required <kebab-case-required>          The kebabCaseRequired option
 
 EXAMPLES:
@@ -144,7 +144,7 @@ USAGE:
 OPTIONS:
   -f, --foo <foo>          The foo option
   --bar                    The bar option
-  -b, --baz [baz]          The baz option (default: 42)
+  -b, --baz <baz>          The baz option (default: 42)
   -q, --qux <qux>          The qux option
 "
 `;
@@ -158,7 +158,7 @@ USAGE:
 OPTIONS:
   -f, --foo <foo>          The foo option
   --bar                    The bar option
-  -b, --baz [baz]          The baz option (default: 42)
+  -b, --baz <baz>          The baz option (default: 42)
 "
 `;
 
@@ -175,9 +175,9 @@ OPTIONS:
   -f, --foo <foo>          The foo option
   -B, --bar                The bar option
   --no-bar                 Negatable of -B, --bar
-  -b, --baz [baz]          The baz option (default: 42)
+  -b, --baz <baz>          The baz option (default: 42)
   -q, --qux <qux>          The qux option
-  -l, --log [log]          The log option (default: info, choices: debug | info | warn | error)
+  -l, --log <log>          The log option (default: info, choices: debug | info | warn | error)
 
 EXAMPLES:
   # Example 1
@@ -233,9 +233,9 @@ OPTIONS:
   -f, --foo <foo>          The foo option
   -B, --bar                The bar option
   --no-bar                 Negatable of -B, --bar
-  -b, --baz [baz]          The baz option (default: 42)
+  -b, --baz <baz>          The baz option (default: 42)
   -q, --qux <qux>          The qux option
-  -l, --log [log]          The log option (default: info, choices: debug | info | warn | error)
+  -l, --log <log>          The log option (default: info, choices: debug | info | warn | error)
 
 EXAMPLES:
   # Example 1
