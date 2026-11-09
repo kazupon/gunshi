@@ -2516,3 +2516,81 @@ describe('the symbols of the usage', () => {
     expect(usage).toMatch(/^ {2}--no-recursive\s+Negate -r, --recursive$/m)
   })
 })
+
+describe('#893 - a blank line of the examples has no trailing spaces', () => {
+  const EXAMPLES = `# List the files
+$ app list
+
+# Copy the files
+$ app copy`
+
+  /**
+   * The help of a command with examples.
+   *
+   * @param command - The command
+   * @param options - The options of the CLI
+   * @returns The help
+   */
+  async function helpOf(command: Command, options: Partial<CliOptions> = {}): Promise<string> {
+    return (await cli(['--help'], command, { name: 'app', usageSilent: true, ...options }))!
+  }
+
+  /**
+   * The lines of the EXAMPLES section of a help, after its heading.
+   *
+   * @param help - The help
+   * @returns The lines of the section
+   */
+  function examplesOf(help: string): string[] {
+    const lines = help.replace(/\n$/, '').split('\n')
+    return lines.slice(lines.findIndex(line => /^(?:EXAMPLES|例):$/.test(line)) + 1)
+  }
+
+  test('a blank line between two examples is empty', async () => {
+    const help = await helpOf(define({ name: 'app', examples: EXAMPLES, run: NOOP }))
+
+    expect(examplesOf(help)).toEqual([
+      '  # List the files',
+      '  $ app list',
+      '',
+      '  # Copy the files',
+      '  $ app copy'
+    ])
+    expect(help.split('\n').filter(line => line.endsWith(' '))).toEqual([])
+  })
+
+  test('the blank lines that the examples start and end with are empty', async () => {
+    const help = await helpOf(define({ name: 'app', examples: `\n${EXAMPLES}\n`, run: NOOP }))
+
+    expect(examplesOf(help)).toEqual([
+      '',
+      '  # List the files',
+      '  $ app list',
+      '',
+      '  # Copy the files',
+      '  $ app copy',
+      ''
+    ])
+  })
+
+  test('the examples of a translation are rendered in the same way', async () => {
+    const command = {
+      name: 'app',
+      examples: EXAMPLES,
+      resource: () =>
+        Promise.resolve({
+          examples: '# ファイルを並べる\n$ app list\n\n# ファイルを写す\n$ app copy'
+        }),
+      run: NOOP
+    } as unknown as Command
+    const help = await helpOf(command, { plugins: [i18n({ locale: 'ja-JP' })] })
+
+    expect(examplesOf(help)).toEqual([
+      '  # ファイルを並べる',
+      '  $ app list',
+      '',
+      '  # ファイルを写す',
+      '  $ app copy'
+    ])
+  })
+})
