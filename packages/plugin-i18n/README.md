@@ -205,7 +205,7 @@ const greetCommand = defineI18nWithTypes<{ extensions: MyExtensions }>()({
 
 ### `withI18nResource`
 
-Add i18n resource to an existing command. This helper is useful for extending an already defined command with `define` function.
+Add i18n resource to an existing command. This helper is useful for extending an already defined command with `define` function, or a lazy command with `lazy` function, which stays a lazy command. A lazy command can also take the resource in its definition, as `lazy(loader, { name, resource })`.
 
 ```ts
 import { define } from 'gunshi' // alternative 'gunshi/definition', or '@gunshi/definition'
