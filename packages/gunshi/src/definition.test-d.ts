@@ -386,3 +386,35 @@ describe('the keys that a command does not have (#871)', () => {
     define({ name: 'remote', subCommands: { add: { name: 'add', run } }, run })
   })
 })
+
+/**
+ * NOTE(kazupon): a lazy command takes `run` from its loader, so its definition has none. A statement
+ * that must not type-check is written on one line, as above.
+ */
+describe('the run of a lazy command comes from its loader (#881)', () => {
+  const run = () => {}
+  const loader = (): CommandRunner => run
+
+  test('lazy and lazyWithTypes reject a run in the definition', () => {
+    // @ts-expect-error `run` comes from the loader
+    lazy(loader, { name: 'deploy', args: commandArgs, run })
+    // @ts-expect-error `run`, in a definition without args
+    lazy(loader, { name: 'deploy', run })
+    // @ts-expect-error `run` of the command that `define` returns
+    lazy(loader, define({ name: 'deploy', args: commandArgs, run }))
+    // @ts-expect-error `run` comes from the loader
+    lazyWithTypes<{ extensions: LoggerExtensions }>()(loader, { name: 'deploy', run })
+    // @ts-expect-error `run` with explicit Gunshi parameters
+    lazy<{ args: typeof commandArgs; extensions: {} }>(loader, { name: 'deploy', run })
+  })
+
+  test('a definition without run is accepted, also when its type has an optional run', () => {
+    lazy(loader, { name: 'deploy', args: commandArgs })
+    const definition = define({ name: 'deploy', args: commandArgs })
+    expectTypeOf(definition.run).toBeNullable()
+    lazy(loader, definition)
+    lazyWithTypes<{ extensions: LoggerExtensions }>()(loader, define({ name: 'deploy' }))
+    const typed: Command = { name: 'deploy' }
+    lazy(loader, typed)
+  })
+})

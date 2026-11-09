@@ -666,6 +666,12 @@ declare function find(): Project
         'No overload matches this call'
       ],
       [
+        'lazy-with-run.ts',
+        `export const c = lazy(async () => () => {}, { name: 'c', run: () => {} })`,
+        "Type '() => void' is not assignable to type 'never'",
+        "is not assignable to type 'never'"
+      ],
+      [
         'returns-an-object-without-json-args.ts',
         `export const c = define({ name: 'c', run: () => ({ project: find() }) })`,
         "is not assignable to type 'Awaitable<string | void>'",
