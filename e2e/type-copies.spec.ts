@@ -146,7 +146,7 @@ const c = define({ name: 'c', args: { ...jsonArgs }, run: () => ({ ok: true }) }
 export const withResource = withI18nResource(c, resource)
 `,
 
-  'i18n-more.ts': `import { cli, define, jsonArgs } from 'gunshi'
+  'i18n-more.ts': `import { cli, define, jsonArgs, lazy } from 'gunshi'
 import { define as defineFromDefinition } from '@gunshi/definition'
 import { withI18nResource } from '@gunshi/plugin-i18n'
 
@@ -155,18 +155,25 @@ const resource = async () => ({ description: 'A command' })
 const a = define({ name: 'a', args: { n: { type: 'number' } }, run: ctx => \`a \${ctx.values.n}\` })
 const b = defineFromDefinition({ name: 'b', args: { n: { type: 'number' } }, run: ctx => \`b \${ctx.values.n}\` })
 const c = define({ name: 'c', args: { ...jsonArgs }, run: () => ({ ok: true }) })
+const d = lazy(async () => define({ name: 'd', run: () => 'd' }), { name: 'd', args: { n: { type: 'number' } } })
 
 export const ia = withI18nResource(a, resource)
 export const ib = withI18nResource(b, resource)
 export const ic = withI18nResource(c, resource)
+// a lazy command stays a lazy command, which the CLI calls to load the command (#877)
+export const id = withI18nResource(d, resource)
+export const loading = id()
 
 const name: string | undefined = ia.name
 const args: { n: { type: 'number' } } = ib.args
+const commandName: string = id.commandName
 void name
 void args
+void commandName
 
-await cli([], ia, { subCommands: { b: ib, c: ic } })
+await cli([], ia, { subCommands: { b: ib, c: ic, d: id } })
 await cli([], ic, { subCommands: { a: ia } })
+await cli([], id)
 `,
 
   'definition-collect.ts': `import { define, jsonArgs } from 'gunshi'

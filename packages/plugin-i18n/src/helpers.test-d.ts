@@ -5,7 +5,7 @@
  * tests) and tsgo (`oxlint --type-check`) report its error on the line under `@ts-expect-error`.
  */
 
-import { define } from 'gunshi'
+import { cli, define, lazy } from 'gunshi'
 import { expectTypeOf, test } from 'vitest'
 import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
 
@@ -36,4 +36,14 @@ test('the helpers take the keys of an i18n command', () => {
 test('withI18nResource takes a SubCommandable, which has commandName', () => {
   const command: SubCommandable = { name: 'deploy', run }
   expectTypeOf(withI18nResource(command, resource).commandName).toEqualTypeOf<string | undefined>()
+})
+
+test('withI18nResource keeps a lazy command callable (#877)', async () => {
+  const lazyCommand = lazy(async () => define({ name: 'deploy', run }), { name: 'deploy' })
+  const translated = withI18nResource(lazyCommand, resource)
+  expectTypeOf(translated).toBeCallableWith()
+  expectTypeOf(translated.commandName).toEqualTypeOf<string>()
+  expectTypeOf(translated.resource).not.toBeNullable()
+  await cli([], define({ name: 'app', run }), { subCommands: { deploy: translated } })
+  await cli([], translated)
 })

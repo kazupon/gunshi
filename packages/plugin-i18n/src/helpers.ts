@@ -44,16 +44,21 @@ type I18nCommandDefinitionResult<
 /**
  * The result type of the {@linkcode withI18nResource} function
  *
+ * NOTE(kazupon): a lazy command stays a lazy command, which the CLI calls to load the command, so its
+ * result keeps the call signature, which `Prettify` would drop (#877).
+ *
  * @internal
  */
 type WithI18nResourceResult<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
   C extends Command<G> | SubCommandable = Command<G>
-> = Prettify<
-  C & { resource: CommandResourceFetcher<G> } & {
-    [K in Exclude<keyof I18nCommand<G>, keyof C | 'resource'>]?: I18nCommand<G>[K]
-  }
->
+> = C extends (...args: any[]) => any
+  ? C & { resource: CommandResourceFetcher<G> }
+  : Prettify<
+      C & { resource: CommandResourceFetcher<G> } & {
+        [K in Exclude<keyof I18nCommand<G>, keyof C | 'resource'>]?: I18nCommand<G>[K]
+      }
+    >
 
 /**
  * Define an i18n-aware {@link I18nCommand | command}.
@@ -214,7 +219,7 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
  *   }
  * })
  *
- * const i18nCommand = withI18nResource(basicCommand, async locale => {
+ * const i18nCommand = withI18nResource(myCommand, async locale => {
  *   const resource = await import(
  *     `./path/to/resources/test/${locale.toString()}.json`,
  *     { with: { type: 'json' } }
@@ -223,9 +228,9 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
  * })
  * ```
  *
- * @param command - A defined {@link Command | command} with {@linkcode define} function
+ * @param command - A {@link Command | command} defined with {@linkcode define}, or a lazy command defined with `lazy`, which stays a lazy command
  * @param resource - A {@link CommandResourceFetcher | resource fetcher} for the command
- * @returns A {@link I18nCommand | command} with i18n resource support
+ * @returns A {@link I18nCommand | command} with i18n resource support, or a lazy command for a lazy command
  */
 export function withI18nResource<
   G extends GunshiParamsConstraint,
@@ -236,8 +241,19 @@ export function withI18nResource<
   command: C & UnknownKeys<C, I18nCommand<G> & SubCommandable>,
   resource: CommandResourceFetcher<G>
 ): WithI18nResourceResult<G, C> {
+  /**
+   * NOTE(kazupon): a lazy command is a function, which the CLI calls to load the command. A copy of its
+   * keys into an object loses the loader, and the CLI runs the copy as a command without `run`, which
+   * does nothing (#877). So the keys are copied onto a function that calls the lazy command, as the
+   * core does when it names a function given as a sub-command. The lazy command is not changed.
+   */
+  if (typeof command === 'function') {
+    return Object.assign((...args: unknown[]) => (command as Function)(...args), command, {
+      resource
+    }) as unknown as WithI18nResourceResult<G, C>
+  }
   return {
     ...command,
     resource
-  } as WithI18nResourceResult<G, C>
+  } as unknown as WithI18nResourceResult<G, C>
 }
