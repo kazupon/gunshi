@@ -115,6 +115,7 @@ export function isLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
  *
  * If the loader returns a command, the properties of the loaded command take precedence,
  * and the properties that it does not define fall back to the definition that is given to `lazy`.
+ * `run` comes from the loader only, as the definition has none, so a loaded command without `run` is an error.
  *
  * @param cmd - A {@link Commandable} or {@link LazyCommand} to resolve
  * @param name - Optional name of the command, if not provided, it will use the name from the command itself.

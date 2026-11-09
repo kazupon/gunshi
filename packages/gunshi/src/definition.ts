@@ -118,6 +118,19 @@ type UnknownKeys<D, Shape> = { [K in Exclude<keyof D, keyof Shape>]: never }
 type LazyDefinitionShape<G extends GunshiParamsConstraint> = Command<G> & { resource?: unknown }
 
 /**
+ * A definition of a lazy command without `run`: the `run` that a definition has is mapped to `never`
+ *
+ * NOTE(kazupon): a lazy command takes `run` from its loader, and never from its definition (#881): the
+ * runner is what the loader loads when the command runs. A `run` in the definition would be dropped, or
+ * fail as a command without `run`, so it is reported at the key. A `run` that is optional in the type
+ * is not, because `define` without `run`, the definition of the guide, returns a command whose `run`
+ * is optional, and so does a value of the `Command` type.
+ *
+ * @internal
+ */
+type WithoutRun<D> = { [K in D extends { run: unknown } ? 'run' : never]: never }
+
+/**
  * Define a {@link Command | command}.
  *
  * @example
@@ -290,15 +303,17 @@ export function lazy<A extends Args>(
  * @typeParam D - A partial {@link Command} definition type with required `args`
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - A {@link Command | command} definition. Its `name` may be omitted,
- *   including when the lazy command is used as the CLI entry command.
+ * @param definition - A {@link Command | command} definition without `run`, which the loader returns.
+ *   Its `name` may be omitted, including when the lazy command is used as the CLI entry command.
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
 export function lazy<
   D extends { args: Args } & Partial<Command<{ args: D['args']; extensions: {} }>>
 >(
   loader: CommandLoader<{ args: D['args']; extensions: {} }>,
-  definition: D & UnknownKeys<D, LazyDefinitionShape<{ args: D['args']; extensions: {} }>>
+  definition: D &
+    UnknownKeys<D, LazyDefinitionShape<{ args: D['args']; extensions: {} }>> &
+    WithoutRun<D>
 ): LazyCommand<{ args: D['args']; extensions: {} }, D>
 
 /**
@@ -308,24 +323,24 @@ export function lazy<
  * @typeParam D - A partial {@link Command} definition type
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - An optional {@link Command | command} definition. Its `name` may be omitted,
- *   including when the lazy command is used as the CLI entry command.
+ * @param definition - An optional {@link Command | command} definition without `run`, which the loader
+ *   returns. Its `name` may be omitted, including when the lazy command is used as the CLI entry command.
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
 export function lazy<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
-  D extends Partial<Command<G>> = Partial<Command<G>>
+  D extends Partial<Command<G>> = Omit<Partial<Command<G>>, 'run'>
 >(
   loader: CommandLoader<G>,
-  definition?: D & WithoutJsonArgs<D> & UnknownKeys<D, LazyDefinitionShape<G>>
+  definition?: D & WithoutJsonArgs<D> & UnknownKeys<D, LazyDefinitionShape<G>> & WithoutRun<D>
 ): LazyCommand<G, D>
 
 /**
  * Define a {@link LazyCommand | lazy command} with or without definition.
  *
  * @param loader - A {@link CommandLoader | command loader} function that returns a command definition
- * @param definition - An optional {@link Command | command} definition. Its `name` may be omitted,
- *   including when the lazy command is used as the CLI entry command.
+ * @param definition - An optional {@link Command | command} definition without `run`, which the loader
+ *   returns. Its `name` may be omitted, including when the lazy command is used as the CLI entry command.
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
 export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
@@ -381,7 +396,7 @@ type LazyWithTypesReturn<FullG extends GunshiParamsConstraint> = <
   D extends Partial<Command<FullG>> = {}
 >(
   loader: CommandLoader<FullG>,
-  definition?: D & UnknownKeys<D, LazyDefinitionShape<FullG>>
+  definition?: D & UnknownKeys<D, LazyDefinitionShape<FullG>> & WithoutRun<D>
 ) => LazyCommand<FullG, D>
 
 /**
@@ -426,7 +441,7 @@ export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypes
 
   return <D extends Partial<Command<FullGunshiParams>> = {}>(
     loader: CommandLoader<FullGunshiParams>,
-    definition?: D & UnknownKeys<D, LazyDefinitionShape<FullGunshiParams>>
+    definition?: D & UnknownKeys<D, LazyDefinitionShape<FullGunshiParams>> & WithoutRun<D>
   ): LazyCommand<FullGunshiParams, D> => {
     return lazy(loader as any, definition as any) as LazyCommand<FullGunshiParams, D>
   }

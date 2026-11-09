@@ -254,6 +254,34 @@ export const wrapped = withI18nResource(entry, resource)
 await cli([], define({ name: 'app', description: 'An app', run }), {
   subCommands: { typed, show, fromDefinition, translated, load: () => define({ name: 'load', run }) }
 })
+`,
+
+  // a run in the definition of a lazy command is a type error with the helpers of each package: the loader returns it (#881)
+  'lazy-run.ts': `import { define, lazy, lazyWithTypes } from 'gunshi'
+import type { Command } from 'gunshi'
+import { define as defineFromDefinition, lazy as lazyFromDefinition } from '@gunshi/definition'
+import { defineI18n } from '@gunshi/plugin-i18n'
+
+const run = () => {}
+const resource = async () => ({ description: 'A command' })
+
+// @ts-expect-error \`run\` comes from the loader
+lazy(() => run, { name: 'a', run })
+// @ts-expect-error \`run\` comes from the loader
+lazyWithTypes<{ extensions: {} }>()(() => run, { name: 'a', run })
+// @ts-expect-error \`run\` comes from the loader
+lazyFromDefinition(() => run, { name: 'a', run })
+// @ts-expect-error \`run\` of the command that \`define\` returns
+lazy(() => run, define({ name: 'a', run }))
+// @ts-expect-error \`run\` of the command that \`defineI18n\` returns
+lazy(() => run, defineI18n({ name: 'a', resource, run }))
+
+// a definition without run, also when its type has an optional run
+export const a = lazy(() => run, define({ name: 'a' }))
+export const b = lazyFromDefinition(() => run, defineFromDefinition({ name: 'b' }))
+export const c = lazy(() => run, defineI18n({ name: 'c', resource }))
+const typed: Command = { name: 'd', run }
+export const d = lazy(() => run, typed)
 `
 }
 
