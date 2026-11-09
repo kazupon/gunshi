@@ -1993,6 +1993,97 @@ describe('#749 - the columns are aligned by the width a terminal draws', () => {
   })
 })
 
+describe('#872 - a row without a description has no trailing spaces', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  async function usageOf(args: Args, usageOptionType = false): Promise<string> {
+    const command = { args, name: 'main', description: 'Main', run: NOOP } as TestCommand
+    const ctx = await createCommandContext({
+      args,
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { cwd: '/path/to/main', name: 'my-cli', version: '0.0.0', usageOptionType }
+    })
+    return await renderUsage<WithRendererOnly>(ctx)
+  }
+
+  /**
+   * The rows of a section of the usage.
+   *
+   * @param usage - The rendered usage
+   * @param heading - The section to look at
+   * @returns The rows of the section
+   */
+  function rowsOf(usage: string, heading: string): string[] {
+    const lines = usage.split('\n')
+    const rows: string[] = []
+    for (
+      let i = lines.indexOf(`${heading}:`) + 1;
+      i < lines.length && lines[i].trim() !== '';
+      i++
+    ) {
+      rows.push(lines[i])
+    }
+    return rows
+  }
+
+  test('a positional argument without a description', async () => {
+    const usage = await usageOf({
+      input: { type: 'positional', description: 'The input' },
+      output: { type: 'positional' }
+    })
+
+    const rows = rowsOf(usage, 'ARGUMENTS')
+    expect(rows[1]).toBe('  output')
+    // the row with a description is padded as before
+    expect(rows[0]).toMatch(/^ {2}input {2,}The input$/)
+  })
+
+  test('an option without a description, whose name is shorter than the middle margin', async () => {
+    const usage = await usageOf({ all: { type: 'boolean', short: 'a' } })
+
+    expect(rowsOf(usage, 'OPTIONS')).toEqual(['  -a, --all'])
+  })
+
+  test('the type of an option without a description', async () => {
+    const usage = await usageOf(
+      {
+        file: { type: 'string' },
+        output: { type: 'string', description: 'The output' },
+        quiet: { type: 'boolean', description: 'Quiet' }
+      },
+      true
+    )
+
+    const rows = rowsOf(usage, 'OPTIONS')
+    for (const row of rows) {
+      expect(row).toBe(row.trimEnd())
+    }
+    expect(rows[0]).toMatch(/^ {2}--file <file> +\[string\]$/)
+    // the descriptions after the types are aligned as before
+    expect(rows[1].indexOf('The output')).toBe(rows[2].indexOf('Quiet'))
+  })
+
+  test.each([false, true])(
+    'an option without a description, whose default follows (usageOptionType: %s)',
+    async usageOptionType => {
+      const usage = await usageOf(
+        {
+          count: { type: 'number', default: 1 },
+          output: { type: 'string', description: 'The output' }
+        },
+        usageOptionType
+      )
+
+      const rows = rowsOf(usage, 'OPTIONS')
+      const count = rows.find(row => row.includes('--count')) ?? ''
+      const output = rows.find(row => row.includes('--output')) ?? ''
+      // the row is padded as before, since the default follows: it starts a space after the descriptions
+      expect(count.indexOf('(default: 1)')).toBe(output.indexOf('The output') + 1)
+    }
+  )
+})
+
 describe('the usage of a group', () => {
   const add = define({ name: 'add', description: 'Add a record', run: NOOP })
   const list = define({ name: 'list', description: 'List the records', run: NOOP })
