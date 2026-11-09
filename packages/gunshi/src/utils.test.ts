@@ -227,6 +227,20 @@ describe('resolveLazyCommand', () => {
       new TypeError(`'run' is required in command: key`)
     )
   })
+
+  // `typeof null` is 'object', but null is neither a command nor a runner (#883)
+  test.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['a number', 0],
+    ['a string', 'run']
+  ])('a loader that returns %s fails with Cannot resolve command', async (_label, value) => {
+    const command = lazy((async () => value) as unknown as CommandLoader, { name: 'deploy' })
+
+    await expect(resolveLazyCommand(command, 'key', true)).rejects.toThrow(
+      new TypeError(`Cannot resolve command: deploy`)
+    )
+  })
 })
 
 describe('isJsonArg', () => {

@@ -85,7 +85,7 @@ export default define({
 
 Implement the command in a separate file (e.g., `runner.ts`):
 
-```ts [packages/command-a/src/ruuner.ts]
+```ts [packages/command-a/src/runner.ts]
 import meta from './meta.ts'
 import type { CommandRunner } from 'gunshi'
 
@@ -105,21 +105,17 @@ import type { CommandRunner, GunshiParamsConstraint } from 'gunshi'
 
 export async function load<G extends GunshiParamsConstraint>(
   pkg: string
-): Promise<CommandRunner<G> | null> {
-  let mod: Promise<CommandRunner<G> | null> | undefined
-  // Dynamic import of the command package
+): Promise<CommandRunner<G>> {
   try {
-    mod = await import(pkg).then(m => m.default || m)
+    // Dynamic import of the command package
+    return await import(pkg).then(m => m.default || m)
   } catch (error: unknown) {
     // Handle module not found errors
     if (isErrorModuleNotFound(error)) {
-      mod = Promise.resolve(null)
+      throw new Error(`Fatal Error: '${pkg}' Command Runner is not installed`, { cause: error })
     }
+    throw new Error(`Fatal Error: '${pkg}' Command Runner loading failed`, { cause: error })
   }
-  if (mod === undefined) {
-    throw new Error(`Fatal Error: '${pkg}' Command Runner loading failed`)
-  }
-  return mod
 }
 
 function isErrorModuleNotFound(e: unknown): e is NodeJS.ErrnoException {
@@ -131,6 +127,8 @@ function isErrorModuleNotFound(e: unknown): e is NodeJS.ErrnoException {
   )
 }
 ```
+
+The loader returns a command runner, or a command. Gunshi fails with `Cannot resolve command: <name>` for anything else, such as `null`, so throw an error that tells what went wrong instead, as for a command package that is not installed.
 
 ### 5. Command Definitions
 
@@ -171,7 +169,7 @@ import { commandALazy, commandBLazy } from './commands.ts'
 
 async function main() {
   // Load package.json for version info
-  const { default: pkgJsonModule } = await import('./package.json', { with: { type: 'json' } })
+  const { default: pkgJson } = await import('./package.json', { with: { type: 'json' } })
 
   // Run the CLI with lazy-loaded commands
   await cli(process.argv.slice(2), commandALazy, {
@@ -204,7 +202,8 @@ function createLazyCommand(name: string) {
     async () => {
       // Dynamically import metadata and implementation
       const meta = await import(`${name}/meta`).then(m => m.default || m)
-      return await load(name)
+      // The loaded command takes precedence over the minimal metadata below
+      return { ...meta, run: await load(name) }
     },
     { name } // Minimal metadata, rest will be loaded on demand
   )

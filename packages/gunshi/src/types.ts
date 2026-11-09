@@ -888,6 +888,10 @@ type IsAnyArgs<A> = 0 extends 1 & A ? true : false
  * A function that returns a command or command runner.
  * This is used to lazily load commands.
  *
+ * Any other value, such as `null` or `undefined`, fails when the command is loaded, with
+ * `Cannot resolve command: <name>`. To tell what went wrong, such as a module that is not found,
+ * throw an error instead.
+ *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner.
  *
  * @returns A command or command runner
