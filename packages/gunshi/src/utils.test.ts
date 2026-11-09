@@ -4,7 +4,7 @@ import { lazy } from './definition.ts'
 import { jsonArgs } from './json.ts'
 import { isJsonArg, isLazyCommand, resolveJsonRequest, resolveLazyCommand } from './utils.ts'
 
-import type { Args, Command, CommandRunner } from './types.ts'
+import type { Args, Command, CommandLoader, CommandRunner } from './types.ts'
 
 const run: CommandRunner = () => {}
 
@@ -208,6 +208,24 @@ describe('resolveLazyCommand', () => {
     expect(resolved.args).toEqual({ target: { type: 'string' } })
     expect(resolved.name).toBeUndefined()
     expect(resolved.run).toBeUndefined()
+  })
+
+  test('the errors of a loaded command name the command, not the loader function', async () => {
+    // loaders in consts, as the guide writes them: each function is named after its const
+    const buildLoader = async () => ({ description: 'Build the project' })
+    const deployLoader = (async () => undefined) as unknown as CommandLoader
+    const statusLoader = async () => ({ description: 'Show the status' })
+
+    await expect(
+      resolveLazyCommand(lazy(buildLoader, { name: 'build' }), 'key', true)
+    ).rejects.toThrow(new TypeError(`'run' is required in command: build`))
+    await expect(
+      resolveLazyCommand(lazy(deployLoader, { name: 'deploy' }), 'key', true)
+    ).rejects.toThrow(new TypeError(`Cannot resolve command: deploy`))
+    // without a name in the definition, the name that the command is given with
+    await expect(resolveLazyCommand(lazy(statusLoader), 'key', true)).rejects.toThrow(
+      new TypeError(`'run' is required in command: key`)
+    )
   })
 })
 
