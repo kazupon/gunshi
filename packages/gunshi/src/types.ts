@@ -326,11 +326,13 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Sub commands.
    *
    * An object or a Map keyed by the sub-command names, or an array of commands, which are keyed by their names.
+   * A value of the object or the Map may also be a loader, a function that returns the command or its runner,
+   * which runs as a lazy command named after its key.
    * When this is not given, the {@linkcode Command.subCommands} of the entry command are the sub-commands.
    */
   subCommands?:
-    | Record<string, SubCommandable>
-    | Map<string, SubCommandable>
+    | Record<string, SubCommandable | SubCommandLoader>
+    | Map<string, SubCommandable | SubCommandLoader>
     | readonly SubCommandable[]
   /**
    * Left margin of the command output.
@@ -700,7 +702,8 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * Nested sub-commands for this command.
    *
    * Allows building command trees like `git remote add`.
-   * Each key is the sub-command name, and the value is a command or lazy command.
+   * Each key is the sub-command name, and the value is a command, a lazy command, or a loader, a function that
+   * returns the command or its runner, which runs as a lazy command named after its key.
    * An array of commands is keyed by the names of the commands.
    *
    * On the entry command, these are the top-level sub-commands when {@linkcode CliOptions.subCommands} is not given.
@@ -708,8 +711,8 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * @since v0.28.0
    */
   subCommands?:
-    | Record<string, SubCommandable>
-    | Map<string, SubCommandable>
+    | Record<string, SubCommandable | SubCommandLoader>
+    | Map<string, SubCommandable | SubCommandLoader>
     | readonly SubCommandable[]
 }
 
@@ -745,6 +748,14 @@ export type LazyCommand<
 export type Commandable<G extends GunshiParamsConstraint = DefaultGunshiParams> =
   | Command<G>
   | LazyCommand<G, {}>
+
+/**
+ * A function given as a sub-command, which the CLI loads as a lazy command named after its key:
+ * it returns the command, or its runner
+ *
+ * @internal
+ */
+type SubCommandLoader = () => Awaitable<SubCommandable | ((...args: any[]) => any)>
 
 /**
  * Sub-command entry type for use in subCommands.
@@ -802,10 +813,6 @@ export interface SubCommandable {
    * @since v0.28.0
    */
   subCommands?: Record<string, any> | Map<string, any> | readonly any[]
-  /**
-   * Index signature to allow additional properties
-   */
-  [key: string]: any
 }
 
 /**
