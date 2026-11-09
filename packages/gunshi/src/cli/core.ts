@@ -105,11 +105,15 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
    * NOTE(kazupon): a CLI whose user declares no sub-commands has no command tree of its own,
    * so a positional argument must not become a command name just because a plugin added a command.
    * The user can still opt out with an explicit `fallbackToEntry: false`.
+   * An entry command without `run` has nothing to run with the argument: the commands that the plugins
+   * add are the commands of the CLI, so an argument that is not one of them is reported, as when the
+   * user declares them (#874). A lazy entry command and a runner given to `cli()` have something to run.
    */
   if (
     initialSubCommands.size === 0 &&
     cliOptions.subCommands.size > 0 &&
-    options.fallbackToEntry === undefined
+    options.fallbackToEntry === undefined &&
+    (typeof entry === 'function' || entry.run != null)
   ) {
     cliOptions.fallbackToEntry = true
   }

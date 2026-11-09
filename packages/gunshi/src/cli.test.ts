@@ -2884,6 +2884,98 @@ describe('github issues', () => {
     })
   })
 
+  describe('#874 - a word that is not a command name, when plugins add the commands of an entry without run', () => {
+    afterEach(() => {
+      process.exitCode = undefined
+    })
+
+    const add = define({ name: 'add', description: 'Add a record', run: () => {} })
+    const list = define({ name: 'list', description: 'List the records', run: () => {} })
+    const tools = plugin({
+      id: 'tools',
+      setup: ctx => {
+        ctx.addCommand('add', add)
+        ctx.addCommand('list', list)
+      }
+    })
+
+    test.each([
+      ['a plugin adds the commands', { plugins: [tools] }],
+      ['the CLI declares the commands', { subCommands: { add, list } }]
+    ])('is reported to stderr with exit code 1 when %s', async (_label, options) => {
+      const stderr = defineMockErrorLog()
+
+      await expect(
+        cli(['ad'], define({ name: 'app' }), { name: 'app', ...options })
+      ).resolves.toBeUndefined()
+
+      expect(stderr()).toContain('Command not found: ad')
+      expect(process.exitCode).toBe(1)
+    })
+
+    test('is the error that cli() rejects with, with usageSilent and with gunshi/bone', async () => {
+      const entry = define({ name: 'app' })
+
+      for (const run of [
+        cli(['ad'], entry, { name: 'app', usageSilent: true, plugins: [tools] }),
+        boneCli(['ad'], entry, { name: 'app', plugins: [tools] })
+      ]) {
+        const error = await run.then(
+          () => undefined,
+          (error: unknown) => error
+        )
+        expect(error).toBeInstanceOf(AggregateError)
+        expect((error as AggregateError).errors).toEqual([
+          expect.objectContaining({ message: 'Command not found: ad' })
+        ])
+      }
+    })
+
+    test('the commands that the plugins add still run, and the entry alone prints its usage', async () => {
+      const run = vi.fn<() => void>()
+      const adds = plugin({
+        id: 'adds',
+        setup: ctx => {
+          ctx.addCommand('add', define({ name: 'add', run }))
+        }
+      })
+      const options = { name: 'app', usageSilent: true, plugins: [adds] } satisfies CliOptions
+
+      await cli(['add'], define({ name: 'app' }), options)
+      const usage = await cli([], define({ name: 'app' }), options)
+
+      expect(run).toHaveBeenCalledTimes(1)
+      expect(usage).toContain('USAGE:\n  app [COMMANDS] <OPTIONS>')
+    })
+
+    test.each([
+      ['an entry command with run', (run: CommandRunner) => define({ name: 'app', run })],
+      ['a runner given to cli()', (run: CommandRunner) => run],
+      ['a lazy entry command', (run: CommandRunner) => lazy(() => run, { name: 'app' })]
+    ])('%s still takes the word, as since #722', async (_label, createEntry) => {
+      const run = vi.fn<CommandRunner>()
+
+      await cli(['ad'], createEntry(run), { name: 'app', usageSilent: true, plugins: [tools] })
+
+      expect(run).toHaveBeenCalledWith(expect.objectContaining({ positionals: ['ad'] }))
+    })
+
+    test('an explicit `fallbackToEntry: true` still passes the word to the entry, as before', async () => {
+      const stderr = defineMockErrorLog()
+
+      await expect(
+        cli(['ad'], define({ name: 'app' }), {
+          name: 'app',
+          plugins: [tools],
+          fallbackToEntry: true
+        })
+      ).resolves.toBeUndefined()
+
+      expect(stderr()).toBe('')
+      expect(process.exitCode).toBeUndefined()
+    })
+  })
+
   describe('#768 - plugin-added commands include the entry in help', () => {
     function createEntry() {
       return define({
