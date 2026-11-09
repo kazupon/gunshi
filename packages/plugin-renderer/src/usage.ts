@@ -630,10 +630,18 @@ async function generateOptionalArgsUsage<
       const valueDesc = key.startsWith(ARG_NEGATABLE_PREFIX)
         ? ''
         : await resolveDisplayValue(ctx, key)
-      // padEnd is used to align the `[]` symbols
-      const desc = `${optionsSchema ? padEndToWidth(optionsSchema, optionSchemaMaxLength + 3) : ''}${rawDesc}`
+      /**
+       * NOTE(kazupon): a row is padded only where something follows, so that a row without a description
+       * has no trailing spaces (#872), as a row of the commands section has none (#727). The `[]` symbols are
+       * padded to align the descriptions after them, and the name is padded to align the rest.
+       */
+      const typeColumn =
+        optionsSchema && (rawDesc || valueDesc)
+          ? padEndToWidth(optionsSchema, optionSchemaMaxLength + 3)
+          : optionsSchema.trimEnd()
+      const desc = `${typeColumn}${rawDesc}`
       const descLength = desc.length + valueDesc.length
-      const option = `${padEndToWidth(value, (descLength > 0 ? optionsMaxLength : 0) + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
+      const option = `${descLength > 0 ? padEndToWidth(value, optionsMaxLength + ctx.env.middleMargin) : value}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
       return `${option.padStart(ctx.env.leftMargin + option.length)}`
     })
   )
@@ -664,7 +672,10 @@ async function generatePositionalArgsUsage<
         (await ctx.extensions[pluginId].text(resolveArgKey(name, ctx.name))) ||
         (ctx.args[name] as ArgSchema & { description?: string }).description ||
         ''
-      const arg = `${padEndToWidth(name, argsMaxLength + ctx.env.middleMargin)} ${desc}`
+      // a row without a description is not padded, so that it has no trailing spaces (#872)
+      const arg = desc
+        ? `${padEndToWidth(name, argsMaxLength + ctx.env.middleMargin)} ${desc}`
+        : name
       return `${arg.padStart(ctx.env.leftMargin + arg.length)}`
     })
   )
