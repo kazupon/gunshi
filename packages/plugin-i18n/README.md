@@ -355,7 +355,7 @@ When defining your localization resources (either directly in the `resource` fun
 - **Argument and Option Descriptions**: Keys for the descriptions of both command arguments (positional args) and options **must** be prefixed with `arg:`. For example:
   - For an argument named `file`: use `arg:file`
   - For an option named `verbose`: use `arg:verbose`
-  - **Negatable Argument Descriptions**: For boolean options (e.g., `--verbose`), Gunshi automatically generates a description for the negatable version (e.g., `--no-verbose`) using the built-in `NEGATABLE` key (e.g., "Negatable of --verbose"). To provide a custom translation for a specific negatable option, use the pattern `arg:no-<optionName>`, for example, `arg:no-verbose`.
+  - **Negatable Argument Descriptions**: For boolean options (e.g., `--verbose`), Gunshi automatically generates a description for the negatable version (e.g., `--no-verbose`) using the built-in `NEGATABLE` key (e.g., "Negate --verbose"). To provide a custom translation for a specific negatable option, use the pattern `arg:no-<optionName>`, for example, `arg:no-verbose`.
 - **Custom Keys**: Any other keys you define for custom translation messages (like greetings, error messages, etc.) do not require a prefix and can be named freely (e.g., `informal_greeting`, `error_file_not_found`).
 - **Built-in Keys**: Keys for built-in functionalities are handled by Gunshi's default locales. The complete list includes:
   - `USAGE` - Usage section header
@@ -364,7 +364,7 @@ When defining your localization resources (either directly in the `resource` fun
   - `COMMANDS` - Commands section header
   - `EXAMPLES` - Examples section header
   - `FORMORE` - Footer text for additional help
-  - `NEGATABLE` - Prefix for negatable options (e.g., "Negatable of --verbose")
+  - `NEGATABLE` - Description of the negated form of an option, which places the option with `{$option}` (e.g., "Negate --verbose"). A text without `{$option}` has the option put after it
   - `DEFAULT` - Prefix for default values (e.g., "default: 5")
   - `CHOICES` - Prefix for available choices (e.g., "choices: red, green, blue")
   - `help` - Description for the help option ("Display this help message")

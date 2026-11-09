@@ -1,7 +1,7 @@
 # my-tool(1) -- A utility for processing data
 
 ## SYNOPSIS
-my-tool <OPTIONS>
+my-tool [OPTIONS]
 
 ## DESCRIPTION
 A utility for processing data

@@ -5,7 +5,7 @@ My CLI tool (my-cli v1.0.0)
 Create a new resource
 
 USAGE:
-  my-cli create <OPTIONS>
+  my-cli create [OPTIONS] --name <name>
 
 OPTIONS:
   -h, --help                 Display this help message

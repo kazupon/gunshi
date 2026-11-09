@@ -73,7 +73,9 @@ describe('extension: translate', () => {
       expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
         'For more info, run any command with the `--help` flag'
       )
-      expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('Negatable of')
+      expect(extension.translate(resolveBuiltInKey('NEGATABLE'), { option: '--force' })).toEqual(
+        'Negate --force'
+      )
       expect(
         extension.translate('err:arg:required-option', {
           displayName: "'--id'"
@@ -106,7 +108,9 @@ describe('extension: translate', () => {
       expect(extension.translate(resolveBuiltInKey('FORMORE'))).toEqual(
         '詳細は、コマンドと`--help`フラグを実行してください'
       )
-      expect(extension.translate(resolveBuiltInKey('NEGATABLE'))).toEqual('否定可能な')
+      expect(extension.translate(resolveBuiltInKey('NEGATABLE'), { option: '--force' })).toEqual(
+        '--force を打ち消す'
+      )
       expect(
         extension.translate('err:arg:required-option', {
           displayName: "'--id'"

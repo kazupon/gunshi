@@ -14,7 +14,7 @@ npm install -g data-processor
 ```sh
 A data processing utility (data-processor v1.0.0)
 USAGE:
-  data-processor <OPTIONS>
+  data-processor [OPTIONS] --input <input>
 
 OPTIONS:
   -h, --help                     Display this help message

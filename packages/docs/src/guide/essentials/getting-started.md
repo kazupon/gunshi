@@ -155,7 +155,7 @@ Here's an example of the generated help output:
 
 ```sh
 USAGE:
-  COMMAND <OPTIONS>
+  COMMAND [OPTIONS]
 
 OPTIONS:
   -h, --help                 Display this help message

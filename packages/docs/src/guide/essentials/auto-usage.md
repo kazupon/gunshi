@@ -9,7 +9,7 @@ When you define a command with Gunshi, the library automatically:
 - Adds `--help` and `-h` flags to every command
 - Adds `--version` and `-v` flags when you provide a version in the CLI options
 - Generates formatted usage text based on your command configuration
-- Displays usage information when users request help or provide invalid arguments
+- Displays usage information when users request help, and reports invalid arguments as errors
 - Includes descriptions, examples, and type information you provide
 
 The generated usage follows standard CLI conventions, making your application immediately familiar to users.
@@ -20,17 +20,16 @@ Gunshi uses consistent bracket notation throughout the generated usage to indica
 
 ### Angle Brackets `<>` - Required Elements
 
-Angle brackets indicate required elements or parameters without default values:
+Angle brackets indicate elements that must be given:
 
-- `<OPTIONS>` - The command has required options (at least one option without a default value)
-- `<name>` - An option parameter that must be provided (no default value)
+- `<name>` - The value that an option takes, such as `--name <name>`. It is in angle brackets even when the option has a default, because the value cannot be left out when the option is given. The default is shown as `(default: VALUE)` in the description
 - `<positional>` - A required positional argument
 
-Example:
+The USAGE line spells out each required option (`required: true`) with its value, after `[OPTIONS]`, so that it tells what the command needs:
 
 ```sh
 USAGE:
-  app <OPTIONS>
+  app [OPTIONS] --name <name>
 
 OPTIONS:
   -n, --name <name>    Name to use (required)
@@ -46,9 +45,9 @@ It is left out of the other places a user could discover it, too: shell completi
 
 ### Square Brackets `[]` - Optional Elements
 
-Square brackets indicate optional elements or parameters with default values:
+Square brackets indicate optional elements:
 
-- `[name]` - An option parameter with a default value
+- `[OPTIONS]` - The options that can be left out. The USAGE line has it when the command has an option that is not required, such as `--help`
 - `[<positional>]` - An optional positional argument
 - `[<positional> ...]` - Optional multiple positional arguments
 - `[COMMANDS]` - A sub-command, shown when the COMMANDS section lists commands
@@ -58,13 +57,13 @@ Example:
 
 ```sh
 USAGE:
-  app [COMMANDS]
+  app [COMMANDS] [OPTIONS]
 
 COMMANDS:
   [manage]    Default command for managing resources
 
 OPTIONS:
-  -t, --type [type]    Resource type (default: standard)
+  -t, --type <type>    Resource type (default: standard)
 ```
 
 This notation provides immediate visual feedback about what users must provide versus what they can omit, making your CLI more intuitive to use.
@@ -90,7 +89,7 @@ For a simple command with basic configuration (see [Getting Started](./getting-s
 A greeting CLI (greet-cli v1.0.0)
 
 USAGE:
-  greet-cli <OPTIONS>
+  greet-cli [OPTIONS]
 
 OPTIONS:
   -h, --help                 Display this help message
@@ -114,12 +113,12 @@ When your command includes argument definitions and examples (see [Declarative C
 app (app v1.0.0)
 
 USAGE:
-  app <OPTIONS>
+  app [OPTIONS]
 
 OPTIONS:
   -p, --path <path>                    File or directory path to operate on
   -r, --recursive                      Operate recursively on directories
-  --no-recursive                       Negatable of -r, --recursive
+  --no-recursive                       Negate -r, --recursive
   -o, --operation <operation>          Operation to perform: list, copy, move, or delete
   -h, --help                           Display this help message
   -v, --version                        Display this version
@@ -138,7 +137,7 @@ EXAMPLES:
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!IMPORTANT]
-> Boolean options automatically receive a negatable version with the `--no-` prefix. This allows users to explicitly disable boolean flags.
+> A boolean option declared with `negatable: true` also accepts its `--no-` prefixed form, which lets users explicitly disable the flag. The help lists the negated form after the option, as `--no-recursive` above. See [Negatable Boolean Options](./declarative.md#negatable-boolean-options).
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -162,7 +161,7 @@ This adds type information to each option:
 OPTIONS:
   -p, --path <path>              [string]   File or directory path to operate on
   -r, --recursive                [boolean]  Operate recursively on directories
-  --no-recursive                 [boolean]  Negatable of -r, --recursive
+  --no-recursive                 [boolean]  Negate -r, --recursive
   -o, --operation <operation>    [string]   Operation to perform: list, copy, move, or delete
   -h, --help                     [boolean]  Display this help message
   -v, --version                  [boolean]  Display this version
@@ -180,12 +179,12 @@ When users run the main command with `--help`:
 resource-manager (resource-manager v1.0.0)
 
 USAGE:
-  resource-manager [COMMANDS] <OPTIONS>
+  resource-manager [COMMANDS] [OPTIONS]
 
 COMMANDS:
-  [manage]                  Manage resources
-  create <OPTIONS>          Create a new resource
-  list <OPTIONS>            List all resources
+  [manage]                                Manage resources
+  create [OPTIONS] --name <name>          Create a new resource
+  list [OPTIONS]                          List all resources
 
 For more info, run any command with the `--help` flag:
   resource-manager --help
@@ -205,7 +204,7 @@ OPTIONS:
 > prints this usage when it runs without a sub-command. A lazy command has a default command, since its loader returns the
 > runner, and so does a function given to `cli()` as the entry.
 > Each row describes the arguments that its own command declares, so a command with no options of its own
-> has no `<OPTIONS>` next to it.
+> has no `[OPTIONS]` next to it, and a required option is spelled out, as in `create [OPTIONS] --name <name>`.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -219,13 +218,13 @@ resource-manager (resource-manager v1.0.0)
 Create a new resource
 
 USAGE:
-  resource-manager create <OPTIONS>
+  resource-manager create [OPTIONS] --name <name>
 
 OPTIONS:
   -h, --help                 Display this help message
   -v, --version              Display this version
   -n, --name <name>          Name of the resource
-  -t, --type [type]          Type of resource (default: default)
+  -t, --type <type>          Type of resource (default: default)
 ```
 
 ### Positional Arguments Display
@@ -238,7 +237,7 @@ resource-manager (resource-manager v1.0.0)
 Manage resources
 
 USAGE:
-  resource-manager manage <OPTIONS> <resource>
+  resource-manager manage [OPTIONS] <resource>
 
 ARGUMENTS:
   resource           Type of resource to manage (e.g., user, project)
@@ -268,27 +267,27 @@ Gunshi provides several automatic features without requiring any configuration:
 
 ### Negatable Boolean Options
 
-- Boolean options automatically get `--no-` prefixed versions
+- A boolean option declared with `negatable: true` also accepts its `--no-` prefixed form
 - Allows explicit disabling of boolean flags
-- Example: `--recursive` automatically creates `--no-recursive`
+- The help lists the negated form and describes it, such as `--no-recursive  Negate -r, --recursive`
 
 ### Invalid Argument Handling
 
-- Usage is automatically displayed when users provide invalid arguments
-- Helps users understand what went wrong
-- Provides immediate guidance for correct usage
+- When the arguments do not match the command, such as a missing required option, Gunshi prints the errors to stderr and does not run the command
+- Each error names the argument, such as `Option '--name' or '-n' is required`
+- The usage is not printed with the errors. See [Errors and Exit Codes](./errors.md#argument-errors)
 
 ## Key Points
 
 When working with auto-generated usage:
 
 - The `--help` flag is automatically added to all commands - you don't need to define it
-- Usage is displayed when users provide invalid arguments or explicitly request help
+- Usage is displayed when users request help, and invalid arguments are reported as errors without the usage
 - Descriptions in your `args` configuration become the help text for each option
 - The `examples` field accepts both single strings and multi-line strings for multiple examples
 - Sub-command help is accessible both from the main help and individually via `command --help`
-- Required options are shown with angle brackets `<option>` in the USAGE line
-- Boolean options automatically get negatable versions (`--no-` prefix) when not required
+- The USAGE line shows `[OPTIONS]` for the options that can be left out, and spells out each required option, such as `--name <name>`
+- Boolean options declared with `negatable: true` get negated forms (`--no-` prefix), which the help lists and describes
 - The `usageOptionType` CLI option adds type annotations to help output
 
 ## Next Steps

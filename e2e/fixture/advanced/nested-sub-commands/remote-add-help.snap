@@ -3,7 +3,7 @@ A Git-like CLI (git v1.0.0)
 Add a remote
 
 USAGE:
-  git remote add <OPTIONS>
+  git remote add [OPTIONS] --url <url>
 
 OPTIONS:
   -h, --help             Display this help message

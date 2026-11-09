@@ -3,7 +3,7 @@ resource-cli (resource-cli v1.0.0)
 Create a resource
 
 USAGE:
-  resource-cli create <OPTIONS>
+  resource-cli create [OPTIONS] --name <name>
 
 OPTIONS:
   -h, --help             Display this help message

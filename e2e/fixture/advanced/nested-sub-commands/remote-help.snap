@@ -3,11 +3,11 @@ A Git-like CLI (git v1.0.0)
 Manage remotes
 
 USAGE:
-  git remote [COMMANDS] <OPTIONS>
+  git remote [COMMANDS] [OPTIONS]
 
 COMMANDS:
-  add <OPTIONS>          Add a remote
-  remove <name>          Remove a remote
+  add --url <url>          Add a remote
+  remove <name>            Remove a remote
 
 For more info, run any command with the `--help` flag:
   git remote add --help
