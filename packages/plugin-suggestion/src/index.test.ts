@@ -298,6 +298,22 @@ describe('suggestion plugin', () => {
     expect(run).toHaveBeenCalledOnce()
   })
 
+  test('suggests a command that a plugin adds to an entry without run (#874)', async () => {
+    const stderr = defineMockErrorLog()
+    const adds = plugin({
+      id: 'adds',
+      setup: ctx => {
+        ctx.addCommand('run', define({ name: 'run', run: vi.fn<() => void>() }))
+      }
+    })
+
+    await expect(
+      cli(['rn'], define({ name: 'main' }), { plugins: [adds, suggestion()] })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
+  })
+
   test('localizes unknown option suggestion hints with i18n', async () => {
     const stderr = defineMockErrorLog()
 
