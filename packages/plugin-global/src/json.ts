@@ -77,7 +77,7 @@ export interface JsonFailure {
    */
   message: string
   /**
-   * The commands to run next. Only for `action_required`.
+   * The commands to run next. Only for `action_required`, when `--help` shows the help of the command.
    */
   next?: JsonNext[]
   /**
@@ -134,6 +134,7 @@ export async function createValidationFailure(
     issues.push(await createIssue(ctx, err))
   }
   const [single] = issues.length === 1 ? issues : []
+  const next = await createNext(ctx, resolveCommandPath(ctx, errors))
   return {
     status: 'action_required',
     reason: single ? single.reason : 'invalid_arguments',
@@ -142,7 +143,7 @@ export async function createValidationFailure(
       : await localizeBuiltinResource(ctx, resolveBuiltInKey('json:invalid-arguments'), {
           count: issues.length
         }),
-    next: await createNext(ctx, resolveCommandPath(ctx, errors)),
+    ...(next ? { next } : {}),
     data: { issues }
   }
 }
@@ -154,11 +155,12 @@ export async function createValidationFailure(
  * @returns The JSON error
  */
 export async function createNotSupportedFailure(ctx: Context): Promise<JsonFailure> {
+  const next = await createNext(ctx, ctx.commandPath)
   return {
     status: 'action_required',
     reason: toReason(JsonOutputErrorKeys.notSupported),
     message: await localizeBuiltinResource(ctx, JsonOutputErrorKeys.notSupported),
-    next: await createNext(ctx, ctx.commandPath)
+    ...(next ? { next } : {})
   }
 }
 
@@ -321,15 +323,36 @@ function resolveCommandPath(ctx: Context, errors: Error[]): readonly string[] {
 }
 
 /**
+ * Check whether `--help` shows the help of the command of the context.
+ *
+ * NOTE(kazupon): a command may declare a `help` argument of its own, which wins over the global one, and
+ * then `--help` is an argument of the command. Without a usage renderer, `--help` prints nothing. Either
+ * way, the help is not a way to fix the input. For an unknown command, the context is the one of its
+ * parent, whose help is pointed to.
+ *
+ * @param ctx - The command context
+ * @returns `true` when the global `--help` is in effect for the command, and the CLI renders a usage
+ */
+function hasHelp(ctx: Context): boolean {
+  return ctx.env.globalOptions?.has('help') === true && ctx.env.renderUsage != null
+}
+
+/**
  * Create the `next` of a JSON error: the help of a command. Without the name of the CLI, the command
  * line has `<COMMAND>` for its name, and `when` tells to replace it, since the agent knows how it ran
  * the CLI.
  *
  * @param ctx - The command context
  * @param commandPath - The path of the command
- * @returns The `next`
+ * @returns The `next`, or `undefined` when `--help` does not show the help of the command
  */
-async function createNext(ctx: Context, commandPath: readonly string[]): Promise<JsonNext[]> {
+async function createNext(
+  ctx: Context,
+  commandPath: readonly string[]
+): Promise<JsonNext[] | undefined> {
+  if (!hasHelp(ctx)) {
+    return undefined
+  }
   const name = ctx.env.name
   const argv = [name || '<COMMAND>', ...commandPath, '--help']
   const when = await localizeBuiltinResource(
