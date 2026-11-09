@@ -155,12 +155,28 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     cliOptions.subCommands = targetLevelSubCommands
   }
 
-  // resolve lazy commands before parsing so loader-defined args are available
-  const resolvedCommand = isLazyCommand<G>(targetCommand)
-    ? await resolveLazyCommand<G>(targetCommand, targetCommandName, true)
-    : targetCommand
+  /**
+   * NOTE(kazupon): a lazy command is loaded before the arguments are parsed, so that the arguments of the
+   * loaded command are used. An error of the loading, such as one that the loader throws, is thrown where the
+   * command would run, after the decorators, as an error of `run` is (#885): the global options plugin prints a
+   * `CommandError` with its exit code, and the failure as JSON with `--json`, and `onErrorCommand` sees it.
+   * Until then, the definition given to `lazy` stands for the command, so that its arguments are parsed, and
+   * `--help` prints its usage.
+   */
+  let resolvedCommand: Command<G>
+  let loadFailure: { error: unknown } | undefined
+  if (isLazyCommand<G>(targetCommand)) {
+    try {
+      resolvedCommand = await resolveLazyCommand<G>(targetCommand, targetCommandName, true)
+    } catch (error: unknown) {
+      loadFailure = { error }
+      resolvedCommand = await resolveLazyCommand<G>(targetCommand, targetCommandName)
+    }
+  } else {
+    resolvedCommand = targetCommand
+  }
 
-  if (selection.error == null && isLazyCommand<G>(targetCommand)) {
+  if (selection.error == null && isLazyCommand<G>(targetCommand) && loadFailure === undefined) {
     const loadedPositionals = getRoutingPositionals(
       tokens,
       pluginContext.globalOptions,
@@ -240,15 +256,19 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 
   const reported = trackReported(commandContext)
   let fallbackRunner: () => void = NOOP
-  if (resolvedCommand.run == null) {
+  if (loadFailure !== undefined) {
+    // the command whose loading failed is not a command without `run`: it runs, and throws the error
+    const { error } = loadFailure
+    fallbackRunner = () => {
+      throw error
+    }
+  } else if (resolvedCommand.run == null) {
     markWithoutRun(commandContext)
     /**
      * NOTE(kazupon): a command without `run` and without sub-commands has nothing to run, which is a
-     * mistake in its definition, such as a `run` left out (#879). It throws the error of a lazy command
-     * whose loader returns a command without `run`, where the command would run, after the decorators,
-     * so that `--help` still prints its usage. A lazy command fails earlier, when its loader runs, which
-     * is before the arguments are parsed: with `--help` too, and with sub-commands too. A command with
-     * sub-commands needs no runner, as before.
+     * mistake in its definition, such as a `run` left out (#879). It throws a `TypeError` where the command
+     * would run, after the decorators, so that `--help` still prints its usage. So does a lazy command whose
+     * loader returns a command without `run` (#885). A command with sub-commands needs no runner, as before.
      */
     const hasSubCommands =
       targetDepth === 0

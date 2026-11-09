@@ -434,9 +434,35 @@ When the loader returns a Command object, Gunshi resolves the command from both 
 - **The loaded command takes precedence**: A property that the loaded command defines is used, even if the definition has it too
 - **The definition is the fallback**: A property that the loaded command does not define is taken from the definition, so a loader that returns only `{ run }` behaves the same as a loader that returns the runner function
 - **Properties are not merged**: If both of them define a property such as `args` or `rendering`, the whole value of the loaded command is used
-- **`run` comes from the loader**: The loader returns the runner, or a command with `run`, and the definition has none. A `run` in the definition is a type error in TypeScript, and is not used: a loaded command without `run` fails with `'run' is required in command: <name>`
+- **`run` comes from the loader**: The loader returns the runner, or a command with `run`, and the definition has none. A `run` in the definition is a type error in TypeScript, and is not used. A loaded command without `run` is a command without `run`: it fails with `'run' is required in command: <name>` when it runs, unless it has sub-commands
 
 In the example above, `my-cli config --help` shows the description `Config command (debug: false)` and the `--verbose` option, which come from the loaded command. On the other hand, `my-cli --help` lists the command as `Dynamically configured command`, because the command list is rendered from the definition without calling the loader.
+
+## Errors While Loading
+
+A loader can fail, for example when the module of the command is not found. Gunshi reports an error of the loader where the command runs, as an error that `run` throws:
+
+- A `CommandError` prints its message to stderr without a stack trace, and sets the exit code. Throw one for a failure that people can act on
+- With `--json`, the failure is printed as JSON
+- The `onErrorCommand` hook sees the error
+- Any other error rejects the `cli()` promise, as an [unexpected error](./errors.md#unexpected-errors) of `run` does
+
+Until then, the definition stands for the command: Gunshi parses the arguments of the definition, and `--help` prints its usage.
+
+```ts
+import { CommandError, lazy } from 'gunshi'
+
+const deploy = lazy(
+  async () => {
+    try {
+      return (await import('./commands/deploy.ts')).run
+    } catch (error) {
+      throw new CommandError('Could not load the deploy command', { cause: error })
+    }
+  },
+  { name: 'deploy', description: 'Deploy the app' }
+)
+```
 
 ## Performance Considerations
 

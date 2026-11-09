@@ -1265,16 +1265,24 @@ describe('lazy commands', () => {
     expect(tree.loaded).toEqual(['entry'])
   })
 
-  test.each([
-    ['throws', 'broken'],
-    ['returns a command without a runner', 'norun']
-  ])('falls back to the definition when the loader %s', async (_label, name) => {
+  test('falls back to the definition when the loader throws', async () => {
     const tree = createLazyTree()
-    await run(['complete', '--', name, '--'], tree)
+    await run(['complete', '--', 'broken', '--'], tree)
 
     expect(output).toEqual([...GLOBAL_OPTION_LINES, ':4'])
-    expect(tree.loaded).toEqual([name])
+    expect(tree.loaded).toEqual(['broken'])
     // the shell is the one that receives the output, and not every shell discards stderr
+    expect(warnSpy).not.toHaveBeenCalled()
+    expect(errorSpy).not.toHaveBeenCalled()
+  })
+
+  // a loaded command without a runner is a command without `run`, which fails when it runs (#885)
+  test('completes the arguments of a loaded command without a runner', async () => {
+    const tree = createLazyTree()
+    await run(['complete', '--', 'norun', '--'], tree)
+
+    expect(output).toEqual([...GLOBAL_OPTION_LINES, '--x\t', ':4'])
+    expect(tree.loaded).toEqual(['norun'])
     expect(warnSpy).not.toHaveBeenCalled()
     expect(errorSpy).not.toHaveBeenCalled()
   })

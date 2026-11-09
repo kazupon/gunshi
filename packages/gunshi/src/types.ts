@@ -672,9 +672,8 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * {@linkcode CommandContext.omitted | omitted} set to `true`.
    *
    * A command without sub-commands needs a runner. Without one, it throws a `TypeError` when it runs
-   * (`'run' is required in command: <name>`), the error of a lazy command whose loader returns a command
-   * without a runner, and `--help` still prints its usage. A lazy command fails earlier, when its loader
-   * runs, even with `--help`.
+   * (`'run' is required in command: <name>`), and `--help` still prints its usage. So does a lazy command
+   * whose loader returns a command without a runner.
    */
   run?: CommandRunner<G>
   /**
@@ -888,9 +887,12 @@ type IsAnyArgs<A> = 0 extends 1 & A ? true : false
  * A function that returns a command or command runner.
  * This is used to lazily load commands.
  *
- * Any other value, such as `null` or `undefined`, fails when the command is loaded, with
- * `Cannot resolve command: <name>`. To tell what went wrong, such as a module that is not found,
- * throw an error instead.
+ * Any other value, such as `null` or `undefined`, fails with `Cannot resolve command: <name>`. To tell
+ * what went wrong, such as a module that is not found, throw an error instead, such as a
+ * `CommandError`. An error of the loading is thrown where the command would run, as an error of
+ * `run` is: a `CommandError` prints its message with its exit code, `--json` prints the failure as JSON,
+ * and `onErrorCommand` sees it. Until then, the definition given to `lazy` stands for the command, so that
+ * `--help` prints its usage.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command context and command runner.
  *

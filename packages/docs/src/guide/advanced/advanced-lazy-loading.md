@@ -101,6 +101,7 @@ export const run: CommandRunner<{ args: typeof meta.args }> = async ctx => {
 Create a custom loader to dynamically import command implementations:
 
 ```ts [packages/cli/src/loader.ts]
+import { CommandError } from 'gunshi'
 import type { CommandRunner, GunshiParamsConstraint } from 'gunshi'
 
 export async function load<G extends GunshiParamsConstraint>(
@@ -110,9 +111,9 @@ export async function load<G extends GunshiParamsConstraint>(
     // Dynamic import of the command package
     return await import(pkg).then(m => m.default || m)
   } catch (error: unknown) {
-    // Handle module not found errors
+    // Handle module not found errors, which people can fix by installing the package
     if (isErrorModuleNotFound(error)) {
-      throw new Error(`Fatal Error: '${pkg}' Command Runner is not installed`, { cause: error })
+      throw new CommandError(`'${pkg}' is not installed`, { code: 'not_installed', cause: error })
     }
     throw new Error(`Fatal Error: '${pkg}' Command Runner loading failed`, { cause: error })
   }
@@ -128,7 +129,7 @@ function isErrorModuleNotFound(e: unknown): e is NodeJS.ErrnoException {
 }
 ```
 
-The loader returns a command runner, or a command. Gunshi fails with `Cannot resolve command: <name>` for anything else, such as `null`, so throw an error that tells what went wrong instead, as for a command package that is not installed.
+The loader returns a command runner, or a command. Gunshi fails with `Cannot resolve command: <name>` for anything else, such as `null`, so throw an error that tells what went wrong instead, as for a command package that is not installed. Gunshi reports an error of the loader where the command runs, as one of `run` (see [Errors While Loading](../essentials/lazy-async.md#errors-while-loading)): the `CommandError` prints its message and its cause without a stack trace, with exit code `1`.
 
 ### 5. Command Definitions
 

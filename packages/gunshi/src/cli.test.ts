@@ -4680,18 +4680,6 @@ describe('reported command errors', () => {
           ]
         }
       ]
-    },
-    {
-      title: 'while a lazy command loads',
-      setup: error => [
-        [],
-        lazy(
-          () => {
-            throw error
-          },
-          { name: 'demo' }
-        )
-      ]
     }
   ])('reject with a CommandError thrown $title, without printing it', async ({ setup }) => {
     const stderr = defineMockErrorLog()
@@ -5144,6 +5132,136 @@ describe('a command without run and without sub-commands (#879)', () => {
       message: `'run' is required in command: list`
     })
     expect(process.exitCode).toBe(1)
+  })
+})
+
+/**
+ * NOTE(kazupon): a lazy command is loaded before the arguments are parsed, and an error of the loading is thrown
+ * where the command would run, after the decorators, as an error of `run` is. The definition stands for the
+ * command until then.
+ */
+describe('the errors of loading a lazy command (#885)', () => {
+  const entry = define({ name: 'demo', run: vi.fn<() => void>() })
+  const failing = (error: unknown) =>
+    lazy(
+      () => {
+        throw error
+      },
+      { name: 'deploy', description: 'Deploy the app', args: { ...jsonArgs } }
+    )
+
+  test('a CommandError thrown by the loader is printed with its exit code, and onErrorCommand sees it', async () => {
+    const stderr = defineMockErrorLog()
+    const error = new CommandError('Project acme not found', { exitCode: 2 })
+    const onErrorCommand = vi.fn<NonNullable<CliOptions['onErrorCommand']>>()
+
+    await expect(
+      cli(['deploy'], entry, {
+        name: 'demo',
+        subCommands: { deploy: failing(error) },
+        onErrorCommand
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Project acme not found')
+    expect(process.exitCode).toBe(2)
+    expect(onErrorCommand).toHaveBeenCalledWith(expect.anything(), error)
+    expect(entry.run).not.toHaveBeenCalled()
+  })
+
+  test('with --json, a failure of the loader is printed as JSON', async () => {
+    const stderr = defineMockErrorLog()
+    const error = new CommandError('Project acme not found', { code: 'not_found' })
+
+    await cli(['deploy', '--json'], entry, {
+      name: 'demo',
+      subCommands: { deploy: failing(error) }
+    })
+
+    expect(JSON.parse(stderr())).toEqual({
+      status: 'error',
+      reason: 'not_found',
+      message: 'Project acme not found'
+    })
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('any other error of the loader rejects, after onErrorCommand sees it', async () => {
+    const error = new Error('boom')
+    const onErrorCommand = vi.fn<NonNullable<CliOptions['onErrorCommand']>>()
+
+    await expect(
+      cli(['deploy'], entry, {
+        name: 'demo',
+        subCommands: { deploy: failing(error) },
+        onErrorCommand
+      })
+    ).rejects.toBe(error)
+
+    expect(onErrorCommand).toHaveBeenCalledWith(expect.anything(), error)
+  })
+
+  test('--help prints the usage of the definition when the loader fails', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['deploy', '--help'], entry, {
+      name: 'demo',
+      subCommands: { deploy: failing(new Error('boom')) }
+    })
+
+    expect(log()).toContain('Deploy the app')
+    expect(log()).toContain('USAGE:\n  demo deploy <OPTIONS>')
+  })
+
+  test('a loaded command without run fails where it runs, and --help prints its usage', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const status = lazy(async () => ({ description: 'Show the loaded status' }), { name: 'status' })
+    const options = { name: 'demo', subCommands: { status } }
+
+    await expect(cli(['status'], entry, options)).rejects.toThrow(
+      new TypeError(`'run' is required in command: status`)
+    )
+    await cli(['status', '--help'], entry, options)
+
+    expect(log()).toContain('Show the loaded status')
+  })
+
+  test('a lazy group whose loaded command has no run prints its usage, as a group without run does', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const add = define({ name: 'add', run: vi.fn<() => void>() })
+    const records = lazy(async () => ({ description: 'Manage the records' }), {
+      name: 'records',
+      subCommands: { add }
+    })
+
+    await cli(['records'], entry, { name: 'demo', subCommands: { records } })
+
+    expect(log()).toContain('Manage the records')
+    expect(log()).toContain('USAGE:\n  demo records [COMMANDS] <OPTIONS>')
+  })
+
+  test('@gunshi/bone calls onErrorCommand, and rejects', async () => {
+    const error = new CommandError('Project acme not found')
+    const onErrorCommand = vi.fn<NonNullable<CliOptions['onErrorCommand']>>()
+
+    await expect(
+      boneCli(['deploy'], entry, { subCommands: { deploy: failing(error) }, onErrorCommand })
+    ).rejects.toBe(error)
+
+    expect(onErrorCommand).toHaveBeenCalledWith(expect.anything(), error)
+  })
+
+  test('generate renders the usage of the definition when the loader fails', async () => {
+    const usage = await generate('deploy', entry, {
+      name: 'demo',
+      subCommands: { deploy: failing(new CommandError('Project acme not found')) }
+    })
+
+    expect(usage).toContain('Deploy the app')
+    expect(usage).toContain('USAGE:\n  demo deploy <OPTIONS>')
   })
 })
 
