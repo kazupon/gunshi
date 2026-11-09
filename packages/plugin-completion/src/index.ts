@@ -106,6 +106,23 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
 
       ctx.addCommand(COMPLETE_COMMAND_NAME, {
         ...fallbackEntry,
+        /**
+         * NOTE(kazupon): the help lists the `complete` command only alongside other commands, as v0.37.3
+         * did (#875). The completion script runs it, and the users of the CLI run it once to install the
+         * script, so the help of a CLI of a single command describes the command alone, without
+         * `[COMMANDS]` and the commands section. It is read when the help is rendered, after all the
+         * plugins have added their commands, so that the order of the plugins does not matter.
+         *
+         * @returns Whether the help leaves the command out
+         */
+        get internal(): boolean {
+          for (const [name, command] of ctx.subCommands) {
+            if (name !== COMPLETE_COMMAND_NAME && !command.entry && !command.internal) {
+              return false
+            }
+          }
+          return true
+        },
         rendering: {
           header: null // disable header rendering for completion command
         },

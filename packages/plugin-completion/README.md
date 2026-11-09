@@ -96,6 +96,8 @@ my-cli dep<TAB>  # Completes to: my-cli deploy
 my-cli deploy --env<TAB>  # Completes to: my-cli deploy --environment
 ```
 
+The help lists the `complete` command only alongside the other commands of your CLI. The help of a CLI of a single command describes that command alone, without a `COMMANDS` section, so tell the users of your CLI how to install the completion, as in [Shell Completion Setup](#shell-completion-setup).
+
 ### Shell Support
 
 The `complete` command accepts the following shell types:
