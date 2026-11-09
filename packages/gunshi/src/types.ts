@@ -670,6 +670,11 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * A command that has sub-commands needs no runner: run without a sub-command, it prints its usage,
    * with the global options plugin, as `--help` does. A command with a runner runs it then, with
    * {@linkcode CommandContext.omitted | omitted} set to `true`.
+   *
+   * A command without sub-commands needs a runner. Without one, it throws a `TypeError` when it runs
+   * (`'run' is required in command: <name>`), the error of a lazy command whose loader returns a command
+   * without a runner, and `--help` still prints its usage. A lazy command fails earlier, when its loader
+   * runs, even with `--help`.
    */
   run?: CommandRunner<G>
   /**

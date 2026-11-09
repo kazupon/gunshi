@@ -428,7 +428,7 @@ await cli(process.argv.slice(2), entry, {
 })
 ```
 
-`remote` and the entry only group sub-commands, so they have no `run`: run without a sub-command, such as `git remote`, a command without `run` prints its usage, as `--help` does.
+`remote` and the entry only group sub-commands, so they have no `run`: run without a sub-command, such as `git remote`, a command without `run` prints its usage, as `--help` does. A command without sub-commands needs `run`: without it, the command throws `'run' is required in command` when it runs.
 
 For more details on nested sub-commands, including lazy loading, intermediate command handling, and `commandPath`, see the [Nested Sub-Commands](../advanced/nested-sub-commands.md) guide.
 

@@ -5092,6 +5092,61 @@ describe('an array of sub-commands', () => {
   })
 })
 
+describe('a command without run and without sub-commands (#879)', () => {
+  const status = define({ name: 'status', description: 'Show the status' })
+  const entry = define({ name: 'demo', run: vi.fn<() => void>() })
+
+  test('fails when it runs as a sub-command, with its name', async () => {
+    await expect(cli(['status'], entry, { name: 'demo', subCommands: { status } })).rejects.toThrow(
+      new TypeError(`'run' is required in command: status`)
+    )
+    expect(entry.run).not.toHaveBeenCalled()
+  })
+
+  test('is named after its key when it has no name', async () => {
+    await expect(
+      cli(['info'], entry, { name: 'demo', subCommands: { info: { description: 'Show info' } } })
+    ).rejects.toThrow(`'run' is required in command: info`)
+  })
+
+  test('prints its usage with --help', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['status', '--help'], entry, { name: 'demo', subCommands: { status } })
+
+    expect(log()).toContain('demo status <OPTIONS>')
+  })
+
+  test('fails as a lazy command whose loader returns a command without run does', async () => {
+    const lazyStatus = lazy(async () => define({ name: 'status' }), { name: 'status' })
+    await expect(
+      cli(['status'], entry, { name: 'demo', subCommands: { status: lazyStatus } })
+    ).rejects.toThrow(new TypeError(`'run' is required in command: status`))
+  })
+
+  test('@gunshi/bone fails too', async () => {
+    await expect(boneCli(['status'], entry, { subCommands: { status } })).rejects.toThrow(
+      `'run' is required in command: status`
+    )
+  })
+
+  test('with --json, fails with command_failed, when it spreads jsonArgs', async () => {
+    const errorLog = defineMockErrorLog()
+    const list = define({ name: 'list', args: { ...jsonArgs } })
+
+    await cli(['list', '--json'], entry, { name: 'demo', subCommands: { list } })
+
+    // it was invalid_result, whose message suspects a plugin that decorates the command
+    expect(JSON.parse(errorLog())).toEqual({
+      status: 'error',
+      reason: 'command_failed',
+      message: `'run' is required in command: list`
+    })
+    expect(process.exitCode).toBe(1)
+  })
+})
+
 describe('a command without run that has sub-commands', () => {
   const add = define({ name: 'add', description: 'Add a record', run: () => {} })
   const list = define({ name: 'list', description: 'List the records', run: () => {} })
@@ -5144,13 +5199,13 @@ describe('a command without run that has sub-commands', () => {
     expect(log()).toBe('')
   })
 
-  test('a command without sub-commands prints nothing, as before', async () => {
+  test('a command without sub-commands fails instead, since it has nothing to run (#879)', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
 
-    const result = await cli([], define({ name: 'demo' }), { name: 'demo' })
-
-    expect(result).toBeUndefined()
+    await expect(cli([], define({ name: 'demo' }), { name: 'demo' })).rejects.toThrow(
+      new TypeError(`'run' is required in command: demo`)
+    )
     expect(log()).toBe('')
   })
 
