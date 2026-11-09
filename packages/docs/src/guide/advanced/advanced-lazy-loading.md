@@ -85,7 +85,7 @@ export default define({
 
 Implement the command in a separate file (e.g., `runner.ts`):
 
-```ts [packages/command-a/src/ruuner.ts]
+```ts [packages/command-a/src/runner.ts]
 import meta from './meta.ts'
 import type { CommandRunner } from 'gunshi'
 
@@ -169,7 +169,7 @@ import { commandALazy, commandBLazy } from './commands.ts'
 
 async function main() {
   // Load package.json for version info
-  const { default: pkgJsonModule } = await import('./package.json', { with: { type: 'json' } })
+  const { default: pkgJson } = await import('./package.json', { with: { type: 'json' } })
 
   // Run the CLI with lazy-loaded commands
   await cli(process.argv.slice(2), commandALazy, {
@@ -202,7 +202,8 @@ function createLazyCommand(name: string) {
     async () => {
       // Dynamically import metadata and implementation
       const meta = await import(`${name}/meta`).then(m => m.default || m)
-      return await load(name)
+      // The loaded command takes precedence over the minimal metadata below
+      return { ...meta, run: await load(name) }
     },
     { name } // Minimal metadata, rest will be loaded on demand
   )
