@@ -94,7 +94,28 @@ type CommandDefinition<
   A extends Args,
   E extends ExtendContext,
   C extends Partial<Command<{ args: A; extensions: E }>>
-> = C & Command<{ args: A; extensions: E }>
+> = C & Command<{ args: A; extensions: E }> & UnknownKeys<C, Command<{ args: A; extensions: E }>>
+
+/**
+ * The keys of a definition that the shape does not have, mapped to `never`
+ *
+ * NOTE(kazupon): the helpers infer the definition, so that the keys that it has are not optional in
+ * their result. A type parameter that is inferred from an object literal takes in every key of the
+ * literal, and TypeScript checks no excess property against it, so a typo such as `subcommands`
+ * would type-check and be ignored at run time (#871). Mapping the keys that the shape does not have
+ * to `never` reports each of them at the key.
+ *
+ * @internal
+ */
+type UnknownKeys<D, Shape> = { [K in Exclude<keyof D, keyof Shape>]: never }
+
+/**
+ * The shape of the definition of a lazy command: a command, and the `resource` of the i18n plugin,
+ * which `lazy` copies onto the lazy command
+ *
+ * @internal
+ */
+type LazyDefinitionShape<G extends GunshiParamsConstraint> = Command<G> & { resource?: unknown }
 
 /**
  * Define a {@link Command | command}.
@@ -277,7 +298,7 @@ export function lazy<
   D extends { args: Args } & Partial<Command<{ args: D['args']; extensions: {} }>>
 >(
   loader: CommandLoader<{ args: D['args']; extensions: {} }>,
-  definition: D
+  definition: D & UnknownKeys<D, LazyDefinitionShape<{ args: D['args']; extensions: {} }>>
 ): LazyCommand<{ args: D['args']; extensions: {} }, D>
 
 /**
@@ -294,7 +315,10 @@ export function lazy<
 export function lazy<
   G extends GunshiParamsConstraint = DefaultGunshiParams,
   D extends Partial<Command<G>> = Partial<Command<G>>
->(loader: CommandLoader<G>, definition?: D & WithoutJsonArgs<D>): LazyCommand<G, D>
+>(
+  loader: CommandLoader<G>,
+  definition?: D & WithoutJsonArgs<D> & UnknownKeys<D, LazyDefinitionShape<G>>
+): LazyCommand<G, D>
 
 /**
  * Define a {@link LazyCommand | lazy command} with or without definition.
@@ -357,7 +381,7 @@ type LazyWithTypesReturn<FullG extends GunshiParamsConstraint> = <
   D extends Partial<Command<FullG>> = {}
 >(
   loader: CommandLoader<FullG>,
-  definition?: D
+  definition?: D & UnknownKeys<D, LazyDefinitionShape<FullG>>
 ) => LazyCommand<FullG, D>
 
 /**
@@ -402,7 +426,7 @@ export function lazyWithTypes<G extends GunshiParamsConstraint>(): LazyWithTypes
 
   return <D extends Partial<Command<FullGunshiParams>> = {}>(
     loader: CommandLoader<FullGunshiParams>,
-    definition?: D
+    definition?: D & UnknownKeys<D, LazyDefinitionShape<FullGunshiParams>>
   ): LazyCommand<FullGunshiParams, D> => {
     return lazy(loader as any, definition as any) as LazyCommand<FullGunshiParams, D>
   }

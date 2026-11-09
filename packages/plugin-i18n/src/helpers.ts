@@ -17,6 +17,14 @@ import type {
 import type { CommandResourceFetcher, I18nCommand } from './types.ts'
 
 /**
+ * The keys of a definition that an i18n command does not have, mapped to `never`, so that a typo such
+ * as `subcommands` is reported at the key (#871). See `UnknownKeys` of `gunshi/definition`.
+ *
+ * @internal
+ */
+type UnknownKeys<D, Shape> = { [K in Exclude<keyof D, keyof Shape>]: never }
+
+/**
  * The result type of the {@linkcode defineI18n} function
  *
  * @internal
@@ -93,7 +101,9 @@ export function defineI18n<
   definition: C & { args?: A } & Omit<
       I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>,
       'resource' | 'args'
-    > & { resource?: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }> }
+    > & {
+      resource?: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }>
+    } & UnknownKeys<C, I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>>
 ): I18nCommandDefinitionResult<{ args: A; extensions: ExtractExtensions<G> }, C>
 
 /**
@@ -121,7 +131,9 @@ type DefineI18nWithTypesReturn<
   definition: C & { args?: A } & Omit<
       I18nCommand<{ args: A; extensions: DefaultExtensions }>,
       'resource' | 'args'
-    > & { resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }> }
+    > & {
+      resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }>
+    } & UnknownKeys<C, I18nCommand<{ args: A; extensions: DefaultExtensions }>>
 ) => I18nCommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C>
 
 /**
@@ -176,7 +188,9 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
     definition: C & { args?: A } & Omit<
         I18nCommand<{ args: A; extensions: DefaultExtensions }>,
         'resource' | 'args'
-      > & { resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }> }
+      > & {
+        resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }>
+      } & UnknownKeys<C, I18nCommand<{ args: A; extensions: DefaultExtensions }>>
   ): I18nCommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C> => {
     return defineI18n(definition) as any
   }) as DefineI18nWithTypesReturn<DefaultExtensions, DefaultArgs>
@@ -216,7 +230,12 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
 export function withI18nResource<
   G extends GunshiParamsConstraint,
   C extends Command<G> | SubCommandable
->(command: C, resource: CommandResourceFetcher<G>): WithI18nResourceResult<G, C> {
+>(
+  // NOTE(kazupon): the command may be a `SubCommandable` (#862), so its keys, such as `commandName`,
+  // are known too
+  command: C & UnknownKeys<C, I18nCommand<G> & SubCommandable>,
+  resource: CommandResourceFetcher<G>
+): WithI18nResourceResult<G, C> {
   return {
     ...command,
     resource
