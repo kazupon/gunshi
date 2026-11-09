@@ -79,7 +79,7 @@ await cli(process.argv.slice(2), main, {
 - Write the `choices` of an `enum` `as const`, so that its value is typed as their union. Without it, the value is a `string`
 - Declare an argument as an object with a `type`, as `service` above, or with a parser combinator, as `release` above. A combinator is the whole schema: it does not go in `type`, and it takes no object with a `type` (`positional()` alone is a string)
 - Sub-commands go in the `subCommands` option of `cli()`: an object keyed by the command names, a `Map`, or an array of commands. A command can also have its own `subCommands`. The command given to `cli()` runs when no command is given
-- A command that only groups sub-commands needs no `run`, as `ship` above: run without a sub-command, it prints its usage, as `--help` does, and the exit code is 0. Give it a `run` only when it has something else to do then
+- A command that only groups sub-commands needs no `run`, as `ship` above: run without a sub-command, it prints its usage, as `--help` does, and the exit code is 0. Give it a `run` only when it has something else to do then. Any other command needs `run`: without it, the command throws `'run' is required in command` when it runs
 - The `args` of a command are its own, so the sub-commands do not see the `args` of the main command. For an option of every command, spread shared arguments as above
 - Give `name` and `version` to `cli()`. The usage shows the name (`COMMAND` without it), `--version` prints the version, and the errors of `--json` tell the command to run next with the name
 - Gunshi ignores an option that a command does not declare, except `--json`. Keep this default unless the requirements say that an unknown option is an error: then give `strict: true` to `cli()`

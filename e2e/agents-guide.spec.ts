@@ -352,6 +352,20 @@ await cli(process.argv.slice(2), define({ name: 'todo', run: () => console.log('
     expect(result.stdout).toBe(run(file, ['tag', '--help']).stdout)
   })
 
+  test('any other command needs run, and fails without it when it runs', () => {
+    const file = write(
+      'leaf-without-run.mjs',
+      `import { cli, define } from 'gunshi'
+const add = define({ name: 'add', description: 'Add a bookmark' })
+await cli(process.argv.slice(2), define({ name: 'bm', run: () => {} }), { name: 'bm', subCommands: { add } })
+`
+    )
+    const result = run(file, ['add'])
+    expect(result.code).toBe(1)
+    expect(result.stderr).toMatch(/'run' is required in command: add/)
+    expect(run(file, ['add', '--help'])).toMatchObject({ code: 0, stderr: '' })
+  })
+
   test('a command that groups sub-commands runs its run, when it has one', () => {
     const file = write('group-with-run.mjs', withGroup(", run: () => console.log('tag')"))
     expect(run(file, ['tag']).stdout).toBe('tag\n')

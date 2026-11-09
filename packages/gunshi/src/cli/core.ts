@@ -239,11 +239,33 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   })
 
   const reported = trackReported(commandContext)
+  let fallbackRunner: () => void = NOOP
   if (resolvedCommand.run == null) {
     markWithoutRun(commandContext)
+    /**
+     * NOTE(kazupon): a command without `run` and without sub-commands has nothing to run, which is a
+     * mistake in its definition, such as a `run` left out (#879). It fails as a lazy command whose loader
+     * returns a command without `run` does. It fails where the command would run, after the decorators,
+     * so that `--help` still prints its usage. A command with sub-commands needs no runner, as before.
+     */
+    const hasSubCommands =
+      targetDepth === 0
+        ? routingOptions.subCommands.size > 0
+        : (getCommandSubCommands<G>(resolvedCommand)?.size ?? 0) > 0
+    if (!hasSubCommands) {
+      const commandName = resolvedCommand.name || targetCommandName || ANONYMOUS_COMMAND_NAME
+      fallbackRunner = () => {
+        throw new TypeError(`'run' is required in command: ${commandName}`)
+      }
+    }
   }
   try {
-    return await executeCommand(resolvedCommand, commandContext, decorators.commandDecorators)
+    return await executeCommand(
+      resolvedCommand,
+      commandContext,
+      decorators.commandDecorators,
+      fallbackRunner
+    )
   } catch (error: unknown) {
     /**
      * NOTE(kazupon): a plugin that has reported the validation errors to the user marks them, as the
@@ -1302,9 +1324,10 @@ function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextEx
 async function executeCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   cmd: Command<G>,
   ctx: Readonly<CommandContext<G>>,
-  decorators: Readonly<CommandDecorator<G>[]>
+  decorators: Readonly<CommandDecorator<G>[]>,
+  fallbackRunner: () => void = NOOP
 ): Promise<string | undefined> {
-  const commandRunner = cmd.run || NOOP
+  const commandRunner = cmd.run || fallbackRunner
   const baseRunner = (ctx: Readonly<CommandContext<G>>): Awaitable<string | void | JsonResult> => {
     if (hasPriorityValidationError(ctx.validationError)) {
       throw ctx.validationError
