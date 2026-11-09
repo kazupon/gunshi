@@ -501,6 +501,26 @@ const existingLocalizableCommand = withI18nResource(existingCommand, locale => (
 }))
 ```
 
+`withI18nResource` also takes a [lazy command](../essentials/lazy-async.md), and returns a lazy command that loads the same command when it runs:
+
+```ts
+import { lazy } from 'gunshi'
+import { withI18nResource } from '@gunshi/plugin-i18n'
+
+const lazyBuild = lazy(async () => (await import('./commands/build.ts')).run, {
+  name: 'build',
+  description: 'Build the project'
+})
+
+const localizableLazyBuild = withI18nResource(lazyBuild, locale =>
+  locale.toString() === 'ja-JP'
+    ? { description: 'プロジェクトをビルドする' }
+    : { description: 'Build the project' }
+)
+```
+
+A lazy command can also take its resource in its definition, as `lazy(loader, { name: 'build', resource })`.
+
 ### `resolveKey`
 
 The `resolveKey` helper ensures proper command namespace handling for custom translation keys:

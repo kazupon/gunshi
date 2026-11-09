@@ -1,5 +1,5 @@
 import { DeepWriteable } from '@gunshi/shared'
-import { cli, define } from 'gunshi'
+import { cli, define, lazy } from 'gunshi'
 import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
 import i18n from './index.ts'
@@ -385,6 +385,51 @@ describe('withI18nResource', () => {
     )
 
     expect(mock).toHaveBeenCalled()
+  })
+
+  test('keeps a lazy command lazy, as a sub-command (#877)', async () => {
+    const run = vi.fn<() => void>()
+    const loader = vi.fn<() => Promise<ReturnType<typeof define>>>(async () =>
+      define({ name: 'test', run })
+    )
+    const resource = vi.fn<CommandResourceFetcher>(() => ({ description: 'テストコマンド' }))
+    const lazyCommand = lazy(loader, { name: 'test', description: 'Test command' })
+
+    const localizedCommand = withI18nResource(lazyCommand, resource)
+
+    expect(typeof localizedCommand).toBe('function')
+    expect(localizedCommand.commandName).toBe('test')
+    expect(localizedCommand.description).toBe('Test command')
+    expect(localizedCommand.resource).toBe(resource)
+    // the lazy command is not changed
+    expect('resource' in lazyCommand).toBe(false)
+
+    await cli(
+      ['test'],
+      { run: () => {} },
+      {
+        subCommands: { test: localizedCommand },
+        plugins: [i18n({ locale: 'ja-JP' })]
+      }
+    )
+
+    expect(loader).toHaveBeenCalled()
+    expect(run).toHaveBeenCalled()
+    expect(resource).toHaveBeenCalled()
+  })
+
+  test('keeps a lazy command lazy, as the entry (#877)', async () => {
+    const run = vi.fn<() => void>()
+    const resource = vi.fn<CommandResourceFetcher>(() => ({ description: 'テストコマンド' }))
+    const localizedCommand = withI18nResource(
+      lazy(async () => define({ name: 'test', run }), { name: 'test' }),
+      resource
+    )
+
+    await cli([], localizedCommand, { plugins: [i18n({ locale: 'ja-JP' })] })
+
+    expect(run).toHaveBeenCalled()
+    expect(resource).toHaveBeenCalled()
   })
 
   test('preserves all properties', () => {
