@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import completion from './index.ts'
 import { COMPLETE_COMMAND_NAME, registerCompletion, registerForCompletion } from './registration.ts'
 
-import type { ArgSchema, Args, Command, LazyCommand } from '@gunshi/plugin'
+import type { ArgSchema, Args, Command, LazyCommand, Plugin } from '@gunshi/plugin'
 import type { I18nCommand, I18nExtension } from '@gunshi/plugin-i18n'
 import type { MockInstance } from 'vitest'
 import type { CompletionOptions } from './types.ts'
@@ -2503,5 +2503,100 @@ describe('#744 - a short name that a global option also uses', () => {
     // `--logLevel` is the global option, and it still takes its value
     expect(await completeWith(['local', '-l', '--logLevel', ''])).toEqual(['debug\t', ':4'])
     expect(await completeWith(['local', '-l', '--logLevel', 'debug', ''])).toEqual(['prod\t', ':4'])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// #875 - the help lists the `complete` command only alongside other commands
+// ---------------------------------------------------------------------------
+
+describe('#875 - the `complete` command in the help', () => {
+  const file = { type: 'positional', description: 'A file' } satisfies ArgSchema
+  const add = defineCommand({ name: 'add', description: 'Add a record', run: NOOP })
+  const list = defineCommand({ name: 'list', description: 'List the records', run: NOOP })
+
+  function app(run: Command['run'] = NOOP): Command {
+    return defineCommand({ name: 'app', description: 'An app', args: { file }, run })
+  }
+
+  function adds(name: string): Plugin {
+    return plugin({
+      id: `adds-${name}`,
+      setup: ctx => {
+        ctx.addCommand(name, defineCommand({ name, description: `The ${name} command`, run: NOOP }))
+      }
+    })
+  }
+
+  async function helpOf(
+    entry: Command,
+    plugins: Plugin[],
+    subCommands?: Record<string, Command>
+  ): Promise<string> {
+    return (
+      (await cli(['--help'], entry, { name: 'app', usageSilent: true, subCommands, plugins })) ?? ''
+    )
+  }
+
+  test('is not listed for a CLI of a single command', async () => {
+    const help = await helpOf(app(), [completion()])
+
+    expect(help).toContain('USAGE:\n  app <OPTIONS> <file>')
+    expect(help).not.toContain('COMMANDS:')
+    expect(help).not.toContain('complete')
+  })
+
+  test.each([
+    {
+      label: 'the CLI declares commands',
+      entry: app(),
+      plugins: [completion()],
+      subCommands: { add, list },
+      usage: 'app [COMMANDS] <OPTIONS> <file>'
+    },
+    {
+      label: 'a plugin adds the commands of an entry without run',
+      entry: defineCommand({ name: 'app', description: 'An app' }),
+      plugins: [adds('add'), completion()],
+      subCommands: undefined,
+      usage: 'app [COMMANDS] <OPTIONS>'
+    },
+    {
+      label: 'another plugin adds a command before it',
+      entry: app(),
+      plugins: [adds('lint'), completion()],
+      subCommands: undefined,
+      usage: 'app [COMMANDS] <OPTIONS> <file>'
+    },
+    {
+      label: 'another plugin adds a command after it',
+      entry: app(),
+      plugins: [completion(), adds('lint')],
+      subCommands: undefined,
+      usage: 'app [COMMANDS] <OPTIONS> <file>'
+    }
+  ])(
+    'is listed alongside the other commands when $label',
+    async ({ entry, plugins, subCommands, usage }) => {
+      const help = await helpOf(entry, plugins, subCommands)
+
+      expect(help).toContain(`USAGE:\n  ${usage}`)
+      expect(help).toMatch(/^ {2}complete +Generate shell completion script$/m)
+    }
+  )
+
+  test('a CLI of a single command still prints the script, and its entry still takes a word', async () => {
+    const output: string[] = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+    const run = vi.fn<NonNullable<Command['run']>>()
+
+    await cli(['complete', 'bash'], app(run), { name: 'app', plugins: [completion()] })
+    await cli(['foo'], app(run), { name: 'app', plugins: [completion()] })
+
+    expect(output.join('\n')).toContain('# bash completion for app')
+    expect(run).toHaveBeenCalledTimes(1)
+    expect(run).toHaveBeenCalledWith(expect.objectContaining({ positionals: ['foo'] }))
   })
 })

@@ -343,7 +343,7 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-The completion plugin adds a special `complete` command to your CLI that generates shell-specific completion scripts.
+The completion plugin adds a special `complete` command to your CLI that generates shell-specific completion scripts. The help lists it only alongside the other commands of your CLI: the help of a CLI of a single command describes that command alone.
 
 ### Installing Completion for End Users
 
