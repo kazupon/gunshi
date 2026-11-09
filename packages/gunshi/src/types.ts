@@ -672,8 +672,9 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * {@linkcode CommandContext.omitted | omitted} set to `true`.
    *
    * A command without sub-commands needs a runner. Without one, it throws a `TypeError` when it runs
-   * (`'run' is required in command: <name>`), as a lazy command whose loader returns a command without
-   * a runner does. `--help` still prints its usage.
+   * (`'run' is required in command: <name>`), the error of a lazy command whose loader returns a command
+   * without a runner, and `--help` still prints its usage. A lazy command fails earlier, when its loader
+   * runs, even with `--help`.
    */
   run?: CommandRunner<G>
   /**

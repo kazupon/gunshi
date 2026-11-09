@@ -244,9 +244,11 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     markWithoutRun(commandContext)
     /**
      * NOTE(kazupon): a command without `run` and without sub-commands has nothing to run, which is a
-     * mistake in its definition, such as a `run` left out (#879). It fails as a lazy command whose loader
-     * returns a command without `run` does. It fails where the command would run, after the decorators,
-     * so that `--help` still prints its usage. A command with sub-commands needs no runner, as before.
+     * mistake in its definition, such as a `run` left out (#879). It throws the error of a lazy command
+     * whose loader returns a command without `run`, where the command would run, after the decorators,
+     * so that `--help` still prints its usage. A lazy command fails earlier, when its loader runs, which
+     * is before the arguments are parsed: with `--help` too, and with sub-commands too. A command with
+     * sub-commands needs no runner, as before.
      */
     const hasSubCommands =
       targetDepth === 0
