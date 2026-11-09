@@ -115,7 +115,8 @@ export function isLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
  *
  * If the loader returns a command, the properties of the loaded command take precedence,
  * and the properties that it does not define fall back to the definition that is given to `lazy`.
- * `run` comes from the loader only, as the definition has none, so a loaded command without `run` is an error.
+ * `run` comes from the loader only, as the definition has none. A loaded command without `run` is resolved
+ * without it, as any command without `run`, which the CLI fails with when it runs, unless it has sub-commands.
  *
  * @param cmd - A {@link Commandable} or {@link LazyCommand} to resolve
  * @param name - Optional name of the command, if not provided, it will use the name from the command itself.
@@ -147,7 +148,7 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
 
     if (needRunResolving) {
       /**
-       * NOTE(kazupon): the errors name the command, by its `commandName` or the name that it is given with.
+       * NOTE(kazupon): the error names the command, by its `commandName` or the name that it is given with.
        * The lazy command is the loader function, so its `name` is the name of the function, such as
        * `buildLoader` of a loader in a const.
        */
@@ -156,13 +157,11 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
       if (typeof loaded === 'function') {
         command.run = loaded
       } else if (typeof loaded === 'object' && loaded !== null) {
-        if (loaded.run == null) {
-          throw new TypeError(`'run' is required in command: ${commandName}`)
-        }
         /**
          * NOTE(kazupon): the loaded command wins, and the definition that is given to `lazy` is the fallback
          * for what the loaded command does not define. A loader that returns `{ run }` keeps the whole definition,
-         * like a loader that returns the runner itself.
+         * like a loader that returns the runner itself. A loaded command without `run` is a command without `run`
+         * (#885): the CLI fails with it where it would run, as with any other, or prints the usage of a group.
          */
         command.run = loaded.run
         command.name = loaded.name ?? cmd.commandName

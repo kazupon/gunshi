@@ -113,10 +113,13 @@ Gunshi prints a `CommandError` that is thrown from these places:
 
 - `run`, and the functions that `run` calls, including the functions of a plugin extension
 - a command decorator of a plugin (see [Plugin Decorators](../plugin/decorators.md))
+- the loader of a [lazy command](./lazy-async.md), which loads the command when it runs
 
-It does not print a `CommandError` thrown from a [hook](../advanced/command-hooks.md), while a plugin extends the command context, or while a [lazy command](./lazy-async.md) loads.
+It does not print a `CommandError` thrown from a [hook](../advanced/command-hooks.md), or while a plugin extends the command context.
 
 These run outside the command, and the `cli()` promise rejects with the error, as it does with an [unexpected error](#unexpected-errors). Throw the failures that a command expects from `run`.
+
+Gunshi loads a lazy command before it parses the arguments, and reports an error of the loader where the command runs, as an error of `run`. Until then, the definition given to `lazy` stands for the command, so `--help` prints its usage.
 
 ## With `--json`
 
