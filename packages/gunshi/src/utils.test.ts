@@ -210,21 +210,42 @@ describe('resolveLazyCommand', () => {
     expect(resolved.run).toBeUndefined()
   })
 
-  test('the errors of a loaded command name the command, not the loader function', async () => {
+  test('the error of a loaded value that is not a command names the command, not the loader function', async () => {
     // loaders in consts, as the guide writes them: each function is named after its const
-    const buildLoader = async () => ({ description: 'Build the project' })
     const deployLoader = (async () => undefined) as unknown as CommandLoader
-    const statusLoader = async () => ({ description: 'Show the status' })
+    const statusLoader = (async () => undefined) as unknown as CommandLoader
 
-    await expect(
-      resolveLazyCommand(lazy(buildLoader, { name: 'build' }), 'key', true)
-    ).rejects.toThrow(new TypeError(`'run' is required in command: build`))
     await expect(
       resolveLazyCommand(lazy(deployLoader, { name: 'deploy' }), 'key', true)
     ).rejects.toThrow(new TypeError(`Cannot resolve command: deploy`))
     // without a name in the definition, the name that the command is given with
     await expect(resolveLazyCommand(lazy(statusLoader), 'key', true)).rejects.toThrow(
-      new TypeError(`'run' is required in command: key`)
+      new TypeError(`Cannot resolve command: key`)
+    )
+  })
+
+  // the CLI fails with a command without run where it runs, as with any other (#885)
+  test('a loaded command without run is resolved without it', async () => {
+    const buildLoader = async () => ({ description: 'Build the project' })
+
+    const resolved = await resolveLazyCommand(lazy(buildLoader, { name: 'build' }), 'key', true)
+
+    expect(resolved.run).toBeUndefined()
+    expect(resolved.name).toBe('build')
+    expect(resolved.description).toBe('Build the project')
+  })
+
+  // `typeof null` is 'object', but null is neither a command nor a runner (#883)
+  test.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['a number', 0],
+    ['a string', 'run']
+  ])('a loader that returns %s fails with Cannot resolve command', async (_label, value) => {
+    const command = lazy((async () => value) as unknown as CommandLoader, { name: 'deploy' })
+
+    await expect(resolveLazyCommand(command, 'key', true)).rejects.toThrow(
+      new TypeError(`Cannot resolve command: deploy`)
     )
   })
 })
