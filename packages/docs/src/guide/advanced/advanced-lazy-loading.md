@@ -105,21 +105,17 @@ import type { CommandRunner, GunshiParamsConstraint } from 'gunshi'
 
 export async function load<G extends GunshiParamsConstraint>(
   pkg: string
-): Promise<CommandRunner<G> | null> {
-  let mod: Promise<CommandRunner<G> | null> | undefined
-  // Dynamic import of the command package
+): Promise<CommandRunner<G>> {
   try {
-    mod = await import(pkg).then(m => m.default || m)
+    // Dynamic import of the command package
+    return await import(pkg).then(m => m.default || m)
   } catch (error: unknown) {
     // Handle module not found errors
     if (isErrorModuleNotFound(error)) {
-      mod = Promise.resolve(null)
+      throw new Error(`Fatal Error: '${pkg}' Command Runner is not installed`, { cause: error })
     }
+    throw new Error(`Fatal Error: '${pkg}' Command Runner loading failed`, { cause: error })
   }
-  if (mod === undefined) {
-    throw new Error(`Fatal Error: '${pkg}' Command Runner loading failed`)
-  }
-  return mod
 }
 
 function isErrorModuleNotFound(e: unknown): e is NodeJS.ErrnoException {
@@ -131,6 +127,8 @@ function isErrorModuleNotFound(e: unknown): e is NodeJS.ErrnoException {
   )
 }
 ```
+
+The loader returns a command runner, or a command. Gunshi fails with `Cannot resolve command: <name>` for anything else, such as `null`, so throw an error that tells what went wrong instead, as for a command package that is not installed.
 
 ### 5. Command Definitions
 

@@ -155,7 +155,7 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
       const loaded = await cmd()
       if (typeof loaded === 'function') {
         command.run = loaded
-      } else if (typeof loaded === 'object') {
+      } else if (typeof loaded === 'object' && loaded !== null) {
         if (loaded.run == null) {
           throw new TypeError(`'run' is required in command: ${commandName}`)
         }
@@ -178,6 +178,10 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
           ;(command as { resource: any }).resource = loaded.resource
         }
       } else {
+        /**
+         * NOTE(kazupon): `null` comes here too, though `typeof null` is `'object'` (#883): a loader may return it
+         * for a module that is not found, and it is neither a command nor a runner, as `undefined` is not.
+         */
         throw new TypeError(`Cannot resolve command: ${commandName}`)
       }
     }
