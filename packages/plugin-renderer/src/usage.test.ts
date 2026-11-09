@@ -1311,7 +1311,7 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
     )
 
     expect(usage).toContain('--no-widgets')
-    expect(usage).not.toContain('Negatable of')
+    expect(usage).not.toContain('Negate ')
   })
 
   test('is typed by its own schema', async () => {
@@ -1348,7 +1348,7 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
     })
 
     expect(usage).toContain('Skip the cache')
-    expect(usage).toMatch(/--no-no-cache\s+Negatable of --no-cache/)
+    expect(usage).toMatch(/--no-no-cache\s+Negate --no-cache/)
   })
 
   test('the negated form of a negatable option is unchanged', async () => {
@@ -1358,7 +1358,7 @@ describe('#732 - an argument whose name starts with `no-` is described by itself
       false
     )
 
-    expect(usage).toMatch(/--no-force\s+Negatable of -f, --force/)
+    expect(usage).toMatch(/--no-force\s+Negate -f, --force/)
   })
 })
 
@@ -1466,7 +1466,7 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
 
     expect(negatedRows(usage)).toHaveLength(1)
     expect(negatedRows(usage)[0]).toContain('Never run for real')
-    expect(usage).not.toContain('Negatable of')
+    expect(usage).not.toContain('Negate ')
   })
 
   test('the order in which the two are declared makes no difference', async () => {
@@ -1511,7 +1511,7 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
     })
 
     expect(negatedRows(usage)).toHaveLength(1)
-    expect(negatedRows(usage)[0]).toContain('Negatable of -d, --dry-run')
+    expect(negatedRows(usage)[0]).toContain('Negate -d, --dry-run')
   })
 
   test('without `toKebab` the two are different names, and both are listed', async () => {
@@ -1524,7 +1524,7 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
     )
 
     expect(usage).toMatch(/--noDryRun\s+Never run for real/)
-    expect(usage).toMatch(/--no-dryRun\s+Negatable of -d, --dryRun/)
+    expect(usage).toMatch(/--no-dryRun\s+Negate -d, --dryRun/)
   })
 })
 
@@ -2506,5 +2506,13 @@ describe('the symbols of the usage', () => {
 
     expect(usage).toMatch(/^ {2}push --remote <remote>\s+Push$/m)
     expect(usage).toMatch(/^ {2}tidy \[OPTIONS\]\s+Tidy$/m)
+  })
+
+  test('the negated form of a negatable option is described with the option it negates', async () => {
+    const usage = await usageOf({
+      recursive: { type: 'boolean', short: 'r', negatable: true, description: 'Recursive' }
+    })
+
+    expect(usage).toMatch(/^ {2}--no-recursive\s+Negate -r, --recursive$/m)
   })
 })

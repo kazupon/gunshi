@@ -94,7 +94,7 @@ describe('without translation function', () => {
     // negatable argument
     expect(
       await localize(resolveArgKey<NonNullable<typeof command1.args>>('no-bar', ctx.name))
-    ).toEqual('Negatable of --bar')
+    ).toEqual('Negate --bar')
     // non-existent argument
     expect(await localize(resolveArgKey('test', ctx.name))).toEqual('test')
   })
@@ -166,7 +166,7 @@ describe('an argument whose name starts with `no-`', () => {
       force: { type: 'boolean', short: 'f', negatable: true, description: 'Force' }
     })
 
-    expect(await localize(resolveArgKey('no-force', 'main'))).toEqual('Negatable of -f, --force')
+    expect(await localize(resolveArgKey('no-force', 'main'))).toEqual('Negate -f, --force')
   })
 
   test('is not composed for an option that is not negatable', async () => {
@@ -182,6 +182,6 @@ describe('an argument whose name starts with `no-`', () => {
     })
 
     expect(await localize(resolveArgKey('no-cache', 'main'))).toEqual('Skip the cache')
-    expect(await localize(resolveArgKey('no-no-cache', 'main'))).toEqual('Negatable of --no-cache')
+    expect(await localize(resolveArgKey('no-no-cache', 'main'))).toEqual('Negate --no-cache')
   })
 })

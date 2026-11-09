@@ -69,7 +69,7 @@ USAGE:
 OPTIONS:
   -f, --foo-bar <foo-bar>                                  The fooBar option
   --baz-qux                                                The bazQux option
-  --no-baz-qux                                             Negatable of --baz-qux
+  --no-baz-qux                                             Negate --baz-qux
   -c, --camel-case <camel-case>                            The camelCase option (default: 42)
   -k, --kebab-case-required <kebab-case-required>          The kebabCaseRequired option
 
@@ -174,7 +174,7 @@ ARGUMENTS:
 OPTIONS:
   -f, --foo <foo>          The foo option
   -B, --bar                The bar option
-  --no-bar                 Negatable of -B, --bar
+  --no-bar                 Negate -B, --bar
   -b, --baz <baz>          The baz option (default: 42)
   -q, --qux <qux>          The qux option
   -l, --log <log>          The log option (default: info, choices: debug | info | warn | error)
@@ -232,7 +232,7 @@ ARGUMENTS:
 OPTIONS:
   -f, --foo <foo>          The foo option
   -B, --bar                The bar option
-  --no-bar                 Negatable of -B, --bar
+  --no-bar                 Negate -B, --bar
   -b, --baz <baz>          The baz option (default: 42)
   -q, --qux <qux>          The qux option
   -l, --log <log>          The log option (default: info, choices: debug | info | warn | error)

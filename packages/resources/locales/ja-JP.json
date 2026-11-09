@@ -7,7 +7,7 @@
   "OPTIONS": "オプション",
   "EXAMPLES": "例",
   "FORMORE": "詳細は、コマンドと`--help`フラグを実行してください",
-  "NEGATABLE": "否定可能な",
+  "NEGATABLE": "{$option} を打ち消す",
   "DEFAULT": "デフォルト",
   "CHOICES": "選択肢",
   "CAUSEDBY": "原因",

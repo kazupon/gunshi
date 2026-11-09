@@ -118,7 +118,7 @@ USAGE:
 OPTIONS:
   -p, --path <path>                    File or directory path to operate on
   -r, --recursive                      Operate recursively on directories
-  --no-recursive                       Negatable of -r, --recursive
+  --no-recursive                       Negate -r, --recursive
   -o, --operation <operation>          Operation to perform: list, copy, move, or delete
   -h, --help                           Display this help message
   -v, --version                        Display this version
@@ -137,7 +137,7 @@ EXAMPLES:
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!IMPORTANT]
-> Boolean options automatically receive a negatable version with the `--no-` prefix. This allows users to explicitly disable boolean flags.
+> A boolean option declared with `negatable: true` also accepts its `--no-` prefixed form, which lets users explicitly disable the flag. The help lists the negated form after the option, as `--no-recursive` above. See [Negatable Boolean Options](./declarative.md#negatable-boolean-options).
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -161,7 +161,7 @@ This adds type information to each option:
 OPTIONS:
   -p, --path <path>              [string]   File or directory path to operate on
   -r, --recursive                [boolean]  Operate recursively on directories
-  --no-recursive                 [boolean]  Negatable of -r, --recursive
+  --no-recursive                 [boolean]  Negate -r, --recursive
   -o, --operation <operation>    [string]   Operation to perform: list, copy, move, or delete
   -h, --help                     [boolean]  Display this help message
   -v, --version                  [boolean]  Display this version
@@ -267,9 +267,9 @@ Gunshi provides several automatic features without requiring any configuration:
 
 ### Negatable Boolean Options
 
-- Boolean options automatically get `--no-` prefixed versions
+- A boolean option declared with `negatable: true` also accepts its `--no-` prefixed form
 - Allows explicit disabling of boolean flags
-- Example: `--recursive` automatically creates `--no-recursive`
+- The help lists the negated form and describes it, such as `--no-recursive  Negate -r, --recursive`
 
 ### Invalid Argument Handling
 
@@ -287,7 +287,7 @@ When working with auto-generated usage:
 - The `examples` field accepts both single strings and multi-line strings for multiple examples
 - Sub-command help is accessible both from the main help and individually via `command --help`
 - The USAGE line shows `[OPTIONS]` for the options that can be left out, and spells out each required option, such as `--name <name>`
-- Boolean options automatically get negatable versions (`--no-` prefix) when not required
+- Boolean options declared with `negatable: true` get negated forms (`--no-` prefix), which the help lists and describes
 - The `usageOptionType` CLI option adds type annotations to help output
 
 ## Next Steps

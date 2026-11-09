@@ -7,6 +7,7 @@ import { ANONYMOUS_COMMAND_NAME } from '@gunshi/plugin'
 import {
   ARG_NEGATABLE_PREFIX,
   COMMON_ARGS,
+  composeNegatableDescription,
   resolveExamples as _resolvedExamples,
   makeShortLongOptionPair,
   resolveArgKey,
@@ -638,7 +639,12 @@ async function generateOptionalArgsUsage<
         const schema = ctx.args[name]
         if (schema) {
           const optionKey = makeShortLongOptionPair(schema, name, ctx.toKebab)
-          rawDesc = `${await ctx.extensions[pluginId].text(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
+          rawDesc = composeNegatableDescription(
+            await ctx.extensions[pluginId].text(resolveBuiltInKey('NEGATABLE'), {
+              option: optionKey
+            }),
+            optionKey
+          )
         }
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''

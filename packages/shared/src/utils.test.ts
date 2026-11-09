@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { resolveCommandArgs as resolveCommandArgsOfCore } from '../../gunshi/src/cli/args.ts'
 import {
+  composeNegatableDescription,
   resolveArgKey,
   resolveCommandArgs,
   resolveDisplayName,
@@ -148,5 +149,18 @@ describe('resolveCommandArgs', () => {
     resolveCommandArgs(globalOptions, { verbose: { type: 'boolean', short: 'v' } } satisfies Args)
 
     expect(globalOptions.get('version')!.short).toEqual('v')
+  })
+})
+
+describe('composeNegatableDescription', () => {
+  test('takes the text that places the option', () => {
+    expect(composeNegatableDescription('Negate --force', '--force')).toBe('Negate --force')
+    expect(composeNegatableDescription('-f, --force を打ち消す', '-f, --force')).toBe(
+      '-f, --force を打ち消す'
+    )
+  })
+
+  test('puts the option after a text without the placeholder, as before', () => {
+    expect(composeNegatableDescription('Négation de', '--force')).toBe('Négation de --force')
   })
 })

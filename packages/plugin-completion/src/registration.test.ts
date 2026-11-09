@@ -584,7 +584,7 @@ describe('registerForCompletion', () => {
     [['remote', '--verbose', ''], 'add\tAdd a remote'],
     [['remote', 'add', '--force', ''], 'origin\t'],
     [['remote', 'add', '--no-force', ''], 'origin\t'],
-    [['remote', 'add', '--no-'], '--no-force\tNegatable of -f, --force']
+    [['remote', 'add', '--no-'], '--no-force\tNegate -f, --force']
   ])('completes after a boolean option: %j', async (args, expected) => {
     const [actual] = await complete(registerActivePath(args), args, false, output)
     expect(actual.split('\n')).toContain(expected)
@@ -818,7 +818,7 @@ describe('global options', () => {
       '--version\tDisplay this version',
       '--profile\tProfile',
       '--color\tColorize output',
-      '--no-color\tNegatable of --color',
+      '--no-color\tNegate --color',
       '--config\tConfig file',
       '--mode\tMode',
       '--debug\tDebug',
@@ -901,7 +901,7 @@ describe('global options', () => {
       '--version\tVersion to release',
       '--profile\tProfile',
       '--color\tColorize output',
-      '--no-color\tNegatable of --color',
+      '--no-color\tNegate --color',
       ':4'
     ])
     expect(t.commands.get('release')?.options.get('version')?.isBoolean).toEqual(false)
@@ -1643,7 +1643,7 @@ describe('toKebab', () => {
   test('suggests the names that gunshi accepts', async () => {
     expect(await complete(['deploy', '--'])).toEqual([
       '--dry-run\tDry run',
-      '--no-dry-run\tNegatable of --dry-run',
+      '--no-dry-run\tNegate --dry-run',
       '--log-level\tLog level',
       ':4'
     ])
@@ -1659,10 +1659,7 @@ describe('toKebab', () => {
 
   test('completes a prefix that is typed in kebab-case', async () => {
     expect(await complete(['deploy', '--dry-'])).toEqual(['--dry-run\tDry run', ':4'])
-    expect(await complete(['deploy', '--no-d'])).toEqual([
-      '--no-dry-run\tNegatable of --dry-run',
-      ':4'
-    ])
+    expect(await complete(['deploy', '--no-d'])).toEqual(['--no-dry-run\tNegate --dry-run', ':4'])
   })
 
   test('completes the value with the handler that is configured by the argument key', async () => {
@@ -1715,7 +1712,7 @@ describe('toKebab', () => {
 
     expect(await complete(['deploy', '--'], { deploy: lazyDeploy })).toEqual([
       '--dry-run\tDry run',
-      '--no-dry-run\tNegatable of --dry-run',
+      '--no-dry-run\tNegate --dry-run',
       '--log-level\tLog level',
       ':4'
     ])
@@ -1854,7 +1851,7 @@ describe('hidden', () => {
       '--visibleGlobal\tVisible global',
       '--output\tOutput file',
       '--force\tForce',
-      '--no-force\tNegatable of --force',
+      '--no-force\tNegate --force',
       ':4'
     ])
   })
@@ -2048,7 +2045,7 @@ describe('#732 - an argument whose name starts with `no-`', () => {
       '--help\tDisplay this help message',
       '--version\tDisplay this version',
       '--force\tForce',
-      '--no-force\tNegatable of -f, --force',
+      '--no-force\tNegate -f, --force',
       ':4'
     ])
   })
@@ -2148,9 +2145,9 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
       '--help\tこのヘルプメッセージを表示',
       '--version\tこのバージョンを表示',
       '--force\t強制',
-      '--no-force\t否定可能な -f, --force',
+      '--no-force\t-f, --force を打ち消す',
       '--color\t色を付ける',
-      '--no-color\t否定可能な --color',
+      '--no-color\t--color を打ち消す',
       '--quiet\tQuiet',
       ':4'
     ])
@@ -2163,10 +2160,10 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
     ])
     const japanese = await complete(['build', '--'])
 
-    expect(english).toContain('--no-force\tNegatable of -f, --force')
-    expect(english).toContain('--no-color\tNegatable of --color')
+    expect(english).toContain('--no-force\tNegate -f, --force')
+    expect(english).toContain('--no-color\tNegate --color')
     // the same CLI, and the same argument, described in the other locale
-    expect(japanese).toContain('--no-force\t否定可能な -f, --force')
+    expect(japanese).toContain('--no-force\t-f, --force を打ち消す')
   })
 
   test('a resource of its own still wins', async () => {
@@ -2174,11 +2171,11 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
 
     expect(candidates).toContain('--no-force\t強制しない')
     // the one without a resource of its own still falls back to the composed text
-    expect(candidates).toContain('--no-color\t否定可能な --color')
+    expect(candidates).toContain('--no-color\t--color を打ち消す')
   })
 
   test('the composed text follows `toKebab`', async () => {
-    expect(await complete(['deploy', '--'])).toContain('--no-dry-run\t否定可能な -d, --dry-run')
+    expect(await complete(['deploy', '--'])).toContain('--no-dry-run\t-d, --dry-run を打ち消す')
   })
 
   test('a negatable global option is described too', async () => {
@@ -2188,7 +2185,7 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
       completion({ config })
     ])
 
-    expect(candidates).toContain('--no-tty\t否定可能な --tty')
+    expect(candidates).toContain('--no-tty\t--tty を打ち消す')
   })
 
   test('a hidden negatable global option stays hidden, and takes no value', async () => {
@@ -2201,7 +2198,7 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
       )
     ).toBe(false)
     expect(await complete(['build', '--no-t'], { build }, plugins)).toEqual([
-      '--no-tty\t否定可能な --tty',
+      '--no-tty\t--tty を打ち消す',
       ':4'
     ])
     // a boolean option takes no value, so the word after it completes the positional (#710, #735)
@@ -2217,9 +2214,9 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
       '--help\tDisplay this help message',
       '--version\tDisplay this version',
       '--force\tForce',
-      '--no-force\tNegatable of -f, --force',
+      '--no-force\tNegate -f, --force',
       '--color\tColorize output',
-      '--no-color\tNegatable of --color',
+      '--no-color\tNegate --color',
       '--quiet\tQuiet',
       ':4'
     ])
@@ -2243,7 +2240,7 @@ describe("#731 - a negatable option's description with the i18n plugin", () => {
     const candidates = await complete(['cache', '--'], { cache })
 
     expect(candidates).toContain('--no-cache\tSkip the cache')
-    expect(candidates).not.toContain('--no-cache\t否定可能な --cache')
+    expect(candidates).not.toContain('--no-cache\t--cache を打ち消す')
   })
 })
 
@@ -2320,7 +2317,7 @@ describe('#743 - `toKebab` brings two keys under one name', () => {
     ).toEqual([
       '--noDryRun\tNever run for real',
       '--dryRun\tDry run',
-      '--no-dryRun\tNegatable of -d, --dryRun',
+      '--no-dryRun\tNegate -d, --dryRun',
       ':4'
     ])
   })
