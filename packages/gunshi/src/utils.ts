@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { JSON_ARG } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, JSON_ARG } from './constants.ts'
 
 import type {
   Args,
@@ -146,12 +146,18 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
     command = Object.assign(create<Command<G>>(), baseCommand)
 
     if (needRunResolving) {
+      /**
+       * NOTE(kazupon): the errors name the command, by its `commandName` or the name that it is given with.
+       * The lazy command is the loader function, so its `name` is the name of the function, such as
+       * `buildLoader` of a loader in a const.
+       */
+      const commandName = cmd.commandName || name || ANONYMOUS_COMMAND_NAME
       const loaded = await cmd()
       if (typeof loaded === 'function') {
         command.run = loaded
       } else if (typeof loaded === 'object') {
         if (loaded.run == null) {
-          throw new TypeError(`'run' is required in command: ${cmd.name || name}`)
+          throw new TypeError(`'run' is required in command: ${commandName}`)
         }
         /**
          * NOTE(kazupon): the loaded command wins, and the definition that is given to `lazy` is the fallback
@@ -172,7 +178,7 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
           ;(command as { resource: any }).resource = loaded.resource
         }
       } else {
-        throw new TypeError(`Cannot resolve command: ${cmd.name || name}`)
+        throw new TypeError(`Cannot resolve command: ${commandName}`)
       }
     }
   } else {
