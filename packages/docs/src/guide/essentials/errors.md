@@ -24,6 +24,8 @@ The command follows the errors that your own `renderValidationErrors` renders, t
 
 The `cli()` promise resolves. To report the argument errors in your own way, see [Reporting Errors Yourself](#reporting-errors-yourself).
 
+With `--help` or `--version`, Gunshi prints the help or the version instead, and does not report the argument errors, an unknown option of `strict: true` included. An unknown command is still reported, since it is not known which command was meant.
+
 ## Expected Failures
 
 When a command fails in a way that it expects, throw a `CommandError` with a message for the user:

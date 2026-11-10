@@ -74,6 +74,8 @@ When these options are used:
 - **With `--help`**: The command execution is bypassed, and the usage information is displayed instead
 - **With `--version`**: The command execution is bypassed, and only the version number is printed
 
+They are answered even when the other arguments are wrong, an unknown option of `strict: true` included: the errors are not reported. An unknown command, or a command line that cannot be resolved, is reported instead, since it is not known which command was meant.
+
 A command that has sub-commands and no `run`, run without a sub-command, displays its usage too, as with `--help`, instead of doing nothing.
 
 When the arguments are wrong, the errors are printed to stderr, followed by the command that shows the help of the nearest command: the command itself, or the parent of an unknown command. It follows a message that a `renderValidationErrors` of your own renders, too. Give `helpHint: false` to `cli()` to leave it out, such as when your message points to the help itself: `next` of the errors of `--json` stays. It is not printed for a command whose `--help` does not show the help.
