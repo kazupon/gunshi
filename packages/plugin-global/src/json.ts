@@ -23,6 +23,7 @@ import {
   resolveDisplayName,
   resolveKey
 } from '@gunshi/shared'
+import { isWithoutRun } from './runner.ts'
 
 import type { ArgSchema, CommandContext, DefaultGunshiParams } from '@gunshi/plugin'
 
@@ -497,6 +498,11 @@ export interface JsonHelp {
      */
     description: string | null
     /**
+     * Whether the command runs by itself, without a sub-command: it has `run`. A command with sub-commands
+     * and no `run` prints its usage instead.
+     */
+    runnable: boolean
+    /**
      * The sub-commands, when the command is a group of them, as the help lists them.
      */
     commands: JsonHelpCommand[]
@@ -596,6 +602,13 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
       command: argv.join(' '),
       argv,
       description: await describe(resolveKey('description', ctx.name), ctx.description),
+      /**
+       * NOTE(kazupon): the help for people tells it by listing the command first among its sub-commands,
+       * as `[app]`, only when it has `run` (#866), and the document lists the sub-commands only. It is
+       * told by the mark of the core, which makes a command with sub-commands and no `run` print its usage
+       * when it runs: the mark is set for the command that was loaded, a lazy one included.
+       */
+      runnable: !isWithoutRun(ctx),
       commands,
       arguments: positionals,
       options,

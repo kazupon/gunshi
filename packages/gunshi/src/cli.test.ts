@@ -6015,6 +6015,7 @@ describe('--help and --version with --json', () => {
         command: 'demo status',
         argv: ['demo', 'status'],
         description: 'Show the status',
+        runnable: true,
         commands: [],
         arguments: [],
         options: [
@@ -6063,6 +6064,7 @@ describe('--help and --version with --json', () => {
         command: 'demo deploy',
         argv: ['demo', 'deploy'],
         description: null,
+        runnable: true,
         commands: [],
         arguments: [{ name: 'target', description: 'The target', required: true, multiple: false }],
         options: [
@@ -6109,9 +6111,42 @@ describe('--help and --version with --json', () => {
     expect(JSON.parse(log())).toMatchObject({
       help: {
         command: 'demo records',
+        runnable: false,
         commands: [{ name: 'list', description: 'List the records' }]
       }
     })
+  })
+
+  test('--help tells whether the command runs by itself, without a sub-command', async () => {
+    const list = define({ name: 'list', run: vi.fn<() => void>() })
+    const tags = define({ name: 'tags', subCommands: { list }, run: vi.fn<() => void>() })
+    const lazyRecords = lazy(() => define({ name: 'records' }), {
+      name: 'records',
+      subCommands: { list }
+    })
+    const silent = { ...options, usageSilent: true }
+    const runnable = (json: string | undefined) =>
+      (JSON.parse(json as string) as { help: { runnable: boolean } }).help.runnable
+
+    // the entry, a command without sub-commands, and a group, with `run`
+    expect(runnable(await cli(['--help', '--json'], entry, silent))).toBe(true)
+    expect(runnable(await cli(['status', '--help', '--json'], entry, silent))).toBe(true)
+    expect(
+      runnable(await cli(['tags', '--help', '--json'], entry, { ...silent, subCommands: { tags } }))
+    ).toBe(true)
+    // the entry and a group without `run`, which print their usage when they run
+    const group = define({ name: 'demo', subCommands: { records } })
+    expect(runnable(await cli(['--help', '--json'], group, silent))).toBe(false)
+    expect(runnable(await cli(['records', '--help', '--json'], entry, silent))).toBe(false)
+    // a lazy group whose loader returns a command without `run`
+    expect(
+      runnable(
+        await cli(['records', '--help', '--json'], entry, {
+          ...silent,
+          subCommands: { records: lazyRecords }
+        })
+      )
+    ).toBe(false)
   })
 
   test('--help starts the command with <COMMAND> without the name of the CLI', async () => {
