@@ -10,6 +10,8 @@ import {
   hasPriorityValidationError,
   isArgsValidationError,
   isCommandError,
+  isCommandNotFoundError,
+  isCommandResolutionError,
   JsonOutputError,
   JsonOutputErrorKeys
 } from '@gunshi/plugin'
@@ -241,6 +243,21 @@ function withoutJsonOption(error: AggregateError | undefined): AggregateError | 
 }
 
 /**
+ * Check whether the validation errors leave it unknown which command was meant: a command that is not
+ * found, or a command line that cannot be resolved.
+ *
+ * @param error - The aggregate error of the validation errors
+ * @returns `true` when one of the errors is about the command itself
+ */
+function leavesCommandUnknown(error: AggregateError | undefined): boolean {
+  return (
+    error?.errors.some(
+      (err: unknown) => isCommandNotFoundError(err) || isCommandResolutionError(err)
+    ) ?? false
+  )
+}
+
+/**
  * Decorator function to extend the command with global options.
  *
  * @param baseRunner - The base command runner
@@ -334,7 +351,16 @@ const decorator: CommandDecorator<{
     throw error
   }
 
-  if (hasPriorityValidationError(validationError)) {
+  /**
+   * NOTE(kazupon): `--help` and `--version` are answered before the argument errors, as what was asked
+   * for: the help is what a user reads when the arguments are wrong. An unknown option of `strict` is one
+   * of the argument errors then, as a missing or an invalid value is. An unknown command and a command
+   * line that cannot be resolved are still reported first, since they leave it unknown which command was
+   * meant, and the error points to the help of the nearest command.
+   */
+  const asked =
+    (values.version && globalOptions?.has('version')) || (values.help && globalOptions?.has('help'))
+  if (asked ? leavesCommandUnknown(validationError) : hasPriorityValidationError(validationError)) {
     return await report(validationError!)
   }
 

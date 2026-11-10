@@ -5770,3 +5770,164 @@ describe('a command without run that has sub-commands', () => {
     expect(log()).toBe('')
   })
 })
+
+describe('--help and --version with an unknown option of strict', () => {
+  const entry = define({ name: 'demo', run: vi.fn<() => void>() })
+  const deploy = define({
+    name: 'deploy',
+    args: { name: { type: 'string', required: true } },
+    run: vi.fn<() => void>()
+  })
+  const status = define({
+    name: 'status',
+    args: { ...jsonArgs, project: { type: 'string', required: true } },
+    run: () => ({ project: 'acme' })
+  })
+  const records = define({
+    name: 'records',
+    subCommands: { list: define({ name: 'list', run: vi.fn<() => void>() }) }
+  })
+  const options = {
+    name: 'demo',
+    version: '1.0.0',
+    strict: true,
+    subCommands: { deploy, status, records }
+  }
+
+  test.each([
+    { argv: ['deploy', '--unknown', '--help'] },
+    { argv: ['deploy', '--help', '--unknown'] },
+    { argv: ['deploy', '--unknown=1', '-h'] },
+    { argv: ['deploy', '-hx'] }
+  ])('$argv prints the help, without the argument errors', async ({ argv }) => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
+    const onErrorCommand = vi.fn<() => void>()
+
+    await cli(argv, entry, { ...options, onErrorCommand })
+
+    expect(log()).toContain('demo deploy [OPTIONS] --name <name>')
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+    expect(onErrorCommand).not.toHaveBeenCalled()
+    expect(deploy.run).not.toHaveBeenCalled()
+  })
+
+  test('--version prints the version, without the argument errors', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
+
+    await cli(['deploy', '--unknown', '--version'], entry, options)
+
+    expect(log()).toBe('1.0.0')
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('--help with --json prints the help as text', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const stderr = defineMockErrorLog()
+
+    await cli(['status', '--unknown', '--json', '--help'], entry, options)
+
+    expect(log()).toContain('demo status [OPTIONS] --project <project>')
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('an unknown command is still reported with --help', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['records', 'nope', '--unknown', '--help'], entry, options)
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      'Command not found: nope\nUnknown option: --unknown' + helpHint(['records'], { name: 'demo' })
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('a command line that cannot be resolved is still reported with --help', async () => {
+    const stderr = defineMockErrorLog()
+    const config = plugin({
+      id: 'test:config',
+      setup(ctx) {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+
+    await expect(
+      cli(['--config', 'clean', 'deploy', '--help'], entry, {
+        ...options,
+        plugins: [config],
+        subCommands: {
+          clean: define({ name: 'clean', run: vi.fn<() => void>() }),
+          deploy: define({
+            name: 'deploy',
+            args: { config: { type: 'boolean' } },
+            run: vi.fn<() => void>()
+          })
+        }
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      'The options do not identify a consistent command. Move options after the command name.' +
+        helpHint([], { name: 'demo' })
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('a lazy command whose definition does not match is still reported with --help', async () => {
+    const stderr = defineMockErrorLog()
+    const config = plugin({
+      id: 'test:config',
+      setup(ctx) {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+    const lazyDeploy = lazy(
+      async () =>
+        define({ name: 'deploy', args: { config: { type: 'boolean' } }, run: vi.fn<() => void>() }),
+      { name: 'deploy' }
+    )
+
+    await expect(
+      cli(['--config', 'clean', 'deploy', '--unknown', '--help'], entry, {
+        ...options,
+        plugins: [config],
+        subCommands: {
+          clean: define({ name: 'clean', run: vi.fn<() => void>() }),
+          deploy: lazyDeploy
+        }
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      'Lazy command schema mismatch at deploy. Declare leading options in the lazy definition or move options after the command name.\nUnknown option: --unknown' +
+        helpHint(['deploy'], { name: 'demo' })
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('the unknown option is reported with --help that a command takes itself', async () => {
+    const stderr = defineMockErrorLog()
+    const own = define({
+      name: 'own',
+      args: { help: { type: 'boolean' } },
+      run: vi.fn<() => void>()
+    })
+
+    await expect(
+      cli(['own', '--unknown', '--help'], entry, { ...options, subCommands: { own } })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('Unknown option: --unknown')
+    expect(process.exitCode).toBe(1)
+    expect(own.run).not.toHaveBeenCalled()
+  })
+})
