@@ -5826,14 +5826,14 @@ describe('--help and --version with an unknown option of strict', () => {
     expect(process.exitCode).toBeUndefined()
   })
 
-  test('--help with --json prints the help as text', async () => {
+  test('--help with --json prints the help as JSON', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const stderr = defineMockErrorLog()
 
     await cli(['status', '--unknown', '--json', '--help'], entry, options)
 
-    expect(log()).toContain('demo status [OPTIONS] --project <project>')
+    expect(JSON.parse(log())).toMatchObject({ help: { command: 'demo status', json: true } })
     expect(stderr()).toBe('')
     expect(process.exitCode).toBeUndefined()
   })
@@ -5929,5 +5929,247 @@ describe('--help and --version with an unknown option of strict', () => {
     expect(stderr()).toBe('Unknown option: --unknown')
     expect(process.exitCode).toBe(1)
     expect(own.run).not.toHaveBeenCalled()
+  })
+})
+
+describe('--help and --version together', () => {
+  const entry = define({ name: 'demo', run: vi.fn<() => void>() })
+  const deploy = define({ name: 'deploy', run: vi.fn<() => void>() })
+
+  test.each([{ argv: ['--version', '--help'] }, { argv: ['deploy', '--help', '--version'] }])(
+    '$argv prints the help',
+    async ({ argv }) => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+
+      await cli(argv, entry, { name: 'demo', version: '1.0.0', subCommands: { deploy } })
+
+      expect(log()).toContain('USAGE:')
+      expect(deploy.run).not.toHaveBeenCalled()
+    }
+  )
+})
+
+describe('--help and --version with --json', () => {
+  const entry = define({ name: 'demo', description: 'A demo CLI', run: vi.fn<() => void>() })
+  const status = define({
+    name: 'status',
+    description: 'Show the status',
+    args: {
+      ...jsonArgs,
+      project: { type: 'string', short: 'p', required: true, description: 'The project' }
+    },
+    run: () => ({ project: 'acme' })
+  })
+  const deploy = define({
+    name: 'deploy',
+    args: {
+      target: { type: 'positional', description: 'The target' },
+      env: {
+        type: 'enum',
+        choices: ['production', 'preview'],
+        default: 'preview',
+        description: 'Environment'
+      },
+      prod: { type: 'boolean', negatable: true },
+      secret: { type: 'string', hidden: true }
+    },
+    run: vi.fn<() => void>()
+  })
+  const records = define({
+    name: 'records',
+    description: 'Manage records',
+    subCommands: {
+      list: define({ name: 'list', description: 'List the records', run: vi.fn<() => void>() })
+    }
+  })
+  const options = { name: 'demo', version: '1.0.0', subCommands: { status, deploy, records } }
+  const help = {
+    name: '--help',
+    short: '-h',
+    description: 'Display this help message',
+    type: 'boolean',
+    value: null,
+    required: false,
+    multiple: false,
+    default: null,
+    choices: null,
+    negatable: false,
+    global: true
+  }
+  const version = {
+    ...help,
+    name: '--version',
+    short: '-v',
+    description: 'Display this version'
+  }
+
+  test('--help prints the help of a command that spreads jsonArgs as JSON', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['status', '--help', '--json'], entry, options)
+
+    expect(JSON.parse(log())).toEqual({
+      help: {
+        command: 'demo status',
+        argv: ['demo', 'status'],
+        description: 'Show the status',
+        commands: [],
+        arguments: [],
+        options: [
+          help,
+          version,
+          {
+            name: '--json',
+            short: null,
+            description: 'Output the result as JSON',
+            type: 'boolean',
+            value: null,
+            required: false,
+            multiple: false,
+            default: null,
+            choices: null,
+            negatable: false,
+            global: false
+          },
+          {
+            name: '--project',
+            short: '-p',
+            description: 'The project',
+            type: 'string',
+            value: '<project>',
+            required: true,
+            multiple: false,
+            default: null,
+            choices: null,
+            negatable: false,
+            global: false
+          }
+        ],
+        json: true
+      }
+    })
+  })
+
+  test('--help prints the help of a command without jsonArgs as JSON too', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['deploy', '--json', '--help'], entry, options)
+
+    expect(JSON.parse(log())).toEqual({
+      help: {
+        command: 'demo deploy',
+        argv: ['demo', 'deploy'],
+        description: null,
+        commands: [],
+        arguments: [{ name: 'target', description: 'The target', required: true, multiple: false }],
+        options: [
+          help,
+          version,
+          {
+            name: '--env',
+            short: null,
+            description: 'Environment',
+            type: 'enum',
+            value: '<env>',
+            required: false,
+            multiple: false,
+            default: 'preview',
+            choices: ['production', 'preview'],
+            negatable: false,
+            global: false
+          },
+          {
+            name: '--prod',
+            short: null,
+            description: null,
+            type: 'boolean',
+            value: null,
+            required: false,
+            multiple: false,
+            default: null,
+            choices: null,
+            negatable: true,
+            global: false
+          }
+        ],
+        json: false
+      }
+    })
+  })
+
+  test('--help lists the sub-commands of a group', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['records', '--help', '--json'], entry, options)
+
+    expect(JSON.parse(log())).toMatchObject({
+      help: {
+        command: 'demo records',
+        commands: [{ name: 'list', description: 'List the records' }]
+      }
+    })
+  })
+
+  test('--help starts the command with <COMMAND> without the name of the CLI', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['status', '--help', '--json'], entry, { ...options, name: undefined })
+
+    expect(JSON.parse(log())).toMatchObject({
+      help: { command: '<COMMAND> status', argv: ['<COMMAND>', 'status'] }
+    })
+  })
+
+  test('--version prints the version as JSON', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['--version', '--json'], entry, options)
+    await cli(['--version', '--json'], entry, { ...options, version: undefined })
+
+    expect(log()).toBe('{"version":"1.0.0"}\n{"version":null}')
+  })
+
+  test('the help is text with --json=false, and for a command with a json argument of its own', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const own = define({
+      name: 'own',
+      args: { json: { type: 'boolean' } },
+      run: vi.fn<() => void>()
+    })
+
+    await cli(['status', '--help', '--json=false'], entry, options)
+    await cli(['own', '--help', '--json'], entry, { ...options, subCommands: { own } })
+
+    expect(log()).not.toContain('{"help"')
+    expect(log()).toContain('demo status [OPTIONS]')
+    expect(log()).toContain('demo own [OPTIONS]')
+  })
+
+  test('nothing is printed with usageSilent, and cli() returns the JSON', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    const json = await cli(['status', '--help', '--json'], entry, { ...options, usageSilent: true })
+
+    expect(log()).toBe('')
+    expect(JSON.parse(json as string)).toMatchObject({ help: { command: 'demo status' } })
+  })
+
+  test('nothing is printed when the CLI renders no usage', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await expect(
+      cli(['status', '--help', '--json'], entry, { ...options, renderUsage: null })
+    ).resolves.toBeUndefined()
+
+    expect(log()).toBe('')
   })
 })

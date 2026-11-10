@@ -104,7 +104,7 @@
     "knip": "^6.12.2",
     "lint-staged": "^17.0.0",
     "mitata": "^1.0.34",
-    "oxfmt": "^0.75.0",
+    "oxfmt": "^0.76.0",
     "oxlint": "^1.86.0",
     "oxlint-tsgolint": "^7.0.2003",
     "pkg-pr-new": "^0.0.93",

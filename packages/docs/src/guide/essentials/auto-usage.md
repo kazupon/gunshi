@@ -258,11 +258,14 @@ Gunshi provides several automatic features without requiring any configuration:
 - Automatically added to all commands
 - Displays usage information and exits
 - Works at every command level (main and sub-commands)
+- Comes before `--version` when both are given
+- With `--json`, prints the help as one JSON document (see [JSON Output](./json-output.md#help-and-version))
 
 ### Version Flag (`--version`, `-v`)
 
 - Automatically added when you provide a `version` in CLI options
 - Displays the version and exits
+- With `--json`, prints `{"version":"…"}`
 - Available at all command levels
 
 ### Negatable Boolean Options

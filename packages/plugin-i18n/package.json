@@ -74,7 +74,7 @@
     "@gunshi/plugin-renderer": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "@gunshi/shared": "workspace:*",
-    "@intlify/core-base": "12.0.0-alpha.8",
+    "@intlify/core-base": "12.0.0-alpha.9",
     "gunshi": "workspace:*",
     "messageformat": "4.1.0",
     "publint": "catalog:",
