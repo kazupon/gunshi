@@ -240,16 +240,20 @@ const command = define({
 })
 
 await cli(process.argv.slice(2), command, {
+  name: 'app',
   strict: true,
   plugins: [suggestion()]
 })
 ```
 
-If the user runs `app --alow-reload`, the validation output includes a hint:
+If the user runs `app --alow-reload`, the validation output includes a hint, before the command that shows the help:
 
 ```txt
 Unknown option: --alow-reload
 Did you mean --allow-reload?
+
+See the arguments of the command:
+  app --help
 ```
 
 The same plugin also handles command suggestions:
@@ -257,6 +261,9 @@ The same plugin also handles command suggestions:
 ```txt
 Command not found: rn
 Did you mean run?
+
+See the arguments of the command:
+  app --help
 ```
 
 The plugin decorates validation error rendering. It does not detect unknown options or commands itself; Gunshi core provides structured validation errors and candidate metadata.

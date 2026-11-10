@@ -153,7 +153,7 @@ The `field` of an issue is written as on the command line: the long form of an o
 
 `next` starts with the name of the CLI, given to `cli()` as `name`. Without it, the command line starts with `<COMMAND>`, and `when` says to replace it with how the CLI was run. Give your CLI a `name`, so that `next` is a command line to run as it is.
 
-There is no `next` when `--help` does not show the help of that command: when the command declares a `help` argument of its own, which then takes `--help`, or when the CLI renders no usage, with `renderUsage: null`.
+There is no `next` when `--help` does not show the help of that command: when the command declares a `help` argument of its own, which then takes `--help`, or when the CLI renders no usage, with `renderUsage: null`. `helpHint: false`, which leaves the command that shows the help out of the output for people, does not leave out `next`.
 
 ### Reasons
 

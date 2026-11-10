@@ -232,6 +232,13 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   strict: boolean
   /**
+   * Whether to follow the validation errors with the command that shows the help.
+   *
+   * @default true
+   * @see {@linkcode CliOptions.helpHint}
+   */
+  helpHint: boolean
+  /**
    * Sub commands.
    *
    * @see {@linkcode CliOptions.subCommands}
@@ -392,6 +399,8 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    *
    * With the global options plugin, the rendered message is printed to stderr, the exit code is set
    * to `1`, {@linkcode CliOptions.onErrorCommand} is called, and `cli()` resolves with `undefined`.
+   * The message is followed by the command that shows the help, unless {@linkcode CliOptions.helpHint}
+   * is `false`.
    * Set it to `null` to report the validation errors yourself: nothing is printed, and `cli()` rejects
    * with the `AggregateError`. A renderer that returns an empty message, and
    * {@linkcode CliOptions.usageSilent}, also leave them to the caller.
@@ -402,6 +411,21 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   renderValidationErrors?:
     | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
     | null
+  /**
+   * Whether to follow the validation errors with the command that shows the help of the nearest
+   * command: the command itself for an argument error, and the parent of an unknown command, such as
+   * `my-app deploy --help`. With the global options plugin, it is printed to stderr after the errors,
+   * after an empty line and a heading. It is the command that `next` of the JSON error has with
+   * `--json`.
+   *
+   * Set it to `false` to leave the command out, such as when your renderer of the validation errors
+   * points to the help in its own way. It changes the output for people only: `next` of the JSON error
+   * stays. The command is left out for a command whose `--help` does not show the help, too: one that
+   * declares a `help` argument of its own, or with `renderUsage: null`.
+   *
+   * @default true
+   */
+  helpHint?: boolean
   /**
    * Whether to fallback to entry command when the sub-command is not found.
    *

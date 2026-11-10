@@ -149,6 +149,27 @@ export async function createValidationFailure(
 }
 
 /**
+ * Render the lines that follow the validation errors for people: the command that shows the help of the
+ * command nearest to what the user wrote, with what it is for, which `next` of the JSON error has too.
+ * They start with an empty line, which parts them from the errors.
+ *
+ * @param ctx - The command context
+ * @param error - The aggregate error of the validation errors
+ * @returns The lines, or `undefined` when `--help` does not show the help of the command
+ */
+export async function renderHelpHint(
+  ctx: Context,
+  error: AggregateError
+): Promise<string | undefined> {
+  const next = await createNext(ctx, resolveCommandPath(ctx, error.errors as Error[]))
+  if (next === undefined) {
+    return undefined
+  }
+  const [{ command, when }] = next
+  return ['', `${when}:`, `  ${command}`].join('\n')
+}
+
+/**
  * Create the JSON error of `--json` given to a command that does not spread `jsonArgs`.
  *
  * @param ctx - The command context

@@ -76,6 +76,8 @@ When these options are used:
 
 A command that has sub-commands and no `run`, run without a sub-command, displays its usage too, as with `--help`, instead of doing nothing.
 
+When the arguments are wrong, the errors are printed to stderr, followed by the command that shows the help of the nearest command: the command itself, or the parent of an unknown command. It follows a message that a `renderValidationErrors` of your own renders, too. Give `helpHint: false` to `cli()` to leave it out, such as when your message points to the help itself: `next` of the errors of `--json` stays. It is not printed for a command whose `--help` does not show the help.
+
 ### JSON Output
 
 A command that spreads `jsonArgs` from `gunshi` into its arguments accepts `--json`. With it, this plugin:

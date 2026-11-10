@@ -798,6 +798,9 @@ describe('--json given to a command that does not spread jsonArgs', () => {
     await catchError(() => decorator(() => {})(ctx))
 
     expect(renderValidationErrors).toHaveBeenCalled()
-    expect(output.stderr()).toEqual(['Unknown option: --json'])
+    expect(output.stderr()).toEqual([
+      'Unknown option: --json',
+      `\n${SEE_THE_ARGUMENTS}:\n  demo --help`
+    ])
   })
 })
