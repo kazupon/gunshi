@@ -367,16 +367,17 @@ const decorator: CommandDecorator<{
   /**
    * NOTE(kazupon): `--help` and `--version` print with `log`, not with `ctx.log`, which is silenced when
    * the command is asked for JSON: the text of the help is what was asked for. `usageSilent` still
-   * silences them.
+   * silences them. `--help` comes before `--version` when both are given, whichever comes first on the
+   * command line: the help is what tells how to use the command.
    */
   const write: Writer = ctx.env.usageSilent ? NOOP : log
 
-  if (values.version && globalOptions?.has('version')) {
-    return writeVersion(ctx, write)
-  }
-
   if (values.help && globalOptions?.has('help')) {
     return await writeUsage(ctx, write)
+  }
+
+  if (values.version && globalOptions?.has('version')) {
+    return writeVersion(ctx, write)
   }
 
   /**

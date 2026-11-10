@@ -74,6 +74,8 @@ When these options are used:
 - **With `--help`**: The command execution is bypassed, and the usage information is displayed instead
 - **With `--version`**: The command execution is bypassed, and only the version number is printed
 
+When both are given, the help is printed.
+
 They are answered even when the other arguments are wrong, an unknown option of `strict: true` included: the errors are not reported. An unknown command, or a command line that cannot be resolved, is reported instead, since it is not known which command was meant.
 
 A command that has sub-commands and no `run`, run without a sub-command, displays its usage too, as with `--help`, instead of doing nothing.

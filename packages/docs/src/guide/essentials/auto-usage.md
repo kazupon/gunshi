@@ -258,6 +258,7 @@ Gunshi provides several automatic features without requiring any configuration:
 - Automatically added to all commands
 - Displays usage information and exits
 - Works at every command level (main and sub-commands)
+- Comes before `--version` when both are given
 
 ### Version Flag (`--version`, `-v`)
 

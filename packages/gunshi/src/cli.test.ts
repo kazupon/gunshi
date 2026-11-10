@@ -5931,3 +5931,21 @@ describe('--help and --version with an unknown option of strict', () => {
     expect(own.run).not.toHaveBeenCalled()
   })
 })
+
+describe('--help and --version together', () => {
+  const entry = define({ name: 'demo', run: vi.fn<() => void>() })
+  const deploy = define({ name: 'deploy', run: vi.fn<() => void>() })
+
+  test.each([{ argv: ['--version', '--help'] }, { argv: ['deploy', '--help', '--version'] }])(
+    '$argv prints the help',
+    async ({ argv }) => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+
+      await cli(argv, entry, { name: 'demo', version: '1.0.0', subCommands: { deploy } })
+
+      expect(log()).toContain('USAGE:')
+      expect(deploy.run).not.toHaveBeenCalled()
+    }
+  )
+})
