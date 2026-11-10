@@ -16,7 +16,7 @@ import {
   resolveKey,
   resolveOptionNames
 } from '@gunshi/shared'
-import { isMarkedWithoutRun, isResolvedWithoutRun } from './runner.ts'
+import { isMarkedWithoutRun, isResolvedFromContext, isResolvedWithoutRun } from './runner.ts'
 import { pluginId } from './types.ts'
 import { displayWidth, padEndToWidth } from './width.ts'
 
@@ -386,20 +386,20 @@ async function resolveExamples<
  * command that runs when no sub-command is given. A command without `run` runs nothing then, so its row
  * would name a command that does not exist. Each row is checked against its own command, which
  * `loadCommands` records. `loadCommands` does not run the loader of a lazy command, which may return a
- * command without `run` too, so the row of the command of the context, which has its name, is checked by
- * the mark of the core as well, which loaded the command and prints its usage when it runs. The other rows
- * marked with `entry`, such as a command that a plugin adds, are checked against their own commands.
+ * command without `run` too, so the row that comes from the command of the context, which `loadCommands`
+ * records as well, is checked by the mark of the core too, which loaded the command and prints its usage
+ * when it runs. The other rows marked with `entry`, such as a command that a plugin adds, even with the same
+ * name, are checked against their own commands.
  *
  * @param ctx - A {@link CommandContext | command context}
  * @param cmd - A command from `loadCommands`
  * @returns True if the row is an entry command, and the command has no `run`
  */
 function isEntryWithoutRun(ctx: Readonly<CommandContext>, cmd: Command): boolean {
-  if (cmd.entry !== true) {
-    return false
-  }
-  const own = (cmd.name || ANONYMOUS_COMMAND_NAME) === (ctx.name || ANONYMOUS_COMMAND_NAME)
-  return isResolvedWithoutRun(cmd) || (own && isMarkedWithoutRun(ctx))
+  return (
+    cmd.entry === true &&
+    (isResolvedWithoutRun(cmd) || (isResolvedFromContext(cmd) && isMarkedWithoutRun(ctx)))
+  )
 }
 
 /**

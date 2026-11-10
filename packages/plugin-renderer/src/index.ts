@@ -32,7 +32,7 @@
 import { ANONYMOUS_COMMAND_NAME, createCommandContext, plugin } from '@gunshi/plugin'
 import { localizable, namespacedId, resolveKey, resolveLazyCommand } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
-import { recordRunner } from './runner.ts'
+import { recordContextCommand, recordRunner } from './runner.ts'
 import { pluginId as id } from './types.ts'
 import { renderUsage } from './usage.ts'
 import { renderValidationErrors } from './validation.ts'
@@ -84,10 +84,16 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
           return cachedCommands as unknown as Command<G>[]
         }
 
+        // the command of the context, as the core lists it among its sub-commands: the entry at the root,
+        // and a copy of the group under the last name of its path at a nested level
+        const own =
+          ctx.callMode === 'entry'
+            ? ctx.env.entryCommand
+            : ctx.env.subCommands?.get(ctx.commandPath?.[ctx.commandPath.length - 1] ?? '')
         const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
         const allCommands = await Promise.all(
           subCommands.map(async ([name, cmd]) =>
-            recordRunner(cmd, await resolveLazyCommand(cmd, name))
+            recordContextCommand(cmd, own, recordRunner(cmd, await resolveLazyCommand(cmd, name)))
           )
         )
 
@@ -101,9 +107,13 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
           !subCommands.some(([, command]) => command === entryCommand)
         ) {
           allCommands.push(
-            recordRunner(
+            recordContextCommand(
               entryCommand,
-              await resolveLazyCommand<G>(entryCommand, ANONYMOUS_COMMAND_NAME)
+              own,
+              recordRunner(
+                entryCommand,
+                await resolveLazyCommand<G>(entryCommand, ANONYMOUS_COMMAND_NAME)
+              )
             )
           )
         }

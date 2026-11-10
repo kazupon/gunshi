@@ -2318,6 +2318,17 @@ describe('the usage of a group', () => {
     expect(commandRows(usage!)).toEqual(['[marked]'])
   })
 
+  test('an entry without run leaves the row of a plugin command with its name, marked as an entry', async () => {
+    const entry = define({ name: 'demo', description: 'Demo CLI' })
+    const demo = define({ name: 'demo', description: 'Plugin demo', entry: true, run: NOOP })
+    const usage = await cli(['--help'], entry, {
+      ...options,
+      plugins: [addCommands({ add, demo })]
+    })
+
+    expect(commandRows(usage!)).toEqual(['[demo]', 'add'])
+  })
+
   test('renders no commands section when no row is left', async () => {
     const entry = define({ name: 'demo', description: 'Demo CLI' })
     const marked = define({ name: 'marked', description: 'Marked', entry: true })
