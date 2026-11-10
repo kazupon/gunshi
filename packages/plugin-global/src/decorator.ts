@@ -23,7 +23,7 @@ import {
   resolveBuiltInKey,
   resolveJsonRequest
 } from '@gunshi/shared'
-import { writeUsage, writeVersion } from './extension.ts'
+import { writeUsage, writeUsageJson, writeVersion, writeVersionJson } from './extension.ts'
 import {
   collectCauses,
   createNotSupportedFailure,
@@ -366,18 +366,21 @@ const decorator: CommandDecorator<{
 
   /**
    * NOTE(kazupon): `--help` and `--version` print with `log`, not with `ctx.log`, which is silenced when
-   * the command is asked for JSON: the text of the help is what was asked for. `usageSilent` still
+   * the command is asked for JSON: the help and the version are what was asked for. `usageSilent` still
    * silences them. `--help` comes before `--version` when both are given, whichever comes first on the
-   * command line: the help is what tells how to use the command.
+   * command line: the help is what tells how to use the command. With `--json`, they are printed as one
+   * JSON document, so that stdout has the JSON only, whether the command spreads `jsonArgs` or not: they
+   * are answered by gunshi, not by the command. A command with a `json` argument of its own takes
+   * `--json` itself, and gets the text.
    */
   const write: Writer = ctx.env.usageSilent ? NOOP : log
 
   if (values.help && globalOptions?.has('help')) {
-    return await writeUsage(ctx, write)
+    return request === undefined ? await writeUsage(ctx, write) : await writeUsageJson(ctx, write)
   }
 
   if (values.version && globalOptions?.has('version')) {
-    return writeVersion(ctx, write)
+    return request === undefined ? writeVersion(ctx, write) : writeVersionJson(ctx, write)
   }
 
   /**

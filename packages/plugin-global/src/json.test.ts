@@ -711,7 +711,7 @@ describe('--json given to a command that does not spread jsonArgs', () => {
     }
   )
 
-  test('shows the help for --help, and the version for --version, first', async () => {
+  test('shows the help for --help, and the version for --version, as JSON, first', async () => {
     const output = captureOutput()
     const globalOptions = new Map(Object.entries(COMMON_ARGS))
     const renderUsage = () => Promise.resolve('USAGE: demo legacy')
@@ -726,9 +726,12 @@ describe('--json given to a command that does not spread jsonArgs', () => {
       cliOptions: { globalOptions }
     })
 
-    expect(await decorator(() => {})(help.ctx)).toBe('USAGE: demo legacy')
-    expect(await decorator(() => {})(version.ctx)).toBe('1.0.0')
-    expect(output.stdout()).toEqual(['USAGE: demo legacy', '1.0.0'])
+    const helpJson = (await decorator(() => {})(help.ctx)) as string
+    expect(JSON.parse(helpJson)).toMatchObject({
+      help: { command: 'demo', argv: ['demo'], commands: [], arguments: [], json: false }
+    })
+    expect(await decorator(() => {})(version.ctx)).toBe('{"version":"1.0.0"}')
+    expect(output.stdout()).toEqual([helpJson, '{"version":"1.0.0"}'])
     expect(output.stderr()).toEqual([])
   })
 

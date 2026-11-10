@@ -6,7 +6,7 @@ Gunshi provides official plugins that address common CLI development needs. See 
 
 ### [@gunshi/plugin-global](https://github.com/kazupon/gunshi/tree/main/packages/plugin-global)
 
-Adds global `--help` and `--version` options to all commands, and prints the result and the errors of the commands that spread `jsonArgs` as JSON with `--json`.
+Adds global `--help` and `--version` options to all commands, and prints JSON with `--json`: the help and the version of every command, and the result and the errors of the commands that spread `jsonArgs`.
 
 ### [@gunshi/plugin-renderer](https://github.com/kazupon/gunshi/tree/main/packages/plugin-renderer)
 

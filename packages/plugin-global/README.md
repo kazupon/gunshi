@@ -5,7 +5,7 @@
 
 > global options plugin for gunshi.
 
-This plugin provides standard global options (`--help` and `--version`) for all commands in your CLI application, and the JSON output of `--json` for the commands that spread `jsonArgs`. It's installed by default in gunshi, ensuring consistent behavior across all CLI applications.
+This plugin provides standard global options (`--help` and `--version`) for all commands in your CLI application, and the JSON output of `--json`: the help and the version of every command, and the result and the errors of the commands that spread `jsonArgs`. It's installed by default in gunshi, ensuring consistent behavior across all CLI applications.
 
 ## 💿 Installation
 
@@ -89,6 +89,8 @@ A command that spreads `jsonArgs` from `gunshi` into its arguments accepts `--js
 - prints the result that the command returns from `run`, an object keyed by a noun, as one JSON document to stdout
 - prints an error as one line of JSON to stderr, with `status`, `reason`, `message`, `next` and `data`, and leaves stdout empty
 - stops a command that does not spread `jsonArgs` before it runs, with `json_not_supported`, when `--json` is given to it
+
+With `--help` or `--version`, `--json` is answered for every command, whether it spreads `jsonArgs` or not: the help is printed as one JSON document, `{ "help": { … } }`, made from the same arguments as the help, and the version as `{"version":"1.2.3"}`. A command with a `json` argument of its own takes `--json` itself, and gets them as text.
 
 `--json` is not a global option: the commands that support it declare it. For the details, see [JSON Output](https://gunshi.dev/guide/essentials/json-output).
 
