@@ -8,12 +8,19 @@ This guide shows how Gunshi reports each of them, and which exit code the proces
 
 When the arguments do not match the command, such as a missing required argument or an option value of the wrong type, Gunshi does not run the command.
 
-It prints the errors to stderr, without a stack trace, and sets the exit code to `1`:
+It prints the errors to stderr, without a stack trace, followed by the command that shows the help of the command, and sets the exit code to `1`:
 
 ```sh
 $ node cli.js
 Positional argument 'project' is required
+
+Replace <COMMAND> with how you ran this CLI, to see the arguments of the command:
+  <COMMAND> --help
 ```
+
+The command starts with the name of the CLI, given to `cli()` as `name`, such as `projects --help`, under the heading `See the arguments of the command:`. Without it, as in this example, the command starts with `<COMMAND>`, and the heading says to replace it. For an unknown command, the command shows the help of its parent, such as `projects remote --help` for `projects remote ad`. It is not printed for a command whose `--help` does not show the help: a command that declares a `help` argument of its own, or a CLI that renders no usage.
+
+The command follows the errors that your own `renderValidationErrors` renders, too. To leave it out, such as when your errors point to the help themselves, give `helpHint: false` to `cli()`. It leaves the command out of the output for people only: `next` of the errors of `--json` still points to the help (see [JSON Output](./json-output.md#errors)).
 
 The `cli()` promise resolves. To report the argument errors in your own way, see [Reporting Errors Yourself](#reporting-errors-yourself).
 

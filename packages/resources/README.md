@@ -58,7 +58,8 @@ Keys for built-in functionalities are handled by Gunshi's default locales. The c
 - `CHOICES` - Prefix for available choices (e.g., "choices: red, green, blue")
 - `CAUSEDBY` - Heading of the lines of the causes of a `CommandError` (e.g., "Caused by: connect ECONNREFUSED 127.0.0.1:5432")
 - `json` - Description for the `--json` option of `jsonArgs` ("Output the result as JSON")
-- `json:invalid-arguments`, `json:next:help`, `json:next:help-placeholder` - Texts that only the JSON errors of `--json` print
+- `json:invalid-arguments` - Text that only the JSON errors of `--json` print
+- `json:next:help`, `json:next:help-placeholder` - What the command that shows the help is for: `when` of `next` in the JSON errors of `--json`, and the heading of that command after the argument errors. The second is for a CLI without a name, whose command starts with `<COMMAND>`
 - `err:json:not-supported`, `err:json:invalid-result`, `err:json:unserializable-result` - Messages of the errors of the JSON output
 - `help` - Description for the help option ("Display this help message")
 - `version` - Description for the version option ("Display this version")

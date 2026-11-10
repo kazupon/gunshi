@@ -146,5 +146,7 @@ await cli(process.argv.slice(2), command, {
   // Custom renderers
   renderHeader: customHeaderRenderer,
   renderUsage: customUsageRenderer,
-  renderValidationErrors: customValidationErrorsRenderer
+  renderValidationErrors: customValidationErrorsRenderer,
+  // the renderer of the validation errors points to the help itself
+  helpHint: false
 })

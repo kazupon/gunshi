@@ -4,7 +4,7 @@ import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest'
 import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
-import { defineMockErrorLog, defineMockLog } from '../test/utils.ts'
+import { defineMockErrorLog, defineMockLog, helpHint } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
 import { define, lazy } from './definition.ts'
@@ -1148,7 +1148,7 @@ test('enum optional argument', async () => {
     })
   ).resolves.toBeUndefined()
   expect(process.exitCode).toBe(1)
-  expect(stderr()).toEqual(`Invalid value for '--foo': expected one of "a", "b", "c"`)
+  expect(stderr()).toEqual(`Invalid value for '--foo': expected one of "a", "b", "c"` + helpHint())
 })
 
 describe('args validation i18n', () => {
@@ -1182,7 +1182,7 @@ describe('args validation i18n', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toEqual("必須オプション: '--id'")
+    expect(stderr()).toEqual("必須オプション: '--id'" + helpHint())
   })
 
   test('translates required positional', async () => {
@@ -1214,7 +1214,7 @@ describe('args validation i18n', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toEqual('必須位置引数: file')
+    expect(stderr()).toEqual('必須位置引数: file' + helpHint())
   })
 
   test('translates invalid type and invalid choice', async () => {
@@ -1251,7 +1251,9 @@ describe('args validation i18n', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toEqual(["型エラー: '--count'", "選択エラー: '--level'"].join('\n'))
+    expect(stderr()).toEqual(
+      ["型エラー: '--count'", "選択エラー: '--level'"].join('\n') + helpHint()
+    )
   })
 
   test('translates custom parse wrapper', async () => {
@@ -1286,7 +1288,7 @@ describe('args validation i18n', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toEqual('カスタム解析エラー: Invalid port')
+    expect(stderr()).toEqual('カスタム解析エラー: Invalid port' + helpHint())
   })
 
   test('translates a missing value, with the hint of args-tokens', async () => {
@@ -1317,7 +1319,8 @@ describe('args validation i18n', () => {
     ).resolves.toBeUndefined()
 
     expect(stderr()).toEqual(
-      "オプション '--port' or '-p' には値が必要です ('-5' を値として渡すには '--port=-5' と書いてください)"
+      "オプション '--port' or '-p' には値が必要です ('-5' を値として渡すには '--port=-5' と書いてください)" +
+        helpHint([], { locale: 'ja-JP' })
     )
   })
 
@@ -1343,7 +1346,8 @@ describe('args validation i18n', () => {
     ).resolves.toBeUndefined()
 
     expect(stderr()).toEqual(
-      "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+      "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')" +
+        helpHint()
     )
   })
 
@@ -1374,7 +1378,7 @@ describe('args validation i18n', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toEqual("位置引数 'input-file' は必須です")
+    expect(stderr()).toEqual("位置引数 'input-file' は必須です" + helpHint([], { locale: 'ja-JP' }))
   })
 
   test('a required positional in en-US reads as the message of args-tokens', async () => {
@@ -1398,7 +1402,7 @@ describe('args validation i18n', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toEqual("Positional argument 'input-file' is required")
+    expect(stderr()).toEqual("Positional argument 'input-file' is required" + helpHint())
   })
 })
 
@@ -1433,7 +1437,7 @@ describe('positional arguments', () => {
         run: vi.fn<() => void>()
       })
     ).resolves.toBeUndefined()
-    expect(stderr()).toEqual(`Positional argument 'bar' is required`)
+    expect(stderr()).toEqual(`Positional argument 'bar' is required` + helpHint())
   })
 
   test('optional positional arguments', async () => {
@@ -1559,7 +1563,7 @@ describe('positional arguments', () => {
         }
       )
     ).resolves.toBeUndefined()
-    expect(stderr()).toEqual(`Positional argument 'bar' is required`)
+    expect(stderr()).toEqual(`Positional argument 'bar' is required` + helpHint(['command2']))
   })
 })
 
@@ -2006,7 +2010,7 @@ describe('command lifecycle hooks', () => {
     expect(executionOrder).toEqual(['before', 'error'])
     expect(mockCommand).not.toHaveBeenCalled()
     expect(capturedError).toBeInstanceOf(AggregateError)
-    expect(stderr()).toBe(`Option '--id' is required`)
+    expect(stderr()).toBe(`Option '--id' is required` + helpHint())
     expect(process.exitCode).toBe(1)
   })
 
@@ -2054,7 +2058,7 @@ describe('command lifecycle hooks', () => {
         name: 'alow-reload',
         candidates: ['--help', '--version', '--allow-reload']
       })
-      expect(stderr()).toBe('Unknown option: --alow-reload')
+      expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
     })
 
     test('allows declared long, short, negatable, and kebab-case options', async () => {
@@ -2273,7 +2277,7 @@ describe('command lifecycle hooks', () => {
         `Option '--id' is required`,
         'Unknown option: --bad'
       ])
-      expect(stderr()).toBe(`Option '--id' is required\nUnknown option: --bad`)
+      expect(stderr()).toBe(`Option '--id' is required\nUnknown option: --bad` + helpHint())
     })
 
     test('localizes unknown option validation errors with i18n plugin', async () => {
@@ -2299,7 +2303,9 @@ describe('command lifecycle hooks', () => {
       ).resolves.toBeUndefined()
 
       expect(mockCommand).not.toHaveBeenCalled()
-      expect(stderr()).toBe('未定義のオプションです: --alow-reload')
+      expect(stderr()).toBe(
+        '未定義のオプションです: --alow-reload' + helpHint([], { locale: 'ja-JP' })
+      )
     })
 
     test('localizes command not found validation errors with i18n plugin', async () => {
@@ -2333,7 +2339,7 @@ describe('command lifecycle hooks', () => {
       ).resolves.toBeUndefined()
 
       expect(mockCommand).not.toHaveBeenCalled()
-      expect(stderr()).toBe('コマンドが見つかりません: missing')
+      expect(stderr()).toBe('コマンドが見つかりません: missing' + helpHint([], { locale: 'ja-JP' }))
     })
   })
 
@@ -4433,7 +4439,7 @@ describe('reported validation errors', () => {
     await expect(cli([], { args, run })).resolves.toBeUndefined()
 
     expect(run).not.toHaveBeenCalled()
-    expect(stderr()).toBe(`Option '--id' is required`)
+    expect(stderr()).toBe(`Option '--id' is required` + helpHint())
     expect(stdout()).toBe('')
     expect(process.exitCode).toBe(1)
   })
@@ -4579,6 +4585,243 @@ describe('reported validation errors', () => {
     expect(run).not.toHaveBeenCalled()
     expect(stderr()).toContain('Unknown option: --nope')
     expect(process.exitCode).toBe(1)
+  })
+})
+
+describe('the help after the validation errors', () => {
+  const entry = define({ name: 'demo', run: vi.fn<() => void>() })
+  const deploy = define({
+    name: 'deploy',
+    args: {
+      name: { type: 'string', required: true },
+      count: { type: 'number' }
+    },
+    run: vi.fn<() => void>()
+  })
+  const records = define({
+    name: 'records',
+    subCommands: {
+      tags: define({
+        name: 'tags',
+        subCommands: { add: define({ name: 'add', run: vi.fn<() => void>() }) }
+      })
+    }
+  })
+
+  beforeEach(() => {
+    // the tests check the exit code, which other tests may have left
+    process.exitCode = undefined
+  })
+
+  test('an argument error is followed by the help of the command', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['deploy'], entry, { name: 'demo', subCommands: { deploy } })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(`Option '--name' is required` + helpHint(['deploy'], { name: 'demo' }))
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('two or more errors are followed by the help once', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['deploy', '--count', 'abc'], entry, { name: 'demo', subCommands: { deploy } })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      [`Option '--name' is required`, `Invalid value for '--count': expected number`].join('\n') +
+        helpHint(['deploy'], { name: 'demo' })
+    )
+  })
+
+  test.each([
+    { argv: ['nope'], path: [] },
+    { argv: ['records', 'nope'], path: ['records'] },
+    { argv: ['records', 'tags', 'nope'], path: ['records', 'tags'] }
+  ])(
+    'an unknown command in $argv is followed by the help of its parent',
+    async ({ argv, path }) => {
+      const stderr = defineMockErrorLog()
+
+      await expect(
+        cli(argv, entry, { name: 'demo', subCommands: { deploy, records } })
+      ).resolves.toBeUndefined()
+
+      expect(stderr()).toBe('Command not found: nope' + helpHint(path, { name: 'demo' }))
+      expect(process.exitCode).toBe(1)
+    }
+  )
+
+  test('a command that cannot be resolved is followed by the help of the commands it is among', async () => {
+    const stderr = defineMockErrorLog()
+    const config = plugin({
+      id: 'test:config',
+      setup(ctx) {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+
+    await expect(
+      cli(['--config', 'clean', 'deploy'], entry, {
+        name: 'demo',
+        plugins: [config],
+        subCommands: {
+          clean: define({ name: 'clean', run: vi.fn<() => void>() }),
+          deploy: define({
+            name: 'deploy',
+            args: { config: { type: 'boolean' } },
+            run: vi.fn<() => void>()
+          })
+        }
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      'The options do not identify a consistent command. Move options after the command name.' +
+        helpHint([], { name: 'demo' })
+    )
+  })
+
+  test('follows the errors that a plugin of the app decorates', async () => {
+    const stderr = defineMockErrorLog()
+    const theme = plugin({
+      id: 'test:theme',
+      setup(ctx) {
+        ctx.decorateValidationErrorsRenderer(
+          async (baseRenderer, cmdCtx, error) => `[theme] ${await baseRenderer(cmdCtx, error)}`
+        )
+      }
+    })
+
+    await expect(
+      cli(['deploy'], entry, { name: 'demo', plugins: [theme], subCommands: { deploy } })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      `[theme] Option '--name' is required` + helpHint(['deploy'], { name: 'demo' })
+    )
+  })
+
+  test('the heading is translated by the i18n plugin', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['records', 'nope'], entry, {
+        name: 'demo',
+        plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })],
+        subCommands: { deploy, records }
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      'コマンドが見つかりません: nope' + helpHint(['records'], { name: 'demo', locale: 'ja-JP' })
+    )
+  })
+
+  test('is not printed for a command that declares a help argument of its own', async () => {
+    const stderr = defineMockErrorLog()
+    const ownHelp = define({
+      name: 'deploy',
+      args: {
+        name: { type: 'string', required: true },
+        help: { type: 'boolean' }
+      },
+      run: vi.fn<() => void>()
+    })
+
+    await expect(
+      cli(['deploy'], entry, { name: 'demo', subCommands: { deploy: ownHelp } })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(`Option '--name' is required`)
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('is not printed when the CLI renders no usage', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['deploy'], entry, { name: 'demo', renderUsage: null, subCommands: { deploy } })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(`Option '--name' is required`)
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('follows the errors that the app renders', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['deploy'], entry, {
+        name: 'demo',
+        renderValidationErrors: (_ctx: unknown, error: AggregateError) =>
+          Promise.resolve(`app: ${error.errors.length} wrong argument`),
+        subCommands: { deploy }
+      })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('app: 1 wrong argument' + helpHint(['deploy'], { name: 'demo' }))
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('follows the errors that the command renders', async () => {
+    const stderr = defineMockErrorLog()
+    const rendered = define({
+      name: 'deploy',
+      args: { name: { type: 'string', required: true } },
+      rendering: { validationErrors: () => Promise.resolve('deploy cannot start') },
+      run: vi.fn<() => void>()
+    })
+
+    await expect(
+      cli(['deploy'], entry, { name: 'demo', subCommands: { deploy: rendered } })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe('deploy cannot start' + helpHint(['deploy'], { name: 'demo' }))
+    expect(process.exitCode).toBe(1)
+  })
+
+  test.each([
+    { title: 'the plugins render', options: {} },
+    {
+      title: 'the app renders',
+      options: {
+        renderValidationErrors: (_ctx: unknown, error: AggregateError) =>
+          Promise.resolve(`app: ${error.errors.length} wrong argument`)
+      }
+    }
+  ])('is not printed with helpHint: false, after the errors that $title', async ({ options }) => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['deploy'], entry, { name: 'demo', helpHint: false, subCommands: { deploy }, ...options })
+    ).resolves.toBeUndefined()
+
+    expect(stderr()).toBe(
+      options.renderValidationErrors ? 'app: 1 wrong argument' : `Option '--name' is required`
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('with helpHint: false, the JSON error still points to the help in next', async () => {
+    const stderr = defineMockErrorLog()
+    const status = define({
+      name: 'status',
+      args: { ...jsonArgs, project: { type: 'string', required: true } },
+      run: () => ({ project: 'acme' })
+    })
+
+    await expect(
+      cli(['status', '--json'], entry, { name: 'demo', helpHint: false, subCommands: { status } })
+    ).resolves.toBeUndefined()
+
+    expect(JSON.parse(stderr())).toMatchObject({
+      reason: 'required_option',
+      next: [{ command: 'demo status --help', argv: ['demo', 'status', '--help'] }]
+    })
   })
 })
 

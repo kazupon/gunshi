@@ -28,7 +28,8 @@ import {
   createResultFailure,
   createRunFailure,
   createValidationFailure,
-  messageOf
+  messageOf,
+  renderHelpHint
 } from './json.ts'
 
 import type {
@@ -312,8 +313,23 @@ const decorator: CommandDecorator<{
       throw error
     }
     const message = await showValidationErrors(error)
-    if (message && !ctx.env.usageSilent && markReported(ctx, error)) {
-      setExitCode(1)
+    if (message && !ctx.env.usageSilent) {
+      /**
+       * NOTE(kazupon): the errors are followed by the command that shows the help of the command nearest
+       * to what the user wrote, as `next` of the JSON error has it: the command itself for an argument
+       * error, and the parent for an unknown command. The errors tell what is wrong, and the command tells
+       * where to look next, which the message of an unknown command does not: it is the same at every
+       * level. It is printed outside the renderer of the errors, so it comes after the hints that a plugin
+       * such as the suggestion plugin adds, and after the errors that a renderer of the app renders.
+       * `helpHint: false` leaves it out, for an app that points to the help in its own way.
+       */
+      const hint = ctx.env.helpHint === false ? undefined : await renderHelpHint(ctx, error)
+      if (hint) {
+        console.error(hint)
+      }
+      if (markReported(ctx, error)) {
+        setExitCode(1)
+      }
     }
     throw error
   }

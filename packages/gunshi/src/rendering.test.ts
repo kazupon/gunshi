@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { defineMockErrorLog, defineMockLog } from '../test/utils.ts'
+import { defineMockErrorLog, defineMockLog, helpHint } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
 import { plugin } from './plugin/core.ts'
@@ -308,7 +308,7 @@ describe('Command rendering options', () => {
 
       await expect(cli(['test'], entry, createOptions(source))).resolves.toBeUndefined()
 
-      expect(stderr()).toBe('Custom validation errors')
+      expect(stderr()).toBe('Custom validation errors' + helpHint(['test'], { name: 'test-cli' }))
     })
   })
 })
