@@ -57,7 +57,8 @@ interface Run {
 
 /**
  * Create the command context of a run of `demo`, by default for a command that spreads `jsonArgs` and
- * is given `--json`.
+ * is given `--json`. The global `--help` and `--version` are in effect, and the CLI renders a usage, as
+ * with the global options plugin and the renderer plugin.
  *
  * @param run - What differs from the default
  * @returns The command context and the set of the reported errors
@@ -77,7 +78,13 @@ async function createRun({
     tokens,
     validationError,
     commandPath,
-    cliOptions: { name: 'demo', version: '1.0.0', ...cliOptions } as CliOptions,
+    cliOptions: {
+      name: 'demo',
+      version: '1.0.0',
+      globalOptions: new Map(Object.entries(COMMON_ARGS)),
+      renderUsage: () => Promise.resolve('USAGE: demo'),
+      ...cliOptions
+    } as CliOptions,
     extensions: {
       [pluginId]: { key: Symbol(pluginId), factory: extension },
       ...Object.fromEntries(
@@ -588,6 +595,49 @@ describe('an error before the command runs', () => {
       }
     ])
   })
+
+  test.each([
+    {
+      title: 'the command declares a help argument of its own',
+      args: {
+        ...jsonArgs,
+        name: { type: 'string', required: true },
+        help: { type: 'boolean' }
+      } satisfies Args,
+      // the core leaves the global options that the command declares out of the ones in effect
+      cliOptions: { globalOptions: new Map([['version', COMMON_ARGS.version]]) }
+    },
+    {
+      title: 'the CLI renders no usage',
+      args: { ...jsonArgs, name: { type: 'string', required: true } } satisfies Args,
+      cliOptions: { renderUsage: null }
+    }
+  ])('has no next when --help does not show the help: $title', async ({ args, cliOptions }) => {
+    const output = captureOutput()
+    const validationError = new AggregateError([required('name')])
+    const { ctx, reported } = await createRun({
+      args,
+      validationError,
+      commandPath: ['deploy'],
+      cliOptions
+    })
+
+    expect(await catchError(() => decorator(() => ({ ok: true }))(ctx))).toBe(validationError)
+
+    const [failure] = output.json() as Record<string, unknown>[]
+    expect(failure).toEqual({
+      status: 'action_required',
+      reason: 'required_option',
+      message: "Option '--name' is required",
+      data: {
+        issues: [
+          { field: '--name', reason: 'required_option', message: "Option '--name' is required" }
+        ]
+      }
+    })
+    expect(process.exitCode).toBe(1)
+    expect(reported.has(validationError)).toBe(true)
+  })
 })
 
 describe('--json given to a command that does not spread jsonArgs', () => {
@@ -619,6 +669,26 @@ describe('--json given to a command that does not spread jsonArgs', () => {
     ])
     expect(process.exitCode).toBe(1)
     expect(reported.has(error as object)).toBe(true)
+  })
+
+  test('has no next when the command declares a help argument of its own', async () => {
+    const output = captureOutput()
+    const { ctx } = await createRun({
+      args: { help: { type: 'boolean' } },
+      values: {},
+      commandPath: ['legacy'],
+      cliOptions: { globalOptions: new Map([['version', COMMON_ARGS.version]]) }
+    })
+
+    await catchError(() => decorator(() => {})(ctx))
+
+    expect(output.json()).toEqual([
+      {
+        status: 'action_required',
+        reason: 'json_not_supported',
+        message: 'This command does not support --json'
+      }
+    ])
   })
 
   test.each([
@@ -728,6 +798,9 @@ describe('--json given to a command that does not spread jsonArgs', () => {
     await catchError(() => decorator(() => {})(ctx))
 
     expect(renderValidationErrors).toHaveBeenCalled()
-    expect(output.stderr()).toEqual(['Unknown option: --json'])
+    expect(output.stderr()).toEqual([
+      'Unknown option: --json',
+      `\n${SEE_THE_ARGUMENTS}:\n  demo --help`
+    ])
   })
 })

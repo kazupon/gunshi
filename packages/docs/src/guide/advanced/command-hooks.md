@@ -137,8 +137,9 @@ With an understanding of how hooks work and their parameters, let's explore how 
 
 ### Handling Argument Validation Errors
 
-When argument validation fails, Gunshi prints the validation error message to stderr, sets the
-exit code to `1`, and calls `onErrorCommand`. The `cli()` promise then resolves, so a plain
+When argument validation fails, Gunshi prints the validation error message to stderr, followed by
+the command that shows the help (see [Argument Errors](../essentials/errors.md#argument-errors)),
+sets the exit code to `1`, and calls `onErrorCommand`. The `cli()` promise then resolves, so a plain
 `await cli(...)` ends with the message and exit code `1`, without a stack trace.
 
 In `onErrorCommand`, you can detect this case with `ctx.validationError`, for example to use

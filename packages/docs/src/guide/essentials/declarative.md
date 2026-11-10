@@ -357,14 +357,18 @@ By default, Gunshi keeps backward compatibility by ignoring option tokens that a
 
 ```js
 await cli(process.argv.slice(2), command, {
+  name: 'app',
   strict: true
 })
 ```
 
-With `strict: true`, an input such as `--alow-reload` is reported as an argument validation error:
+With `strict: true`, an input such as `--alow-reload` is reported as an argument validation error, followed by the command that shows the help (see [Argument Errors](./errors.md#argument-errors)):
 
 ```txt
 Unknown option: --alow-reload
+
+See the arguments of the command:
+  app --help
 ```
 
 The error uses the `err:arg:unknown-option` resource key, so the message follows the same renderer and i18n behavior as other argument validation errors. Suggestions such as `Did you mean --allow-reload?` are intentionally left to suggestion plugins.
@@ -399,7 +403,7 @@ to stop command exploration; values after it are passed through as `ctx.rest`.
 
 When a sub-command cannot be resolved, Gunshi reports it as a structured `CommandNotFoundError` inside the validation error pipeline. This avoids brittle checks such as `error.message.startsWith('Command not found:')`.
 
-Gunshi prints `Command not found: <name>` to stderr and sets the exit code to `1`, as it does for the other validation errors (see [Handling Argument Validation Errors](../advanced/command-hooks.md#handling-argument-validation-errors)). To add your own guidance, look the error up in `onErrorCommand`:
+Gunshi prints `Command not found: <name>` to stderr, followed by the command that shows the help of the parent command, and sets the exit code to `1`, as it does for the other validation errors (see [Handling Argument Validation Errors](../advanced/command-hooks.md#handling-argument-validation-errors)). To add your own guidance, look the error up in `onErrorCommand`:
 
 ```js
 import { cli, define, isCommandNotFoundError } from 'gunshi'

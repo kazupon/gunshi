@@ -2,7 +2,7 @@ import i18n from '@gunshi/plugin-i18n'
 import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { cli, define, lazy, plugin } from 'gunshi'
 import { describe, expect, test, vi } from 'vitest'
-import { defineMockErrorLog } from '../../gunshi/test/utils.ts'
+import { defineMockErrorLog, helpHint } from '../../gunshi/test/utils.ts'
 import { defineSuggestNames, levenshtein, suggestion } from './index.ts'
 
 import type { ResolvedSuggestionOptions } from './index.ts'
@@ -121,7 +121,9 @@ describe('suggestion plugin', () => {
     ).resolves.toBeUndefined()
 
     expect(run).not.toHaveBeenCalled()
-    expect(stderr()).toBe('Unknown option: --alow-reload\nDid you mean --allow-reload?')
+    expect(stderr()).toBe(
+      'Unknown option: --alow-reload\nDid you mean --allow-reload?' + helpHint()
+    )
   })
 
   test('does not suggest options when includeOptions is false', async () => {
@@ -147,7 +149,7 @@ describe('suggestion plugin', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toBe('Unknown option: --alow-reload')
+    expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
   })
 
   test('does not suggest short options by default', async () => {
@@ -173,7 +175,7 @@ describe('suggestion plugin', () => {
       )
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toBe('Unknown option: -x')
+    expect(stderr()).toBe('Unknown option: -x' + helpHint())
   })
 
   test('does not suggest unknown options when strict mode is disabled', async () => {
@@ -214,7 +216,7 @@ describe('suggestion plugin', () => {
     ).resolves.toBeUndefined()
 
     expect(run).not.toHaveBeenCalled()
-    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?' + helpHint())
   })
 
   test('uses nested command candidates from the parent command', async () => {
@@ -236,7 +238,7 @@ describe('suggestion plugin', () => {
       })
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?' + helpHint(['task']))
   })
 
   test('uses lazy parent command candidates', async () => {
@@ -266,7 +268,7 @@ describe('suggestion plugin', () => {
       })
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?' + helpHint(['task']))
   })
 
   test('does not suggest commands when includeCommands is false', async () => {
@@ -281,7 +283,7 @@ describe('suggestion plugin', () => {
       })
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toBe('Command not found: rn')
+    expect(stderr()).toBe('Command not found: rn' + helpHint())
   })
 
   test('does not suggest commands when fallbackToEntry handles the input', async () => {
@@ -311,7 +313,7 @@ describe('suggestion plugin', () => {
       cli(['rn'], define({ name: 'main' }), { plugins: [adds, suggestion()] })
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toBe('Command not found: rn\nDid you mean run?')
+    expect(stderr()).toBe('Command not found: rn\nDid you mean run?' + helpHint())
   })
 
   test('localizes unknown option suggestion hints with i18n', async () => {
@@ -346,7 +348,8 @@ describe('suggestion plugin', () => {
     ).resolves.toBeUndefined()
 
     expect(stderr()).toBe(
-      '未定義のオプションです: --alow-reload\n--allow-reload の指定ミスではありませんか？'
+      '未定義のオプションです: --alow-reload\n--allow-reload の指定ミスではありませんか？' +
+        helpHint([], { locale: 'ja-JP' })
     )
   })
 
@@ -370,6 +373,9 @@ describe('suggestion plugin', () => {
       })
     ).resolves.toBeUndefined()
 
-    expect(stderr()).toBe('コマンドが見つかりません: rn\nrun の指定ミスではありませんか？')
+    expect(stderr()).toBe(
+      'コマンドが見つかりません: rn\nrun の指定ミスではありませんか？' +
+        helpHint([], { locale: 'ja-JP' })
+    )
   })
 })

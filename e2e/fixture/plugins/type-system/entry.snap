@@ -1,1 +1,4 @@
 Option '--endpoint' is required
+
+See the arguments of the command:
+  my-cli --help

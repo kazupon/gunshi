@@ -124,7 +124,7 @@ $ echo $?
 | `status`  | `action_required` when the command stopped before it ran, and the input can be fixed. `error` when the command failed while it ran, or after: do not run it again without checking |
 | `reason`  | The reason of the failure, for programs to read, in snake_case                                                                                                                     |
 | `message` | The message for people, as Gunshi prints it without `--json`, translated by the [i18n plugin](../advanced/internationalization.md). Read `reason`, not `message`                   |
-| `next`    | The commands to run next: the help of the nearest command. Only for `action_required`                                                                                              |
+| `next`    | The commands to run next: the help of the nearest command. Only for `action_required`, when `--help` shows the help of that command                                                |
 | `data`    | `issues`: the argument errors, each with `field`, `reason` and `message`. `causes`: the messages of the causes of the error, from the outermost                                    |
 
 An argument error looks like this:
@@ -152,6 +152,8 @@ An argument error looks like this:
 The `field` of an issue is written as on the command line: the long form of an option (`--dry-run` with `toKebab`), the name of a positional argument, and an unknown option or an unknown command as it was typed.
 
 `next` starts with the name of the CLI, given to `cli()` as `name`. Without it, the command line starts with `<COMMAND>`, and `when` says to replace it with how the CLI was run. Give your CLI a `name`, so that `next` is a command line to run as it is.
+
+There is no `next` when `--help` does not show the help of that command: when the command declares a `help` argument of its own, which then takes `--help`, or when the CLI renders no usage, with `renderUsage: null`. `helpHint: false`, which leaves the command that shows the help out of the output for people, does not leave out `next`.
 
 ### Reasons
 

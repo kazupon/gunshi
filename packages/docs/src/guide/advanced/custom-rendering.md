@@ -313,6 +313,8 @@ await cli(process.argv.slice(2), command, {
 > [!NOTE]
 > `renderValidationErrors` customizes how validation errors are displayed. Gunshi prints the rendered message to stderr, sets the exit code to `1`, and passes the errors to `onErrorCommand`, and the `cli()` promise resolves. Set `renderValidationErrors` to `null`, or return an empty message, to report the errors yourself: Gunshi prints nothing, and the `cli()` promise rejects with the `AggregateError`. For examples, see [Handling Argument Validation Errors](./command-hooks.md#handling-argument-validation-errors).
 >
+> Gunshi follows your message with the command that shows the help (see [Argument Errors](../essentials/errors.md#argument-errors)), as it does the message of the plugins, whether you give the renderer as `renderValidationErrors` or in the `rendering` of a command. If your message points to the help itself, give `helpHint: false` to `cli()` to leave the command of Gunshi out, as the examples below do.
+>
 > With `--json`, Gunshi prints the validation errors as one line of JSON instead, and does not call `renderValidationErrors`: an empty message cannot tell Gunshi to leave them to you then. To report them yourself with `--json` as well, set `renderValidationErrors` to `null`. See [JSON Output](../essentials/json-output.md#reporting-errors-yourself).
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
@@ -405,7 +407,9 @@ await cli(process.argv.slice(2), command, {
   description: 'A task management utility',
   renderHeader: customHeaderRenderer,
   renderUsage: customUsageRenderer,
-  renderValidationErrors: customValidationErrorsRenderer
+  renderValidationErrors: customValidationErrorsRenderer,
+  // the renderer of the validation errors points to the help itself
+  helpHint: false
 })
 ```
 
@@ -942,7 +946,9 @@ await cli(process.argv.slice(2), command, {
   // Custom renderers
   renderHeader: customHeaderRenderer,
   renderUsage: customUsageRenderer,
-  renderValidationErrors: customValidationErrorsRenderer
+  renderValidationErrors: customValidationErrorsRenderer,
+  // the renderer of the validation errors points to the help itself
+  helpHint: false
 })
 ```
 

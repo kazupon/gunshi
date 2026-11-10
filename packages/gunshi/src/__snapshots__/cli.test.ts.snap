@@ -389,7 +389,10 @@ Options:
 
 ******************************
 * Option '--bar' is required *
-******************************"
+******************************
+
+See the arguments of the command:
+  gunshi --help"
 `;
 
 exports[`edge cases > 'description' option 1`] = `
