@@ -373,6 +373,8 @@ See the arguments of the command:
 
 The error uses the `err:arg:unknown-option` resource key, so the message follows the same renderer and i18n behavior as other argument validation errors. Suggestions such as `Did you mean --allow-reload?` are intentionally left to suggestion plugins.
 
+`--help` and `--version` are still answered: `app --alow-reload --help` prints the help, and the unknown option is not reported, as another wrong argument is not. An unknown command is reported, with or without `--help`.
+
 `--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`. With `strict`, it is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
 
 #### Options before sub-commands

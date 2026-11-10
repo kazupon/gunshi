@@ -379,6 +379,10 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * arguments or installed global options are reported as validation errors
    * before the command runner is executed.
    *
+   * With the global options plugin, `--help` and `--version` are still answered: given with them, an
+   * unknown option is not reported, as the other argument validation errors are not. An unknown command
+   * is still reported.
+   *
    * `--json` is not reported, since gunshi knows what it means: given to a command that does not
    * spread `jsonArgs`, the global options plugin reports `json_not_supported` for it instead, with or
    * without `strict`. `--json=false` asks for no JSON, and is reported.
