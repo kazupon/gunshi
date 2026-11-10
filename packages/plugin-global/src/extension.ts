@@ -3,7 +3,14 @@
  * @license MIT
  */
 
-import type { Awaitable, CommandContextCore, DefaultGunshiParams } from '@gunshi/plugin'
+import { createHelpDocument } from './json.ts'
+
+import type {
+  Awaitable,
+  CommandContext,
+  CommandContextCore,
+  DefaultGunshiParams
+} from '@gunshi/plugin'
 
 /**
  * Extended command context which provides utilities via global options plugin.
@@ -91,6 +98,54 @@ export async function writeUsage(
   }
   write(usage)
   return header ? [header, usage].join('\n') : usage
+}
+
+/**
+ * The indent of a JSON document on stdout: 2 spaces on a terminal, and one line otherwise, as the result
+ * of a command is printed.
+ *
+ * @returns The indent for `JSON.stringify`
+ */
+function indentOf(): number | undefined {
+  const stdout = (globalThis as { process?: { stdout?: { isTTY?: boolean } } }).process?.stdout
+  return stdout?.isTTY === true ? 2 : undefined
+}
+
+/**
+ * Print the version of the application as JSON: `{"version":"1.2.3"}`, and `null` when the version is not
+ * specified.
+ *
+ * @param ctx - The command context
+ * @param write - The function to print with
+ * @returns The JSON that is printed
+ */
+export function writeVersionJson(
+  ctx: CommandContextCore<DefaultGunshiParams>,
+  write: Writer
+): string {
+  const json = JSON.stringify({ version: ctx.env.version || null }, null, indentOf())
+  write(json)
+  return json
+}
+
+/**
+ * Print the help of the command as JSON (see {@linkcode createHelpDocument}). As with the help, nothing is
+ * printed when the CLI renders no usage.
+ *
+ * @param ctx - The command context
+ * @param write - The function to print with
+ * @returns The JSON that is printed, or `undefined` if the `renderUsage` is not specified
+ */
+export async function writeUsageJson(
+  ctx: Readonly<CommandContext<DefaultGunshiParams>>,
+  write: Writer
+): Promise<string | undefined> {
+  if (ctx.env.renderUsage == null) {
+    return
+  }
+  const json = JSON.stringify(await createHelpDocument(ctx), null, indentOf())
+  write(json)
+  return json
 }
 
 /**

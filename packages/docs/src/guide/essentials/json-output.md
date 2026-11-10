@@ -179,6 +179,51 @@ throw new CommandError(`Project ${name} not found`, { code: 'not_found', cause: 
 
 Any other error that the command throws is `command_failed`, even when it has a `code` of its own, such as `ENOENT`. With `--json`, Gunshi prints it as JSON too, and the `cli()` promise resolves. For more about the errors, see [Errors and Exit Codes](./errors.md).
 
+## Help and Version
+
+With `--json`, `--help` and `--version` print JSON too, so that stdout has the JSON only. They are answered for any command, whether it spreads `jsonArgs` or not, since Gunshi answers them, not the command.
+
+`--help --json` prints the help as one JSON document, made from the same arguments and translations as the help for people:
+
+```sh
+$ node cli.js --help --json | jq '.help | {command, description, json}'
+{
+  "command": "projects",
+  "description": "List the projects",
+  "json": true
+}
+$ node cli.js --help --json | jq '.help.options[] | select(.name == "--limit")'
+{
+  "name": "--limit",
+  "short": null,
+  "description": "How many projects to list",
+  "type": "number",
+  "value": "<limit>",
+  "required": false,
+  "multiple": false,
+  "default": 10,
+  "choices": null,
+  "negatable": false,
+  "global": false
+}
+```
+
+| Key           | Value                                                                                                                                                             |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `command`     | The command line of the command, to read, as in `next` of the errors. Without the `name` of `cli()`, it starts with `<COMMAND>`                                   |
+| `argv`        | The arguments of the command line, to run                                                                                                                         |
+| `description` | The description of the command                                                                                                                                    |
+| `commands`    | The sub-commands of a command that groups them, as the help lists them: `name` and `description`                                                                  |
+| `arguments`   | The positional arguments, in order: `name`, `description`, `required` and `multiple`                                                                              |
+| `options`     | The options, the global options included: `name`, `short`, `description`, `type`, `value`, `required`, `multiple`, `default`, `choices`, `negatable` and `global` |
+| `json`        | Whether the command prints its result as JSON with `--json`: it spreads `jsonArgs`                                                                                |
+
+A value that is not there is `null`, and an empty list is `[]`, so that every key is there. On a terminal, the document is indented.
+
+`--version --json` prints `{"version":"1.2.3"}`, with the `version` given to `cli()`, or `{"version":null}` without it.
+
+A command with a `json` argument of its own takes `--json` itself, and gets the help and the version as text. With `usageSilent`, or `renderUsage: null`, nothing is printed, as for the help as text.
+
 ## `jsonArgs` or a `json` of Your Own
 
 Spread `jsonArgs` when the command can follow the contract of Gunshi: an object keyed by a noun for the result, and one line of JSON for a failure.
@@ -187,7 +232,7 @@ When the output is already fixed, such as an array that the readers expect, an e
 
 ## Commands Without `--json`
 
-When `--json` is given to a command that does not spread `jsonArgs`, Gunshi stops it before it runs, with `json_not_supported`, so that a program does not take its text for JSON. `--help` and `--version` still print as before.
+When `--json` is given to a command that does not spread `jsonArgs`, Gunshi stops it before it runs, with `json_not_supported`, so that a program does not take its text for JSON. `--help` and `--version` are still answered, as JSON: see [Help and Version](#help-and-version).
 
 With `strict`, `--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, and a command with it runs. `--json=false` asks for no JSON, and stays an unknown option with `strict`.
 

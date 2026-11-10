@@ -14,13 +14,17 @@ import {
   JsonOutputErrorKeys
 } from '@gunshi/plugin'
 import {
+  isJsonArg,
   localizeBuiltinResource,
   localizeValidationError,
+  namespacedId,
+  resolveArgKey,
   resolveBuiltInKey,
-  resolveDisplayName
+  resolveDisplayName,
+  resolveKey
 } from '@gunshi/shared'
 
-import type { CommandContext, DefaultGunshiParams } from '@gunshi/plugin'
+import type { ArgSchema, CommandContext, DefaultGunshiParams } from '@gunshi/plugin'
 
 /**
  * A command to run next, which `next` of a JSON error lists.
@@ -381,4 +385,252 @@ async function createNext(
     resolveBuiltInKey(name ? 'json:next:help' : 'json:next:help-placeholder')
   )
   return [{ command: argv.join(' '), argv, when }]
+}
+
+/**
+ * An option, which `options` of the help as JSON lists.
+ */
+interface JsonHelpOption {
+  /**
+   * The name of the option, as it is written on the command line: `--dry-run`.
+   */
+  name: string
+  /**
+   * The short name of the option: `-n`, or `null`.
+   */
+  short: string | null
+  /**
+   * The description of the option, as the help shows it, or `null`.
+   */
+  description: string | null
+  /**
+   * The type of the value: `string`, `number`, `boolean`, `enum`, or `custom`.
+   */
+  type: string
+  /**
+   * What to write for the value, as the help shows it: `<name>`. `null` for a boolean, which takes no
+   * value.
+   */
+  value: string | null
+  /**
+   * Whether the option must be given.
+   */
+  required: boolean
+  /**
+   * Whether the option may be given more than once.
+   */
+  multiple: boolean
+  /**
+   * The value that the option has when it is not given, or `null`.
+   */
+  default: unknown
+  /**
+   * The values that the option takes, or `null` when it takes any.
+   */
+  choices: unknown[] | null
+  /**
+   * Whether `--no-` in front of the name turns the option off.
+   */
+  negatable: boolean
+  /**
+   * Whether the option is a global option, which the commands take: `--help` and `--version`.
+   */
+  global: boolean
+}
+
+/**
+ * A positional argument, which `arguments` of the help as JSON lists.
+ */
+interface JsonHelpArgument {
+  /**
+   * The name of the argument.
+   */
+  name: string
+  /**
+   * The description of the argument, as the help shows it, or `null`.
+   */
+  description: string | null
+  /**
+   * Whether the argument must be given.
+   */
+  required: boolean
+  /**
+   * Whether the argument takes the rest of the positional arguments.
+   */
+  multiple: boolean
+}
+
+/**
+ * A sub-command, which `commands` of the help as JSON lists.
+ */
+interface JsonHelpCommand {
+  /**
+   * The name of the sub-command, which follows the command line of the help.
+   */
+  name: string
+  /**
+   * The description of the sub-command, as the help shows it, or `null`.
+   */
+  description: string | null
+}
+
+/**
+ * The document that the global options plugin prints to stdout for `--help` with `--json`. In it, an
+ * empty list is `[]`, and a value that is not there is `null`, so that every key is always there.
+ */
+export interface JsonHelp {
+  /**
+   * The help of the command.
+   */
+  help: {
+    /**
+     * The command line of the command, to read: `demo deploy`. Without the name of the CLI, it starts
+     * with `<COMMAND>`.
+     */
+    command: string
+    /**
+     * The arguments of the command line, to run.
+     */
+    argv: string[]
+    /**
+     * The description of the command, or `null`.
+     */
+    description: string | null
+    /**
+     * The sub-commands, when the command is a group of them, as the help lists them.
+     */
+    commands: JsonHelpCommand[]
+    /**
+     * The positional arguments, in order.
+     */
+    arguments: JsonHelpArgument[]
+    /**
+     * The options, the global options included.
+     */
+    options: JsonHelpOption[]
+    /**
+     * Whether the command prints its result as JSON with `--json`: it spreads `jsonArgs`.
+     */
+    json: boolean
+  }
+}
+
+/**
+ * The id of the usage renderer plugin. The help as JSON takes the descriptions and the sub-commands
+ * from its extension, so that they are the ones of the help, translated by the i18n plugin.
+ */
+const RENDERER = namespacedId('renderer')
+
+/**
+ * What the help as JSON uses of the extension of the usage renderer plugin.
+ */
+interface RendererExtension {
+  text: (key: string) => Promise<string>
+  loadCommands: () => Promise<{ name?: string; entry?: boolean }[]>
+  localizeCommandDescription: (cmd: unknown) => Promise<string>
+}
+
+/**
+ * Create the help as JSON: the command, its sub-commands, its positional arguments, and its options,
+ * from the metadata that the help is rendered from. A hidden argument and an internal command are left
+ * out, as the help leaves them out.
+ *
+ * @param ctx - The command context
+ * @returns The help as JSON
+ */
+export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
+  const renderer = (ctx.extensions as Record<string, unknown> | undefined)?.[RENDERER] as
+    | RendererExtension
+    | undefined
+  const describe = async (key: string, fallback?: string): Promise<string | null> =>
+    (renderer ? await renderer.text(key) : '') || fallback || null
+
+  const options: JsonHelpOption[] = []
+  const positionals: JsonHelpArgument[] = []
+  for (const [key, schema] of Object.entries(ctx.args) as [string, ArgSchema][]) {
+    if (schema.hidden) {
+      continue
+    }
+    const description = await describe(resolveArgKey(key, ctx.name), schema.description)
+    if (schema.type === 'positional') {
+      positionals.push({
+        name: key,
+        description,
+        required: isRequiredPositional(schema),
+        multiple: schema.multiple === true
+      })
+      continue
+    }
+    const name = resolveDisplayName(key, schema, ctx.toKebab)
+    options.push({
+      name: `--${name}`,
+      short: schema.short ? `-${schema.short}` : null,
+      description,
+      type: schema.type,
+      value: schema.type === 'boolean' ? null : `<${name}>`,
+      required: schema.required === true,
+      multiple: schema.multiple === true,
+      default: isJsonValue(schema.default) ? schema.default : null,
+      choices: schema.type === 'enum' && Array.isArray(schema.choices) ? [...schema.choices] : null,
+      negatable: schema.type === 'boolean' && schema.negatable === true,
+      global: ctx.env.globalOptions?.has(key) === true
+    })
+  }
+
+  const commands: JsonHelpCommand[] = []
+  if (ctx.omitted && renderer) {
+    for (const cmd of await renderer.loadCommands()) {
+      if (cmd.entry || !cmd.name) {
+        continue
+      }
+      commands.push({
+        name: cmd.name,
+        description: (await renderer.localizeCommandDescription(cmd)) || null
+      })
+    }
+  }
+
+  const argv = [ctx.env.name || '<COMMAND>', ...ctx.commandPath]
+  return {
+    help: {
+      command: argv.join(' '),
+      argv,
+      description: await describe(resolveKey('description', ctx.name), ctx.description),
+      commands,
+      arguments: positionals,
+      options,
+      json: isJsonArg(ctx.args.json)
+    }
+  }
+}
+
+/**
+ * Check whether a positional argument must be given, as the help shows it: unless the schema says
+ * otherwise, an argument without a default must be given.
+ *
+ * @param schema - The schema of the positional argument
+ * @returns `true` when the argument must be given
+ */
+function isRequiredPositional(schema: ArgSchema): boolean {
+  if (schema.required === true || schema.required === false) {
+    return schema.required
+  }
+  return schema.default == null
+}
+
+/**
+ * Check whether a value can be written in JSON as it is.
+ *
+ * @param value - The value
+ * @returns `true` when the value is written in JSON
+ */
+function isJsonValue(value: unknown): boolean {
+  if (value === undefined) {
+    return false
+  }
+  try {
+    return JSON.stringify(value) !== undefined
+  } catch {
+    return false
+  }
 }

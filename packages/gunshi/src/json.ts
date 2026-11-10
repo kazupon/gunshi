@@ -12,7 +12,8 @@ import { JSON_ARG } from './constants.ts'
  * the output for people with `ctx.log`. With `--json`, the global options plugin silences `ctx.log`,
  * prints the result as one JSON document to stdout, and prints a failure as one line of JSON to
  * stderr. `--json` given to a command that does not spread it stops the command before it runs, with
- * `json_not_supported`.
+ * `json_not_supported`. With `--help` or `--version`, `--json` is answered for any command: the help and
+ * the version are printed as JSON.
  *
  * The `json` argument has a mark, by which gunshi tells it from a `json` argument of the command's
  * own, which gunshi does not touch. To give it a short name, spread it:
