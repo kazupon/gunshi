@@ -16,7 +16,7 @@ import {
   resolveKey,
   resolveOptionNames
 } from '@gunshi/shared'
-import { isResolvedWithoutRun } from './runner.ts'
+import { isMarkedWithoutRun, isResolvedWithoutRun } from './runner.ts'
 import { pluginId } from './types.ts'
 import { displayWidth, padEndToWidth } from './width.ts'
 
@@ -231,7 +231,7 @@ async function renderCommandsSection<
     `${await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMANDS'))}:`
   ]
   const loadedCommands = ((await ctx.extensions?.[pluginId].loadCommands<G>()) || []).filter(
-    cmd => !isEntryWithoutRun(cmd)
+    cmd => !isEntryWithoutRun(ctx, cmd)
   )
   const commandSymbols = await Promise.all(
     loadedCommands.map(async cmd => await makeCommandSymbol(ctx, cmd))
@@ -385,13 +385,21 @@ async function resolveExamples<
  * NOTE(kazupon): the core lists the command itself among its sub-commands, marked with `entry`, for the
  * command that runs when no sub-command is given. A command without `run` runs nothing then, so its row
  * would name a command that does not exist. Each row is checked against its own command, which
- * `loadCommands` records: a lazy command always has a runner, which its loader returns.
+ * `loadCommands` records. `loadCommands` does not run the loader of a lazy command, which may return a
+ * command without `run` too, so the row of the command of the context, which has its name, is checked by
+ * the mark of the core as well, which loaded the command and prints its usage when it runs. The other rows
+ * marked with `entry`, such as a command that a plugin adds, are checked against their own commands.
  *
+ * @param ctx - A {@link CommandContext | command context}
  * @param cmd - A command from `loadCommands`
  * @returns True if the row is an entry command, and the command has no `run`
  */
-function isEntryWithoutRun(cmd: Command): boolean {
-  return cmd.entry === true && isResolvedWithoutRun(cmd)
+function isEntryWithoutRun(ctx: Readonly<CommandContext>, cmd: Command): boolean {
+  if (cmd.entry !== true) {
+    return false
+  }
+  const own = (cmd.name || ANONYMOUS_COMMAND_NAME) === (ctx.name || ANONYMOUS_COMMAND_NAME)
+  return isResolvedWithoutRun(cmd) || (own && isMarkedWithoutRun(ctx))
 }
 
 /**
@@ -414,7 +422,7 @@ async function hasCommands<
   const loadedCommands = (await ctx.extensions?.[pluginId].loadCommands<G>()) || []
   return (
     (loadedCommands.length > 1 || loadedCommands.some(cmd => !cmd.entry)) &&
-    loadedCommands.some(cmd => !isEntryWithoutRun(cmd))
+    loadedCommands.some(cmd => !isEntryWithoutRun(ctx, cmd))
   )
 }
 

@@ -2273,6 +2273,19 @@ describe('the usage of a group', () => {
     expect(commandRows(await usageOfGroup(records))).toEqual(['[records]', 'add', 'list'])
   })
 
+  test('a lazy group whose loader returns a command without run lists only its sub-commands', async () => {
+    const records = lazy(() => define({ name: 'records' }), {
+      name: 'records',
+      description: 'Manage records',
+      args: {},
+      subCommands: { add, list }
+    })
+    const usage = await usageOfGroup(records)
+
+    expect(commandRows(usage)).toEqual(['add', 'list'])
+    expect(forMoreLines(usage)).toEqual(['demo records add --help', 'demo records list --help'])
+  })
+
   test('an entry given as a runner lists itself', async () => {
     const usage = await cli(['--help'], async () => {}, {
       ...options,
