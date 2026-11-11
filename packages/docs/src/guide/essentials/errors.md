@@ -26,6 +26,23 @@ The `cli()` promise resolves. To report the argument errors in your own way, see
 
 With `--help` or `--version`, Gunshi prints the help or the version instead, and does not report the argument errors, an unknown option of `strict: true` and an unexpected positional argument of `strictPositionals: true` included. An unknown command is still reported, since it is not known which command was meant.
 
+To end with another exit code, such as `2`, the exit code of a usage error in many command-line tools, give it to `cli()` as `validationErrorExitCode`:
+
+```js
+await cli(process.argv.slice(2), command, { validationErrorExitCode: 2 })
+```
+
+It is the exit code of the argument errors, an unknown command included, whether they are printed as text or as JSON (see [With `--json`](#with-json)), and of `--json` given to a command that does not support it. It does not change the exit code of a `CommandError`, or of an unexpected error.
+
+A command may also find an error in its arguments itself, such as a start date after the end date. To end it with the same exit code, throw a [`CommandError`](#expected-failures) with the exit code that `ctx.env` has:
+
+```js
+throw new CommandError('--from must come before --to', {
+  code: 'invalid_range',
+  exitCode: ctx.env.validationErrorExitCode
+})
+```
+
 ## Expected Failures
 
 When a command fails in a way that it expects, throw a `CommandError` with a message for the user:
@@ -151,12 +168,12 @@ A bug stays visible, with the stack trace to find it.
 
 ## Exit Codes
 
-| What happens                        | Exit code                                       | The `cli()` promise |
-| ----------------------------------- | ----------------------------------------------- | ------------------- |
-| The command succeeds                | `0`, unless the command sets `process.exitCode` | Resolves            |
-| The arguments are wrong             | `1`                                             | Resolves            |
-| The command throws a `CommandError` | The `exitCode` of the error, `1` by default     | Resolves            |
-| The command throws any other error  | `1`, when the app does not catch the error      | Rejects             |
+| What happens                        | Exit code                                        | The `cli()` promise |
+| ----------------------------------- | ------------------------------------------------ | ------------------- |
+| The command succeeds                | `0`, unless the command sets `process.exitCode`  | Resolves            |
+| The arguments are wrong             | `1`, or the `validationErrorExitCode` of `cli()` | Resolves            |
+| The command throws a `CommandError` | The `exitCode` of the error, `1` by default      | Resolves            |
+| The command throws any other error  | `1`, when the app does not catch the error       | Rejects             |
 
 Gunshi sets the exit code with `process.exitCode`, and does not call `process.exit()`.
 

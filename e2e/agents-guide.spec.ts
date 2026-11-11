@@ -518,35 +518,40 @@ await cli(process.argv.slice(2), main, {
     expect(run(file, ['create', 'db', '--replicas', '2'], envWith({ TWO: '1' })).code).toBe(0)
   })
 
-  test('onErrorCommand is called with a CommandError too, and isCommandError leaves its exit code alone', () => {
+  test('validationErrorExitCode sets another exit code for the errors of the arguments only', () => {
     const file = write(
-      'exit-code-command-error.mjs',
-      `import { cli, CommandError, define, isCommandError } from 'gunshi'
-const remove = define({
-  name: 'remove',
-  args: { name: { type: 'positional' } },
-  run: ctx => {
-    throw new CommandError('Database ' + ctx.values.name + ' not found', { code: 'not_found' })
-  }
-})
-await cli(process.argv.slice(2), define({ name: 'cloud', run: () => {} }), {
+      'validation-exit-code.mjs',
+      `import { cli, CommandError, define, jsonArgs } from 'gunshi'
+const create = define({ name: 'create', args: { name: { type: 'positional' }, replicas: { type: 'number' } }, run: ctx => console.log(JSON.stringify(ctx.values)) })
+const remove = define({ name: 'remove', args: { ...jsonArgs }, run: () => { throw new CommandError('Release v9 does not exist', { exitCode: 3 }) } })
+const status = define({ name: 'status', run: () => console.log('ok') })
+const main = define({ name: 'cloud', run: () => console.log('main') })
+await cli(process.argv.slice(2), main, {
   name: 'cloud',
-  subCommands: { remove },
-  onErrorCommand: (ctx, error) => {
-    if (process.env.ALL === '1' || !isCommandError(error)) process.exitCode = 2
-  }
+  version: '1.0.0',
+  subCommands: { create, remove, status },
+  strict: true,
+  validationErrorExitCode: 2
 })
 `
     )
-    const withCheck = envWith({ ALL: undefined })
-    expect(run(file, ['remove', 'db'], withCheck)).toEqual({
-      code: 1,
-      stdout: '',
-      stderr: 'Database db not found\n'
-    })
-    expect(run(file, ['remove'], withCheck)).toMatchObject({ code: 2, stdout: '' })
-    // without the check, the exit code of the CommandError is overwritten
-    expect(run(file, ['remove', 'db'], envWith({ ALL: '1' })).code).toBe(2)
+    for (const args of [
+      ['create', 'db', '--unknown', 'x'],
+      ['nope'],
+      ['create', 'db', '--replicas', 'abc'],
+      ['create'],
+      ['status', '--json']
+    ]) {
+      const result = run(file, args)
+      expect(result.code, `${args.join(' ')}: ${result.stderr}`).toBe(2)
+      expect(result.stdout).toBe('')
+      expect(result.stderr).not.toBe('')
+      expect(hasStackTrace(result.stderr)).toBe(false)
+    }
+    expect(run(file, ['remove']).code).toBe(3)
+    expect(run(file, ['remove', '--json']).code).toBe(3)
+    expect(run(file, ['create', '--help']).code).toBe(0)
+    expect(run(file, ['create', 'db', '--replicas', '2']).code).toBe(0)
   })
 
   test('a CommandError prints its message to stderr without a stack trace, and sets the exit code', () => {
