@@ -246,6 +246,14 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   helpHint: boolean
   /**
+   * The exit code of the validation errors. A command can give it to a `CommandError`, to end an
+   * argument error that it finds itself with the same exit code.
+   *
+   * @default 1
+   * @see {@linkcode CliOptions.validationErrorExitCode}
+   */
+  validationErrorExitCode: number
+  /**
    * Sub commands.
    *
    * @see {@linkcode CliOptions.subCommands}
@@ -426,7 +434,8 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Render function the validation errors.
    *
    * With the global options plugin, the rendered message is printed to stderr, the exit code is set
-   * to `1`, {@linkcode CliOptions.onErrorCommand} is called, and `cli()` resolves with `undefined`.
+   * to {@linkcode CliOptions.validationErrorExitCode}, `1` by default,
+   * {@linkcode CliOptions.onErrorCommand} is called, and `cli()` resolves with `undefined`.
    * The message is followed by the command that shows the help, unless {@linkcode CliOptions.helpHint}
    * is `false`.
    * Set it to `null` to report the validation errors yourself: nothing is printed, and `cli()` rejects
@@ -454,6 +463,22 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * @default true
    */
   helpHint?: boolean
+  /**
+   * The exit code of the validation errors, such as `2`, the exit code of a usage error in many
+   * command-line tools. They are the errors of the arguments: a missing or invalid argument, an unknown
+   * command, an unknown option of `strict`, a positional argument that the command does not take of
+   * `strictPositionals`, and `--json` given to a command that does not spread `jsonArgs`. With the global
+   * options plugin, the exit code is set to it when the errors are printed, as text or as JSON, before
+   * {@linkcode CliOptions.onErrorCommand} is called, which can still change it.
+   *
+   * It is an integer from `1` to `255`, as the `exitCode` of a `CommandError` is, and any other value is
+   * replaced with `1`. It does not change the exit code of a `CommandError`, nor of any other error that a
+   * command throws. With `renderValidationErrors: null` and {@linkcode CliOptions.usageSilent}, nothing is
+   * printed, and the exit code is left alone.
+   *
+   * @default 1
+   */
+  validationErrorExitCode?: number
   /**
    * Whether to fallback to entry command when the sub-command is not found.
    *
@@ -494,9 +519,9 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Hook that runs when a command throws an error, or when the arguments fail validation
    *
    * For the validation errors and a `CommandError` that the global options plugin has printed, the
-   * exit code is already set when the hook runs (`1` for the validation errors, and the `exitCode` of
-   * a `CommandError`), so the hook can set another one, and `cli()` resolves after it. Any other
-   * error rejects `cli()` after the hook.
+   * exit code is already set when the hook runs ({@linkcode CliOptions.validationErrorExitCode} for the
+   * validation errors, and the `exitCode` of a `CommandError`), so the hook can set another one, and
+   * `cli()` resolves after it. Any other error rejects `cli()` after the hook.
    *
    * @param ctx - The command context
    * @param error - The error thrown during execution, or the `AggregateError` of the validation errors

@@ -288,11 +288,12 @@ const decorator: CommandDecorator<{
 
   /**
    * NOTE(kazupon): when the plugin has shown the validation errors to the user, they have been
-   * reported: the exit code is 1, and `cli()` ends without rejecting, as the other CLI libraries end
-   * without a stack trace. They are still thrown, so that the `onErrorCommand` hook sees them. When
-   * nothing was shown (`renderValidationErrors: null`, an empty message, or `usageSilent`), `cli()`
-   * rejects with them, for the app to report them. So it does when the core keeps no set of reported
-   * errors for the run, and then the exit code is left alone.
+   * reported: the exit code is the `validationErrorExitCode` of `cli()`, `1` by default, and `cli()`
+   * ends without rejecting, as the other CLI libraries end without a stack trace. They are still
+   * thrown, so that the `onErrorCommand` hook sees them. When nothing was shown
+   * (`renderValidationErrors: null`, an empty message, or `usageSilent`), `cli()` rejects with them,
+   * for the app to report them. So it does when the core keeps no set of reported errors for the run,
+   * and then the exit code is left alone.
    *
    * With `--json`, they are printed as JSON, and the renderer of the validation errors is not called.
    * `renderValidationErrors: null` and `usageSilent` still leave them to the app.
@@ -307,7 +308,7 @@ const decorator: CommandDecorator<{
   ): Promise<never> => {
     if (request !== undefined) {
       if (ctx.env.renderValidationErrors !== null && !ctx.env.usageSilent) {
-        printFailure(error, await createFailure(), 1)
+        printFailure(error, await createFailure(), ctx.env.validationErrorExitCode)
       }
       throw error
     }
@@ -327,7 +328,7 @@ const decorator: CommandDecorator<{
         console.error(hint)
       }
       if (markReported(ctx, error)) {
-        setExitCode(1)
+        setExitCode(ctx.env.validationErrorExitCode)
       }
     }
     throw error

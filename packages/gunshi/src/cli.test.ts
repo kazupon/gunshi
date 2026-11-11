@@ -6397,3 +6397,187 @@ describe('strictPositionals of cli()', () => {
     expect(run).not.toHaveBeenCalled()
   })
 })
+
+describe('validationErrorExitCode of cli()', () => {
+  const entry = () => define({ name: 'app', run: () => {} })
+  const deploy = () =>
+    define({
+      name: 'deploy',
+      args: { ...jsonArgs, name: { type: 'string', required: true } },
+      run: () => ({ deployed: true })
+    })
+
+  afterEach(() => {
+    process.exitCode = undefined
+  })
+
+  test('is 1 by default', async () => {
+    defineMockErrorLog()
+
+    await cli(['deploy'], entry(), { name: 'app', subCommands: { deploy: deploy() } })
+
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('is the exit code of the errors of the arguments and of an unknown command', async () => {
+    defineMockErrorLog()
+    const options = {
+      name: 'app',
+      subCommands: { deploy: deploy() },
+      strict: true,
+      strictPositionals: true,
+      validationErrorExitCode: 2
+    }
+    const codes: unknown[] = []
+
+    for (const argv of [
+      ['deploy'],
+      ['deploy', '--name'],
+      ['nope'],
+      ['deploy', '--name', 'web', '--unknown'],
+      ['deploy', '--name', 'web', 'extra']
+    ]) {
+      process.exitCode = undefined
+      await cli(argv, entry(), options)
+      codes.push(process.exitCode)
+    }
+
+    expect(codes).toEqual([2, 2, 2, 2, 2])
+  })
+
+  test('is the exit code of the errors printed as JSON, json_not_supported included', async () => {
+    const stderr = defineMockErrorLog()
+    const plain = define({ name: 'plain', run: () => {} })
+    const options = {
+      name: 'app',
+      subCommands: { deploy: deploy(), plain },
+      validationErrorExitCode: 2
+    }
+    const codes: unknown[] = []
+
+    for (const argv of [
+      ['deploy', '--json'],
+      ['plain', '--json']
+    ]) {
+      process.exitCode = undefined
+      await cli(argv, entry(), options)
+      codes.push(process.exitCode)
+    }
+
+    expect(codes).toEqual([2, 2])
+    expect(stderr()).toContain('"reason":"json_not_supported"')
+  })
+
+  test('does not change the exit code of an error that the command throws', async () => {
+    defineMockErrorLog()
+    const fail = define({
+      name: 'fail',
+      args: { ...jsonArgs },
+      run: () => {
+        throw new CommandError('Release v9 does not exist', { exitCode: 3 })
+      }
+    })
+    const crash = define({
+      name: 'crash',
+      args: { ...jsonArgs },
+      run: () => {
+        throw new TypeError('Cannot read properties of undefined')
+      }
+    })
+    const options = { name: 'app', subCommands: { fail, crash }, validationErrorExitCode: 2 }
+    const codes: unknown[] = []
+
+    for (const argv of [['fail'], ['fail', '--json'], ['crash', '--json']]) {
+      process.exitCode = undefined
+      await cli(argv, entry(), options)
+      codes.push(process.exitCode)
+    }
+    process.exitCode = undefined
+    await expect(cli(['crash'], entry(), options)).rejects.toThrow(
+      'Cannot read properties of undefined'
+    )
+
+    expect(codes).toEqual([3, 3, 1])
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('is set before onErrorCommand, which can change it', async () => {
+    defineMockErrorLog()
+    let seen: unknown
+
+    await cli(['deploy'], entry(), {
+      name: 'app',
+      subCommands: { deploy: deploy() },
+      validationErrorExitCode: 2,
+      onErrorCommand: () => {
+        seen = process.exitCode
+        process.exitCode = 4
+      }
+    })
+
+    expect(seen).toBe(2)
+    expect(process.exitCode).toBe(4)
+  })
+
+  test('does not apply to --help and --version, which are answered', async () => {
+    const options = {
+      name: 'app',
+      version: '1.2.3',
+      subCommands: { deploy: deploy() },
+      usageSilent: true,
+      validationErrorExitCode: 2
+    }
+
+    const usage = await cli(['deploy', '--help'], entry(), options)
+    const version = await cli(['deploy', '--version'], entry(), options)
+
+    expect(usage).toContain('USAGE:')
+    expect(version).toBe('1.2.3')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('is replaced with 1 when it is not an integer from 1 to 255', async () => {
+    defineMockErrorLog()
+    const codes: unknown[] = []
+
+    for (const value of [0, 256, 1.5, -1, Number.NaN, '2']) {
+      process.exitCode = undefined
+      await cli(['deploy'], entry(), {
+        name: 'app',
+        subCommands: { deploy: deploy() },
+        validationErrorExitCode: value as number
+      })
+      codes.push(process.exitCode)
+    }
+
+    expect(codes).toEqual([1, 1, 1, 1, 1, 1])
+  })
+
+  test('leaves the exit code alone when the app reports the errors itself', async () => {
+    defineMockErrorLog()
+    const options = { name: 'app', subCommands: { deploy: deploy() }, validationErrorExitCode: 2 }
+
+    await expect(
+      cli(['deploy'], entry(), { ...options, renderValidationErrors: null })
+    ).rejects.toThrow(AggregateError)
+    await expect(cli(['deploy'], entry(), { ...options, usageSilent: true })).rejects.toThrow(
+      AggregateError
+    )
+
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('does not apply to bone, which does not report the errors', async () => {
+    const run = vi.fn<() => void>()
+
+    await expect(
+      boneCli(['extra'], define({ name: 'app', run }), {
+        strictPositionals: true,
+        validationErrorExitCode: 2
+      })
+    ).rejects.toThrow('Unexpected positional argument: extra')
+
+    expect(run).not.toHaveBeenCalled()
+    expect(process.exitCode).toBeUndefined()
+  })
+})
