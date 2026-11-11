@@ -139,11 +139,13 @@ With an understanding of how hooks work and their parameters, let's explore how 
 
 When argument validation fails, Gunshi prints the validation error message to stderr, followed by
 the command that shows the help (see [Argument Errors](../essentials/errors.md#argument-errors)),
-sets the exit code to `1`, and calls `onErrorCommand`. The `cli()` promise then resolves, so a plain
-`await cli(...)` ends with the message and exit code `1`, without a stack trace.
+sets the exit code to `1`, or to the `validationErrorExitCode` of `cli()`, and calls `onErrorCommand`.
+The `cli()` promise then resolves, so a plain `await cli(...)` ends with the message and the exit
+code, without a stack trace.
 
-In `onErrorCommand`, you can detect this case with `ctx.validationError`, for example to use
-another exit code:
+To use another exit code, such as `2`, give it to `cli()` as `validationErrorExitCode` (see
+[Argument Errors](../essentials/errors.md#argument-errors)). In `onErrorCommand`, you can detect this
+case with `ctx.validationError`, for example to record it:
 
 ```ts
 import { cli, define } from 'gunshi'
@@ -162,9 +164,10 @@ const command = define({
 })
 
 await cli(process.argv.slice(2), command, {
+  validationErrorExitCode: 2,
   onErrorCommand: (ctx, error) => {
     if (ctx.validationError === error) {
-      process.exitCode = 2
+      console.error(`[${new Date().toISOString()}] ${ctx.name}: the arguments are wrong`)
     }
   }
 })

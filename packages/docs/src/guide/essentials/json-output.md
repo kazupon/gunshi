@@ -167,7 +167,7 @@ There is no `next` when `--help` does not show the help of that command: when th
 | `command_failed`                                                                                                                                                                                                     | `error`           | The command throws any other error, or a `CommandError` without a `code` |
 | `invalid_result`, `unserializable_result`                                                                                                                                                                            | `error`           | The result cannot be printed as JSON                                     |
 
-The exit code is `1`, except for a `CommandError`, which keeps its own `exitCode`.
+The exit code is `1`, or the `validationErrorExitCode` of `cli()` for the errors of `action_required` (see [Argument Errors](./errors.md#argument-errors)), and a `CommandError` keeps its own `exitCode`.
 
 ### Failures of the Command
 

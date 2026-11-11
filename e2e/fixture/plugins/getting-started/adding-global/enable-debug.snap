@@ -19,6 +19,7 @@ Context: [Object: null prototype] {
     strict: false,
     strictPositionals: false,
     helpHint: true,
+    validationErrorExitCode: 1,
     renderHeader: [Function: renderer],
     renderUsage: [Function: renderer],
     renderValidationErrors: [Function: renderer],
