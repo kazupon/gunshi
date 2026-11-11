@@ -91,7 +91,7 @@
     "eslint": "^10.3.0",
     "eslint-plugin-jsdoc": "^65.0.0",
     "eslint-plugin-jsonc": "^3.1.2",
-    "eslint-plugin-markdown-preferences": "^0.42.0",
+    "eslint-plugin-markdown-preferences": "^0.43.0",
     "eslint-plugin-module-interop": "^0.4.0",
     "eslint-plugin-oxlint": "^1.86.0",
     "eslint-plugin-regexp": "^3.1.0",
