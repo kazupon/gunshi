@@ -551,7 +551,7 @@ function hasJsonOutputErrorShape(error: Record<PropertyKey, unknown>): boolean {
  * @param value - The value to check
  * @returns `true` if the value is an exit code of a failure
  */
-function isFailureExitCode(value: unknown): value is number {
+export function isFailureExitCode(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) >= 1 && (value as number) <= 255
 }
 

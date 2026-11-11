@@ -26,6 +26,7 @@ export const CLI_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   strict: false,
   strictPositionals: false,
   helpHint: true,
+  validationErrorExitCode: 1,
   renderHeader: undefined,
   renderUsage: undefined,
   renderValidationErrors: undefined,

@@ -16,6 +16,7 @@
  */
 
 import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from './constants.ts'
+import { isFailureExitCode } from './error.ts'
 import { create, deepFreeze, isLazyCommand, log, resolveJsonRequest } from './utils.ts'
 
 import type {
@@ -176,6 +177,14 @@ export async function createCommandContext<
    */
 
   const env = Object.assign(create<CommandEnvironment<G>>(), CLI_OPTIONS_DEFAULT, cliOptions)
+
+  /**
+   * NOTE(kazupon): the exit code of the validation errors is an exit code of a failure, as the `exitCode`
+   * of a `CommandError` is: any other value is replaced with `1`.
+   */
+  if (!isFailureExitCode(env.validationErrorExitCode)) {
+    env.validationErrorExitCode = 1
+  }
 
   /**
    * apply Command definition's rendering option with highest priority
