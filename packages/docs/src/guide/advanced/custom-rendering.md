@@ -748,20 +748,24 @@ renderUsage: ctx => {
 
 #### Positional and Rest Arguments
 
-Handle non-flag arguments:
+Handle non-flag arguments. `ctx.positionals` has the names of the command path first, so the positional arguments of the command itself are `ctx.positionals.slice(ctx.commandPath.length)`. The message of each error is in `error.errors`: `error.message` of the validation errors is empty.
 
 ```js
 renderValidationErrors: (ctx, error) => {
-  // ctx.positionals - Positional arguments
+  // ctx.positionals - Positional arguments, the names of the command path first
   // ctx.rest - Arguments after '--' delimiter
+  const lines = error.errors.map(err => err.message)
 
-  if (ctx.positionals.length > 0) {
-    return `Unexpected arguments: ${ctx.positionals.join(', ')}\n${error.message}`
+  const positionals = ctx.positionals.slice(ctx.commandPath.length)
+  if (positionals.length > 0) {
+    lines.push(`Positional arguments: ${positionals.join(', ')}`)
   }
 
-  return error.message
+  return lines.join('\n')
 }
 ```
+
+To report the positional arguments that a command does not take, give `strictPositionals: true` to `cli()`. See [Strict Positional Argument Validation](../essentials/declarative.md#strict-positional-argument-validation).
 
 #### Plugin Extensions
 
