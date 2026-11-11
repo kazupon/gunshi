@@ -311,7 +311,7 @@ await cli(process.argv.slice(2), command, {
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> `renderValidationErrors` customizes how validation errors are displayed. Gunshi prints the rendered message to stderr, sets the exit code to `1`, and passes the errors to `onErrorCommand`, and the `cli()` promise resolves. Set `renderValidationErrors` to `null`, or return an empty message, to report the errors yourself: Gunshi prints nothing, and the `cli()` promise rejects with the `AggregateError`. For examples, see [Handling Argument Validation Errors](./command-hooks.md#handling-argument-validation-errors).
+> `renderValidationErrors` customizes how validation errors are displayed. Gunshi prints the rendered message to stderr, sets the exit code to `1`, or to the `validationErrorExitCode` of `cli()`, and passes the errors to `onErrorCommand`, and the `cli()` promise resolves. Set `renderValidationErrors` to `null`, or return an empty message, to report the errors yourself: Gunshi prints nothing, and the `cli()` promise rejects with the `AggregateError`. For examples, see [Handling Argument Validation Errors](./command-hooks.md#handling-argument-validation-errors).
 >
 > Gunshi follows your message with the command that shows the help (see [Argument Errors](../essentials/errors.md#argument-errors)), as it does the message of the plugins, whether you give the renderer as `renderValidationErrors` or in the `rendering` of a command. If your message points to the help itself, give `helpHint: false` to `cli()` to leave the command of Gunshi out, as the examples below do.
 >
