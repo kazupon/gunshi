@@ -36,3 +36,43 @@ export function recordRunner<C extends object>(given: unknown, resolved: C): C {
 export function isResolvedWithoutRun(resolved: object): boolean {
   return resolvedWithoutRun.has(resolved)
 }
+
+/**
+ * The commands that `loadCommands` resolved from the command of the context, whose help is printed.
+ *
+ * NOTE(kazupon): the core lists the command of the context among its sub-commands, marked with `entry`: the
+ * entry at the root, and a copy of a group under the last name of its path at a nested level. A plugin may
+ * add a command with the same name, marked with `entry` too, so the row is told by the command that it
+ * comes from, not by its name.
+ */
+const resolvedFromContext = new WeakSet<object>()
+
+/**
+ * Record whether the command that was given is the command of the context, for the command resolved from
+ * it.
+ *
+ * @param given - The command that was given: one of the sub-commands of the context, or its entry command
+ * @param own - The command of the context, as the core lists it among its sub-commands
+ * @param resolved - The command that `loadCommands` resolved from it
+ * @returns The resolved command
+ */
+export function recordContextCommand<C extends object>(
+  given: unknown,
+  own: unknown,
+  resolved: C
+): C {
+  if (own != null && given === own) {
+    resolvedFromContext.add(resolved)
+  }
+  return resolved
+}
+
+/**
+ * Check if a command that `loadCommands` resolved comes from the command of the context.
+ *
+ * @param resolved - A command from `loadCommands`
+ * @returns `true` if the command that was given is the command of the context
+ */
+export function isResolvedFromContext(resolved: object): boolean {
+  return resolvedFromContext.has(resolved)
+}
