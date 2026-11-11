@@ -149,7 +149,7 @@ An argument error looks like this:
 }
 ```
 
-The `field` of an issue is written as on the command line: the long form of an option (`--dry-run` with `toKebab`), the name of a positional argument, and an unknown option or an unknown command as it was typed.
+The `field` of an issue is written as on the command line: the long form of an option (`--dry-run` with `toKebab`), the name of a positional argument, and an unknown option, a positional argument that the command does not take or an unknown command as it was typed.
 
 `next` starts with the name of the CLI, given to `cli()` as `name`. Without it, the command line starts with `<COMMAND>`, and `when` says to replace it with how the CLI was run. Give your CLI a `name`, so that `next` is a command line to run as it is.
 
@@ -157,15 +157,15 @@ There is no `next` when `--help` does not show the help of that command: when th
 
 ### Reasons
 
-| Reason                                                                                                                                                                                      | Status            | When                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------ |
-| `required_option`, `required_positional`, `missing_value`, `invalid_type`, `invalid_choice`, `invalid_default`, `custom_parse`, `unexpected_value`, `conflicting_options`, `unknown_option` | `action_required` | An argument is wrong                                                     |
-| `invalid_arguments`                                                                                                                                                                         | `action_required` | Two or more arguments are wrong: each is in `data.issues`                |
-| `unknown_command`, `ambiguous_command`, `inconsistent_options`, `lazy_schema_mismatch`                                                                                                      | `action_required` | The command cannot be resolved                                           |
-| `json_not_supported`                                                                                                                                                                        | `action_required` | `--json` is given to a command that does not spread `jsonArgs`           |
-| The `code` of a `CommandError`                                                                                                                                                              | `error`           | The command throws a `CommandError` with a `code`                        |
-| `command_failed`                                                                                                                                                                            | `error`           | The command throws any other error, or a `CommandError` without a `code` |
-| `invalid_result`, `unserializable_result`                                                                                                                                                   | `error`           | The result cannot be printed as JSON                                     |
+| Reason                                                                                                                                                                                                               | Status            | When                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------ |
+| `required_option`, `required_positional`, `missing_value`, `invalid_type`, `invalid_choice`, `invalid_default`, `custom_parse`, `unexpected_value`, `conflicting_options`, `unknown_option`, `unexpected_positional` | `action_required` | An argument is wrong                                                     |
+| `invalid_arguments`                                                                                                                                                                                                  | `action_required` | Two or more arguments are wrong: each is in `data.issues`                |
+| `unknown_command`, `ambiguous_command`, `inconsistent_options`, `lazy_schema_mismatch`                                                                                                                               | `action_required` | The command cannot be resolved                                           |
+| `json_not_supported`                                                                                                                                                                                                 | `action_required` | `--json` is given to a command that does not spread `jsonArgs`           |
+| The `code` of a `CommandError`                                                                                                                                                                                       | `error`           | The command throws a `CommandError` with a `code`                        |
+| `command_failed`                                                                                                                                                                                                     | `error`           | The command throws any other error, or a `CommandError` without a `code` |
+| `invalid_result`, `unserializable_result`                                                                                                                                                                            | `error`           | The result cannot be printed as JSON                                     |
 
 The exit code is `1`, except for a `CommandError`, which keeps its own `exitCode`.
 

@@ -557,7 +557,8 @@ function isFailureExitCode(value: unknown): value is number {
 
 /**
  * Check whether validation errors must stop the command before it runs: an unknown command, a command
- * line that cannot be resolved, or an unknown option of `strict`. The global options plugin reports
+ * line that cannot be resolved, an unknown option of `strict`, or a positional argument that the command
+ * does not take, of `strictPositionals`. The global options plugin reports
  * them before `--help` and `--version`, except an unknown option: `--help` and `--version` are answered
  * before it, as they are before the other validation errors.
  *
@@ -570,7 +571,9 @@ export function hasPriorityValidationError(error: AggregateError | undefined): b
       (error: unknown) =>
         isCommandNotFoundError(error) ||
         isCommandResolutionError(error) ||
-        (isArgsValidationError(error) && error.code === ArgsValidationErrorKeys.unknownOption)
+        (isArgsValidationError(error) &&
+          (error.code === ArgsValidationErrorKeys.unknownOption ||
+            error.code === ArgsValidationErrorKeys.unexpectedPositional))
     ) ?? false
   )
 }

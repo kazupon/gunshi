@@ -123,6 +123,18 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
           }
           return true
         },
+        /**
+         * NOTE(kazupon): the shell is declared, so that the usage shows it, and the command takes it with
+         * `strictPositionals` of `cli()`. The completion script runs the command with the words after `--`,
+         * which stay in `rest`.
+         */
+        args: {
+          shell: {
+            type: 'positional',
+            required: false,
+            description: 'The shell to print the completion script for'
+          }
+        },
         rendering: {
           header: null // disable header rendering for completion command
         },

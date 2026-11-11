@@ -2578,7 +2578,7 @@ describe('#875 - the `complete` command in the help', () => {
       const help = await helpOf(entry, plugins, subCommands)
 
       expect(help).toContain(`USAGE:\n  ${usage}`)
-      expect(help).toMatch(/^ {2}complete +Generate shell completion script$/m)
+      expect(help).toMatch(/^ {2}complete \[<shell>\] +Generate shell completion script$/m)
     }
   )
 
@@ -2595,5 +2595,34 @@ describe('#875 - the `complete` command in the help', () => {
     expect(output.join('\n')).toContain('# bash completion for app')
     expect(run).toHaveBeenCalledTimes(1)
     expect(run).toHaveBeenCalledWith(expect.objectContaining({ positionals: ['foo'] }))
+  })
+})
+
+describe('strictPositionals of cli()', () => {
+  test('the complete command takes the shell', async () => {
+    const logs: string[] = []
+    const log = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logs.push(args.join(' '))
+    })
+    const error = vi.spyOn(console, 'error').mockImplementation(NOOP)
+
+    try {
+      await cli(
+        ['complete', 'zsh'],
+        defineCommand({ name: 'root', description: 'Root command', run: NOOP }),
+        {
+          name: 'mycli',
+          strictPositionals: true,
+          plugins: [completion()]
+        }
+      )
+
+      expect(error).not.toHaveBeenCalled()
+      expect(logs.join('\n')).toContain('#compdef mycli')
+    } finally {
+      log.mockRestore()
+      error.mockRestore()
+      process.exitCode = undefined
+    }
   })
 })

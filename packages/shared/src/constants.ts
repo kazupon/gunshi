@@ -72,7 +72,8 @@ export const ARG_ERROR_RESOURCE_KEYS = [
   'err:arg:unexpected-value',
   'err:arg:missing-value',
   'err:arg:conflict',
-  'err:arg:invalid-default'
+  'err:arg:invalid-default',
+  'err:arg:unexpected-positional'
 ] as const
 
 // a hint follows the error of its code; it is not a code, so it stays out of `ARG_ERROR_RESOURCE_KEYS`
