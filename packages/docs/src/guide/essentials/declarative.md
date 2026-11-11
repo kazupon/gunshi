@@ -219,7 +219,7 @@ const command = define({
 - **Default Values**: A single positional argument with `default` uses that value when the command-line value is missing, unless `required: true` is set.
 - **Order Matters**: Positional arguments are matched based on the order they appear on the command line and the order they are defined in the `args` object. Optional positional arguments leave enough input values for later required positional arguments before consuming a value.
 - **Accessing Values**: The resolved value is accessible via `ctx.values`, using the _key_ you defined in the `args` object (e.g., `ctx.values.source`, `ctx.values.destination`).
-- **`ctx.positionals`**: This array still exists and contains the raw string values of positional arguments in the order they were parsed (e.g., `ctx.positionals[0]`, `ctx.positionals[1]`). While available, using `ctx.values.<key>` is generally preferred for clarity and consistency.
+- **`ctx.positionals`**: This array still exists and contains the raw string values of the positional arguments in the order they were parsed, the names of the command path first: `app deploy web` gives `['deploy', 'web']`, and the positional arguments of the command itself are `ctx.positionals.slice(ctx.commandPath.length)`. While available, using `ctx.values.<key>` is generally preferred for clarity and consistency.
 - **Descriptions**: The `description` property is used for generating help/usage messages.
 - **Type Conversion**: `args-tokens` resolves positional arguments as strings. You typically need to perform type conversions or further validation on the values accessed via `ctx.values.<key>` within your `run` function based on your application's needs.
 
@@ -376,6 +376,31 @@ The error uses the `err:arg:unknown-option` resource key, so the message follows
 `--help` and `--version` are still answered: `app --alow-reload --help` prints the help, and the unknown option is not reported, as another wrong argument is not. An unknown command is reported, with or without `--help`.
 
 `--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`. With `strict`, it is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
+
+#### Strict Positional Argument Validation
+
+By default, Gunshi also keeps the positional arguments that a command does not declare: they are in `ctx.positionals`. Enable `strictPositionals` when you want them to fail before the command runner executes, as `strict` does for the options:
+
+```js
+await cli(process.argv.slice(2), command, {
+  name: 'app',
+  strict: true,
+  strictPositionals: true
+})
+```
+
+With `strictPositionals: true`, an input such as `app deploy web extra`, where `deploy` declares one positional argument, is reported as an argument validation error, followed by the command that shows the help:
+
+```txt
+Unexpected positional argument: extra
+
+See the arguments of the command:
+  app deploy --help
+```
+
+A command takes as many positional arguments as it declares, an optional one included. To take any number of them, declare a positional argument with `multiple: true`. The arguments after `--` are not positional arguments: they stay in `ctx.rest`.
+
+The error uses the `err:arg:unexpected-positional` resource key. As with an unknown option of `strict`, `--help` and `--version` are still answered, and after a command with sub-commands, a word that is not one of them is reported as an unknown command instead.
 
 #### Options before sub-commands
 

@@ -305,8 +305,8 @@ function resolveReason(error: Error): string {
 
 /**
  * Resolve how the user wrote the argument of an error on the command line: the long form of an option,
- * the name of a positional argument, an unknown option as it is typed, and an unknown command as it is
- * typed. So an agent can use it as it is.
+ * the name of a positional argument, an unknown option and a positional argument that the command does not
+ * take as they are typed, and an unknown command as it is typed. So an agent can use it as it is.
  *
  * @param ctx - The command context
  * @param error - A validation error
@@ -320,7 +320,10 @@ function resolveField(ctx: Context, error: Error): string | undefined {
     return undefined
   }
   const { name, rawName } = error.values
-  if (error.code === ArgsValidationErrorKeys.unknownOption) {
+  if (
+    error.code === ArgsValidationErrorKeys.unknownOption ||
+    error.code === ArgsValidationErrorKeys.unexpectedPositional
+  ) {
     return typeof rawName === 'string' ? rawName : undefined
   }
   if (typeof name !== 'string' || !Object.hasOwn(ctx.args, name)) {

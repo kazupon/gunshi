@@ -28,6 +28,7 @@
   "err:arg:missing-value:hint": "(to pass '{$next}' as its value, write '{$suggestion}')",
   "err:arg:conflict": "{$displayName} conflicts with {$conflictDisplayName}",
   "err:arg:invalid-default": "Invalid default for {$displayName}: {$actual} is not one of {$choices}",
+  "err:arg:unexpected-positional": "Unexpected positional argument: {$rawName}",
   "err:cmd:not-found": "Command not found: {$commandName}",
   "err:cmd:ambiguous": "The command is ambiguous. Move options after the command name: {$candidatePaths}",
   "err:cmd:inconsistent-options": "The options do not identify a consistent command. Move options after the command name.",

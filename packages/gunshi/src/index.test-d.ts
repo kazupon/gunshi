@@ -37,6 +37,9 @@ test('exports args validation error types', () => {
   expectTypeOf(ArgsValidationErrorKeys.missingValue).toEqualTypeOf<'err:arg:missing-value'>()
   expectTypeOf(ArgsValidationErrorKeys.conflict).toEqualTypeOf<'err:arg:conflict'>()
   expectTypeOf(ArgsValidationErrorKeys.invalidDefault).toEqualTypeOf<'err:arg:invalid-default'>()
+  expectTypeOf(
+    ArgsValidationErrorKeys.unexpectedPositional
+  ).toEqualTypeOf<'err:arg:unexpected-positional'>()
   expectTypeOf<ArgsValidationErrorCode>().toEqualTypeOf<
     (typeof ArgsValidationErrorKeys)[keyof typeof ArgsValidationErrorKeys]
   >()
