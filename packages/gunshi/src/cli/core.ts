@@ -238,6 +238,15 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
             toKebab: resolvedCommand.toKebab
           })
         )
+      : []),
+    /**
+     * NOTE(kazupon): after a command that could not be resolved, the positional argument is the name of the
+     * command that was not found, which is reported already.
+     */
+    ...(cliOptions.strictPositionals && !diagnostic && additionalValidationErrors.length === 0
+      ? createUnexpectedPositionalErrors(
+          findUnexpectedPositionals(args, positionals, skipPositional)
+        )
       : [])
   ])
 
@@ -569,6 +578,41 @@ function createUnknownOptionErrors(unknownOptions: UnknownOption[]): ArgsValidat
       }
     })
   })
+}
+
+/**
+ * Find the positional arguments that the command does not take: the ones after its command path that its
+ * positional arguments do not take. A positional argument with `multiple` takes all of them.
+ *
+ * NOTE(kazupon): args-tokens gives the positional arguments after the command path to the positional
+ * arguments of the command in the order they are declared, so the declared ones take the first of them,
+ * as many as they are, an optional one included, and the rest are left over.
+ *
+ * @param args - The arguments of the command
+ * @param positionals - The positional arguments, the command path included
+ * @param skipPositional - The index of the last command name in `positionals`
+ * @returns The positional arguments that are left over
+ */
+function findUnexpectedPositionals(
+  args: Args,
+  positionals: string[],
+  skipPositional: number
+): string[] {
+  const declared = Object.values(args).filter(schema => schema.type === 'positional')
+  if (declared.some(schema => schema.multiple)) {
+    return []
+  }
+  return positionals.slice(skipPositional + 1 + declared.length)
+}
+
+function createUnexpectedPositionalErrors(positionals: string[]): ArgsValidationError[] {
+  return positionals.map(
+    rawName =>
+      new ArgsValidationError(`Unexpected positional argument: ${rawName}`, {
+        code: ArgsValidationErrorKeys.unexpectedPositional,
+        values: { rawName }
+      })
+  )
 }
 
 function mergeValidationErrors(

@@ -232,6 +232,13 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   strict: boolean
   /**
+   * Whether to treat the positional arguments that the command does not take as argument validation errors.
+   *
+   * @default false
+   * @see {@linkcode CliOptions.strictPositionals}
+   */
+  strictPositionals: boolean
+  /**
    * Whether to follow the validation errors with the command that shows the help.
    *
    * @default true
@@ -391,6 +398,23 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    */
   strict?: boolean
   /**
+   * Whether to treat the positional arguments that the command does not take as argument validation
+   * errors, as `strict` does for the options.
+   *
+   * When enabled, the positional arguments after the command path that the positional arguments of the
+   * resolved command do not take are reported as validation errors before the command runner is
+   * executed. A command takes as many as it declares, an optional one included, and any number with a
+   * positional argument with `multiple: true`. The arguments after `--` are not positional arguments:
+   * they stay in `rest`.
+   *
+   * With the global options plugin, `--help` and `--version` are still answered, as they are with the
+   * other argument validation errors. After a command with sub-commands, a word that is not one of them
+   * is reported as an unknown command instead.
+   *
+   * @default false
+   */
+  strictPositionals?: boolean
+  /**
    * Render function the command usage.
    */
   renderUsage?: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null
@@ -534,8 +558,9 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    */
   values: ArgValues<ExtractArgs<G>>
   /**
-   * Command positionals arguments, that is the positionals of the command that is executed.
-   * Resolve positionals with `resolveArgs` from command arguments.
+   * The positional arguments of the command line, the names of the command path first: `app deploy web`
+   * gives `['deploy', 'web']`. The positional arguments of the command itself are
+   * `positionals.slice(commandPath.length)`, and the ones that it declares are in `values` too.
    */
   positionals: string[]
   /**

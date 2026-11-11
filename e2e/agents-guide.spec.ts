@@ -392,6 +392,31 @@ await cli(process.argv.slice(2), main, { subCommands: { add } })
     expect(strict.stderr).toMatch(/Unknown option: --file/)
   })
 
+  test('a positional argument that a command does not declare is kept, unless strictPositionals: true', () => {
+    const file = write(
+      'strict-positionals.mjs',
+      withAdd(
+        "{ title: { type: 'positional' } }",
+        ", strictPositionals: process.env.STRICT === '1'"
+      )
+    )
+    expect(run(file, ['add', 'milk', 'eggs'])).toMatchObject({
+      code: 0,
+      stdout: '{"title":"milk"}\n'
+    })
+    const strict = run(file, ['add', 'milk', 'eggs'], envWith({ STRICT: '1' }))
+    expect(strict.code).toBe(1)
+    expect(strict.stderr).toMatch(/Unexpected positional argument: eggs/)
+    const many = write(
+      'strict-positionals-many.mjs',
+      withAdd("{ titles: { type: 'positional', multiple: true } }", ', strictPositionals: true')
+    )
+    expect(run(many, ['add', 'milk', 'eggs'])).toMatchObject({
+      code: 0,
+      stdout: '{"titles":["milk","eggs"]}\n'
+    })
+  })
+
   test('--json is not ignored: a command without jsonArgs stops before it runs, with or without strict', () => {
     const file = write(
       'json-not-supported.mjs',

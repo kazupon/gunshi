@@ -6208,3 +6208,192 @@ describe('--help and --version with --json', () => {
     expect(log()).toBe('')
   })
 })
+
+describe('strictPositionals of cli()', () => {
+  const entry = () => define({ name: 'app', run: () => {} })
+
+  test('keeps the positional arguments that a command does not declare, by default', async () => {
+    let positionals: string[] = []
+    const deploy = define({
+      name: 'deploy',
+      run: ctx => {
+        positionals = ctx.positionals
+      }
+    })
+
+    await cli(['deploy', 'extra'], entry(), { name: 'app', subCommands: { deploy } })
+
+    expect(positionals).toEqual(['deploy', 'extra'])
+  })
+
+  test('reports the positional arguments that the command does not take, before it runs', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    let codes: unknown[] = []
+    const deploy = define({ name: 'deploy', args: { name: { type: 'string' } }, run })
+
+    await cli(['deploy', '--name', 'web', 'extra1', 'extra2'], entry(), {
+      name: 'app',
+      subCommands: { deploy },
+      strictPositionals: true,
+      onErrorCommand: (_ctx, error) => {
+        codes = (error as AggregateError).errors.map(error => (error as { code?: unknown }).code)
+      }
+    })
+
+    expect(run).not.toHaveBeenCalled()
+    expect(codes).toEqual(['err:arg:unexpected-positional', 'err:arg:unexpected-positional'])
+    expect(stderr()).toBe(
+      'Unexpected positional argument: extra1\nUnexpected positional argument: extra2' +
+        helpHint(['deploy'], { name: 'app' })
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('takes as many as the command declares, and any number for a positional argument with multiple', async () => {
+    const seen: unknown[] = []
+    const add = define({
+      name: 'add',
+      args: { file: { type: 'positional' } },
+      run: ctx => {
+        seen.push(ctx.values.file)
+      }
+    })
+    const open = define({
+      name: 'open',
+      args: { target: { type: 'positional', required: false } },
+      run: ctx => {
+        seen.push(ctx.values.target ?? null)
+      }
+    })
+    const cat = define({
+      name: 'cat',
+      args: { files: { type: 'positional', multiple: true } },
+      run: ctx => {
+        seen.push(ctx.values.files)
+      }
+    })
+    const options = { name: 'app', subCommands: { add, open, cat }, strictPositionals: true }
+
+    await cli(['add', 'a.txt'], entry(), options)
+    await cli(['open'], entry(), options)
+    await cli(['open', 'x'], entry(), options)
+    await cli(['cat', 'a', 'b', 'c'], entry(), options)
+
+    expect(seen).toEqual(['a.txt', null, 'x', ['a', 'b', 'c']])
+  })
+
+  test('counts them after the command path, for a nested and a lazy command too', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    const add = define({ name: 'add', args: { file: { type: 'positional' } }, run })
+    const records = define({ name: 'records', subCommands: { add } })
+    const later = lazy(() => run, { name: 'later', args: { name: { type: 'string' } } })
+    const options = { name: 'app', subCommands: { records, later }, strictPositionals: true }
+
+    await cli(['records', 'add', 'a.txt', 'extra1'], entry(), options)
+    await cli(['later', '--name', 'web', 'extra2'], entry(), options)
+
+    expect(run).not.toHaveBeenCalled()
+    expect(stderr()).toBe(
+      'Unexpected positional argument: extra1' +
+        helpHint(['records', 'add'], { name: 'app' }) +
+        '\nUnexpected positional argument: extra2' +
+        helpHint(['later'], { name: 'app' })
+    )
+  })
+
+  test('reports an unknown command only, after a command with sub-commands', async () => {
+    const stderr = defineMockErrorLog()
+    const add = define({ name: 'add', run: () => {} })
+    const records = define({ name: 'records', subCommands: { add } })
+
+    await cli(['records', 'nope'], entry(), {
+      name: 'app',
+      subCommands: { records },
+      strictPositionals: true
+    })
+
+    expect(stderr()).toBe('Command not found: nope' + helpHint(['records'], { name: 'app' }))
+  })
+
+  test('leaves the arguments after -- in rest', async () => {
+    let rest: string[] = []
+    const deploy = define({
+      name: 'deploy',
+      run: ctx => {
+        rest = ctx.rest
+      }
+    })
+
+    await cli(['deploy', '--', 'a', '--b'], entry(), {
+      name: 'app',
+      subCommands: { deploy },
+      strictPositionals: true
+    })
+
+    expect(rest).toEqual(['a', '--b'])
+  })
+
+  test('answers --help before them', async () => {
+    const run = vi.fn<() => void>()
+
+    const usage = await cli(['extra', '--help'], define({ name: 'app', run }), {
+      name: 'app',
+      usageSilent: true,
+      strictPositionals: true
+    })
+
+    expect(run).not.toHaveBeenCalled()
+    expect(usage).toContain('USAGE:')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('reports them as JSON with --json', async () => {
+    const stderr = defineMockErrorLog()
+    const deploy = define({
+      name: 'deploy',
+      args: { ...jsonArgs },
+      run: () => ({ deployed: true })
+    })
+
+    await cli(['deploy', 'extra1', '--json'], entry(), {
+      name: 'app',
+      subCommands: { deploy },
+      strictPositionals: true
+    })
+
+    const failure = JSON.parse(stderr()) as { reason: string; data: { issues: unknown[] } }
+    expect(failure.reason).toBe('unexpected_positional')
+    expect(failure.data.issues).toEqual([
+      {
+        field: 'extra1',
+        reason: 'unexpected_positional',
+        message: 'Unexpected positional argument: extra1'
+      }
+    ])
+  })
+
+  test('is translated with the built-in resources', async () => {
+    const stderr = defineMockErrorLog()
+
+    await cli(['extra'], entry(), {
+      name: 'app',
+      strictPositionals: true,
+      plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })]
+    })
+
+    expect(stderr()).toBe(
+      '余分な位置引数です: extra' + helpHint([], { name: 'app', locale: 'ja-JP' })
+    )
+  })
+
+  test('stops the command of bone, whose cli() rejects with the error', async () => {
+    const run = vi.fn<() => void>()
+
+    await expect(
+      boneCli(['extra'], define({ name: 'app', run }), { strictPositionals: true })
+    ).rejects.toThrow('Unexpected positional argument: extra')
+    expect(run).not.toHaveBeenCalled()
+  })
+})
