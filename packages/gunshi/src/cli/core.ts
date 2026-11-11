@@ -334,8 +334,8 @@ function trackReported(ctx: object): WeakSet<object> {
 
 /**
  * The key of the registry of the command contexts whose command has no `run`. The global options plugin
- * and the usage renderer plugin read it with the same registered symbol, since `gunshi` and the plugins
- * bundle their own copies.
+ * and the usage renderer plugin read it with `isWithoutRun` of `@gunshi/shared`, by the same registered
+ * symbol, since `gunshi` and the plugins bundle their own copies. Neither is in the public API.
  */
 const WITHOUT_RUN = Symbol.for('gunshi.withoutRun')
 

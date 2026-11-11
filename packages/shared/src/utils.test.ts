@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'vitest'
 import { resolveCommandArgs as resolveCommandArgsOfCore } from '../../gunshi/src/cli/args.ts'
+import { cli } from '../../gunshi/src/cli/bone.ts'
+import { define } from '../../gunshi/src/definition.ts'
 import {
   composeNegatableDescription,
+  isWithoutRun,
   resolveArgKey,
   resolveCommandArgs,
   resolveDisplayName,
@@ -162,5 +165,25 @@ describe('composeNegatableDescription', () => {
 
   test('puts the option after a text without the placeholder, as before', () => {
     expect(composeNegatableDescription('Négation de', '--force')).toBe('Négation de --force')
+  })
+})
+
+describe('isWithoutRun', () => {
+  test('reads the mark that the core puts on the context of a command without run', async () => {
+    const add = define({ name: 'add', run: () => {} })
+    const records = define({ name: 'records', subCommands: { add } })
+    const marks: boolean[] = []
+    const options = {
+      subCommands: { records },
+      onBeforeCommand: (ctx: object) => {
+        marks.push(isWithoutRun(ctx))
+      }
+    }
+
+    await cli(['records'], define({ name: 'demo', run: () => {} }), options)
+    await cli(['records', 'add'], define({ name: 'demo', run: () => {} }), options)
+
+    expect(marks).toEqual([true, false])
+    expect(isWithoutRun({})).toBe(false)
   })
 })

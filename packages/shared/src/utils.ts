@@ -227,3 +227,30 @@ function resolveGlobalOptions(
 
   return resolved
 }
+
+/**
+ * The key of the registry in which the core of gunshi keeps the command contexts whose command has no
+ * `run`: the same registered symbol as the one of the core, which marks the context.
+ */
+const WITHOUT_RUN = Symbol.for('gunshi.withoutRun')
+
+/**
+ * Check if the command of a run has no `run`, by the mark that the core of gunshi puts on its context.
+ *
+ * NOTE(kazupon): the plugins cannot tell it from the context, nor from the runner that they decorate,
+ * which the core always wraps, so the core marks the context, once the command is loaded, a lazy one
+ * included. The mark is kept in a registry under a registered symbol, since `gunshi` and the plugins
+ * bundle their own copies. The global options plugin prints the usage of a group without `run` by the
+ * mark, and tells it in the help as JSON, and the usage renderer plugin does not list such a group as its
+ * default command. The core keeps its own key and its writer out of the public API, as only the plugins
+ * read the mark, and the tests pin this reader to the mark of the core.
+ *
+ * @param ctx - The command context of the run
+ * @returns `true` if the core marked the context as the one of a command without `run`
+ */
+export function isWithoutRun(ctx: object): boolean {
+  const registry = (globalThis as unknown as Record<symbol, WeakSet<object> | undefined>)[
+    WITHOUT_RUN
+  ]
+  return registry?.has(ctx) === true
+}

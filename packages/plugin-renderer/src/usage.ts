@@ -8,6 +8,7 @@ import {
   ARG_NEGATABLE_PREFIX,
   COMMON_ARGS,
   composeNegatableDescription,
+  isWithoutRun,
   resolveExamples as _resolvedExamples,
   makeShortLongOptionPair,
   resolveArgKey,
@@ -16,7 +17,7 @@ import {
   resolveKey,
   resolveOptionNames
 } from '@gunshi/shared'
-import { isMarkedWithoutRun, isResolvedFromContext, isResolvedWithoutRun } from './runner.ts'
+import { isResolvedFromContext, isResolvedWithoutRun } from './runner.ts'
 import { pluginId } from './types.ts'
 import { displayWidth, padEndToWidth } from './width.ts'
 
@@ -398,7 +399,7 @@ async function resolveExamples<
 function isEntryWithoutRun(ctx: Readonly<CommandContext>, cmd: Command): boolean {
   return (
     cmd.entry === true &&
-    (isResolvedWithoutRun(cmd) || (isResolvedFromContext(cmd) && isMarkedWithoutRun(ctx)))
+    (isResolvedWithoutRun(cmd) || (isResolvedFromContext(cmd) && isWithoutRun(ctx)))
   )
 }
 

@@ -18,6 +18,7 @@ import {
 import {
   DefaultResource,
   formatResource,
+  isWithoutRun,
   log,
   namespacedId,
   resolveBuiltInKey,
@@ -33,7 +34,6 @@ import {
   messageOf,
   renderHelpHint
 } from './json.ts'
-import { isWithoutRun } from './runner.ts'
 
 import type {
   CommandDecorator,

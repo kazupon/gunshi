@@ -15,6 +15,7 @@ import {
 } from '@gunshi/plugin'
 import {
   isJsonArg,
+  isWithoutRun,
   localizeBuiltinResource,
   localizeValidationError,
   namespacedId,
@@ -23,7 +24,6 @@ import {
   resolveDisplayName,
   resolveKey
 } from '@gunshi/shared'
-import { isWithoutRun } from './runner.ts'
 
 import type { ArgSchema, CommandContext, DefaultGunshiParams } from '@gunshi/plugin'
 
