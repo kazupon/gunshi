@@ -558,9 +558,9 @@ function isFailureExitCode(value: unknown): value is number {
 /**
  * Check whether validation errors must stop the command before it runs: an unknown command, a command
  * line that cannot be resolved, an unknown option of `strict`, or a positional argument that the command
- * does not take, of `strictPositionals`. The global options plugin reports
- * them before `--help` and `--version`, except an unknown option: `--help` and `--version` are answered
- * before it, as they are before the other validation errors.
+ * does not take, of `strictPositionals`. The global options plugin reports them before `--help` and
+ * `--version`, except an unknown option and a positional argument that the command does not take:
+ * `--help` and `--version` are answered before them, as they are before the other validation errors.
  *
  * @param error - An aggregate validation error
  * @returns `true` if the validation error must be handled with priority
