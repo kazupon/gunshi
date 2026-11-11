@@ -430,7 +430,7 @@ to stop command exploration; values after it are passed through as `ctx.rest`.
 
 When a sub-command cannot be resolved, Gunshi reports it as a structured `CommandNotFoundError` inside the validation error pipeline. This avoids brittle checks such as `error.message.startsWith('Command not found:')`.
 
-Gunshi prints `Command not found: <name>` to stderr, followed by the command that shows the help of the parent command, and sets the exit code to `1`, as it does for the other validation errors (see [Handling Argument Validation Errors](../advanced/command-hooks.md#handling-argument-validation-errors)). To add your own guidance, look the error up in `onErrorCommand`:
+Gunshi prints `Command not found: <name>` to stderr, followed by the command that shows the help of the parent command, and sets the exit code to `1`, or to the `validationErrorExitCode` of `cli()`, as it does for the other validation errors (see [Handling Argument Validation Errors](../advanced/command-hooks.md#handling-argument-validation-errors)). To add your own guidance, look the error up in `onErrorCommand`:
 
 ```js
 import { cli, define, isCommandNotFoundError } from 'gunshi'
