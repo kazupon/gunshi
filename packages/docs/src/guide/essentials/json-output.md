@@ -213,6 +213,7 @@ $ node cli.js --help --json | jq '.help.options[] | select(.name == "--limit")'
 | `command`     | The command line of the command, to read, as in `next` of the errors. Without the `name` of `cli()`, it starts with `<COMMAND>`                                   |
 | `argv`        | The arguments of the command line, to run                                                                                                                         |
 | `description` | The description of the command                                                                                                                                    |
+| `runnable`    | Whether the command runs by itself, without a sub-command: it has `run`. A command with sub-commands and no `run` prints its usage instead                        |
 | `commands`    | The sub-commands of a command that groups them, as the help lists them: `name` and `description`                                                                  |
 | `arguments`   | The positional arguments, in order: `name`, `description`, `required` and `multiple`                                                                              |
 | `options`     | The options, the global options included: `name`, `short`, `description`, `type`, `value`, `required`, `multiple`, `default`, `choices`, `negatable` and `global` |

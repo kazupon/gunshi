@@ -334,7 +334,8 @@ function trackReported(ctx: object): WeakSet<object> {
 
 /**
  * The key of the registry of the command contexts whose command has no `run`. The global options plugin
- * reads it with the same registered symbol, since `gunshi` and the plugins bundle their own copies.
+ * and the usage renderer plugin read it with `isWithoutRun` of `@gunshi/shared`, by the same registered
+ * symbol, since `gunshi` and the plugins bundle their own copies. Neither is in the public API.
  */
 const WITHOUT_RUN = Symbol.for('gunshi.withoutRun')
 
@@ -343,9 +344,10 @@ const WITHOUT_RUN = Symbol.for('gunshi.withoutRun')
  *
  * NOTE(kazupon): the global options plugin prints the usage of a command that has sub-commands and no
  * `run`, when it runs without a sub-command, as `--help` does. The plugin cannot tell it from the context,
- * nor from the runner that it decorates, which the core always wraps, so the core tells it. A lazy command
- * always has a runner, which its loader returns. The registry is weak, and holds the context of this run
- * only: a nested `cli()` in a hook has a context of its own.
+ * nor from the runner that it decorates, which the core always wraps, so the core tells it. The command
+ * is checked once it is loaded, so a lazy command whose loader returns a command without `run` is marked
+ * too. The registry is weak, and holds the context of this run only: a nested `cli()` in a hook has a
+ * context of its own.
  *
  * @param ctx - The command context of the run
  */
