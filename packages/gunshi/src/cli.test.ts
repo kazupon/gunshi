@@ -20,7 +20,7 @@ import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
 import { hidden, string } from './combinators.ts'
 
-import type { ArgSchema, Args } from 'args-tokens'
+import type { ArgSchema, Args, ArgsValidationError } from 'args-tokens'
 import type { Mocked } from 'vitest'
 import type { Plugin } from './plugin/core.ts'
 import type {
@@ -316,6 +316,28 @@ describe('execute command', () => {
     ).resolves.toBeUndefined()
     expect(stderr()).toContain('Command not found: show')
     expect(process.exitCode).toBe(1)
+  })
+
+  test('an internal command is not a candidate of an unknown command, and still runs', async () => {
+    const mockDebug = vi.fn<() => void>()
+    const subCommands = {
+      deploy: define({ name: 'deploy', run: vi.fn<() => void>() }),
+      debug: define({ name: 'debug', internal: true, run: mockDebug }),
+      push: lazy(() => vi.fn<() => void>(), { name: 'push', internal: true })
+    }
+
+    defineMockErrorLog()
+    let capturedError: AggregateError | undefined
+    await cli(['debg'], define({ name: 'main' }), {
+      subCommands,
+      onErrorCommand: (_ctx, error) => {
+        capturedError = error as AggregateError
+      }
+    })
+    expect(findCommandNotFoundError(capturedError).candidates).toEqual(['deploy', 'main'])
+
+    await cli(['debug'], define({ name: 'main' }), { subCommands })
+    expect(mockDebug).toHaveBeenCalledOnce()
   })
 
   test('command not found exposes structured metadata', async () => {
@@ -6016,6 +6038,7 @@ describe('--help and --version with --json', () => {
         command: 'demo status',
         argv: ['demo', 'status'],
         description: 'Show the status',
+        deprecated: null,
         runnable: true,
         commands: [],
         arguments: [],
@@ -6135,6 +6158,7 @@ describe('--help and --version with --json', () => {
         command: 'demo deploy',
         argv: ['demo', 'deploy'],
         description: null,
+        deprecated: null,
         runnable: true,
         commands: [],
         arguments: [{ name: 'target', description: 'The target', required: true, multiple: false }],
@@ -6702,5 +6726,390 @@ describe('validationErrorExitCode of cli()', () => {
 
     expect(run).not.toHaveBeenCalled()
     expect(process.exitCode).toBeUndefined()
+  })
+})
+
+describe('aliases of a command', () => {
+  test('a command runs with one of its aliases, with its name and its path', async () => {
+    let seen: unknown
+    await cli(['ls', '--all'], define({ name: 'main' }), {
+      subCommands: {
+        list: define({
+          name: 'list',
+          aliases: ['ls', 'l'],
+          args: { all: { type: 'boolean' } },
+          run: ctx => {
+            seen = {
+              name: ctx.name,
+              path: ctx.commandPath,
+              all: ctx.values.all,
+              positionals: ctx.positionals
+            }
+          }
+        })
+      }
+    })
+    // the positional arguments are what the user typed, the alias included
+    expect(seen).toEqual({ name: 'list', path: ['list'], all: true, positionals: ['ls'] })
+  })
+
+  test('the sub-commands of a group are found after its alias', async () => {
+    let path: string[] | undefined
+    const add = define({
+      name: 'add',
+      run: ctx => {
+        path = ctx.commandPath
+      }
+    })
+    await cli(['rmt', 'add'], define({ name: 'main' }), {
+      subCommands: { remote: define({ name: 'remote', aliases: ['rmt'], subCommands: { add } }) }
+    })
+    expect(path).toEqual(['remote', 'add'])
+  })
+
+  test('a command without a name is named after its key, with an alias too', async () => {
+    let name: string | undefined
+    await cli(['ls'], define({ name: 'main' }), {
+      subCommands: {
+        list: {
+          aliases: ['ls'],
+          run: ctx => {
+            name = ctx.name
+          }
+        }
+      }
+    })
+    expect(name).toBe('list')
+  })
+
+  test('a lazy command takes its aliases from the definition given to lazy', async () => {
+    let name: string | undefined
+    const loader = vi.fn<() => CommandRunner>(() => ctx => {
+      name = ctx.name
+    })
+    await cli(['ls'], define({ name: 'main' }), {
+      subCommands: { list: lazy(loader, { name: 'list', aliases: ['ls'] }) }
+    })
+    expect(loader).toHaveBeenCalledOnce()
+    expect(name).toBe('list')
+  })
+
+  test('a sub-command whose name is the alias wins over the alias', async () => {
+    const ls = vi.fn<() => void>()
+    const list = vi.fn<() => void>()
+    await cli(['ls'], define({ name: 'main' }), {
+      subCommands: {
+        list: define({ name: 'list', aliases: ['ls'], run: list }),
+        ls: define({ name: 'ls', run: ls })
+      }
+    })
+    expect(ls).toHaveBeenCalledOnce()
+    expect(list).not.toHaveBeenCalled()
+  })
+
+  test('two commands with the same alias are a mistake, which the alias throws', async () => {
+    const list = vi.fn<() => void>()
+    const subCommands = {
+      list: define({ name: 'list', aliases: ['ls'], run: list }),
+      logs: define({ name: 'logs', aliases: ['ls'], run: vi.fn<() => void>() })
+    }
+    await expect(cli(['ls'], define({ name: 'main' }), { subCommands })).rejects.toThrow(
+      new TypeError("Alias 'ls' is given to more than one command: 'list' and 'logs'")
+    )
+    // the names of the commands still run
+    await cli(['list'], define({ name: 'main' }), { subCommands })
+    expect(list).toHaveBeenCalledOnce()
+  })
+
+  test('an alias after the value of an option of the command (#774)', async () => {
+    let seen: unknown
+    await cli(['--scope', 'acme', 'ls'], define({ name: 'main' }), {
+      subCommands: {
+        list: define({
+          name: 'list',
+          aliases: ['ls'],
+          args: { scope: { type: 'string' } },
+          run: ctx => {
+            seen = { name: ctx.name, scope: ctx.values.scope }
+          }
+        })
+      }
+    })
+    expect(seen).toEqual({ name: 'list', scope: 'acme' })
+  })
+
+  test('the help does not list an alias, and the help of an alias is the help of the command', async () => {
+    const options = {
+      name: 'app',
+      usageSilent: true,
+      subCommands: {
+        list: define({
+          name: 'list',
+          description: 'List the items',
+          aliases: ['ls'],
+          run: vi.fn<() => void>()
+        })
+      }
+    }
+    const root = await cli(['--help'], define({ name: 'main' }), options)
+    expect(root).toContain('list')
+    expect(root).not.toMatch(/\bls\b/)
+
+    const byAlias = await cli(['ls', '--help'], define({ name: 'main' }), options)
+    expect(byAlias).toBe(await cli(['list', '--help'], define({ name: 'main' }), options))
+    expect(byAlias).toContain('app list')
+  })
+
+  test('the help as JSON of an alias is the help of the command', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const options = {
+      name: 'app',
+      subCommands: {
+        list: define({
+          name: 'list',
+          description: 'List the items',
+          aliases: ['ls'],
+          run: vi.fn<() => void>()
+        })
+      }
+    }
+    await cli(['ls', '--help', '--json'], define({ name: 'main' }), options)
+    const byAlias = JSON.parse(log())
+    expect(byAlias.help.command).toBe('app list')
+    expect(byAlias.help.argv).toEqual(['app', 'list'])
+  })
+
+  test('an alias runs the command with gunshi/bone too', async () => {
+    const list = vi.fn<() => void>()
+    await boneCli(['ls'], define({ name: 'main' }), {
+      subCommands: { list: define({ name: 'list', aliases: ['ls'], run: list }) }
+    })
+    expect(list).toHaveBeenCalledOnce()
+  })
+})
+
+describe('deprecated commands and arguments', () => {
+  const runDeploy = vi.fn<() => void>()
+  const deploy = define({
+    name: 'deploy',
+    description: 'Deploy the project',
+    args: {
+      output: { type: 'string', description: 'Output format' },
+      format: { type: 'string', short: 'f', deprecated: 'Use --output.' },
+      dryRun: { type: 'boolean', deprecated: true },
+      target: { type: 'positional', required: false, deprecated: 'Use --target.' },
+      level: { type: 'string', default: 'info', deprecated: true }
+    },
+    run: runDeploy
+  })
+  const push = define({ ...deploy, name: 'push', deprecated: 'Use deploy.' })
+  const runAdd = vi.fn<() => void>()
+  const remote = define({
+    name: 'remote',
+    description: 'Manage remotes',
+    subCommands: { add: define({ name: 'add', description: 'Add a remote', run: runAdd }) }
+  })
+  const oldRemote = define({ ...remote, name: 'old-remote', deprecated: 'Use remote.' })
+  const status = define({
+    name: 'status',
+    args: { ...jsonArgs },
+    deprecated: true,
+    run: () => ({ status: 'ok' })
+  })
+  const entry = define({ name: 'main' })
+  const options = {
+    name: 'app',
+    version: '1.0.0',
+    subCommands: { deploy, push, remote, 'old-remote': oldRemote, status }
+  }
+
+  beforeEach(() => {
+    runDeploy.mockClear()
+    runAdd.mockClear()
+  })
+
+  test('a deprecated command runs, and warns of it once, to stderr', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['push'], entry, options)
+    expect(runDeploy).toHaveBeenCalledOnce()
+    expect(stderr()).toBe('push is deprecated. Use deploy.')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('deprecated: true warns without a text', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['old'], entry, {
+      subCommands: { old: define({ name: 'old', deprecated: true, run: vi.fn<() => void>() }) }
+    })
+    expect(stderr()).toBe('old is deprecated.')
+  })
+
+  test('a command under a deprecated group warns of the group', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['old-remote', 'add'], entry, options)
+    expect(runAdd).toHaveBeenCalledOnce()
+    expect(stderr()).toBe('old-remote is deprecated. Use remote.')
+  })
+
+  test('a deprecated option that is given warns once, by its long name, and one with its default only does not', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['deploy', '-f', 'json', '--format', 'yaml'], entry, options)
+    expect(runDeploy).toHaveBeenCalledOnce()
+    expect(stderr()).toBe('--format is deprecated. Use --output.')
+  })
+
+  test('the deprecated arguments are warned of in the order of the arguments', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['deploy', 'web', '--dryRun'], entry, options)
+    expect(stderr()).toBe('--dryRun is deprecated.\n<target> is deprecated. Use --target.')
+  })
+
+  test('a deprecated option is named as it is given, in kebab-case with toKebab', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['run', '--dry-run'], entry, {
+      subCommands: {
+        run: define({
+          name: 'run',
+          toKebab: true,
+          args: { dryRun: { type: 'boolean', deprecated: 'Use --plan.' } },
+          run: vi.fn<() => void>()
+        })
+      }
+    })
+    expect(stderr()).toBe('--dry-run is deprecated. Use --plan.')
+  })
+
+  test('a deprecated command warns before its deprecated arguments', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['push', '--format', 'json'], entry, options)
+    expect(stderr()).toBe('push is deprecated. Use deploy.\n--format is deprecated. Use --output.')
+  })
+
+  test('nothing is warned of with --help, --version, the errors of the arguments, --json and usageSilent', async () => {
+    const stderr = defineMockErrorLog()
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['push', '--format', 'json', '--help'], entry, options)
+    await cli(['push', '--version'], entry, options)
+    expect(stderr()).toBe('')
+
+    await cli(['push', '--formt', 'json'], entry, { ...options, strict: true })
+    expect(stderr()).toContain('Unknown option: --formt')
+    expect(stderr()).not.toContain('deprecated')
+    process.exitCode = undefined
+
+    await cli(['status', '--json'], entry, options)
+    expect(stderr()).not.toContain('deprecated')
+    expect(log()).toContain('"status":"ok"')
+
+    await cli(['push', '--format', 'json'], entry, { ...options, usageSilent: true })
+    expect(stderr()).not.toContain('deprecated')
+  })
+
+  test('the help leaves them out, and the help of a deprecated command says so after its description', async () => {
+    const silent = { ...options, usageSilent: true }
+    const root = await cli(['--help'], entry, silent)
+    expect(root).toContain('deploy')
+    expect(root).toContain('remote')
+    expect(root).not.toContain('push')
+    expect(root).not.toContain('old-remote')
+    expect(root).not.toContain('status')
+
+    const deployHelp = await cli(['deploy', '--help'], entry, silent)
+    expect(deployHelp).toContain('--output')
+    expect(deployHelp).not.toContain('--format')
+    expect(deployHelp).not.toContain('dryRun')
+    expect(deployHelp).not.toContain('target')
+    expect(deployHelp).not.toContain('deprecated')
+
+    expect(await cli(['push', '--help'], entry, silent)).toContain(
+      'Deploy the project\npush is deprecated. Use deploy.\n\nUSAGE:'
+    )
+    expect(await cli(['old-remote', 'add', '--help'], entry, silent)).toContain(
+      'Add a remote\nold-remote is deprecated. Use remote.\n\nUSAGE:'
+    )
+  })
+
+  test('the help as JSON leaves them out, and tells the deprecation of the command', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['push', '--help', '--json'], entry, options)
+    const pushHelp = JSON.parse(log()).help
+    expect(pushHelp.deprecated).toBe('push is deprecated. Use deploy.')
+    expect(pushHelp.options.map((option: { name: string }) => option.name)).toEqual([
+      '--output',
+      '--help',
+      '--version'
+    ])
+    expect(pushHelp.arguments).toEqual([])
+  })
+
+  test('the help as JSON of a command that is not deprecated has no deprecation, and no deprecated commands', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+
+    await cli(['--help', '--json'], entry, options)
+    const rootHelp = JSON.parse(log()).help
+    expect(rootHelp.deprecated).toBeNull()
+    expect(rootHelp.commands.map((command: { name: string }) => command.name)).toEqual([
+      'deploy',
+      'remote'
+    ])
+  })
+
+  test('the candidates of an unknown command and an unknown option leave them out', async () => {
+    defineMockErrorLog()
+    let capturedError: AggregateError | undefined
+    const onErrorCommand = (_ctx: unknown, error: Error) => {
+      capturedError = error as AggregateError
+    }
+
+    await cli(['pus'], entry, { ...options, onErrorCommand })
+    expect(findCommandNotFoundError(capturedError).candidates).toEqual(['deploy', 'remote', 'main'])
+
+    await cli(['deploy', '--formt', 'json'], entry, { ...options, strict: true, onErrorCommand })
+    const unknown = ((capturedError?.errors ?? []) as ArgsValidationError[]).find(
+      error => error.code === 'err:arg:unknown-option'
+    )
+    expect(unknown?.values.candidates).toEqual(['--help', '--version', '--output'])
+  })
+
+  test('a lazy command takes its deprecation from the definition for the help, and warns when it runs', async () => {
+    const stderr = defineMockErrorLog()
+    const loader = vi.fn<() => CommandRunner>(() => () => {})
+    const lazyOptions = {
+      usageSilent: false,
+      subCommands: {
+        deploy,
+        push: lazy(loader, { name: 'push', deprecated: 'Use deploy.' })
+      }
+    }
+
+    const root = await cli(['--help'], entry, { ...lazyOptions, usageSilent: true })
+    expect(root).not.toContain('push')
+    expect(loader).not.toHaveBeenCalled()
+
+    await cli(['push'], entry, lazyOptions)
+    expect(loader).toHaveBeenCalledOnce()
+    expect(stderr()).toBe('push is deprecated. Use deploy.')
+  })
+
+  test('the warning is translated by the i18n plugin', async () => {
+    const stderr = defineMockErrorLog()
+    await cli(['push', '--format', 'json'], entry, {
+      ...options,
+      plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })]
+    })
+    expect(stderr()).toBe('push は非推奨です。 Use deploy.\n--format は非推奨です。 Use --output.')
+  })
+
+  test('gunshi/bone runs a deprecated command without a warning', async () => {
+    const stderr = defineMockErrorLog()
+    await boneCli(['push', '--format', 'json'], entry, options)
+    expect(runDeploy).toHaveBeenCalledOnce()
+    expect(stderr()).toBe('')
   })
 })

@@ -30,7 +30,13 @@
  */
 
 import { ANONYMOUS_COMMAND_NAME, createCommandContext, plugin } from '@gunshi/plugin'
-import { localizable, namespacedId, resolveKey, resolveLazyCommand } from '@gunshi/shared'
+import {
+  isDeprecated,
+  localizable,
+  namespacedId,
+  resolveKey,
+  resolveLazyCommand
+} from '@gunshi/shared'
 import { renderHeader } from './header.ts'
 import { recordContextCommand, recordRunner } from './runner.ts'
 import { pluginId as id } from './types.ts'
@@ -118,8 +124,10 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
           )
         }
 
-        // filter out internal commands
-        cachedCommands = allCommands.filter(cmd => !cmd.internal).filter(Boolean)
+        // filter out internal and deprecated commands
+        cachedCommands = allCommands
+          .filter(cmd => !cmd.internal && !isDeprecated(cmd.deprecated))
+          .filter(Boolean)
         cachedCommands.sort((a, b) => {
           // first, prioritize entry commands
           if (a.entry && !b.entry) {

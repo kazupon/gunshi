@@ -43,6 +43,8 @@ describe('resolveLazyCommand', () => {
     examples: '$ my-cli deploy --env prod',
     toKebab: true,
     internal: true,
+    aliases: ['dp'],
+    deprecated: 'Use release.',
     entry: true,
     rendering: { header: null },
     subCommands: { status: { name: 'status', run } }
@@ -55,6 +57,8 @@ describe('resolveLazyCommand', () => {
     examples: '$ my-cli loaded',
     toKebab: false,
     internal: false,
+    aliases: ['ld'],
+    deprecated: false,
     entry: false,
     rendering: { usage: null },
     subCommands: { logs: { name: 'logs', run } }
@@ -98,6 +102,8 @@ describe('resolveLazyCommand', () => {
     expect(resolved.examples).toBe('$ my-cli deploy --env prod')
     expect(resolved.toKebab).toBe(true)
     expect(resolved.internal).toBe(true)
+    expect(resolved.aliases).toEqual(['dp'])
+    expect(resolved.deprecated).toBe('Use release.')
     expect(resolved.entry).toBe(true)
     expect(resolved.rendering).toEqual({ header: null })
     expect(Object.keys(resolved.subCommands || {})).toEqual(['status'])
@@ -118,6 +124,8 @@ describe('resolveLazyCommand', () => {
     expect(resolved.examples).toBe('$ my-cli loaded')
     expect(resolved.toKebab).toBe(false)
     expect(resolved.internal).toBe(false)
+    expect(resolved.aliases).toEqual(['ld'])
+    expect(resolved.deprecated).toBe(false)
     expect(resolved.entry).toBe(false)
     // the whole `rendering` of the loaded command, not a merge with the one of the definition
     expect(resolved.rendering).toEqual({ usage: null })

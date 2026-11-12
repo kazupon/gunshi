@@ -136,6 +136,8 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
       args: cmd.args,
       examples: cmd.examples,
       internal: cmd.internal,
+      aliases: cmd.aliases,
+      deprecated: cmd.deprecated,
       entry: cmd.entry,
       toKebab: cmd.toKebab,
       rendering: cmd.rendering,
@@ -169,6 +171,8 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
         command.args = loaded.args ?? cmd.args
         command.examples = loaded.examples ?? cmd.examples
         command.internal = loaded.internal ?? cmd.internal
+        command.aliases = loaded.aliases ?? cmd.aliases
+        command.deprecated = loaded.deprecated ?? cmd.deprecated
         command.entry = loaded.entry ?? cmd.entry
         command.toKebab = loaded.toKebab ?? cmd.toKebab
         command.rendering = loaded.rendering ?? cmd.rendering

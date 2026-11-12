@@ -393,7 +393,7 @@ The one shape this cannot express is the same letter on both sides of the comman
 
 ### Hidden Arguments
 
-An argument with `hidden: true` is kept out of completion, the way it is kept out of `--help`. It is not offered among the candidates, a typed prefix does not complete it, its short name is not suggested, its negatable `--no-` form is not offered, and its value is not completed. A hidden global option is treated the same way.
+An argument with `hidden: true`, or with `deprecated`, is kept out of completion, the way it is kept out of `--help`. It is not offered among the candidates, a typed prefix does not complete it, its short name is not suggested, its negatable `--no-` form is not offered, and its value is not completed. A hidden global option is treated the same way.
 
 It is still accepted when the command runs, and completion knows that, so typing one does not stop the completion of what comes after it:
 
@@ -406,6 +406,18 @@ prod  staging                                      # the positional argument is 
 
 $ my-cli --legacyGlobal <TAB>
 deploy  remote                                     # and so are the sub-commands
+```
+
+### Aliases
+
+An alias of a command (`aliases`) is not offered among the candidates: completion offers the names of the commands, as the help lists them. Nor is a deprecated command (`deprecated`), as an internal one. After an alias, the options and the sub-commands of the command are completed as after its name:
+
+```sh
+$ my-cli l<TAB>
+list                                               # its alias ls is not offered
+
+$ my-cli ls --<TAB>
+--help  --version  --all                           # the options of list
 ```
 
 ## ⚙️ Plugin Options

@@ -11,6 +11,7 @@
   "DEFAULT": "デフォルト",
   "CHOICES": "選択肢",
   "CAUSEDBY": "原因",
+  "DEPRECATED": "{$name} は非推奨です。",
   "help": "このヘルプメッセージを表示",
   "version": "このバージョンを表示",
   "json": "結果を JSON で出力する",

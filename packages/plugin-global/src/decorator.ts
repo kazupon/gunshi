@@ -21,6 +21,8 @@ import {
   isWithoutRun,
   log,
   namespacedId,
+  renderDeprecatedArgs,
+  renderDeprecatedCommands,
   resolveBuiltInKey,
   resolveJsonRequest
 } from '@gunshi/shared'
@@ -392,6 +394,22 @@ const decorator: CommandDecorator<{
    */
   if (request === undefined && ctx.omitted && isWithoutRun(ctx)) {
     return await writeUsage(ctx, write)
+  }
+
+  /**
+   * NOTE(kazupon): a deprecated command, a command under a deprecated group, and a deprecated argument that the
+   * user gave still work, and each is warned of once, to stderr, before the command runs: the warning tells what
+   * to use instead. They are not warned of with `--json`, whose stderr has a failure only, as one line of JSON,
+   * nor with `usageSilent`, which keeps the text of gunshi off the terminal. The help, the version and the errors
+   * of the arguments are answered above, without them.
+   */
+  if (request === undefined && !ctx.env.usageSilent) {
+    for (const sentence of [
+      ...(await renderDeprecatedCommands(ctx)),
+      ...(await renderDeprecatedArgs(ctx))
+    ]) {
+      console.error(sentence)
+    }
   }
 
   // normal command execution
