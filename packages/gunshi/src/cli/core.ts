@@ -817,9 +817,9 @@ function resolveCommandTreeFromPositionals<G extends GunshiParamsConstraint>(
 
   for (let i = 0; i < positionals.length; i++) {
     const token = positionals[i]
-    const cmd = currentSubCommands.get(token)
+    const found = findSubCommand(currentSubCommands, token)
 
-    if (cmd == null) {
+    if (found == null) {
       if (depth === 0) {
         // no match at top level
         if (options.fallbackToEntry) {
@@ -855,20 +855,23 @@ function resolveCommandTreeFromPositionals<G extends GunshiParamsConstraint>(
       }
     }
 
+    // the name of the command is its key, also when the user typed one of its aliases
+    const [key, cmd] = found
+
     // resolve command name if missing - shallow copy to avoid mutating user objects
     let resolved: Command<G> | LazyCommand<G> = cmd
     if (typeof cmd === 'function' && (cmd as any).commandName == null) {
       const copy = Object.assign((...args: unknown[]) => (cmd as Function)(...args), cmd, {
-        commandName: token
+        commandName: key
       }) as unknown as LazyCommand<G>
       resolved = copy
     } else if (typeof cmd === 'object' && cmd.name == null) {
-      resolved = Object.assign(create<Command<G>>(), cmd, { name: token }) as Command<G>
+      resolved = Object.assign(create<Command<G>>(), cmd, { name: key }) as Command<G>
     }
 
     resolvedCommand = resolved
-    resolvedName = token
-    commandPath.push(token)
+    resolvedName = key
+    commandPath.push(key)
     depth++
 
     // check if the matched command has its own nested subCommands
@@ -1081,12 +1084,13 @@ function collectRoutingCandidates<G extends GunshiParamsConstraint>(
     parentPath: string[]
   ): void {
     for (let index = offset; index < rawPositionals.length; index++) {
-      const name = rawPositionals[index]
-      const command = commands.get(name)
-      if (command == null) {
+      const found = findSubCommand(commands, rawPositionals[index])
+      if (found == null) {
         continue
       }
 
+      // the path has the names of the commands, as the routing of each candidate resolves them
+      const [name, command] = found
       const path = [...parentPath, name]
       const key = JSON.stringify(path)
       const normalized = normalizeCommandReference(command, name)
@@ -1104,6 +1108,43 @@ function collectRoutingCandidates<G extends GunshiParamsConstraint>(
 
   collect(root, 0, [])
   return candidates
+}
+
+/**
+ * Find the sub-command that a word of the command line names: the sub-command whose name is the word, or else the
+ * one that has the word among its {@linkcode Command.aliases | aliases}.
+ *
+ * NOTE(kazupon): a name wins over an alias, so that an alias never hides a sub-command. A lazy command has the
+ * aliases of its definition, as it is not loaded yet. Two sub-commands that give the same alias are a mistake in
+ * their definitions, which is thrown as a `TypeError`, as a name given twice in an array of `subCommands` is.
+ *
+ * @param commands - The sub-commands of a level, by their names
+ * @param word - The word of the command line
+ * @returns The name of the sub-command and the sub-command, or `undefined` when no sub-command is named so
+ */
+function findSubCommand<G extends GunshiParamsConstraint>(
+  commands: Map<string, Command<G> | LazyCommand<G>>,
+  word: string
+): [string, Command<G> | LazyCommand<G>] | undefined {
+  const command = commands.get(word)
+  if (command != null) {
+    return [word, command]
+  }
+
+  let found: [string, Command<G> | LazyCommand<G>] | undefined
+  for (const [name, candidate] of commands) {
+    const aliases: unknown = candidate.aliases
+    if (!Array.isArray(aliases) || !aliases.includes(word)) {
+      continue
+    }
+    if (found) {
+      throw new TypeError(
+        `Alias '${word}' is given to more than one command: '${found[0]}' and '${name}'`
+      )
+    }
+    found = [name, candidate]
+  }
+  return found
 }
 
 function normalizeCommandReference<G extends GunshiParamsConstraint>(

@@ -355,6 +355,7 @@ describe('the keys that a command does not have (#871)', () => {
       examples: 'deploy --input app.zip',
       toKebab: true,
       internal: false,
+      aliases: ['dp'],
       entry: false,
       rendering: { header: null },
       run
@@ -363,6 +364,14 @@ describe('the keys that a command does not have (#871)', () => {
     expectTypeOf(define(plain).name).toEqualTypeOf<string>()
     const typed: Command = { name: 'deploy', run }
     expectTypeOf(define(typed).name).toEqualTypeOf<string | undefined>()
+  })
+
+  test('aliases are the names of a command, in its definition and in the definition of lazy', () => {
+    define({ name: 'list', aliases: ['ls', 'l'] as const, run })
+    lazy(loader, { name: 'list', aliases: ['ls'] })
+    define({ name: 'remote', subCommands: { add: { name: 'add', aliases: ['a'], run } }, run })
+    // @ts-expect-error `aliases` is an array of names
+    define({ name: 'list', aliases: 'ls', run })
   })
 
   test('the keys of the definition are not optional in the result, and the other keys are', () => {

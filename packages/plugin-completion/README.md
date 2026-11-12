@@ -408,6 +408,18 @@ $ my-cli --legacyGlobal <TAB>
 deploy  remote                                     # and so are the sub-commands
 ```
 
+### Aliases
+
+An alias of a command (`aliases`) is not offered among the candidates: completion offers the names of the commands, as the help lists them. After an alias, the options and the sub-commands of the command are completed as after its name:
+
+```sh
+$ my-cli l<TAB>
+list                                               # its alias ls is not offered
+
+$ my-cli ls --<TAB>
+--help  --version  --all                           # the options of list
+```
+
 ## ⚙️ Plugin Options
 
 ### `config`

@@ -370,6 +370,7 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
     lazyCommand.args = definition.args
     lazyCommand.examples = definition.examples
     lazyCommand.internal = definition.internal
+    lazyCommand.aliases = definition.aliases
     lazyCommand.entry = definition.entry
     lazyCommand.toKebab = definition.toKebab
     lazyCommand.rendering = definition.rendering

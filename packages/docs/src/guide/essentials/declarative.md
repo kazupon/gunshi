@@ -138,6 +138,7 @@ When you run this command with `--help`, Gunshi automatically generates comprehe
 Commands also support these configuration properties:
 
 - `internal`: Boolean flag to mark commands as internal (default: `false`). Internal commands are hidden from help usage but remain fully functional: they are left out of the help, shell completion, the help as JSON, and the `Did you mean` hint for an unknown command, and still run when they are typed. This is useful for debug commands, administrative functions, or implementation details that shouldn't be exposed to end users.
+- `aliases`: Other names of the command, such as `['ls']` for `list`. The command runs with any of them, and `ctx.name` and `ctx.commandPath` have its name. An alias is accepted but not taught: the help, the `Did you mean` hint for an unknown command and shell completion show the name only. See [Aliases of Sub-commands](./composable.md#aliases-of-sub-commands).
 - `entry`: Boolean flag that marks the main command when subcommands exist (default: `undefined`). This property is typically set automatically by the framework. When used with the `fallbackToEntry` CLI option, it enables fallback behavior for unmatched subcommands.
 - `rendering`: Object to customize how the command displays help, usage, and error messages. This allows fine-grained control over command-level rendering output.
 

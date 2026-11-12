@@ -6726,3 +6726,163 @@ describe('validationErrorExitCode of cli()', () => {
     expect(process.exitCode).toBeUndefined()
   })
 })
+
+describe('aliases of a command', () => {
+  test('a command runs with one of its aliases, with its name and its path', async () => {
+    let seen: unknown
+    await cli(['ls', '--all'], define({ name: 'main' }), {
+      subCommands: {
+        list: define({
+          name: 'list',
+          aliases: ['ls', 'l'],
+          args: { all: { type: 'boolean' } },
+          run: ctx => {
+            seen = {
+              name: ctx.name,
+              path: ctx.commandPath,
+              all: ctx.values.all,
+              positionals: ctx.positionals
+            }
+          }
+        })
+      }
+    })
+    // the positional arguments are what the user typed, the alias included
+    expect(seen).toEqual({ name: 'list', path: ['list'], all: true, positionals: ['ls'] })
+  })
+
+  test('the sub-commands of a group are found after its alias', async () => {
+    let path: string[] | undefined
+    const add = define({
+      name: 'add',
+      run: ctx => {
+        path = ctx.commandPath
+      }
+    })
+    await cli(['rmt', 'add'], define({ name: 'main' }), {
+      subCommands: { remote: define({ name: 'remote', aliases: ['rmt'], subCommands: { add } }) }
+    })
+    expect(path).toEqual(['remote', 'add'])
+  })
+
+  test('a command without a name is named after its key, with an alias too', async () => {
+    let name: string | undefined
+    await cli(['ls'], define({ name: 'main' }), {
+      subCommands: {
+        list: {
+          aliases: ['ls'],
+          run: ctx => {
+            name = ctx.name
+          }
+        }
+      }
+    })
+    expect(name).toBe('list')
+  })
+
+  test('a lazy command takes its aliases from the definition given to lazy', async () => {
+    let name: string | undefined
+    const loader = vi.fn<() => CommandRunner>(() => ctx => {
+      name = ctx.name
+    })
+    await cli(['ls'], define({ name: 'main' }), {
+      subCommands: { list: lazy(loader, { name: 'list', aliases: ['ls'] }) }
+    })
+    expect(loader).toHaveBeenCalledOnce()
+    expect(name).toBe('list')
+  })
+
+  test('a sub-command whose name is the alias wins over the alias', async () => {
+    const ls = vi.fn<() => void>()
+    const list = vi.fn<() => void>()
+    await cli(['ls'], define({ name: 'main' }), {
+      subCommands: {
+        list: define({ name: 'list', aliases: ['ls'], run: list }),
+        ls: define({ name: 'ls', run: ls })
+      }
+    })
+    expect(ls).toHaveBeenCalledOnce()
+    expect(list).not.toHaveBeenCalled()
+  })
+
+  test('two commands with the same alias are a mistake, which the alias throws', async () => {
+    const list = vi.fn<() => void>()
+    const subCommands = {
+      list: define({ name: 'list', aliases: ['ls'], run: list }),
+      logs: define({ name: 'logs', aliases: ['ls'], run: vi.fn<() => void>() })
+    }
+    await expect(cli(['ls'], define({ name: 'main' }), { subCommands })).rejects.toThrow(
+      new TypeError("Alias 'ls' is given to more than one command: 'list' and 'logs'")
+    )
+    // the names of the commands still run
+    await cli(['list'], define({ name: 'main' }), { subCommands })
+    expect(list).toHaveBeenCalledOnce()
+  })
+
+  test('an alias after the value of an option of the command (#774)', async () => {
+    let seen: unknown
+    await cli(['--scope', 'acme', 'ls'], define({ name: 'main' }), {
+      subCommands: {
+        list: define({
+          name: 'list',
+          aliases: ['ls'],
+          args: { scope: { type: 'string' } },
+          run: ctx => {
+            seen = { name: ctx.name, scope: ctx.values.scope }
+          }
+        })
+      }
+    })
+    expect(seen).toEqual({ name: 'list', scope: 'acme' })
+  })
+
+  test('the help does not list an alias, and the help of an alias is the help of the command', async () => {
+    const options = {
+      name: 'app',
+      usageSilent: true,
+      subCommands: {
+        list: define({
+          name: 'list',
+          description: 'List the items',
+          aliases: ['ls'],
+          run: vi.fn<() => void>()
+        })
+      }
+    }
+    const root = await cli(['--help'], define({ name: 'main' }), options)
+    expect(root).toContain('list')
+    expect(root).not.toMatch(/\bls\b/)
+
+    const byAlias = await cli(['ls', '--help'], define({ name: 'main' }), options)
+    expect(byAlias).toBe(await cli(['list', '--help'], define({ name: 'main' }), options))
+    expect(byAlias).toContain('app list')
+  })
+
+  test('the help as JSON of an alias is the help of the command', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const options = {
+      name: 'app',
+      subCommands: {
+        list: define({
+          name: 'list',
+          description: 'List the items',
+          aliases: ['ls'],
+          run: vi.fn<() => void>()
+        })
+      }
+    }
+    await cli(['ls', '--help', '--json'], define({ name: 'main' }), options)
+    const byAlias = JSON.parse(log())
+    expect(byAlias.help.command).toBe('app list')
+    expect(byAlias.help.argv).toEqual(['app', 'list'])
+  })
+
+  test('an alias runs the command with gunshi/bone too', async () => {
+    const list = vi.fn<() => void>()
+    await boneCli(['ls'], define({ name: 'main' }), {
+      subCommands: { list: define({ name: 'list', aliases: ['ls'], run: list }) }
+    })
+    expect(list).toHaveBeenCalledOnce()
+  })
+})

@@ -2626,3 +2626,58 @@ describe('strictPositionals of cli()', () => {
     }
   })
 })
+
+describe('aliases', () => {
+  let output: string[] = []
+
+  beforeEach(() => {
+    output = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  const list = defineCommand({
+    name: 'list',
+    description: 'List the items',
+    aliases: ['ls'],
+    args: { all: { type: 'boolean', description: 'All the items' } },
+    run: NOOP
+  })
+  const remote = defineCommand({
+    name: 'remote',
+    description: 'Manage remotes',
+    aliases: ['rmt'],
+    subCommands: { add: defineCommand({ name: 'add', description: 'Add a remote', run: NOOP }) },
+    run: NOOP
+  })
+
+  async function complete(request: string[]): Promise<string[]> {
+    output.length = 0
+    await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      version: '0.0.0',
+      usageSilent: true,
+      subCommands: { list, remote },
+      plugins: [completion()]
+    })
+    return [...output]
+  }
+
+  test('an alias is not among the candidates', async () => {
+    expect(await complete([''])).toEqual(['list\tList the items', 'remote\tManage remotes', ':4'])
+    expect(await complete(['l'])).toEqual(['list\tList the items', ':4'])
+    expect(await complete(['r'])).toEqual(['remote\tManage remotes', ':4'])
+  })
+
+  test('the options of a command are completed after its alias', async () => {
+    expect(await complete(['ls', '--'])).toContain('--all\tAll the items')
+    expect(await complete(['ls', '--'])).toEqual(await complete(['list', '--']))
+    expect(await complete(['ls', '--a'])).toEqual(['--all\tAll the items', ':4'])
+  })
+
+  test('the sub-commands of a group are completed after its alias', async () => {
+    expect(await complete(['rmt', ''])).toEqual(['add\tAdd a remote', ':4'])
+    expect(await complete(['rmt', ''])).toEqual(await complete(['remote', '']))
+  })
+})

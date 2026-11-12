@@ -271,6 +271,20 @@ describe('suggestion plugin', () => {
     expect(stderr()).toBe('Command not found: rn\nDid you mean run?' + helpHint(['task']))
   })
 
+  test('suggests the name of a command, not one of its aliases', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['lss'], define({ name: 'main' }), {
+        subCommands: {
+          list: define({ name: 'list', aliases: ['ls'], run: vi.fn<() => void>() })
+        },
+        plugins: [suggestion()]
+      })
+    ).resolves.toBeUndefined()
+    expect(stderr()).toBe('Command not found: lss\nDid you mean list?' + helpHint())
+  })
+
   test('does not suggest an internal command, which the help leaves out', async () => {
     const stderr = defineMockErrorLog()
 

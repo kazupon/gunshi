@@ -491,7 +491,15 @@ function resolveCommandPath(
   let current: Command | LazyCommand | undefined
   let currentLevel = level
   for (const [index, name] of names.entries()) {
-    const cmd = currentLevel?.get(name)
+    /**
+     * NOTE(kazupon): a command is found by one of its aliases too, as gunshi finds it, so that its options are
+     * completed after the alias. The alias itself is never a candidate: the candidates are the names.
+     */
+    const cmd =
+      currentLevel?.get(name) ??
+      [...(currentLevel?.values() ?? [])].find(
+        command => Array.isArray(command.aliases) && command.aliases.includes(name)
+      )
     if (cmd == undefined || isSkipped(name, cmd, topLevel && index === 0)) {
       return undefined
     }

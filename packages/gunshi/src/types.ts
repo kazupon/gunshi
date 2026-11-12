@@ -776,6 +776,19 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    */
   internal?: boolean
   /**
+   * Other names of the command, such as `['ls']` for `list`.
+   *
+   * The command runs with any of them, as with its name, and `ctx.name` and `ctx.commandPath` have its name:
+   * the help, the hints and the help as JSON tell the name of the command. An alias is accepted but not taught:
+   * the help does not list it, and the `Did you mean` hint for an unknown command and shell completion do not
+   * offer it.
+   *
+   * A sub-command whose name is the alias wins over the alias, so an alias never hides a command. Two commands
+   * at the same level with the same alias are a mistake: using the alias throws a `TypeError`. A lazy command
+   * takes its aliases from the definition given to `lazy`, as it is found before it is loaded.
+   */
+  aliases?: readonly string[]
+  /**
    * Whether this command is an entry command.
    *
    * @default undefined
@@ -884,6 +897,10 @@ export interface SubCommandable {
    * see {@link Command.internal}
    */
   internal?: boolean
+  /**
+   * see {@link Command.aliases}
+   */
+  aliases?: readonly string[]
   /**
    * see {@link Command.entry}
    */

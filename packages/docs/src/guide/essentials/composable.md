@@ -128,6 +128,30 @@ await cli(process.argv.slice(2), mainCommand, {
 
 When both are given, the `subCommands` option of `cli()` is used for the CLI, and the sub-commands of the main command are reached under its name, as [nested sub-commands](#nested-sub-commands).
 
+## Aliases of Sub-commands
+
+Give a sub-command other names with `aliases`, such as `ls` for `list`:
+
+```ts [commands/list.ts]
+import { define } from 'gunshi'
+
+export const listCommand = define({
+  name: 'list',
+  description: 'List resources',
+  aliases: ['ls'],
+  run: ctx => {
+    // `ctx.name` is 'list', also when the command is run as `my-app ls`
+    console.log('Listing resources...')
+  }
+})
+```
+
+`my-app ls` runs the command as `my-app list` does. The help lists the command under its name only, and `my-app ls --help` shows the help of `my-app list`, so that the help teaches one name. The `Did you mean` hint of `@gunshi/plugin-suggestion` and shell completion offer the name too, and shell completion still completes the options of the command after an alias.
+
+- A sub-command named after the alias wins over the alias, so an alias never hides a command
+- Two sub-commands at the same level with the same alias are a mistake: the alias throws a `TypeError` when it is used
+- A lazy command takes its aliases from the definition given to `lazy`, since the command is found before it is loaded
+
 ## Options for Every Command
 
 To give every command the same option, such as `--file` or `--verbose`, define the arguments once and spread them into the `args` of each command.
