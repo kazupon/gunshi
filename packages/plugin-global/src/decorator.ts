@@ -385,8 +385,8 @@ const decorator: CommandDecorator<{
   /**
    * NOTE(kazupon): a command that has sub-commands and no `run`, run without a sub-command, prints its
    * usage instead of nothing, as `--help` does: to stdout, with exit code 0, and `cli()` returns the
-   * text. The CLI guidelines of Vercel say so: "A group invoked without an action shows its help and
-   * exits `0`". It is printed where the command would run, so the argument errors are reported first.
+   * text. Such a group is run by itself to see what it has, so it shows its usage and succeeds.
+   * It is printed where the command would run, so the argument errors are reported first.
    * With `--json`, stdout has the JSON only, so the usage is not printed, and a command that spreads
    * `jsonArgs` fails for its missing result as before.
    */
