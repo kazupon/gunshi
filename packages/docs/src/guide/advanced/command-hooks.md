@@ -27,7 +27,7 @@ graph TD
     M -->|Yes| N[Return Result]
     M -->|Error| K
     K --> Q{Validation error reported to stderr?}
-    Q -->|Yes| R[Resolve with exit code 1]
+    Q -->|Yes| R[Resolve with validationErrorExitCode, 1 by default]
     Q -->|No| O[Throw Error]
     N --> P([End])
     O --> P
@@ -47,8 +47,9 @@ Gunshi provides three main lifecycle hooks:
 - **`onErrorCommand`**: Executes when a command throws an error
 
 Argument validation failures are also treated as command errors. Gunshi prints the validation
-error message to stderr and sets the exit code to `1`, then calls `onErrorCommand`, and the
-`cli()` promise resolves. See [Handling Argument Validation Errors](#handling-argument-validation-errors).
+error message to stderr and sets the exit code to `1`, or to the `validationErrorExitCode` of
+`cli()`, then calls `onErrorCommand`, and the `cli()` promise resolves. See
+[Handling Argument Validation Errors](#handling-argument-validation-errors).
 
 So does a `CommandError` that a command throws for a failure it expects, with the exit code of the
 error. See [Handling Expected Failures](#handling-expected-failures).
@@ -144,8 +145,10 @@ The `cli()` promise then resolves, so a plain `await cli(...)` ends with the mes
 code, without a stack trace.
 
 To use another exit code, such as `2`, give it to `cli()` as `validationErrorExitCode` (see
-[Argument Errors](../essentials/errors.md#argument-errors)). In `onErrorCommand`, you can detect this
-case with `ctx.validationError`, for example to record it:
+[Argument Errors](../essentials/errors.md#argument-errors)). In `onErrorCommand`, you can tell the
+errors of the arguments by the `AggregateError` that holds them, for example to record them. It
+holds them for `--json` given to a command that does not support it too, which is not
+`ctx.validationError`:
 
 ```ts
 import { cli, define } from 'gunshi'
@@ -166,7 +169,7 @@ const command = define({
 await cli(process.argv.slice(2), command, {
   validationErrorExitCode: 2,
   onErrorCommand: (ctx, error) => {
-    if (ctx.validationError === error) {
+    if (error instanceof AggregateError) {
       console.error(`[${new Date().toISOString()}] ${ctx.name}: the arguments are wrong`)
     }
   }

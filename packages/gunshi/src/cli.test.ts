@@ -3030,7 +3030,8 @@ describe('github issues', () => {
       expect(mapHelp).toBe(userHelp)
       expect(pluginHelp).toBe(userHelp)
       expect(pluginHelp).toContain('  [build] <target>')
-      expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
+      expect(pluginHelp?.match(/^ {2}\[build\] /gm)).toHaveLength(1)
+      expect(pluginHelp?.match(/^ {2}mycli <COMMAND> --help$/gm)).toHaveLength(1)
     })
 
     test('does not add the entry to the command registry', async () => {
@@ -6466,6 +6467,58 @@ describe('validationErrorExitCode of cli()', () => {
 
     expect(codes).toEqual([2, 2])
     expect(stderr()).toContain('"reason":"json_not_supported"')
+  })
+
+  test('is the exit code of an unknown command and of a command line that cannot be resolved, with --help and --version too', async () => {
+    defineMockErrorLog()
+    const config = plugin({
+      id: 'test:config',
+      setup(ctx) {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+    const options = {
+      name: 'app',
+      version: '1.2.3',
+      plugins: [config],
+      subCommands: {
+        clean: define({ name: 'clean', run: () => {} }),
+        deploy: define({ name: 'deploy', args: { config: { type: 'boolean' } }, run: () => {} })
+      },
+      validationErrorExitCode: 2
+    }
+    const codes: unknown[] = []
+
+    for (const argv of [
+      ['nope', '--help'],
+      ['nope', '--version'],
+      ['--config', 'clean', 'deploy'],
+      ['--config', 'clean', 'deploy', '--help']
+    ]) {
+      process.exitCode = undefined
+      await cli(argv, entry(), options)
+      codes.push(process.exitCode)
+    }
+
+    expect(codes).toEqual([2, 2, 2, 2])
+  })
+
+  test('is the exit code of a default that is not one of its choices too', async () => {
+    const stderr = defineMockErrorLog()
+    const level = define({
+      name: 'level',
+      args: { level: { type: 'enum', choices: ['info', 'warn'], default: 'debug' } },
+      run: () => {}
+    })
+
+    await cli(['level'], entry(), {
+      name: 'app',
+      subCommands: { level },
+      validationErrorExitCode: 2
+    })
+
+    expect(stderr()).toContain('Invalid default for')
+    expect(process.exitCode).toBe(2)
   })
 
   test('does not change the exit code of an error that the command throws', async () => {

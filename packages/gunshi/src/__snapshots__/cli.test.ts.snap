@@ -8,9 +8,9 @@ USAGE:
   gunshi command1 [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>          The foo option
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          The foo option
 "
 `;
 
@@ -24,8 +24,7 @@ COMMANDS:
   command1 [OPTIONS]          This is command1 (entry)
 
 For more info, run any command with the \`--help\` flag:
-  gunshi --help
-  gunshi command1 --help
+  gunshi <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
@@ -38,9 +37,9 @@ exports[`auto generate usage > loosely entry command > console 1`] = `
   COMMAND [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>
 "
 `;
 
@@ -49,9 +48,9 @@ exports[`auto generate usage > loosely entry command > rendered 1`] = `
   COMMAND [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>
 "
 `;
 
@@ -82,9 +81,9 @@ USAGE:
   my-cli command2 [OPTIONS]
 
 OPTIONS:
+  -b, --bar <bar>           (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
-  -b, --bar <bar>           (default: 42)
 "
 `;
 
@@ -97,13 +96,12 @@ COMMANDS:
   command2 [OPTIONS]          This is command2
 
 For more info, run any command with the \`--help\` flag:
-  my-cli --help
-  my-cli command2 --help
+  my-cli <COMMAND> --help
 
 OPTIONS:
+  -f, --foo <foo>          The foo option
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          The foo option
 
 This is command2
 
@@ -111,9 +109,9 @@ USAGE:
   my-cli command2 [OPTIONS]
 
 OPTIONS:
+  -b, --bar <bar>           (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
-  -b, --bar <bar>           (default: 42)
 "
 `;
 
@@ -126,13 +124,12 @@ COMMANDS:
   command2 [OPTIONS]          This is command2
 
 For more info, run any command with the \`--help\` flag:
-  my-cli --help
-  my-cli command2 --help
+  my-cli <COMMAND> --help
 
 OPTIONS:
+  -f, --foo <foo>          The foo option
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          The foo option
 "
 `;
 
@@ -144,9 +141,9 @@ USAGE:
   gunshi command1 [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>          The foo option
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          The foo option
 "
 `;
 
@@ -160,8 +157,7 @@ COMMANDS:
   command1 [OPTIONS]          This is command1 (entry)
 
 For more info, run any command with the \`--help\` flag:
-  gunshi --help
-  gunshi command1 --help
+  gunshi <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
@@ -207,9 +203,9 @@ USAGE:
   gunshi [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>          [string]  The foo option
   -h, --help               [boolean] Display this help message
   -v, --version            [boolean] Display this version
-  -f, --foo <foo>          [string]  The foo option
 
 EXAMPLES:
   # Example 1
@@ -225,9 +221,9 @@ USAGE:
   gunshi [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>          [string]  The foo option
   -h, --help               [boolean] Display this help message
   -v, --version            [boolean] Display this version
-  -f, --foo <foo>          [string]  The foo option
 
 EXAMPLES:
   # Example 1
@@ -245,9 +241,9 @@ USAGE:
   gunshi command1 [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>          The foo option
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          The foo option
 
 EXAMPLES:
   # Example 1
@@ -265,9 +261,9 @@ USAGE:
   gunshi command2 [OPTIONS]
 
 OPTIONS:
+  -b, --bar <bar>          The bar option (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
-  -b, --bar <bar>          The bar option (default: 42)
 
 EXAMPLES:
   # Example 1
@@ -288,13 +284,12 @@ exports[`auto generate usage > strictly sub commands > console output 1`] = `
     command2 [オプション]                 This is command2
 
 詳細は、コマンドと\`--help\`フラグを実行してください:
-    gunshi --help
-    gunshi command2 --help
+    gunshi <コマンド> --help
 
 オプション:
+    -f, --foo <foo>               The foo option
     -h, --help                    このヘルプメッセージを表示
     -v, --version                 このバージョンを表示
-    -f, --foo <foo>               The foo option
 
 例:
     # Example 1
@@ -310,9 +305,9 @@ USAGE:
   gunshi command1 [OPTIONS]
 
 OPTIONS:
+  -f, --foo <foo>          The foo option
   -h, --help               Display this help message
   -v, --version            Display this version
-  -f, --foo <foo>          The foo option
 
 EXAMPLES:
   # Example 1
@@ -328,9 +323,9 @@ USAGE:
   gunshi command2 [OPTIONS]
 
 OPTIONS:
+  -b, --bar <bar>          The bar option (default: 42)
   -h, --help               Display this help message
   -v, --version            Display this version
-  -b, --bar <bar>          The bar option (default: 42)
 
 EXAMPLES:
   # Example 1
@@ -350,13 +345,12 @@ exports[`auto generate usage > strictly sub commands > entry 1`] = `
     command2 [オプション]                 This is command2
 
 詳細は、コマンドと\`--help\`フラグを実行してください:
-    gunshi --help
-    gunshi command2 --help
+    gunshi <コマンド> --help
 
 オプション:
+    -f, --foo <foo>               The foo option
     -h, --help                    このヘルプメッセージを表示
     -v, --version                 このバージョンを表示
-    -f, --foo <foo>               The foo option
 
 例:
     # Example 1
@@ -402,9 +396,9 @@ USAGE:
   gunshi [OPTIONS]
 
 OPTIONS:
+  -d, --description <description>          This is a description of description option
   -h, --help                               Display this help message
   -v, --version                            Display this version
-  -d, --description <description>          This is a description of description option
 "
 `;
 
@@ -428,8 +422,7 @@ COMMANDS:
   cmd1
 
 For more info, run any command with the \`--help\` flag:
-  mycli --help
-  mycli cmd1 --help
+  mycli <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
@@ -446,9 +439,7 @@ COMMANDS:
   cmd2
 
 For more info, run any command with the \`--help\` flag:
-  mycli --help
-  mycli cmd1 --help
-  mycli cmd2 --help
+  mycli <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
@@ -477,8 +468,7 @@ COMMANDS:
   cmd1
 
 For more info, run any command with the \`--help\` flag:
-  mycli --help
-  mycli cmd1 --help
+  mycli <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
@@ -497,9 +487,7 @@ COMMANDS:
   cmd2
 
 For more info, run any command with the \`--help\` flag:
-  mycli --help
-  mycli cmd1 --help
-  mycli cmd2 --help
+  mycli <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
@@ -515,9 +503,9 @@ USAGE:
   my-cli hello [OPTIONS]
 
 OPTIONS:
+  --name <name>          The name of the person to say hello to (default: World)
   -h, --help             Display this help message
   -v, --version          Display this version
-  --name <name>          The name of the person to say hello to (default: World)
 "
 `;
 
@@ -529,9 +517,9 @@ USAGE:
   lazy-command-loading config [OPTIONS]
 
 OPTIONS:
+  --verbose              Enable verbose output (default: false)
   -h, --help             Display this help message
   -v, --version          Display this version
-  --verbose              Enable verbose output (default: false)
 "
 `;
 
@@ -545,8 +533,7 @@ COMMANDS:
   config                          Load command configuration
 
 For more info, run any command with the \`--help\` flag:
-  lazy-command-loading --help
-  lazy-command-loading config --help
+  lazy-command-loading <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
@@ -560,10 +547,10 @@ USAGE:
   gunshi [OPTIONS] --bar
 
 OPTIONS:
-  -h, --help               Display this help message
-  -v, --version            Display this version
   -f, --foo <foo>          this is foo option
   --bar                    this is bar option
   -b, --baz <baz>          this is baz option (default: 42)
+  -h, --help               Display this help message
+  -v, --version            Display this version
 "
 `;

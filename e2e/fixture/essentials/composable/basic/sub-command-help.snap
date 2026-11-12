@@ -6,7 +6,7 @@ USAGE:
   my-app create [OPTIONS] --name <name>
 
 OPTIONS:
+  -n, --name <name>
   -h, --help                 Display this help message
   -v, --version              Display this version
-  -n, --name <name>
 

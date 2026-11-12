@@ -43,6 +43,8 @@ throw new CommandError('--from must come before --to', {
 })
 ```
 
+With `--json`, it is printed as any `CommandError` is: a JSON error of `status: "error"`, with its `code` as the `reason` (see [With `--json`](#with-json)). The argument errors that Gunshi finds are of `status: "action_required"`, with the command that shows the help in `next`.
+
 ## Expected Failures
 
 When a command fails in a way that it expects, throw a `CommandError` with a message for the user:

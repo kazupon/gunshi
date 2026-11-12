@@ -4,8 +4,8 @@ i18n-example (i18n-example v1.0.0)
   i18n-example [オプション]
 
 オプション:
-  -h, --help                 このヘルプメッセージを表示
-  -v, --version              このバージョンを表示
   -n, --name <name>          挨拶する相手の名前
   -f, --formal               丁寧な挨拶を使用する
+  -h, --help                 このヘルプメッセージを表示
+  -v, --version              このバージョンを表示
 

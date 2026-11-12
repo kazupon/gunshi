@@ -4,7 +4,7 @@ USAGE:
   my-cli [OPTIONS] --endpoint <endpoint>
 
 OPTIONS:
+  --endpoint <endpoint>          API endpoint to fetch
   -h, --help                     Display this help message
   -v, --version                  Display this version
-  --endpoint <endpoint>          API endpoint to fetch
 

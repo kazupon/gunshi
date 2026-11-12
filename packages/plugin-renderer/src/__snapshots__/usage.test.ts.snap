@@ -222,9 +222,7 @@ COMMANDS:
   show [OPTIONS] --qux <qux> <positional1>          A show command
 
 For more info, run any command with the \`--help\` flag:
-  cmd1 command1 --help
-  cmd1 command2 --help
-  cmd1 show --help
+  cmd1 <COMMAND> --help
 
 ARGUMENTS:
   positional1           The positional argument 1

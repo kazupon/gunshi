@@ -92,8 +92,7 @@ COMMANDS:
   remove <name>            Remove a remote
 
 For more info, run any command with the `--help` flag:
-  git remote add --help
-  git remote remove --help
+  git remote <COMMAND> --help
 
 # Show help for leaf command
 $ npx tsx cli.ts remote add --help

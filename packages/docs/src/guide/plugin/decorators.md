@@ -351,9 +351,9 @@ USAGE:
   my-cli [OPTIONS] --output <output>
 
 OPTIONS:
+  --output <output>
   -h, --help                 Display this help message
   -v, --version              Display this version
-  --output <output>
 
 
 Generated: 2025-08-15T14:26:43.121Z

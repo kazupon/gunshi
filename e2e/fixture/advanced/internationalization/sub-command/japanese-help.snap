@@ -8,8 +8,7 @@ resource-cli (resource-cli v1.0.0)
   create --name <name>          リソースを作成
 
 詳細は、コマンドと`--help`フラグを実行してください:
-  resource-cli --help
-  resource-cli create --help
+  resource-cli <コマンド> --help
 
 オプション:
   -h, --help             このヘルプメッセージを表示

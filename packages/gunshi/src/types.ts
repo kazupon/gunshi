@@ -466,15 +466,16 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   /**
    * The exit code of the validation errors, such as `2`, the exit code of a usage error in many
    * command-line tools. They are the errors of the arguments: a missing or invalid argument, an unknown
-   * command, an unknown option of `strict`, a positional argument that the command does not take of
-   * `strictPositionals`, and `--json` given to a command that does not spread `jsonArgs`. With the global
-   * options plugin, the exit code is set to it when the errors are printed, as text or as JSON, before
-   * {@linkcode CliOptions.onErrorCommand} is called, which can still change it.
+   * command or a command line that cannot be resolved, an unknown option of `strict`, a positional
+   * argument that the command does not take of `strictPositionals`, and `--json` given to a command
+   * that does not spread `jsonArgs`. With the global options plugin, the exit code is set to it when
+   * the errors are printed, as text or as JSON, before {@linkcode CliOptions.onErrorCommand} is called,
+   * which can still change it.
    *
    * It is an integer from `1` to `255`, as the `exitCode` of a `CommandError` is, and any other value is
    * replaced with `1`. It does not change the exit code of a `CommandError`, nor of any other error that a
-   * command throws. With `renderValidationErrors: null` and {@linkcode CliOptions.usageSilent}, nothing is
-   * printed, and the exit code is left alone.
+   * command throws. With `renderValidationErrors: null`, a renderer that returns an empty message, or
+   * {@linkcode CliOptions.usageSilent}, nothing is printed, and the exit code is left alone.
    *
    * @default 1
    */

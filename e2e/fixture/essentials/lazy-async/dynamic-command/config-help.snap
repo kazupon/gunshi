@@ -6,7 +6,7 @@ USAGE:
   my-cli config [OPTIONS]
 
 OPTIONS:
+  --verbose              Verbose output
   -h, --help             Display this help message
   -v, --version          Display this version
-  --verbose              Verbose output
 
