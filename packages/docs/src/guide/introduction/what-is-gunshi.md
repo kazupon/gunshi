@@ -26,6 +26,12 @@ Gunshi provides a modern approach to building command-line interfaces in JavaScr
 - **Maintainable**: Declarative configuration makes code easier to understand and maintain
 - **Performant**: Lazy loading ensures resources are only loaded when needed
 
+The CLIs that you build are used by people, by scripts, and by AI agents. Gunshi builds what each of them relies on from the definitions of your commands:
+
+- **For people**: The help shows what to type, with the required options spelled out, and an error points to the help of the nearest command ([Auto Usage Generation](../essentials/auto-usage.md))
+- **For scripts**: The errors go to stderr with a non-zero exit code, and a command that spreads `jsonArgs` prints its result and its errors as JSON with `--json` ([Errors and Exit Codes](../essentials/errors.md), [JSON Output](../essentials/json-output.md))
+- **For AI agents**: `--help --json` describes a command as data, the JSON errors tell what to run next, and your CLI can tell when an agent runs it, to stop asking questions ([AI Agent Detection](../advanced/ai-agent-detection.md))
+
 Whether you're building a simple CLI tool or a complex command-line application with multiple sub-commands, Gunshi provides the features you need to create a great user experience.
 
 ## Next Steps
