@@ -1602,7 +1602,7 @@ describe('#747 - the CLI is named the same way in the "for more info" block', ()
   test('a CLI with no name uses the placeholder the rest of the page uses', async () => {
     const lines = forMoreLines(await renderPage())
 
-    expect(lines).toEqual(['COMMAND --help', 'COMMAND cmd1 --help', 'COMMAND cmd2 --help'])
+    expect(lines).toEqual(['COMMAND <COMMAND> --help'])
   })
 
   test('a CLI with no name never says `undefined`', async () => {
@@ -1612,23 +1612,19 @@ describe('#747 - the CLI is named the same way in the "for more info" block', ()
   test('a CLI with a name is unchanged', async () => {
     const lines = forMoreLines(await renderPage({ name: 'my-cli' }))
 
-    expect(lines).toEqual(['my-cli --help', 'my-cli cmd1 --help', 'my-cli cmd2 --help'])
+    expect(lines).toEqual(['my-cli <COMMAND> --help'])
   })
 
   test('the placeholder is localized', async () => {
     const lines = forMoreLines(await renderPage({ locale: true }))
 
-    expect(lines).toEqual(['コマンド --help', 'コマンド cmd1 --help', 'コマンド cmd2 --help'])
+    expect(lines).toEqual(['コマンド <コマンド> --help'])
   })
 
   test('a nested command keeps the path behind the placeholder', async () => {
     const lines = forMoreLines(await renderPage({ commandPath: ['remote'], subCommands: NESTED }))
 
-    expect(lines).toEqual([
-      'COMMAND remote --help',
-      'COMMAND remote add --help',
-      'COMMAND remote remove --help'
-    ])
+    expect(lines).toEqual(['COMMAND remote <COMMAND> --help'])
   })
 
   test('a nested command of a named CLI is unchanged', async () => {
@@ -1636,11 +1632,21 @@ describe('#747 - the CLI is named the same way in the "for more info" block', ()
       await renderPage({ name: 'my-cli', commandPath: ['remote'], subCommands: NESTED })
     )
 
-    expect(lines).toEqual([
-      'my-cli remote --help',
-      'my-cli remote add --help',
-      'my-cli remote remove --help'
-    ])
+    expect(lines).toEqual(['my-cli remote <COMMAND> --help'])
+  })
+
+  test('the block is one line, however many commands the section lists', async () => {
+    const many = new Map<string, TestCommand>(
+      ['a', 'b', 'c', 'd', 'e'].map(name => [
+        name,
+        { name, description: name.toUpperCase(), run: NOOP } as TestCommand
+      ])
+    )
+    const usage = await renderPage({ name: 'my-cli', subCommands: many })
+
+    expect(forMoreLines(usage)).toEqual(['my-cli <COMMAND> --help'])
+    // each command is named once, in the commands section
+    expect(usage.split('\n').filter(line => line.trim().startsWith('my-cli a'))).toEqual([])
   })
 
   test('the block and the usage line name the CLI with the same word', async () => {
@@ -2223,11 +2229,7 @@ describe('the usage of a group', () => {
     const usage = await usageOfGroup(records)
 
     expect(commandRows(usage)).toEqual(['[records]', 'add', 'list'])
-    expect(forMoreLines(usage)).toEqual([
-      'demo records --help',
-      'demo records add --help',
-      'demo records list --help'
-    ])
+    expect(forMoreLines(usage)).toEqual(['demo records <COMMAND> --help'])
   })
 
   test('a group without run lists only its sub-commands', async () => {
@@ -2240,7 +2242,7 @@ describe('the usage of a group', () => {
 
     expect(usageLine(usage)).toBe('demo records [COMMANDS] [OPTIONS]')
     expect(commandRows(usage)).toEqual(['add', 'list'])
-    expect(forMoreLines(usage)).toEqual(['demo records add --help', 'demo records list --help'])
+    expect(forMoreLines(usage)).toEqual(['demo records <COMMAND> --help'])
   })
 
   test('an entry without run lists only its sub-commands', async () => {
@@ -2249,7 +2251,7 @@ describe('the usage of a group', () => {
 
     expect(usageLine(usage!)).toBe('demo [COMMANDS] [OPTIONS]')
     expect(commandRows(usage!)).toEqual(['add', 'list'])
-    expect(forMoreLines(usage!)).toEqual(['demo add --help', 'demo list --help'])
+    expect(forMoreLines(usage!)).toEqual(['demo <COMMAND> --help'])
   })
 
   test('an entry without run is not listed among the commands that plugins add', async () => {
@@ -2283,7 +2285,7 @@ describe('the usage of a group', () => {
     const usage = await usageOfGroup(records)
 
     expect(commandRows(usage)).toEqual(['add', 'list'])
-    expect(forMoreLines(usage)).toEqual(['demo records add --help', 'demo records list --help'])
+    expect(forMoreLines(usage)).toEqual(['demo records <COMMAND> --help'])
   })
 
   test('an entry given as a runner lists itself', async () => {

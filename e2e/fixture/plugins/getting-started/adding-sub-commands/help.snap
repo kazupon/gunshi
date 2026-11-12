@@ -7,9 +7,7 @@ COMMANDS:
   lint                     Run linter
 
 For more info, run any command with the `--help` flag:
-  COMMAND --help
-  COMMAND clean --help
-  COMMAND lint --help
+  COMMAND <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message

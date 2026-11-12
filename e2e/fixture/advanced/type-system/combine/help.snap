@@ -9,8 +9,7 @@ COMMANDS:
   query --table <table>          Query database tables
 
 For more info, run any command with the `--help` flag:
-  advanced-combine --help
-  advanced-combine query --help
+  advanced-combine <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message

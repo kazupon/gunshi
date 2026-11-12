@@ -10,8 +10,7 @@ COMMANDS:
   list [OPTIONS]                List all resources
 
 For more info, run any command with the `--help` flag:
-  my-cli create --help
-  my-cli list --help
+  my-cli <COMMAND> --help
 
 OPTIONS:
   -h, --help             Display this help message
