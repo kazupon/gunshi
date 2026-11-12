@@ -92,10 +92,10 @@ USAGE:
   greet-cli [OPTIONS]
 
 OPTIONS:
-  -h, --help                 Display this help message
-  -v, --version              Display this version
   -n, --name <name>          Name to greet
   -u, --uppercase            Convert greeting to uppercase
+  -h, --help                 Display this help message
+  -v, --version              Display this version
 ```
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
@@ -116,12 +116,12 @@ USAGE:
   app [OPTIONS]
 
 OPTIONS:
-  -h, --help                           Display this help message
-  -v, --version                        Display this version
   -p, --path <path>                    File or directory path to operate on
   -r, --recursive                      Operate recursively on directories
   --no-recursive                       Negate -r, --recursive
   -o, --operation <operation>          Operation to perform: list, copy, move, or delete
+  -h, --help                           Display this help message
+  -v, --version                        Display this version
 
 EXAMPLES:
   # List files in current directory
@@ -219,10 +219,10 @@ USAGE:
   resource-manager create [OPTIONS] --name <name>
 
 OPTIONS:
-  -h, --help                 Display this help message
-  -v, --version              Display this version
   -n, --name <name>          Name of the resource
   -t, --type <type>          Type of resource (default: default)
+  -h, --help                 Display this help message
+  -v, --version              Display this version
 ```
 
 ### Positional Arguments Display

@@ -7,9 +7,9 @@ USAGE:
   app-bone [OPTIONS]
 
 OPTIONS:
+  --say <say>            say something (default: hello!)
   -h, --help             Display this help message
   -v, --version          Display this version
-  --say <say>            say something (default: hello!)
 "
 `;
 

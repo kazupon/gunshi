@@ -17,11 +17,11 @@ USAGE:
   data-processor [OPTIONS] --input <input>
 
 OPTIONS:
-  -h, --help                     Display this help message
-  -v, --version                  Display this version
   -i, --input <input>            Input file path
   -f, --format <format>          Output format (json, csv, xml)
   -o, --output <output>          Output file path
+  -h, --help                     Display this help message
+  -v, --version                  Display this version
 
 ```
 

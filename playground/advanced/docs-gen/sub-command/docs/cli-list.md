@@ -8,8 +8,8 @@ USAGE:
   my-cli list [OPTIONS]
 
 OPTIONS:
+  -f, --format <format>          Output format (json, table)
   -h, --help                     Display this help message
   -v, --version                  Display this version
-  -f, --format <format>          Output format (json, table)
 
 ```

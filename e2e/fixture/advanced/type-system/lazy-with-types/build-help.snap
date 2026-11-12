@@ -6,8 +6,8 @@ USAGE:
   mycli build [OPTIONS] --target <target>
 
 OPTIONS:
-  -h, --help                 Display this help message
-  -v, --version              Display this version
   --target <target>           (choices: dev | prod)
   --minify                    (default: false)
+  -h, --help                 Display this help message
+  -v, --version              Display this version
 

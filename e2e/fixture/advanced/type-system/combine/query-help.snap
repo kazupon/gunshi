@@ -7,7 +7,7 @@ USAGE:
   advanced-combine query [OPTIONS] --table <table>
 
 OPTIONS:
+  --table <table>
   -h, --help               Display this help message
   -v, --version            Display this version
-  --table <table>
 

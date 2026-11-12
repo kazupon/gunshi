@@ -2651,3 +2651,85 @@ $ app copy`
     ])
   })
 })
+
+describe('the options of the command come before the global options', () => {
+  /**
+   * The help of a command.
+   *
+   * @param command - The command
+   * @param options - The options of the CLI
+   * @returns The help
+   */
+  async function helpOf(command: Command, options: Partial<CliOptions> = {}): Promise<string> {
+    return (await cli(['--help'], command, { name: 'app', usageSilent: true, ...options }))!
+  }
+
+  /**
+   * The options of the rows of the OPTIONS section of a help.
+   *
+   * @param help - The help
+   * @returns The first column of each row
+   */
+  function optionRows(help: string): string[] {
+    const lines = help.split('\n')
+    const start = lines.indexOf('OPTIONS:')
+    const end = lines.indexOf('', start)
+    return lines.slice(start + 1, end).map(line => line.trim().split(/\s{2,}/)[0])
+  }
+
+  test('the global options follow the options of the command', async () => {
+    const help = await helpOf(
+      define({
+        name: 'app',
+        args: {
+          name: { type: 'string', short: 'n', description: 'Name' },
+          force: { type: 'boolean', negatable: true, description: 'Force' }
+        },
+        run: NOOP
+      })
+    )
+
+    expect(optionRows(help)).toEqual([
+      '-n, --name <name>',
+      '--force',
+      '--no-force',
+      '-h, --help',
+      '-v, --version'
+    ])
+  })
+
+  test('a global option that a plugin adds follows the options of the command too', async () => {
+    const trace = plugin({
+      id: 'trace',
+      setup: ctx => ctx.addGlobalOption('trace', { type: 'boolean', description: 'Trace' })
+    })
+    const help = await helpOf(
+      define({ name: 'app', args: { name: { type: 'string', description: 'Name' } }, run: NOOP }),
+      { plugins: [trace] }
+    )
+
+    expect(optionRows(help)).toEqual(['--name <name>', '-h, --help', '-v, --version', '--trace'])
+  })
+
+  test('an argument of the command that replaces a global option is listed with the options of the command', async () => {
+    const help = await helpOf(
+      define({
+        name: 'app',
+        args: {
+          name: { type: 'string', description: 'Name' },
+          version: { type: 'string', description: 'The version to release' }
+        },
+        run: NOOP
+      })
+    )
+
+    // the arguments keep the order in which they are merged: the replaced global option first
+    expect(optionRows(help)).toEqual(['--version <version>', '--name <name>', '-h, --help'])
+  })
+
+  test('a command without options of its own lists the global options', async () => {
+    const help = await helpOf(define({ name: 'app', run: NOOP }))
+
+    expect(optionRows(help)).toEqual(['-h, --help', '-v, --version'])
+  })
+})
