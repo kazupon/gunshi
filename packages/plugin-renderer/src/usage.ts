@@ -11,6 +11,7 @@ import {
   isWithoutRun,
   resolveExamples as _resolvedExamples,
   makeShortLongOptionPair,
+  orderGlobalOptionsLast,
   resolveArgKey,
   resolveBuiltInKey,
   resolveDisplayName,
@@ -520,14 +521,9 @@ async function generateOptionsSymbols<
 }
 
 /**
- * Get the visible optional arguments in the order of the options section
- *
- * NOTE(kazupon): the options of the command come first, and the global options in effect after them, each
- * in the order in which they are merged: the reader looks for the options of the command, and the global
- * options, such as `--help` and `--version`, are the same for every command. Only the help is ordered this
- * way: the arguments are parsed as `resolveCommandArgs` merges them, the global options first. An argument
- * of the command that replaces a global option is not in effect as a global option, so it is listed with
- * the options of the command.
+ * Get the visible optional arguments in the order of the options section: the options of the command
+ * first, and the global options in effect after them, as the help as JSON lists them too (see
+ * {@linkcode orderGlobalOptionsLast})
  *
  * @param ctx - A {@link CommandContext | command context}
  * @returns The visible optional arguments, the options of the command first
@@ -535,15 +531,7 @@ async function generateOptionsSymbols<
 function getOrderedOptionalArgs<G extends GunshiParams>(
   ctx: Readonly<CommandContext<G>>
 ): [string, ArgSchema][] {
-  const args = getVisibleOptionalArgs(ctx.args)
-  const globalOptions = ctx.env.globalOptions
-  if (!globalOptions || globalOptions.size === 0) {
-    return args
-  }
-  return [
-    ...args.filter(([name]) => !globalOptions.has(name)),
-    ...args.filter(([name]) => globalOptions.has(name))
-  ]
+  return orderGlobalOptionsLast(getVisibleOptionalArgs(ctx.args), ctx.env.globalOptions)
 }
 
 /**

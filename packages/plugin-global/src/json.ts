@@ -19,6 +19,7 @@ import {
   localizeBuiltinResource,
   localizeValidationError,
   namespacedId,
+  orderGlobalOptionsLast,
   resolveArgKey,
   resolveBuiltInKey,
   resolveDisplayName,
@@ -514,7 +515,8 @@ export interface JsonHelp {
      */
     arguments: JsonHelpArgument[]
     /**
-     * The options, the global options included.
+     * The options, the global options included, in the order of the help for people: the options of
+     * the command first, and the global options in effect after them.
      */
     options: JsonHelpOption[]
     /**
@@ -556,7 +558,18 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
 
   const options: JsonHelpOption[] = []
   const positionals: JsonHelpArgument[] = []
-  for (const [key, schema] of Object.entries(ctx.args) as [string, ArgSchema][]) {
+  // the options in the order of the help for people: the options of the command first, the global options
+  // in effect after them. The positional arguments keep the order in which they are merged, which is the
+  // order in which they are bound, a global one that a plugin adds included, as the help lists them
+  const entries = Object.entries(ctx.args) as [string, ArgSchema][]
+  const args = [
+    ...entries.filter(([, schema]) => schema.type === 'positional'),
+    ...orderGlobalOptionsLast(
+      entries.filter(([, schema]) => schema.type !== 'positional'),
+      ctx.env.globalOptions
+    )
+  ]
+  for (const [key, schema] of args) {
     if (schema.hidden) {
       continue
     }
