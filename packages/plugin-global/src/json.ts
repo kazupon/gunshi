@@ -100,7 +100,7 @@ type Context = Readonly<CommandContext<DefaultGunshiParams>>
  * The reasons that are not derived from the codes by the rule: they would read as something else.
  */
 const RENAMED_REASONS: ReadonlyMap<string, string> = new Map([
-  // a conflict with a resource that exists, in the reasons of Vercel's guidelines
+  // `conflict` is a conflict with a resource that exists, as HTTP 409 is
   [ArgsValidationErrorKeys.conflict, 'conflicting_options'],
   // `not_found` is a resource that is not found
   [CommandNotFoundErrorKeys.notFound, 'unknown_command'],
