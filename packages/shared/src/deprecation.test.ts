@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { cli } from '../../gunshi/src/cli/bone.ts'
 import { define } from '../../gunshi/src/definition.ts'
 import { getDeprecatedCommands, isDeprecated } from './deprecation.ts'

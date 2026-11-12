@@ -1,48 +1,33 @@
 {
   "name": "@gunshi/plugin-i18n",
-  "description": "internationalization plugin for gunshi",
   "version": "1.0.0-rc.6",
+  "description": "internationalization plugin for gunshi",
+  "keywords": [
+    "cli",
+    "gunshi",
+    "i18n",
+    "internationalization",
+    "plugin"
+  ],
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/kazupon",
-  "bugs": {
-    "url": "https://github.com/kazupon/gunshi/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git",
     "directory": "packages/plugin-i18n"
   },
-  "keywords": [
-    "gunshi",
-    "i18n",
-    "internationalization",
-    "plugin",
-    "cli"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">= 22"
-  },
-  "type": "module",
+  "funding": "https://github.com/sponsors/kazupon",
   "files": [
     "lib"
   ],
+  "type": "module",
   "module": "lib/index.js",
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js",
-      "require": "./lib/index.js",
-      "default": "./lib/index.js"
-    },
-    "./package.json": "./package.json"
-  },
   "types": "lib/index.d.ts",
   "typesVersions": {
     "*": {
@@ -52,21 +37,25 @@
       ]
     }
   },
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "build:docs": "tsx ../../scripts/api-references.ts",
     "prepack": "pnpm build"
   },
   "dependencies": {
     "@gunshi/plugin": "workspace:*"
-  },
-  "peerDependencies": {
-    "@gunshi/plugin-global": "workspace:*"
-  },
-  "peerDependenciesMeta": {
-    "@gunshi/plugin-global": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "@gunshi/bone": "workspace:*",
@@ -77,7 +66,17 @@
     "@intlify/core-base": "12.0.0-alpha.9",
     "gunshi": "workspace:*",
     "messageformat": "4.1.0",
-    "publint": "catalog:",
-    "tsdown": "catalog:"
+    "publint": "catalog:"
+  },
+  "peerDependencies": {
+    "@gunshi/plugin-global": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@gunshi/plugin-global": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">= 22"
   }
 }

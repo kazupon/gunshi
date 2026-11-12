@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { expect, test } from 'vitest'
+import { expect, test } from 'vite-plus/test'
 import { runCommand } from '../scripts/utils.ts'
 
 const ROOT = path.resolve(import.meta.dirname, '..')

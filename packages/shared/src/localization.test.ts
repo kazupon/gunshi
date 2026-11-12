@@ -1,6 +1,6 @@
 import { define } from 'gunshi'
 import { createCommandContext } from 'gunshi/context'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vite-plus/test'
 import { localizable } from './localization.ts'
 import { resolveArgKey, resolveBuiltInKey } from './utils.ts'
 

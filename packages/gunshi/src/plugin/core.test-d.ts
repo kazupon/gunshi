@@ -1,4 +1,4 @@
-import { describe, expectTypeOf, test } from 'vitest'
+import { describe, expectTypeOf, test } from 'vite-plus/test'
 import { plugin } from './core.ts'
 
 import type { Args, CommandContextExtension } from '../types.ts'

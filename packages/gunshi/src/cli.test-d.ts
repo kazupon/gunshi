@@ -3,7 +3,7 @@
  * This test verifies that type inference works correctly when combining cli() and define()
  */
 
-import { expectTypeOf, test } from 'vitest'
+import { expectTypeOf, test } from 'vite-plus/test'
 import { cli } from './cli.ts'
 import { define, defineWithTypes, jsonArgs, lazy } from './definition.ts'
 

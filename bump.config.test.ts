@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'vite-plus/test'
 import config from './bump.config.ts'
 
 test('bumpp config writes generated notes before the release commit', () => {

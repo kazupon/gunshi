@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { resolveCommandArgs as resolveCommandArgsOfCore } from '../../gunshi/src/cli/args.ts'
 import { cli } from '../../gunshi/src/cli/bone.ts'
 import { define } from '../../gunshi/src/definition.ts'

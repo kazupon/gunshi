@@ -4,13 +4,13 @@ import { createCommandContext, plugin } from '@gunshi/plugin'
 import i18n from '@gunshi/plugin-i18n'
 import { COMMON_ARGS, getCommandSubCommands, namespacedId } from '@gunshi/shared'
 import { cli, lazy } from 'gunshi'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test'
 import completion from './index.ts'
 import { COMPLETE_COMMAND_NAME, registerCompletion, registerForCompletion } from './registration.ts'
 
 import type { ArgSchema, Args, Command, LazyCommand, Plugin } from '@gunshi/plugin'
 import type { I18nCommand, I18nExtension } from '@gunshi/plugin-i18n'
-import type { MockInstance } from 'vitest'
+import type { MockInstance } from 'vite-plus/test'
 import type { CompletionOptions } from './types.ts'
 
 const NOOP = () => {}

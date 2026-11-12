@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises'
-import { assert, expect, test } from 'vitest'
+import { assert, expect, test } from 'vite-plus/test'
 import master from '../locales/en-US.json' with { type: 'json' }
 import resources from './index.ts'
 

@@ -1,15 +1,14 @@
 {
-  "oxc.requireConfig": true,
   "oxc.trace.server": "messages",
   "oxc.typeAware": true,
   "editor.defaultFormatter": "oxc.oxc-vscode",
+  "oxc.fmt.configPath": "./vite.config.ts",
+  "oxc.disableNestedConfig": true,
+  "oxc.fmt.disableNestedConfig": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always",
-    "source.fixAll.oxc": "always",
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.oxc": "always"
   },
-  "eslint.useFlatConfig": true,
-  "eslint.validate": ["javascript", "typescript"],
   "files.associations": {
     "*.json": "jsonc"
   },

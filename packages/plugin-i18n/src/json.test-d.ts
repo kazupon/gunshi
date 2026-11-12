@@ -6,7 +6,7 @@
  */
 
 import { define, jsonArgs } from 'gunshi'
-import { expectTypeOf, test } from 'vitest'
+import { expectTypeOf, test } from 'vite-plus/test'
 import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
 
 const resource = async () => ({ description: 'List the projects' })

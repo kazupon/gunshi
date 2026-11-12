@@ -1,42 +1,45 @@
 {
   "name": "gunshi",
-  "description": "Modern javascript command-line library",
   "version": "1.0.0-rc.6",
+  "description": "Modern javascript command-line library",
+  "keywords": [
+    "args",
+    "argument",
+    "argv",
+    "cli",
+    "command",
+    "option"
+  ],
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/kazupon",
-  "bugs": {
-    "url": "https://github.com/kazupon/gunshi/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git",
     "directory": "packages/gunshi"
   },
-  "keywords": [
-    "command",
-    "option",
-    "cli",
-    "argument",
-    "args",
-    "argv"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">= 22"
-  },
-  "type": "module",
+  "funding": "https://github.com/sponsors/kazupon",
   "files": [
     "AGENTS.md",
     "lib",
     "skills"
   ],
+  "type": "module",
   "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/*",
+        "./*"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "types": "./lib/index.d.ts",
@@ -100,17 +103,11 @@
     },
     "./package.json": "./package.json"
   },
-  "types": "lib/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./lib/*",
-        "./*"
-      ]
-    }
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "prepack": "pnpm build"
   },
   "devDependencies": {
@@ -123,7 +120,9 @@
     "args-tokens": "catalog:",
     "publint": "catalog:",
     "std-env": "^4.1.0",
-    "tsdown": "catalog:",
     "zod": "catalog:"
+  },
+  "engines": {
+    "node": ">= 22"
   }
 }

@@ -1,12 +1,12 @@
 {
   "name": "first",
   "private": true,
-  "packageManager": "pnpm@12.18.0",
   "type": "module",
   "scripts": {
     "test": "vitest run"
   },
   "dependencies": {
     "gunshi": "file:../../../packages/gunshi"
-  }
+  },
+  "packageManager": "pnpm@12.18.0"
 }

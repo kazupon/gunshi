@@ -1,7 +1,7 @@
 import global from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
-import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vite-plus/test'
 import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockErrorLog, defineMockLog, helpHint } from '../test/utils.ts'
@@ -21,7 +21,7 @@ import { renderValidationErrors } from './renderer.ts'
 import { hidden, string } from './combinators.ts'
 
 import type { ArgSchema, Args, ArgsValidationError } from 'args-tokens'
-import type { Mocked } from 'vitest'
+import type { Mocked } from 'vite-plus/test'
 import type { Plugin } from './plugin/core.ts'
 import type {
   CliOptions,

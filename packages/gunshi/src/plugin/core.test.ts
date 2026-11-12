@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, test, vi } from 'vitest'
+import { describe, expect, expectTypeOf, test, vi } from 'vite-plus/test'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { define, defineWithTypes } from '../definition.ts'

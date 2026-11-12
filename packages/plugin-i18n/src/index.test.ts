@@ -5,7 +5,7 @@ import renderer from '@gunshi/plugin-renderer'
 import resources from '@gunshi/resources'
 import { namespacedId, resolveArgKey, resolveBuiltInKey, resolveKey } from '@gunshi/shared'
 import { MessageFormat } from 'messageformat'
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vite-plus/test'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import { jsonArgs } from '../../gunshi/src/json.ts'
 import {

@@ -1,43 +1,25 @@
 {
   "name": "gunshi-monorepo",
-  "description": "Monorepo for gunshi - Modern javascript command-line library",
-  "private": true,
   "version": "1.0.0-rc.6",
+  "private": true,
+  "description": "Monorepo for gunshi - Modern javascript command-line library",
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/kazupon",
-  "bugs": {
-    "url": "https://github.com/kazupon/gunshi/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git"
   },
-  "packageManager": "pnpm@12.18.0",
-  "engines": {
-    "node": ">= 22"
-  },
-  "devEngines": {
-    "runtime": [
-      {
-        "name": "node",
-        "version": ">=22",
-        "onFail": "error"
-      },
-      {
-        "name": "bun",
-        "version": ">=1.1",
-        "onFail": "ignore"
-      }
-    ]
-  },
+  "funding": "https://github.com/sponsors/kazupon",
   "type": "module",
   "scripts": {
     "bench:mitata": "node --expose-gc bench/mitata.js",
-    "bench:vitest": "vitest bench --run",
+    "bench:vitest": "vp test bench --run",
     "build": "pnpm -r build",
     "build:bone": "pnpm -F @gunshi/bone build",
     "build:definition": "pnpm -F @gunshi/definition build",
@@ -55,77 +37,57 @@
     "changelog": "gh-changelogen --repo=kazupon/gunshi",
     "clean": "git clean -df",
     "dev:docs": "pnpm -F @gunshi/docs dev",
-    "dev:eslint": "pnpx @eslint/config-inspector --config eslint.config.ts",
-    "e2e": "vitest run --config vitest.e2e.config.ts",
+    "e2e": "vp test run --config vitest.e2e.config.ts",
     "fix": "pnpm run \"/^fix:/\"",
-    "fix:eslint": "eslint . --fix",
+    "fix:check": "vp check --fix",
     "fix:knip": "knip --fix --no-exit-code",
-    "fix:oxfmt": "oxfmt . --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
-    "fix:oxlint": "oxlint --type-aware --type-check --fix",
     "lint": "pnpm run \"/^lint:/\"",
-    "lint:eslint": "eslint . --cache",
+    "lint:check": "vp check",
     "lint:knip": "knip",
-    "lint:oxfmt": "oxfmt . --check --config ./node_modules/@kazupon/prettier-config/index.json",
-    "lint:oxlint": "oxlint --type-aware --type-check",
     "prepare": "git config --local core.hooksPath .githooks",
     "preview:docs": "pnpm -F @gunshi/docs preview",
     "release": "bumpp",
-    "test": "vitest --typecheck run",
-    "test:core": "vitest --typecheck run packages/gunshi",
-    "test:plugin-completion": "vitest --typecheck run packages/plugin-completion",
-    "test:plugin-dryrun": "vitest --typecheck run packages/plugin-dryrun",
-    "test:plugin-global": "vitest --typecheck run packages/plugin-global",
-    "test:plugin-i18n": "vitest --typecheck run packages/plugin-i18n",
-    "test:plugin-renderer": "vitest --typecheck run packages/plugin-renderer",
-    "test:plugin-suggestion": "vitest --typecheck run packages/plugin-suggestion"
+    "test": "vp test run --typecheck",
+    "test:core": "vp test run --typecheck packages/gunshi",
+    "test:plugin-completion": "vp test run --typecheck packages/plugin-completion",
+    "test:plugin-dryrun": "vp test run --typecheck packages/plugin-dryrun",
+    "test:plugin-global": "vp test run --typecheck packages/plugin-global",
+    "test:plugin-i18n": "vp test run --typecheck packages/plugin-i18n",
+    "test:plugin-renderer": "vp test run --typecheck packages/plugin-renderer",
+    "test:plugin-suggestion": "vp test run --typecheck packages/plugin-suggestion"
   },
   "devDependencies": {
-    "@eslint/markdown": "^8.0.1",
-    "@kazupon/eslint-config": "^0.45.0",
-    "@kazupon/eslint-plugin": "^0.7.1",
-    "@kazupon/prettier-config": "^0.2.0",
+    "@kazupon/vp-config": "catalog:",
     "@types/node": "catalog:",
-    "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "@vitest/coverage-v8": "^5.0.0",
+    "@vitest/coverage-v8": "5.1.0",
     "bumpp": "^12.0.0",
-    "eslint": "^10.3.0",
-    "eslint-plugin-jsdoc": "^65.0.0",
-    "eslint-plugin-jsonc": "^3.1.2",
-    "eslint-plugin-markdown-preferences": "^0.43.0",
-    "eslint-plugin-module-interop": "^0.4.0",
-    "eslint-plugin-oxlint": "^1.86.0",
-    "eslint-plugin-regexp": "^3.1.0",
-    "eslint-plugin-unused-imports": "^4.4.1",
-    "eslint-plugin-vue": "^10.9.1",
-    "eslint-plugin-vue-composable": "^1.0.0",
-    "eslint-plugin-yml": "^3.3.2",
     "gh-changelogen": "^2.0.0",
     "gunshi019": "npm:gunshi@0.19.0",
-    "knip": "^6.12.2",
-    "lint-staged": "^17.0.0",
+    "knip": "^6.45.1",
     "mitata": "^1.0.34",
-    "oxfmt": "^0.76.0",
-    "oxlint": "^1.86.0",
-    "oxlint-tsgolint": "^7.0.2003",
     "pkg-pr-new": "^0.0.93",
     "tsx": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.59.2",
+    "vite-plus": "catalog:",
     "vitepress-api-references": "catalog:",
-    "vitest": "^5.0.0"
+    "vitest": "5.1.0"
   },
-  "lint-staged": {
-    "*.ts?(x)": [
-      "oxfmt --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
-      "oxlint --config .oxlintrc.json --type-aware --type-check --fix --no-error-on-unmatched-pattern"
-    ],
-    "*.{js,mjs,cjs}": [
-      "oxfmt --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
-      "oxlint --config .oxlintrc.json --fix --no-error-on-unmatched-pattern"
-    ],
-    "*.{json,jsonc,json5,md,yml,yaml}": [
-      "oxfmt --config ./node_modules/@kazupon/prettier-config/index.json --no-error-on-unmatched-pattern",
-      "eslint --fix"
+  "devEngines": {
+    "runtime": [
+      {
+        "name": "node",
+        "version": ">=22",
+        "onFail": "error"
+      },
+      {
+        "name": "bun",
+        "version": ">=1.1",
+        "onFail": "ignore"
+      }
     ]
-  }
+  },
+  "engines": {
+    "node": ">= 22"
+  },
+  "packageManager": "pnpm@12.18.0"
 }

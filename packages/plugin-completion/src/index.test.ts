@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { runCommand } from '../../../scripts/utils.ts'
 
 const SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/basic.node.ts complete --`

@@ -1,45 +1,30 @@
 {
   "name": "@gunshi/shared",
-  "description": "shared utils for gunshi",
   "version": "1.0.0-rc.6",
+  "description": "shared utils for gunshi",
+  "keywords": [
+    "cli",
+    "gunshi"
+  ],
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/kazupon",
-  "bugs": {
-    "url": "https://github.com/kazupon/gunshi/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git",
     "directory": "packages/shared"
   },
-  "keywords": [
-    "gunshi",
-    "cli"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">= 22"
-  },
-  "type": "module",
+  "funding": "https://github.com/sponsors/kazupon",
   "files": [
     "lib"
   ],
+  "type": "module",
   "module": "lib/index.js",
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js",
-      "require": "./lib/index.js",
-      "default": "./lib/index.js"
-    },
-    "./package.json": "./package.json"
-  },
   "types": "lib/index.d.ts",
   "typesVersions": {
     "*": {
@@ -49,15 +34,29 @@
       ]
     }
   },
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "prepack": "pnpm build"
   },
   "devDependencies": {
     "@gunshi/plugin": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "gunshi": "workspace:*",
-    "publint": "catalog:",
-    "tsdown": "catalog:"
+    "publint": "catalog:"
+  },
+  "engines": {
+    "node": ">= 22"
   }
 }
