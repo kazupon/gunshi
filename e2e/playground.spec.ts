@@ -1,6 +1,6 @@
 import { existsSync, promises as fs } from 'node:fs'
 import path from 'node:path'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { runCommand } from '../scripts/utils.ts'
 
 async function getFixtureDirents(fixturePath: string) {

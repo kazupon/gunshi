@@ -18,7 +18,7 @@ import {
 } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { afterAll, beforeAll, describe, expect, test } from 'vite-plus/test'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const GUNSHI = path.join(ROOT, 'packages', 'gunshi')

@@ -12,19 +12,19 @@
     {
       "matchPackageNames": [
         "typescript",
-        "@typescript/native-preview",
-        "eslint",
-        "@eslint/markdown",
-        "@eslint/compat",
-        "@kazupon/eslint-config",
-        "@kazupon/prettier-config",
-        "prettier",
+        "vite-plus",
+        "@kazupon/vp-config",
         "knip",
         "vitest",
         "pkg-pr-new",
         "bumpp"
       ],
       "minimumReleaseAge": null
+    },
+    {
+      "description": "Update vitest with Vite+, which bundles its own vitest: the playground example imports vitest from the root",
+      "groupName": "vite-plus",
+      "matchPackageNames": ["vite-plus", "vitest", "@vitest/coverage-v8"]
     },
     {
       "description": "Hold tsdown at 0.22.x until sxzz/rolldown-plugin-dts#312 is fixed. See NOTES.md",

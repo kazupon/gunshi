@@ -1,4 +1,4 @@
-import { onTestFinished, vi } from 'vitest'
+import { onTestFinished, vi } from 'vite-plus/test'
 
 /**
  *

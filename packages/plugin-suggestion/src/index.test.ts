@@ -1,7 +1,7 @@
 import i18n from '@gunshi/plugin-i18n'
 import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { cli, define, lazy, plugin } from 'gunshi'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vite-plus/test'
 import { defineMockErrorLog, helpHint } from '../../gunshi/test/utils.ts'
 import { defineSuggestNames, levenshtein, suggestion } from './index.ts'
 

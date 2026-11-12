@@ -1,7 +1,7 @@
 import { defineWithTypes } from '@gunshi/definition'
 import global, { pluginId as globalPluginId } from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vite-plus/test'
 import { cli } from './index.ts'
 
 import type { GlobalExtension, PluginId } from '@gunshi/plugin-global'

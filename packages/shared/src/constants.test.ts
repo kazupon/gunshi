@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'vite-plus/test'
 import {
   ARG_ERROR_RESOURCE_KEYS,
   COMMAND_BUILTIN_RESOURCE_KEYS,

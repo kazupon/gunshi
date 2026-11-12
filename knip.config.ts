@@ -3,7 +3,7 @@ import type { KnipConfig } from 'knip'
 export default {
   workspaces: {
     '.': {
-      entry: ['scripts/*.ts', 'bump.config.ts'],
+      entry: ['scripts/*.ts', 'bump.config.ts', 'vitest.e2e.config.ts'],
       project: '**/*.ts'
     },
     'packages/gunshi': {
@@ -28,14 +28,7 @@ export default {
     }
   },
   ignore: ['**/src/**.test-d.ts', 'bench/**', 'design/**/*.ts', 'playground/**'],
-  ignoreDependencies: [
-    'lint-staged',
-    'mitata',
-    'gunshi019',
-    '@kazupon/prettier-config',
-    '@kazupon/eslint-plugin',
-    '@typescript/native-preview'
-  ],
+  ignoreDependencies: ['mitata', 'gunshi019'],
   ignoreBinaries: [
     // `pnpm view` is a built-in pnpm subcommand, not a separate binary.
     // Used in .github/workflows/release.yml for idempotency checks.

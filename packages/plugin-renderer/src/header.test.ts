@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'vite-plus/test'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import { renderHeader } from './header.ts'
 

@@ -6,7 +6,7 @@
  * tests) and tsgo (`oxlint --type-check`) report its error on the line under `@ts-expect-error`.
  */
 
-import { describe, expectTypeOf, test } from 'vitest'
+import { describe, expectTypeOf, test } from 'vite-plus/test'
 import { args, extend, integer, merge, withDefault } from './combinators.ts'
 import { createCommandContext } from './context.ts'
 import { define, lazy } from './definition.ts'

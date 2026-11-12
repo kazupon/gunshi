@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vite-plus/test'
 import register from '../test/fixtures/register.ts'
 import show from '../test/fixtures/show.ts'
 import { define, lazy } from './definition.ts'

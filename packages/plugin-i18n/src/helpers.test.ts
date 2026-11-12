@@ -1,6 +1,6 @@
 import { DeepWriteable } from '@gunshi/shared'
 import { cli, define, lazy } from 'gunshi'
-import { describe, expect, expectTypeOf, test, vi } from 'vitest'
+import { describe, expect, expectTypeOf, test, vi } from 'vite-plus/test'
 import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
 import i18n from './index.ts'
 

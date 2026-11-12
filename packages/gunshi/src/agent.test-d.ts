@@ -8,7 +8,7 @@
  * - `AgentProfile` is NOT a named type export.
  */
 
-import { expectTypeOf, test } from 'vitest'
+import { expectTypeOf, test } from 'vite-plus/test'
 import * as agent from './agent.ts'
 import { getAgentProfile } from './agent.ts'
 

@@ -6,7 +6,7 @@
  */
 
 import { cli, define, lazy } from 'gunshi'
-import { expectTypeOf, test } from 'vitest'
+import { expectTypeOf, test } from 'vite-plus/test'
 import { defineI18n, defineI18nWithTypes, withI18nResource } from './helpers.ts'
 
 import type { SubCommandable } from 'gunshi'

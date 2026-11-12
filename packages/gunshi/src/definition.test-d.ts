@@ -1,4 +1,4 @@
-import { describe, expectTypeOf, test } from 'vitest'
+import { describe, expectTypeOf, test } from 'vite-plus/test'
 import { define, defineWithTypes, jsonArgs, lazy, lazyWithTypes } from './definition.ts'
 
 import type { Args, Command, CommandRunner, GunshiParams } from './types.ts'

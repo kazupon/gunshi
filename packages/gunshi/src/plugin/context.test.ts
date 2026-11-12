@@ -1,10 +1,10 @@
-import { afterEach, beforeEach, describe, expect, expectTypeOf, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, expectTypeOf, test, vi } from 'vite-plus/test'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from './context.ts'
 
 import type { Args } from 'args-tokens'
-import type { MockInstance } from 'vitest'
+import type { MockInstance } from 'vite-plus/test'
 import type { GunshiParams } from '../types.ts'
 
 describe('PluginContext#addGlobalOpttion', () => {
