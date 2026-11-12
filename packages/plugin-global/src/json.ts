@@ -19,6 +19,7 @@ import {
   localizeBuiltinResource,
   localizeValidationError,
   namespacedId,
+  orderGlobalOptionsLast,
   resolveArgKey,
   resolveBuiltInKey,
   resolveDisplayName,
@@ -100,7 +101,7 @@ type Context = Readonly<CommandContext<DefaultGunshiParams>>
  * The reasons that are not derived from the codes by the rule: they would read as something else.
  */
 const RENAMED_REASONS: ReadonlyMap<string, string> = new Map([
-  // a conflict with a resource that exists, in the reasons of Vercel's guidelines
+  // `conflict` is a conflict with a resource that exists, as HTTP 409 is
   [ArgsValidationErrorKeys.conflict, 'conflicting_options'],
   // `not_found` is a resource that is not found
   [CommandNotFoundErrorKeys.notFound, 'unknown_command'],
@@ -514,7 +515,8 @@ export interface JsonHelp {
      */
     arguments: JsonHelpArgument[]
     /**
-     * The options, the global options included.
+     * The options, the global options included, in the order of the help for people: the options of
+     * the command first, and the global options in effect after them.
      */
     options: JsonHelpOption[]
     /**
@@ -556,7 +558,18 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
 
   const options: JsonHelpOption[] = []
   const positionals: JsonHelpArgument[] = []
-  for (const [key, schema] of Object.entries(ctx.args) as [string, ArgSchema][]) {
+  // the options in the order of the help for people: the options of the command first, the global options
+  // in effect after them. The positional arguments keep the order in which they are merged, which is the
+  // order in which they are bound, a global one that a plugin adds included, as the help lists them
+  const entries = Object.entries(ctx.args) as [string, ArgSchema][]
+  const args = [
+    ...entries.filter(([, schema]) => schema.type === 'positional'),
+    ...orderGlobalOptionsLast(
+      entries.filter(([, schema]) => schema.type !== 'positional'),
+      ctx.env.globalOptions
+    )
+  ]
+  for (const [key, schema] of args) {
     if (schema.hidden) {
       continue
     }
