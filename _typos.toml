@@ -9,6 +9,8 @@ healt = "healt"
 outpu = "outpu"
 # Intentional misspelling used in the tests of a deprecated option, which the hint does not suggest.
 formt = "formt"
+# Intentional misspelling used in the test of the negated form of a deprecated option, which the hint does not suggest.
+legac = "legac"
 
 [default.extend-identifiers]
 # A type exported by @gunshi/shared. Renaming it would break the code that imports it.
