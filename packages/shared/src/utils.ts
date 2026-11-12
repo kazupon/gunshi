@@ -254,3 +254,31 @@ export function isWithoutRun(ctx: object): boolean {
   ]
   return registry?.has(ctx) === true
 }
+
+/**
+ * Order the arguments of a command as the help lists them: the arguments of the command first, and the
+ * global options in effect after them, each in the order in which they are merged.
+ *
+ * NOTE(kazupon): the reader looks for the options of the command, and the global options, such as `--help`
+ * and `--version`, are the same for every command. The help for people and the help as JSON both list the
+ * options in this order, so that they agree. Only the help is ordered this way: the arguments are parsed as
+ * `resolveCommandArgs` merges them, the global options first. An argument of the command that replaces a
+ * global option is not in effect as a global option, so it is listed with the arguments of the command.
+ *
+ * @typeParam T - The type of the value of an argument, such as its schema
+ * @param args - The arguments, as pairs of a name and a value, in the order in which they are merged
+ * @param globalOptions - The global options in effect, as `ctx.env.globalOptions` has them
+ * @returns The arguments, the global options in effect last
+ */
+export function orderGlobalOptionsLast<T>(
+  args: [string, T][],
+  globalOptions: ReadonlyMap<string, unknown> | undefined
+): [string, T][] {
+  if (!globalOptions || globalOptions.size === 0) {
+    return [...args]
+  }
+  return [
+    ...args.filter(([name]) => !globalOptions.has(name)),
+    ...args.filter(([name]) => globalOptions.has(name))
+  ]
+}

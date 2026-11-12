@@ -6020,8 +6020,6 @@ describe('--help and --version with --json', () => {
         commands: [],
         arguments: [],
         options: [
-          help,
-          version,
           {
             name: '--json',
             short: null,
@@ -6047,11 +6045,58 @@ describe('--help and --version with --json', () => {
             choices: null,
             negatable: false,
             global: false
-          }
+          },
+          help,
+          version
         ],
         json: true
       }
     })
+  })
+
+  test('--help lists the options in the order of the help for people, the global options last', async () => {
+    const release = define({
+      name: 'release',
+      args: {
+        ...jsonArgs,
+        // it replaces the global option, so it is an option of the command, where it is merged
+        version: { type: 'string', description: 'The version to release' },
+        tag: { type: 'string', description: 'The tag' }
+      },
+      run: () => ({ released: true })
+    })
+    const silent = {
+      ...options,
+      subCommands: { ...options.subCommands, release },
+      usageSilent: true
+    }
+    const namesInJson = (json: string | undefined) =>
+      (JSON.parse(json as string) as { help: { options: { name: string }[] } }).help.options.map(
+        option => option.name
+      )
+    const namesInText = (text: string | undefined) => {
+      const lines = (text as string).split('\n')
+      const names: string[] = []
+      for (const line of lines.slice(lines.findIndex(line => line.trim() === 'OPTIONS:') + 1)) {
+        if (line.trim() === '') {
+          break
+        }
+        names.push(/--[\w-]+/.exec(line)?.[0] as string)
+      }
+      return names
+    }
+
+    for (const command of ['status', 'release']) {
+      expect(namesInJson(await cli([command, '--help', '--json'], entry, silent))).toEqual(
+        namesInText(await cli([command, '--help'], entry, silent))
+      )
+    }
+    expect(namesInJson(await cli(['release', '--help', '--json'], entry, silent))).toEqual([
+      '--version',
+      '--json',
+      '--tag',
+      '--help'
+    ])
   })
 
   test('--help prints the help of a command without jsonArgs as JSON too', async () => {
@@ -6069,8 +6114,6 @@ describe('--help and --version with --json', () => {
         commands: [],
         arguments: [{ name: 'target', description: 'The target', required: true, multiple: false }],
         options: [
-          help,
-          version,
           {
             name: '--env',
             short: null,
@@ -6096,7 +6139,9 @@ describe('--help and --version with --json', () => {
             choices: null,
             negatable: true,
             global: false
-          }
+          },
+          help,
+          version
         ],
         json: false
       }

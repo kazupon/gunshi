@@ -5,6 +5,7 @@ import { define } from '../../gunshi/src/definition.ts'
 import {
   composeNegatableDescription,
   isWithoutRun,
+  orderGlobalOptionsLast,
   resolveArgKey,
   resolveCommandArgs,
   resolveDisplayName,
@@ -185,5 +186,56 @@ describe('isWithoutRun', () => {
 
     expect(marks).toEqual([true, false])
     expect(isWithoutRun({})).toBe(false)
+  })
+})
+
+describe('orderGlobalOptionsLast', () => {
+  const inEffect = new Map<string, ArgSchema>([
+    ['help', { type: 'boolean' }],
+    ['version', { type: 'boolean' }]
+  ])
+  const names = (args: [string, unknown][]) => args.map(([name]) => name)
+
+  test('puts the arguments of the command first, and the global options in effect after them, each in the order in which they are merged', () => {
+    const args: [string, string][] = [
+      ['help', 'h'],
+      ['version', 'v'],
+      ['name', 'n'],
+      ['count', 'c']
+    ]
+
+    expect(names(orderGlobalOptionsLast(args, inEffect))).toEqual([
+      'name',
+      'count',
+      'help',
+      'version'
+    ])
+  })
+
+  test('puts an argument that replaces a global option with the arguments of the command, where it is merged', () => {
+    // the core leaves the global options that the command declares out of the ones in effect
+    const args: [string, string][] = [
+      ['help', 'h'],
+      ['version', 'the version of the command'],
+      ['name', 'n']
+    ]
+
+    expect(names(orderGlobalOptionsLast(args, new Map([['help', inEffect.get('help')]])))).toEqual([
+      'version',
+      'name',
+      'help'
+    ])
+  })
+
+  test('keeps the order without global options in effect, and leaves the arguments as they are', () => {
+    const args: [string, string][] = [
+      ['help', 'h'],
+      ['name', 'n']
+    ]
+
+    expect(orderGlobalOptionsLast(args, undefined)).toEqual(args)
+    expect(orderGlobalOptionsLast(args, new Map())).toEqual(args)
+    expect(orderGlobalOptionsLast(args, inEffect)).not.toBe(args)
+    expect(names(args)).toEqual(['help', 'name'])
   })
 })
