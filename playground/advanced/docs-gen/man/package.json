@@ -1,13 +1,13 @@
 {
   "name": "man",
   "private": true,
-  "packageManager": "pnpm@12.18.0",
   "type": "module",
   "scripts": {
     "start": "node cli.ts"
   },
   "dependencies": {
-    "marked-man": "2.1.1",
-    "gunshi": "file:../../../../packages/gunshi"
-  }
+    "gunshi": "file:../../../../packages/gunshi",
+    "marked-man": "2.1.1"
+  },
+  "packageManager": "pnpm@12.18.0"
 }

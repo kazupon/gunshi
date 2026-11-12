@@ -1,47 +1,32 @@
 {
   "name": "@gunshi/combinators",
-  "description": "parser combinators for gunshi argument schema",
   "version": "1.0.0-rc.6",
+  "description": "parser combinators for gunshi argument schema",
+  "keywords": [
+    "cli",
+    "combinators",
+    "gunshi",
+    "parser"
+  ],
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/kazupon",
-  "bugs": {
-    "url": "https://github.com/kazupon/gunshi/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git",
     "directory": "packages/combinators"
   },
-  "keywords": [
-    "gunshi",
-    "combinators",
-    "parser",
-    "cli"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">= 22"
-  },
-  "type": "module",
+  "funding": "https://github.com/sponsors/kazupon",
   "files": [
     "lib"
   ],
+  "type": "module",
   "module": "lib/index.js",
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js",
-      "require": "./lib/index.js",
-      "default": "./lib/index.js"
-    },
-    "./package.json": "./package.json"
-  },
   "types": "lib/index.d.ts",
   "typesVersions": {
     "*": {
@@ -51,6 +36,18 @@
       ]
     }
   },
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsdown",
     "prepack": "pnpm build"
@@ -59,5 +56,8 @@
     "gunshi": "workspace:*",
     "publint": "catalog:",
     "tsdown": "catalog:"
+  },
+  "engines": {
+    "node": ">= 22"
   }
 }

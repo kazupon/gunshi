@@ -1,7 +1,6 @@
 {
   "name": "loading",
   "private": true,
-  "packageManager": "pnpm@12.18.0",
   "type": "module",
   "scripts": {
     "start": "node cli.ts"
@@ -10,5 +9,6 @@
     "@gunshi/plugin-i18n": "file:../../../../packages/plugin-i18n",
     "@gunshi/resources": "file:../../../../packages/resources",
     "gunshi": "file:../../../../packages/gunshi"
-  }
+  },
+  "packageManager": "pnpm@12.18.0"
 }

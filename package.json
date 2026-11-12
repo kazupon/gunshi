@@ -1,39 +1,21 @@
 {
   "name": "gunshi-monorepo",
-  "description": "Monorepo for gunshi - Modern javascript command-line library",
-  "private": true,
   "version": "1.0.0-rc.6",
+  "private": true,
+  "description": "Monorepo for gunshi - Modern javascript command-line library",
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/kazupon",
-  "bugs": {
-    "url": "https://github.com/kazupon/gunshi/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git"
   },
-  "packageManager": "pnpm@12.18.0",
-  "engines": {
-    "node": ">= 22"
-  },
-  "devEngines": {
-    "runtime": [
-      {
-        "name": "node",
-        "version": ">=22",
-        "onFail": "error"
-      },
-      {
-        "name": "bun",
-        "version": ">=1.1",
-        "onFail": "ignore"
-      }
-    ]
-  },
+  "funding": "https://github.com/sponsors/kazupon",
   "type": "module",
   "scripts": {
     "bench:mitata": "node --expose-gc bench/mitata.js",
@@ -89,5 +71,23 @@
     "vite-plus": "catalog:",
     "vitepress-api-references": "catalog:",
     "vitest": "5.1.0"
-  }
+  },
+  "devEngines": {
+    "runtime": [
+      {
+        "name": "node",
+        "version": ">=22",
+        "onFail": "error"
+      },
+      {
+        "name": "bun",
+        "version": ">=1.1",
+        "onFail": "ignore"
+      }
+    ]
+  },
+  "engines": {
+    "node": ">= 22"
+  },
+  "packageManager": "pnpm@12.18.0"
 }

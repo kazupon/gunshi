@@ -1,47 +1,32 @@
 {
   "name": "@gunshi/plugin-suggestion",
-  "description": "suggestion plugin for gunshi",
   "version": "1.0.0-rc.6",
+  "description": "suggestion plugin for gunshi",
+  "keywords": [
+    "cli",
+    "gunshi",
+    "plugin",
+    "suggestion"
+  ],
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
-  },
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/kazupon",
-  "bugs": {
-    "url": "https://github.com/kazupon/gunshi/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kazupon/gunshi.git",
     "directory": "packages/plugin-suggestion"
   },
-  "keywords": [
-    "gunshi",
-    "suggestion",
-    "plugin",
-    "cli"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">= 22"
-  },
-  "type": "module",
+  "funding": "https://github.com/sponsors/kazupon",
   "files": [
     "lib"
   ],
+  "type": "module",
   "module": "lib/index.js",
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js",
-      "require": "./lib/index.js",
-      "default": "./lib/index.js"
-    },
-    "./package.json": "./package.json"
-  },
   "types": "lib/index.d.ts",
   "typesVersions": {
     "*": {
@@ -51,6 +36,18 @@
       ]
     }
   },
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsdown",
     "build:docs": "tsx ../../scripts/api-references.ts",
@@ -59,14 +56,17 @@
   "dependencies": {
     "@gunshi/plugin": "workspace:*"
   },
-  "peerDependencies": {
-    "@gunshi/plugin-i18n": "workspace:*"
-  },
   "devDependencies": {
     "@gunshi/plugin-i18n": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "gunshi": "workspace:*",
     "publint": "catalog:",
     "tsdown": "catalog:"
+  },
+  "peerDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*"
+  },
+  "engines": {
+    "node": ">= 22"
   }
 }

@@ -1,15 +1,15 @@
 {
   "name": "bun",
-  "module": "cli.ts",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "module": "cli.ts",
+  "dependencies": {
+    "gunshi": "0.37.3"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^6.0.0"
-  },
-  "dependencies": {
-    "gunshi": "0.37.3"
   }
 }
