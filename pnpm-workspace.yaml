@@ -31,7 +31,7 @@ supportedArchitectures:
     - glibc
     - musl
 catalog:
-  typescript: ^6.0.3
+  typescript: ^7.0.2
   zod: ^4.4.3
   publint: ^0.3.20
   vite-plus: 1.6.0

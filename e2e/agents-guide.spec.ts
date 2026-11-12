@@ -704,8 +704,8 @@ declare function find(): Project
       [
         'returns-an-object-without-json-args.ts',
         `export const c = define({ name: 'c', run: () => ({ project: find() }) })`,
-        "is not assignable to type 'Awaitable<string | void>'",
-        "is not assignable to type 'Awaitable<string | void>'"
+        "is not assignable to type 'Awaitable<void | string>'",
+        "'Awaitable<void | string>'"
       ]
     ]
     for (const [file, code] of cases) {
