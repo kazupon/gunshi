@@ -14,12 +14,14 @@ import {
   JsonOutputErrorKeys
 } from '@gunshi/plugin'
 import {
+  isDeprecated,
   isJsonArg,
   isWithoutRun,
   localizeBuiltinResource,
   localizeValidationError,
   namespacedId,
   orderGlobalOptionsLast,
+  renderDeprecatedCommands,
   resolveArgKey,
   resolveBuiltInKey,
   resolveDisplayName,
@@ -502,6 +504,11 @@ export interface JsonHelp {
      */
     description: string | null
     /**
+     * What the help says when the command, or a group above it, is deprecated: one sentence for each, on a line
+     * of its own, such as `push is deprecated. Use deploy.`, or `null`.
+     */
+    deprecated: string | null
+    /**
      * Whether the command runs by itself, without a sub-command: it has `run`. A command with sub-commands
      * and no `run` prints its usage instead.
      */
@@ -543,8 +550,8 @@ interface RendererExtension {
 
 /**
  * Create the help as JSON: the command, its sub-commands, its positional arguments, and its options,
- * from the metadata that the help is rendered from. A hidden argument and an internal command are left
- * out, as the help leaves them out.
+ * from the metadata that the help is rendered from. A hidden or deprecated argument and an internal or
+ * deprecated command are left out, as the help leaves them out.
  *
  * @param ctx - The command context
  * @returns The help as JSON
@@ -570,7 +577,7 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
     )
   ]
   for (const [key, schema] of args) {
-    if (schema.hidden) {
+    if (schema.hidden || isDeprecated(schema.deprecated)) {
       continue
     }
     const description = await describe(resolveArgKey(key, ctx.name), schema.description)
@@ -618,6 +625,7 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
       command: argv.join(' '),
       argv,
       description: await describe(resolveKey('description', ctx.name), ctx.description),
+      deprecated: (await renderDeprecatedCommands(ctx)).join('\n') || null,
       /**
        * NOTE(kazupon): the help for people tells it by listing the command first among its sub-commands,
        * as `[app]`, only when it has `run` (#866), and the document lists the sub-commands only. It is

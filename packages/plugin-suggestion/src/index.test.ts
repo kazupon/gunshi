@@ -285,6 +285,29 @@ describe('suggestion plugin', () => {
     expect(stderr()).toBe('Command not found: lss\nDid you mean list?' + helpHint())
   })
 
+  test('does not suggest a deprecated command or a deprecated option, which the help leaves out', async () => {
+    const stderr = defineMockErrorLog()
+    const subCommands = {
+      deploy: define({
+        name: 'deploy',
+        args: { output: { type: 'string' }, format: { type: 'string', deprecated: true } },
+        run: vi.fn<() => void>()
+      }),
+      push: define({ name: 'push', deprecated: 'Use deploy.', run: vi.fn<() => void>() })
+    }
+
+    await cli(['pus'], define({ name: 'main' }), { subCommands, plugins: [suggestion()] })
+    expect(stderr()).toBe('Command not found: pus' + helpHint())
+
+    await cli(['deploy', '--formt', 'json'], define({ name: 'main' }), {
+      subCommands,
+      strict: true,
+      plugins: [suggestion()]
+    })
+    expect(stderr()).toContain('Unknown option: --formt' + helpHint(['deploy']))
+    expect(stderr()).not.toContain('Did you mean')
+  })
+
   test('does not suggest an internal command, which the help leaves out', async () => {
     const stderr = defineMockErrorLog()
 

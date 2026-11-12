@@ -36,6 +36,7 @@ export {
   boolean,
   choice,
   combinator,
+  deprecated,
   describe,
   extend,
   float,

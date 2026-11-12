@@ -97,7 +97,7 @@ Without i18n, the plugin falls back to `Did you mean {$name}?`.
 
 The plugin does not detect unknown options or unknown commands by itself.
 Gunshi core creates structured validation errors and provides candidate metadata.
-The candidates are the commands and the options that the help lists: an internal command and a `hidden` option are left out.
+The candidates are the commands and the options that the help lists: an internal or deprecated command, and a `hidden` or deprecated option are left out. An alias of a command is not a candidate either: the hint offers the name.
 This plugin only decorates validation error rendering and appends suggestion hints.
 
 With `--json`, gunshi prints the validation errors as one line of JSON, without the renderer of the validation errors, so no hint is added. The JSON error points to the help of the command in `next`, as the command after the hints does for people.

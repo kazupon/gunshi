@@ -59,7 +59,8 @@ export const COMMAND_BUILTIN_RESOURCE_KEYS = [
   'NEGATABLE',
   'DEFAULT',
   'CHOICES',
-  'CAUSEDBY'
+  'CAUSEDBY',
+  'DEPRECATED'
 ] as const
 
 export const ARG_ERROR_RESOURCE_KEYS = [

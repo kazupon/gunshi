@@ -8,10 +8,12 @@ import {
   ARG_NEGATABLE_PREFIX,
   COMMON_ARGS,
   composeNegatableDescription,
+  isDeprecated,
   isWithoutRun,
   resolveExamples as _resolvedExamples,
   makeShortLongOptionPair,
   orderGlobalOptionsLast,
+  renderDeprecatedCommands,
   resolveArgKey,
   resolveBuiltInKey,
   resolveDisplayName,
@@ -37,7 +39,7 @@ type Extensions = Record<PluginId, UsageRendererExtension>
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
 
 function isHiddenArg(schema: ArgSchema): boolean {
-  return (schema as { hidden?: boolean }).hidden === true
+  return (schema as { hidden?: boolean }).hidden === true || isDeprecated(schema.deprecated)
 }
 
 function getVisibleOptionalArgs(args: Args): [string, ArgSchema][] {
@@ -65,9 +67,15 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
 
   // render description section (sub command executed only)
   if (ctx.callMode === 'subCommand') {
-    const description = await resolveDescription(ctx)
-    if (description) {
-      messages.push(description, '')
+    /**
+     * NOTE(kazupon): the help of a deprecated command, and of a command under a deprecated group, says so after
+     * the description, with what to use instead, as the warning does when it runs. The lists leave it out.
+     */
+    const lines = [await resolveDescription(ctx), ...(await renderDeprecatedCommands(ctx))].filter(
+      Boolean
+    )
+    if (lines.length > 0) {
+      messages.push(...lines, '')
     }
   }
 

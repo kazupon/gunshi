@@ -436,7 +436,7 @@ When the loader returns a Command object, Gunshi resolves the command from both 
 - **Properties are not merged**: If both of them define a property such as `args` or `rendering`, the whole value of the loaded command is used
 - **`run` comes from the loader**: The loader returns the runner, or a command with `run`, and the definition has none. A `run` in the definition is a type error in TypeScript, and is not used. A loaded command without `run` is a command without `run`: it fails with `'run' is required in command: <name>` when it runs, unless it has sub-commands
 
-The command is found before it is loaded, so it is found by the `aliases` of the definition only.
+The command is found before it is loaded, so it is found by the `aliases` of the definition only, and the command list of the help leaves it out by the `deprecated` of the definition.
 
 In the example above, `my-cli config --help` shows the description `Config command (debug: false)` and the `--verbose` option, which come from the loaded command. On the other hand, `my-cli --help` lists the command as `Dynamically configured command`, because the command list is rendered from the definition without calling the loader.
 

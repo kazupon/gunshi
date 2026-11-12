@@ -7,6 +7,8 @@ lod = "lod"
 healt = "healt"
 # Intentional misspelling used in the test for the candidates of an unknown option.
 outpu = "outpu"
+# Intentional misspelling used in the tests of a deprecated option, which the hint does not suggest.
+formt = "formt"
 
 [default.extend-identifiers]
 # A type exported by @gunshi/shared. Renaming it would break the code that imports it.

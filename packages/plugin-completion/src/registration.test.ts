@@ -2676,6 +2676,48 @@ describe('aliases', () => {
     expect(await complete(['ls', '--a'])).toEqual(['--all\tAll the items', ':4'])
   })
 
+  test('a deprecated command and a deprecated option are not among the candidates', async () => {
+    output.length = 0
+    await cli(['complete', '--', ''], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      usageSilent: true,
+      subCommands: {
+        list,
+        push: defineCommand({ name: 'push', description: 'Push', deprecated: true, run: NOOP }),
+        deploy: defineCommand({
+          name: 'deploy',
+          description: 'Deploy',
+          args: {
+            output: { type: 'string', description: 'Output' },
+            format: { type: 'string', description: 'Format', deprecated: 'Use --output.' }
+          },
+          run: NOOP
+        })
+      },
+      plugins: [completion()]
+    })
+    expect(output).toEqual(['list\tList the items', 'deploy\tDeploy', ':4'])
+
+    output.length = 0
+    await cli(['complete', '--', 'deploy', '--'], defineCommand({ name: 'main', run: NOOP }), {
+      name: 'mycli',
+      usageSilent: true,
+      subCommands: {
+        deploy: defineCommand({
+          name: 'deploy',
+          args: {
+            output: { type: 'string', description: 'Output' },
+            format: { type: 'string', description: 'Format', deprecated: 'Use --output.' }
+          },
+          run: NOOP
+        })
+      },
+      plugins: [completion()]
+    })
+    expect(output).toContain('--output\tOutput')
+    expect(output.join('\n')).not.toContain('--format')
+  })
+
   test('the sub-commands of a group are completed after its alias', async () => {
     expect(await complete(['rmt', ''])).toEqual(['add\tAdd a remote', ':4'])
     expect(await complete(['rmt', ''])).toEqual(await complete(['remote', '']))

@@ -139,6 +139,7 @@ Commands also support these configuration properties:
 
 - `internal`: Boolean flag to mark commands as internal (default: `false`). Internal commands are hidden from help usage but remain fully functional: they are left out of the help, shell completion, the help as JSON, and the `Did you mean` hint for an unknown command, and still run when they are typed. This is useful for debug commands, administrative functions, or implementation details that shouldn't be exposed to end users.
 - `aliases`: Other names of the command, such as `['ls']` for `list`. The command runs with any of them, and `ctx.name` and `ctx.commandPath` have its name. An alias is accepted but not taught: the help, the `Did you mean` hint for an unknown command and shell completion show the name only. See [Aliases of Sub-commands](./composable.md#aliases-of-sub-commands).
+- `deprecated`: Mark the command as deprecated: `true`, or the text that tells what to use instead, such as `'Use deploy.'`. It still runs, and Gunshi warns when it runs; the help, the `Did you mean` hint and shell completion leave it out, as for an internal command. See [Renaming a Sub-command](./composable.md#renaming-a-sub-command).
 - `entry`: Boolean flag that marks the main command when subcommands exist (default: `undefined`). This property is typically set automatically by the framework. When used with the `fallbackToEntry` CLI option, it enables fallback behavior for unmatched subcommands.
 - `rendering`: Object to customize how the command displays help, usage, and error messages. This allows fine-grained control over command-level rendering output.
 
@@ -167,6 +168,7 @@ Each option can have the following properties:
 - `multiple`: Set to `true` if multiple option values are allowed
 - `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
 - `hidden`: Set to `true` to hide the argument from generated help/usage output while keeping it parseable.
+- `deprecated`: Mark the argument as deprecated: `true`, or the text that tells what to use instead, such as `'Use --output.'`. It is still parsed, the help leaves it out as `hidden` does, and Gunshi warns when it is given. See [Deprecated Options](#deprecated-options).
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
 - `choices`: The values that an `enum` option accepts. Required when `type` is 'enum', unless the option has a `parse` function, which then receives the value as it would for a 'string' option
 - `conflicts`: Specify mutually exclusive options that cannot be used together
@@ -402,6 +404,38 @@ See the arguments of the command:
 A command takes as many positional arguments as it declares, an optional one included. To take any number of them, declare a positional argument with `multiple: true`. The arguments after `--` are not positional arguments: they stay in `ctx.rest`.
 
 The error uses the `err:arg:unexpected-positional` resource key. As with an unknown option of `strict`, `--help` and `--version` are still answered, and after a command with sub-commands, a word that is not one of them is reported as an unknown command instead.
+
+#### Deprecated Options
+
+To rename an option without breaking the scripts that use its old name, keep the old one as a deprecated option, and use its value when the new one is not given:
+
+```js
+const exportCommand = define({
+  name: 'export',
+  args: {
+    output: { type: 'string', description: 'Output format' },
+    format: { type: 'string', deprecated: 'Use --output.' }
+  },
+  run: ctx => {
+    const output = ctx.values.output ?? ctx.values.format ?? 'text'
+    console.log(`Exporting as ${output}`)
+  }
+})
+```
+
+`app export --format json` still runs, and prints a warning to stderr before the command runs:
+
+```txt
+--format is deprecated. Use --output.
+```
+
+- The warning is printed once, even when the option is given twice. An option that only has its `default` is not given, and is not warned of
+- A deprecated positional argument is warned of in the same way, as `<name> is deprecated.`
+- The help, shell completion and the `Did you mean` hint for an unknown option leave a deprecated argument out, so that they teach what to use instead. `strict` still accepts it
+- With `--json`, nothing is warned of, so that stderr has a failure only, as one line of JSON. Nor with `usageSilent`, nor with `gunshi/bone`, which has no plugins
+- The sentence uses the `DEPRECATED` resource key, which the i18n plugin translates, followed by the text of `deprecated`
+
+The `deprecated()` combinator of `gunshi/combinators` marks a schema in the same way: `deprecated(string(), 'Use --output.')`.
 
 #### Options before sub-commands
 
