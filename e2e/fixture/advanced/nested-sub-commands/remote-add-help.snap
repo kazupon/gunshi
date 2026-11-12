@@ -6,7 +6,7 @@ USAGE:
   git remote add [OPTIONS] --url <url>
 
 OPTIONS:
+  --url <url>            Remote URL
   -h, --help             Display this help message
   -v, --version          Display this version
-  --url <url>            Remote URL
 

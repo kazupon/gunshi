@@ -158,10 +158,10 @@ USAGE:
   COMMAND [OPTIONS]
 
 OPTIONS:
-  -h, --help                 Display this help message
-  -v, --version              Display this version
   -n, --name <name>          Name to greet
   -u, --uppercase            Convert greeting to uppercase
+  -h, --help                 Display this help message
+  -v, --version              Display this version
 ```
 
 The help message automatically includes:

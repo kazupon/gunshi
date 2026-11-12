@@ -5,9 +5,9 @@ USAGE:
   my-cli [OPTIONS] --output <output>
 
 OPTIONS:
+  --output <output>
   -h, --help                 Display this help message
   -v, --version              Display this version
-  --output <output>
 
 
 Generated: xxxx-xx-xxTxx:xx:xx.xxxZ

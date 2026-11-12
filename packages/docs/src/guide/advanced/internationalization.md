@@ -662,10 +662,10 @@ USAGE:
   i18n-example [OPTIONS]
 
 OPTIONS:
-  -h, --help                 Display this help message
-  -v, --version              Display this version
   -n, --name <name>          Name to greet
   -f, --formal               Use formal greeting
+  -h, --help                 Display this help message
+  -v, --version              Display this version
 ```
 
 Japanese (`MY_LANG=ja-JP node cli.ts --help`):
@@ -677,10 +677,10 @@ i18n-example (i18n-example v1.0.0)
   i18n-example [オプション]
 
 オプション:
-  -h, --help                 このヘルプメッセージを表示
-  -v, --version              このバージョンを表示
   -n, --name <name>          挨拶する相手の名前
   -f, --formal               丁寧な挨拶を使用する
+  -h, --help                 このヘルプメッセージを表示
+  -v, --version              このバージョンを表示
 ```
 
 ## Important Notes on Custom Keys

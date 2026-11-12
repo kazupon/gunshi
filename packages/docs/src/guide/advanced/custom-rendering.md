@@ -258,9 +258,9 @@ USAGE:
   my-app [OPTIONS]
 
 OPTIONS:
+  -n, --name <name>          Name to use
   -h, --help                 Display this help message
   -v, --version              Display this version
-  -n, --name <name>          Name to use
 ```
 
 ### Disabling Renderers

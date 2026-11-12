@@ -3030,7 +3030,8 @@ describe('github issues', () => {
       expect(mapHelp).toBe(userHelp)
       expect(pluginHelp).toBe(userHelp)
       expect(pluginHelp).toContain('  [build] <target>')
-      expect(pluginHelp?.match(/^ {2}mycli --help$/gm)).toHaveLength(1)
+      expect(pluginHelp?.match(/^ {2}\[build\] /gm)).toHaveLength(1)
+      expect(pluginHelp?.match(/^ {2}mycli <COMMAND> --help$/gm)).toHaveLength(1)
     })
 
     test('does not add the entry to the command registry', async () => {

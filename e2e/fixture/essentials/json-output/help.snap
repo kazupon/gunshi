@@ -6,8 +6,8 @@ USAGE:
   projects list [OPTIONS]
 
 OPTIONS:
-  -h, --help               Display this help message
-  -v, --version            Display this version
   --json                   Output the result as JSON
   --limit <limit>          How many projects to list (default: 10)
+  -h, --help               Display this help message
+  -v, --version            Display this version
 

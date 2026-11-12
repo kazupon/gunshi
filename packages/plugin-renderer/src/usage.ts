@@ -254,23 +254,18 @@ async function renderCommandsSection<
     `${await ctx.extensions[pluginId].text(resolveBuiltInKey('FORMORE'))}:`
   )
   /**
-   * NOTE(kazupon): the CLI is named the same way the usage line and the entry row of the section
-   * above name it, because `CliOptions.name` is optional and the block would otherwise invite the
-   * reader to run `undefined --help`.
+   * NOTE(kazupon): the commands are pointed to with one line, a placeholder in place of the name of the
+   * command, not with a line for each command of the section above: those lines named the same commands
+   * again, and grew with them. The CLI is named the same way the usage line and the entry row of the
+   * section above name it, because `CliOptions.name` is optional and the line would otherwise invite the
+   * reader to run `undefined <COMMAND> --help`.
    */
   const entry = await resolveEntry(ctx)
   const basePath =
     ctx.commandPath && ctx.commandPath.length > 0 ? `${entry} ${ctx.commandPath.join(' ')}` : entry
-  messages.push(
-    ...loadedCommands.map(cmd => {
-      let commandStr = cmd.entry ? '' : cmd.name || ''
-      if (commandStr) {
-        commandStr += ' '
-      }
-      const commandHelp = `${basePath} ${commandStr}--help`
-      return `${commandHelp.padStart(ctx.env.leftMargin + commandHelp.length)}`
-    })
-  )
+  const placeholder = await ctx.extensions[pluginId].text(resolveBuiltInKey('COMMAND'))
+  const commandHelp = `${basePath} <${placeholder}> --help`
+  messages.push(commandHelp.padStart(ctx.env.leftMargin + commandHelp.length))
   return messages
 }
 
@@ -525,6 +520,33 @@ async function generateOptionsSymbols<
 }
 
 /**
+ * Get the visible optional arguments in the order of the options section
+ *
+ * NOTE(kazupon): the options of the command come first, and the global options in effect after them, each
+ * in the order in which they are merged: the reader looks for the options of the command, and the global
+ * options, such as `--help` and `--version`, are the same for every command. Only the help is ordered this
+ * way: the arguments are parsed as `resolveCommandArgs` merges them, the global options first. An argument
+ * of the command that replaces a global option is not in effect as a global option, so it is listed with
+ * the options of the command.
+ *
+ * @param ctx - A {@link CommandContext | command context}
+ * @returns The visible optional arguments, the options of the command first
+ */
+function getOrderedOptionalArgs<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>
+): [string, ArgSchema][] {
+  const args = getVisibleOptionalArgs(ctx.args)
+  const globalOptions = ctx.env.globalOptions
+  if (!globalOptions || globalOptions.size === 0) {
+    return args
+  }
+  return [
+    ...args.filter(([name]) => !globalOptions.has(name)),
+    ...args.filter(([name]) => globalOptions.has(name))
+  ]
+}
+
+/**
  * Get optional arguments pairs for usage
  *
  * @param ctx - A {@link CommandContext | command context}
@@ -541,7 +563,7 @@ function getOptionalArgsPairs<G extends GunshiParams>(
    */
   const optionNames = resolveOptionNames(ctx.args, ctx.toKebab)
 
-  return getVisibleOptionalArgs(ctx.args).reduce(
+  return getOrderedOptionalArgs(ctx).reduce(
     (acc, [name, schema]) => {
       const displayName = resolveDisplayName(name, schema, ctx.toKebab)
       let key = makeShortLongOptionPair(schema, name, ctx.toKebab)
