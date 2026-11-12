@@ -597,9 +597,10 @@ function findUnknownOptions(
     /**
      * NOTE(kazupon): a hidden option is still accepted, so it stays a known option. It is left out
      * of the candidates, which are what `@gunshi/plugin-suggestion` offers as "Did you mean". So is a
-     * deprecated option, which the help leaves out too.
+     * deprecated option, which the help leaves out too, and so is the negated form of either.
      */
-    if (!schema.hidden && !isDeprecated(schema.deprecated)) {
+    const offered = !schema.hidden && !isDeprecated(schema.deprecated)
+    if (offered) {
       addLongOptionCandidate(optionName)
     }
 
@@ -610,7 +611,7 @@ function findUnknownOptions(
     if (schema.type === 'boolean' && schema.negatable) {
       const negatableOptionName = `${NEGATABLE_OPTION_PREFIX}${optionName}`
       knownNegatableOptions.add(negatableOptionName)
-      if (!schema.hidden) {
+      if (offered) {
         addLongOptionCandidate(negatableOptionName)
       }
     }

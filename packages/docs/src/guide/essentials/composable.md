@@ -167,10 +167,12 @@ await cli(process.argv.slice(2), mainCommand, {
   subCommands: {
     deploy: deployCommand,
     // the old name of deploy, kept for the scripts that still use it
-    push: define({ ...deployCommand, name: 'push', deprecated: 'Use deploy.' })
+    push: define({ ...deployCommand, name: 'push', aliases: [], deprecated: 'Use deploy.' })
   }
 })
 ```
+
+The spread copies the `aliases` of `deploy` too, and `aliases: []` takes them off the old name, since two sub-commands at the same level with the same alias are a mistake.
 
 `my-app push` still runs, and prints a warning to stderr before the command runs:
 

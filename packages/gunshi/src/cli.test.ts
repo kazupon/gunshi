@@ -7077,6 +7077,33 @@ describe('deprecated commands and arguments', () => {
     expect(unknown?.values.candidates).toEqual(['--help', '--version', '--output'])
   })
 
+  test('the negated form of a deprecated option is not a candidate either, and is still accepted', async () => {
+    defineMockErrorLog()
+    const run = vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+    const build = define({
+      name: 'build',
+      args: {
+        legacy: { type: 'boolean', negatable: true, deprecated: 'Use --modern.' },
+        modern: { type: 'boolean', negatable: true }
+      },
+      run
+    })
+    let capturedError: AggregateError | undefined
+    await cli(['--no-legac'], build, {
+      strict: true,
+      onErrorCommand: (_ctx, error) => {
+        capturedError = error as AggregateError
+      }
+    })
+    const unknown = ((capturedError?.errors ?? []) as ArgsValidationError[]).find(
+      error => error.code === 'err:arg:unknown-option'
+    )
+    expect(unknown?.values.candidates).toEqual(['--help', '--version', '--modern', '--no-modern'])
+
+    await cli(['--no-legacy'], build, { strict: true })
+    expect(run.mock.calls[0][0].values).toMatchObject({ legacy: false })
+  })
+
   test('a lazy command takes its deprecation from the definition for the help, and warns when it runs', async () => {
     const stderr = defineMockErrorLog()
     const loader = vi.fn<() => CommandRunner>(() => () => {})

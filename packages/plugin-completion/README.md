@@ -420,6 +420,8 @@ $ my-cli ls --<TAB>
 --help  --version  --all                           # the options of list
 ```
 
+The values after an alias are completed by the handlers that are configured for the command under its key in `config.subCommands`, such as `list`, as after its name.
+
 ## ⚙️ Plugin Options
 
 ### `config`

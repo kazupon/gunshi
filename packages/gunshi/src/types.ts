@@ -799,7 +799,8 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * use instead.
    *
    * To rename a command, keep the old name as a deprecated command that runs as the new one, such as
-   * `push: define({ ...deploy, name: 'push', deprecated: 'Use deploy.' })`. It has no effect on the entry command.
+   * `push: define({ ...deploy, name: 'push', aliases: [], deprecated: 'Use deploy.' })`, where `aliases: []` takes
+   * the aliases that the spread copies off the old name. It has no effect on the entry command.
    */
   deprecated?: boolean | string
   /**

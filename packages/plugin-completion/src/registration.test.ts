@@ -2722,4 +2722,86 @@ describe('aliases', () => {
     expect(await complete(['rmt', ''])).toEqual(['add\tAdd a remote', ':4'])
     expect(await complete(['rmt', ''])).toEqual(await complete(['remote', '']))
   })
+
+  test('the values after an alias are completed by the handlers that are configured under the key of the command', async () => {
+    const add = defineCommand({
+      name: 'add',
+      description: 'Add a remote',
+      aliases: ['a'],
+      args: { name: { type: 'positional', description: 'The name of the remote' } },
+      run: NOOP
+    })
+    const subCommands = {
+      list: defineCommand({
+        name: 'list',
+        description: 'List the items',
+        aliases: ['ls'],
+        args: { output: { type: 'string', description: 'Output format' } },
+        run: NOOP
+      }),
+      remote: defineCommand({ ...remote, subCommands: { add } })
+    }
+    const config = {
+      subCommands: {
+        list: { args: { output: { handler: () => [{ value: 'json' }, { value: 'text' }] } } },
+        'remote add': { args: { name: { handler: () => [{ value: 'origin' }] } } }
+      }
+    }
+    async function completeValues(request: string[]): Promise<string[]> {
+      output.length = 0
+      await cli(['complete', '--', ...request], defineCommand({ name: 'main', run: NOOP }), {
+        name: 'mycli',
+        usageSilent: true,
+        subCommands,
+        plugins: [completion({ config })]
+      })
+      return [...output]
+    }
+
+    expect(await completeValues(['ls', '--output', ''])).toEqual(['json\t', 'text\t', ':4'])
+    expect(await completeValues(['ls', '--output', ''])).toEqual(
+      await completeValues(['list', '--output', ''])
+    )
+    for (const request of [
+      ['rmt', 'add', ''],
+      ['remote', 'a', ''],
+      ['rmt', 'a', ''],
+      ['rmt a', '']
+    ]) {
+      expect(await completeValues(request)).toEqual(['origin\t', ':4'])
+    }
+  })
+
+  test('a lazy command without a name is named after its key after an alias, as gunshi names it', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(NOOP)
+    // the i18n plugin names the command when its resource fails to load
+    const list = lazy(
+      () =>
+        Promise.resolve(
+          defineCommand({
+            args: { output: { type: 'string', description: 'Output format' } },
+            resource: () => Promise.reject(new Error('cannot load')),
+            run: NOOP
+          })
+        ),
+      { aliases: ['ls'] }
+    )
+
+    try {
+      await cli(['complete', '--', 'ls', '--'], defineCommand({ name: 'main', run: NOOP }), {
+        name: 'mycli',
+        usageSilent: true,
+        subCommands: { list },
+        plugins: [i18n(), completion()]
+      })
+
+      expect(output).toContain('--output\tOutput format')
+      expect(error).toHaveBeenCalledWith(
+        'Failed to load resource for command "list":',
+        expect.any(Error)
+      )
+    } finally {
+      error.mockRestore()
+    }
+  })
 })
