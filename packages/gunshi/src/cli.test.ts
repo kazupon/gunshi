@@ -6099,6 +6099,31 @@ describe('--help and --version with --json', () => {
     ])
   })
 
+  test('--help lists the positional arguments in the order in which they are bound, a global one included', async () => {
+    const scope = plugin({
+      id: 'test:global-positional',
+      setup: ctx => {
+        ctx.addGlobalOption('scope', { type: 'positional', description: 'The scope' })
+      }
+    })
+    const add = define({
+      name: 'add',
+      args: { file: { type: 'positional', description: 'The file' } },
+      run: vi.fn<() => void>()
+    })
+    const silent = { ...options, subCommands: { add }, plugins: [scope], usageSilent: true }
+
+    const json = JSON.parse((await cli(['add', '--help', '--json'], entry, silent)) as string) as {
+      help: { arguments: { name: string }[] }
+    }
+    const text = (await cli(['add', '--help'], entry, silent)) as string
+
+    // the command line binds the global one first, as the arguments are merged
+    expect(json.help.arguments.map(argument => argument.name)).toEqual(['scope', 'file'])
+    expect(text.indexOf('  scope ')).toBeLessThan(text.indexOf('  file '))
+    expect(add.run).not.toHaveBeenCalled()
+  })
+
   test('--help prints the help of a command without jsonArgs as JSON too', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)

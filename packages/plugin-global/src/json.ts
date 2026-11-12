@@ -559,11 +559,16 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
   const options: JsonHelpOption[] = []
   const positionals: JsonHelpArgument[] = []
   // the options in the order of the help for people: the options of the command first, the global options
-  // in effect after them
-  const args = orderGlobalOptionsLast(
-    Object.entries(ctx.args) as [string, ArgSchema][],
-    ctx.env.globalOptions
-  )
+  // in effect after them. The positional arguments keep the order in which they are merged, which is the
+  // order in which they are bound, a global one that a plugin adds included, as the help lists them
+  const entries = Object.entries(ctx.args) as [string, ArgSchema][]
+  const args = [
+    ...entries.filter(([, schema]) => schema.type === 'positional'),
+    ...orderGlobalOptionsLast(
+      entries.filter(([, schema]) => schema.type !== 'positional'),
+      ctx.env.globalOptions
+    )
+  ]
   for (const [key, schema] of args) {
     if (schema.hidden) {
       continue

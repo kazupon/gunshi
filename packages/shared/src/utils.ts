@@ -256,19 +256,21 @@ export function isWithoutRun(ctx: object): boolean {
 }
 
 /**
- * Order the arguments of a command as the help lists them: the arguments of the command first, and the
- * global options in effect after them, each in the order in which they are merged.
+ * Order the options of a command as the help lists them: the options of the command first, and the global
+ * options in effect after them, each in the order in which they are merged.
  *
  * NOTE(kazupon): the reader looks for the options of the command, and the global options, such as `--help`
  * and `--version`, are the same for every command. The help for people and the help as JSON both list the
- * options in this order, so that they agree. Only the help is ordered this way: the arguments are parsed as
- * `resolveCommandArgs` merges them, the global options first. An argument of the command that replaces a
- * global option is not in effect as a global option, so it is listed with the arguments of the command.
+ * options in this order, so that they agree. Only the options of the help are ordered this way: the
+ * arguments are parsed as `resolveCommandArgs` merges them, the global options first, and the positional
+ * arguments are listed in that order, the order in which they are bound. An argument of the command that
+ * replaces a global option is not in effect as a global option, so it is listed with the options of the
+ * command.
  *
- * @typeParam T - The type of the value of an argument, such as its schema
- * @param args - The arguments, as pairs of a name and a value, in the order in which they are merged
+ * @typeParam T - The type of the value of an option, such as its schema
+ * @param args - The options, as pairs of a name and a value, in the order in which they are merged
  * @param globalOptions - The global options in effect, as `ctx.env.globalOptions` has them
- * @returns The arguments, the global options in effect last
+ * @returns The options, the global options in effect last
  */
 export function orderGlobalOptionsLast<T>(
   args: [string, T][],
