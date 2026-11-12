@@ -128,6 +128,63 @@ await cli(process.argv.slice(2), mainCommand, {
 
 When both are given, the `subCommands` option of `cli()` is used for the CLI, and the sub-commands of the main command are reached under its name, as [nested sub-commands](#nested-sub-commands).
 
+## Aliases of Sub-commands
+
+Give a sub-command other names with `aliases`, such as `ls` for `list`:
+
+```ts [commands/list.ts]
+import { define } from 'gunshi'
+
+export const listCommand = define({
+  name: 'list',
+  description: 'List resources',
+  aliases: ['ls'],
+  run: ctx => {
+    // `ctx.name` is 'list', also when the command is run as `my-app ls`
+    console.log('Listing resources...')
+  }
+})
+```
+
+`my-app ls` runs the command as `my-app list` does. The help lists the command under its name only, and `my-app ls --help` shows the help of `my-app list`, so that the help teaches one name. The `Did you mean` hint of `@gunshi/plugin-suggestion` and shell completion offer the name too, and shell completion still completes the options of the command after an alias.
+
+- A sub-command named after the alias wins over the alias, so an alias never hides a command
+- Two sub-commands at the same level with the same alias are a mistake: the alias throws a `TypeError` when it is used
+- A lazy command takes its aliases from the definition given to `lazy`, since the command is found before it is loaded
+
+## Renaming a Sub-command
+
+To rename a sub-command without breaking the scripts that use its old name, keep the old name as a deprecated command that runs as the new one:
+
+```ts [cli.ts]
+import { cli, define } from 'gunshi'
+import { deployCommand } from './commands/deploy.ts'
+import { mainCommand } from './commands/main.ts'
+
+await cli(process.argv.slice(2), mainCommand, {
+  name: 'my-app',
+  version: '1.0.0',
+  subCommands: {
+    deploy: deployCommand,
+    // the old name of deploy, kept for the scripts that still use it
+    push: define({ ...deployCommand, name: 'push', deprecated: 'Use deploy.' })
+  }
+})
+```
+
+`my-app push` still runs, and prints a warning to stderr before the command runs:
+
+```txt
+push is deprecated. Use deploy.
+```
+
+- The help, the `Did you mean` hint for an unknown command and shell completion leave a deprecated command out, as an internal one, so that they teach what to use instead
+- The help of the deprecated command says that it is deprecated, after its description
+- A command under a deprecated group, such as `my-app old-group add` for a renamed group, warns of the group too
+- `deprecated` is `true`, or the text that tells what to use instead. The warning is printed once. With `--json`, nothing is warned of, so that stderr has a failure only, as one line of JSON. Nor with `usageSilent`, nor with `gunshi/bone`, which has no plugins
+
+An alias (`aliases`) is for a name that stays: it is never warned of. A deprecated command is for a name that is going away.
+
 ## Options for Every Command
 
 To give every command the same option, such as `--file` or `--verbose`, define the arguments once and spread them into the `args` of each command.

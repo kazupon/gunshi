@@ -545,7 +545,7 @@ const command = define({
 
 Marks an argument schema as hidden from generated usage/help output.
 
-Use this for deprecated or internal options that should remain parseable:
+Use this for internal options that should remain parseable. For an option that is going away, use [`deprecated()`](#deprecated), which also warns when it is given:
 
 ```ts [hidden-example.ts]
 import { define } from 'gunshi'
@@ -563,6 +563,30 @@ const command = define({
     if (ctx.values.legacyMode) {
       console.log('legacy mode enabled')
     }
+  }
+})
+```
+
+### deprecated()
+
+Marks an argument schema as deprecated: `deprecated(schema)`, or `deprecated(schema, 'Use --output.')` with the text that tells what to use instead.
+
+The argument is still parsed, and the help, shell completion and the `Did you mean` hint leave it out, as for `hidden()`. When it is given, Gunshi prints a warning to stderr before the command runs: `--format is deprecated. Use --output.`
+
+```ts [deprecated-example.ts]
+import { define } from 'gunshi'
+import { deprecated, string } from 'gunshi/combinators'
+
+const command = define({
+  name: 'export',
+  args: {
+    output: string({ description: 'Output format' }),
+    // the old name of --output, kept for the scripts that still use it
+    format: deprecated(string(), 'Use --output.')
+  },
+  run: ctx => {
+    const output = ctx.values.output ?? ctx.values.format ?? 'text'
+    console.log(`Exporting as ${output}`)
   }
 })
 ```

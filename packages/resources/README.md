@@ -57,6 +57,7 @@ Keys for built-in functionalities are handled by Gunshi's default locales. The c
 - `DEFAULT` - Prefix for default values (e.g., "default: 5")
 - `CHOICES` - Prefix for available choices (e.g., "choices: red, green, blue")
 - `CAUSEDBY` - Heading of the lines of the causes of a `CommandError` (e.g., "Caused by: connect ECONNREFUSED 127.0.0.1:5432")
+- `DEPRECATED` - Sentence that tells that a command or an argument is deprecated, which places its name with `{$name}` (e.g., "push is deprecated."). The text of its `deprecated`, which tells what to use instead, follows the sentence
 - `json` - Description for the `--json` option of `jsonArgs` ("Output the result as JSON")
 - `json:invalid-arguments` - Text that only the JSON errors of `--json` print
 - `json:next:help`, `json:next:help-placeholder` - What the command that shows the help is for: `when` of `next` in the JSON errors of `--json`, and the heading of that command after the argument errors. The second is for a CLI without a name, whose command starts with `<COMMAND>`

@@ -70,7 +70,8 @@ export type CommandNotFoundErrorOptions = {
    */
   commandName: string
   /**
-   * Command names available at the same level.
+   * The names of the commands at the same level, which `@gunshi/plugin-suggestion` offers as "Did you mean".
+   * An internal command is left out, as the help leaves it out.
    */
   candidates?: readonly string[]
   /**

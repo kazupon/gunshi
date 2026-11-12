@@ -11,6 +11,7 @@
   "DEFAULT": "default",
   "CHOICES": "choices",
   "CAUSEDBY": "Caused by",
+  "DEPRECATED": "{$name} is deprecated.",
   "help": "Display this help message",
   "version": "Display this version",
   "json": "Output the result as JSON",

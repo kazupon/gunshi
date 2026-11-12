@@ -776,6 +776,33 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    */
   internal?: boolean
   /**
+   * Other names of the command, such as `['ls']` for `list`.
+   *
+   * The command runs with any of them, as with its name, and `ctx.name` and `ctx.commandPath` have its name:
+   * the help, the hints and the help as JSON tell the name of the command. An alias is accepted but not taught:
+   * the help does not list it, and the `Did you mean` hint for an unknown command and shell completion do not
+   * offer it.
+   *
+   * A sub-command whose name is the alias wins over the alias, so an alias never hides a command. Two commands
+   * at the same level with the same alias are a mistake: using the alias throws a `TypeError`. A lazy command
+   * takes its aliases from the definition given to `lazy`, as it is found before it is loaded.
+   */
+  aliases?: readonly string[]
+  /**
+   * Whether the command is deprecated: `true`, or the text that tells what to use instead, such as `'Use deploy.'`.
+   *
+   * A deprecated command still runs. With the global options plugin, it prints a warning to stderr when it runs,
+   * once: `push is deprecated. Use deploy.`, and not when the command is asked for JSON with `--json`. A command
+   * under a deprecated group, such as the old name of a renamed group, warns of the group too. Its help says that
+   * it is deprecated, after its description. As an internal command, it is left out of the help, the
+   * `Did you mean` hint for an unknown command, shell completion and the help as JSON, so that they teach what to
+   * use instead.
+   *
+   * To rename a command, keep the old name as a deprecated command that runs as the new one, such as
+   * `push: define({ ...deploy, name: 'push', deprecated: 'Use deploy.' })`. It has no effect on the entry command.
+   */
+  deprecated?: boolean | string
+  /**
    * Whether this command is an entry command.
    *
    * @default undefined
@@ -884,6 +911,14 @@ export interface SubCommandable {
    * see {@link Command.internal}
    */
   internal?: boolean
+  /**
+   * see {@link Command.aliases}
+   */
+  aliases?: readonly string[]
+  /**
+   * see {@link Command.deprecated}
+   */
+  deprecated?: boolean | string
   /**
    * see {@link Command.entry}
    */

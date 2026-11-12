@@ -8,6 +8,7 @@ import {
   ARG_NEGATABLE_PREFIX,
   composeNegatableDescription,
   getCommandSubCommands,
+  isDeprecated,
   localizable,
   makeShortLongOptionPair,
   resolveArgKey,
@@ -324,7 +325,8 @@ export async function registerCompletion({
   const optionNames = resolveOptionNames(args, ctx.toKebab)
 
   for (const [key, schema] of Object.entries(args)) {
-    const hidden = schema.hidden === true
+    // a deprecated argument is left out as a hidden one is, as the help leaves it out
+    const hidden = schema.hidden === true || isDeprecated(schema.deprecated)
     if (schema.type === 'positional') {
       /**
        * NOTE(kazupon): the argument keeps its place, so that the positions of the arguments after it
@@ -491,7 +493,15 @@ function resolveCommandPath(
   let current: Command | LazyCommand | undefined
   let currentLevel = level
   for (const [index, name] of names.entries()) {
-    const cmd = currentLevel?.get(name)
+    /**
+     * NOTE(kazupon): a command is found by one of its aliases too, as gunshi finds it, so that its options are
+     * completed after the alias. The alias itself is never a candidate: the candidates are the names.
+     */
+    const cmd =
+      currentLevel?.get(name) ??
+      [...(currentLevel?.values() ?? [])].find(
+        command => Array.isArray(command.aliases) && command.aliases.includes(name)
+      )
     if (cmd == undefined || isSkipped(name, cmd, topLevel && index === 0)) {
       return undefined
     }
@@ -502,8 +512,13 @@ function resolveCommandPath(
 }
 
 function isSkipped(name: string, cmd: Command | LazyCommand, topLevel: boolean): boolean {
-  // skip entry / internal command, and the completion command itself, which only lives at the top level
-  return !!cmd.internal || !!cmd.entry || (topLevel && name === COMPLETE_COMMAND_NAME)
+  // skip entry / internal / deprecated command, and the completion command itself, which only lives at the top level
+  return (
+    !!cmd.internal ||
+    isDeprecated(cmd.deprecated) ||
+    !!cmd.entry ||
+    (topLevel && name === COMPLETE_COMMAND_NAME)
+  )
 }
 
 /**

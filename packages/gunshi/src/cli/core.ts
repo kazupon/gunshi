@@ -266,6 +266,10 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     validationError,
     cliOptions: cliOptions
   })
+  markDeprecatedCommands(
+    commandContext,
+    collectDeprecatedCommands(routingOptions.subCommands, targetCommandPath, resolvedCommand)
+  )
 
   const reported = trackReported(commandContext)
   let fallbackRunner: () => void = NOOP
@@ -363,6 +367,87 @@ const WITHOUT_RUN = Symbol.for('gunshi.withoutRun')
 function markWithoutRun(ctx: object): void {
   const registry = globalThis as unknown as Record<symbol, WeakSet<object> | undefined>
   ;(registry[WITHOUT_RUN] ??= new WeakSet()).add(ctx)
+}
+
+/**
+ * The key of the registry of the deprecated commands on the path of a run. The global options plugin and the
+ * usage renderer plugin read it with `getDeprecatedCommands` of `@gunshi/shared`, by the same registered
+ * symbol, since `gunshi` and the plugins bundle their own copies. Neither is in the public API.
+ */
+const DEPRECATED_COMMANDS = Symbol.for('gunshi.deprecatedCommands')
+
+/**
+ * A deprecated command on the path of a run: its path, and its `deprecated`.
+ */
+interface DeprecatedCommandMark {
+  commandPath: string[]
+  deprecated: true | string
+}
+
+/**
+ * Check whether the `deprecated` of a command or an argument marks it as deprecated.
+ *
+ * @param deprecated - The `deprecated` of a command or an argument
+ * @returns `true` for `true` or a text
+ */
+function isDeprecated(deprecated: unknown): deprecated is true | string {
+  return deprecated === true || typeof deprecated === 'string'
+}
+
+/**
+ * Collect the deprecated commands on the path of a run, root first.
+ *
+ * NOTE(kazupon): the command that runs is the loaded one, whose `deprecated` wins over the one of the definition
+ * given to `lazy`. The commands above it are the definitions of the tree, as the routing found them. The entry
+ * command is not on the path.
+ *
+ * @param root - The sub-commands at the top level
+ * @param commandPath - The names of the commands on the path
+ * @param resolvedCommand - The command that runs
+ * @returns The deprecated commands, with their paths
+ */
+function collectDeprecatedCommands<G extends GunshiParamsConstraint>(
+  root: Map<string, Command<G> | LazyCommand<G>>,
+  commandPath: string[],
+  resolvedCommand: Command<G>
+): DeprecatedCommandMark[] {
+  const marks: DeprecatedCommandMark[] = []
+  let level: Map<string, Command<G> | LazyCommand<G>> | undefined = root
+  for (const [index, name] of commandPath.entries()) {
+    const last = index === commandPath.length - 1
+    const declared: Command<G> | LazyCommand<G> | undefined = level?.get(name)
+    const command = last ? resolvedCommand : declared
+    if (command == null) {
+      break
+    }
+    if (isDeprecated(command.deprecated)) {
+      marks.push({ commandPath: commandPath.slice(0, index + 1), deprecated: command.deprecated })
+    }
+    level = declared == null ? undefined : getCommandSubCommands<G>(declared)
+  }
+  return marks
+}
+
+/**
+ * Mark the command context of a run with the deprecated commands on its path.
+ *
+ * NOTE(kazupon): the context has the command that runs, and not the commands above it, such as the old name of a
+ * renamed group, so the core, which walks the path, tells the plugins which of them are deprecated. The global
+ * options plugin warns of them, and the usage renderer plugin says so in the help. The registry is weak, and
+ * holds the context of this run only.
+ *
+ * @param ctx - The command context of the run
+ * @param marks - The deprecated commands on the path
+ */
+function markDeprecatedCommands(ctx: object, marks: DeprecatedCommandMark[]): void {
+  if (marks.length === 0) {
+    return
+  }
+  const registry = globalThis as unknown as Record<
+    symbol,
+    WeakMap<object, readonly DeprecatedCommandMark[]> | undefined
+  >
+  ;(registry[DEPRECATED_COMMANDS] ??= new WeakMap()).set(ctx, marks)
 }
 
 /**
@@ -511,9 +596,10 @@ function findUnknownOptions(
     knownLongOptions.add(optionName)
     /**
      * NOTE(kazupon): a hidden option is still accepted, so it stays a known option. It is left out
-     * of the candidates, which are what `@gunshi/plugin-suggestion` offers as "Did you mean".
+     * of the candidates, which are what `@gunshi/plugin-suggestion` offers as "Did you mean". So is a
+     * deprecated option, which the help leaves out too.
      */
-    if (!schema.hidden) {
+    if (!schema.hidden && !isDeprecated(schema.deprecated)) {
       addLongOptionCandidate(optionName)
     }
 
@@ -817,9 +903,9 @@ function resolveCommandTreeFromPositionals<G extends GunshiParamsConstraint>(
 
   for (let i = 0; i < positionals.length; i++) {
     const token = positionals[i]
-    const cmd = currentSubCommands.get(token)
+    const found = findSubCommand(currentSubCommands, token)
 
-    if (cmd == null) {
+    if (found == null) {
       if (depth === 0) {
         // no match at top level
         if (options.fallbackToEntry) {
@@ -855,20 +941,23 @@ function resolveCommandTreeFromPositionals<G extends GunshiParamsConstraint>(
       }
     }
 
+    // the name of the command is its key, also when the user typed one of its aliases
+    const [key, cmd] = found
+
     // resolve command name if missing - shallow copy to avoid mutating user objects
     let resolved: Command<G> | LazyCommand<G> = cmd
     if (typeof cmd === 'function' && (cmd as any).commandName == null) {
       const copy = Object.assign((...args: unknown[]) => (cmd as Function)(...args), cmd, {
-        commandName: token
+        commandName: key
       }) as unknown as LazyCommand<G>
       resolved = copy
     } else if (typeof cmd === 'object' && cmd.name == null) {
-      resolved = Object.assign(create<Command<G>>(), cmd, { name: token }) as Command<G>
+      resolved = Object.assign(create<Command<G>>(), cmd, { name: key }) as Command<G>
     }
 
     resolvedCommand = resolved
-    resolvedName = token
-    commandPath.push(token)
+    resolvedName = key
+    commandPath.push(key)
     depth++
 
     // check if the matched command has its own nested subCommands
@@ -1081,12 +1170,13 @@ function collectRoutingCandidates<G extends GunshiParamsConstraint>(
     parentPath: string[]
   ): void {
     for (let index = offset; index < rawPositionals.length; index++) {
-      const name = rawPositionals[index]
-      const command = commands.get(name)
-      if (command == null) {
+      const found = findSubCommand(commands, rawPositionals[index])
+      if (found == null) {
         continue
       }
 
+      // the path has the names of the commands, as the routing of each candidate resolves them
+      const [name, command] = found
       const path = [...parentPath, name]
       const key = JSON.stringify(path)
       const normalized = normalizeCommandReference(command, name)
@@ -1104,6 +1194,43 @@ function collectRoutingCandidates<G extends GunshiParamsConstraint>(
 
   collect(root, 0, [])
   return candidates
+}
+
+/**
+ * Find the sub-command that a word of the command line names: the sub-command whose name is the word, or else the
+ * one that has the word among its {@linkcode Command.aliases | aliases}.
+ *
+ * NOTE(kazupon): a name wins over an alias, so that an alias never hides a sub-command. A lazy command has the
+ * aliases of its definition, as it is not loaded yet. Two sub-commands that give the same alias are a mistake in
+ * their definitions, which is thrown as a `TypeError`, as a name given twice in an array of `subCommands` is.
+ *
+ * @param commands - The sub-commands of a level, by their names
+ * @param word - The word of the command line
+ * @returns The name of the sub-command and the sub-command, or `undefined` when no sub-command is named so
+ */
+function findSubCommand<G extends GunshiParamsConstraint>(
+  commands: Map<string, Command<G> | LazyCommand<G>>,
+  word: string
+): [string, Command<G> | LazyCommand<G>] | undefined {
+  const command = commands.get(word)
+  if (command != null) {
+    return [word, command]
+  }
+
+  let found: [string, Command<G> | LazyCommand<G>] | undefined
+  for (const [name, candidate] of commands) {
+    const aliases: unknown = candidate.aliases
+    if (!Array.isArray(aliases) || !aliases.includes(word)) {
+      continue
+    }
+    if (found) {
+      throw new TypeError(
+        `Alias '${word}' is given to more than one command: '${found[0]}' and '${name}'`
+      )
+    }
+    found = [name, candidate]
+  }
+  return found
 }
 
 function normalizeCommandReference<G extends GunshiParamsConstraint>(
@@ -1363,7 +1490,15 @@ function createCommandNotFoundError<G extends GunshiParamsConstraint>(
       commandName
     },
     commandName,
-    candidates: [...(resolved.parentSubCommands?.keys() || [])],
+    /**
+     * NOTE(kazupon): the candidates are what `@gunshi/plugin-suggestion` offers as "Did you mean". An internal
+     * command is left out of them, as the help, shell completion and the help as JSON leave it out: it still
+     * runs when it is typed, but nothing shows it to the user. So is a deprecated command, whose replacement is
+     * what to offer.
+     */
+    candidates: [...(resolved.parentSubCommands || [])]
+      .filter(([, command]) => !command.internal && !isDeprecated(command.deprecated))
+      .map(([name]) => name),
     commandPath: resolved.parentCommandPath || []
   })
 }

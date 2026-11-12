@@ -43,6 +43,8 @@ The option continues to be accepted and parsed at runtime, but it is omitted fro
 
 It is left out of the other places a user could discover it, too: shell completion does not offer it and does not complete its value, and the `Did you mean` hint for an unknown option does not suggest it.
 
+For an option that is going away, such as the old name of a renamed option, mark it `deprecated` instead: the help leaves it out in the same way, and Gunshi warns when it is given. See [Deprecated Options](./declarative.md#deprecated-options).
+
 ### Square Brackets `[]` - Optional Elements
 
 Square brackets indicate optional elements:
