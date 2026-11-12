@@ -1363,7 +1363,14 @@ function createCommandNotFoundError<G extends GunshiParamsConstraint>(
       commandName
     },
     commandName,
-    candidates: [...(resolved.parentSubCommands?.keys() || [])],
+    /**
+     * NOTE(kazupon): the candidates are what `@gunshi/plugin-suggestion` offers as "Did you mean". An internal
+     * command is left out of them, as the help, shell completion and the help as JSON leave it out: it still
+     * runs when it is typed, but nothing shows it to the user.
+     */
+    candidates: [...(resolved.parentSubCommands || [])]
+      .filter(([, command]) => !command.internal)
+      .map(([name]) => name),
     commandPath: resolved.parentCommandPath || []
   })
 }

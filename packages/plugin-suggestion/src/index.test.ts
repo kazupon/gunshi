@@ -271,6 +271,22 @@ describe('suggestion plugin', () => {
     expect(stderr()).toBe('Command not found: rn\nDid you mean run?' + helpHint(['task']))
   })
 
+  test('does not suggest an internal command, which the help leaves out', async () => {
+    const stderr = defineMockErrorLog()
+
+    await expect(
+      cli(['pus'], define({ name: 'main' }), {
+        subCommands: {
+          deploy: define({ name: 'deploy', run: vi.fn<() => void>() }),
+          push: define({ name: 'push', internal: true, run: vi.fn<() => void>() }),
+          debug: lazy(() => vi.fn<() => void>(), { name: 'debug', internal: true })
+        },
+        plugins: [suggestion()]
+      })
+    ).resolves.toBeUndefined()
+    expect(stderr()).toBe('Command not found: pus' + helpHint())
+  })
+
   test('does not suggest commands when includeCommands is false', async () => {
     const stderr = defineMockErrorLog()
 

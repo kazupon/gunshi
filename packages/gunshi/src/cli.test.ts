@@ -318,6 +318,28 @@ describe('execute command', () => {
     expect(process.exitCode).toBe(1)
   })
 
+  test('an internal command is not a candidate of an unknown command, and still runs', async () => {
+    const mockDebug = vi.fn<() => void>()
+    const subCommands = {
+      deploy: define({ name: 'deploy', run: vi.fn<() => void>() }),
+      debug: define({ name: 'debug', internal: true, run: mockDebug }),
+      push: lazy(() => vi.fn<() => void>(), { name: 'push', internal: true })
+    }
+
+    defineMockErrorLog()
+    let capturedError: AggregateError | undefined
+    await cli(['debg'], define({ name: 'main' }), {
+      subCommands,
+      onErrorCommand: (_ctx, error) => {
+        capturedError = error as AggregateError
+      }
+    })
+    expect(findCommandNotFoundError(capturedError).candidates).toEqual(['deploy', 'main'])
+
+    await cli(['debug'], define({ name: 'main' }), { subCommands })
+    expect(mockDebug).toHaveBeenCalledOnce()
+  })
+
   test('command not found exposes structured metadata', async () => {
     const mockEntry = vi.fn<() => void>()
     const entry = define({
