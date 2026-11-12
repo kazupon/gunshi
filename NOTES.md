@@ -12,7 +12,7 @@ The notes below describe how this is implemented in practice and the constraints
 
 How each package under `packages/*` handles `args-tokens`, based on actual inspection of build outputs (`lib/*.js`, `lib/*.d.ts`).
 
-Verified with: `tsdown@0.22.14` + `rolldown-plugin-dts@0.27.14` (`tsdown@0.23` is not used yet; see [Why we stay on tsdown 0.22](#why-we-stay-on-tsdown-022)).
+Verified with: `vp pack` of `vite-plus@1.6.0` (`tsdown@0.23.4` + `rolldown-plugin-dts@0.28.8`). See [How the packages moved to `vp pack`](#how-the-packages-moved-to-vp-pack).
 
 #### Results
 
@@ -29,8 +29,8 @@ Verified with: `tsdown@0.22.14` + `rolldown-plugin-dts@0.27.14` (`tsdown@0.23` i
 
 #### How the bundling happens
 
-- **JS bundle**: `args-tokens` is declared under `devDependencies`, so tsdown bundles it by default (only `dependencies` / `peerDependencies` / `optionalDependencies` are auto-externalized).
-- **`.d.ts` inlining**: Since tsdown 0.22.1, declaration files follow the JS bundling by default, so the `args-tokens` types are inlined as well. Each `tsdown.config.ts` also lists them in `deps.dts.alwaysBundle` (`['args-tokens', ...]`), to state the intent and to keep the types inlined even if `args-tokens` becomes a dependency.
+- **JS bundle**: `args-tokens` is declared under `devDependencies`, so tsdown, which `vp pack` runs, bundles it by default (only `dependencies` / `peerDependencies` / `optionalDependencies` are auto-externalized).
+- **`.d.ts` inlining**: Since tsdown 0.22.1, declaration files follow the JS bundling by default, so the `args-tokens` types are inlined as well. The `pack` of each `vite.config.ts` also lists them in `deps.dts.alwaysBundle` (`['args-tokens', ...]`), to state the intent and to keep the types inlined even if `args-tokens` becomes a dependency.
 
 #### Design intent
 
@@ -39,15 +39,15 @@ The goal is to **completely hide `args-tokens` from the public API** of gunshi. 
 - "JS impl included" group (`gunshi` / `bone` / `combinators` / `shared`): both runtime and types are inlined.
 - "Types only" group (`definition` / `plugin` / `plugin-i18n` / `plugin-renderer`): does not use the `args-tokens` runtime internally, but the re-exported type chain references `args-tokens`, so only `.d.ts` inlining is required.
 
-#### Why we stay on tsdown 0.22
+#### How the packages moved to `vp pack`
 
-- `tsdown@0.23` uses `rolldown-plugin-dts@0.28`. Since `rolldown-plugin-dts@0.28.2`, a chunk whose exports are all inlined as `export declare …` / `export type …` gets no `export {}` marker ([issue #312](https://github.com/sxzz/rolldown-plugin-dts/issues/312)). In a `.d.ts` module without any export declaration, TypeScript treats every top-level declaration as exported, so internal declarations become importable at the type level, while the JS does not export them. Across the gunshi packages, 65 such names appear (for example `COMMON_ARGS` from `@gunshi/plugin-i18n`).
-- Until it is fixed, the catalog in `pnpm-workspace.yaml` pins `tsdown` to `0.22.14`, and `.github/renovate.json` holds Renovate below `0.23.0` (`allowedVersions`), since Renovate automerges the updates that pass CI.
+- `tsdown@0.23.0` to `0.23.3` use `rolldown-plugin-dts@0.28.2` to `0.28.6`, where a chunk whose exports are all inlined as `export declare …` / `export type …` gets no `export {}` marker ([issue #312](https://github.com/sxzz/rolldown-plugin-dts/issues/312)). In a `.d.ts` module without any export declaration, TypeScript treats every top-level declaration as exported, so internal declarations become importable at the type level, while the JS does not export them. Across the gunshi packages, 65 such names appeared (for example `COMMON_ARGS` from `@gunshi/plugin-i18n`), so the packages stayed on `tsdown@0.22.14`, and Renovate was held below `0.23.0`.
+- `rolldown-plugin-dts@0.28.7` fixed it, and Vite+ 1.5.0 and later bundle `tsdown@0.23.4` with `rolldown-plugin-dts@0.28.8`. When the packages moved to `vp pack`, the public API of every types entry was compared with the one of `tsdown@0.22.14`: no name was added, removed or changed, and no `.d.ts` imports `args-tokens`. The JS differs only where rolldown inlines constants.
 - History: up to `tsdown@0.21`, the types were inlined with the array form of `dts.resolve`, which was removed in `rolldown-plugin-dts` v0.21.0 ([issue #106](https://github.com/sxzz/rolldown-plugin-dts/issues/106)), so `rolldown-plugin-dts` was pinned to 0.20.0. [Issue #199](https://github.com/sxzz/rolldown-plugin-dts/issues/199) was resolved by the `deps.dts` option of `tsdown@0.22.1`.
 
-#### Future plans
+#### When updating Vite+
 
-Move to `tsdown@0.23` once issue #312 is fixed. Before moving, compare the public API of the built `.d.ts` files with the current ones: no name may be added or removed, and no `.d.ts` may import `args-tokens`.
+Vite+ bundles its own tsdown and rolldown-plugin-dts, so an update of Vite+ can change the declarations. Compare the public API of the built `.d.ts` files with the ones before the update: no name may be added or removed, and no `.d.ts` may import `args-tokens`.
 
 ## Package Manager
 

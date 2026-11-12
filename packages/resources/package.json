@@ -60,13 +60,12 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "prepack": "pnpm build"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "publint": "catalog:",
-    "tsdown": "catalog:"
+    "publint": "catalog:"
   },
   "engines": {
     "node": ">= 22"

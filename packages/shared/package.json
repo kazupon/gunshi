@@ -47,15 +47,14 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "prepack": "pnpm build"
   },
   "devDependencies": {
     "@gunshi/plugin": "workspace:*",
     "@gunshi/resources": "workspace:*",
     "gunshi": "workspace:*",
-    "publint": "catalog:",
-    "tsdown": "catalog:"
+    "publint": "catalog:"
   },
   "engines": {
     "node": ">= 22"

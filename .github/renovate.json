@@ -25,11 +25,6 @@
       "description": "Update vitest with Vite+, which bundles its own vitest: the playground example imports vitest from the root",
       "groupName": "vite-plus",
       "matchPackageNames": ["vite-plus", "vitest", "@vitest/coverage-v8"]
-    },
-    {
-      "description": "Hold tsdown at 0.22.x until sxzz/rolldown-plugin-dts#312 is fixed. See NOTES.md",
-      "matchPackageNames": ["tsdown"],
-      "allowedVersions": "<0.23.0"
     }
   ]
 }

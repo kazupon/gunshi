@@ -50,7 +50,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "build:docs": "tsx ../../scripts/api-references.ts",
     "prepack": "pnpm build"
   },
@@ -66,8 +66,7 @@
     "@intlify/core-base": "12.0.0-alpha.9",
     "gunshi": "workspace:*",
     "messageformat": "4.1.0",
-    "publint": "catalog:",
-    "tsdown": "catalog:"
+    "publint": "catalog:"
   },
   "peerDependencies": {
     "@gunshi/plugin-global": "workspace:*"

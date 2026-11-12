@@ -34,7 +34,6 @@ catalog:
   typescript: ^6.0.3
   zod: ^4.4.3
   publint: ^0.3.20
-  tsdown: 0.22.14
   vite-plus: 1.6.0
   '@kazupon/vp-config': 1.1.1
   "@types/node": ^26.0.0
@@ -49,7 +48,6 @@ minimumReleaseAgeExclude:
   - tsx
   - args-tokens
   - "@bomb.sh/tab"
-  - tsdown
   - vite
   - vitepress-api-references
   - "@ox-content/*"

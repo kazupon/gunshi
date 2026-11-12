@@ -107,7 +107,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "prepack": "pnpm build"
   },
   "devDependencies": {
@@ -120,7 +120,6 @@
     "args-tokens": "catalog:",
     "publint": "catalog:",
     "std-env": "^4.1.0",
-    "tsdown": "catalog:",
     "zod": "catalog:"
   },
   "engines": {

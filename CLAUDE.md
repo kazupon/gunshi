@@ -271,8 +271,8 @@ When creating plugins:
 
 ### Build Tool
 
-- **tsdown**: Modern TypeScript bundler powered by Rolldown
-- Configuration: `tsdown.config.ts` in each package
+- **`vp pack`** of Vite+: tsdown, the TypeScript bundler powered by Rolldown, bundled in Vite+
+- Configuration: the `pack` of `vite.config.ts` in each package
 - Features:
   - TypeScript compilation with declaration files
   - Publint validation

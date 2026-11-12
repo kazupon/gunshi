@@ -48,7 +48,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "build:docs": "tsx ../../scripts/api-references.ts",
     "prepack": "pnpm build"
   },
@@ -57,8 +57,7 @@
   },
   "devDependencies": {
     "@gunshi/shared": "workspace:*",
-    "publint": "catalog:",
-    "tsdown": "catalog:"
+    "publint": "catalog:"
   },
   "engines": {
     "node": ">= 22"

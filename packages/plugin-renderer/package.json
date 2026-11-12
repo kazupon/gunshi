@@ -50,7 +50,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "build:docs": "tsx ../../scripts/api-references.ts",
     "prepack": "pnpm build"
   },
@@ -59,8 +59,7 @@
   },
   "devDependencies": {
     "@gunshi/shared": "workspace:*",
-    "publint": "catalog:",
-    "tsdown": "catalog:"
+    "publint": "catalog:"
   },
   "peerDependencies": {
     "@gunshi/plugin-i18n": "workspace:*"

@@ -49,7 +49,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "build:docs": "tsx ../../scripts/api-references.ts",
     "prepack": "pnpm build"
   },
@@ -64,8 +64,7 @@
     "@types/node": "catalog:",
     "gunshi": "workspace:*",
     "publint": "catalog:",
-    "rollup-plugin-license": "^3.6.0",
-    "tsdown": "catalog:"
+    "rollup-plugin-license": "^3.6.0"
   },
   "peerDependencies": {
     "@gunshi/plugin-i18n": "workspace:*"
