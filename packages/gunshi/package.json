@@ -3,11 +3,17 @@
   "version": "1.0.0-rc.6",
   "description": "JavaScript command-line library, your strategist for CLIs that people and AI agents use",
   "keywords": [
+    "agent-skills",
+    "agents-md",
+    "ai-agent",
     "args",
     "argument",
     "argv",
     "cli",
+    "coding-agent",
     "command",
+    "command-line",
+    "json",
     "option"
   ],
   "bugs": {
