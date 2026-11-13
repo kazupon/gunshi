@@ -2,7 +2,7 @@
   "name": "gunshi-monorepo",
   "version": "1.0.0-rc.6",
   "private": true,
-  "description": "Monorepo for gunshi - Modern javascript command-line library",
+  "description": "Monorepo for gunshi - JavaScript command-line library, your strategist for CLIs that people and AI agents use",
   "bugs": {
     "url": "https://github.com/kazupon/gunshi/issues"
   },
