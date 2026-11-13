@@ -417,6 +417,17 @@ await cli(process.argv.slice(2), main, { subCommands: { add } })
     })
   })
 
+  test('strictPositionals is not part of strict: strict alone keeps an extra positional argument', () => {
+    const file = write(
+      'strict-only.mjs',
+      withAdd("{ title: { type: 'positional' } }", ', strict: true')
+    )
+    expect(run(file, ['add', 'milk', 'eggs'])).toMatchObject({
+      code: 0,
+      stdout: '{"title":"milk"}\n'
+    })
+  })
+
   test('--json is not ignored: a command without jsonArgs stops before it runs, with or without strict', () => {
     const file = write(
       'json-not-supported.mjs',
@@ -554,6 +565,80 @@ await cli(process.argv.slice(2), main, {
     expect(run(file, ['create', 'db', '--replicas', '2']).code).toBe(0)
   })
 
+  test('validationErrorExitCode does not make an unknown option an error: without strict, the command runs', () => {
+    const file = write(
+      'validation-exit-code-strict.mjs',
+      withAdd(
+        "{ title: { type: 'positional' } }",
+        ", validationErrorExitCode: 2, strict: process.env.STRICT === '1'"
+      )
+    )
+    expect(run(file, ['add', 'milk', '--urgent'])).toMatchObject({
+      code: 0,
+      stdout: '{"title":"milk"}\n'
+    })
+    const strict = run(file, ['add', 'milk', '--urgent'], envWith({ STRICT: '1' }))
+    expect(strict.code).toBe(2)
+    expect(strict.stdout).toBe('')
+    expect(strict.stderr).toMatch(/Unknown option: --urgent/)
+  })
+
+  test('the values that args checks are errors of the arguments: a range, and a parser that throws', () => {
+    const replicas =
+      "replicas: describe(short(withDefault(integer({ min: 1, max: 5 }), 1), 'r'), 'The replicas')"
+    expect(readFileSync(GUIDE, 'utf8')).toContain(replicas)
+    const file = write(
+      'check-in-args.ts',
+      `import { cli, define, jsonArgs } from 'gunshi'
+import { combinator, describe, integer, positional, short, withDefault } from 'gunshi/combinators'
+const create = define({
+  name: 'create',
+  args: {
+    ...jsonArgs,
+    name: positional(
+      combinator({
+        parse: value => {
+          if (!/^[a-z0-9-]+$/.test(value)) {
+            throw new Error('use lowercase letters, digits and hyphens')
+          }
+          return value
+        }
+      })
+    ),
+    ${replicas}
+  },
+  run: ctx => ({ database: { name: ctx.values.name, replicas: ctx.values.replicas } })
+})
+await cli(process.argv.slice(2), define({ name: 'cloud' }), { name: 'cloud', subCommands: { create }, validationErrorExitCode: 2 })
+`
+    )
+    const { output } = typeCheck([file])
+    expect(output).toBe('')
+    expect(run(file, ['create', 'db', '--json'])).toEqual({
+      code: 0,
+      stdout: '{"database":{"name":"db","replicas":1}}\n',
+      stderr: ''
+    })
+    expect(run(file, ['create', 'db', '-r', '3', '--json']).stdout).toBe(
+      '{"database":{"name":"db","replicas":3}}\n'
+    )
+    for (const args of [
+      ['create', 'db', '-r', '9'],
+      ['create', 'Bad_Name']
+    ]) {
+      const result = run(file, args)
+      expect(result.code, `${args.join(' ')}: ${result.stderr}`).toBe(2)
+      expect(result.stdout).toBe('')
+      expect(result.stderr).toContain('cloud create --help')
+      expect(hasStackTrace(result.stderr)).toBe(false)
+      const json = run(file, [...args, '--json'])
+      expect(json.code).toBe(2)
+      const failure = jsonFailure(json)
+      expect(failure.status).toBe('action_required')
+      expect(failure.next?.[0]?.command).toBe('cloud create --help')
+    }
+  })
+
   test('a CommandError prints its message to stderr without a stack trace, and sets the exit code', () => {
     const file = write(
       'command-error.mjs',
@@ -676,6 +761,12 @@ declare function find(): Project
         `export const c = define({ name: 'c', args: { ...jsonArgs }, run: async ctx => { ctx.log('c') } })`,
         "Type 'void' is not assignable to type 'JsonResult'",
         "Type 'void' is not assignable to type 'JsonResult'"
+      ],
+      [
+        'returns-in-one-branch.ts',
+        `export const c = define({ name: 'c', args: { ...jsonArgs }, run: ctx => { if (ctx.values.json) { return { project: find() } } ctx.log('c') } })`,
+        "Type 'undefined' is not assignable to type 'Awaitable<JsonResult>'",
+        "or the same with `'undefined'`"
       ],
       [
         'returns-a-value.ts',
