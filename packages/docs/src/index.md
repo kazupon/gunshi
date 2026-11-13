@@ -5,7 +5,7 @@ layout: home
 hero:
   name: 'Gunshi'
   text: 'Your strategist for CLIs that people and AI agents use'
-  tagline: 'Robust, modular, flexible, and localizable JavaScript command-line library'
+  tagline: 'You define the commands; Gunshi devises the help, the errors, and the JSON'
   image:
     src: /logo.png
     alt: Gunshi

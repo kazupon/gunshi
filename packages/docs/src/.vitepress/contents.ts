@@ -2,7 +2,7 @@ export const meta = {
   title: 'Gunshi',
   description:
     'JavaScript command-line library, your strategist for CLIs that people and AI agents use',
-  tagline: 'Robust, modular, flexible, and localizable JavaScript command-line library'
+  tagline: 'You define the commands; Gunshi devises the help, the errors, and the JSON'
 }
 
 export type Sidebar = {
