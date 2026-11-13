@@ -119,7 +119,7 @@
     "@types/node": "catalog:",
     "args-tokens": "catalog:",
     "publint": "catalog:",
-    "std-env": "^4.1.0",
+    "std-env": "^4.3.0",
     "zod": "catalog:"
   },
   "engines": {
