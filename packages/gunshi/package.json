@@ -1,7 +1,7 @@
 {
   "name": "gunshi",
   "version": "1.0.0-rc.6",
-  "description": "Modern javascript command-line library",
+  "description": "JavaScript command-line library, your strategist for CLIs that people and AI agents use",
   "keywords": [
     "args",
     "argument",
