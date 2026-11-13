@@ -1,6 +1,6 @@
 {
   "name": "gunshi",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "description": "JavaScript command-line library, your strategist for CLIs that people and AI agents use",
   "keywords": [
     "agent-skills",
