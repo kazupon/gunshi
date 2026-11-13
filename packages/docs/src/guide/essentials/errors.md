@@ -34,6 +34,8 @@ await cli(process.argv.slice(2), command, { validationErrorExitCode: 2 })
 
 It is the exit code of the argument errors, an unknown command included, whether they are printed as text or as JSON (see [With `--json`](#with-json)), and of `--json` given to a command that does not support it. It does not change the exit code of a `CommandError`, or of an unexpected error.
 
+An unknown option is one of the argument errors only with `strict: true` (see [Strict Unknown Option Validation](./declarative.md#strict-unknown-option-validation)). Without it, Gunshi ignores the option and runs the command, so when an unknown option is a usage error too, give both `strict: true` and `validationErrorExitCode`.
+
 A command may also find an error in its arguments itself, such as a start date after the end date. To end it with the same exit code, throw a [`CommandError`](#expected-failures) with the exit code that `ctx.env` has:
 
 ```js
