@@ -344,8 +344,8 @@ importers:
         specifier: 'catalog:'
         version: 0.3.21
       std-env:
-        specifier: ^4.1.0
-        version: 4.2.0
+        specifier: ^4.3.0
+        version: 4.3.0
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -4214,9 +4214,6 @@ packages:
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
 
-  std-env@4.2.0:
-    resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
-
   std-env@4.3.0:
     resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
 
@@ -7744,8 +7741,6 @@ snapshots:
       spdx-ranges: 2.1.1
 
   sprintf-js@1.0.3: {}
-
-  std-env@4.2.0: {}
 
   std-env@4.3.0: {}
 
