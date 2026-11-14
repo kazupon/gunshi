@@ -672,6 +672,38 @@ await cli(process.argv.slice(2), define({ name: 'cloud' }), { name: 'cloud', sub
     }
   })
 
+  test('a positional argument with parse is still positional: the id of the guide', () => {
+    const guide = readFileSync(GUIDE, 'utf8')
+    const id = "id: { type: 'positional', description: 'The id', parse: integerIn(1, 9999) }"
+    expect(guide).toContain(id)
+    const integerIn = /^const integerIn = [\s\S]+?^\}$/m.exec(guide)?.[0]
+    expect(integerIn).toBeDefined()
+    const file = write(
+      'positional-parse.ts',
+      `import { cli, define } from 'gunshi'
+${integerIn}
+const done = define({
+  name: 'done',
+  args: { ${id} },
+  run: ctx => {
+    // a number that the command needs, not an option that may be missing
+    const id: number = ctx.values.id
+    console.log(JSON.stringify({ id }))
+  }
+})
+await cli(process.argv.slice(2), define({ name: 'todo' }), { name: 'todo', subCommands: { done }, validationErrorExitCode: 2 })
+`
+    )
+    expect(typeCheck([file]).output).toBe('')
+    expect(run(file, ['done', '3'])).toEqual({ code: 0, stdout: '{"id":3}\n', stderr: '' })
+    for (const args of [['done', '0'], ['done', 'abc'], ['done']]) {
+      const result = run(file, args)
+      expect(result.code, `${args.join(' ')}: ${result.stderr}`).toBe(2)
+      expect(result.stdout).toBe('')
+      expect(hasStackTrace(result.stderr)).toBe(false)
+    }
+  })
+
   test('a CommandError prints its message to stderr without a stack trace, and sets the exit code', () => {
     const file = write(
       'command-error.mjs',
