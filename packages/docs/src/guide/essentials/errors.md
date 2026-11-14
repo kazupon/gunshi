@@ -213,3 +213,7 @@ With `usageSilent: true`, Gunshi prints nothing and leaves the exit code alone.
 The `cli()` promise rejects with the `CommandError`, or with the `AggregateError` that holds the argument errors, for you to report them. This suits tests, and programs that call `cli()`.
 
 To report only the argument errors yourself, set `renderValidationErrors` to `null` (see [Handling Argument Validation Errors](../advanced/command-hooks.md#handling-argument-validation-errors)). It does not change how Gunshi reports a `CommandError`.
+
+## Next Steps
+
+With `--json`, Gunshi prints these errors as JSON. Learn how a command supports `--json`, and what it prints, in [JSON Output](./json-output.md).

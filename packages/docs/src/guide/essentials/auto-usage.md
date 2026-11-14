@@ -296,4 +296,4 @@ When working with auto-generated usage:
 
 ## Next Steps
 
-Learn about the [Plugin System](./plugin-system.md) to extend functionality.
+Learn how Gunshi reports the errors of the arguments and the failures of your commands, and which exit codes it sets, in [Errors and Exit Codes](./errors.md).
