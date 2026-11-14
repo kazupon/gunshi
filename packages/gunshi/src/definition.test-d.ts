@@ -1,4 +1,17 @@
 import { describe, expectTypeOf, test } from 'vite-plus/test'
+import {
+  choice,
+  combinator,
+  describe as describeArg,
+  integer,
+  map,
+  multiple,
+  positional,
+  required,
+  short,
+  string,
+  withDefault
+} from './combinators.ts'
 import { define, defineWithTypes, jsonArgs, lazy, lazyWithTypes } from './definition.ts'
 
 import type { Args, Command, CommandRunner, GunshiParams } from './types.ts'
@@ -439,5 +452,137 @@ describe('the run of a lazy command comes from its loader (#881)', () => {
     lazyWithTypes<{ extensions: LoggerExtensions }>()(loader, define({ name: 'deploy' }))
     const typed: Command = { name: 'deploy' }
     lazy(loader, typed)
+  })
+})
+
+/**
+ * NOTE(kazupon): a key that an argument does not have is reported at the key, with a type that
+ * names the key, and the key to use instead for a key of another library or a typo, such as
+ * `'alias' is not a key of an argument: use 'short'`. The e2e tests check the messages with the
+ * built declarations (`e2e/type-copies.spec.ts`). A statement that must not type-check is written
+ * on one line, as above. Two forms are not checked:
+ *
+ * - An object given to `cli()` as a command: its arguments are not typed at all (#931)
+ * - A sub-command written as an object in a table of sub-commands: `SubCommandable` takes any
+ *   arguments (#440), so that a sub-command in a variable without `as const` type-checks. Such a
+ *   sub-command is defined with `define`, which checks its arguments
+ */
+describe('the keys that an argument does not have (#930)', () => {
+  const run = () => {}
+  const list = () => ({ ok: true })
+  const loader = (): CommandRunner => run
+  const parse = (value: string) => Number(value)
+  const strict = true as boolean
+
+  test('define rejects them', () => {
+    // @ts-expect-error `positional` is not a key of an argument: use `type: 'positional'`
+    define({ name: 'rm', args: { n: { type: 'custom', positional: true, parse } }, run })
+    // @ts-expect-error `require`: the key of a required argument is `required`
+    define({ name: 'add', args: { store: { type: 'string', require: true } }, run })
+    // @ts-expect-error `desc`: the key of the description is `description`
+    define({ name: 'add', args: { store: { type: 'string', desc: 'The file' } }, run })
+    // @ts-expect-error `alias`: the key of the short name is `short`
+    define({ name: 'add', args: { verbose: { type: 'boolean', alias: 'v' } }, run })
+    // @ts-expect-error `array`: the key of an argument given more than once is `multiple`
+    define({ name: 'add', args: { tag: { type: 'string', array: true } }, run })
+    // @ts-expect-error `desc`, next to the arguments of `jsonArgs`
+    define({ name: 'ls', args: { ...jsonArgs, s: { type: 'string', desc: 'S' } }, run: list })
+  })
+
+  test('define rejects them in a variable, and in a spread of it', () => {
+    const args = { store: { type: 'string', desc: 'The file' } } as const
+    // @ts-expect-error `desc`, in the arguments in a variable
+    define({ name: 'add', args, run })
+    // @ts-expect-error `desc`, spread from the variable
+    define({ name: 'add', args: { ...args, count: { type: 'number' } }, run })
+  })
+
+  test('define rejects them in a member of a union of schemas', () => {
+    type Value = { type: 'string'; require: true } | { type: 'number' }
+    const value: Value = strict ? { type: 'string', require: true } : { type: 'number' }
+    // @ts-expect-error `require`, in one member of the union
+    define({ name: 'add', args: { value }, run })
+    type Short = { type: 'string'; short: 's' } | { type: 'number' }
+    const short: Short = strict ? { type: 'string', short: 's' } : { type: 'number' }
+    define({ name: 'add', args: { short }, run })
+  })
+
+  test('defineWithTypes rejects them', () => {
+    const defineWithLogger = defineWithTypes<{ extensions: LoggerExtensions }>()
+    // @ts-expect-error `desc` is not a key of an argument
+    defineWithLogger({ name: 'add', args: { store: { type: 'string', desc: 'S' } }, run })
+  })
+
+  test('lazy and lazyWithTypes reject them in the definition', () => {
+    // @ts-expect-error `desc` is not a key of an argument
+    lazy(loader, { name: 'add', args: { store: { type: 'string', desc: 'S' } } })
+    const lazyWithLogger = lazyWithTypes<{ extensions: LoggerExtensions }>()
+    // @ts-expect-error `desc` is not a key of an argument
+    lazyWithLogger(loader, { name: 'add', args: { store: { type: 'string', desc: 'S' } } })
+  })
+
+  test('the keys of an argument are accepted, and the values are inferred', () => {
+    define({
+      name: 'all',
+      args: {
+        s: { type: 'string', short: 's', description: 'S', hidden: false, required: true },
+        d: { type: 'string', deprecated: 'Use s.', metavar: 'text', toKebab: true, conflicts: 's' },
+        b: { type: 'boolean', negatable: true, default: false },
+        e: { type: 'enum', choices: ['x', 'y'] as const, default: 'x' },
+        p: { type: 'positional', parse, required: false, multiple: true },
+        c: { type: 'custom', parse, default: 1 }
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.s).toEqualTypeOf<string>()
+        expectTypeOf(ctx.values.e).toEqualTypeOf<'x' | 'y'>()
+        expectTypeOf(ctx.values.p).toEqualTypeOf<number[] | undefined>()
+        expectTypeOf(ctx.values.c).toEqualTypeOf<number>()
+      }
+    })
+  })
+
+  test('the arguments of jsonArgs and of the parser combinators are accepted', () => {
+    define({ name: 'ls', args: { ...jsonArgs }, run: list })
+    define({ name: 'ls', args: { json: { ...jsonArgs.json, short: 'j' } }, run: list })
+    lazy(() => define({ name: 'ls', args: { ...jsonArgs }, run: list }), {
+      name: 'ls',
+      args: { ...jsonArgs }
+    })
+    define({
+      name: 'combinators',
+      args: {
+        i: integer({ min: 1 }),
+        w: withDefault(integer(), 1),
+        r: required(string()),
+        p: positional(integer()),
+        m: multiple(string()),
+        sh: short(string(), 's'),
+        d: describeArg(string(), 'D'),
+        ch: choice(['a', 'b'] as const),
+        mp: map(string(), value => value.length),
+        co: combinator({ parse }),
+        u: strict ? multiple(integer()) : string()
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.w).toEqualTypeOf<number>()
+        expectTypeOf(ctx.values.r).toEqualTypeOf<string>()
+      }
+    })
+  })
+
+  test('the arguments typed as Args, and in variables without unknown keys, are accepted', () => {
+    define({ name: 'add', args: commandArgs, run })
+    const typed: Args = { store: { type: 'string' } }
+    define({ name: 'add', args: typed, run })
+    const common = { config: { type: 'string', default: 'ship.json' } } as const
+    define({
+      name: 'add',
+      args: { ...common, count: { type: 'number' } },
+      run: ctx => {
+        expectTypeOf(ctx.values.config).toEqualTypeOf<string>()
+      }
+    })
+    defineWithTypes<{ extensions: LoggerExtensions }>()({ name: 'add', args: commandArgs, run })
+    lazyWithTypes<{ extensions: LoggerExtensions }>()(loader, { name: 'add', args: commandArgs })
   })
 })

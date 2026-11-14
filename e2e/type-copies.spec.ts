@@ -282,8 +282,69 @@ export const b = lazyFromDefinition(() => run, defineFromDefinition({ name: 'b' 
 export const c = lazy(() => run, defineI18n({ name: 'c', resource }))
 const typed: Command = { name: 'd', run }
 export const d = lazy(() => run, typed)
+`,
+
+  // a key that an argument does not have is a type error with the helpers of each package (#930)
+  'unknown-arg-keys.ts': `import { define, defineWithTypes, jsonArgs, lazy, lazyWithTypes } from 'gunshi'
+import { integer, withDefault } from 'gunshi/combinators'
+import { define as defineFromDefinition, lazy as lazyFromDefinition } from '@gunshi/definition'
+import { defineI18n, defineI18nWithTypes } from '@gunshi/plugin-i18n'
+
+const run = () => {}
+const resource = async () => ({ description: 'A command' })
+const parse = (value: string) => Number(value)
+
+// @ts-expect-error \`positional\` is not a key of an argument
+define({ name: 'a', args: { n: { type: 'custom', positional: true, parse } }, run })
+// @ts-expect-error \`alias\` is not a key of an argument
+defineWithTypes<{ extensions: {} }>()({ name: 'a', args: { s: { type: 'string', alias: 's' } }, run })
+// @ts-expect-error \`array\` is not a key of an argument
+lazy(() => run, { name: 'a', args: { s: { type: 'string', array: true } } })
+// @ts-expect-error \`desc\` is not a key of an argument
+lazyWithTypes<{ extensions: {} }>()(() => run, { name: 'a', args: { s: { type: 'string', desc: 'S' } } })
+// @ts-expect-error \`require\` is not a key of an argument
+defineFromDefinition({ name: 'a', args: { s: { type: 'string', require: true } }, run })
+// @ts-expect-error \`desc\` is not a key of an argument
+lazyFromDefinition(() => run, { name: 'a', args: { s: { type: 'string', desc: 'S' } } })
+// @ts-expect-error \`alias\` is not a key of an argument
+defineI18n({ name: 'a', args: { s: { type: 'string', alias: 's' } }, resource, run })
+// @ts-expect-error \`alias\` is not a key of an argument
+defineI18nWithTypes<{ extensions: {} }>()({ name: 'a', args: { s: { type: 'string', alias: 's' } }, run })
+
+// the keys of an argument, jsonArgs and the parser combinators
+export const all = define({
+  name: 'all',
+  args: {
+    ...jsonArgs,
+    verbose: { type: 'boolean', short: 'v', negatable: true },
+    wait: { type: 'custom', metavar: 'seconds', default: 60, parse },
+    count: integer({ min: 1 }),
+    limit: withDefault(integer(), 20)
+  },
+  run: ctx => ({ wait: ctx.values.wait, count: ctx.values.count, limit: ctx.values.limit })
+})
+export const short = defineFromDefinition({ name: 'short', args: { json: { ...jsonArgs.json, short: 'j' } }, run: () => ({ ok: true }) })
+export const translated = defineI18n({ name: 'translated', args: { s: { type: 'string', description: 'S' } }, resource, run })
 `
 }
+
+/**
+ * The errors of the keys that an argument does not have (#930), in a directory of its own: the program is not a
+ * program that type-checks, as the ones above
+ */
+const UNKNOWN_ARG_KEY_ERRORS = `import { define } from 'gunshi'
+import { define as defineFromDefinition } from '@gunshi/definition'
+import { defineI18n } from '@gunshi/plugin-i18n'
+
+const run = () => {}
+const resource = async () => ({ description: 'A command' })
+const parse = (value: string) => Number(value)
+
+define({ name: 'a', args: { n: { type: 'custom', positional: true, parse } }, run })
+define({ name: 'a', args: { s: { type: 'string', alias: 's', array: true } }, run })
+defineFromDefinition({ name: 'a', args: { s: { type: 'string', desc: 'S', require: true } }, run })
+defineI18n({ name: 'a', args: { s: { type: 'string', alias: 's' } }, resource, run })
+`
 
 let dir = ''
 
@@ -330,4 +391,36 @@ test('the programs type-check against the built declarations of the packages', (
   const result = spawnSync(tsc, ['-p', 'tsconfig.json'], { cwd: dir, encoding: 'utf8' })
   expect(`${result.stdout}${result.stderr}`).toBe('')
   expect(result.status).toBe(0)
+})
+
+test('an error of a key that an argument does not have names the key, and the key to use instead', () => {
+  const errors = path.join(dir, 'unknown-arg-key-errors')
+  mkdirSync(errors)
+  writeFileSync(path.join(errors, 'errors.ts'), UNKNOWN_ARG_KEY_ERRORS)
+  writeFileSync(
+    path.join(errors, 'tsconfig.json'),
+    `${JSON.stringify({ extends: '../tsconfig.json', include: ['*.ts'] })}\n`
+  )
+  const tsc = path.join(ROOT, 'node_modules', '.bin', 'tsc')
+  const result = spawnSync(tsc, ['-p', 'tsconfig.json'], { cwd: errors, encoding: 'utf8' })
+  // the first line of each error: the file, the line and the column, and the message
+  const reported = `${result.stdout}${result.stderr}`
+    .split('\n')
+    .filter(line => line.startsWith('errors.ts('))
+  const expected: [number, string][] = [
+    [9, `"'positional' is not a key of an argument"`],
+    [10, `"'alias' is not a key of an argument: use 'short'"`],
+    [10, `"'array' is not a key of an argument: use 'multiple'"`],
+    [11, `"'desc' is not a key of an argument: use 'description'"`],
+    [11, `"'require' is not a key of an argument: use 'required'"`],
+    // the copy of the types of the i18n plugin
+    [12, `"'alias' is not a key of an argument: use 'short'"`]
+  ]
+  for (const [line, message] of expected) {
+    expect(
+      reported.some(error => error.startsWith(`errors.ts(${line},`) && error.includes(message))
+    ).toBe(true)
+  }
+  expect(reported).toHaveLength(expected.length)
+  expect(result.status).not.toBe(0)
 })
