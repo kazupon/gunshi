@@ -615,9 +615,9 @@ await cli(process.argv.slice(2), main, {
 
   test('the values that args checks are errors of the arguments: a range, and a parser that throws', () => {
     const guide = readFileSync(GUIDE, 'utf8')
-    const replicas =
-      "replicas: { type: 'custom', short: 'r', default: 1, description: 'The replicas', parse: integerIn(1, 5) }"
-    expect(guide).toContain(replicas)
+    const wait =
+      "wait: { type: 'custom', short: 'w', default: 60, description: 'Seconds to wait for the service', parse: integerIn(0, 600) }"
+    expect(guide).toContain(wait)
     // the rule for a value of the example, `integerIn()`
     const integerIn = /^const integerIn = [\s\S]+?^\}$/m.exec(guide)?.[0]
     expect(integerIn).toBeDefined()
@@ -625,11 +625,11 @@ await cli(process.argv.slice(2), main, {
       'check-in-args.ts',
       `import { cli, define, jsonArgs } from 'gunshi'
 ${integerIn}
-const create = define({
-  name: 'create',
+const deploy = define({
+  name: 'deploy',
   args: {
     ...jsonArgs,
-    name: {
+    service: {
       type: 'positional',
       parse: value => {
         if (!/^[a-z0-9-]+$/.test(value)) {
@@ -638,37 +638,37 @@ const create = define({
         return value
       }
     },
-    ${replicas}
+    ${wait}
   },
-  run: ctx => ({ database: { name: ctx.values.name, replicas: ctx.values.replicas } })
+  run: ctx => ({ deployment: { service: ctx.values.service, wait: ctx.values.wait } })
 })
-await cli(process.argv.slice(2), define({ name: 'cloud' }), { name: 'cloud', subCommands: { create }, validationErrorExitCode: 2 })
+await cli(process.argv.slice(2), define({ name: 'ship' }), { name: 'ship', subCommands: { deploy }, validationErrorExitCode: 2 })
 `
     )
     const { output } = typeCheck([file])
     expect(output).toBe('')
-    expect(run(file, ['create', 'db', '--json'])).toEqual({
+    expect(run(file, ['deploy', 'api', '--json'])).toEqual({
       code: 0,
-      stdout: '{"database":{"name":"db","replicas":1}}\n',
+      stdout: '{"deployment":{"service":"api","wait":60}}\n',
       stderr: ''
     })
-    expect(run(file, ['create', 'db', '-r', '3', '--json']).stdout).toBe(
-      '{"database":{"name":"db","replicas":3}}\n'
+    expect(run(file, ['deploy', 'api', '-w', '30', '--json']).stdout).toBe(
+      '{"deployment":{"service":"api","wait":30}}\n'
     )
     for (const args of [
-      ['create', 'db', '-r', '9'],
-      ['create', 'Bad_Name']
+      ['deploy', 'api', '-w', '700'],
+      ['deploy', 'Bad_Name']
     ]) {
       const result = run(file, args)
       expect(result.code, `${args.join(' ')}: ${result.stderr}`).toBe(2)
       expect(result.stdout).toBe('')
-      expect(result.stderr).toContain('cloud create --help')
+      expect(result.stderr).toContain('ship deploy --help')
       expect(hasStackTrace(result.stderr)).toBe(false)
       const json = run(file, [...args, '--json'])
       expect(json.code).toBe(2)
       const failure = jsonFailure(json)
       expect(failure.status).toBe('action_required')
-      expect(failure.next?.[0]?.command).toBe('cloud create --help')
+      expect(failure.next?.[0]?.command).toBe('ship deploy --help')
     }
   })
 
