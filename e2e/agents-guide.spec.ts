@@ -280,6 +280,92 @@ await cli(process.argv.slice(2), define({ name: 'x', args: { ...jsonArgs }, run:
     expect(run(file, ['add', 'milk']).stdout).toBe('{"title":"milk"}\n')
   })
 
+  test('a positional argument with multiple: true is optional, and undefined without values, unless it has required: true', () => {
+    const guide = readFileSync(GUIDE, 'utf8')
+    const releases =
+      "releases: { type: 'positional', multiple: true, required: true, description: 'The release numbers', parse: integerIn(1, 999) }"
+    expect(guide).toContain(releases)
+    // the rule for a value of the example, `integerIn()`
+    const integerIn = /^const integerIn = [\s\S]+?^\}$/m.exec(guide)?.[0]
+    expect(integerIn).toBeDefined()
+    const file = write(
+      'positional-multiple.ts',
+      `import { cli, define } from 'gunshi'
+${integerIn}
+const promote = define({
+  name: 'promote',
+  args: { ${releases} },
+  run: ctx => {
+    const releases: number[] = ctx.values.releases
+    console.log(JSON.stringify(releases))
+  }
+})
+const status = define({
+  name: 'status',
+  args: { releases: { type: 'positional', multiple: true, parse: integerIn(1, 999) } },
+  run: ctx => {
+    const releases: number[] | undefined = ctx.values.releases
+    // @ts-expect-error without required: true, the value may be undefined
+    const all: number[] = ctx.values.releases
+    console.log(JSON.stringify({ releases: releases ?? 'undefined', all: all ?? 'undefined' }))
+  }
+})
+await cli(process.argv.slice(2), define({ name: 'ship' }), { name: 'ship', subCommands: { promote, status } })
+`
+    )
+    expect(typeCheck([file]).output).toBe('')
+    expect(run(file, ['promote', '3', '12']).stdout).toBe('[3,12]\n')
+    const none = run(file, ['promote'])
+    expect(none.code).toBe(1)
+    expect(none.stderr).toMatch(/releases/)
+    // `parse` reads each of them
+    const wrong = run(file, ['promote', '3', '1000'])
+    expect(wrong.code).toBe(1)
+    expect(wrong.stdout).toBe('')
+    expect(wrong.stderr).toContain('expected an integer from 1 to 999')
+    expect(run(file, ['status']).stdout).toBe('{"releases":"undefined","all":"undefined"}\n')
+    expect(run(file, ['status', '7']).stdout).toBe('{"releases":[7],"all":[7]}\n')
+  })
+
+  test('an option with multiple: true is undefined when it is not given, and its default is one value, not an array', () => {
+    const file = write(
+      'option-multiple.ts',
+      `import { cli, define } from 'gunshi'
+const deploy = define({
+  name: 'deploy',
+  args: {
+    var: { type: 'string', multiple: true },
+    region: { type: 'string', multiple: true, default: 'eu' }
+  },
+  run: ctx => {
+    const vars: string[] = ctx.values.var ?? []
+    const regions: string[] = ctx.values.region
+    console.log(JSON.stringify({ given: ctx.values.var ?? 'undefined', vars, regions }))
+  }
+})
+await cli(process.argv.slice(2), define({ name: 'ship' }), { name: 'ship', subCommands: { deploy } })
+`
+    )
+    expect(typeCheck([file]).output).toBe('')
+    expect(run(file, ['deploy', '--var', 'A=1', '--var', 'B=2']).stdout).toBe(
+      '{"given":["A=1","B=2"],"vars":["A=1","B=2"],"regions":["eu"]}\n'
+    )
+    expect(run(file, ['deploy']).stdout).toBe('{"given":"undefined","vars":[],"regions":["eu"]}\n')
+    const arrayDefault = write(
+      'option-multiple-array-default.ts',
+      `import { define } from 'gunshi'
+define({ name: 'deploy', args: { var: { type: 'string', multiple: true, default: [] } }, run: () => {} })
+`
+    )
+    // the type error that the guide quotes
+    expect(typeCheck([arrayDefault]).output).toContain(
+      "Type 'never[]' is not assignable to type 'string | number | boolean | undefined'"
+    )
+    expect(readFileSync(GUIDE, 'utf8')).toContain(
+      "Type 'never[]' is not assignable to type 'string | number | boolean | undefined'"
+    )
+  })
+
   test('an option is named after its key, or in kebab-case with toKebab', () => {
     const file = write(
       'kebab.mjs',
