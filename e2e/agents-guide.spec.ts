@@ -228,6 +228,7 @@ describe('the example of AGENTS.md', () => {
     [['rollback', '3'], 0, /^Rolled back to release 3\n$/, ''],
     [['rollback', '0'], 1, /^$/, /Invalid value for 'release': expected an integer from 1 to 999/],
     [['rollback', '1000'], 1, /^$/, /expected an integer from 1 to 999/],
+    [['rollback', '1e2'], 1, /^$/, /expected an integer from 1 to 999/],
     [['rollback', '11'], 1, /^$/, /^Release 11 not found\n$/],
     [
       ['rollback', '11', '--json'],
@@ -314,21 +315,27 @@ await cli(process.argv.slice(2), add, { name: 'add' })
     expect(run(file, ['--help']).stdout).toMatch(/title\s+The title/)
   })
 
-  test('an option made with a combinator is optional unless it is wrapped in required() or withDefault()', () => {
+  test('an option made with a combinator is optional unless its combinator takes required: true, or it is wrapped in required() or withDefault()', () => {
     const file = write(
       'combinator-optional.ts',
       `import { define } from 'gunshi'
 import { integer, required, withDefault } from 'gunshi/combinators'
 define({
   name: 'resize',
-  args: { plain: integer({ min: 1 }), needed: required(integer({ min: 1 })), defaulted: withDefault(integer({ min: 1 }), 1) },
+  args: {
+    plain: integer({ min: 1 }),
+    inOptions: integer({ min: 1, required: true }),
+    needed: required(integer({ min: 1 })),
+    defaulted: withDefault(integer({ min: 1 }), 1)
+  },
   run: ctx => {
     const plain: number | undefined = ctx.values.plain
+    const inOptions: number = ctx.values.inOptions
     const needed: number = ctx.values.needed
     const defaulted: number = ctx.values.defaulted
-    // @ts-expect-error without required() or withDefault(), the value may be undefined
+    // @ts-expect-error without required: true, required() or withDefault(), the value may be undefined
     const wrong: number = ctx.values.plain
-    console.log(plain, needed, defaulted, wrong)
+    console.log(plain, inOptions, needed, defaulted, wrong)
   }
 })
 `

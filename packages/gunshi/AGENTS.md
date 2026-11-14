@@ -15,7 +15,7 @@ const common = {
 // A rule for a value: `parse` reads the value given, and throws an `Error` for a wrong one
 const integerIn = (min: number, max: number) => (value: string) => {
   const n = Number(value)
-  if (!Number.isInteger(n) || n < min || n > max) {
+  if (!/^-?\d+$/.test(value) || n < min || n > max) {
     throw new Error(`expected an integer from ${min} to ${max}`)
   }
   return n
@@ -88,7 +88,7 @@ await cli(process.argv.slice(2), main, {
 - Write the `choices` of an `enum` `as const`, so that its value is typed as their union. Without it, the value is a `string`
 - Declare each argument as an object with a `type`, as above. It is the way of Gunshi, and its guides use it
 - Check the values of the arguments in `args`, not in `run`: a choice with an `enum`, and any other rule, such as a number in a range, with a `parse` function that throws an `Error` for a wrong value, as `release` above. Gunshi then reports a wrong value as an error of the arguments, as below, and the value has the type that `parse` returns. `parse` gets the value as a string, whatever the `type`: give an option with `parse` the type `custom`, and keep `positional` for a positional argument. An option `-r` from 1 to 5 that defaults to 1: `replicas: { type: 'custom', short: 'r', default: 1, description: 'The replicas', parse: integerIn(1, 5) }`
-- The parser combinators of `gunshi/combinators` (`integer({ min, max })`, `string({ pattern })`, `withDefault()`, `required()`, and others) write the same schemas with functions. Use them only when the project already declares its arguments with them, or when many arguments share the rules that they check, so that each does not need a `parse` of its own. A combinator is the whole schema: it does not go in `type`, and it takes no object with a `type` (`positional()` alone is a string). An option made with a combinator is optional unless it is wrapped in `required()` or `withDefault()`
+- The parser combinators of `gunshi/combinators` (`integer({ min, max })`, `string({ pattern })`, `withDefault()`, `required()`, and others) write the same schemas with functions. Use them only when the project already declares its arguments with them, or when many arguments share the rules that they check, so that each does not need a `parse` of its own. A combinator is the whole schema: it does not go in `type`, and it takes no object with a `type` (`positional()` alone is a string). An option made with a combinator is optional unless its combinator takes `required: true`, as `integer({ min: 1, required: true })`, or it is wrapped in `required()` or `withDefault()`
 - Sub-commands go in the `subCommands` option of `cli()`: an object keyed by the command names, a `Map`, or an array of commands. A command can also have its own `subCommands`. The command given to `cli()` runs when no command is given
 - A command that only groups sub-commands needs no `run`, as `ship` above: run without a sub-command, it prints its usage, as `--help` does, and the exit code is 0. Give it a `run` only when it has something else to do then. Any other command needs `run`: without it, the command throws `'run' is required in command` when it runs
 - The `args` of a command are its own, so the sub-commands do not see the `args` of the main command. For an option of every command, spread shared arguments as above

@@ -36,7 +36,7 @@ Parser combinators make the same schemas with functions. Use them when:
 - You build the arguments of many commands from shared groups, with [`args()`](#args), [`merge()`](#merge) and [`extend()`](#extend)
 - The project already declares its arguments with them
 
-Objects and combinators can be mixed in the `args` of a command. An option made with a combinator is optional unless it is wrapped in [`required()`](#required) or [`withDefault()`](#withdefault), as `required: true` and `default` make an object required or give it a value.
+Objects and combinators can be mixed in the `args` of a command. An option made with a combinator may be omitted, as an object may: `required: true` in the options of its base combinator, such as `integer({ required: true })`, or [`required()`](#required) makes it required, as `required: true` does for an object, and [`withDefault()`](#withdefault) gives it a value when it is omitted, as `default` does.
 
 ## Objects and Combinators Side by Side
 
@@ -63,7 +63,7 @@ const command = define({
       default: 8080,
       parse: value => {
         const port = Number(value)
-        if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+        if (!/^\d+$/.test(value) || port < 1 || port > 65_535) {
           throw new TypeError(`Invalid port: ${value}. Must be an integer from 1 to 65535`)
         }
         return port
@@ -1069,7 +1069,7 @@ const objectCommand = define({
       description: 'Port number',
       parse: value => {
         const port = Number(value)
-        if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+        if (!/^\d+$/.test(value) || port < 1 || port > 65_535) {
           throw new TypeError(`Invalid port: ${value}. Must be an integer from 1 to 65535`)
         }
         return port
