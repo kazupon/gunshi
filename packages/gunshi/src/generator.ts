@@ -17,13 +17,13 @@
 import { cliUsage } from './cli/builtin.ts'
 import { create } from './utils.ts'
 
+import type { EntryCommandable } from './cli/entry-types.ts'
 import type {
   CliOptions,
   Command,
   DefaultGunshiParams,
   GunshiParamsConstraint,
-  LazyCommand,
-  SubCommandable
+  LazyCommand
 } from './types.ts'
 
 /**
@@ -45,7 +45,7 @@ export type GenerateOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
  */
 export async function generate<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   command: string | string[] | null,
-  entry: Command<G> | LazyCommand<G> | SubCommandable,
+  entry: Command<G> | LazyCommand<G> | EntryCommandable,
   options: GenerateOptions<G> = {}
 ): Promise<string> {
   const args: string[] = []

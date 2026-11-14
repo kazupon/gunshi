@@ -80,3 +80,16 @@ test('withI18nResource keeps a lazy command callable (#877)', async () => {
   await cli([], define({ name: 'app', run }), { subCommands: { deploy: translated } })
   await cli([], translated)
 })
+
+test('cli() takes the commands of the helpers as the command (#931)', async () => {
+  const deploy = defineI18n({
+    name: 'deploy',
+    args: { replicas: { type: 'number', default: 1 } },
+    resource,
+    run: ctx => {
+      expectTypeOf(ctx.values.replicas).toEqualTypeOf<number>()
+    }
+  })
+  await cli([], deploy)
+  await cli([], withI18nResource(define({ name: 'deploy', run }), resource))
+})

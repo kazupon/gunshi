@@ -175,7 +175,7 @@ Each option can have the following properties:
 - `negatable`: Set to `true` to accept the negated form of a boolean option, such as `--no-verbose`. See [Negatable Boolean Options](#negatable-boolean-options)
 - `metavar`: The name of the type of the value. The parser combinators set it, such as `integer` for `integer()`. The help names the value after the option, not after it
 
-These are all the keys of an argument. Any other key is a type error in the definition that you give to `define`, `lazy` and the other helpers. TypeScript reports it at the key, and names it, as in `'alias' is not a key of an argument: use 'short'`. So a key of another library, such as `alias`, or a typo, such as `require`, is reported instead of being ignored. An object that you give to `cli()` as a command is not checked, so define it with `define`.
+These are all the keys of an argument. Any other key is a type error in the definition that you give to `define`, `lazy` and the other helpers. TypeScript reports it at the key, and names it, as in `'alias' is not a key of an argument: use 'short'`. So a key of another library, such as `alias`, or a typo, such as `require`, is reported instead of being ignored. So is such a key in an object that you give to `cli()` as the command, which TypeScript reports with its own message. An object in the table of the sub-commands is not checked, so define it with `define`.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
