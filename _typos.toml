@@ -11,6 +11,8 @@ outpu = "outpu"
 formt = "formt"
 # Intentional misspelling used in the test of the negated form of a deprecated option, which the hint does not suggest.
 legac = "legac"
+# Intentional misspelling used in the type tests of an argument whose type is not valid (#931).
+numbr = "numbr"
 
 [default.extend-identifiers]
 # A type exported by @gunshi/shared. Renaming it would break the code that imports it.

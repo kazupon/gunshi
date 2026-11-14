@@ -325,6 +325,60 @@ export const all = define({
 })
 export const short = defineFromDefinition({ name: 'short', args: { json: { ...jsonArgs.json, short: 'j' } }, run: () => ({ ok: true }) })
 export const translated = defineI18n({ name: 'translated', args: { s: { type: 'string', description: 'S' } }, resource, run })
+`,
+
+  // an object given to cli() or generate() as the command is typed by its arguments (#931)
+  'cli-entry.ts': `import { cli } from 'gunshi'
+import { cli as cliOfBone } from 'gunshi/bone'
+import { generate } from 'gunshi/generator'
+
+const run = () => {}
+
+await cli([], {
+  name: 'deploy',
+  args: { replicas: { type: 'number', default: 1 }, tag: { type: 'string' } },
+  run: ctx => {
+    const replicas: number = ctx.values.replicas
+    const tag: string | undefined = ctx.values.tag
+    return [replicas, tag].join(' ')
+  }
+})
+await cliOfBone([], {
+  name: 'deploy',
+  args: { replicas: { type: 'number', default: 1 } },
+  run: ctx => {
+    const replicas: number = ctx.values.replicas
+    return String(replicas)
+  }
+})
+// @ts-expect-error 'numbr' is not a type of an argument
+await cli([], { name: 'a', args: { n: { type: 'numbr' } }, run })
+// @ts-expect-error \`desc\` is not a key of an argument
+await cli([], { name: 'a', args: { s: { type: 'string', desc: 'S' } }, run })
+// @ts-expect-error a runner returns a string or nothing
+await cli([], { name: 'a', args: { n: { type: 'number', default: 1 } }, run: ctx => ctx.values.n })
+// @ts-expect-error 'numbr' is not a type of an argument
+await cliOfBone([], { name: 'a', args: { n: { type: 'numbr' } }, run })
+// @ts-expect-error 'numbr' is not a type of an argument
+await generate(null, { name: 'a', args: { n: { type: 'numbr' } }, run })
+`,
+
+  // the commands of another copy of the types, given to cli() and generate() as the command
+  'entry-another-copy.ts': `import { define, jsonArgs, lazy } from '@gunshi/definition'
+import { cli } from 'gunshi'
+import { generate } from 'gunshi/generator'
+
+const run = () => {}
+const show = define({ name: 'show', args: { limit: { type: 'number', default: 20 } }, run: ctx => String(ctx.values.limit) })
+const list = define({ name: 'list', args: { ...jsonArgs }, run: async () => ({ items: [] as string[] }) })
+
+await cli([], show)
+await cli([], list)
+export const usages = [
+  await generate(null, show),
+  await generate(null, list),
+  await generate(null, lazy(() => run, { name: 'lazily', args: { limit: { type: 'number' } } }))
+]
 `
 }
 

@@ -5,6 +5,7 @@
 
 import { cliCore } from './core.ts'
 
+import type { UnknownArgKeys } from '../arg-keys.ts'
 import type {
   Args,
   CliOptions,
@@ -15,12 +16,17 @@ import type {
   GunshiParams,
   LazyCommand
 } from '../types.ts'
+import type { NoInferParams } from './entry-types.ts'
 
 /**
  * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
  * To have them, use `cli` from `gunshi`.
  *
- * @typeParam A - The type of {@linkcode Args | arguments} defined in the command and cli options.
+ * An object written as the entry command is typed by its `args`, as with `define`: `ctx.values` of its `run` are
+ * inferred from them, and a key that an argument does not have is an error.
+ *
+ * @typeParam A - The type of {@linkcode Args | arguments} of the entry command, inferred from its `args`.
+ * @typeParam G - A type extending {@linkcode GunshiParams}, which is not inferred: `{ args: A; extensions: {} }`.
  *
  * @param args - Command line arguments
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
@@ -32,8 +38,11 @@ export async function cli<
   G extends GunshiParams = { args: A; extensions: {} }
 >(
   args: string[],
-  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
-  options?: CliOptions<G>
+  entry:
+    | (Command<NoInferParams<G>> & { args?: A & UnknownArgKeys<A> })
+    | CommandRunner<NoInferParams<G>>
+    | LazyCommand<NoInferParams<G>>,
+  options?: CliOptions<NoInferParams<G>>
 ): Promise<string | undefined>
 
 /**
