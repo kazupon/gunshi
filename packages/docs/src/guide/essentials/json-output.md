@@ -283,3 +283,7 @@ To tell an error of the JSON output, such as the `json_not_supported` in `onErro
 With `renderValidationErrors: null` or `usageSilent: true`, Gunshi prints no JSON for the argument errors and for `json_not_supported`, and the `cli()` promise rejects with the `AggregateError` that holds them, as without `--json`. A renderer of the validation errors is not called with `--json`: to report them yourself, set it to `null`.
 
 The errors of the command and of the result are printed as JSON with these options too, since they are not texts for people.
+
+## Next Steps
+
+Learn about the [Plugin System](./plugin-system.md) to extend your CLI with plugins for features like i18n and shell completion.
