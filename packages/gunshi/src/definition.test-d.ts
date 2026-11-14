@@ -497,6 +497,16 @@ describe('the keys that an argument does not have (#930)', () => {
     define({ name: 'add', args: { ...args, count: { type: 'number' } }, run })
   })
 
+  test('define rejects them in a member of a union of schemas', () => {
+    type Value = { type: 'string'; require: true } | { type: 'number' }
+    const value: Value = strict ? { type: 'string', require: true } : { type: 'number' }
+    // @ts-expect-error `require`, in one member of the union
+    define({ name: 'add', args: { value }, run })
+    type Short = { type: 'string'; short: 's' } | { type: 'number' }
+    const short: Short = strict ? { type: 'string', short: 's' } : { type: 'number' }
+    define({ name: 'add', args: { short }, run })
+  })
+
   test('defineWithTypes rejects them', () => {
     const defineWithLogger = defineWithTypes<{ extensions: LoggerExtensions }>()
     // @ts-expect-error `desc` is not a key of an argument

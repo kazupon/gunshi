@@ -33,6 +33,12 @@ test('defineI18n and defineI18nWithTypes reject the keys that an argument does n
   defineI18n({ name: 'add', args: { store: { type: 'string', desc: 'S' } }, resource, run })
   // @ts-expect-error `alias`: the key of the short name is `short`
   defineI18nCommand({ name: 'add', args: { verbose: { type: 'boolean', alias: 'v' } }, run })
+  type Value = { type: 'string'; require: true } | { type: 'number' }
+  // a value of the union, not narrowed to one of its members
+  const pick = (): Value => ({ type: 'number' })
+  const value = pick()
+  // @ts-expect-error `require`, in one member of a union of schemas
+  defineI18n({ name: 'add', args: { value }, resource, run })
 })
 
 test('defineI18n and defineI18nWithTypes take the keys of an argument', () => {

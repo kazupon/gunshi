@@ -31,6 +31,15 @@ type UnknownArgKeyMessage<P> =
   `'${P & string}' is not a key of an argument${P extends keyof ArgKeyHints ? `: use '${ArgKeyHints[P]}'` : ''}`
 
 /**
+ * The keys of all the members of a union of schemas, such as a schema typed as
+ * `{ type: 'string'; require: true } | { type: 'number' }`: `keyof` of a union has only the keys that every member
+ * has
+ *
+ * @internal
+ */
+type KeysOfEach<S> = S extends unknown ? keyof S : never
+
+/**
  * The keys of each argument that {@link ArgSchema} does not have, mapped to a type that names the key
  *
  * NOTE(kazupon): the definition helpers infer the arguments, so a key that an argument does not have, such as
@@ -44,7 +53,7 @@ type UnknownArgKeyMessage<P> =
  */
 export type UnknownArgKeys<A> = {
   [K in keyof A]: {
-    [P in Exclude<keyof A[K], keyof ArgSchema | `~gunshi.${string}`>]: {
+    [P in Exclude<KeysOfEach<A[K]>, keyof ArgSchema | `~gunshi.${string}`>]: {
       [M in UnknownArgKeyMessage<P>]: never
     }
   }
