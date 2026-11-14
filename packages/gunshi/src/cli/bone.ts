@@ -16,7 +16,7 @@ import type {
   GunshiParams,
   LazyCommand
 } from '../types.ts'
-import type { NoInferParams } from './entry-types.ts'
+import type { EntryCommandable, NoInferParams } from './entry-types.ts'
 
 /**
  * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
@@ -86,6 +86,26 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
  * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
  * To have them, use `cli` from `gunshi`.
  *
+ * This overload takes a command of another copy of the types of gunshi, such as a command of `@gunshi/definition`,
+ * whose types the overloads above cannot compare. `@gunshi/bone` exports no `define`, so a CLI on it defines its
+ * commands with another package. Its arguments are checked as `Args`, and its runner returns what a runner returns. It
+ * must be the last of the overloads.
+ *
+ * @param args - Command line arguments
+ * @param entry - A command-like object (command, command runner, or lazy command)
+ * @param options - A {@link CliOptions | CLI options}
+ * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ */
+export async function cli(
+  args: string[],
+  entry: EntryCommandable,
+  options?: CliOptions
+): Promise<string | undefined>
+
+/**
+ * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
+ * To have them, use `cli` from `gunshi`.
+ *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
  *
  * @param args - Command line arguments
@@ -95,8 +115,8 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   args: string[],
-  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G> | EntryCommandable,
   options: CliOptions<G> = {}
 ): Promise<string | undefined> {
-  return cliCore<G>(args, entry, options, [])
+  return cliCore<G>(args, entry as Command<G> | CommandRunner<G> | LazyCommand<G>, options, [])
 }

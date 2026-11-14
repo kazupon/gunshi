@@ -1,12 +1,12 @@
 /**
  * The types of the built packages, across their copies.
  *
- * `gunshi`, `@gunshi/definition`, `@gunshi/plugin` and `@gunshi/plugin-i18n` each bundle their own copy of the
- * types of gunshi, so a command defined with one package is passed to an API of another. The type tests of the
- * repository read the sources, which are one copy, and cannot see a type that differs between the copies, such as
- * a `unique symbol`. These tests write small programs into a temporary directory, with the packages linked into
- * `node_modules`, and type-check them against the built declarations, with `skipLibCheck: false`. Run
- * `pnpm build` first.
+ * `gunshi`, `@gunshi/bone`, `@gunshi/definition`, `@gunshi/plugin` and `@gunshi/plugin-i18n` each bundle their
+ * own copy of the types of gunshi, so a command defined with one package is passed to an API of another. The type
+ * tests of the repository read the sources, which are one copy, and cannot see a type that differs between the
+ * copies, such as a `unique symbol`. These tests write small programs into a temporary directory, with the
+ * packages linked into `node_modules`, and type-check them against the built declarations, with
+ * `skipLibCheck: false`. Run `pnpm build` first.
  *
  * The programs are written here, as the guide for coding agents writes its CLIs, so that the type check and the
  * linters of the repository, which read the sources, leave them alone. A statement that must not type-check is
@@ -23,6 +23,7 @@ const ROOT = path.resolve(import.meta.dirname, '..')
 
 const PACKAGES: Record<string, string> = {
   gunshi: 'gunshi',
+  '@gunshi/bone': 'bone',
   '@gunshi/definition': 'definition',
   '@gunshi/plugin': 'plugin',
   '@gunshi/plugin-i18n': 'plugin-i18n'
@@ -379,6 +380,24 @@ export const usages = [
   await generate(null, list),
   await generate(null, lazy(() => run, { name: 'lazily', args: { limit: { type: 'number' } } }))
 ]
+`,
+
+  // @gunshi/bone exports no define: a CLI on it defines its commands with another package (#933)
+  'bone-another-copy.ts': `import { cli as cliOfBone } from '@gunshi/bone'
+import { define, jsonArgs } from '@gunshi/definition'
+import { cli as cliOfGunshiBone } from 'gunshi/bone'
+import { define as defineFromGunshi } from 'gunshi/definition'
+
+const show = define({ name: 'show', args: { limit: { type: 'number', default: 20 } }, run: ctx => String(ctx.values.limit) })
+const list = define({ name: 'list', args: { ...jsonArgs }, run: async () => ({ items: [] as string[] }) })
+const add = defineFromGunshi({ name: 'add', args: { file: { type: 'positional' } }, run: ctx => ctx.values.file })
+
+await cliOfBone([], show)
+await cliOfBone([], list)
+await cliOfBone([], add)
+await cliOfGunshiBone([], show)
+// @ts-expect-error 'numbr' is not a type of an argument
+await cliOfBone([], { name: 'a', args: { n: { type: 'numbr' } }, run: () => {} })
 `
 }
 
