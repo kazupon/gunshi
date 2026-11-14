@@ -226,7 +226,9 @@ describe('the example of AGENTS.md', () => {
       /^\{"status":"action_required","reason":"invalid_choice",.*\}\n$/
     ],
     [['rollback', '3'], 0, /^Rolled back to release 3\n$/, ''],
-    [['rollback', '0'], 1, /^$/, /Integer must be >= 1/],
+    [['rollback', '0'], 1, /^$/, /Invalid value for 'release': expected an integer from 1 to 999/],
+    [['rollback', '1000'], 1, /^$/, /expected an integer from 1 to 999/],
+    [['rollback', '1e2'], 1, /^$/, /expected an integer from 1 to 999/],
     [['rollback', '11'], 1, /^$/, /^Release 11 not found\n$/],
     [
       ['rollback', '11', '--json'],
@@ -234,7 +236,7 @@ describe('the example of AGENTS.md', () => {
       /^$/,
       /^\{"status":"action_required","reason":"json_not_supported",.*\}\n$/
     ],
-    [['rollback', 'abc'], 1, /^$/, /Expected an integer/],
+    [['rollback', 'abc'], 1, /^$/, /expected an integer from 1 to 999/],
     [['frobnicate'], 1, /^$/, /Command not found: frobnicate/]
   ]
 
@@ -311,6 +313,34 @@ await cli(process.argv.slice(2), add, { name: 'add' })
     )
     expect(run(file, ['milk', '2']).stdout).toBe('{"title":"milk","id":2}\n')
     expect(run(file, ['--help']).stdout).toMatch(/title\s+The title/)
+  })
+
+  test('an option made with a combinator is optional unless its combinator takes required: true, or it is wrapped in required() or withDefault()', () => {
+    const file = write(
+      'combinator-optional.ts',
+      `import { define } from 'gunshi'
+import { integer, required, withDefault } from 'gunshi/combinators'
+define({
+  name: 'resize',
+  args: {
+    plain: integer({ min: 1 }),
+    inOptions: integer({ min: 1, required: true }),
+    needed: required(integer({ min: 1 })),
+    defaulted: withDefault(integer({ min: 1 }), 1)
+  },
+  run: ctx => {
+    const plain: number | undefined = ctx.values.plain
+    const inOptions: number = ctx.values.inOptions
+    const needed: number = ctx.values.needed
+    const defaulted: number = ctx.values.defaulted
+    // @ts-expect-error without required: true, required() or withDefault(), the value may be undefined
+    const wrong: number = ctx.values.plain
+    console.log(plain, inOptions, needed, defaulted, wrong)
+  }
+})
+`
+    )
+    expect(typeCheck([file]).output).toBe('')
   })
 
   test('subCommands is an object, a Map or an array', () => {
@@ -584,27 +614,30 @@ await cli(process.argv.slice(2), main, {
   })
 
   test('the values that args checks are errors of the arguments: a range, and a parser that throws', () => {
+    const guide = readFileSync(GUIDE, 'utf8')
     const replicas =
-      "replicas: describe(short(withDefault(integer({ min: 1, max: 5 }), 1), 'r'), 'The replicas')"
-    expect(readFileSync(GUIDE, 'utf8')).toContain(replicas)
+      "replicas: { type: 'custom', short: 'r', default: 1, description: 'The replicas', parse: integerIn(1, 5) }"
+    expect(guide).toContain(replicas)
+    // the rule for a value of the example, `integerIn()`
+    const integerIn = /^const integerIn = [\s\S]+?^\}$/m.exec(guide)?.[0]
+    expect(integerIn).toBeDefined()
     const file = write(
       'check-in-args.ts',
       `import { cli, define, jsonArgs } from 'gunshi'
-import { combinator, describe, integer, positional, short, withDefault } from 'gunshi/combinators'
+${integerIn}
 const create = define({
   name: 'create',
   args: {
     ...jsonArgs,
-    name: positional(
-      combinator({
-        parse: value => {
-          if (!/^[a-z0-9-]+$/.test(value)) {
-            throw new Error('use lowercase letters, digits and hyphens')
-          }
-          return value
+    name: {
+      type: 'positional',
+      parse: value => {
+        if (!/^[a-z0-9-]+$/.test(value)) {
+          throw new Error('use lowercase letters, digits and hyphens')
         }
-      })
-    ),
+        return value
+      }
+    },
     ${replicas}
   },
   run: ctx => ({ database: { name: ctx.values.name, replicas: ctx.values.replicas } })

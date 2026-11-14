@@ -6,12 +6,20 @@ This file is for coding agents that write a command-line interface with Gunshi. 
 
 ```ts
 import { cli, CommandError, define, jsonArgs } from 'gunshi'
-import { describe, integer, positional } from 'gunshi/combinators'
 
 // Options for every command: declare them once `as const`, and spread them into the `args` of each command
 const common = {
   config: { type: 'string', default: 'ship.json', description: 'The config file' }
 } as const
+
+// A rule for a value: `parse` reads the value given, and throws an `Error` for a wrong one
+const integerIn = (min: number, max: number) => (value: string) => {
+  const n = Number(value)
+  if (!/^-?\d+$/.test(value) || n < min || n > max) {
+    throw new Error(`expected an integer from ${min} to ${max}`)
+  }
+  return n
+}
 
 const deploy = define({
   name: 'deploy',
@@ -45,9 +53,10 @@ const rollback = define({
   description: 'Roll back to a release',
   args: {
     ...common,
-    release: describe(positional(integer({ min: 1 })), 'The release number')
+    release: { type: 'positional', description: 'The release number', parse: integerIn(1, 999) }
   },
   run: ctx => {
+    // release: number, what `parse` returns
     if (ctx.values.release > 10) {
       // a failure the command expects: the message goes to stderr, without a stack trace, and the exit code is 1
       throw new CommandError(`Release ${ctx.values.release} not found`, { code: 'not_found' })
@@ -71,14 +80,15 @@ await cli(process.argv.slice(2), main, {
 
 ## Things to Know
 
-- Import `cli`, `define`, `jsonArgs` and `CommandError` from `gunshi`, and the parser combinators (`integer`, `positional`, `describe`, `short`, `withDefault`, `combinator`, and others) from `gunshi/combinators`. Write the CLI with `cli()` and `define()`: `parseArgs` and `resolveArgs` of `gunshi` are the low-level parts that `cli()` uses. `gunshi/bone` is Gunshi without its built-in plugins, so it has no `--help`, no `--version` and no `--json`
+- Import `cli`, `define`, `jsonArgs` and `CommandError` from `gunshi`. Write the CLI with `cli()` and `define()`: `parseArgs` and `resolveArgs` of `gunshi` are the low-level parts that `cli()` uses. `gunshi/bone` is Gunshi without its built-in plugins, so it has no `--help`, no `--version` and no `--json`
 - The types of an argument are `string`, `number`, `boolean`, `enum` (with `choices`), `positional`, and `custom` (with `parse`). An argument can also have `short`, `default`, `required`, `multiple` and `description`
 - An argument is an option unless its type is `positional`, and an option is named after its key: `dryRun` is `--dryRun`, or `--dry-run` with `toKebab: true`. `name: { type: 'string', required: true }` is a required `--name`, not a positional argument
 - `short` gives an option a one-letter name, as `-t` above. Give one only to the options that need it, and a letter to only one option of a command
 - A `positional` argument is required unless it has `required: false`. Positional arguments are taken in the order they are declared
 - Write the `choices` of an `enum` `as const`, so that its value is typed as their union. Without it, the value is a `string`
-- Declare an argument as an object with a `type`, as `service` above, or with a parser combinator, as `release` above. A combinator is the whole schema: it does not go in `type`, and it takes no object with a `type` (`positional()` alone is a string)
-- Check the values of the arguments in `args`, not in `run`: a choice with an `enum`, a number in a range with `integer({ min, max })`, and any other rule with `combinator({ parse })`, whose `parse` throws an `Error` for a wrong value. Gunshi then reports a wrong value as an error of the arguments, as below. An option `-r` from 1 to 5 that defaults to 1: `replicas: describe(short(withDefault(integer({ min: 1, max: 5 }), 1), 'r'), 'The replicas')`
+- Declare each argument as an object with a `type`, as above. It is the way of Gunshi, and its guides use it
+- Check the values of the arguments in `args`, not in `run`: a choice with an `enum`, and any other rule, such as a number in a range, with a `parse` function that throws an `Error` for a wrong value, as `release` above. Gunshi then reports a wrong value as an error of the arguments, as below, and the value has the type that `parse` returns. `parse` gets the value as a string, whatever the `type`: give an option with `parse` the type `custom`, and keep `positional` for a positional argument. An option `-r` from 1 to 5 that defaults to 1: `replicas: { type: 'custom', short: 'r', default: 1, description: 'The replicas', parse: integerIn(1, 5) }`
+- The parser combinators of `gunshi/combinators` (`integer({ min, max })`, `string({ pattern })`, `withDefault()`, `required()`, and others) write the same schemas with functions. Use them only when the project already declares its arguments with them, or when many arguments share the rules that they check, so that each does not need a `parse` of its own. A combinator is the whole schema: it does not go in `type`, and it takes no object with a `type` (`positional()` alone is a string). An option made with a combinator is optional unless its combinator takes `required: true`, as `integer({ min: 1, required: true })`, or it is wrapped in `required()` or `withDefault()`
 - Sub-commands go in the `subCommands` option of `cli()`: an object keyed by the command names, a `Map`, or an array of commands. A command can also have its own `subCommands`. The command given to `cli()` runs when no command is given
 - A command that only groups sub-commands needs no `run`, as `ship` above: run without a sub-command, it prints its usage, as `--help` does, and the exit code is 0. Give it a `run` only when it has something else to do then. Any other command needs `run`: without it, the command throws `'run' is required in command` when it runs
 - The `args` of a command are its own, so the sub-commands do not see the `args` of the main command. For an option of every command, spread shared arguments as above
@@ -107,7 +117,7 @@ The guides are Markdown files of `@gunshi/docs`, which has the docs of the same 
 - The usage shown by `--help`: `node_modules/@gunshi/docs/src/guide/essentials/auto-usage.md`, `node_modules/@gunshi/docs/src/guide/advanced/custom-rendering.md`
 - Expected failures and exit codes: `node_modules/@gunshi/docs/src/guide/essentials/errors.md`
 - Output as JSON with `--json`: `node_modules/@gunshi/docs/src/guide/essentials/json-output.md`
-- Integers with a range, choices, defaults, and your own parsers: `node_modules/@gunshi/docs/src/guide/advanced/parser-combinators.md`
+- The parser combinators, and when to use them: `node_modules/@gunshi/docs/src/guide/advanced/parser-combinators.md`
 - Code that runs before or after every command: `node_modules/@gunshi/docs/src/guide/advanced/command-hooks.md`
 - Writing a plugin: `node_modules/@gunshi/docs/src/guide/essentials/plugin-system.md`, `node_modules/@gunshi/docs/src/guide/plugin/introduction.md`
 - Messages in other languages: `node_modules/@gunshi/docs/src/guide/advanced/internationalization.md`
