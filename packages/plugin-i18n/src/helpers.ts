@@ -5,6 +5,7 @@
 
 import type {
   Args,
+  ArgSchema,
   Command,
   DefaultGunshiParams,
   ExtendContext,
@@ -23,6 +24,42 @@ import type { CommandResourceFetcher, I18nCommand } from './types.ts'
  * @internal
  */
 type UnknownKeys<D, Shape> = { [K in Exclude<keyof D, keyof Shape>]: never }
+
+/**
+ * The keys that people write in an argument, from another library or by a typo, with the key of Gunshi to use
+ * instead. A copy of `ArgKeyHints` of `gunshi` (`packages/gunshi/src/arg-keys.ts`): change both.
+ *
+ * @internal
+ */
+type ArgKeyHints = {
+  alias: 'short'
+  array: 'multiple'
+  desc: 'description'
+  require: 'required'
+}
+
+/**
+ * The message for a key that an argument does not have, with the key to use instead when {@link ArgKeyHints} has
+ * one
+ *
+ * @internal
+ */
+type UnknownArgKeyMessage<P> =
+  `'${P & string}' is not a key of an argument${P extends keyof ArgKeyHints ? `: use '${ArgKeyHints[P]}'` : ''}`
+
+/**
+ * The keys of each argument that `ArgSchema` does not have, mapped to a type that names the key, so that the error
+ * says which key an argument does not have (#930). See `UnknownArgKeys` of `gunshi`.
+ *
+ * @internal
+ */
+type UnknownArgKeys<A> = {
+  [K in keyof A]: {
+    [P in Exclude<keyof A[K], keyof ArgSchema | `~gunshi.${string}`>]: {
+      [M in UnknownArgKeyMessage<P>]: never
+    }
+  }
+}
 
 /**
  * The result type of the {@linkcode defineI18n} function
@@ -108,7 +145,9 @@ export function defineI18n<
       'resource' | 'args'
     > & {
       resource?: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }>
-    } & UnknownKeys<C, I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>>
+    } & UnknownKeys<C, I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>> & {
+      args?: UnknownArgKeys<A>
+    }
 ): I18nCommandDefinitionResult<{ args: A; extensions: ExtractExtensions<G> }, C>
 
 /**
@@ -138,7 +177,9 @@ type DefineI18nWithTypesReturn<
       'resource' | 'args'
     > & {
       resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }>
-    } & UnknownKeys<C, I18nCommand<{ args: A; extensions: DefaultExtensions }>>
+    } & UnknownKeys<C, I18nCommand<{ args: A; extensions: DefaultExtensions }>> & {
+      args?: UnknownArgKeys<A>
+    }
 ) => I18nCommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C>
 
 /**
@@ -195,7 +236,9 @@ export function defineI18nWithTypes<G extends GunshiParamsConstraint>(): DefineI
         'resource' | 'args'
       > & {
         resource?: CommandResourceFetcher<{ args: A; extensions: DefaultExtensions }>
-      } & UnknownKeys<C, I18nCommand<{ args: A; extensions: DefaultExtensions }>>
+      } & UnknownKeys<C, I18nCommand<{ args: A; extensions: DefaultExtensions }>> & {
+        args?: UnknownArgKeys<A>
+      }
   ): I18nCommandDefinitionResult<{ args: A; extensions: DefaultExtensions }, C> => {
     return defineI18n(definition) as any
   }) as DefineI18nWithTypesReturn<DefaultExtensions, DefaultArgs>
