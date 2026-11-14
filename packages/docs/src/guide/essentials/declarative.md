@@ -176,7 +176,7 @@ Each option can have the following properties:
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> For a more type-safe and composable way to define arguments, see [Parser Combinators](../advanced/parser-combinators.md).
+> [Parser Combinators](../advanced/parser-combinators.md) are another way to write the same schemas, with functions. See [Objects or Combinators](../advanced/parser-combinators.md#objects-or-combinators) for when to use them.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

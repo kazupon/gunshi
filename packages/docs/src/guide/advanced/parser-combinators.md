@@ -1,11 +1,11 @@
 # Parser Combinators
 
-Parser combinators provide a functional, composable approach to defining type-safe argument schemas in Gunshi. Instead of writing plain object configurations, you can use factory functions that generate schemas with full type inference.
+Parser combinators are another way to write the argument schemas of Gunshi: factory functions that make the same schemas as the objects of [Declarative Configuration](../essentials/declarative.md), and compose them.
 
 This approach brings several advantages:
 
 - **Composable building blocks**: Combine simple parsers to create complex schemas
-- **Type-safe by design**: Full TypeScript type inference without manual annotations
+- **Rules built in**: Check integers in a range, or strings with a pattern or a length, without a `parse` function of your own
 - **Reusable schema groups**: Define common configurations once, use them everywhere
 - **Functional programming style**: Chain and compose operations naturally
 
@@ -26,13 +26,25 @@ The standalone `@gunshi/combinators` package is ideal when you only need combina
 > [!NOTE]
 > The `@gunshi/combinators` package needs to be installed separately: `npm install @gunshi/combinators`. The `gunshi/combinators` import path is available as part of the main `gunshi` package.
 
-## Traditional vs Combinator Approach
+## Objects or Combinators
 
-Let's compare the traditional object-based approach with parser combinators to understand the difference:
+Declare the arguments as objects with a `type`, as the other guides do. It is the way of Gunshi: an object can declare any argument, a rule for its value included, with a `parse` function that throws an error for a wrong value. The guide for coding agents that `gunshi` ships (`AGENTS.md`) teaches objects too.
 
-### Traditional Approach
+Parser combinators make the same schemas with functions. Use them when:
 
-```ts [traditional.ts]
+- Many arguments share the rules that a combinator checks, such as integers in a range or strings with a pattern, so that each argument does not need a `parse` function of its own
+- You build the arguments of many commands from shared groups, with [`args()`](#args), [`merge()`](#merge) and [`extend()`](#extend)
+- The project already declares its arguments with them
+
+Objects and combinators can be mixed in the `args` of a command. An option made with a combinator is optional unless it is wrapped in [`required()`](#required) or [`withDefault()`](#withdefault), as `required: true` and `default` make an object required or give it a value.
+
+## Objects and Combinators Side by Side
+
+The same command, with objects and with combinators:
+
+### Objects
+
+```ts [objects.ts]
 import { define } from 'gunshi'
 
 const command = define({
@@ -45,12 +57,17 @@ const command = define({
       default: 'localhost'
     },
     port: {
-      type: 'number',
+      type: 'custom',
       short: 'p',
       description: 'Port number',
       default: 8080,
-      min: 1,
-      max: 65535
+      parse: value => {
+        const port = Number(value)
+        if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+          throw new TypeError(`Invalid port: ${value}. Must be an integer from 1 to 65535`)
+        }
+        return port
+      }
     },
     verbose: {
       type: 'boolean',
@@ -64,7 +81,7 @@ const command = define({
 })
 ```
 
-### Combinator Approach
+### Combinators
 
 ```ts [combinators.ts]
 import { define } from 'gunshi'
@@ -95,7 +112,7 @@ const command = define({
 })
 ```
 
-The combinator approach offers better composability and type inference, while maintaining the same runtime behavior.
+Both declare the same arguments, and their values have the same types: `host` and `port` have a default, so they are never `undefined`. `integer({ min, max })` checks the range that the `parse` function of the object checks.
 
 ## Base Combinators
 
@@ -1037,29 +1054,34 @@ When using parser combinators, consider these guidelines:
 6. **Consistent naming**: Use descriptive names for your schema groups
 7. **Test compositions**: Verify that merged and extended schemas behave as expected
 
-## Migration from Traditional Approach
+## Converting Between Objects and Combinators
 
-If you have existing commands using the traditional object approach, you can gradually migrate to combinators:
+An argument declared as an object can be written with combinators, and the other way around, one argument at a time:
 
 ```ts
-// Before: Traditional approach
-const oldCommand = define({
+// An object
+const objectCommand = define({
   args: {
     port: {
-      type: 'number',
+      type: 'custom',
       short: 'p',
       default: 8080,
-      min: 1,
-      max: 65535,
-      description: 'Port number'
+      description: 'Port number',
+      parse: value => {
+        const port = Number(value)
+        if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+          throw new TypeError(`Invalid port: ${value}. Must be an integer from 1 to 65535`)
+        }
+        return port
+      }
     }
   }
 })
 
-// After: Combinator approach
+// Combinators
 import { integer, withDefault, short } from 'gunshi/combinators'
 
-const newCommand = define({
+const combinatorCommand = define({
   args: {
     port: withDefault(
       short(
@@ -1076,4 +1098,4 @@ const newCommand = define({
 })
 ```
 
-Both approaches are fully compatible and can be mixed within the same application. Choose the approach that best fits your team's preferences and coding style.
+Both can be mixed within the same application. See [Objects or Combinators](#objects-or-combinators) for when to use which.
