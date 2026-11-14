@@ -131,6 +131,10 @@ export default defineConfig(
             text: `v${pkgJson.version}`,
             items: [
               {
+                text: 'v1.0 Release Notes',
+                link: '/release/v1.0'
+              },
+              {
                 text: 'v0.27 Release Notes',
                 link: '/release/v0.27'
               },
