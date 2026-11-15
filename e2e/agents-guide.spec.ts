@@ -506,6 +506,10 @@ await cli(process.argv.slice(2), main, { subCommands: { add } })
     const strict = run(file, ['add', '--file', 'a.json'], envWith({ STRICT: '1' }))
     expect(strict.code).toBe(1)
     expect(strict.stderr).toMatch(/Unknown option: --file/)
+    // the rule applies to the requirements that make such an option an error, whatever they call it
+    expect(readFileSync(GUIDE, 'utf8')).toContain(
+      'unless the requirements make such an option an error, in whatever words they use'
+    )
   })
 
   test('a positional argument that a command does not declare is kept, unless strictPositionals: true', () => {
