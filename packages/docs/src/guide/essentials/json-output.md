@@ -63,7 +63,7 @@ $ node cli.js --json | cat
 
 `--json` shows up in the help of the command, as `--json  Output the result as JSON`. To give it a short name, spread its schema: `json: { ...jsonArgs.json, short: 'j' }`.
 
-To know whether the command is asked for JSON, read `ctx.values.json`, for example to skip a prompt or a spinner.
+To know whether the command is asked for JSON, read `ctx.values.json`, for example to skip a prompt or a spinner. Do not read it to choose between the result and the lines for people: print the lines with `ctx.log`, which prints nothing with `--json`, and return the result in every branch.
 
 ## The Result
 
@@ -101,12 +101,16 @@ The types check what `run` returns: a command that spreads `jsonArgs` returns an
 
 The last line of a type error tells what went wrong:
 
-| What you wrote                                                                                | The last line of the type error                                                                                                                                       | How to fix it                                                                   |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `run` returns nothing                                                                         | `Type 'void' is not assignable to type 'JsonResult'`, or `'Awaitable<JsonResult>'` when `run` is not `async`                                                          | Return the result                                                               |
-| `run` returns a value of an interface as it is (`return project`)                             | `Index signature for type 'string' is missing in type 'Project'`                                                                                                      | Key it by a noun: `return { project }`                                          |
-| `run` returns an array                                                                        | `Index signature for type 'string' is missing in type 'Project[]'`                                                                                                    | Key it by a noun: `return { projects }`, or print it with a `json` of your own  |
-| A lazy command spreads `jsonArgs` into the command that it loads, but not into its definition | `No overload matches this call`, and `'{ project: Project; }' is not assignable to type 'string \| void'`, or `'Awaitable<string \| void>'` when `run` is not `async` | Spread `jsonArgs` into the definition too (see [Lazy Commands](#lazy-commands)) |
+| What you wrote                                                                                | The last line of the type error                                                                                                                                       | How to fix it                                                                        |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `run` returns nothing                                                                         | `Type 'void' is not assignable to type 'JsonResult'`, or `'Awaitable<JsonResult>'` when `run` is not `async`                                                          | Return the result                                                                    |
+| `run` returns the result in some branches only, such as after a check of `ctx.values.json`    | `Type 'undefined' is not assignable to type 'JsonResult'`, or `'Awaitable<JsonResult>'` when `run` is not `async`                                                     | Return the result in every branch, and print the lines for people with `ctx.log`     |
+| `run` returns a value of an interface as it is (`return project`)                             | `Index signature for type 'string' is missing in type 'Project'`                                                                                                      | Key it by a noun: `return { project }`                                               |
+| `run` returns an array                                                                        | `Index signature for type 'string' is missing in type 'Project[]'`                                                                                                    | Key it by a noun: `return { projects }`, or print it with a `json` of your own       |
+| A command that does not spread `jsonArgs` returns an object                                   | `'{ project: Project; }' is not assignable to type 'string \| void'`, or `'Awaitable<string \| void>'` when `run` is not `async`                                      | Spread `jsonArgs` to print it with `--json`, or print it yourself and return nothing |
+| A lazy command spreads `jsonArgs` into the command that it loads, but not into its definition | `No overload matches this call`, and `'{ project: Project; }' is not assignable to type 'string \| void'`, or `'Awaitable<string \| void>'` when `run` is not `async` | Spread `jsonArgs` into the definition too (see [Lazy Commands](#lazy-commands))      |
+
+TypeScript 7 writes `string | void` as `void | string`.
 
 ## Errors
 
