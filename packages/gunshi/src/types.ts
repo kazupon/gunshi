@@ -164,7 +164,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   cwd: string | undefined
   /**
-   * Command name.
+   * The name of the CLI, given to `cli()` as `name`.
    *
    * @see {@linkcode CliOptions.name}
    */
@@ -332,7 +332,11 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    */
   cwd?: string
   /**
-   * Command program name.
+   * The name of the CLI, as it is run, such as `todo`.
+   *
+   * The usage line and the help as JSON start with it, and so do the command that the errors point to
+   * for the help and `next` of the errors of `--json`. Without it, the usage line starts with `COMMAND`,
+   * and the others with `<COMMAND>`, a placeholder for how the CLI was run.
    */
   name?: string
   /**
