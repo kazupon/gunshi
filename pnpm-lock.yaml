@@ -171,8 +171,8 @@ catalogs:
       specifier: ^26.0.0
       version: 26.6.4
     args-tokens:
-      specifier: 1.2.0
-      version: 1.2.0
+      specifier: 1.3.0
+      version: 1.3.0
     publint:
       specifier: ^0.3.20
       version: 0.3.21
@@ -291,7 +291,7 @@ importers:
         version: 15.0.0(vue@3.5.43(typescript@7.0.2))
       args-tokens:
         specifier: 'catalog:'
-        version: 1.2.0
+        version: 1.3.0
       mermaid:
         specifier: ^12.0.0
         version: 12.0.0
@@ -339,7 +339,7 @@ importers:
         version: 26.6.4
       args-tokens:
         specifier: 'catalog:'
-        version: 1.2.0
+        version: 1.3.0
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -2899,8 +2899,8 @@ packages:
     resolution: {integrity: sha512-kWceoEa1zXbcBvgy+BT1ddTLyB7B51u32EhOK/ZMY324nxmQAm767HD+g+9avBEPVmoDjWIYLvsSCQqtbcph/g==}
     engines: {node: '>= 20'}
 
-  args-tokens@1.2.0:
-    resolution: {integrity: sha512-XNF+Gl1VKJNzoLlYxGNJFLMVpfutNvurscm79pddnFuwvDFwMzbJrW0QAOawvaHzDylP8gtYfzi3neImaRhH4g==}
+  args-tokens@1.3.0:
+    resolution: {integrity: sha512-d8MH2Xc65cjxJPii+PLz8+3ZZXbr3naJRLs0jsUThWMIecif3+mcXyoVyjTQPhmRtChMiijY6J2w21aNw1IGiw==}
     engines: {node: '>= 22'}
 
   aria-query@5.3.0:
@@ -6166,7 +6166,7 @@ snapshots:
 
   args-tokens@0.17.1: {}
 
-  args-tokens@1.2.0: {}
+  args-tokens@1.3.0: {}
 
   aria-query@5.3.0:
     dependencies:
