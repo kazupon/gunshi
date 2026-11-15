@@ -18,7 +18,7 @@ import { generate } from './generator.ts'
 import { jsonArgs } from './json.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
-import { hidden, string } from './combinators.ts'
+import { combinator, hidden, integer, map, number, string } from './combinators.ts'
 
 import type { ArgSchema, Args, ArgsValidationError } from 'args-tokens'
 import type { Mocked } from 'vite-plus/test'
@@ -1425,6 +1425,154 @@ describe('args validation i18n', () => {
     ).resolves.toBeUndefined()
 
     expect(stderr()).toEqual("Positional argument 'input-file' is required" + helpHint())
+  })
+})
+
+describe('the rules of the parser combinators', () => {
+  const command = () =>
+    define({
+      name: 'app',
+      args: {
+        ...jsonArgs,
+        count: integer({ min: 1 }),
+        size: number({ max: 10 }),
+        name: string({ minLength: 2 }),
+        title: string({ maxLength: 3 }),
+        slug: string({ pattern: /^[a-z]+$/ })
+      },
+      run: () => ({ ok: true })
+    })
+  const argv = ['--count', '0', '--size', '11', '--name', 'a', '--title', 'abcd', '--slug', 'A1']
+
+  test.each([
+    {
+      argv: ['--count', '0'],
+      field: '--count',
+      reason: 'too_small',
+      message: "Invalid value for '--count': Integer must be >= 1, got 0"
+    },
+    {
+      argv: ['--size', '11'],
+      field: '--size',
+      reason: 'too_large',
+      message: "Invalid value for '--size': Number must be <= 10, got 11"
+    },
+    {
+      argv: ['--name', 'a'],
+      field: '--name',
+      reason: 'too_short',
+      message: "Invalid value for '--name': String must be at least 2 characters"
+    },
+    {
+      argv: ['--title', 'abcd'],
+      field: '--title',
+      reason: 'too_long',
+      message: "Invalid value for '--title': String must be at most 3 characters"
+    },
+    {
+      argv: ['--slug', 'A1'],
+      field: '--slug',
+      reason: 'pattern_mismatch',
+      message: "Invalid value for '--slug': String must match pattern /^[a-z]+$/"
+    }
+  ])('$field reports $reason with --json', async ({ argv, field, reason, message }) => {
+    const stderr = defineMockErrorLog()
+
+    await cli([...argv, '--json'], command(), { name: 'app' })
+
+    expect(JSON.parse(stderr())).toMatchObject({
+      status: 'action_required',
+      reason,
+      message,
+      data: { issues: [{ field, reason, message }] }
+    })
+  })
+
+  test('an error that a parse function of your own throws is custom_parse, even a RangeError', async () => {
+    const stderr = defineMockErrorLog()
+    const app = define({
+      name: 'app',
+      args: {
+        ...jsonArgs,
+        port: combinator({
+          parse: value => {
+            const port = Number(value)
+            if (port < 1 || port > 65_535) {
+              throw new RangeError(`Port must be from 1 to 65535, got ${value}`)
+            }
+            return port
+          }
+        }),
+        even: map(integer(), n => {
+          if (n % 2 !== 0) {
+            throw new Error(`Must be even, got ${n}`)
+          }
+          return n
+        })
+      },
+      run: () => ({ ok: true })
+    })
+
+    await cli(['--port', '70000', '--even', '3', '--json'], app, { name: 'app' })
+
+    const failure = JSON.parse(stderr()) as {
+      data: { issues: { field: string; reason: string }[] }
+    }
+    expect(failure.data.issues.map(({ field, reason }) => ({ field, reason }))).toEqual([
+      { field: '--port', reason: 'custom_parse' },
+      { field: '--even', reason: 'custom_parse' }
+    ])
+  })
+
+  test('prints the messages of args-tokens without the i18n plugin', async () => {
+    const stderr = defineMockErrorLog()
+
+    await cli(argv, command(), { name: 'app' })
+
+    expect(stderr()).toBe(
+      [
+        "Invalid value for '--count': Integer must be >= 1, got 0",
+        "Invalid value for '--size': Number must be <= 10, got 11",
+        "Invalid value for '--name': String must be at least 2 characters",
+        "Invalid value for '--title': String must be at most 3 characters",
+        "Invalid value for '--slug': String must match pattern /^[a-z]+$/"
+      ].join('\n') + helpHint([], { name: 'app' })
+    )
+  })
+
+  test('translates them with the built-in resources of en-US', async () => {
+    const stderr = defineMockErrorLog()
+
+    await cli(argv, command(), { name: 'app', plugins: [i18n({ locale: 'en-US' })] })
+
+    expect(stderr()).toBe(
+      [
+        "Invalid value for '--count': expected integer >= 1, got 0",
+        "Invalid value for '--size': expected number <= 10, got 11",
+        "Invalid value for '--name': expected at least 2 characters",
+        "Invalid value for '--title': expected at most 3 characters",
+        "Invalid value for '--slug': expected to match /^[a-z]+$/"
+      ].join('\n') + helpHint([], { name: 'app' })
+    )
+  })
+
+  test('translates them with the built-in resources of ja-JP', async () => {
+    const stderr = defineMockErrorLog()
+
+    await cli(argv, command(), {
+      name: 'app',
+      plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })]
+    })
+
+    expect(stderr()).toBe(
+      [
+        "'--count' の値が小さすぎます。1 以上を指定してください: 0",
+        "'--size' の値が大きすぎます。10 以下を指定してください: 11",
+        "'--name' の値が短すぎます。2 文字以上を指定してください",
+        "'--title' の値が長すぎます。3 文字以下を指定してください",
+        "'--slug' の値が不正です。/^[a-z]+$/ に合う値を指定してください"
+      ].join('\n') + helpHint([], { name: 'app', locale: 'ja-JP' })
+    )
   })
 })
 

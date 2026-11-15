@@ -112,7 +112,7 @@ const command = define({
 })
 ```
 
-Both declare the same arguments, and their values have the same types: `host` and `port` have a default, so they are never `undefined`. `integer({ min, max })` checks the range that the `parse` function of the object checks.
+Both declare the same arguments, and their values have the same types: `host` and `port` have a default, so they are never `undefined`. `integer({ min, max })` checks the range that the `parse` function of the object checks. A value that breaks a rule of a combinator is an argument error, whose `reason` with [`--json`](../essentials/json-output.md#reasons) names the rule, such as `too_large` for a value above `max`, while an error that a `parse` function throws is `custom_parse`.
 
 ## Base Combinators
 
