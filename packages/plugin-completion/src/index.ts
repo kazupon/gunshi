@@ -57,7 +57,7 @@
  */
 
 import { RootCommand } from '@bomb.sh/tab'
-import { plugin } from '@gunshi/plugin'
+import { CommandError, plugin } from '@gunshi/plugin'
 import { namespacedId } from '@gunshi/shared'
 import { COMPLETE_COMMAND_NAME, registerForCompletion } from './registration.ts'
 import { pluginId } from './types.ts'
@@ -139,10 +139,6 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
           header: null // disable header rendering for completion command
         },
         run: async cmdCtx => {
-          if (!cmdCtx.env.name) {
-            throw new Error('your cli name is not defined.')
-          }
-
           let shell: string | undefined = cmdCtx._[1]
           if (shell === TERMINATOR) {
             shell = undefined
@@ -179,7 +175,15 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
              */
             t.parse(resolvedArgs)
           } else if (['zsh', 'bash', 'fish', 'powershell'].includes(shell)) {
-            // the completion script only needs the CLI name and the executable
+            /**
+             * NOTE(kazupon): the completion script needs the name of the CLI, which the shell completes,
+             * and the executable. Completing a request does not, so only printing the script requires it.
+             */
+            if (!cmdCtx.env.name) {
+              throw new CommandError(
+                "The completion script needs the name of the CLI: give 'name' to cli()"
+              )
+            }
             t.setup(cmdCtx.env.name, quoteExec(), shell)
           }
         }

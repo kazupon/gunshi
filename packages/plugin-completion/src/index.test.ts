@@ -1,5 +1,7 @@
-import { describe, expect, test } from 'vite-plus/test'
+import { cli, define } from 'gunshi'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test'
 import { runCommand } from '../../../scripts/utils.ts'
+import completion from './index.ts'
 
 const SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/basic.node.ts complete --`
 
@@ -358,5 +360,48 @@ describe('i18n support', () => {
       })
       expect(output).toMatchSnapshot()
     })
+  })
+})
+
+describe('the complete command', () => {
+  const entry = define({ name: 'todo', run: () => {} })
+  const add = define({ name: 'add', description: 'Add a task', run: () => {} })
+
+  let output: string[] = []
+  let errors: string[] = []
+
+  beforeEach(() => {
+    output = []
+    errors = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+    vi.spyOn(console, 'error').mockImplementation((...values: unknown[]) => {
+      errors.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    process.exitCode = undefined
+  })
+
+  test('reports that the script needs the name of the CLI with one line, without a stack trace', async () => {
+    await expect(
+      cli(['complete', 'zsh'], entry, { subCommands: { add }, plugins: [completion()] })
+    ).resolves.toBeUndefined()
+
+    expect(errors).toEqual([
+      "The completion script needs the name of the CLI: give 'name' to cli()"
+    ])
+    expect(output).toEqual([])
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('completes a request without the name of the CLI', async () => {
+    await cli(['complete', '--', 'a'], entry, { subCommands: { add }, plugins: [completion()] })
+
+    expect(output).toEqual(['add\tAdd a task', ':4'])
+    expect(errors).toEqual([])
   })
 })
