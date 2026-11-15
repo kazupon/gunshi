@@ -18,7 +18,7 @@ Provides internationalization support for CLI applications.
 
 ### [@gunshi/plugin-completion](https://github.com/kazupon/gunshi/tree/main/packages/plugin-completion)
 
-Provides shell completion functionality for bash, zsh, and fish.
+Provides shell completion functionality for bash, zsh, fish, and PowerShell.
 
 ### [@gunshi/plugin-dryrun](https://github.com/kazupon/gunshi/tree/main/packages/plugin-dryrun)
 
