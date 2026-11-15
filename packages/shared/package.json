@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/shared",
-  "version": "1.0.0-rc.7",
+  "version": "1.0.0-rc.8",
   "description": "shared utils for gunshi",
   "keywords": [
     "cli",
