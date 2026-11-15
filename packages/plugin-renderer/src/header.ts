@@ -15,9 +15,12 @@ export function renderHeader<G extends GunshiParams = DefaultGunshiParams>(
   ctx: Readonly<CommandContext<G>>
 ): Promise<string> {
   const title = ctx.env.description || ctx.env.name || ''
-  return Promise.resolve(
-    title
-      ? `${title} (${ctx.env.name || ''}${ctx.env.version ? ` v${ctx.env.version}` : ''})`
-      : title
-  )
+  /**
+   * NOTE(kazupon): the parentheses tell only what the CLI has of its name and its version: without
+   * `name`, they have no empty name, and without both, there are none.
+   */
+  const detail = [ctx.env.name, ctx.env.version ? `v${ctx.env.version}` : '']
+    .filter(Boolean)
+    .join(' ')
+  return Promise.resolve(title && detail ? `${title} (${detail})` : title)
 }
