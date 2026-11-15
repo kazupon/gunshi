@@ -1,3 +1,5 @@
+import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
+import i18n from '@gunshi/plugin-i18n'
 import { cli, define } from 'gunshi'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test'
 import { runCommand } from '../../../scripts/utils.ts'
@@ -403,5 +405,44 @@ describe('the complete command', () => {
 
     expect(output).toEqual(['add\tAdd a task', ':4'])
     expect(errors).toEqual([])
+  })
+
+  test('reports an unknown shell as an argument error, with the help of the command', async () => {
+    await cli(['complete', 'tcsh'], entry, {
+      name: 'todo',
+      subCommands: { add },
+      plugins: [completion()]
+    })
+
+    expect(errors.join('\n')).toBe(
+      [
+        `Invalid value for 'shell': expected one of "bash", "zsh", "fish", "powershell"`,
+        '',
+        'See the arguments of the command:',
+        '  todo complete --help'
+      ].join('\n')
+    )
+    expect(output).toEqual([])
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('translates the error of an unknown shell', async () => {
+    await cli(['complete', 'tcsh'], entry, {
+      name: 'todo',
+      subCommands: { add },
+      plugins: [
+        completion(),
+        i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jaJPResource } })
+      ]
+    })
+
+    expect(errors.join('\n')).toBe(
+      [
+        `'shell' の値が不正です。指定可能な値: "bash", "zsh", "fish", "powershell"`,
+        '',
+        'コマンドの引数を確認する:',
+        '  todo complete --help'
+      ].join('\n')
+    )
   })
 })
