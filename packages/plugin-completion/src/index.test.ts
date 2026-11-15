@@ -1,5 +1,9 @@
-import { describe, expect, test } from 'vite-plus/test'
+import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
+import i18n from '@gunshi/plugin-i18n'
+import { cli, define } from 'gunshi'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test'
 import { runCommand } from '../../../scripts/utils.ts'
+import completion from './index.ts'
 
 const SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/basic.node.ts complete --`
 
@@ -358,5 +362,87 @@ describe('i18n support', () => {
       })
       expect(output).toMatchSnapshot()
     })
+  })
+})
+
+describe('the complete command', () => {
+  const entry = define({ name: 'todo', run: () => {} })
+  const add = define({ name: 'add', description: 'Add a task', run: () => {} })
+
+  let output: string[] = []
+  let errors: string[] = []
+
+  beforeEach(() => {
+    output = []
+    errors = []
+    vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+      output.push(values.map(value => String(value)).join(' '))
+    })
+    vi.spyOn(console, 'error').mockImplementation((...values: unknown[]) => {
+      errors.push(values.map(value => String(value)).join(' '))
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    process.exitCode = undefined
+  })
+
+  test('reports that the script needs the name of the CLI with one line, without a stack trace', async () => {
+    await expect(
+      cli(['complete', 'zsh'], entry, { subCommands: { add }, plugins: [completion()] })
+    ).resolves.toBeUndefined()
+
+    expect(errors).toEqual([
+      "The completion script needs the name of the CLI: give 'name' to cli()"
+    ])
+    expect(output).toEqual([])
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('completes a request without the name of the CLI', async () => {
+    await cli(['complete', '--', 'a'], entry, { subCommands: { add }, plugins: [completion()] })
+
+    expect(output).toEqual(['add\tAdd a task', ':4'])
+    expect(errors).toEqual([])
+  })
+
+  test('reports an unknown shell as an argument error, with the help of the command', async () => {
+    await cli(['complete', 'tcsh'], entry, {
+      name: 'todo',
+      subCommands: { add },
+      plugins: [completion()]
+    })
+
+    expect(errors.join('\n')).toBe(
+      [
+        `Invalid value for 'shell': expected one of "bash", "zsh", "fish", "powershell"`,
+        '',
+        'See the arguments of the command:',
+        '  todo complete --help'
+      ].join('\n')
+    )
+    expect(output).toEqual([])
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('translates the error of an unknown shell', async () => {
+    await cli(['complete', 'tcsh'], entry, {
+      name: 'todo',
+      subCommands: { add },
+      plugins: [
+        completion(),
+        i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jaJPResource } })
+      ]
+    })
+
+    expect(errors.join('\n')).toBe(
+      [
+        `'shell' の値が不正です。指定可能な値: "bash", "zsh", "fish", "powershell"`,
+        '',
+        'コマンドの引数を確認する:',
+        '  todo complete --help'
+      ].join('\n')
+    )
   })
 })
