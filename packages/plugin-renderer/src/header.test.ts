@@ -64,3 +64,30 @@ test('no version', async () => {
 
   expect(await renderHeader(ctx)).toEqual('this is command line (cmd1)')
 })
+
+test('no name', async () => {
+  const ctx = await createCommandContext({
+    omitted: true,
+    command,
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      description: 'this is command line',
+      version: '0.0.0'
+    }
+  })
+
+  expect(await renderHeader(ctx)).toEqual('this is command line (v0.0.0)')
+})
+
+test('no name & no version', async () => {
+  const ctx = await createCommandContext({
+    omitted: true,
+    command,
+    cliOptions: {
+      cwd: '/path/to/cmd1',
+      description: 'this is command line'
+    }
+  })
+
+  expect(await renderHeader(ctx)).toEqual('this is command line')
+})
