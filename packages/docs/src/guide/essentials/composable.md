@@ -232,7 +232,7 @@ Each command takes the option whether it is written before or after the command 
 
 > [!NOTE]
 > The `args` of the main command are the arguments of the main command only: the sub-commands do not see them.
-> Without `strict: true`, an option that a sub-command does not take is ignored, so spread the shared arguments into every command that reads them.
+> An option that a sub-command does not take is an unknown option of it, so spread the shared arguments into every command that takes them.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -424,7 +424,7 @@ npx tsx src/cli.ts list --filter active
 Listing resources with filter: active
 
 # Falls back to main command when "unknown" sub-command is not found
-npx tsx src/cli.ts unknown --flag value
+npx tsx src/cli.ts unknown
 Use a sub-command
 Run "resource-manager --help" for available commands
 

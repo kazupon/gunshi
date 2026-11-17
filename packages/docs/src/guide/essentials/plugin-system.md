@@ -241,7 +241,6 @@ const command = define({
 
 await cli(process.argv.slice(2), command, {
   name: 'app',
-  strict: true,
   plugins: [suggestion()]
 })
 ```
@@ -275,7 +274,6 @@ import i18n from '@gunshi/plugin-i18n'
 import { suggestion } from '@gunshi/plugin-suggestion'
 
 await cli(process.argv.slice(2), command, {
-  strict: true,
   plugins: [i18n({ locale: 'ja-JP' }), suggestion()]
 })
 ```

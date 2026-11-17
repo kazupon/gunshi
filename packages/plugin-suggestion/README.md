@@ -31,7 +31,6 @@ const command = define({
 
 await cli(process.argv.slice(2), command, {
   name: 'app',
-  strict: true,
   plugins: [suggestion()]
 })
 ```
@@ -45,6 +44,8 @@ Did you mean --allow-reload?
 See the arguments of the command:
   app --help
 ```
+
+Gunshi reports an unknown option by default. With `strict: false`, it ignores the option, and there is no hint for it.
 
 When the user enters an unknown command, the plugin suggests a command from the same command level:
 
@@ -86,7 +87,6 @@ import i18n from '@gunshi/plugin-i18n'
 import { suggestion } from '@gunshi/plugin-suggestion'
 
 await cli(argv, command, {
-  strict: true,
   plugins: [i18n({ locale: 'ja-JP' }), suggestion()]
 })
 ```
