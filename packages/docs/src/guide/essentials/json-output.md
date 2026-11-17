@@ -242,7 +242,7 @@ When the output is already fixed, such as an array that the readers expect, an e
 
 When `--json` is given to a command that does not spread `jsonArgs`, Gunshi stops it before it runs, with `json_not_supported`, so that a program does not take its text for JSON. `--help` and `--version` are still answered, as JSON: see [Help and Version](#help-and-version).
 
-With `strict`, `--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, and a command with it runs. `--json=false` asks for no JSON, and stays an unknown option with `strict`.
+`--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, and a command with it runs. `--json=false` asks for no JSON, and stays an unknown option, unless `strict: false` is given.
 
 ## Lazy Commands
 

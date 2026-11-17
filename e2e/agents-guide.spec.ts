@@ -217,7 +217,7 @@ describe('the example of AGENTS.md', () => {
       /^\{"deployment":\{"service":"api","target":"prod","dryRun":true,"config":"x.json"\}\}\n$/,
       ''
     ],
-    [['deploy', 'api', '--unknown'], 0, /^Deployed api to dev\n$/, ''],
+    [['deploy', 'api', '--unknown'], 1, /^$/, /^Unknown option: --unknown\n/],
     [['deploy', 'api', '--target', 'qa'], 1, /^$/, /--target/],
     [
       ['deploy', 'api', '--target', 'qa', '--json'],
@@ -262,10 +262,14 @@ import { define, jsonArgs } from 'gunshi'
 await cli(process.argv.slice(2), define({ name: 'x', args: { ...jsonArgs }, run: () => ({ item: 1 }) }), { name: 'x', version: '1.0.0' })
 `
     )
+    // given to it, `--help` and `--version` are unknown options, and cli() rejects with them
     const help = run(file, ['--help'])
     const version = run(file, ['--version'])
-    expect(help).toMatchObject({ code: 0, stdout: '' })
-    expect(version.stdout).toBe('')
+    expect(help).toMatchObject({ code: 1, stdout: '' })
+    expect(help.stderr).toMatch(/Unknown option: --help/)
+    expect(version).toMatchObject({ code: 1, stdout: '' })
+    expect(version.stderr).toMatch(/Unknown option: --version/)
+    // `--json` is an argument of the command here (jsonArgs), which gunshi/bone does not print
     expect(run(file, ['--json'])).toEqual({ code: 0, stdout: '', stderr: '' })
   })
 
@@ -494,21 +498,40 @@ await cli(process.argv.slice(2), define({ name: 'bm', run: () => {} }), { name: 
       `import { cli, define } from 'gunshi'
 const add = define({ name: 'add', run: ctx => console.log(JSON.stringify(ctx.values)) })
 const main = define({ name: 'todo', args: { file: { type: 'string' } }, run: () => {} })
-await cli(process.argv.slice(2), main, { subCommands: { add } })
+await cli(process.argv.slice(2), main, { subCommands: { add }, strict: process.env.STRICT !== 'false' })
 `
     )
-    expect(run(file, ['add', '--file', 'a.json']).stdout).toBe('{}\n')
+    // an option of the main command given with a sub-command is an unknown option of the sub-command
+    const reported = run(file, ['add', '--file', 'a.json'])
+    expect(reported).toMatchObject({ code: 1, stdout: '' })
+    expect(reported.stderr).toMatch(/^Unknown option: --file\n/)
+    // without strict, it is ignored: the sub-command does not see it
+    expect(run(file, ['add', '--file', 'a.json'], envWith({ STRICT: 'false' })).stdout).toBe('{}\n')
   })
 
-  test('an option that a command does not declare is ignored, unless strict: true', () => {
-    const file = write('strict.mjs', withAdd('{}', ", strict: process.env.STRICT === '1'"))
-    expect(run(file, ['add', '--file', 'a.json'])).toMatchObject({ code: 0, stdout: '{}\n' })
-    const strict = run(file, ['add', '--file', 'a.json'], envWith({ STRICT: '1' }))
-    expect(strict.code).toBe(1)
-    expect(strict.stderr).toMatch(/Unknown option: --file/)
-    // the rule applies to the requirements that make such an option an error, whatever they call it
+  test('an option that a command does not declare is reported, unless strict: false', () => {
+    const file = write('strict.mjs', withAdd('{}', ", strict: process.env.STRICT !== 'false'"))
+    const reported = run(file, ['add', '--file', 'a.json'])
+    expect(reported).toMatchObject({ code: 1, stdout: '' })
+    expect(reported.stderr).toMatch(/^Unknown option: --file\n/)
+    expect(run(file, ['add', '--file', 'a.json'], envWith({ STRICT: 'false' }))).toMatchObject({
+      code: 0,
+      stdout: '{}\n'
+    })
+    // the arguments after `--` stay in `ctx.rest`, with or without strict
+    const rest = write(
+      'strict-rest.mjs',
+      `import { cli, define } from 'gunshi'
+await cli(process.argv.slice(2), define({ name: 'exec', run: ctx => console.log(JSON.stringify(ctx.rest)) }))
+`
+    )
+    expect(run(rest, ['--', '--file', 'a.json'])).toMatchObject({
+      code: 0,
+      stdout: '["--file","a.json"]\n'
+    })
+    // the rule applies to the requirements that let such an option pass, whatever they call it
     expect(readFileSync(GUIDE, 'utf8')).toContain(
-      'unless the requirements make such an option an error, in whatever words they use'
+      'Keep this default unless the requirements say that such an option is ignored, or passed on to another program, in whatever words they use: then give `strict: false` to `cli()`'
     )
   })
 

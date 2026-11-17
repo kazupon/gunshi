@@ -23,7 +23,7 @@ export const CLI_OPTIONS_DEFAULT: CliOptions<DefaultGunshiParams> = {
   middleMargin: 10,
   usageOptionType: false,
   usageOptionValue: true,
-  strict: false,
+  strict: true,
   strictPositionals: false,
   helpHint: true,
   validationErrorExitCode: 1,

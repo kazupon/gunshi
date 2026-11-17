@@ -194,6 +194,7 @@ describe('suggestion plugin', () => {
         run
       }),
       {
+        strict: false,
         plugins: [suggestion()]
       }
     )
