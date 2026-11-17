@@ -3,7 +3,13 @@
  * @license MIT
  */
 
-import { ArgsValidationError, ArgsValidationErrorKeys, parseArgs, resolveArgs } from 'args-tokens'
+import {
+  ArgsValidationError,
+  ArgsValidationErrorKeys,
+  isArgsValidationError,
+  parseArgs,
+  resolveArgs
+} from 'args-tokens'
 import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
@@ -235,7 +241,10 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     ...(cliOptions.strict && !diagnostic
       ? createUnknownOptionErrors(
           findUnknownOptions(args, tokens, {
-            toKebab: resolvedCommand.toKebab
+            toKebab: resolvedCommand.toKebab,
+            suggestedValues: findSuggestedValues(args, argv, tokens, error, {
+              toKebab: resolvedCommand.toKebab
+            })
           })
         )
       : []),
@@ -563,6 +572,11 @@ type UnknownOption = {
 
 type StrictOptionValidationOptions = {
   toKebab?: boolean
+  /**
+   * The indexes of the arguments that an error of a missing value suggests as the value of its option, which are
+   * not reported as unknown options (see {@link findSuggestedValues}).
+   */
+  suggestedValues?: ReadonlySet<number>
 }
 
 const NEGATABLE_OPTION_PREFIX = 'no-'
@@ -627,6 +641,10 @@ function findUnknownOptions(
       continue
     }
 
+    if (options.suggestedValues?.has(token.index)) {
+      continue
+    }
+
     const isLongOption = token.rawName.startsWith('--')
     if (isLongOption) {
       if (knownLongOptions.has(token.name) || knownNegatableOptions.has(token.name)) {
@@ -644,6 +662,59 @@ function findUnknownOptions(
   }
 
   return unknownOptions
+}
+
+/**
+ * Find the arguments that the errors of a missing value suggest as the values of their options, such as `-5` in
+ * `--port -5`: args-tokens reads `-5` as an option, and its error says to write `--port=-5`. Such an argument is
+ * not reported as an unknown option too.
+ *
+ * NOTE(kazupon): args-tokens suggests the argument right after an option that is given without a value, when the
+ * tokens of that argument are options that are not all declared and the option may take it as a value, and gives
+ * it in `values.next` of the error. An error without `next` suggests nothing, and its next argument is reported as
+ * before. The same argument elsewhere on the command line is reported too.
+ *
+ * @param args - The arguments of the command
+ * @param argv - The command line arguments, which the indexes of the tokens point into
+ * @param tokens - The tokens of the command line arguments
+ * @param error - The argument validation errors of args-tokens
+ * @param options - How the option names are written
+ * @returns The indexes of the suggested arguments
+ */
+function findSuggestedValues(
+  args: Args,
+  argv: string[],
+  tokens: ArgToken[],
+  error: AggregateError | undefined,
+  options: StrictOptionValidationOptions
+): Set<number> {
+  const indexes = new Set<number>()
+  for (const cause of error?.errors ?? []) {
+    if (!isArgsValidationError(cause) || cause.code !== ArgsValidationErrorKeys.missingValue) {
+      continue
+    }
+
+    const { name, next } = cause.values
+    if (typeof name !== 'string' || typeof next !== 'string' || !Object.hasOwn(args, name)) {
+      continue
+    }
+
+    const schema = args[name]
+    const optionName = resolveOptionName(name, schema, options)
+    for (const token of tokens) {
+      if (token.kind !== 'option' || !token.rawName || token.value !== undefined) {
+        continue
+      }
+
+      const named = token.rawName.startsWith('--')
+        ? token.name === optionName
+        : token.name === schema.short
+      if (named && argv[token.index + 1] === next) {
+        indexes.add(token.index + 1)
+      }
+    }
+  }
+  return indexes
 }
 
 function resolveOptionName(

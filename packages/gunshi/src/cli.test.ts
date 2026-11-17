@@ -2231,6 +2231,68 @@ describe('command lifecycle hooks', () => {
       expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
     })
 
+    describe('an argument that the error of a missing value suggests as its value', () => {
+      const app = define({
+        name: 'app',
+        args: {
+          port: { type: 'number', short: 'p' },
+          name: { type: 'string' }
+        },
+        run: () => {}
+      })
+
+      async function rejectedWith(argv: string[]): Promise<string[]> {
+        try {
+          await cli(argv, app, { strict: true, usageSilent: true })
+        } catch (error: unknown) {
+          if (error instanceof AggregateError) {
+            return (error.errors as Error[]).map(e => e.message)
+          }
+          throw error
+        }
+        throw new Error('cli() did not reject')
+      }
+
+      test.each([
+        [
+          ['--port', '-5'],
+          "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+        ],
+        [
+          ['-p', '-5'],
+          "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+        ],
+        [
+          ['--name', '--foo'],
+          "Option '--name' requires a value (to pass '--foo' as its value, write '--name=--foo')"
+        ]
+      ])(
+        '%j is reported as a missing value, not as an unknown option too',
+        async (argv, message) => {
+          expect(await rejectedWith(argv)).toEqual([message])
+        }
+      )
+
+      test('the same argument after it is still an unknown option', async () => {
+        expect(await rejectedWith(['--port', '-5', '-5'])).toEqual([
+          "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')",
+          'Unknown option: -5'
+        ])
+      })
+
+      test('an error that suggests no value leaves the next argument an unknown option', async () => {
+        // `--verbose` is not a number, so args-tokens does not suggest `--port=--verbose`
+        expect(await rejectedWith(['--port', '--verbose'])).toEqual([
+          "Option '--port' or '-p' requires a value",
+          'Unknown option: --verbose'
+        ])
+      })
+
+      test('an unknown option alone is reported', async () => {
+        expect(await rejectedWith(['-5'])).toEqual(['Unknown option: -5'])
+      })
+    })
+
     test('allows declared long, short, negatable, and kebab-case options', async () => {
       const mockCommand = vi.fn<() => void>()
 
