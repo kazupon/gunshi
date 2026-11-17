@@ -13,7 +13,7 @@
 // BENCH_BASELINE   label of a stored run to show next to this run and to assert against
 
 import { existsSync } from 'node:fs'
-import { expect, test } from 'vitest'
+import { expect, test } from 'vite-plus/test'
 import { cli } from '../packages/gunshi/lib/index.js'
 import completion from '../packages/plugin-completion/lib/index.js'
 import i18n from '../packages/plugin-i18n/lib/index.js'

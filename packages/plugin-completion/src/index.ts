@@ -57,7 +57,7 @@
  */
 
 import { RootCommand } from '@bomb.sh/tab'
-import { plugin } from '@gunshi/plugin'
+import { ArgsValidationError, ArgsValidationErrorKeys, CommandError, plugin } from '@gunshi/plugin'
 import { namespacedId } from '@gunshi/shared'
 import { COMPLETE_COMMAND_NAME, registerForCompletion } from './registration.ts'
 import { pluginId } from './types.ts'
@@ -70,6 +70,13 @@ import type { CompletionOptions } from './types.ts'
 export * from './types.ts'
 
 const TERMINATOR = '--'
+
+/**
+ * The shells that the completion script is printed for, as `@bomb.sh/tab` supports them.
+ */
+const SHELLS = ['bash', 'zsh', 'fish', 'powershell'] as const
+
+const SHELL_CHOICES = SHELLS.map(shell => JSON.stringify(shell)).join(', ')
 
 const i18nPluginId = namespacedId('i18n')
 
@@ -132,17 +139,35 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
           shell: {
             type: 'positional',
             required: false,
-            description: 'The shell to print the completion script for'
+            description: 'The shell to print the completion script for',
+            /**
+             * NOTE(kazupon): a shell that the script cannot be printed for is an argument error, as a value
+             * that is not one of the `choices` of an `enum` option is, so that it is reported with the
+             * help of the command, instead of printing nothing.
+             *
+             * @param value - The shell given on the command line
+             * @returns The shell
+             */
+            parse: (value: string): string => {
+              if (!(SHELLS as readonly string[]).includes(value)) {
+                throw new ArgsValidationError(`expected one of ${SHELL_CHOICES}`, {
+                  code: ArgsValidationErrorKeys.invalidChoice,
+                  values: {
+                    expected: 'enum',
+                    choices: SHELL_CHOICES,
+                    choiceValues: [...SHELLS],
+                    actual: value
+                  }
+                })
+              }
+              return value
+            }
           }
         },
         rendering: {
           header: null // disable header rendering for completion command
         },
         run: async cmdCtx => {
-          if (!cmdCtx.env.name) {
-            throw new Error('your cli name is not defined.')
-          }
-
           let shell: string | undefined = cmdCtx._[1]
           if (shell === TERMINATOR) {
             shell = undefined
@@ -178,8 +203,16 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
              * registered and matches the same command.
              */
             t.parse(resolvedArgs)
-          } else if (['zsh', 'bash', 'fish', 'powershell'].includes(shell)) {
-            // the completion script only needs the CLI name and the executable
+          } else if ((SHELLS as readonly string[]).includes(shell)) {
+            /**
+             * NOTE(kazupon): the completion script needs the name of the CLI, which the shell completes,
+             * and the executable. Completing a request does not, so only printing the script requires it.
+             */
+            if (!cmdCtx.env.name) {
+              throw new CommandError(
+                "The completion script needs the name of the CLI: give 'name' to cli()"
+              )
+            }
             t.setup(cmdCtx.env.name, quoteExec(), shell)
           }
         }

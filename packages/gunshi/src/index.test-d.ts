@@ -1,4 +1,4 @@
-import { expectTypeOf, test } from 'vitest'
+import { expectTypeOf, test } from 'vite-plus/test'
 import {
   CommandError as DefinitionCommandError,
   isCommandError as definitionIsCommandError
@@ -40,6 +40,11 @@ test('exports args validation error types', () => {
   expectTypeOf(
     ArgsValidationErrorKeys.unexpectedPositional
   ).toEqualTypeOf<'err:arg:unexpected-positional'>()
+  expectTypeOf(ArgsValidationErrorKeys.tooSmall).toEqualTypeOf<'err:arg:too-small'>()
+  expectTypeOf(ArgsValidationErrorKeys.tooLarge).toEqualTypeOf<'err:arg:too-large'>()
+  expectTypeOf(ArgsValidationErrorKeys.tooShort).toEqualTypeOf<'err:arg:too-short'>()
+  expectTypeOf(ArgsValidationErrorKeys.tooLong).toEqualTypeOf<'err:arg:too-long'>()
+  expectTypeOf(ArgsValidationErrorKeys.patternMismatch).toEqualTypeOf<'err:arg:pattern-mismatch'>()
   expectTypeOf<ArgsValidationErrorCode>().toEqualTypeOf<
     (typeof ArgsValidationErrorKeys)[keyof typeof ArgsValidationErrorKeys]
   >()

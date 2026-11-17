@@ -24,7 +24,7 @@ The command follows the errors that your own `renderValidationErrors` renders, t
 
 The `cli()` promise resolves. To report the argument errors in your own way, see [Reporting Errors Yourself](#reporting-errors-yourself).
 
-With `--help` or `--version`, Gunshi prints the help or the version instead, and does not report the argument errors, an unknown option of `strict: true` and an unexpected positional argument of `strictPositionals: true` included. An unknown command is still reported, since it is not known which command was meant.
+With `--help` or `--version`, Gunshi prints the help or the version instead, and does not report the argument errors, an unknown option and an unexpected positional argument of `strictPositionals: true` included. An unknown command is still reported, since it is not known which command was meant.
 
 To end with another exit code, such as `2`, the exit code of a usage error in many command-line tools, give it to `cli()` as `validationErrorExitCode`:
 
@@ -33,6 +33,8 @@ await cli(process.argv.slice(2), command, { validationErrorExitCode: 2 })
 ```
 
 It is the exit code of the argument errors, an unknown command included, whether they are printed as text or as JSON (see [With `--json`](#with-json)), and of `--json` given to a command that does not support it. It does not change the exit code of a `CommandError`, or of an unexpected error.
+
+An unknown option is one of the argument errors, unless `strict: false` is given (see [Strict Unknown Option Validation](./declarative.md#strict-unknown-option-validation)), so it ends with this exit code too. With `strict: false`, Gunshi ignores the option and runs the command.
 
 A command may also find an error in its arguments itself, such as a start date after the end date. To end it with the same exit code, throw a [`CommandError`](#expected-failures) with the exit code that `ctx.env` has:
 
@@ -211,3 +213,7 @@ With `usageSilent: true`, Gunshi prints nothing and leaves the exit code alone.
 The `cli()` promise rejects with the `CommandError`, or with the `AggregateError` that holds the argument errors, for you to report them. This suits tests, and programs that call `cli()`.
 
 To report only the argument errors yourself, set `renderValidationErrors` to `null` (see [Handling Argument Validation Errors](../advanced/command-hooks.md#handling-argument-validation-errors)). It does not change how Gunshi reports a `CommandError`.
+
+## Next Steps
+
+Learn how a command supports `--json`, and how Gunshi prints its result and its errors as JSON, in [JSON Output](./json-output.md).

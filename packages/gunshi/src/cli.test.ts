@@ -1,7 +1,7 @@
 import global from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
-import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vite-plus/test'
 import { z } from 'zod/v4-mini'
 import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockErrorLog, defineMockLog, helpHint } from '../test/utils.ts'
@@ -18,10 +18,10 @@ import { generate } from './generator.ts'
 import { jsonArgs } from './json.ts'
 import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
-import { hidden, string } from './combinators.ts'
+import { combinator, hidden, integer, map, number, string } from './combinators.ts'
 
 import type { ArgSchema, Args, ArgsValidationError } from 'args-tokens'
-import type { Mocked } from 'vitest'
+import type { Mocked } from 'vite-plus/test'
 import type { Plugin } from './plugin/core.ts'
 import type {
   CliOptions,
@@ -1039,7 +1039,8 @@ test('usageSilent silences ctx.log but not console.log', async () => {
 test('_ (rawArgs)', async () => {
   const args = ['--foo', 'bar', '--baz', 'qux']
   const fn = vi.fn<() => void>()
-  await cli(args, fn)
+  // the options are not declared: without strict, the command runs with them
+  await cli(args, fn, { strict: false })
 
   expect(fn).toHaveBeenCalledWith(expect.objectContaining({ _: args }))
 })
@@ -1047,7 +1048,8 @@ test('_ (rawArgs)', async () => {
 test('tokens', async () => {
   const args = ['--foo', 'bar']
   const fn = vi.fn<() => void>()
-  await cli(args, fn)
+  // the option is not declared: without strict, the command runs with it
+  await cli(args, fn, { strict: false })
 
   expect(fn).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -1428,6 +1430,154 @@ describe('args validation i18n', () => {
   })
 })
 
+describe('the rules of the parser combinators', () => {
+  const command = () =>
+    define({
+      name: 'app',
+      args: {
+        ...jsonArgs,
+        count: integer({ min: 1 }),
+        size: number({ max: 10 }),
+        name: string({ minLength: 2 }),
+        title: string({ maxLength: 3 }),
+        slug: string({ pattern: /^[a-z]+$/ })
+      },
+      run: () => ({ ok: true })
+    })
+  const argv = ['--count', '0', '--size', '11', '--name', 'a', '--title', 'abcd', '--slug', 'A1']
+
+  test.each([
+    {
+      argv: ['--count', '0'],
+      field: '--count',
+      reason: 'too_small',
+      message: "Invalid value for '--count': Integer must be >= 1, got 0"
+    },
+    {
+      argv: ['--size', '11'],
+      field: '--size',
+      reason: 'too_large',
+      message: "Invalid value for '--size': Number must be <= 10, got 11"
+    },
+    {
+      argv: ['--name', 'a'],
+      field: '--name',
+      reason: 'too_short',
+      message: "Invalid value for '--name': String must be at least 2 characters"
+    },
+    {
+      argv: ['--title', 'abcd'],
+      field: '--title',
+      reason: 'too_long',
+      message: "Invalid value for '--title': String must be at most 3 characters"
+    },
+    {
+      argv: ['--slug', 'A1'],
+      field: '--slug',
+      reason: 'pattern_mismatch',
+      message: "Invalid value for '--slug': String must match pattern /^[a-z]+$/"
+    }
+  ])('$field reports $reason with --json', async ({ argv, field, reason, message }) => {
+    const stderr = defineMockErrorLog()
+
+    await cli([...argv, '--json'], command(), { name: 'app' })
+
+    expect(JSON.parse(stderr())).toMatchObject({
+      status: 'action_required',
+      reason,
+      message,
+      data: { issues: [{ field, reason, message }] }
+    })
+  })
+
+  test('an error that a parse function of your own throws is custom_parse, even a RangeError', async () => {
+    const stderr = defineMockErrorLog()
+    const app = define({
+      name: 'app',
+      args: {
+        ...jsonArgs,
+        port: combinator({
+          parse: value => {
+            const port = Number(value)
+            if (port < 1 || port > 65_535) {
+              throw new RangeError(`Port must be from 1 to 65535, got ${value}`)
+            }
+            return port
+          }
+        }),
+        even: map(integer(), n => {
+          if (n % 2 !== 0) {
+            throw new Error(`Must be even, got ${n}`)
+          }
+          return n
+        })
+      },
+      run: () => ({ ok: true })
+    })
+
+    await cli(['--port', '70000', '--even', '3', '--json'], app, { name: 'app' })
+
+    const failure = JSON.parse(stderr()) as {
+      data: { issues: { field: string; reason: string }[] }
+    }
+    expect(failure.data.issues.map(({ field, reason }) => ({ field, reason }))).toEqual([
+      { field: '--port', reason: 'custom_parse' },
+      { field: '--even', reason: 'custom_parse' }
+    ])
+  })
+
+  test('prints the messages of args-tokens without the i18n plugin', async () => {
+    const stderr = defineMockErrorLog()
+
+    await cli(argv, command(), { name: 'app' })
+
+    expect(stderr()).toBe(
+      [
+        "Invalid value for '--count': Integer must be >= 1, got 0",
+        "Invalid value for '--size': Number must be <= 10, got 11",
+        "Invalid value for '--name': String must be at least 2 characters",
+        "Invalid value for '--title': String must be at most 3 characters",
+        "Invalid value for '--slug': String must match pattern /^[a-z]+$/"
+      ].join('\n') + helpHint([], { name: 'app' })
+    )
+  })
+
+  test('translates them with the built-in resources of en-US', async () => {
+    const stderr = defineMockErrorLog()
+
+    await cli(argv, command(), { name: 'app', plugins: [i18n({ locale: 'en-US' })] })
+
+    expect(stderr()).toBe(
+      [
+        "Invalid value for '--count': expected integer >= 1, got 0",
+        "Invalid value for '--size': expected number <= 10, got 11",
+        "Invalid value for '--name': expected at least 2 characters",
+        "Invalid value for '--title': expected at most 3 characters",
+        "Invalid value for '--slug': expected to match /^[a-z]+$/"
+      ].join('\n') + helpHint([], { name: 'app' })
+    )
+  })
+
+  test('translates them with the built-in resources of ja-JP', async () => {
+    const stderr = defineMockErrorLog()
+
+    await cli(argv, command(), {
+      name: 'app',
+      plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })]
+    })
+
+    expect(stderr()).toBe(
+      [
+        "'--count' の値が小さすぎます。1 以上を指定してください: 0",
+        "'--size' の値が大きすぎます。10 以下を指定してください: 11",
+        "'--name' の値が短すぎます。2 文字以上を指定してください",
+        "'--title' の値が長すぎます。3 文字以下を指定してください",
+        "'--slug' の値が不正です。/^[a-z]+$/ に合う値を指定してください"
+      ].join('\n') + helpHint([], { name: 'app', locale: 'ja-JP' })
+    )
+  })
+})
+
 describe('positional arguments', () => {
   test('basic', async () => {
     const stderr = defineMockErrorLog()
@@ -1647,11 +1797,16 @@ describe('argument name kebabnize', () => {
     } satisfies Args
 
     const mockFn1 = vi.fn<() => void>()
-    await cli(['--foo-bar', 'value1', '--bazQux', 'value2'], {
-      args,
-      toKebab: true,
-      run: mockFn1
-    })
+    // with `toKebab: true`, `--bazQux` is not an option of the command: without strict, it is ignored
+    await cli(
+      ['--foo-bar', 'value1', '--bazQux', 'value2'],
+      {
+        args,
+        toKebab: true,
+        run: mockFn1
+      },
+      { strict: false }
+    )
 
     expect(mockFn1).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -2037,13 +2192,42 @@ describe('command lifecycle hooks', () => {
   })
 
   describe('strict option validation', () => {
-    test('keeps unknown options compatible by default and with strict disabled', async () => {
+    test('reports unknown options by default, and ignores them with strict disabled', async () => {
+      const stderr = defineMockErrorLog()
       const mockCommand = vi.fn<() => void>()
 
       await cli(['--alow-reload'], { run: mockCommand })
+
+      expect(mockCommand).not.toHaveBeenCalled()
+      expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
+      expect(process.exitCode).toBe(1)
+
       await cli(['--alow-reload'], { run: mockCommand }, { strict: false })
 
-      expect(mockCommand).toHaveBeenCalledTimes(2)
+      expect(mockCommand).toHaveBeenCalledOnce()
+    })
+
+    test('keeps the arguments after -- in rest by default', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(['--', '--unknown', 'value'], { run: mockCommand })
+
+      expect(mockCommand).toHaveBeenCalledWith(
+        expect.objectContaining({ rest: ['--unknown', 'value'] })
+      )
+    })
+
+    test('answers --help before an unknown option by default', async () => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(['--unknown', '--help'], { name: 'app', run: mockCommand })
+
+      expect(log()).toContain('--help')
+      expect(stderr()).toBe('')
+      expect(mockCommand).not.toHaveBeenCalled()
     })
 
     test('reports unknown long options before command execution', async () => {
@@ -2081,6 +2265,68 @@ describe('command lifecycle hooks', () => {
         candidates: ['--help', '--version', '--allow-reload']
       })
       expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
+    })
+
+    describe('an argument that the error of a missing value suggests as its value', () => {
+      const app = define({
+        name: 'app',
+        args: {
+          port: { type: 'number', short: 'p' },
+          name: { type: 'string' }
+        },
+        run: () => {}
+      })
+
+      async function rejectedWith(argv: string[]): Promise<string[]> {
+        try {
+          await cli(argv, app, { strict: true, usageSilent: true })
+        } catch (error: unknown) {
+          if (error instanceof AggregateError) {
+            return (error.errors as Error[]).map(e => e.message)
+          }
+          throw error
+        }
+        throw new Error('cli() did not reject')
+      }
+
+      test.each([
+        [
+          ['--port', '-5'],
+          "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+        ],
+        [
+          ['-p', '-5'],
+          "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')"
+        ],
+        [
+          ['--name', '--foo'],
+          "Option '--name' requires a value (to pass '--foo' as its value, write '--name=--foo')"
+        ]
+      ])(
+        '%j is reported as a missing value, not as an unknown option too',
+        async (argv, message) => {
+          expect(await rejectedWith(argv)).toEqual([message])
+        }
+      )
+
+      test('the same argument after it is still an unknown option', async () => {
+        expect(await rejectedWith(['--port', '-5', '-5'])).toEqual([
+          "Option '--port' or '-p' requires a value (to pass '-5' as its value, write '--port=-5')",
+          'Unknown option: -5'
+        ])
+      })
+
+      test('an error that suggests no value leaves the next argument an unknown option', async () => {
+        // `--verbose` is not a number, so args-tokens does not suggest `--port=--verbose`
+        expect(await rejectedWith(['--port', '--verbose'])).toEqual([
+          "Option '--port' or '-p' requires a value",
+          'Unknown option: --verbose'
+        ])
+      })
+
+      test('an unknown option alone is reported', async () => {
+        expect(await rejectedWith(['-5'])).toEqual(['Unknown option: -5'])
+      })
     })
 
     test('allows declared long, short, negatable, and kebab-case options', async () => {
@@ -2148,6 +2394,20 @@ describe('command lifecycle hooks', () => {
       ).resolves.toBe('1.0.0')
 
       expect(mockCommand).not.toHaveBeenCalled()
+    })
+
+    test('reports an unknown option by default without the global plugin too', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await expect(boneCli(['--unknown'], { run: mockCommand })).rejects.toBeInstanceOf(
+        AggregateError
+      )
+      await expect(boneCli(['--help'], { run: mockCommand })).rejects.toBeInstanceOf(AggregateError)
+      expect(mockCommand).not.toHaveBeenCalled()
+
+      await boneCli(['--unknown'], { run: mockCommand }, { strict: false })
+
+      expect(mockCommand).toHaveBeenCalledOnce()
     })
 
     test('reports help and version as unknown options without global plugin', async () => {
@@ -4400,8 +4660,11 @@ describe('arguments read by args-tokens 1.0', () => {
     '%j does not give `build` to --config',
     async argv => {
       // an explicit empty value, or a long option without a name, is what `--config` gets
-      // (args-tokens #637, #645)
-      expect(await run(argv)).toMatchObject({ ran: { commandPath: ['build'] } })
+      // (args-tokens #637, #645). `--config` is an option of the entry, not of `build`: without
+      // strict, it is ignored, and `build` runs
+      expect(await run(argv, undefined, { strict: false })).toMatchObject({
+        ran: { commandPath: ['build'] }
+      })
     }
   )
 
@@ -7075,6 +7338,33 @@ describe('deprecated commands and arguments', () => {
       error => error.code === 'err:arg:unknown-option'
     )
     expect(unknown?.values.candidates).toEqual(['--help', '--version', '--output'])
+  })
+
+  test('the negated form of a deprecated option is not a candidate either, and is still accepted', async () => {
+    defineMockErrorLog()
+    const run = vi.fn<(ctx: { values: Record<string, unknown> }) => void>()
+    const build = define({
+      name: 'build',
+      args: {
+        legacy: { type: 'boolean', negatable: true, deprecated: 'Use --modern.' },
+        modern: { type: 'boolean', negatable: true }
+      },
+      run
+    })
+    let capturedError: AggregateError | undefined
+    await cli(['--no-legac'], build, {
+      strict: true,
+      onErrorCommand: (_ctx, error) => {
+        capturedError = error as AggregateError
+      }
+    })
+    const unknown = ((capturedError?.errors ?? []) as ArgsValidationError[]).find(
+      error => error.code === 'err:arg:unknown-option'
+    )
+    expect(unknown?.values.candidates).toEqual(['--help', '--version', '--modern', '--no-modern'])
+
+    await cli(['--no-legacy'], build, { strict: true })
+    expect(run.mock.calls[0][0].values).toMatchObject({ legacy: false })
   })
 
   test('a lazy command takes its deprecation from the definition for the help, and warns when it runs', async () => {

@@ -1,5 +1,5 @@
 import { createCommandContext } from 'gunshi/context'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { CommandRunner, define, lazy } from './index.ts'
 
 describe('@gunshi/definition', () => {

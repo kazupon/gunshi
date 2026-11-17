@@ -106,7 +106,10 @@ export default defineConfig(
         ['meta', { property: 'og:locale', content: 'en' }],
         [
           'meta',
-          { property: 'og:title', content: 'Gunshi | Modern javascript command-line library' }
+          {
+            property: 'og:title',
+            content: 'Gunshi | Your strategist for CLIs that people and AI agents use'
+          }
         ],
         ['meta', { property: 'og:image', content: 'https://gunshi.dev/og-image.png' }],
         ['meta', { property: 'og:site_name', content: 'Gunshi' }],

@@ -54,15 +54,21 @@ export interface RegisterCompletionParams {
    */
   t: RootCommand
   /**
-   * The completion name of the command: `'entry'`, or the command path such as `'remote add'`.
+   * The completion name of the command: `'entry'`, or the command path as it is typed, such as `'remote add'`.
    */
   name: string
+  /**
+   * The command path by the keys of the commands, which differs from `name` when a command is typed by one of its
+   * aliases: `'remote add'` for `rmt add`. The completion configuration of the command is looked up by it, and
+   * a lazy command without a name is named after its last key, as gunshi names it. Defaults to `name`.
+   */
+  keyPath?: string
   /**
    * A {@linkcode Command | command} to register.
    */
   cmd: Command | LazyCommand
   /**
-   * The {@linkcode CompletionConfig | completion configurations}, keyed by completion name.
+   * The {@linkcode CompletionConfig | completion configurations}, keyed by `keyPath`.
    */
   config: Record<string, CompletionConfig>
   /**
@@ -188,7 +194,9 @@ export async function registerForCompletion({
   // 2. the commands on the path that is already typed, following `RootCommand#matchCommand`:
   // an option consumes the next argument unless it is known as a boolean option
   const subConfig = config.subCommands || {}
+  // the words as they are typed, which the commands are registered under, and the keys of the commands that they find
   const path: string[] = []
+  const keys: string[] = []
   const commandIndexes: number[] = []
   let level: ReadonlyMap<string, Command | LazyCommand> | undefined = subCommands
   let walked = true
@@ -209,17 +217,20 @@ export async function registerForCompletion({
      * NOTE(kazupon): `RootCommand#matchCommand` joins the words it has matched with a space
      * before looking them up, so a single quoted word can hold a whole command path.
      */
-    const cmd = resolveCommandPath(level, arg.split(' '), path.length === 0)
-    if (cmd == undefined) {
+    const resolved = resolveCommandPath(level, arg.split(' '), path.length === 0)
+    if (resolved == undefined) {
       walked = false // the rest of the arguments are positional arguments
       break
     }
+    const [resolvedKeys, cmd] = resolved
     path.push(arg)
+    keys.push(...resolvedKeys)
     commandIndexes.push(i)
     registered.push(
       await registerCompletion({
         t,
         name: path.join(' '),
+        keyPath: keys.join(' '),
         cmd,
         config: subConfig,
         i18nPluginId,
@@ -247,6 +258,7 @@ export async function registerForCompletion({
       await registerCompletion({
         t,
         name: [...path, name].join(' '),
+        keyPath: [...keys, name].join(' '),
         cmd,
         config: subConfig,
         i18nPluginId,
@@ -268,6 +280,7 @@ export async function registerForCompletion({
 export async function registerCompletion({
   t,
   name,
+  keyPath = name,
   cmd,
   config,
   i18nPluginId,
@@ -280,7 +293,7 @@ export async function registerCompletion({
   const resolvedCmd = await resolveCommand(
     cmd,
     // the completion root is not registered under its own name
-    isBombshellRoot ? undefined : name.split(' ').at(-1),
+    isBombshellRoot ? undefined : keyPath.split(' ').at(-1),
     load && !shallow
   )
   const extensions: Record<string, CommandContextExtension> = Object.create(null) as Record<
@@ -334,7 +347,7 @@ export async function registerCompletion({
        */
       commandTab.argument(
         key,
-        hidden ? undefined : resolveCompletionHandler(name, key, config, i18n),
+        hidden ? undefined : resolveCompletionHandler(keyPath, key, config, i18n),
         schema.multiple
       )
     } else {
@@ -384,7 +397,7 @@ export async function registerCompletion({
         target.option(
           optionName,
           description,
-          resolveCompletionHandler(name, key, config, i18n),
+          resolveCompletionHandler(keyPath, key, config, i18n),
           schema.short
         )
       }
@@ -483,32 +496,53 @@ function resolveCompletionHandler(
  * @param level - The sub-commands the names start from
  * @param names - The command names, from the current level downwards
  * @param topLevel - Whether `level` is the top level of the CLI, where the completion command lives
- * @returns The command, or `undefined` if any of the names does not resolve
+ * @returns The keys of the commands that the names find and the command, or `undefined` if a name does not resolve
  */
 function resolveCommandPath(
   level: ReadonlyMap<string, Command | LazyCommand> | undefined,
   names: string[],
   topLevel: boolean
-): Command | LazyCommand | undefined {
+): [keys: string[], command: Command | LazyCommand] | undefined {
   let current: Command | LazyCommand | undefined
   let currentLevel = level
+  const keys: string[] = []
   for (const [index, name] of names.entries()) {
-    /**
-     * NOTE(kazupon): a command is found by one of its aliases too, as gunshi finds it, so that its options are
-     * completed after the alias. The alias itself is never a candidate: the candidates are the names.
-     */
-    const cmd =
-      currentLevel?.get(name) ??
-      [...(currentLevel?.values() ?? [])].find(
-        command => Array.isArray(command.aliases) && command.aliases.includes(name)
-      )
-    if (cmd == undefined || isSkipped(name, cmd, topLevel && index === 0)) {
+    const found = findCommand(currentLevel, name)
+    if (found == undefined || isSkipped(found[0], found[1], topLevel && index === 0)) {
       return undefined
     }
-    current = cmd
-    currentLevel = getCommandSubCommands(cmd)
+    keys.push(found[0])
+    current = found[1]
+    currentLevel = getCommandSubCommands(found[1])
   }
-  return current
+  return current == undefined ? undefined : [keys, current]
+}
+
+/**
+ * Find a command by its key, or by one of its aliases.
+ *
+ * A command is found by one of its aliases too, as gunshi finds it, so that its options are completed after
+ * the alias. The alias itself is never a candidate: the candidates are the names. The key of the command is
+ * kept, as gunshi keeps it, so that the completion configuration of the command is looked up by its key.
+ *
+ * @param level - The sub-commands to look in
+ * @param name - The name that is typed
+ * @returns The key and the command, or `undefined` if no command answers to the name
+ */
+function findCommand(
+  level: ReadonlyMap<string, Command | LazyCommand> | undefined,
+  name: string
+): [key: string, command: Command | LazyCommand] | undefined {
+  const command = level?.get(name)
+  if (command != undefined) {
+    return [name, command]
+  }
+  for (const [key, candidate] of level ?? []) {
+    if (Array.isArray(candidate.aliases) && candidate.aliases.includes(name)) {
+      return [key, candidate]
+    }
+  }
+  return undefined
 }
 
 function isSkipped(name: string, cmd: Command | LazyCommand, topLevel: boolean): boolean {

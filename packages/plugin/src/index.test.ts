@@ -1,5 +1,5 @@
 import { cli } from 'gunshi'
-import { expect, test } from 'vitest'
+import { expect, test } from 'vite-plus/test'
 import { plugin } from './index.ts'
 
 import type { CommandRunner } from './index.ts'

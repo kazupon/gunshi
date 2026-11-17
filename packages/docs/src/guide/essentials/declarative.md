@@ -172,11 +172,15 @@ Each option can have the following properties:
 - `parse`: A function to parse and validate the argument value. Required when `type` is 'custom'
 - `choices`: The values that an `enum` option accepts. Required when `type` is 'enum', unless the option has a `parse` function, which then receives the value as it would for a 'string' option
 - `conflicts`: Specify mutually exclusive options that cannot be used together
+- `negatable`: Set to `true` to accept the negated form of a boolean option, such as `--no-verbose`. See [Negatable Boolean Options](#negatable-boolean-options)
+- `metavar`: The name of the type of the value. The parser combinators set it, such as `integer` for `integer()`. The help names the value after the option, not after it
+
+These are all the keys of an argument. Any other key is a type error in the definition that you give to `define`, `lazy` and the other helpers. TypeScript reports it at the key, and names it, as in `'alias' is not a key of an argument: use 'short'`. So a key of another library, such as `alias`, or a typo, such as `require`, is reported instead of being ignored. So is such a key in an object that you give to `cli()` as the command, which TypeScript reports with its own message. An object in the table of the sub-commands is not checked, so define it with `define`.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> For a more type-safe and composable way to define arguments, see [Parser Combinators](../advanced/parser-combinators.md).
+> [Parser Combinators](../advanced/parser-combinators.md) are another way to write the same schemas, with functions. See [Objects or Combinators](../advanced/parser-combinators.md#objects-or-combinators) for when to use them.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
@@ -352,20 +356,11 @@ app -p=-5
 app -p-5
 ```
 
-The error message also suggests the form with `=`, such as `(to pass '-5' as its value, write '--port=-5')`. With the i18n plugin, the suggestion follows the translated error, and is translated by the built-in resource key `err:arg:missing-value:hint`.
+The error message also suggests the form with `=`, such as `(to pass '-5' as its value, write '--port=-5')`. With the i18n plugin, the suggestion follows the translated error, and is translated by the built-in resource key `err:arg:missing-value:hint`. The argument that it suggests, `-5` here, is not reported as an unknown option too.
 
 #### Strict Unknown Option Validation
 
-By default, Gunshi keeps backward compatibility by ignoring option tokens that are not declared in the resolved command's `args` or installed global options. Enable `strict` when you want typos or unsupported options to fail before the command runner executes:
-
-```js
-await cli(process.argv.slice(2), command, {
-  name: 'app',
-  strict: true
-})
-```
-
-With `strict: true`, an input such as `--alow-reload` is reported as an argument validation error, followed by the command that shows the help (see [Argument Errors](./errors.md#argument-errors)):
+By default, Gunshi reports an option token that is not declared in the resolved command's `args` or installed global options as an argument validation error, before the command runner executes, so that typos and unsupported options do not pass silently. An input such as `--alow-reload` is reported, followed by the command that shows the help (see [Argument Errors](./errors.md#argument-errors)):
 
 ```txt
 Unknown option: --alow-reload
@@ -376,18 +371,30 @@ See the arguments of the command:
 
 The error uses the `err:arg:unknown-option` resource key, so the message follows the same renderer and i18n behavior as other argument validation errors. Suggestions such as `Did you mean --allow-reload?` are intentionally left to suggestion plugins.
 
-`--help` and `--version` are still answered: `app --alow-reload --help` prints the help, and the unknown option is not reported, as another wrong argument is not. An unknown command is reported, with or without `--help`.
+The arguments of a command are its own: an option that only the main command declares, given with a sub-command, is an unknown option of the sub-command. Spread the shared arguments into every command that takes them (see [Options for Every Command](./composable.md#options-for-every-command)).
 
-`--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`. With `strict`, it is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
-
-#### Strict Positional Argument Validation
-
-By default, Gunshi also keeps the positional arguments that a command does not declare: they are in `ctx.positionals`. Enable `strictPositionals` when you want them to fail before the command runner executes, as `strict` does for the options:
+To ignore such option tokens and run the command, give `strict: false`, such as for a command that passes its arguments as they are to another program:
 
 ```js
 await cli(process.argv.slice(2), command, {
   name: 'app',
-  strict: true,
+  strict: false
+})
+```
+
+The arguments after `--` are not option tokens, with or without `strict`: they stay in `ctx.rest`, as they are. To pass arguments to another program, take them after `--`, such as `app exec -- --any --flags`.
+
+`--help` and `--version` are still answered: `app --alow-reload --help` prints the help, and the unknown option is not reported, as another wrong argument is not. An unknown command is reported, with or without `--help`.
+
+`--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`. It is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
+
+#### Strict Positional Argument Validation
+
+Unlike the options, Gunshi keeps the positional arguments that a command does not declare by default: they are in `ctx.positionals`. Enable `strictPositionals` when you want them to fail before the command runner executes, as the option tokens do:
+
+```js
+await cli(process.argv.slice(2), command, {
+  name: 'app',
   strictPositionals: true
 })
 ```
@@ -403,7 +410,7 @@ See the arguments of the command:
 
 A command takes as many positional arguments as it declares, an optional one included. To take any number of them, declare a positional argument with `multiple: true`. The arguments after `--` are not positional arguments: they stay in `ctx.rest`.
 
-The error uses the `err:arg:unexpected-positional` resource key. As with an unknown option of `strict`, `--help` and `--version` are still answered, and after a command with sub-commands, a word that is not one of them is reported as an unknown command instead.
+The error uses the `err:arg:unexpected-positional` resource key. As with an unknown option, `--help` and `--version` are still answered, and after a command with sub-commands, a word that is not one of them is reported as an unknown command instead.
 
 #### Deprecated Options
 

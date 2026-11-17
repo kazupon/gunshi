@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import { defineMockErrorLog, defineMockLog } from '../../gunshi/test/utils.ts'
 import extension from './extension.ts'

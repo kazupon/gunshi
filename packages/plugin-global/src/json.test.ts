@@ -14,7 +14,7 @@ import {
   isJsonOutputError
 } from '@gunshi/plugin'
 import { COMMON_ARGS } from '@gunshi/shared'
-import { describe, expect, onTestFinished, test, vi } from 'vitest'
+import { describe, expect, onTestFinished, test, vi } from 'vite-plus/test'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import { jsonArgs } from '../../gunshi/src/json.ts'
 import decorator from './decorator.ts'

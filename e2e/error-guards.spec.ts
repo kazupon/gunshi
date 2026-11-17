@@ -10,7 +10,7 @@
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { beforeAll, describe, expect, onTestFinished, test, vi } from 'vitest'
+import { beforeAll, describe, expect, onTestFinished, test, vi } from 'vite-plus/test'
 
 import type { Args, CliOptions, Command } from '../packages/gunshi/src/index.ts'
 

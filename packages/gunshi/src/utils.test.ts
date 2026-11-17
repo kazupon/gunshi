@@ -1,5 +1,5 @@
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { lazy } from './definition.ts'
 import { jsonArgs } from './json.ts'
 import { isJsonArg, isLazyCommand, resolveJsonRequest, resolveLazyCommand } from './utils.ts'

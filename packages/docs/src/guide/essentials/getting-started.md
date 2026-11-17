@@ -231,6 +231,8 @@ The following chapters will guide you through each topic:
 - **[Composable Sub-commands](./composable.md)** - Build complex CLIs with modular sub-commands like `git commit` or `npm install`
 - **[Lazy & Async Command Loading](./lazy-async.md)** - Optimize startup performance by loading commands only when needed
 - **[Auto Usage Generation](./auto-usage.md)** - Create self-documenting CLIs with automatic help and usage information
+- **[Errors and Exit Codes](./errors.md)** - Report the failures of your commands, and choose the exit codes of your CLI
+- **[JSON Output](./json-output.md)** - Print the result and the errors of a command as JSON with `--json`, for scripts and AI agents
 - **[Plugin System](./plugin-system.md)** - Extend your CLI with modular plugins for features like i18n and shell completion
 
 Each chapter builds upon the previous ones, introducing more sophisticated patterns and techniques.

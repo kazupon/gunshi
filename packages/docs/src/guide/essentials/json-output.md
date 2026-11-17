@@ -63,7 +63,7 @@ $ node cli.js --json | cat
 
 `--json` shows up in the help of the command, as `--json  Output the result as JSON`. To give it a short name, spread its schema: `json: { ...jsonArgs.json, short: 'j' }`.
 
-To know whether the command is asked for JSON, read `ctx.values.json`, for example to skip a prompt or a spinner.
+To know whether the command is asked for JSON, read `ctx.values.json`, for example to skip a prompt or a spinner. Do not read it to choose between the result and the lines for people: print the lines with `ctx.log`, which prints nothing with `--json`, and return the result in every branch.
 
 ## The Result
 
@@ -101,12 +101,16 @@ The types check what `run` returns: a command that spreads `jsonArgs` returns an
 
 The last line of a type error tells what went wrong:
 
-| What you wrote                                                                                | The last line of the type error                                                                                                                                       | How to fix it                                                                   |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `run` returns nothing                                                                         | `Type 'void' is not assignable to type 'JsonResult'`, or `'Awaitable<JsonResult>'` when `run` is not `async`                                                          | Return the result                                                               |
-| `run` returns a value of an interface as it is (`return project`)                             | `Index signature for type 'string' is missing in type 'Project'`                                                                                                      | Key it by a noun: `return { project }`                                          |
-| `run` returns an array                                                                        | `Index signature for type 'string' is missing in type 'Project[]'`                                                                                                    | Key it by a noun: `return { projects }`, or print it with a `json` of your own  |
-| A lazy command spreads `jsonArgs` into the command that it loads, but not into its definition | `No overload matches this call`, and `'{ project: Project; }' is not assignable to type 'string \| void'`, or `'Awaitable<string \| void>'` when `run` is not `async` | Spread `jsonArgs` into the definition too (see [Lazy Commands](#lazy-commands)) |
+| What you wrote                                                                                | The last line of the type error                                                                                                                                       | How to fix it                                                                        |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `run` returns nothing                                                                         | `Type 'void' is not assignable to type 'JsonResult'`, or `'Awaitable<JsonResult>'` when `run` is not `async`                                                          | Return the result                                                                    |
+| `run` returns the result in some branches only, such as after a check of `ctx.values.json`    | `Type 'undefined' is not assignable to type 'JsonResult'`, or `'Awaitable<JsonResult>'` when `run` is not `async`                                                     | Return the result in every branch, and print the lines for people with `ctx.log`     |
+| `run` returns a value of an interface as it is (`return project`)                             | `Index signature for type 'string' is missing in type 'Project'`                                                                                                      | Key it by a noun: `return { project }`                                               |
+| `run` returns an array                                                                        | `Index signature for type 'string' is missing in type 'Project[]'`                                                                                                    | Key it by a noun: `return { projects }`, or print it with a `json` of your own       |
+| A command that does not spread `jsonArgs` returns an object                                   | `'{ project: Project; }' is not assignable to type 'string \| void'`, or `'Awaitable<string \| void>'` when `run` is not `async`                                      | Spread `jsonArgs` to print it with `--json`, or print it yourself and return nothing |
+| A lazy command spreads `jsonArgs` into the command that it loads, but not into its definition | `No overload matches this call`, and `'{ project: Project; }' is not assignable to type 'string \| void'`, or `'Awaitable<string \| void>'` when `run` is not `async` | Spread `jsonArgs` into the definition too (see [Lazy Commands](#lazy-commands))      |
+
+TypeScript 7 writes `string | void` as `void | string`.
 
 ## Errors
 
@@ -157,15 +161,17 @@ There is no `next` when `--help` does not show the help of that command: when th
 
 ### Reasons
 
-| Reason                                                                                                                                                                                                               | Status            | When                                                                     |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------ |
-| `required_option`, `required_positional`, `missing_value`, `invalid_type`, `invalid_choice`, `invalid_default`, `custom_parse`, `unexpected_value`, `conflicting_options`, `unknown_option`, `unexpected_positional` | `action_required` | An argument is wrong                                                     |
-| `invalid_arguments`                                                                                                                                                                                                  | `action_required` | Two or more arguments are wrong: each is in `data.issues`                |
-| `unknown_command`, `ambiguous_command`, `inconsistent_options`, `lazy_schema_mismatch`                                                                                                                               | `action_required` | The command cannot be resolved                                           |
-| `json_not_supported`                                                                                                                                                                                                 | `action_required` | `--json` is given to a command that does not spread `jsonArgs`           |
-| The `code` of a `CommandError`                                                                                                                                                                                       | `error`           | The command throws a `CommandError` with a `code`                        |
-| `command_failed`                                                                                                                                                                                                     | `error`           | The command throws any other error, or a `CommandError` without a `code` |
-| `invalid_result`, `unserializable_result`                                                                                                                                                                            | `error`           | The result cannot be printed as JSON                                     |
+| Reason                                                                                                                                                                                                                                                                                      | Status            | When                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------ |
+| `required_option`, `required_positional`, `missing_value`, `invalid_type`, `invalid_choice`, `invalid_default`, `too_small`, `too_large`, `too_short`, `too_long`, `pattern_mismatch`, `custom_parse`, `unexpected_value`, `conflicting_options`, `unknown_option`, `unexpected_positional` | `action_required` | An argument is wrong                                                     |
+| `invalid_arguments`                                                                                                                                                                                                                                                                         | `action_required` | Two or more arguments are wrong: each is in `data.issues`                |
+| `unknown_command`, `ambiguous_command`, `inconsistent_options`, `lazy_schema_mismatch`                                                                                                                                                                                                      | `action_required` | The command cannot be resolved                                           |
+| `json_not_supported`                                                                                                                                                                                                                                                                        | `action_required` | `--json` is given to a command that does not spread `jsonArgs`           |
+| The `code` of a `CommandError`                                                                                                                                                                                                                                                              | `error`           | The command throws a `CommandError` with a `code`                        |
+| `command_failed`                                                                                                                                                                                                                                                                            | `error`           | The command throws any other error, or a `CommandError` without a `code` |
+| `invalid_result`, `unserializable_result`                                                                                                                                                                                                                                                   | `error`           | The result cannot be printed as JSON                                     |
+
+`too_small`, `too_large`, `too_short`, `too_long` and `pattern_mismatch` are the rules of the parser combinators: `min` and `max` of `integer()`, `number()` and `float()`, and `minLength`, `maxLength` and `pattern` of `string()`. `custom_parse` is an error that a `parse` function of your own throws.
 
 The exit code is `1`, or the `validationErrorExitCode` of `cli()` for the errors of `action_required` (see [Argument Errors](./errors.md#argument-errors)), and a `CommandError` keeps its own `exitCode`.
 
@@ -236,7 +242,7 @@ When the output is already fixed, such as an array that the readers expect, an e
 
 When `--json` is given to a command that does not spread `jsonArgs`, Gunshi stops it before it runs, with `json_not_supported`, so that a program does not take its text for JSON. `--help` and `--version` are still answered, as JSON: see [Help and Version](#help-and-version).
 
-With `strict`, `--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, and a command with it runs. `--json=false` asks for no JSON, and stays an unknown option with `strict`.
+`--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, and a command with it runs. `--json=false` asks for no JSON, and stays an unknown option, unless `strict: false` is given.
 
 ## Lazy Commands
 
@@ -283,3 +289,7 @@ To tell an error of the JSON output, such as the `json_not_supported` in `onErro
 With `renderValidationErrors: null` or `usageSilent: true`, Gunshi prints no JSON for the argument errors and for `json_not_supported`, and the `cli()` promise rejects with the `AggregateError` that holds them, as without `--json`. A renderer of the validation errors is not called with `--json`: to report them yourself, set it to `null`.
 
 The errors of the command and of the result are printed as JSON with these options too, since they are not texts for people.
+
+## Next Steps
+
+Learn about the [Plugin System](./plugin-system.md) to extend your CLI with plugins for features like i18n and shell completion.

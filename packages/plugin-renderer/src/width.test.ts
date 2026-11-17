@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { displayWidth, padEndToWidth } from './width.ts'
 
 describe('displayWidth', () => {

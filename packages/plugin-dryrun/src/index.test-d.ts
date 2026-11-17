@@ -1,4 +1,4 @@
-import { expectTypeOf, test } from 'vitest'
+import { expectTypeOf, test } from 'vite-plus/test'
 
 import type { Awaitable } from '@gunshi/plugin'
 import type { DryRunExtension } from './index.ts'

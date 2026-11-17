@@ -1,6 +1,6 @@
 # What's Gunshi?
 
-Gunshi is a modern JavaScript command-line library designed to simplify the creation of command-line interfaces (CLIs).
+Gunshi is a JavaScript command-line library, your strategist for CLIs that people and AI agents use. It is designed to simplify the creation of command-line interfaces (CLIs).
 
 ## Origin of the Name
 

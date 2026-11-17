@@ -1,7 +1,6 @@
 {
   "name": "lifecycle",
   "private": true,
-  "packageManager": "pnpm@12.18.0",
   "type": "module",
   "main": "cli.js",
   "scripts": {
@@ -9,5 +8,6 @@
   },
   "dependencies": {
     "gunshi": "file:../../../packages/gunshi"
-  }
+  },
+  "packageManager": "pnpm@12.18.0"
 }

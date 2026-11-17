@@ -107,6 +107,8 @@ The `complete` command accepts the following shell types:
 - `fish` - Fish shell completion
 - `powershell` - PowerShell completion
 
+Any other shell is an argument error, followed by the command that shows the help of `complete`.
+
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
@@ -122,6 +124,8 @@ This section provides detailed instructions for setting up shell completions in 
 
 Shell completion requires your CLI command to be executable from the generated completion script.
 The plugin currently supports completion script generation for Node.js, Bun source execution, and Bun single-file executables.
+
+The script completes the command named by the `name` of `cli()`, so give your CLI a `name`: without it, printing the script reports an error.
 
 ### Setup by Shell
 
@@ -419,6 +423,8 @@ list                                               # its alias ls is not offered
 $ my-cli ls --<TAB>
 --help  --version  --all                           # the options of list
 ```
+
+The values after an alias are completed by the handlers that are configured for the command under its key in `config.subCommands`, such as `list`, as after its name.
 
 ## ⚙️ Plugin Options
 

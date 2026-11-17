@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { resolveCommandArgs } from './args.ts'
 
 import type { ArgSchema, Args } from '../types.ts'

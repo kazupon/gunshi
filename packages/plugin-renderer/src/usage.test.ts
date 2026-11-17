@@ -1,5 +1,5 @@
 import i18n from '@gunshi/plugin-i18n'
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vite-plus/test'
 import { cli } from '../../gunshi/src/cli.ts'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import { define, lazy } from '../../gunshi/src/definition.ts'

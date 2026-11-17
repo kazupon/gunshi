@@ -1,6 +1,6 @@
 import { CommandError } from '@gunshi/plugin'
 import { COMMON_ARGS, resolveCommandArgs } from '@gunshi/shared'
-import { describe, expect, onTestFinished, test, vi } from 'vitest'
+import { describe, expect, onTestFinished, test, vi } from 'vite-plus/test'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'

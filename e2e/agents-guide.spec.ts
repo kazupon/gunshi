@@ -18,7 +18,7 @@ import {
 } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { afterAll, beforeAll, describe, expect, test } from 'vite-plus/test'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const GUNSHI = path.join(ROOT, 'packages', 'gunshi')
@@ -217,7 +217,7 @@ describe('the example of AGENTS.md', () => {
       /^\{"deployment":\{"service":"api","target":"prod","dryRun":true,"config":"x.json"\}\}\n$/,
       ''
     ],
-    [['deploy', 'api', '--unknown'], 0, /^Deployed api to dev\n$/, ''],
+    [['deploy', 'api', '--unknown'], 1, /^$/, /^Unknown option: --unknown\n/],
     [['deploy', 'api', '--target', 'qa'], 1, /^$/, /--target/],
     [
       ['deploy', 'api', '--target', 'qa', '--json'],
@@ -226,7 +226,9 @@ describe('the example of AGENTS.md', () => {
       /^\{"status":"action_required","reason":"invalid_choice",.*\}\n$/
     ],
     [['rollback', '3'], 0, /^Rolled back to release 3\n$/, ''],
-    [['rollback', '0'], 1, /^$/, /Integer must be >= 1/],
+    [['rollback', '0'], 1, /^$/, /Invalid value for 'release': expected an integer from 1 to 999/],
+    [['rollback', '1000'], 1, /^$/, /expected an integer from 1 to 999/],
+    [['rollback', '1e2'], 1, /^$/, /expected an integer from 1 to 999/],
     [['rollback', '11'], 1, /^$/, /^Release 11 not found\n$/],
     [
       ['rollback', '11', '--json'],
@@ -234,7 +236,7 @@ describe('the example of AGENTS.md', () => {
       /^$/,
       /^\{"status":"action_required","reason":"json_not_supported",.*\}\n$/
     ],
-    [['rollback', 'abc'], 1, /^$/, /Expected an integer/],
+    [['rollback', 'abc'], 1, /^$/, /expected an integer from 1 to 999/],
     [['frobnicate'], 1, /^$/, /Command not found: frobnicate/]
   ]
 
@@ -260,10 +262,14 @@ import { define, jsonArgs } from 'gunshi'
 await cli(process.argv.slice(2), define({ name: 'x', args: { ...jsonArgs }, run: () => ({ item: 1 }) }), { name: 'x', version: '1.0.0' })
 `
     )
+    // given to it, `--help` and `--version` are unknown options, and cli() rejects with them
     const help = run(file, ['--help'])
     const version = run(file, ['--version'])
-    expect(help).toMatchObject({ code: 0, stdout: '' })
-    expect(version.stdout).toBe('')
+    expect(help).toMatchObject({ code: 1, stdout: '' })
+    expect(help.stderr).toMatch(/Unknown option: --help/)
+    expect(version).toMatchObject({ code: 1, stdout: '' })
+    expect(version.stderr).toMatch(/Unknown option: --version/)
+    // `--json` is an argument of the command here (jsonArgs), which gunshi/bone does not print
     expect(run(file, ['--json'])).toEqual({ code: 0, stdout: '', stderr: '' })
   })
 
@@ -276,6 +282,92 @@ await cli(process.argv.slice(2), define({ name: 'x', args: { ...jsonArgs }, run:
     expect(missing.code).toBe(1)
     expect(missing.stderr).toMatch(/title/)
     expect(run(file, ['add', 'milk']).stdout).toBe('{"title":"milk"}\n')
+  })
+
+  test('a positional argument with multiple: true is optional, and undefined without values, unless it has required: true', () => {
+    const guide = readFileSync(GUIDE, 'utf8')
+    const releases =
+      "releases: { type: 'positional', multiple: true, required: true, description: 'The release numbers', parse: integerIn(1, 999) }"
+    expect(guide).toContain(releases)
+    // the rule for a value of the example, `integerIn()`
+    const integerIn = /^const integerIn = [\s\S]+?^\}$/m.exec(guide)?.[0]
+    expect(integerIn).toBeDefined()
+    const file = write(
+      'positional-multiple.ts',
+      `import { cli, define } from 'gunshi'
+${integerIn}
+const promote = define({
+  name: 'promote',
+  args: { ${releases} },
+  run: ctx => {
+    const releases: number[] = ctx.values.releases
+    console.log(JSON.stringify(releases))
+  }
+})
+const status = define({
+  name: 'status',
+  args: { releases: { type: 'positional', multiple: true, parse: integerIn(1, 999) } },
+  run: ctx => {
+    const releases: number[] | undefined = ctx.values.releases
+    // @ts-expect-error without required: true, the value may be undefined
+    const all: number[] = ctx.values.releases
+    console.log(JSON.stringify({ releases: releases ?? 'undefined', all: all ?? 'undefined' }))
+  }
+})
+await cli(process.argv.slice(2), define({ name: 'ship' }), { name: 'ship', subCommands: { promote, status } })
+`
+    )
+    expect(typeCheck([file]).output).toBe('')
+    expect(run(file, ['promote', '3', '12']).stdout).toBe('[3,12]\n')
+    const none = run(file, ['promote'])
+    expect(none.code).toBe(1)
+    expect(none.stderr).toMatch(/releases/)
+    // `parse` reads each of them
+    const wrong = run(file, ['promote', '3', '1000'])
+    expect(wrong.code).toBe(1)
+    expect(wrong.stdout).toBe('')
+    expect(wrong.stderr).toContain('expected an integer from 1 to 999')
+    expect(run(file, ['status']).stdout).toBe('{"releases":"undefined","all":"undefined"}\n')
+    expect(run(file, ['status', '7']).stdout).toBe('{"releases":[7],"all":[7]}\n')
+  })
+
+  test('an option with multiple: true is undefined when it is not given, and its default is one value, not an array', () => {
+    const file = write(
+      'option-multiple.ts',
+      `import { cli, define } from 'gunshi'
+const deploy = define({
+  name: 'deploy',
+  args: {
+    var: { type: 'string', multiple: true },
+    region: { type: 'string', multiple: true, default: 'eu' }
+  },
+  run: ctx => {
+    const vars: string[] = ctx.values.var ?? []
+    const regions: string[] = ctx.values.region
+    console.log(JSON.stringify({ given: ctx.values.var ?? 'undefined', vars, regions }))
+  }
+})
+await cli(process.argv.slice(2), define({ name: 'ship' }), { name: 'ship', subCommands: { deploy } })
+`
+    )
+    expect(typeCheck([file]).output).toBe('')
+    expect(run(file, ['deploy', '--var', 'A=1', '--var', 'B=2']).stdout).toBe(
+      '{"given":["A=1","B=2"],"vars":["A=1","B=2"],"regions":["eu"]}\n'
+    )
+    expect(run(file, ['deploy']).stdout).toBe('{"given":"undefined","vars":[],"regions":["eu"]}\n')
+    const arrayDefault = write(
+      'option-multiple-array-default.ts',
+      `import { define } from 'gunshi'
+define({ name: 'deploy', args: { var: { type: 'string', multiple: true, default: [] } }, run: () => {} })
+`
+    )
+    // the type error that the guide quotes
+    expect(typeCheck([arrayDefault]).output).toContain(
+      "Type 'never[]' is not assignable to type 'string | number | boolean | undefined'"
+    )
+    expect(readFileSync(GUIDE, 'utf8')).toContain(
+      "Type 'never[]' is not assignable to type 'string | number | boolean | undefined'"
+    )
   })
 
   test('an option is named after its key, or in kebab-case with toKebab', () => {
@@ -311,6 +403,34 @@ await cli(process.argv.slice(2), add, { name: 'add' })
     )
     expect(run(file, ['milk', '2']).stdout).toBe('{"title":"milk","id":2}\n')
     expect(run(file, ['--help']).stdout).toMatch(/title\s+The title/)
+  })
+
+  test('an option made with a combinator is optional unless its combinator takes required: true, or it is wrapped in required() or withDefault()', () => {
+    const file = write(
+      'combinator-optional.ts',
+      `import { define } from 'gunshi'
+import { integer, required, withDefault } from 'gunshi/combinators'
+define({
+  name: 'resize',
+  args: {
+    plain: integer({ min: 1 }),
+    inOptions: integer({ min: 1, required: true }),
+    needed: required(integer({ min: 1 })),
+    defaulted: withDefault(integer({ min: 1 }), 1)
+  },
+  run: ctx => {
+    const plain: number | undefined = ctx.values.plain
+    const inOptions: number = ctx.values.inOptions
+    const needed: number = ctx.values.needed
+    const defaulted: number = ctx.values.defaulted
+    // @ts-expect-error without required: true, required() or withDefault(), the value may be undefined
+    const wrong: number = ctx.values.plain
+    console.log(plain, inOptions, needed, defaulted, wrong)
+  }
+})
+`
+    )
+    expect(typeCheck([file]).output).toBe('')
   })
 
   test('subCommands is an object, a Map or an array', () => {
@@ -378,18 +498,41 @@ await cli(process.argv.slice(2), define({ name: 'bm', run: () => {} }), { name: 
       `import { cli, define } from 'gunshi'
 const add = define({ name: 'add', run: ctx => console.log(JSON.stringify(ctx.values)) })
 const main = define({ name: 'todo', args: { file: { type: 'string' } }, run: () => {} })
-await cli(process.argv.slice(2), main, { subCommands: { add } })
+await cli(process.argv.slice(2), main, { subCommands: { add }, strict: process.env.STRICT !== 'false' })
 `
     )
-    expect(run(file, ['add', '--file', 'a.json']).stdout).toBe('{}\n')
+    // an option of the main command given with a sub-command is an unknown option of the sub-command
+    const reported = run(file, ['add', '--file', 'a.json'])
+    expect(reported).toMatchObject({ code: 1, stdout: '' })
+    expect(reported.stderr).toMatch(/^Unknown option: --file\n/)
+    // without strict, it is ignored: the sub-command does not see it
+    expect(run(file, ['add', '--file', 'a.json'], envWith({ STRICT: 'false' })).stdout).toBe('{}\n')
   })
 
-  test('an option that a command does not declare is ignored, unless strict: true', () => {
-    const file = write('strict.mjs', withAdd('{}', ", strict: process.env.STRICT === '1'"))
-    expect(run(file, ['add', '--file', 'a.json'])).toMatchObject({ code: 0, stdout: '{}\n' })
-    const strict = run(file, ['add', '--file', 'a.json'], envWith({ STRICT: '1' }))
-    expect(strict.code).toBe(1)
-    expect(strict.stderr).toMatch(/Unknown option: --file/)
+  test('an option that a command does not declare is reported, unless strict: false', () => {
+    const file = write('strict.mjs', withAdd('{}', ", strict: process.env.STRICT !== 'false'"))
+    const reported = run(file, ['add', '--file', 'a.json'])
+    expect(reported).toMatchObject({ code: 1, stdout: '' })
+    expect(reported.stderr).toMatch(/^Unknown option: --file\n/)
+    expect(run(file, ['add', '--file', 'a.json'], envWith({ STRICT: 'false' }))).toMatchObject({
+      code: 0,
+      stdout: '{}\n'
+    })
+    // the arguments after `--` stay in `ctx.rest`, with or without strict
+    const rest = write(
+      'strict-rest.mjs',
+      `import { cli, define } from 'gunshi'
+await cli(process.argv.slice(2), define({ name: 'exec', run: ctx => console.log(JSON.stringify(ctx.rest)) }))
+`
+    )
+    expect(run(rest, ['--', '--file', 'a.json'])).toMatchObject({
+      code: 0,
+      stdout: '["--file","a.json"]\n'
+    })
+    // the rule applies to the requirements that let such an option pass, whatever they call it
+    expect(readFileSync(GUIDE, 'utf8')).toContain(
+      'Keep this default unless the requirements say that such an option is ignored, or passed on to another program, in whatever words they use: then give `strict: false` to `cli()`'
+    )
   })
 
   test('a positional argument that a command does not declare is kept, unless strictPositionals: true', () => {
@@ -414,6 +557,17 @@ await cli(process.argv.slice(2), main, { subCommands: { add } })
     expect(run(many, ['add', 'milk', 'eggs'])).toMatchObject({
       code: 0,
       stdout: '{"titles":["milk","eggs"]}\n'
+    })
+  })
+
+  test('strictPositionals is not part of strict: strict alone keeps an extra positional argument', () => {
+    const file = write(
+      'strict-only.mjs',
+      withAdd("{ title: { type: 'positional' } }", ', strict: true')
+    )
+    expect(run(file, ['add', 'milk', 'eggs'])).toMatchObject({
+      code: 0,
+      stdout: '{"title":"milk"}\n'
     })
   })
 
@@ -554,6 +708,83 @@ await cli(process.argv.slice(2), main, {
     expect(run(file, ['create', 'db', '--replicas', '2']).code).toBe(0)
   })
 
+  test('validationErrorExitCode does not make an unknown option an error: without strict, the command runs', () => {
+    const file = write(
+      'validation-exit-code-strict.mjs',
+      withAdd(
+        "{ title: { type: 'positional' } }",
+        ", validationErrorExitCode: 2, strict: process.env.STRICT === '1'"
+      )
+    )
+    expect(run(file, ['add', 'milk', '--urgent'])).toMatchObject({
+      code: 0,
+      stdout: '{"title":"milk"}\n'
+    })
+    const strict = run(file, ['add', 'milk', '--urgent'], envWith({ STRICT: '1' }))
+    expect(strict.code).toBe(2)
+    expect(strict.stdout).toBe('')
+    expect(strict.stderr).toMatch(/Unknown option: --urgent/)
+  })
+
+  test('the values that args checks are errors of the arguments: a range, and a parser that throws', () => {
+    const guide = readFileSync(GUIDE, 'utf8')
+    const wait =
+      "wait: { type: 'custom', short: 'w', default: 60, description: 'Seconds to wait for the service', parse: integerIn(0, 600) }"
+    expect(guide).toContain(wait)
+    // the rule for a value of the example, `integerIn()`
+    const integerIn = /^const integerIn = [\s\S]+?^\}$/m.exec(guide)?.[0]
+    expect(integerIn).toBeDefined()
+    const file = write(
+      'check-in-args.ts',
+      `import { cli, define, jsonArgs } from 'gunshi'
+${integerIn}
+const deploy = define({
+  name: 'deploy',
+  args: {
+    ...jsonArgs,
+    service: {
+      type: 'positional',
+      parse: value => {
+        if (!/^[a-z0-9-]+$/.test(value)) {
+          throw new Error('use lowercase letters, digits and hyphens')
+        }
+        return value
+      }
+    },
+    ${wait}
+  },
+  run: ctx => ({ deployment: { service: ctx.values.service, wait: ctx.values.wait } })
+})
+await cli(process.argv.slice(2), define({ name: 'ship' }), { name: 'ship', subCommands: { deploy }, validationErrorExitCode: 2 })
+`
+    )
+    const { output } = typeCheck([file])
+    expect(output).toBe('')
+    expect(run(file, ['deploy', 'api', '--json'])).toEqual({
+      code: 0,
+      stdout: '{"deployment":{"service":"api","wait":60}}\n',
+      stderr: ''
+    })
+    expect(run(file, ['deploy', 'api', '-w', '30', '--json']).stdout).toBe(
+      '{"deployment":{"service":"api","wait":30}}\n'
+    )
+    for (const args of [
+      ['deploy', 'api', '-w', '700'],
+      ['deploy', 'Bad_Name']
+    ]) {
+      const result = run(file, args)
+      expect(result.code, `${args.join(' ')}: ${result.stderr}`).toBe(2)
+      expect(result.stdout).toBe('')
+      expect(result.stderr).toContain('ship deploy --help')
+      expect(hasStackTrace(result.stderr)).toBe(false)
+      const json = run(file, [...args, '--json'])
+      expect(json.code).toBe(2)
+      const failure = jsonFailure(json)
+      expect(failure.status).toBe('action_required')
+      expect(failure.next?.[0]?.command).toBe('ship deploy --help')
+    }
+  })
+
   test('a CommandError prints its message to stderr without a stack trace, and sets the exit code', () => {
     const file = write(
       'command-error.mjs',
@@ -678,6 +909,12 @@ declare function find(): Project
         "Type 'void' is not assignable to type 'JsonResult'"
       ],
       [
+        'returns-in-one-branch.ts',
+        `export const c = define({ name: 'c', args: { ...jsonArgs }, run: ctx => { if (ctx.values.json) { return { project: find() } } ctx.log('c') } })`,
+        "Type 'undefined' is not assignable to type 'Awaitable<JsonResult>'",
+        "or the same with `'undefined'`"
+      ],
+      [
         'returns-a-value.ts',
         `export const c = define({ name: 'c', args: { ...jsonArgs }, run: () => find() })`,
         "Index signature for type 'string' is missing in type 'Project'",
@@ -704,8 +941,8 @@ declare function find(): Project
       [
         'returns-an-object-without-json-args.ts',
         `export const c = define({ name: 'c', run: () => ({ project: find() }) })`,
-        "is not assignable to type 'Awaitable<string | void>'",
-        "is not assignable to type 'Awaitable<string | void>'"
+        "is not assignable to type 'Awaitable<void | string>'",
+        "'Awaitable<void | string>'"
       ]
     ]
     for (const [file, code] of cases) {

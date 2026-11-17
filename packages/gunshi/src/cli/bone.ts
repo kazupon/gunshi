@@ -5,6 +5,7 @@
 
 import { cliCore } from './core.ts'
 
+import type { UnknownArgKeys } from '../arg-keys.ts'
 import type {
   Args,
   CliOptions,
@@ -15,12 +16,17 @@ import type {
   GunshiParams,
   LazyCommand
 } from '../types.ts'
+import type { EntryCommandable, NoInferParams } from './entry-types.ts'
 
 /**
  * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
  * To have them, use `cli` from `gunshi`.
  *
- * @typeParam A - The type of {@linkcode Args | arguments} defined in the command and cli options.
+ * An object written as the entry command is typed by its `args`, as with `define`: `ctx.values` of its `run` are
+ * inferred from them, and a key that an argument does not have is an error.
+ *
+ * @typeParam A - The type of {@linkcode Args | arguments} of the entry command, inferred from its `args`.
+ * @typeParam G - A type extending {@linkcode GunshiParams}, which is not inferred: `{ args: A; extensions: {} }`.
  *
  * @param args - Command line arguments
  * @param entry - A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
@@ -32,8 +38,11 @@ export async function cli<
   G extends GunshiParams = { args: A; extensions: {} }
 >(
   args: string[],
-  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
-  options?: CliOptions<G>
+  entry:
+    | (Command<NoInferParams<G>> & { args?: A & UnknownArgKeys<A> })
+    | CommandRunner<NoInferParams<G>>
+    | LazyCommand<NoInferParams<G>>,
+  options?: CliOptions<NoInferParams<G>>
 ): Promise<string | undefined>
 
 /**
@@ -77,6 +86,26 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
  * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
  * To have them, use `cli` from `gunshi`.
  *
+ * This overload takes a command of another copy of the types of gunshi, such as a command of `@gunshi/definition`,
+ * whose types the overloads above cannot compare. `@gunshi/bone` exports no `define`, so a CLI on it defines its
+ * commands with another package. Its arguments are checked as `Args`, and its runner returns what a runner returns. It
+ * must be the last of the overloads.
+ *
+ * @param args - Command line arguments
+ * @param entry - A command-like object (command, command runner, or lazy command)
+ * @param options - A {@link CliOptions | CLI options}
+ * @returns A rendered usage or undefined. if you will use {@linkcode CliOptions.usageSilent} option, it will return rendered usage string.
+ */
+export async function cli(
+  args: string[],
+  entry: EntryCommandable,
+  options?: CliOptions
+): Promise<string | undefined>
+
+/**
+ * Run the command, without the built-in plugins: `--help` and `--version` print nothing, unless you add the plugins.
+ * To have them, use `cli` from `gunshi`.
+ *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
  *
  * @param args - Command line arguments
@@ -86,8 +115,8 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
  */
 export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   args: string[],
-  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G> | EntryCommandable,
   options: CliOptions<G> = {}
 ): Promise<string | undefined> {
-  return cliCore<G>(args, entry, options, [])
+  return cliCore<G>(args, entry as Command<G> | CommandRunner<G> | LazyCommand<G>, options, [])
 }

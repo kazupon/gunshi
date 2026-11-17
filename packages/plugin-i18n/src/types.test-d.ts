@@ -1,4 +1,4 @@
-import { describe, expectTypeOf, test } from 'vitest'
+import { describe, expectTypeOf, test } from 'vite-plus/test'
 
 import type { Awaitable, Command, Prettify } from '@gunshi/plugin'
 import type {

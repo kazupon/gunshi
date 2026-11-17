@@ -7,7 +7,7 @@
 [![CI][ci-src]][ci-href]
 [![InstallSize][install-size-src]][install-size-src]
 
-Gunshi is a modern javascript command-line library
+Gunshi is a JavaScript command-line library, your strategist for CLIs that people and AI agents use.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 

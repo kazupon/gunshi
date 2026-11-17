@@ -1,5 +1,5 @@
 import { generate as generate019 } from 'gunshi019/generator'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 import { generate } from '../packages/gunshi/lib/generator.js'
 import subCommands from './commands.js'
 

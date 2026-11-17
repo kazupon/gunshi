@@ -279,7 +279,7 @@ Gunshi provides several automatic features without requiring any configuration:
 - When the arguments do not match the command, such as a missing required option, Gunshi prints the errors to stderr and does not run the command
 - Each error names the argument, such as `Option '--name' or '-n' is required`
 - The usage is not printed with the errors. The command that shows it follows them instead, such as `my-app deploy --help`, or the help of the parent command for an unknown command. See [Errors and Exit Codes](./errors.md#argument-errors)
-- With `--help`, the usage is printed instead of the errors, an unknown option of `strict: true` and an unexpected positional argument of `strictPositionals: true` included. An unknown command is still reported
+- With `--help`, the usage is printed instead of the errors, an unknown option and an unexpected positional argument of `strictPositionals: true` included. An unknown command is still reported
 
 ## Key Points
 
@@ -296,4 +296,4 @@ When working with auto-generated usage:
 
 ## Next Steps
 
-Learn about the [Plugin System](./plugin-system.md) to extend functionality.
+Learn how Gunshi reports the errors of the arguments and the failures of your commands, and which exit codes it sets, in [Errors and Exit Codes](./errors.md).

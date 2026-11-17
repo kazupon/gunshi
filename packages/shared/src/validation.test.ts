@@ -1,5 +1,5 @@
 import { createCommandContext } from 'gunshi/context'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 import { resolveBuiltInKey } from './utils.ts'
 import { localizeBuiltinResource } from './validation.ts'
 

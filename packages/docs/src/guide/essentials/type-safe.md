@@ -120,8 +120,8 @@ This approach significantly simplifies creating type-safe CLIs with Gunshi.
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!TIP]
-> For even stronger type inference with composable argument schemas, check out [Parser Combinators](../advanced/parser-combinators.md).
-> Parser combinators provide functional factory functions like `string()`, `integer()`, `withDefault()`, and `required()` that automatically infer precise types without manual annotations.
+> [Parser Combinators](../advanced/parser-combinators.md) such as `string()`, `integer()`, `withDefault()`, and `required()` are another way to write the same schemas, with functions, and their values are typed in the same way.
+> See [Objects or Combinators](../advanced/parser-combinators.md#objects-or-combinators) for when to use them.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 

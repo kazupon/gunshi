@@ -30,14 +30,14 @@ pnpm test:plugin-i18n           # i18n plugin
 pnpm test:plugin-renderer       # Renderer plugin
 pnpm test:plugin-completion     # Completion plugin
 
-# Run linters (oxlint, ESLint, oxfmt, Knip)
+# Run linters (`vp check`: oxfmt, oxlint and the type check; Knip)
 pnpm lint
 
-# Auto-fix lint and formatting issues (oxlint, ESLint, oxfmt, Knip)
+# Auto-fix lint and formatting issues (`vp check --fix`, Knip)
 pnpm fix
 
 # Type checking: TypeScript diagnostics are reported by `pnpm test` (vitest --typecheck)
-# and `pnpm lint` (oxlint --type-check)
+# and `pnpm lint` (`vp check`)
 
 # Run benchmarks
 pnpm bench:vitest
@@ -214,11 +214,11 @@ When creating plugins:
 
 1. **TypeScript Strict Mode**: All source code uses TypeScript with strict mode enabled
 2. **ES Modules**: Use ES modules throughout (`import`/`export`, not `require`)
-3. **Code Style**: Enforced by oxlint, ESLint, and oxfmt (run `pnpm fix` to auto-fix)
+3. **Code Style**: Enforced by Vite+ (`vp check`: oxlint and oxfmt. Run `pnpm fix` to auto-fix)
 4. **Linting**: Must pass `pnpm lint` before submitting PRs
-   - oxlint for JavaScript/TypeScript code quality, with type-aware rules and TypeScript type checking
-   - ESLint for JSDoc, comments, Markdown, JSON, YAML, and Vue files
-   - oxfmt for formatting, using the Prettier config from `@kazupon/prettier-config`
+   - oxlint for JavaScript/TypeScript code quality, with type-aware rules, TypeScript type checking, JSDoc and comments (`@kazupon/vp-config`)
+   - oxfmt for formatting (`defineFmtConfig` of `@kazupon/vp-config`), also of Markdown, JSON and YAML
+   - The settings are in `vite.config.ts`
    - Knip for unused files, exports, and dependencies
 
 ### Testing Requirements
@@ -247,7 +247,7 @@ When creating plugins:
 - Location: Co-located with source files in `packages/*/src/`
 - Framework: Vitest with TypeScript type checking
 - Run: `pnpm test` or `pnpm test:core`, `pnpm test:plugin-*`
-- Coverage: Configured in `vitest.config.ts`
+- Coverage: Configured in `vite.config.ts` (`test.coverage`)
 
 ### E2E Tests
 
@@ -271,8 +271,8 @@ When creating plugins:
 
 ### Build Tool
 
-- **tsdown**: Modern TypeScript bundler powered by Rolldown
-- Configuration: `tsdown.config.ts` in each package
+- **`vp pack`** of Vite+: tsdown, the TypeScript bundler powered by Rolldown, bundled in Vite+
+- Configuration: the `pack` of `vite.config.ts` in each package
 - Features:
   - TypeScript compilation with declaration files
   - Publint validation

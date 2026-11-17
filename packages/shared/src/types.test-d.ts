@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, test } from 'vitest'
+import { describe, expect, expectTypeOf, test } from 'vite-plus/test'
 
 import type { Args, ArgsValidationErrorCode } from 'gunshi'
 import type {
