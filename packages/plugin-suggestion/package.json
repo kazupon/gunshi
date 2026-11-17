@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/plugin-suggestion",
-  "version": "1.0.0-rc.9",
+  "version": "1.0.0-rc.10",
   "description": "suggestion plugin for gunshi",
   "keywords": [
     "cli",

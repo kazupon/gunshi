@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/resources",
-  "version": "1.0.0-rc.9",
+  "version": "1.0.0-rc.10",
   "description": "built-in localization resources for gunshi",
   "keywords": [
     "cli",

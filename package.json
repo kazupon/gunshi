@@ -1,6 +1,6 @@
 {
   "name": "gunshi-monorepo",
-  "version": "1.0.0-rc.9",
+  "version": "1.0.0-rc.10",
   "private": true,
   "description": "Monorepo for gunshi - JavaScript command-line library, your strategist for CLIs that people and AI agents use",
   "bugs": {
