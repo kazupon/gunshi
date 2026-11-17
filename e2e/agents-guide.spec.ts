@@ -509,15 +509,29 @@ await cli(process.argv.slice(2), main, { subCommands: { add }, strict: process.e
     expect(run(file, ['add', '--file', 'a.json'], envWith({ STRICT: 'false' })).stdout).toBe('{}\n')
   })
 
-  test('an option that a command does not declare is ignored, unless strict: true', () => {
-    const file = write('strict.mjs', withAdd('{}', ", strict: process.env.STRICT === '1'"))
-    expect(run(file, ['add', '--file', 'a.json'])).toMatchObject({ code: 0, stdout: '{}\n' })
-    const strict = run(file, ['add', '--file', 'a.json'], envWith({ STRICT: '1' }))
-    expect(strict.code).toBe(1)
-    expect(strict.stderr).toMatch(/Unknown option: --file/)
-    // the rule applies to the requirements that make such an option an error, whatever they call it
+  test('an option that a command does not declare is reported, unless strict: false', () => {
+    const file = write('strict.mjs', withAdd('{}', ", strict: process.env.STRICT !== 'false'"))
+    const reported = run(file, ['add', '--file', 'a.json'])
+    expect(reported).toMatchObject({ code: 1, stdout: '' })
+    expect(reported.stderr).toMatch(/^Unknown option: --file\n/)
+    expect(run(file, ['add', '--file', 'a.json'], envWith({ STRICT: 'false' }))).toMatchObject({
+      code: 0,
+      stdout: '{}\n'
+    })
+    // the arguments after `--` stay in `ctx.rest`, with or without strict
+    const rest = write(
+      'strict-rest.mjs',
+      `import { cli, define } from 'gunshi'
+await cli(process.argv.slice(2), define({ name: 'exec', run: ctx => console.log(JSON.stringify(ctx.rest)) }))
+`
+    )
+    expect(run(rest, ['--', '--file', 'a.json'])).toMatchObject({
+      code: 0,
+      stdout: '["--file","a.json"]\n'
+    })
+    // the rule applies to the requirements that let such an option pass, whatever they call it
     expect(readFileSync(GUIDE, 'utf8')).toContain(
-      'unless the requirements make such an option an error, in whatever words they use'
+      'Keep this default unless the requirements say that such an option is ignored, or passed on to another program, in whatever words they use: then give `strict: false` to `cli()`'
     )
   })
 
