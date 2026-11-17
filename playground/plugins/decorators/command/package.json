@@ -9,5 +9,5 @@
   "dependencies": {
     "gunshi": "file:../../../../packages/gunshi"
   },
-  "packageManager": "pnpm@12.18.0"
+  "packageManager": "pnpm@12.19.0"
 }
