@@ -227,7 +227,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
   /**
    * Whether to treat undefined options as argument validation errors.
    *
-   * @default false
+   * @default true
    * @see {@linkcode CliOptions.strict}
    */
   strict: boolean
@@ -394,9 +394,11 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   /**
    * Whether to treat undefined options as argument validation errors.
    *
-   * When enabled, option tokens that are not declared by the resolved command
-   * arguments or installed global options are reported as validation errors
-   * before the command runner is executed.
+   * By default, option tokens that are not declared by the resolved command arguments or installed global
+   * options are reported as validation errors before the command runner is executed, such as
+   * `Unknown option: --alow-reload`. Set it to `false` to ignore them, and run the command, such as for a
+   * command that passes its arguments as they are to another program. The arguments after `--` are not
+   * option tokens: they stay in `rest` either way.
    *
    * With the global options plugin, `--help` and `--version` are still answered: given with them, an
    * unknown option is not reported, as the other argument validation errors are not. An unknown command
@@ -406,7 +408,7 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * spread `jsonArgs`, the global options plugin reports `json_not_supported` for it instead, with or
    * without `strict`. `--json=false` asks for no JSON, and is reported.
    *
-   * @default false
+   * @default true
    */
   strict?: boolean
   /**
@@ -470,12 +472,11 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
   /**
    * The exit code of the validation errors, such as `2`, the exit code of a usage error in many
    * command-line tools. They are the errors of the arguments: a missing or invalid argument, an unknown
-   * command or a command line that cannot be resolved, an unknown option, only with `strict`, a
+   * command or a command line that cannot be resolved, an unknown option, unless `strict` is `false`, a
    * positional argument that the command does not take, only with `strictPositionals`, and `--json`
-   * given to a command that does not spread `jsonArgs`. Without `strict`, an unknown option is ignored
-   * and the command runs, so to end it with this exit code too, give `strict: true` as well. With the
-   * global options plugin, the exit code is set to it when the errors are printed, as text or as JSON,
-   * before {@linkcode CliOptions.onErrorCommand} is called, which can still change it.
+   * given to a command that does not spread `jsonArgs`. With the global options plugin, the exit code is set
+   * to it when the errors are printed, as text or as JSON, before {@linkcode CliOptions.onErrorCommand} is
+   * called, which can still change it.
    *
    * It is an integer from `1` to `255`, as the `exitCode` of a `CommandError` is, and any other value is
    * replaced with `1`. It does not change the exit code of a `CommandError`, nor of any other error that a

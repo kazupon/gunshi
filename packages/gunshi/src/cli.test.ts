@@ -1039,7 +1039,8 @@ test('usageSilent silences ctx.log but not console.log', async () => {
 test('_ (rawArgs)', async () => {
   const args = ['--foo', 'bar', '--baz', 'qux']
   const fn = vi.fn<() => void>()
-  await cli(args, fn)
+  // the options are not declared: without strict, the command runs with them
+  await cli(args, fn, { strict: false })
 
   expect(fn).toHaveBeenCalledWith(expect.objectContaining({ _: args }))
 })
@@ -1047,7 +1048,8 @@ test('_ (rawArgs)', async () => {
 test('tokens', async () => {
   const args = ['--foo', 'bar']
   const fn = vi.fn<() => void>()
-  await cli(args, fn)
+  // the option is not declared: without strict, the command runs with it
+  await cli(args, fn, { strict: false })
 
   expect(fn).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -1795,11 +1797,16 @@ describe('argument name kebabnize', () => {
     } satisfies Args
 
     const mockFn1 = vi.fn<() => void>()
-    await cli(['--foo-bar', 'value1', '--bazQux', 'value2'], {
-      args,
-      toKebab: true,
-      run: mockFn1
-    })
+    // with `toKebab: true`, `--bazQux` is not an option of the command: without strict, it is ignored
+    await cli(
+      ['--foo-bar', 'value1', '--bazQux', 'value2'],
+      {
+        args,
+        toKebab: true,
+        run: mockFn1
+      },
+      { strict: false }
+    )
 
     expect(mockFn1).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -2185,13 +2192,42 @@ describe('command lifecycle hooks', () => {
   })
 
   describe('strict option validation', () => {
-    test('keeps unknown options compatible by default and with strict disabled', async () => {
+    test('reports unknown options by default, and ignores them with strict disabled', async () => {
+      const stderr = defineMockErrorLog()
       const mockCommand = vi.fn<() => void>()
 
       await cli(['--alow-reload'], { run: mockCommand })
+
+      expect(mockCommand).not.toHaveBeenCalled()
+      expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
+      expect(process.exitCode).toBe(1)
+
       await cli(['--alow-reload'], { run: mockCommand }, { strict: false })
 
-      expect(mockCommand).toHaveBeenCalledTimes(2)
+      expect(mockCommand).toHaveBeenCalledOnce()
+    })
+
+    test('keeps the arguments after -- in rest by default', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(['--', '--unknown', 'value'], { run: mockCommand })
+
+      expect(mockCommand).toHaveBeenCalledWith(
+        expect.objectContaining({ rest: ['--unknown', 'value'] })
+      )
+    })
+
+    test('answers --help before an unknown option by default', async () => {
+      const utils = await import('./utils.ts')
+      const log = defineMockLog(utils)
+      const stderr = defineMockErrorLog()
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(['--unknown', '--help'], { name: 'app', run: mockCommand })
+
+      expect(log()).toContain('--help')
+      expect(stderr()).toBe('')
+      expect(mockCommand).not.toHaveBeenCalled()
     })
 
     test('reports unknown long options before command execution', async () => {
@@ -2358,6 +2394,20 @@ describe('command lifecycle hooks', () => {
       ).resolves.toBe('1.0.0')
 
       expect(mockCommand).not.toHaveBeenCalled()
+    })
+
+    test('reports an unknown option by default without the global plugin too', async () => {
+      const mockCommand = vi.fn<() => void>()
+
+      await expect(boneCli(['--unknown'], { run: mockCommand })).rejects.toBeInstanceOf(
+        AggregateError
+      )
+      await expect(boneCli(['--help'], { run: mockCommand })).rejects.toBeInstanceOf(AggregateError)
+      expect(mockCommand).not.toHaveBeenCalled()
+
+      await boneCli(['--unknown'], { run: mockCommand }, { strict: false })
+
+      expect(mockCommand).toHaveBeenCalledOnce()
     })
 
     test('reports help and version as unknown options without global plugin', async () => {
@@ -4610,8 +4660,11 @@ describe('arguments read by args-tokens 1.0', () => {
     '%j does not give `build` to --config',
     async argv => {
       // an explicit empty value, or a long option without a name, is what `--config` gets
-      // (args-tokens #637, #645)
-      expect(await run(argv)).toMatchObject({ ran: { commandPath: ['build'] } })
+      // (args-tokens #637, #645). `--config` is an option of the entry, not of `build`: without
+      // strict, it is ignored, and `build` runs
+      expect(await run(argv, undefined, { strict: false })).toMatchObject({
+        ran: { commandPath: ['build'] }
+      })
     }
   )
 

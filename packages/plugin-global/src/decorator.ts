@@ -201,8 +201,8 @@ function createJsonOutputError(
 }
 
 /**
- * Leave out the unknown-option errors of a `--json` that asks for JSON, which `strict` reports for a
- * command without a `json` argument. `--json` is the option of gunshi, so it is not unknown to it: the
+ * Leave out the unknown-option errors of a `--json` that asks for JSON, which `strict` (the default) reports
+ * for a command without a `json` argument. `--json` is the option of gunshi, so it is not unknown to it: the
  * plugin reports `json_not_supported` for it instead, with or without `strict`.
  *
  * @param error - The aggregate error of the validation errors
@@ -338,7 +338,7 @@ const decorator: CommandDecorator<{
 
   /**
    * NOTE(kazupon): `--help` and `--version` are answered before the argument errors, as what was asked
-   * for: the help is what a user reads when the arguments are wrong. An unknown option of `strict` is one
+   * for: the help is what a user reads when the arguments are wrong. An unknown option is one
    * of the argument errors then, as a missing or an invalid value is. An unknown command and a command
    * line that cannot be resolved are still reported first, since they leave it unknown which command was
    * meant, and the error points to the help of the nearest command.
