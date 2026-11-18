@@ -8,6 +8,7 @@ import {
   ARG_NEGATABLE_PREFIX,
   COMMON_ARGS,
   composeNegatableDescription,
+  getPassthrough,
   isDeprecated,
   isWithoutRun,
   resolveExamples as _resolvedExamples,
@@ -87,9 +88,11 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
     messages.push(...(await renderCommandsSection(ctx)), '')
   }
 
-  // render positional arguments section
-  if (hasPositionalArgs(ctx.args)) {
-    messages.push(...(await renderPositionalArgsSection(ctx)), '')
+  // render positional arguments section, with the row of the arguments that a command with `passthrough`
+  // passes on, when they have a description
+  const passthroughDescription = await resolvePassthroughDescription(ctx)
+  if (hasPositionalArgs(ctx.args) || passthroughDescription) {
+    messages.push(...(await renderPositionalArgsSection(ctx, passthroughDescription)), '')
   }
 
   // render optional arguments section
@@ -110,6 +113,7 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
  * Render the positional arguments section
  *
  * @param ctx - A {@link CommandContext | command context}
+ * @param passthroughDescription - The description of the arguments that the command passes on, for its row
  * @returns A rendered arguments section
  */
 async function renderPositionalArgsSection<
@@ -117,11 +121,38 @@ async function renderPositionalArgsSection<
     args: Args
     extensions: Extensions
   }>
->(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
+>(ctx: Readonly<CommandContext<G>>, passthroughDescription: string): Promise<string[]> {
   const messages: string[] = []
   messages.push(`${await ctx.extensions[pluginId].text(resolveBuiltInKey('ARGUMENTS'))}:`)
-  messages.push(await generatePositionalArgsUsage(ctx))
+  messages.push(await generatePositionalArgsUsage(ctx, passthroughDescription))
   return messages
+}
+
+/**
+ * Resolve the description of the arguments that a command with `passthrough` passes on to another program.
+ *
+ * NOTE(kazupon): the core marks the context of such a command with its `passthrough`, as the context has the
+ * arguments that it passes on, and not whether it passes them on. The description is a translation of the key
+ * `passthrough` of the command first, as for its description, and then the text of `passthrough`. `true` has no
+ * text, so the help shows the arguments in the usage only, unless there is a translation.
+ *
+ * @param ctx - A {@link CommandContext | command context}
+ * @returns The description, or an empty string for a command without `passthrough`, or without a description
+ */
+async function resolvePassthroughDescription<
+  G extends GunshiParams<{
+    args: Args
+    extensions: Extensions
+  }>
+>(ctx: Readonly<CommandContext<G>>): Promise<string> {
+  const passthrough = getPassthrough(ctx)
+  if (passthrough === undefined) {
+    return ''
+  }
+  return (
+    (await ctx.extensions[pluginId].text(resolveKey('passthrough', ctx.name))) ||
+    (typeof passthrough === 'string' ? passthrough.trim() && passthrough : '')
+  )
 }
 
 /**
@@ -221,6 +252,14 @@ async function makeUsageSymbols<
   const positionalSymbols = generatePositionalSymbols(ctx.args)
   if (positionalSymbols) {
     messages.push(' ', positionalSymbols)
+  }
+  /**
+   * NOTE(kazupon): a command with `passthrough` takes the arguments that it does not declare, to pass them on to
+   * another program, after its own: `[ARGUMENTS ...]`, with the heading of the ARGUMENTS section, in the form of
+   * a positional argument that takes any number.
+   */
+  if (getPassthrough(ctx) !== undefined) {
+    messages.push(` [${await ctx.extensions[pluginId].text(resolveBuiltInKey('ARGUMENTS'))} ...]`)
   }
   return messages.join('')
 }
@@ -714,27 +753,33 @@ async function generatePositionalArgsUsage<
     args: Args
     extensions: Extensions
   }>
->(ctx: CommandContext<G>): Promise<string> {
-  const positionals = getPositionalArgs(ctx.args)
-  if (positionals.length === 0) {
+>(ctx: CommandContext<G>, passthroughDescription: string): Promise<string> {
+  const rows = await Promise.all(
+    getPositionalArgs(ctx.args).map(async ([name]): Promise<[string, string]> => [
+      name,
+      (await ctx.extensions[pluginId].text(resolveArgKey(name, ctx.name))) ||
+        (ctx.args[name] as ArgSchema & { description?: string }).description ||
+        ''
+    ])
+  )
+  // the arguments that a command with `passthrough` passes on come after its own, as in the usage
+  if (passthroughDescription) {
+    rows.push([
+      `${await ctx.extensions[pluginId].text(resolveBuiltInKey('ARGUMENTS'))} ...`,
+      passthroughDescription
+    ])
+  }
+  if (rows.length === 0) {
     return ''
   }
 
-  const argsMaxLength = Math.max(...positionals.map(([name]) => displayWidth(name)))
+  const argsMaxLength = Math.max(...rows.map(([name]) => displayWidth(name)))
 
-  const usages = await Promise.all(
-    positionals.map(async ([name]) => {
-      const desc =
-        (await ctx.extensions[pluginId].text(resolveArgKey(name, ctx.name))) ||
-        (ctx.args[name] as ArgSchema & { description?: string }).description ||
-        ''
-      // a row without a description is not padded, so that it has no trailing spaces (#872)
-      const arg = desc
-        ? `${padEndToWidth(name, argsMaxLength + ctx.env.middleMargin)} ${desc}`
-        : name
-      return `${arg.padStart(ctx.env.leftMargin + arg.length)}`
-    })
-  )
+  const usages = rows.map(([name, desc]) => {
+    // a row without a description is not padded, so that it has no trailing spaces (#872)
+    const arg = desc ? `${padEndToWidth(name, argsMaxLength + ctx.env.middleMargin)} ${desc}` : name
+    return `${arg.padStart(ctx.env.leftMargin + arg.length)}`
+  })
 
   return usages.join('\n')
 }

@@ -2733,3 +2733,120 @@ describe('the options of the command come before the global options', () => {
     expect(optionRows(help)).toEqual(['-h, --help', '-v, --version'])
   })
 })
+
+describe('the arguments that a command with passthrough passes on', () => {
+  const entry = define({ name: 'app', run: NOOP })
+  const args = {
+    script: { type: 'positional', description: 'The script to run' },
+    env: { type: 'string', short: 'e', description: 'The environment' }
+  } satisfies Args
+
+  /**
+   * The help of `exec`, a sub-command.
+   *
+   * @param command - The command
+   * @param options - The options of the CLI
+   * @returns The help
+   */
+  async function helpOf(
+    command: Command | LazyCommand,
+    options: Partial<CliOptions> = {}
+  ): Promise<string> {
+    return (await cli(['exec', '--help'], entry, {
+      name: 'app',
+      usageSilent: true,
+      subCommands: { exec: command },
+      ...options
+    }))!
+  }
+
+  function usageLineOf(help: string, heading = 'USAGE'): string {
+    const lines = help.split('\n')
+    return lines[lines.indexOf(`${heading}:`) + 1].trim()
+  }
+
+  function sectionOf(help: string, heading = 'ARGUMENTS'): string[] {
+    const lines = help.split('\n')
+    const start = lines.indexOf(`${heading}:`)
+    return start === -1 ? [] : lines.slice(start + 1, lines.indexOf('', start))
+  }
+
+  test('the usage line ends with [ARGUMENTS ...], and true shows no row of them', async () => {
+    const help = await helpOf(define({ name: 'exec', passthrough: true, args, run: NOOP }))
+
+    expect(usageLineOf(help)).toBe('app exec [OPTIONS] <script> [ARGUMENTS ...]')
+    expect(sectionOf(help)).toEqual(['  script           The script to run'])
+  })
+
+  test('a text is shown in a row of the ARGUMENTS section, after the positional arguments', async () => {
+    const help = await helpOf(
+      define({ name: 'exec', passthrough: 'The arguments for other-program', args, run: NOOP })
+    )
+
+    expect(usageLineOf(help)).toBe('app exec [OPTIONS] <script> [ARGUMENTS ...]')
+    expect(sectionOf(help)).toEqual([
+      '  script                  The script to run',
+      '  ARGUMENTS ...           The arguments for other-program'
+    ])
+  })
+
+  test('a command without positional arguments has the ARGUMENTS section for a text only', async () => {
+    const withText = await helpOf(
+      define({ name: 'exec', passthrough: 'The arguments for other-program', run: NOOP })
+    )
+    const withTrue = await helpOf(define({ name: 'exec', passthrough: true, run: NOOP }))
+    const withBlank = await helpOf(define({ name: 'exec', passthrough: ' ', run: NOOP }))
+
+    expect(usageLineOf(withText)).toBe('app exec [OPTIONS] [ARGUMENTS ...]')
+    expect(sectionOf(withText)).toEqual([
+      '  ARGUMENTS ...           The arguments for other-program'
+    ])
+    expect(usageLineOf(withTrue)).toBe('app exec [OPTIONS] [ARGUMENTS ...]')
+    expect(sectionOf(withTrue)).toEqual([])
+    expect(withBlank).toBe(withTrue)
+  })
+
+  test('a command without passthrough is shown as before', async () => {
+    const help = await helpOf(define({ name: 'exec', args, run: NOOP }))
+
+    expect(usageLineOf(help)).toBe('app exec [OPTIONS] <script>')
+    expect(sectionOf(help)).toEqual(['  script           The script to run'])
+  })
+
+  test('a lazy command is shown with the passthrough of the loaded command', async () => {
+    const loaded = await helpOf(
+      lazy(() => ({ run: NOOP, passthrough: 'The arguments of the loaded command' }), {
+        name: 'exec',
+        args
+      })
+    )
+    const defined = await helpOf(
+      lazy(() => NOOP, { name: 'exec', args, passthrough: 'The arguments of the definition' })
+    )
+
+    expect(usageLineOf(loaded)).toBe('app exec [OPTIONS] <script> [ARGUMENTS ...]')
+    expect(sectionOf(loaded)).toEqual([
+      '  script                  The script to run',
+      '  ARGUMENTS ...           The arguments of the loaded command'
+    ])
+    expect(sectionOf(defined)).toEqual([
+      '  script                  The script to run',
+      '  ARGUMENTS ...           The arguments of the definition'
+    ])
+  })
+
+  test('the heading and the description are translated, as the description of the command', async () => {
+    const command = {
+      name: 'exec',
+      passthrough: 'The arguments for other-program',
+      resource: () => Promise.resolve({ passthrough: 'ほかのプログラムの引数' }),
+      run: NOOP
+    } as unknown as Command
+    const help = await helpOf(command, {
+      plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': { ARGUMENTS: '引数' } } })]
+    })
+
+    expect(usageLineOf(help)).toBe('app exec [OPTIONS] [引数 ...]')
+    expect(sectionOf(help, '引数')).toEqual(['  引数 ...           ほかのプログラムの引数'])
+  })
+})
