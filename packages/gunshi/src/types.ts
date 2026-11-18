@@ -842,7 +842,9 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    *
    * The help shows it at the end of the usage, as `[ARGUMENTS ...]`, and the text in the ARGUMENTS section, which the
    * i18n plugin translates with the key `passthrough` of the command. With the global options plugin, `--json` is
-   * passed on too, unless the command spreads `jsonArgs`, and the help as JSON has `passthrough`.
+   * passed on too when the command declares no `json` argument: `jsonArgs`, or a `json` argument of its own, takes
+   * `--json`. Without one, `--help --json` and `--version --json` are still answered by gunshi, as JSON, and the help
+   * as JSON has `passthrough`.
    *
    * A lazy command takes it from the loaded command, and from the definition given to `lazy` when the loaded
    * command does not set it, or when the loader returns a runner.
