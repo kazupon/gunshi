@@ -2900,3 +2900,142 @@ describe('the description of the arguments that a runnable entry with sub-comman
     ])
   })
 })
+
+/**
+ * The keys of the resources of a command start with its name, so those of a command named `_` or `err`
+ * start as the built-in keys and the keys of the errors do. Its help shows its texts, not the keys.
+ */
+describe('#949 - a command whose name looks like a built-in key shows its texts', () => {
+  const ENTRY = define({ name: 'app', run: NOOP })
+
+  /**
+   * A command that describes itself, an option and its examples.
+   *
+   * @param name - The name of the command
+   * @returns The command
+   */
+  function commandNamed(name: string): Command {
+    return define({
+      name,
+      description: `The command named ${name}`,
+      examples: `$ app ${name} --name x`,
+      args: { name: { type: 'string', description: 'The name' } },
+      run: NOOP
+    }) as Command
+  }
+
+  /**
+   * The help of a sub-command of `app`.
+   *
+   * @param name - The name of the sub-command
+   * @param options - The options of the CLI
+   * @returns The help
+   */
+  async function helpOf(name: string, options: Partial<CliOptions> = {}): Promise<string> {
+    return (await cli([name, '--help'], ENTRY, {
+      name: 'app',
+      usageSilent: true,
+      subCommands: { [name]: commandNamed(name) },
+      ...options
+    }))!
+  }
+
+  test.each(['_', 'err', 'arg'])('the help of a command named %s', async name => {
+    const help = await helpOf(name)
+
+    expect(help).toContain(`The command named ${name}`)
+    expect(help).toMatch(/--name <name>\s+The name/)
+    expect(help).toMatch(/-h, --help\s+Display this help message/)
+    expect(help).toMatch(/-v, --version\s+Display this version/)
+    expect(help).toContain(`$ app ${name} --name x`)
+    expect(help).not.toContain(`${name}:`)
+  })
+
+  test.each(['_', '_internal', 'err', 'arg'])(
+    'the help of a command named %s, with the i18n plugin',
+    async name => {
+      const help = await helpOf(name, { plugins: [i18n({ locale: 'en-US' })] })
+
+      expect(help).toContain(`The command named ${name}`)
+      expect(help).toMatch(/--name <name>\s+The name/)
+      expect(help).toMatch(/-h, --help\s+Display this help message/)
+      expect(help).toMatch(/-v, --version\s+Display this version/)
+      expect(help).toContain(`$ app ${name} --name x`)
+      expect(help).not.toContain(`${name}:`)
+    }
+  )
+
+  test.each(['_', '_internal', 'err'])(
+    'the help of a command named %s shows the translations of its resource',
+    async name => {
+      const command = {
+        ...commandNamed(name),
+        resource: () =>
+          Promise.resolve({ description: `Translated ${name}`, 'arg:name': 'The translated name' })
+      } as unknown as Command
+      const help = (await cli([name, '--help'], ENTRY, {
+        name: 'app',
+        usageSilent: true,
+        subCommands: { [name]: command },
+        plugins: [i18n({ locale: 'en-US' })]
+      }))!
+
+      expect(help).toContain(`Translated ${name}`)
+      expect(help).toMatch(/--name <name>\s+The translated name/)
+      expect(help).not.toContain(`${name}:`)
+    }
+  )
+
+  /**
+   * The rows of the COMMANDS section of the help of `app`, with the i18n plugin.
+   *
+   * @param subCommands - The sub-commands of `app`
+   * @returns The rows of the section
+   */
+  async function commandRowsOf(subCommands: Record<string, Command>): Promise<string[]> {
+    const help = (await cli(['--help'], ENTRY, {
+      name: 'app',
+      usageSilent: true,
+      subCommands,
+      plugins: [i18n({ locale: 'en-US' })]
+    }))!
+    const lines = help.split('\n')
+    const start = lines.indexOf('COMMANDS:')
+    return lines.slice(start + 1, lines.indexOf('', start))
+  }
+
+  test('the commands section of the parent describes them, with the i18n plugin', async () => {
+    const names = ['_', '_internal', 'err']
+    const rows = await commandRowsOf(
+      Object.fromEntries(names.map(name => [name, commandNamed(name)]))
+    )
+
+    for (const name of names) {
+      expect(rows.find(row => row.trimStart().startsWith(`${name} `))).toContain(
+        `The command named ${name}`
+      )
+    }
+    expect(rows.join('\n')).not.toMatch(/(?:_|_internal|err):description/)
+  })
+
+  test('the commands section of the parent shows the translations of their resources', async () => {
+    const names = ['_', '_internal', 'err']
+    const rows = await commandRowsOf(
+      Object.fromEntries(
+        names.map(name => [
+          name,
+          {
+            ...commandNamed(name),
+            resource: () => Promise.resolve({ description: `Translated ${name}` })
+          } as unknown as Command
+        ])
+      )
+    )
+
+    for (const name of names) {
+      expect(rows.find(row => row.trimStart().startsWith(`${name} `))).toContain(
+        `Translated ${name}`
+      )
+    }
+  })
+})

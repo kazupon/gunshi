@@ -343,3 +343,55 @@ test('custom parse reasonKey uses command resource', async () => {
     '--date の値が不正です: 日付形式が不正です。YYYY-MM-DD 形式で指定してください'
   )
 })
+
+/**
+ * The key of the reason starts with the name of the command, so that of a command named `_` or `err`
+ * starts as the built-in keys and the keys of the errors do, and that of `_internal` starts with `_`.
+ */
+test.each(['_', '_internal', 'err'])(
+  'custom parse reasonKey uses the resource of a command named %s',
+  async name => {
+    const i18nPlugin = i18n({
+      locale: 'ja-JP',
+      builtinResources: {
+        'ja-JP': {
+          'err:arg:custom-parse': '{$displayName} の値が不正です: {$reason}'
+        }
+      }
+    })
+    const rendererPlugin = renderer()
+    const command = {
+      name,
+      resource: () => ({
+        'errors.invalidDateFormat': '日付形式が不正です。{$expected} 形式で指定してください'
+      }),
+      run: async () => {}
+    } as Command
+    const ctx = await createCommandContext({
+      command,
+      extensions: {
+        [i18nPlugin.id]: i18nPlugin.extension,
+        [rendererPlugin.id]: rendererPlugin.extension
+      }
+    })
+    await ctx.extensions[i18nPlugin.id].loadResource('ja-JP', ctx as CommandContext, command)
+
+    const error = new AggregateError([
+      new ArgsValidationError('Invalid value for --date: Invalid date format', {
+        code: ArgsValidationErrorKeys.customParse,
+        values: {
+          displayName: '--date',
+          reason: 'Invalid date format',
+          reasonKey: 'errors.invalidDateFormat',
+          reasonValues: {
+            expected: 'YYYY-MM-DD'
+          }
+        }
+      })
+    ])
+
+    await expect(renderValidationErrors(ctx, error)).resolves.toEqual(
+      '--date の値が不正です: 日付形式が不正です。YYYY-MM-DD 形式で指定してください'
+    )
+  }
+)

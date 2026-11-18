@@ -7809,3 +7809,64 @@ describe('passthrough with --json, and in the help as JSON', () => {
     })
   })
 })
+
+/**
+ * The keys of the resources of a command start with its name, so those of a command named `_` or `err`
+ * start as the built-in keys and the keys of the errors do (#949). The help as JSON describes it with its
+ * texts, not with the keys.
+ */
+describe('a command whose name looks like a built-in key, in the help as JSON', () => {
+  const entry = define({ name: 'app', run: vi.fn<() => void>() })
+
+  /**
+   * The descriptions of a sub-command of `app` and of its options, in the help as JSON.
+   *
+   * @param name - The name of the sub-command
+   * @param plugins - The plugins of the CLI
+   * @returns The description of the command, and the name and the description of each option
+   */
+  async function descriptionsOf(name: string, plugins: Plugin[] = []) {
+    const command = define({
+      name,
+      description: `The command named ${name}`,
+      args: { name: { type: 'string', description: 'The name' } },
+      run: vi.fn<() => void>()
+    })
+    const json = JSON.parse(
+      (await cli([name, '--help', '--json'], entry, {
+        name: 'app',
+        usageSilent: true,
+        subCommands: { [name]: command },
+        plugins
+      })) as string
+    ) as {
+      help: {
+        description: string | null
+        options: { name: string; description: string | null }[]
+      }
+    }
+    return {
+      description: json.help.description,
+      options: json.help.options.map(option => [option.name, option.description])
+    }
+  }
+
+  test.each(['_', 'err'])('describes a command named %s with its texts', async name => {
+    const { description, options } = await descriptionsOf(name)
+
+    expect(description).toBe(`The command named ${name}`)
+    expect(options).toContainEqual(['--name', 'The name'])
+    expect(options).toContainEqual(['--help', 'Display this help message'])
+  })
+
+  test.each(['_', '_internal', 'err'])(
+    'describes a command named %s with its texts, with the i18n plugin',
+    async name => {
+      const { description, options } = await descriptionsOf(name, [i18n({ locale: 'en-US' })])
+
+      expect(description).toBe(`The command named ${name}`)
+      expect(options).toContainEqual(['--name', 'The name'])
+      expect(options).toContainEqual(['--help', 'Display this help message'])
+    }
+  )
+})
