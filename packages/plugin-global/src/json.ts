@@ -14,6 +14,7 @@ import {
   JsonOutputErrorKeys
 } from '@gunshi/plugin'
 import {
+  getPassthrough,
   isDeprecated,
   isJsonArg,
   isWithoutRun,
@@ -522,6 +523,12 @@ export interface JsonHelp {
      */
     arguments: JsonHelpArgument[]
     /**
+     * Whether the command passes the arguments that it does not take on to another program, with
+     * `passthrough`: the description of the arguments, as the help shows it, or `null` without one.
+     * `null` for a command without `passthrough`.
+     */
+    passthrough: { description: string | null } | null
+    /**
      * The options, the global options included, in the order of the help for people: the options of
      * the command first, and the global options in effect after them.
      */
@@ -619,6 +626,13 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
     }
   }
 
+  /**
+   * NOTE(kazupon): the core marks the context of a command with `passthrough`, with its `passthrough`, as the
+   * context has the arguments that it passes on, and not whether it passes them on. The description is the one
+   * of the help: a translation of the key `passthrough` of the command first, as for its description, and then
+   * the text of `passthrough`.
+   */
+  const passthrough = getPassthrough(ctx)
   const argv = [ctx.env.name || '<COMMAND>', ...ctx.commandPath]
   return {
     help: {
@@ -635,6 +649,17 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
       runnable: !isWithoutRun(ctx),
       commands,
       arguments: positionals,
+      passthrough:
+        passthrough === undefined
+          ? null
+          : {
+              description: await describe(
+                resolveKey('passthrough', ctx.name),
+                typeof passthrough === 'string' && passthrough.trim() !== ''
+                  ? passthrough
+                  : undefined
+              )
+            },
       options,
       json: isJsonArg(ctx.args.json)
     }

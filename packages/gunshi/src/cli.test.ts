@@ -6305,6 +6305,7 @@ describe('--help and --version with --json', () => {
         runnable: true,
         commands: [],
         arguments: [],
+        passthrough: null,
         options: [
           {
             name: '--json',
@@ -6425,6 +6426,7 @@ describe('--help and --version with --json', () => {
         runnable: true,
         commands: [],
         arguments: [{ name: 'target', description: 'The target', required: true, multiple: false }],
+        passthrough: null,
         options: [
           {
             name: '--env',
@@ -7636,5 +7638,131 @@ describe('passthrough of a command', () => {
     await expect(
       cli(['exec', 'run.js', '--watch'], entry(), { name: 'app', subCommands: { exec } })
     ).rejects.toBe(error)
+  })
+})
+
+describe('passthrough with --json, and in the help as JSON', () => {
+  const entry = () => define({ name: 'app', run: () => {} })
+  const args = { script: { type: 'positional' } } satisfies Args
+
+  test('passes --json on in a command that does not spread jsonArgs, which runs as without it', async () => {
+    const stderr = defineMockErrorLog()
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const passthroughs: string[][] = []
+    const exec = define({
+      name: 'exec',
+      passthrough: true,
+      args,
+      run: ctx => {
+        passthroughs.push(ctx.passthrough)
+        ctx.log('ran')
+      }
+    })
+
+    await cli(['exec', 'run.js', '--json'], entry(), { name: 'app', subCommands: { exec } })
+
+    expect(passthroughs).toEqual([['--json']])
+    expect(log()).toBe('ran')
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('prints the errors of the arguments as text with --json, as without it', async () => {
+    const stderr = defineMockErrorLog()
+    const exec = define({ name: 'exec', passthrough: true, args, run: () => {} })
+
+    await cli(['exec', '--json'], entry(), { name: 'app', subCommands: { exec } })
+
+    expect(stderr()).toBe(
+      "Positional argument 'script' is required" + helpHint(['exec'], { name: 'app' })
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('a command without passthrough is stopped with json_not_supported, as before', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    const build = define({ name: 'build', run })
+
+    await cli(['build', '--json'], entry(), { name: 'app', subCommands: { build } })
+
+    expect(run).not.toHaveBeenCalled()
+    expect(JSON.parse(stderr())).toMatchObject({ reason: 'json_not_supported' })
+  })
+
+  test('a command that spreads jsonArgs prints its result as JSON, and does not pass --json on', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const passthroughs: string[][] = []
+    const status = define({
+      name: 'status',
+      passthrough: true,
+      args: { ...jsonArgs },
+      run: ctx => {
+        passthroughs.push(ctx.passthrough)
+        return { status: 'ok' }
+      }
+    })
+
+    await cli(['status', '--json', '--watch'], entry(), { name: 'app', subCommands: { status } })
+
+    expect(passthroughs).toEqual([['--watch']])
+    expect(JSON.parse(log())).toEqual({ status: 'ok' })
+  })
+
+  test('answers --help and --version with --json as JSON, and the help tells passthrough', async () => {
+    const exec = define({
+      name: 'exec',
+      passthrough: 'The arguments for other-program',
+      run: vi.fn<() => void>()
+    })
+    const run = define({ name: 'run', passthrough: true, run: vi.fn<() => void>() })
+    const blank = define({ name: 'blank', passthrough: '  ', run: vi.fn<() => void>() })
+    const build = define({ name: 'build', run: vi.fn<() => void>() })
+    const silent = {
+      name: 'app',
+      version: '1.0.0',
+      subCommands: { exec, run, blank, build },
+      usageSilent: true
+    }
+    const passthroughOf = (json: string | undefined) =>
+      (JSON.parse(json as string) as { help: { passthrough: unknown } }).help.passthrough
+
+    expect(passthroughOf(await cli(['exec', '--help', '--json'], entry(), silent))).toEqual({
+      description: 'The arguments for other-program'
+    })
+    expect(passthroughOf(await cli(['run', '--json', '--help'], entry(), silent))).toEqual({
+      description: null
+    })
+    expect(passthroughOf(await cli(['blank', '--help', '--json'], entry(), silent))).toEqual({
+      description: null
+    })
+    expect(passthroughOf(await cli(['build', '--help', '--json'], entry(), silent))).toBeNull()
+    expect(await cli(['exec', '--version', '--json'], entry(), silent)).toBe('{"version":"1.0.0"}')
+    expect(exec.run).not.toHaveBeenCalled()
+  })
+
+  test('the description of the arguments in the help as JSON is translated, as the description of the command', async () => {
+    const exec = {
+      name: 'exec',
+      passthrough: 'The arguments for other-program',
+      resource: () =>
+        Promise.resolve({ description: 'コマンドを動かす', passthrough: 'ほかのプログラムの引数' }),
+      run: () => {}
+    } as unknown as Command
+    const json = await cli(['exec', '--help', '--json'], entry(), {
+      name: 'app',
+      subCommands: { exec },
+      usageSilent: true,
+      plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })]
+    })
+
+    expect(JSON.parse(json as string)).toMatchObject({
+      help: {
+        description: 'コマンドを動かす',
+        passthrough: { description: 'ほかのプログラムの引数' }
+      }
+    })
   })
 })

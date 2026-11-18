@@ -100,7 +100,11 @@ export function localizable<
     }
 
     // if the key is a built-in key 'description' and 'examples', return empty string, because the these keys are resolved by the user.
-    if (key === resolveKey('description', ctx.name)) {
+    // So is 'passthrough', the description of the arguments that a command with `passthrough` passes on.
+    if (
+      key === resolveKey('description', ctx.name) ||
+      key === resolveKey('passthrough', ctx.name)
+    ) {
       return ''
     } else if (key === resolveKey('examples', ctx.name)) {
       return await resolveExamples(ctx, cmd.examples)

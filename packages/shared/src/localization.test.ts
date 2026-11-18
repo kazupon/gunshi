@@ -109,6 +109,8 @@ describe('without translation function', () => {
     expect(await localize('description')).toEqual('description')
     // `examples` key with command name
     expect(await localize('command1:examples')).toEqual('command1 --foo value --no-bar')
+    // `passthrough` key with command name, which the renderers take from the command, as `description`
+    expect(await localize('command1:passthrough')).toEqual('')
     // other keys
     expect(await localize('other_key')).toEqual('other_key')
   })

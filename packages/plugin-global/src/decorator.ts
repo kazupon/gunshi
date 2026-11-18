@@ -18,6 +18,7 @@ import {
 import {
   DefaultResource,
   formatResource,
+  getPassthrough,
   isWithoutRun,
   log,
   namespacedId,
@@ -270,7 +271,15 @@ const decorator: CommandDecorator<{
    * the raw tokens. Either way, the errors are printed as JSON. A command with a `json` of its own
    * handles `--json` itself.
    */
-  const request = resolveJsonRequest(ctx.args, values, ctx.tokens)
+  const jsonRequest = resolveJsonRequest(ctx.args, values, ctx.tokens)
+  /**
+   * NOTE(kazupon): a command with `passthrough` that does not spread `jsonArgs` passes `--json` on to the
+   * other program, as the other options that it does not declare, and `ctx.passthrough` has it. The command
+   * runs as without `--json`: it is not stopped with `json_not_supported`, and its errors are printed as
+   * text. The help and the version are still printed as JSON, as they are answered by gunshi.
+   */
+  const request =
+    jsonRequest === 'undeclared' && getPassthrough(ctx) !== undefined ? undefined : jsonRequest
   const validationError =
     request === undefined ? ctx.validationError : withoutJsonOption(ctx.validationError)
 
@@ -355,22 +364,25 @@ const decorator: CommandDecorator<{
    * silences them. `--help` comes before `--version` when both are given, whichever comes first on the
    * command line: the help is what tells how to use the command. With `--json`, they are printed as one
    * JSON document, so that stdout has the JSON only, whether the command spreads `jsonArgs` or not: they
-   * are answered by gunshi, not by the command. A command with a `json` argument of its own takes
-   * `--json` itself, and gets the text.
+   * are answered by gunshi, not by the command, a command with `passthrough` included. A command with a
+   * `json` argument of its own takes `--json` itself, and gets the text.
    */
   const write: Writer = ctx.env.usageSilent ? NOOP : log
 
   if (values.help && globalOptions?.has('help')) {
-    return request === undefined ? await writeUsage(ctx, write) : await writeUsageJson(ctx, write)
+    return jsonRequest === undefined
+      ? await writeUsage(ctx, write)
+      : await writeUsageJson(ctx, write)
   }
 
   if (values.version && globalOptions?.has('version')) {
-    return request === undefined ? writeVersion(ctx, write) : writeVersionJson(ctx, write)
+    return jsonRequest === undefined ? writeVersion(ctx, write) : writeVersionJson(ctx, write)
   }
 
   /**
    * NOTE(kazupon): `--json` given to a command that does not spread `jsonArgs` stops it before it runs,
-   * as an argument error does, so that the caller does not take its text for JSON.
+   * as an argument error does, so that the caller does not take its text for JSON. A command with
+   * `passthrough` passes it on instead, as above.
    */
   if (request === 'undeclared') {
     return await report(
