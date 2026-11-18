@@ -824,7 +824,7 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
   deprecated?: boolean | string
   /**
    * Whether the command passes the arguments that it does not take on to another program: `true`, or the text that
-   * tells what they are, such as `'The arguments for vitest'`.
+   * tells what they are, such as `'The arguments for the script'`, which the help shows.
    *
    * Such a command reports neither an option that it does not declare, whatever {@linkcode CliOptions.strict} says,
    * nor a positional argument that it does not take, whatever {@linkcode CliOptions.strictPositionals} says.
@@ -837,6 +837,10 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * own, such as `--bail=3`, or the next argument is an option or `--`. Both are passed on, and a positional argument
    * that the command declares does not get it: give the positional arguments of the command before the options of
    * the other program that take no value, such as `exec run.js --watch`, not `exec --watch run.js`.
+   *
+   * The help shows it at the end of the usage, as `[ARGUMENTS ...]`, and the text in the ARGUMENTS section, which the
+   * i18n plugin translates with the key `passthrough` of the command. With the global options plugin, `--json` is
+   * passed on too, unless the command spreads `jsonArgs`, and the help as JSON has `passthrough`.
    *
    * A lazy command takes it from the loaded command, and from the definition given to `lazy` when the loaded
    * command does not set it, or when the loader returns a runner.

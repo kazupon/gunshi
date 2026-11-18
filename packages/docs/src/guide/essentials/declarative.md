@@ -140,6 +140,7 @@ Commands also support these configuration properties:
 - `internal`: Boolean flag to mark commands as internal (default: `false`). Internal commands are hidden from help usage but remain fully functional: they are left out of the help, shell completion, the help as JSON, and the `Did you mean` hint for an unknown command, and still run when they are typed. This is useful for debug commands, administrative functions, or implementation details that shouldn't be exposed to end users.
 - `aliases`: Other names of the command, such as `['ls']` for `list`. The command runs with any of them, and `ctx.name` and `ctx.commandPath` have its name. An alias is accepted but not taught: the help, the `Did you mean` hint for an unknown command and shell completion show the name only. See [Aliases of Sub-commands](./composable.md#aliases-of-sub-commands).
 - `deprecated`: Mark the command as deprecated: `true`, or the text that tells what to use instead, such as `'Use deploy.'`. It still runs, and Gunshi warns when it runs; the help, the `Did you mean` hint and shell completion leave it out, as for an internal command. See [Renaming a Sub-command](./composable.md#renaming-a-sub-command).
+- `passthrough`: Pass the arguments that the command does not take on to another program: `true`, or the text that tells what they are, such as `'The arguments for the script'`, which the help shows. The command reports none of them, and `ctx.passthrough` has them. See [Passing Arguments to Another Program](#passing-arguments-to-another-program).
 - `entry`: Boolean flag that marks the main command when subcommands exist (default: `undefined`). This property is typically set automatically by the framework. When used with the `fallbackToEntry` CLI option, it enables fallback behavior for unmatched subcommands.
 - `rendering`: Object to customize how the command displays help, usage, and error messages. This allows fine-grained control over command-level rendering output.
 
@@ -373,7 +374,7 @@ The error uses the `err:arg:unknown-option` resource key, so the message follows
 
 The arguments of a command are its own: an option that only the main command declares, given with a sub-command, is an unknown option of the sub-command. Spread the shared arguments into every command that takes them (see [Options for Every Command](./composable.md#options-for-every-command)).
 
-To ignore such option tokens and run the command, give `strict: false`, such as for a command that passes its arguments as they are to another program:
+To ignore such option tokens and run the command, give `strict: false` to `cli()`, for every command of the CLI. A command that passes them on to another program takes them with `passthrough` instead, and the other commands keep reporting them: see [Passing Arguments to Another Program](#passing-arguments-to-another-program).
 
 ```js
 await cli(process.argv.slice(2), command, {
@@ -382,11 +383,77 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-The arguments after `--` are not option tokens, with or without `strict`: they stay in `ctx.rest`, as they are. To pass arguments to another program, take them after `--`, such as `app exec -- --any --flags`.
+With `strict: false`, an option that the command does not declare still takes the next argument as its value, unless it has a value of its own, such as `--bail=3`, or the next argument is an option: in `app exec --watch src`, `src` is the value of `--watch`, and is not in `ctx.positionals`. `ctx._` has all the arguments given to `cli()`, the names of the command path first.
+
+The arguments after `--` are not option tokens, with or without `strict`: they stay in `ctx.rest`, as they are, such as `--any --flags` of `app exec -- --any --flags`.
 
 `--help` and `--version` are still answered: `app --alow-reload --help` prints the help, and the unknown option is not reported, as another wrong argument is not. An unknown command is reported, with or without `--help`.
 
-`--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`. It is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
+`--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`, unless the command has `passthrough`, which passes it on. It is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
+
+#### Passing Arguments to Another Program
+
+A command that runs another program can pass it the arguments that the command does not take. Give the command `passthrough: true`, or the text that tells what the arguments are, which the help shows. The command then reports neither an option that it does not declare nor a positional argument that it does not take, whatever `strict` and `strictPositionals` say, and `ctx.passthrough` has them, as they are given and in order:
+
+```js
+import { spawnSync } from 'node:child_process'
+import { define } from 'gunshi'
+
+const exec = define({
+  name: 'exec',
+  description: 'Run a script in an environment of the app',
+  passthrough: 'The arguments for the script',
+  args: {
+    script: { type: 'positional', description: 'The script to run' },
+    env: { type: 'string', short: 'e', default: 'development', description: 'The environment' }
+  },
+  run: ctx => {
+    // `ctx.passthrough` has the arguments after `--` at the end: pass it on in place of `ctx.rest`
+    const { status } = spawnSync(process.execPath, [ctx.values.script, ...ctx.passthrough], {
+      stdio: 'inherit',
+      env: { ...process.env, APP_ENV: ctx.values.env }
+    })
+    process.exitCode = status ?? 1
+  }
+})
+```
+
+`app exec run.js -e production --watch src -- --inspect` runs `run.js` with `--watch src --inspect`, in the environment `production`. The context has the arguments in these values:
+
+| Value             | For `app exec run.js -e production --watch src -- --inspect`                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ctx.values`      | `{ script: 'run.js', env: 'production' }`: the arguments that the command declares                                                                     |
+| `ctx.passthrough` | `['--watch', 'src', '--inspect']`: the arguments that the command does not take, with the ones after `--` at the end, and without `--` itself          |
+| `ctx.rest`        | `['--inspect']`: the arguments after `--`, which are in `ctx.passthrough` too. Pass `ctx.passthrough` on, not `ctx.rest` with it                       |
+| `ctx._`           | `['exec', 'run.js', '-e', 'production', '--watch', 'src', '--', '--inspect']`: all the arguments given to `cli()`, the names of the command path first |
+
+What the command passes on is read as Gunshi reads the arguments:
+
+- An option that the command does not declare takes the next argument as its value, unless it has a value of its own, such as `--bail=3`, or the next argument is an option or `--`. Both are passed on, and a positional argument that the command declares does not get it: `app exec --verbose run.js` takes `run.js` as the value of `--verbose`, and reports that `script` is missing. Give the positional arguments of the command before the options of the other program, such as `app exec run.js --verbose`.
+- A short option group with an option that the command does not declare is passed on as it is given, such as `-qk` for a command that declares `-q` and not `-k`, and the option of the command in it, `-q`, is still read.
+- The options of the command are read as before, and are not passed on, the global options such as `--help` and `--version` included: `app exec --help` prints the help of `exec`. To give them to the other program, give them after `--`, such as `app exec run.js -- --help`.
+- A typo of an option of the command, such as `--envv production`, is not reported: it is passed on, and the other program may report it. So is the `no-` form of a boolean option of the command that is not `negatable`, such as `--no-quiet` for `quiet`.
+- `--json` is passed on too, unless the command spreads `jsonArgs`: the command runs as without it (see [JSON Output](./json-output.md#commands-without-json)).
+- The other errors of the arguments, such as a missing positional argument, are reported as before. The other commands keep reporting the options that they do not declare.
+- A lazy command takes `passthrough` from the loaded command, and from the definition given to `lazy` when the loaded command does not set it.
+
+The help shows that the command takes them, at the end of the usage, as `[ARGUMENTS ...]`, and the text in the ARGUMENTS section. `passthrough: true` shows them in the usage only:
+
+```txt
+USAGE:
+  app exec [OPTIONS] <script> [ARGUMENTS ...]
+
+ARGUMENTS:
+  script                  The script to run
+  ARGUMENTS ...           The arguments for the script
+
+OPTIONS:
+  -e, --env <env>          The environment (default: development)
+  -h, --help               Display this help message
+  -v, --version            Display this version
+```
+
+With the i18n plugin, the text is translated with the key `passthrough` of the command, as its description is. The help as JSON has it in `passthrough` (see [Help and Version](./json-output.md#help-and-version)).
 
 #### Strict Positional Argument Validation
 
@@ -408,7 +475,7 @@ See the arguments of the command:
   app deploy --help
 ```
 
-A command takes as many positional arguments as it declares, an optional one included. To take any number of them, declare a positional argument with `multiple: true`. The arguments after `--` are not positional arguments: they stay in `ctx.rest`.
+A command takes as many positional arguments as it declares, an optional one included. To take any number of them, declare a positional argument with `multiple: true`. The arguments after `--` are not positional arguments: they stay in `ctx.rest`. A command with `passthrough` does not report the others, and passes them on (see [Passing Arguments to Another Program](#passing-arguments-to-another-program)).
 
 The error uses the `err:arg:unexpected-positional` resource key. As with an unknown option, `--help` and `--version` are still answered, and after a command with sub-commands, a word that is not one of them is reported as an unknown command instead.
 
