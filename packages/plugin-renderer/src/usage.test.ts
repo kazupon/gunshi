@@ -2802,7 +2802,7 @@ describe('the arguments that a command with passthrough passes on', () => {
       '  ARGUMENTS ...           The arguments for other-program'
     ])
     expect(usageLineOf(withTrue)).toBe('app exec [OPTIONS] [ARGUMENTS ...]')
-    expect(sectionOf(withTrue)).toEqual([])
+    expect(withTrue).not.toContain('ARGUMENTS:')
     expect(withBlank).toBe(withTrue)
   })
 
@@ -2848,5 +2848,37 @@ describe('the arguments that a command with passthrough passes on', () => {
 
     expect(usageLineOf(help)).toBe('app exec [OPTIONS] [引数 ...]')
     expect(sectionOf(help, '引数')).toEqual(['  引数 ...           ほかのプログラムの引数'])
+  })
+})
+
+describe('the description of the arguments that a runnable entry with sub-commands passes on', () => {
+  test('is the translation of the loaded command, not of the definition that the commands section lists', async () => {
+    const entry = lazy(
+      () =>
+        ({
+          run: NOOP,
+          passthrough: true,
+          resource: () => Promise.resolve({ passthrough: 'The arguments of the loaded command' })
+        }) as unknown as Command,
+      {
+        name: 'app',
+        passthrough: true,
+        resource: () => Promise.resolve({ passthrough: 'The arguments of the definition' })
+      } as unknown as Partial<Command>
+    )
+    const build = define({ name: 'build', run: NOOP })
+
+    const help = (await cli(['--help'], entry, {
+      name: 'app',
+      usageSilent: true,
+      subCommands: { build },
+      plugins: [i18n({ locale: 'en-US' })]
+    }))!
+
+    const lines = help.split('\n')
+    const start = lines.indexOf('ARGUMENTS:')
+    expect(lines.slice(start + 1, lines.indexOf('', start))).toEqual([
+      '  ARGUMENTS ...           The arguments of the loaded command'
+    ])
   })
 })

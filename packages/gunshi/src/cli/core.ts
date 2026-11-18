@@ -225,9 +225,11 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
    * NOTE(kazupon): a command with `passthrough` passes the arguments that it does not take on to another program,
    * so they are not errors. args-tokens tells which ones they are, as only the resolver knows which arguments the
    * options take as their values, and gives their indexes in `argv`, which keep them as they were given: a short
-   * option group with an option that the command does not declare, such as `-qk`, is passed on whole.
+   * option group with an option that the command does not declare, such as `-qk`, is passed on whole. The
+   * `passthrough` of the command is read once, so that the arguments and the mark for the plugins agree.
    */
-  const passthrough = isPassthrough(resolvedCommand.passthrough)
+  const passthroughOfCommand = resolvedCommand.passthrough
+  const passthrough = isPassthrough(passthroughOfCommand)
   const diagnostic = selection.diagnostic === true
   const parsed = diagnostic
     ? {
@@ -291,7 +293,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     commandContext,
     collectDeprecatedCommands(routingOptions.subCommands, targetCommandPath, resolvedCommand)
   )
-  markPassthrough(commandContext, resolvedCommand.passthrough)
+  markPassthrough(commandContext, passthroughOfCommand)
 
   const reported = trackReported(commandContext)
   let fallbackRunner: () => void = NOOP

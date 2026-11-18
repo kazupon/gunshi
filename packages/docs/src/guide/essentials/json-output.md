@@ -243,9 +243,9 @@ When the output is already fixed, such as an array that the readers expect, an e
 
 When `--json` is given to a command that does not spread `jsonArgs`, Gunshi stops it before it runs, with `json_not_supported`, so that a program does not take its text for JSON. `--help` and `--version` are still answered, as JSON: see [Help and Version](#help-and-version).
 
-A command with `passthrough` that does not spread `jsonArgs` passes `--json` on to the other program instead, as the other options that it does not declare: it runs as without `--json`, its errors are printed as text, and `ctx.passthrough` has `--json`. See [Passing Arguments to Another Program](./declarative.md#passing-arguments-to-another-program).
+A command with `passthrough` and without a `json` argument passes `--json` on to the other program instead, as the other options that it does not declare: it runs as without `--json`, its errors are printed as text, and `ctx.passthrough` has `--json`. See [Passing Arguments to Another Program](./declarative.md#passing-arguments-to-another-program).
 
-`--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, a command with it runs, and a command with `passthrough` passes it on. `--json=false` asks for no JSON, and stays an unknown option, unless `strict: false` is given or the command has `passthrough`.
+`--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, a command with it runs, and a command with `passthrough` and without a `json` argument passes it on. For a command without a `json` argument, `--json=false` asks for no JSON, and stays an unknown option, unless `strict: false` is given or the command has `passthrough`.
 
 ## Lazy Commands
 

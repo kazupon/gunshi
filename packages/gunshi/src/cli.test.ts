@@ -7711,6 +7711,26 @@ describe('passthrough with --json, and in the help as JSON', () => {
     expect(JSON.parse(log())).toEqual({ status: 'ok' })
   })
 
+  test('a command with a json argument of its own takes --json itself, and does not pass it on', async () => {
+    const seen: unknown[] = []
+    const exec = define({
+      name: 'exec',
+      passthrough: true,
+      args: { json: { type: 'boolean' } },
+      run: ctx => {
+        seen.push({ json: ctx.values.json, passthrough: ctx.passthrough })
+      }
+    })
+
+    await cli(['exec', '--json', '--watch'], entry(), { name: 'app', subCommands: { exec } })
+    await cli(['exec', '--json=false'], entry(), { name: 'app', subCommands: { exec } })
+
+    expect(seen).toEqual([
+      { json: true, passthrough: ['--watch'] },
+      { json: false, passthrough: [] }
+    ])
+  })
+
   test('answers --help and --version with --json as JSON, and the help tells passthrough', async () => {
     const exec = define({
       name: 'exec',
@@ -7739,7 +7759,9 @@ describe('passthrough with --json, and in the help as JSON', () => {
       description: null
     })
     expect(passthroughOf(await cli(['build', '--help', '--json'], entry(), silent))).toBeNull()
-    expect(await cli(['exec', '--version', '--json'], entry(), silent)).toBe('{"version":"1.0.0"}')
+    // parsed, as it is indented on a terminal
+    const version = (await cli(['exec', '--version', '--json'], entry(), silent)) as string
+    expect(JSON.parse(version)).toEqual({ version: '1.0.0' })
     expect(exec.run).not.toHaveBeenCalled()
   })
 

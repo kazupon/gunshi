@@ -83,6 +83,14 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
   // render usage section
   messages.push(...(await renderUsageSection(ctx)), '')
 
+  /**
+   * NOTE(kazupon): the description of the arguments that a command with `passthrough` passes on is resolved
+   * before the commands section, as the description of the command is: the section localizes the description
+   * of each command that it lists, which loads the resource of that command under its name. A runnable entry is
+   * listed as its definition, so its definition would otherwise replace the translation of the command that runs.
+   */
+  const passthroughDescription = await resolvePassthroughDescription(ctx)
+
   // render commands section
   if (await listsCommands(ctx)) {
     messages.push(...(await renderCommandsSection(ctx)), '')
@@ -90,7 +98,6 @@ export async function renderUsage<G extends GunshiParams = DefaultGunshiParams>(
 
   // render positional arguments section, with the row of the arguments that a command with `passthrough`
   // passes on, when they have a description
-  const passthroughDescription = await resolvePassthroughDescription(ctx)
   if (hasPositionalArgs(ctx.args) || passthroughDescription) {
     messages.push(...(await renderPositionalArgsSection(ctx, passthroughDescription)), '')
   }

@@ -389,7 +389,7 @@ The arguments after `--` are not option tokens, with or without `strict`: they s
 
 `--help` and `--version` are still answered: `app --alow-reload --help` prints the help, and the unknown option is not reported, as another wrong argument is not. An unknown command is reported, with or without `--help`.
 
-`--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`, unless the command has `passthrough`, which passes it on. It is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
+`--json` is the exception, since Gunshi knows what it means. Given to a command that does not spread `jsonArgs`, it is not ignored, with or without `strict`: Gunshi stops the command with `json_not_supported`, unless the command has `passthrough`, which passes it on when it runs. It is not reported as an unknown option either. See [JSON Output](./json-output.md#commands-without-json).
 
 #### Passing Arguments to Another Program
 
@@ -433,7 +433,7 @@ What the command passes on is read as Gunshi reads the arguments:
 - A short option group with an option that the command does not declare is passed on as it is given, such as `-qk` for a command that declares `-q` and not `-k`, and the option of the command in it, `-q`, is still read.
 - The options of the command are read as before, and are not passed on, the global options such as `--help` and `--version` included: `app exec --help` prints the help of `exec`. To give them to the other program, give them after `--`, such as `app exec run.js -- --help`.
 - A typo of an option of the command, such as `--envv production`, is not reported: it is passed on, and the other program may report it. So is the `no-` form of a boolean option of the command that is not `negatable`, such as `--no-quiet` for `quiet`.
-- `--json` is passed on too, unless the command spreads `jsonArgs`: the command runs as without it (see [JSON Output](./json-output.md#commands-without-json)).
+- `--json` is passed on too, unless the command spreads `jsonArgs` or declares a `json` argument of its own: the command runs as without it. `--help --json` and `--version --json` are still answered by Gunshi, as JSON (see [JSON Output](./json-output.md#commands-without-json)).
 - The other errors of the arguments, such as a missing positional argument, are reported as before. The other commands keep reporting the options that they do not declare.
 - A lazy command takes `passthrough` from the loaded command, and from the definition given to `lazy` when the loaded command does not set it.
 

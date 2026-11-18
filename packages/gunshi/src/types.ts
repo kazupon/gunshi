@@ -830,8 +830,10 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * nor a positional argument that it does not take, whatever {@linkcode CliOptions.strictPositionals} says.
    * {@linkcode CommandContext.passthrough | ctx.passthrough} has them, as they are given and in order, with the
    * arguments after `--` at the end. The options that it declares, the global options such as `--help` included,
-   * are read as before and are not passed on: to give `--help` to the other program, give it after `--`. The other
-   * errors of the arguments are reported as before.
+   * are read as before and are not passed on: to give `--help` to the other program, give it after `--`. A short
+   * option group with an option that the command does not declare is passed on whole, such as `-qk` for a command
+   * that declares `-q` and not `-k`: `-q` is read too, and the other program gets it in the group. The other errors
+   * of the arguments are reported as before.
    *
    * An option that the command does not declare takes the next argument as its value, unless it has a value of its
    * own, such as `--bail=3`, or the next argument is an option or `--`. Both are passed on, and a positional argument
