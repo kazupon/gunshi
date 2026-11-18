@@ -136,6 +136,20 @@ function setTerminal(isTTY: boolean) {
 }
 
 /**
+ * Mark the context of a run whose command has `passthrough`, as the core does in `cli()`.
+ *
+ * @param ctx - The command context of the run
+ * @param passthrough - The `passthrough` of the command
+ */
+function markPassthrough(ctx: object, passthrough: true | string): void {
+  const registry = globalThis as unknown as Record<
+    symbol,
+    WeakMap<object, true | string> | undefined
+  >
+  ;(registry[Symbol.for('gunshi.passthrough')] ??= new WeakMap()).set(ctx, passthrough)
+}
+
+/**
  * Run a function, and return what it throws.
  *
  * @param fn - The function
@@ -710,6 +724,38 @@ describe('--json given to a command that does not spread jsonArgs', () => {
       expect(output.stderr()).toEqual([])
     }
   )
+
+  test('runs a command with passthrough, which passes it on, as without it', async () => {
+    const output = captureOutput()
+    const { ctx } = await createRun({ args: {}, values: {}, commandPath: ['exec'] })
+    markPassthrough(ctx, 'The arguments for other-program')
+
+    expect(await decorator(() => 'text')(ctx)).toBe('text')
+    expect(output.stderr()).toEqual([])
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('reports the errors of a command with passthrough as without it, not as JSON', async () => {
+    const output = captureOutput()
+    const required = new ArgsValidationError("Positional argument 'script' is required", {
+      code: ArgsValidationErrorKeys.requiredPositional,
+      values: { name: 'script' }
+    })
+    const { ctx } = await createRun({
+      args: {},
+      values: {},
+      commandPath: ['exec'],
+      validationError: new AggregateError([required])
+    })
+    markPassthrough(ctx, true)
+
+    const error = await catchError(() => decorator(() => {})(ctx))
+
+    // the errors of the arguments, not `json_not_supported`, and no JSON on stderr: the renderer of
+    // the validation errors prints them as text, which this context has none of
+    expect((error as AggregateError).errors).toEqual([required])
+    expect(output.stderr()).toEqual([])
+  })
 
   test('shows the help for --help, and the version for --version, as JSON, first', async () => {
     const output = captureOutput()

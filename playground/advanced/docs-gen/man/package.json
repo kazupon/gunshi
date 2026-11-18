@@ -9,5 +9,5 @@
     "gunshi": "file:../../../../packages/gunshi",
     "marked-man": "2.1.1"
   },
-  "packageManager": "pnpm@12.18.0"
+  "packageManager": "pnpm@12.19.0"
 }

@@ -261,6 +261,8 @@ export async function load<G extends GunshiParamsConstraint>(
 }
 ```
 
+The package parses its arguments itself, so the runner passes on all the arguments after the name of the command, the ones that the metadata declares included, with `ctx._.slice(1)`. Give such a command `passthrough: true` in its definition, such as `lazy(async () => await load('command-a'), { ...metaCommandA, passthrough: true })`: otherwise Gunshi reports an option that the metadata does not declare as an unknown option, before the runner runs (see [Passing Arguments to Another Program](../essentials/declarative.md#passing-arguments-to-another-program)). `ctx.passthrough` has only the arguments that the metadata does not declare, and leaves `--` out, while `ctx._.slice(1)` passes `--` on too, such as for `command-a -- --help`.
+
 When an option appears before a lazy command name or between nested command names, include its
 routing metadata in the lazy definition. Gunshi uses only `type`, `short`, `negatable`, and `toKebab`
 while selecting a path, then loads the selected command and performs normal value conversion once.
