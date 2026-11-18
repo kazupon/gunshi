@@ -387,6 +387,7 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
     lazyCommand.internal = definition.internal
     lazyCommand.aliases = definition.aliases
     lazyCommand.deprecated = definition.deprecated
+    lazyCommand.passthrough = definition.passthrough
     lazyCommand.entry = definition.entry
     lazyCommand.toKebab = definition.toKebab
     lazyCommand.rendering = definition.rendering

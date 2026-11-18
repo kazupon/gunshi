@@ -221,6 +221,13 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     targetDepth
   )
 
+  /**
+   * NOTE(kazupon): a command with `passthrough` passes the arguments that it does not take on to another program,
+   * so they are not errors. args-tokens tells which ones they are, as only the resolver knows which arguments the
+   * options take as their values, and gives their indexes in `argv`, which keep them as they were given: a short
+   * option group with an option that the command does not declare, such as `-qk`, is passed on whole.
+   */
+  const passthrough = isPassthrough(resolvedCommand.passthrough)
   const diagnostic = selection.diagnostic === true
   const parsed = diagnostic
     ? {
@@ -233,12 +240,13 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     : resolveArgs(args, tokens, {
         shortGrouping: true,
         toKebab: resolvedCommand.toKebab,
-        skipPositional
+        skipPositional,
+        passthrough
       })
-  const { explicit, values, positionals, rest, error } = parsed
+  const { explicit, values, positionals, rest, error, passthroughIndices } = parsed
   const validationError = mergeValidationErrors(error, [
     ...additionalValidationErrors,
-    ...(cliOptions.strict && !diagnostic
+    ...(cliOptions.strict && !diagnostic && !passthrough
       ? createUnknownOptionErrors(
           findUnknownOptions(args, tokens, {
             toKebab: resolvedCommand.toKebab,
@@ -252,7 +260,10 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
      * NOTE(kazupon): after a command that could not be resolved, the positional argument is the name of the
      * command that was not found, which is reported already.
      */
-    ...(cliOptions.strictPositionals && !diagnostic && additionalValidationErrors.length === 0
+    ...(cliOptions.strictPositionals &&
+    !diagnostic &&
+    !passthrough &&
+    additionalValidationErrors.length === 0
       ? createUnexpectedPositionalErrors(
           findUnexpectedPositionals(args, positionals, skipPositional)
         )
@@ -265,6 +276,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     values,
     positionals,
     rest,
+    passthrough: passthroughIndices?.map(index => argv[index]) ?? [],
     argv,
     tokens,
     omitted: targetOmitted,
@@ -279,6 +291,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
     commandContext,
     collectDeprecatedCommands(routingOptions.subCommands, targetCommandPath, resolvedCommand)
   )
+  markPassthrough(commandContext, resolvedCommand.passthrough)
 
   const reported = trackReported(commandContext)
   let fallbackRunner: () => void = NOOP
@@ -457,6 +470,47 @@ function markDeprecatedCommands(ctx: object, marks: DeprecatedCommandMark[]): vo
     WeakMap<object, readonly DeprecatedCommandMark[]> | undefined
   >
   ;(registry[DEPRECATED_COMMANDS] ??= new WeakMap()).set(ctx, marks)
+}
+
+/**
+ * The key of the registry of the command contexts whose command passes the arguments that it does not take on to
+ * another program, with its `passthrough`. The global options plugin and the usage renderer plugin read it with
+ * `getPassthrough` of `@gunshi/shared`, by the same registered symbol, since `gunshi` and the plugins bundle their
+ * own copies. Neither is in the public API.
+ */
+const PASSTHROUGH = Symbol.for('gunshi.passthrough')
+
+/**
+ * Check whether the `passthrough` of a command makes it pass the arguments that it does not take on.
+ *
+ * @param passthrough - The `passthrough` of a command
+ * @returns `true` for `true` or a text
+ */
+function isPassthrough(passthrough: unknown): passthrough is true | string {
+  return passthrough === true || typeof passthrough === 'string'
+}
+
+/**
+ * Mark the command context of a run whose command passes the arguments that it does not take on, with its
+ * `passthrough`.
+ *
+ * NOTE(kazupon): the context has the arguments that the command passes on, and not whether it passes them on,
+ * which its help and the help as JSON tell even when there are none, so the core tells the plugins. The command is
+ * checked once it is loaded, so a lazy command is marked by the `passthrough` of the loaded command. The registry is
+ * weak, and holds the context of this run only.
+ *
+ * @param ctx - The command context of the run
+ * @param passthrough - The `passthrough` of the command that runs
+ */
+function markPassthrough(ctx: object, passthrough: unknown): void {
+  if (!isPassthrough(passthrough)) {
+    return
+  }
+  const registry = globalThis as unknown as Record<
+    symbol,
+    WeakMap<object, true | string> | undefined
+  >
+  ;(registry[PASSTHROUGH] ??= new WeakMap()).set(ctx, passthrough)
 }
 
 /**

@@ -256,6 +256,32 @@ export function isWithoutRun(ctx: object): boolean {
 }
 
 /**
+ * The key of the registry in which the core of gunshi keeps the command contexts whose command passes the
+ * arguments that it does not take on to another program, with its `passthrough`: the same registered symbol as
+ * the one of the core, which marks the context.
+ */
+const PASSTHROUGH = Symbol.for('gunshi.passthrough')
+
+/**
+ * Get the `passthrough` of the command of a run, by the mark that the core of gunshi puts on its context.
+ *
+ * NOTE(kazupon): the context has the arguments that the command passes on, in `ctx.passthrough`, and not whether
+ * it passes them on, which the plugins tell even when there are none, such as in the help. So the core marks the
+ * context, once the command is loaded, a lazy one included. As for `isWithoutRun`, the core keeps its own key and
+ * its writer out of the public API, and the tests pin this reader to the mark of the core.
+ *
+ * @param ctx - The command context of the run
+ * @returns The `passthrough` of the command, `true` or the text that tells what the arguments are, or `undefined`
+ *   for a command without it
+ */
+export function getPassthrough(ctx: object): true | string | undefined {
+  const registry = (
+    globalThis as unknown as Record<symbol, WeakMap<object, true | string> | undefined>
+  )[PASSTHROUGH]
+  return registry?.get(ctx)
+}
+
+/**
  * Order the options of a command as the help lists them: the options of the command first, and the global
  * options in effect after them, each in the order in which they are merged.
  *

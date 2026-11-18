@@ -370,6 +370,7 @@ describe('the keys that a command does not have (#871)', () => {
       internal: false,
       aliases: ['dp'],
       deprecated: 'Use release.',
+      passthrough: 'The arguments for the deployer',
       entry: false,
       rendering: { header: null },
       run
@@ -399,6 +400,28 @@ describe('the keys that a command does not have (#871)', () => {
     })
     // @ts-expect-error `deprecated` is true or a text
     define({ name: 'push', deprecated: 1, run })
+  })
+
+  test('passthrough is true or a text, and ctx.passthrough is an array of the arguments', () => {
+    define({
+      name: 'exec',
+      passthrough: true,
+      run: ctx => {
+        expectTypeOf(ctx.passthrough).toEqualTypeOf<string[]>()
+      }
+    })
+    define({ name: 'test', passthrough: 'The arguments for vitest', run })
+    lazy(loader, { name: 'test', passthrough: 'The arguments for vitest' })
+    define({ name: 'tools', subCommands: { exec: { name: 'exec', passthrough: true, run } }, run })
+    define({
+      name: 'build',
+      run: ctx => {
+        // every command has it, as an empty array without `passthrough`
+        expectTypeOf(ctx.passthrough).toEqualTypeOf<string[]>()
+      }
+    })
+    // @ts-expect-error `passthrough` is true or a text
+    define({ name: 'exec', passthrough: 1, run })
   })
 
   test('the keys of the definition are not optional in the result, and the other keys are', () => {

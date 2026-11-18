@@ -4,6 +4,7 @@ import { cli } from '../../gunshi/src/cli/bone.ts'
 import { define } from '../../gunshi/src/definition.ts'
 import {
   composeNegatableDescription,
+  getPassthrough,
   isWithoutRun,
   orderGlobalOptionsLast,
   resolveArgKey,
@@ -186,6 +187,29 @@ describe('isWithoutRun', () => {
 
     expect(marks).toEqual([true, false])
     expect(isWithoutRun({})).toBe(false)
+  })
+})
+
+describe('getPassthrough', () => {
+  test('reads the mark that the core puts on the context of a command with passthrough', async () => {
+    const exec = define({ name: 'exec', passthrough: true, run: () => {} })
+    const test = define({ name: 'test', passthrough: 'The arguments for vitest', run: () => {} })
+    const build = define({ name: 'build', passthrough: false, run: () => {} })
+    const marks: unknown[] = []
+    const options = {
+      subCommands: { exec, test, build },
+      onBeforeCommand: (ctx: object) => {
+        marks.push(getPassthrough(ctx))
+      }
+    }
+
+    await cli(['exec'], define({ name: 'demo', run: () => {} }), options)
+    await cli(['test'], define({ name: 'demo', run: () => {} }), options)
+    await cli(['build'], define({ name: 'demo', run: () => {} }), options)
+    await cli([], define({ name: 'demo', run: () => {} }), options)
+
+    expect(marks).toEqual([true, 'The arguments for vitest', undefined, undefined])
+    expect(getPassthrough({})).toBeUndefined()
   })
 })
 

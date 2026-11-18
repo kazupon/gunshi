@@ -600,6 +600,19 @@ export interface CommandContext<G extends GunshiParamsConstraint = DefaultGunshi
    */
   rest: string[]
   /**
+   * The arguments that the command does not take, as they are given and in order, for a command with
+   * {@linkcode Command.passthrough | passthrough} to pass on to another program: the options that it does not
+   * declare, with the arguments that they take as their values, the positional arguments that it does not take,
+   * and the arguments after `--`, at the end and without `--` itself.
+   *
+   * `app exec run.js --watch src -- --env x`, for `exec` with the positional argument `script`, gives
+   * `['--watch', 'src', '--env', 'x']`. The arguments after `--` are in {@linkcode CommandContext.rest | rest}
+   * too: pass this on in place of `rest`, not with it.
+   *
+   * It is an empty array for a command without `passthrough`.
+   */
+  passthrough: string[]
+  /**
    * Original command line arguments.
    * This argument is passed from `cli` function.
    */
@@ -810,6 +823,26 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    */
   deprecated?: boolean | string
   /**
+   * Whether the command passes the arguments that it does not take on to another program: `true`, or the text that
+   * tells what they are, such as `'The arguments for vitest'`.
+   *
+   * Such a command reports neither an option that it does not declare, whatever {@linkcode CliOptions.strict} says,
+   * nor a positional argument that it does not take, whatever {@linkcode CliOptions.strictPositionals} says.
+   * {@linkcode CommandContext.passthrough | ctx.passthrough} has them, as they are given and in order, with the
+   * arguments after `--` at the end. The options that it declares, the global options such as `--help` included,
+   * are read as before and are not passed on: to give `--help` to the other program, give it after `--`. The other
+   * errors of the arguments are reported as before.
+   *
+   * An option that the command does not declare takes the next argument as its value, unless it has a value of its
+   * own, such as `--bail=3`, or the next argument is an option or `--`. Both are passed on, and a positional argument
+   * that the command declares does not get it: give the positional arguments of the command before the options of
+   * the other program that take no value, such as `exec run.js --watch`, not `exec --watch run.js`.
+   *
+   * A lazy command takes it from the loaded command, and from the definition given to `lazy` when the loaded
+   * command does not set it, or when the loader returns a runner.
+   */
+  passthrough?: boolean | string
+  /**
    * Whether this command is an entry command.
    *
    * @default undefined
@@ -926,6 +959,10 @@ export interface SubCommandable {
    * see {@link Command.deprecated}
    */
   deprecated?: boolean | string
+  /**
+   * see {@link Command.passthrough}
+   */
+  passthrough?: boolean | string
   /**
    * see {@link Command.entry}
    */
