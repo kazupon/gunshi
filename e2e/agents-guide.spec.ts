@@ -530,8 +530,44 @@ await cli(process.argv.slice(2), define({ name: 'exec', run: ctx => console.log(
       stdout: '["--file","a.json"]\n'
     })
     // the rule applies to the requirements that let such an option pass, whatever they call it
+    const guide = readFileSync(GUIDE, 'utf8')
+    expect(guide).toContain(
+      'Keep this default unless the requirements say otherwise, in whatever words they use.'
+    )
+    expect(guide).toContain(
+      'When they say that such an option is ignored, give `strict: false` to `cli()`.'
+    )
+  })
+
+  test('a command with passthrough: true gets the arguments that it does not take in ctx.passthrough', () => {
+    const file = write(
+      'passthrough.mjs',
+      `import { cli, define } from 'gunshi'
+const exec = define({
+  name: 'exec',
+  passthrough: true,
+  args: { script: { type: 'positional' }, env: { type: 'string', short: 'e' } },
+  run: ctx => console.log(JSON.stringify({ values: ctx.values, passthrough: ctx.passthrough, rest: ctx.rest }))
+})
+const build = define({ name: 'build', run: () => console.log('build') })
+const main = define({ name: 'app', run: () => console.log('main') })
+await cli(process.argv.slice(2), main, { name: 'app', version: '1.0.0', subCommands: { exec, build } })
+`
+    )
+    // as typed and in order, with the arguments after `--` at the end, which are in `ctx.rest` too
+    expect(
+      run(file, ['exec', 'run.js', '-e', 'prod', '--watch', 'src', '-qk', '--', '--env', 'x'])
+    ).toMatchObject({
+      code: 0,
+      stdout:
+        '{"values":{"script":"run.js","env":"prod"},"passthrough":["--watch","src","-qk","--env","x"],"rest":["--env","x"]}\n'
+    })
+    // the other commands report the options that they do not declare
+    const reported = run(file, ['build', '--watch'])
+    expect(reported).toMatchObject({ code: 1, stdout: '' })
+    expect(reported.stderr).toMatch(/^Unknown option: --watch\n/)
     expect(readFileSync(GUIDE, 'utf8')).toContain(
-      'Keep this default unless the requirements say that such an option is ignored, or passed on to another program, in whatever words they use: then give `strict: false` to `cli()`'
+      'give the command `passthrough: true`: it then reports none of them, and `ctx.passthrough` has them, as typed and in order, with the arguments after `--` at the end. Pass `ctx.passthrough` on, not `ctx.rest` too.'
     )
   })
 
