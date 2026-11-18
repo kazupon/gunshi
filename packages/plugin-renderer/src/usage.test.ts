@@ -2895,8 +2895,10 @@ describe('the description of the arguments that a runnable entry with sub-comman
 
     const lines = help.split('\n')
     const start = lines.indexOf('ARGUMENTS:')
-    expect(lines.slice(start + 1, lines.indexOf('', start))).toEqual([
-      '  ARGUMENTS ...           The arguments of the loaded command'
-    ])
+    // the label and the description of each row, whatever the columns
+    const rows = lines
+      .slice(start + 1, lines.indexOf('', start))
+      .map(line => line.trim().split(/\s{2,}/))
+    expect(rows).toEqual([['ARGUMENTS ...', 'The arguments of the loaded command']])
   })
 })
