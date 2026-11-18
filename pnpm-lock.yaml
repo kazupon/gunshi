@@ -213,7 +213,7 @@ importers:
         version: 26.6.4
       '@vitest/coverage-v8':
         specifier: 5.1.0
-        version: 5.1.0(@vitest/browser@5.1.0)(vitest@5.1.0)
+        version: 5.1.0(@vitest/browser@5.1.0)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
       bumpp:
         specifier: ^12.0.0
         version: 12.1.1
@@ -230,8 +230,8 @@ importers:
         specifier: ^1.0.34
         version: 1.0.34
       pkg-pr-new:
-        specifier: ^0.0.93
-        version: 0.0.93
+        specifier: ^0.0.94
+        version: 0.0.94
       tsx:
         specifier: 'catalog:'
         version: 4.22.4
@@ -4000,8 +4000,8 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
-  pkg-pr-new@0.0.93:
-    resolution: {integrity: sha512-JH3HEO+m8sNFpalNAeGrNKjdwxNcXT3yuEuGMU/65dvLojPo+Ofnmc8la2v2ceisjXTOKQw/738Pj4KNFY7F+w==}
+  pkg-pr-new@0.0.94:
+    resolution: {integrity: sha512-+s3ZZl1Vt3wHfsIRH+chHG6/3wsu1N+Z5jitNYAPc0GGCYR8xmju34UShzTAMosi4WAYFCXvp80LZZc/fXSdpQ==}
     hasBin: true
 
   pngjs@7.0.0:
@@ -5853,7 +5853,7 @@ snapshots:
     dependencies:
       '@blazediff/core': 1.10.0
       '@vitest/mocker': 5.1.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(publint@0.3.21)(tsx@4.22.4)(typescript@7.0.2)(unrun@0.2.39(synckit@0.11.13))(yaml@2.9.0))
-      '@vitest/ui': 5.1.0(vitest@5.1.0)
+      '@vitest/ui': 5.1.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
       '@vitest/utils': 5.1.0
       magic-string: 1.4.5
       pngjs: 7.0.0
@@ -5871,7 +5871,7 @@ snapshots:
     dependencies:
       '@blazediff/core': 1.10.0
       '@vitest/mocker': 5.1.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
-      '@vitest/ui': 5.1.0(vitest@5.1.0)
+      '@vitest/ui': 5.1.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
       '@vitest/utils': 5.1.0
       magic-string: 1.4.5
       pngjs: 7.0.0
@@ -5886,7 +5886,7 @@ snapshots:
       - vite
     optional: true
 
-  '@vitest/coverage-v8@5.1.0(@vitest/browser@5.1.0)(vitest@5.1.0)':
+  '@vitest/coverage-v8@5.1.0(@vitest/browser@5.1.0)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/istanbul-lib-coverage': 2.1.0
@@ -5899,6 +5899,8 @@ snapshots:
       vitest: 5.1.0(@types/node@26.6.4)(@vitest/browser-preview@5.1.0)(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
     optionalDependencies:
       '@vitest/browser': 5.1.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
+    transitivePeerDependencies:
+      - vite
 
   '@vitest/istanbul-lib-coverage@2.1.0': {}
 
@@ -5937,7 +5939,7 @@ snapshots:
 
   '@vitest/spy@5.1.0': {}
 
-  '@vitest/ui@5.1.0(vitest@5.1.0)':
+  '@vitest/ui@5.1.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)':
     dependencies:
       '@vitest/utils': 5.1.0
       fflate: 0.8.3
@@ -5946,6 +5948,8 @@ snapshots:
       sirv: 3.0.2
       tinyrainbow: 3.2.0
       vitest: 5.1.0(@types/node@26.6.4)(@vitest/browser-preview@5.1.0)(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+    transitivePeerDependencies:
+      - vite
 
   '@vitest/utils@5.1.0':
     dependencies:
@@ -7436,7 +7440,7 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  pkg-pr-new@0.0.93: {}
+  pkg-pr-new@0.0.94: {}
 
   pngjs@7.0.0: {}
 
@@ -8135,8 +8139,8 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.6.4
       '@vitest/browser-preview': 5.1.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(publint@0.3.21)(tsx@4.22.4)(typescript@7.0.2)(unrun@0.2.39(synckit@0.11.13))(yaml@2.9.0))(vitest@5.1.0)
-      '@vitest/coverage-v8': 5.1.0(@vitest/browser@5.1.0)(vitest@5.1.0)
-      '@vitest/ui': 5.1.0(vitest@5.1.0)
+      '@vitest/coverage-v8': 5.1.0(@vitest/browser@5.1.0)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
+      '@vitest/ui': 5.1.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
     transitivePeerDependencies:
       - msw
 
@@ -8159,8 +8163,8 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.6.4
       '@vitest/browser-preview': 5.1.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(publint@0.3.21)(tsx@4.22.4)(typescript@7.0.2)(unrun@0.2.39(synckit@0.11.13))(yaml@2.9.0))(vitest@5.1.0)
-      '@vitest/coverage-v8': 5.1.0(@vitest/browser@5.1.0)(vitest@5.1.0)
-      '@vitest/ui': 5.1.0(vitest@5.1.0)
+      '@vitest/coverage-v8': 5.1.0(@vitest/browser@5.1.0)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
+      '@vitest/ui': 5.1.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@5.1.0)
     transitivePeerDependencies:
       - msw
 
