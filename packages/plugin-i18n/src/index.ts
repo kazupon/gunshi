@@ -36,7 +36,7 @@
 import { plugin } from '@gunshi/plugin'
 import {
   ARG_PREFIX_AND_KEY_SEPARATOR,
-  BUILT_IN_PREFIX,
+  BUILD_IN_PREFIX_AND_KEY_SEPARATOR,
   COMMON_ARGS,
   DefaultResource,
   ERROR_PREFIX_AND_KEY_SEPARATOR,
@@ -71,8 +71,6 @@ export * from './types.ts'
  * The default locale string, which format is BCP 47 language tag.
  */
 export const DEFAULT_LOCALE = 'en-US'
-
-const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 
 /**
  * i18n plugin
@@ -160,10 +158,10 @@ export default function i18n(
         values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
       ): string {
         const strKey = key as string
-        if (isBuiltinResourceKey(strKey)) {
+        const resource = localeBuiltinResources.get(localeStr)
+        const defaultResource = localeBuiltinResources.get(DEFAULT_LOCALE)!
+        if (isBuiltinResourceKey(strKey, resource, defaultResource)) {
           // handle built-in keys
-          const resource = localeBuiltinResources.get(localeStr)
-          const defaultResource = localeBuiltinResources.get(DEFAULT_LOCALE)!
           return formatResource(resource?.[strKey] ?? defaultResource[strKey], values) || strKey
         } else {
           // handle command-specific keys
@@ -374,9 +372,26 @@ function mapResourceWithBuiltinKey(
   )
 }
 
-function isBuiltinResourceKey(key: string): boolean {
+/**
+ * Whether a key is a built-in key or the key of an error, which the built-in resources translate.
+ *
+ * NOTE(kazupon): a key that starts with `_:` or `err:` is one only when the built-in resources have it.
+ * The keys of the resources of a command start with its name, so those of a command named `_` or `err`,
+ * such as `_:description`, start as these keys do, and are the keys of the command, as
+ * `deploy:description` is a key of `deploy`.
+ *
+ * @param key - The key to translate
+ * @param resources - The built-in resources of the locale and of the default locale
+ * @returns `true` when the key is a built-in key or the key of an error
+ */
+function isBuiltinResourceKey(
+  key: string,
+  ...resources: (Record<string, string> | undefined)[]
+): boolean {
   return (
-    key.codePointAt(0) === BUILT_IN_PREFIX_CODE || key.startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)
+    (key.startsWith(BUILD_IN_PREFIX_AND_KEY_SEPARATOR) ||
+      key.startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)) &&
+    resources.some(resource => resource != null && Object.hasOwn(resource, key))
   )
 }
 

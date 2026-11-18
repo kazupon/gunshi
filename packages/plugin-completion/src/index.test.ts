@@ -421,6 +421,28 @@ describe('the complete command', () => {
     expect(errors).toEqual([])
   })
 
+  test('describes a command whose name looks like a built-in key with its description, with the i18n plugin', async () => {
+    const subCommands = Object.fromEntries(
+      ['_', '_internal', 'err'].map(name => [
+        name,
+        define({ name, description: `The command named ${name}`, run: () => {} })
+      ])
+    )
+
+    await cli(['complete', '--', ''], entry, {
+      subCommands,
+      plugins: [completion(), i18n({ locale: 'en-US' })]
+    })
+
+    expect(output).toEqual([
+      '_\tThe command named _',
+      '_internal\tThe command named _internal',
+      'err\tThe command named err',
+      ':4'
+    ])
+    expect(errors).toEqual([])
+  })
+
   test('reports an unknown shell as an argument error, with the help of the command', async () => {
     await cli(['complete', 'tcsh'], entry, {
       name: 'todo',

@@ -7858,4 +7858,15 @@ describe('a command whose name looks like a built-in key, in the help as JSON', 
     expect(options).toContainEqual(['--name', 'The name'])
     expect(options).toContainEqual(['--help', 'Display this help message'])
   })
+
+  test.each(['_', '_internal', 'err'])(
+    'describes a command named %s with its texts, with the i18n plugin',
+    async name => {
+      const { description, options } = await descriptionsOf(name, [i18n({ locale: 'en-US' })])
+
+      expect(description).toBe(`The command named ${name}`)
+      expect(options).toContainEqual(['--name', 'The name'])
+      expect(options).toContainEqual(['--help', 'Display this help message'])
+    }
+  )
 })

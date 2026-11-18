@@ -217,6 +217,71 @@ describe('extension: translate', () => {
     // test non-existent key
     expect(extension.translate('non-existent-key')).toBe('')
   })
+
+  /**
+   * The keys of the resources of a command start with its name, so those of a command named `_` or
+   * `err` start as the built-in keys and the keys of the errors do, and those of a command named
+   * `_internal` start with `_`. They are the keys of the command unless the built-in resources have them.
+   */
+  describe('a command whose name looks like a built-in key', () => {
+    const args = {
+      foo: {
+        type: 'string',
+        description: 'The foo option'
+      }
+    } satisfies Args
+
+    async function extensionWith(name: string) {
+      const plugin = i18n()
+      const command = defineI18n({
+        name,
+        args,
+        run: () => {},
+        resource: () =>
+          Promise.resolve({
+            description: `Translated ${name}`,
+            'arg:foo': `The translated foo of ${name}`
+          })
+      }) as unknown as Command
+      const ctx = await createCommandContext({ args, command, callMode: 'subCommand' })
+      const extension = await plugin.extension.factory(ctx, command)
+      await extension.loadResource(DEFAULT_LOCALE, ctx, command)
+      return extension
+    }
+
+    test.each(['_', '_internal', 'err'])(
+      'the keys of a command named %s are translated by its resource',
+      async name => {
+        const extension = await extensionWith(name)
+
+        expect(extension.translate(resolveKey('description', name))).toBe(`Translated ${name}`)
+        expect(extension.translate(resolveArgKey('foo', name))).toBe(
+          `The translated foo of ${name}`
+        )
+      }
+    )
+
+    test.each(['_', '_internal', 'err'])(
+      'the built-in keys and the keys of the errors are translated as before with a command named %s',
+      async name => {
+        const extension = await extensionWith(name)
+
+        expect(extension.translate(resolveBuiltInKey('USAGE'))).toBe('USAGE')
+        expect(extension.translate(resolveBuiltInKey('FORMORE'))).toBe(
+          'For more info, run any command with the `--help` flag'
+        )
+        expect(extension.translate('err:arg:required-option', { displayName: "'--id'" })).toBe(
+          "Option '--id' is required"
+        )
+      }
+    )
+
+    test('a key that starts with `_:` and that the built-in resources do not have is not found', async () => {
+      const extension = await extensionWith('main')
+
+      expect(extension.translate('_:NOT_BUILT_IN')).toBe('')
+    })
+  })
 })
 
 describe('extension: registerGlobalOptionResources', () => {

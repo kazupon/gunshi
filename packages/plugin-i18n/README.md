@@ -442,12 +442,9 @@ This section covers important implementation details that can help you better un
 
 ### Translation Return Values
 
-The `translate` function has different behaviors depending on the key type:
+The `translate` function returns an empty string (`''`) when it does not find the key.
 
-- **Custom keys**: Returns an empty string (`''`) if the key is not found
-- **Built-in keys** (internally prefixed with `_:`): Returns the key itself if not found
-
-This difference is important for error handling and fallback displays:
+The built-in keys start with `_:`, such as `_:USAGE` (`resolveBuiltInKey('USAGE')`), and the keys of the errors start with `err:`, such as `err:arg:missing-value`. A key that starts with them is a built-in key only when the built-in resources have it, so the keys of a command named `_` or `err`, such as `_:description`, are the keys of that command, as `deploy:description` is a key of `deploy`.
 
 ```ts
 import { resolveKey, resolveBuiltInKey } from '@gunshi/plugin-i18n'
@@ -457,7 +454,7 @@ const { translate } = ctx.extensions['g:i18n']
 // Custom key not found
 translate(resolveKey('nonexistent_key', ctx.name)) // Returns: ''
 
-// Built-in key not found (if not overridden)
+// Built-in key, in en-US
 translate(resolveBuiltInKey('USAGE')) // Returns: 'USAGE'
 ```
 
