@@ -2806,6 +2806,24 @@ describe('the arguments that a command with passthrough passes on', () => {
     expect(withBlank).toBe(withTrue)
   })
 
+  test('the help of a command with passthrough, with a text and with true', async () => {
+    const withText = await helpOf(
+      define({
+        name: 'exec',
+        description: 'Run a script in an environment of the app',
+        passthrough: 'The arguments for the script',
+        args,
+        run: NOOP
+      })
+    )
+    const withTrue = await helpOf(
+      define({ name: 'exec', description: 'Run a script', passthrough: true, run: NOOP })
+    )
+
+    expect(withText).toMatchSnapshot('with a text')
+    expect(withTrue).toMatchSnapshot('with true')
+  })
+
   test('a command without passthrough is shown as before', async () => {
     const help = await helpOf(define({ name: 'exec', args, run: NOOP }))
 

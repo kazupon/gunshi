@@ -7765,6 +7765,27 @@ describe('passthrough with --json, and in the help as JSON', () => {
     expect(exec.run).not.toHaveBeenCalled()
   })
 
+  test('the help as JSON of a command with passthrough', async () => {
+    const exec = define({
+      name: 'exec',
+      description: 'Run a script in an environment of the app',
+      passthrough: 'The arguments for the script',
+      args: {
+        script: { type: 'positional', description: 'The script to run' },
+        env: { type: 'string', short: 'e', description: 'The environment' }
+      },
+      run: vi.fn<() => void>()
+    })
+    const json = await cli(['exec', '--help', '--json'], entry(), {
+      name: 'app',
+      version: '1.0.0',
+      subCommands: { exec },
+      usageSilent: true
+    })
+
+    expect(JSON.parse(json as string)).toMatchSnapshot()
+  })
+
   test('the description of the arguments in the help as JSON is translated, as the description of the command', async () => {
     const exec = {
       name: 'exec',
