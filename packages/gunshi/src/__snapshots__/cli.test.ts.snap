@@ -541,6 +541,75 @@ OPTIONS:
 "
 `;
 
+exports[`passthrough with --json, and in the help as JSON > the help as JSON of a command with passthrough 1`] = `
+{
+  "help": {
+    "arguments": [
+      {
+        "description": "The script to run",
+        "multiple": false,
+        "name": "script",
+        "required": true,
+      },
+    ],
+    "argv": [
+      "app",
+      "exec",
+    ],
+    "command": "app exec",
+    "commands": [],
+    "deprecated": null,
+    "description": "Run a script in an environment of the app",
+    "json": false,
+    "options": [
+      {
+        "choices": null,
+        "default": null,
+        "description": "The environment",
+        "global": false,
+        "multiple": false,
+        "name": "--env",
+        "negatable": false,
+        "required": false,
+        "short": "-e",
+        "type": "string",
+        "value": "<env>",
+      },
+      {
+        "choices": null,
+        "default": null,
+        "description": "Display this help message",
+        "global": true,
+        "multiple": false,
+        "name": "--help",
+        "negatable": false,
+        "required": false,
+        "short": "-h",
+        "type": "boolean",
+        "value": null,
+      },
+      {
+        "choices": null,
+        "default": null,
+        "description": "Display this version",
+        "global": true,
+        "multiple": false,
+        "name": "--version",
+        "negatable": false,
+        "required": false,
+        "short": "-v",
+        "type": "boolean",
+        "value": null,
+      },
+    ],
+    "passthrough": {
+      "description": "The arguments for the script",
+    },
+    "runnable": true,
+  },
+}
+`;
+
 exports[`usageSilent 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 USAGE:

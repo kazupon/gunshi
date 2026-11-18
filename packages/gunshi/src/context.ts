@@ -99,6 +99,10 @@ export interface CommandContextParams<
    */
   rest?: string[]
   /**
+   * The arguments that the target command does not take, for a command with `passthrough`. An empty array if omitted.
+   */
+  passthrough?: string[]
+  /**
    * Original command line arguments
    */
   argv?: string[]
@@ -153,6 +157,7 @@ export async function createCommandContext<
   values = {} as V,
   positionals = [],
   rest = [],
+  passthrough = [],
   argv = [],
   tokens = [],
   command = {} as C,
@@ -230,6 +235,7 @@ export async function createCommandContext<
     values,
     positionals,
     rest,
+    passthrough,
     _: argv,
     tokens,
     toKebab: command.toKebab,

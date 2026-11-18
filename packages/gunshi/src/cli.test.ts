@@ -6305,6 +6305,7 @@ describe('--help and --version with --json', () => {
         runnable: true,
         commands: [],
         arguments: [],
+        passthrough: null,
         options: [
           {
             name: '--json',
@@ -6425,6 +6426,7 @@ describe('--help and --version with --json', () => {
         runnable: true,
         commands: [],
         arguments: [{ name: 'target', description: 'The target', required: true, multiple: false }],
+        passthrough: null,
         options: [
           {
             name: '--env',
@@ -7401,5 +7403,409 @@ describe('deprecated commands and arguments', () => {
     await boneCli(['push', '--format', 'json'], entry, options)
     expect(runDeploy).toHaveBeenCalledOnce()
     expect(stderr()).toBe('')
+  })
+})
+
+describe('passthrough of a command', () => {
+  const entry = () => define({ name: 'app', run: () => {} })
+  const args = {
+    script: { type: 'positional' },
+    env: { type: 'string', short: 'e' },
+    quiet: { type: 'boolean', short: 'q' }
+  } satisfies Args
+
+  interface Seen {
+    passthrough: string[]
+    values: Record<string, unknown>
+    positionals: string[]
+    rest: string[]
+    _: string[]
+  }
+
+  /**
+   * Define `exec`, a command with `passthrough`, which keeps what its context has when it runs.
+   *
+   * @param passthrough - The `passthrough` of the command
+   * @returns The command, and what its context had each time that it ran
+   */
+  function defineExec(passthrough: boolean | string = 'The arguments for other-program') {
+    const seen: Seen[] = []
+    const exec = define({
+      name: 'exec',
+      passthrough,
+      args,
+      run: ctx => {
+        seen.push({
+          passthrough: ctx.passthrough,
+          values: ctx.values,
+          positionals: ctx.positionals,
+          rest: ctx.rest,
+          _: ctx._
+        })
+      }
+    })
+    return { exec, seen }
+  }
+
+  test('gives the arguments that the command does not take in ctx.passthrough, as they are given and in order', async () => {
+    const { exec, seen } = defineExec()
+    const argv = ['exec', 'run.js', '-e', 'prod', '--watch', 'src', '-qk', '--', '--env', 'x']
+
+    await cli(argv, entry(), { name: 'app', subCommands: { exec } })
+
+    expect(seen).toEqual([
+      {
+        passthrough: ['--watch', 'src', '-qk', '--env', 'x'],
+        values: { script: 'run.js', env: 'prod', quiet: true },
+        positionals: ['exec', 'run.js'],
+        rest: ['--env', 'x'],
+        _: argv
+      }
+    ])
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test.each([
+    {
+      label: 'an option with an inline value, and one with the argument that it takes',
+      argv: ['--bail=3', '-u', 'extra'],
+      passthrough: ['--bail=3', '-u', 'extra']
+    },
+    {
+      label: 'a group with an option of the command that takes the next argument',
+      argv: ['-ke', 'prod'],
+      passthrough: ['-ke'],
+      env: 'prod'
+    },
+    {
+      label: 'the no- form of an option that is not negatable, with the argument that it takes',
+      argv: ['-e=stage', '--no-quiet', 'x'],
+      passthrough: ['--no-quiet', 'x'],
+      env: 'stage'
+    },
+    {
+      label: 'the positional arguments that the command does not take',
+      argv: ['a', 'b'],
+      passthrough: ['a', 'b']
+    },
+    {
+      label: 'the help of the other program, after --',
+      argv: ['--watch', '--', '--help'],
+      passthrough: ['--watch', '--help']
+    },
+    { label: 'nothing', argv: [], passthrough: [] }
+  ])('gives $label', async ({ argv, passthrough, env }) => {
+    const { exec, seen } = defineExec(true)
+
+    await cli(['exec', 'run.js', ...argv], entry(), { name: 'app', subCommands: { exec } })
+
+    expect(seen.map(s => s.passthrough)).toEqual([passthrough])
+    expect(seen[0]?.values.env).toBe(env)
+  })
+
+  test('reports the other errors of the arguments, as before', async () => {
+    const stderr = defineMockErrorLog()
+    const { exec, seen } = defineExec()
+    let codes: unknown[] = []
+
+    // `--verbose` takes `run.js` as its value, so `script` is missing
+    await cli(['exec', '--verbose', 'run.js'], entry(), {
+      name: 'app',
+      subCommands: { exec },
+      onErrorCommand: (_ctx, error) => {
+        codes = (error as AggregateError).errors.map(error => (error as { code?: unknown }).code)
+      }
+    })
+
+    expect(seen).toEqual([])
+    expect(codes).toEqual(['err:arg:required-positional'])
+    expect(stderr()).toBe(
+      "Positional argument 'script' is required" + helpHint(['exec'], { name: 'app' })
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('answers --help of gunshi, and does not run', async () => {
+    const { exec, seen } = defineExec()
+
+    const usage = await cli(['exec', '--help'], entry(), {
+      name: 'app',
+      subCommands: { exec },
+      usageSilent: true
+    })
+
+    expect(seen).toEqual([])
+    expect(usage).toContain('USAGE:')
+  })
+
+  test('a command without passthrough reports an option that it does not declare, and its ctx.passthrough is empty', async () => {
+    const stderr = defineMockErrorLog()
+    const passthroughs: string[][] = []
+    const build = define({
+      name: 'build',
+      run: ctx => {
+        passthroughs.push(ctx.passthrough)
+      }
+    })
+    const options = { name: 'app', subCommands: { build } }
+
+    await cli(['build', '--unknown'], entry(), options)
+    expect(stderr()).toBe('Unknown option: --unknown' + helpHint(['build'], { name: 'app' }))
+    expect(process.exitCode).toBe(1)
+
+    await cli(['build'], entry(), options)
+    await cli(['build', '--unknown', 'x'], entry(), { ...options, strict: false })
+    expect(passthroughs).toEqual([[], []])
+  })
+
+  test('reports no positional argument that the command does not take, with strictPositionals', async () => {
+    const stderr = defineMockErrorLog()
+    const { exec, seen } = defineExec()
+    const build = define({ name: 'build', run: () => {} })
+    const options = { name: 'app', subCommands: { exec, build }, strictPositionals: true }
+
+    await cli(['exec', 'run.js', 'a', 'b'], entry(), options)
+    expect(seen.map(s => s.passthrough)).toEqual([['a', 'b']])
+    expect(stderr()).toBe('')
+
+    await cli(['build', 'a'], entry(), options)
+    expect(stderr()).toBe(
+      'Unexpected positional argument: a' + helpHint(['build'], { name: 'app' })
+    )
+  })
+
+  test('a nested command and the entry command take passthrough too', async () => {
+    const { exec, seen } = defineExec()
+    const tools = define({ name: 'tools', subCommands: { exec } })
+    const passthroughs: string[][] = []
+    const app = define({
+      name: 'app',
+      passthrough: true,
+      args,
+      run: ctx => {
+        passthroughs.push(ctx.passthrough)
+      }
+    })
+
+    await cli(['tools', 'exec', 'run.js', '--watch'], entry(), {
+      name: 'app',
+      subCommands: { tools }
+    })
+    await cli(['run.js', '--watch', 'src'], app)
+
+    expect(seen.map(s => s.passthrough)).toEqual([['--watch']])
+    expect(passthroughs).toEqual([['--watch', 'src']])
+  })
+
+  test('gunshi/bone gives the same ctx.passthrough', async () => {
+    const { exec, seen } = defineExec()
+    const argv = ['exec', 'run.js', '-e', 'prod', '--watch', 'src', '-qk', '--', '--env', 'x']
+
+    await boneCli(argv, entry(), { name: 'app', subCommands: { exec } })
+
+    expect(seen.map(s => s.passthrough)).toEqual([['--watch', 'src', '-qk', '--env', 'x']])
+  })
+
+  test('a lazy command takes passthrough from the loaded command, and from the definition given to lazy', async () => {
+    const stderr = defineMockErrorLog()
+    const passthroughs: string[][] = []
+    const run = (ctx: { passthrough: string[] }) => {
+      passthroughs.push(ctx.passthrough)
+    }
+    const subCommands = {
+      loaded: lazy(() => ({ run, passthrough: true }), { name: 'loaded', args }),
+      runner: lazy(() => run, { name: 'runner', args, passthrough: true }),
+      off: lazy(() => ({ run, passthrough: false }), { name: 'off', args, passthrough: true })
+    }
+
+    await cli(['loaded', 'run.js', '--watch'], entry(), { name: 'app', subCommands })
+    await cli(['runner', 'run.js', '--watch'], entry(), { name: 'app', subCommands })
+    await cli(['off', 'run.js', '--watch'], entry(), { name: 'app', subCommands })
+
+    expect(passthroughs).toEqual([['--watch'], ['--watch']])
+    expect(stderr()).toBe('Unknown option: --watch' + helpHint(['off'], { name: 'app' }))
+  })
+
+  test('a lazy command whose loader fails throws its error, and reports no option that it does not declare', async () => {
+    const error = new Error('cannot load')
+    const exec = lazy(
+      () => {
+        throw error
+      },
+      { name: 'exec', args, passthrough: true }
+    )
+
+    await expect(
+      cli(['exec', 'run.js', '--watch'], entry(), { name: 'app', subCommands: { exec } })
+    ).rejects.toBe(error)
+  })
+})
+
+describe('passthrough with --json, and in the help as JSON', () => {
+  const entry = () => define({ name: 'app', run: () => {} })
+  const args = { script: { type: 'positional' } } satisfies Args
+
+  test('passes --json on in a command that does not spread jsonArgs, which runs as without it', async () => {
+    const stderr = defineMockErrorLog()
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const passthroughs: string[][] = []
+    const exec = define({
+      name: 'exec',
+      passthrough: true,
+      args,
+      run: ctx => {
+        passthroughs.push(ctx.passthrough)
+        ctx.log('ran')
+      }
+    })
+
+    await cli(['exec', 'run.js', '--json'], entry(), { name: 'app', subCommands: { exec } })
+
+    expect(passthroughs).toEqual([['--json']])
+    expect(log()).toBe('ran')
+    expect(stderr()).toBe('')
+    expect(process.exitCode).toBeUndefined()
+  })
+
+  test('prints the errors of the arguments as text with --json, as without it', async () => {
+    const stderr = defineMockErrorLog()
+    const exec = define({ name: 'exec', passthrough: true, args, run: () => {} })
+
+    await cli(['exec', '--json'], entry(), { name: 'app', subCommands: { exec } })
+
+    expect(stderr()).toBe(
+      "Positional argument 'script' is required" + helpHint(['exec'], { name: 'app' })
+    )
+    expect(process.exitCode).toBe(1)
+  })
+
+  test('a command without passthrough is stopped with json_not_supported, as before', async () => {
+    const stderr = defineMockErrorLog()
+    const run = vi.fn<() => void>()
+    const build = define({ name: 'build', run })
+
+    await cli(['build', '--json'], entry(), { name: 'app', subCommands: { build } })
+
+    expect(run).not.toHaveBeenCalled()
+    expect(JSON.parse(stderr())).toMatchObject({ reason: 'json_not_supported' })
+  })
+
+  test('a command that spreads jsonArgs prints its result as JSON, and does not pass --json on', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const passthroughs: string[][] = []
+    const status = define({
+      name: 'status',
+      passthrough: true,
+      args: { ...jsonArgs },
+      run: ctx => {
+        passthroughs.push(ctx.passthrough)
+        return { status: 'ok' }
+      }
+    })
+
+    await cli(['status', '--json', '--watch'], entry(), { name: 'app', subCommands: { status } })
+
+    expect(passthroughs).toEqual([['--watch']])
+    expect(JSON.parse(log())).toEqual({ status: 'ok' })
+  })
+
+  test('a command with a json argument of its own takes --json itself, and does not pass it on', async () => {
+    const seen: unknown[] = []
+    const exec = define({
+      name: 'exec',
+      passthrough: true,
+      args: { json: { type: 'boolean' } },
+      run: ctx => {
+        seen.push({ json: ctx.values.json, passthrough: ctx.passthrough })
+      }
+    })
+
+    await cli(['exec', '--json', '--watch'], entry(), { name: 'app', subCommands: { exec } })
+    await cli(['exec', '--json=false'], entry(), { name: 'app', subCommands: { exec } })
+
+    expect(seen).toEqual([
+      { json: true, passthrough: ['--watch'] },
+      { json: false, passthrough: [] }
+    ])
+  })
+
+  test('answers --help and --version with --json as JSON, and the help tells passthrough', async () => {
+    const exec = define({
+      name: 'exec',
+      passthrough: 'The arguments for other-program',
+      run: vi.fn<() => void>()
+    })
+    const run = define({ name: 'run', passthrough: true, run: vi.fn<() => void>() })
+    const blank = define({ name: 'blank', passthrough: '  ', run: vi.fn<() => void>() })
+    const build = define({ name: 'build', run: vi.fn<() => void>() })
+    const silent = {
+      name: 'app',
+      version: '1.0.0',
+      subCommands: { exec, run, blank, build },
+      usageSilent: true
+    }
+    const passthroughOf = (json: string | undefined) =>
+      (JSON.parse(json as string) as { help: { passthrough: unknown } }).help.passthrough
+
+    expect(passthroughOf(await cli(['exec', '--help', '--json'], entry(), silent))).toEqual({
+      description: 'The arguments for other-program'
+    })
+    expect(passthroughOf(await cli(['run', '--json', '--help'], entry(), silent))).toEqual({
+      description: null
+    })
+    expect(passthroughOf(await cli(['blank', '--help', '--json'], entry(), silent))).toEqual({
+      description: null
+    })
+    expect(passthroughOf(await cli(['build', '--help', '--json'], entry(), silent))).toBeNull()
+    // parsed, as it is indented on a terminal
+    const version = (await cli(['exec', '--version', '--json'], entry(), silent)) as string
+    expect(JSON.parse(version)).toEqual({ version: '1.0.0' })
+    expect(exec.run).not.toHaveBeenCalled()
+  })
+
+  test('the help as JSON of a command with passthrough', async () => {
+    const exec = define({
+      name: 'exec',
+      description: 'Run a script in an environment of the app',
+      passthrough: 'The arguments for the script',
+      args: {
+        script: { type: 'positional', description: 'The script to run' },
+        env: { type: 'string', short: 'e', description: 'The environment' }
+      },
+      run: vi.fn<() => void>()
+    })
+    const json = await cli(['exec', '--help', '--json'], entry(), {
+      name: 'app',
+      version: '1.0.0',
+      subCommands: { exec },
+      usageSilent: true
+    })
+
+    expect(JSON.parse(json as string)).toMatchSnapshot()
+  })
+
+  test('the description of the arguments in the help as JSON is translated, as the description of the command', async () => {
+    const exec = {
+      name: 'exec',
+      passthrough: 'The arguments for other-program',
+      resource: () =>
+        Promise.resolve({ description: 'コマンドを動かす', passthrough: 'ほかのプログラムの引数' }),
+      run: () => {}
+    } as unknown as Command
+    const json = await cli(['exec', '--help', '--json'], entry(), {
+      name: 'app',
+      subCommands: { exec },
+      usageSilent: true,
+      plugins: [i18n({ locale: 'ja-JP', builtinResources: { 'ja-JP': jsJPResource } })]
+    })
+
+    expect(JSON.parse(json as string)).toMatchObject({
+      help: {
+        description: 'コマンドを動かす',
+        passthrough: { description: 'ほかのプログラムの引数' }
+      }
+    })
   })
 })

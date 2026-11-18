@@ -45,6 +45,7 @@ describe('resolveLazyCommand', () => {
     internal: true,
     aliases: ['dp'],
     deprecated: 'Use release.',
+    passthrough: 'The arguments for the deployer',
     entry: true,
     rendering: { header: null },
     subCommands: { status: { name: 'status', run } }
@@ -59,6 +60,7 @@ describe('resolveLazyCommand', () => {
     internal: false,
     aliases: ['ld'],
     deprecated: false,
+    passthrough: false,
     entry: false,
     rendering: { usage: null },
     subCommands: { logs: { name: 'logs', run } }
@@ -104,6 +106,7 @@ describe('resolveLazyCommand', () => {
     expect(resolved.internal).toBe(true)
     expect(resolved.aliases).toEqual(['dp'])
     expect(resolved.deprecated).toBe('Use release.')
+    expect(resolved.passthrough).toBe('The arguments for the deployer')
     expect(resolved.entry).toBe(true)
     expect(resolved.rendering).toEqual({ header: null })
     expect(Object.keys(resolved.subCommands || {})).toEqual(['status'])
@@ -126,6 +129,7 @@ describe('resolveLazyCommand', () => {
     expect(resolved.internal).toBe(false)
     expect(resolved.aliases).toEqual(['ld'])
     expect(resolved.deprecated).toBe(false)
+    expect(resolved.passthrough).toBe(false)
     expect(resolved.entry).toBe(false)
     // the whole `rendering` of the loaded command, not a merge with the one of the definition
     expect(resolved.rendering).toEqual({ usage: null })

@@ -242,3 +242,34 @@ EXAMPLES:
   $ test -f bar -b 42 -q quux
 "
 `;
+
+exports[`the arguments that a command with passthrough passes on > the help of a command with passthrough, with a text and with true > with a text 1`] = `
+"app (app)
+Run a script in an environment of the app
+
+USAGE:
+  app exec [OPTIONS] <script> [ARGUMENTS ...]
+
+ARGUMENTS:
+  script                  The script to run
+  ARGUMENTS ...           The arguments for the script
+
+OPTIONS:
+  -e, --env <env>          The environment
+  -h, --help               Display this help message
+  -v, --version            Display this version
+"
+`;
+
+exports[`the arguments that a command with passthrough passes on > the help of a command with passthrough, with a text and with true > with true 1`] = `
+"app (app)
+Run a script
+
+USAGE:
+  app exec [OPTIONS] [ARGUMENTS ...]
+
+OPTIONS:
+  -h, --help             Display this help message
+  -v, --version          Display this version
+"
+`;

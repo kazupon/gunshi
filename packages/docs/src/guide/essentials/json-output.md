@@ -187,7 +187,7 @@ Any other error that the command throws is `command_failed`, even when it has a 
 
 ## Help and Version
 
-With `--json`, `--help` and `--version` print JSON too, so that stdout has the JSON only. They are answered for any command, whether it spreads `jsonArgs` or not, since Gunshi answers them, not the command.
+With `--json`, `--help` and `--version` print JSON too, so that stdout has the JSON only. They are answered for any command, whether it spreads `jsonArgs` or not, a command with `passthrough` included, since Gunshi answers them, not the command.
 
 `--help --json` prints the help as one JSON document, made from the same arguments and translations as the help for people:
 
@@ -214,17 +214,18 @@ $ node cli.js --help --json | jq '.help.options[] | select(.name == "--limit")'
 }
 ```
 
-| Key           | Value                                                                                                                                                                                                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `command`     | The command line of the command, to read, as in `next` of the errors. Without the `name` of `cli()`, it starts with `<COMMAND>`                                                                                                                                           |
-| `argv`        | The arguments of the command line, to run                                                                                                                                                                                                                                 |
-| `description` | The description of the command                                                                                                                                                                                                                                            |
-| `deprecated`  | What the help says when the command, or a group above it, is deprecated: one sentence for each, on a line of its own, such as `push is deprecated. Use deploy.`                                                                                                           |
-| `runnable`    | Whether the command runs by itself, without a sub-command: it has `run`. A command with sub-commands and no `run` prints its usage instead                                                                                                                                |
-| `commands`    | The sub-commands of a command that groups them, as the help lists them: `name` and `description`                                                                                                                                                                          |
-| `arguments`   | The positional arguments, in order: `name`, `description`, `required` and `multiple`                                                                                                                                                                                      |
-| `options`     | The options, the global options included, in the order of the help: the options of the command first, and the global options after them. Each has `name`, `short`, `description`, `type`, `value`, `required`, `multiple`, `default`, `choices`, `negatable` and `global` |
-| `json`        | Whether the command prints its result as JSON with `--json`: it spreads `jsonArgs`                                                                                                                                                                                        |
+| Key           | Value                                                                                                                                                                                                                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `command`     | The command line of the command, to read, as in `next` of the errors. Without the `name` of `cli()`, it starts with `<COMMAND>`                                                                                                                                                            |
+| `argv`        | The arguments of the command line, to run                                                                                                                                                                                                                                                  |
+| `description` | The description of the command                                                                                                                                                                                                                                                             |
+| `deprecated`  | What the help says when the command, or a group above it, is deprecated: one sentence for each, on a line of its own, such as `push is deprecated. Use deploy.`                                                                                                                            |
+| `runnable`    | Whether the command runs by itself, without a sub-command: it has `run`. A command with sub-commands and no `run` prints its usage instead                                                                                                                                                 |
+| `commands`    | The sub-commands of a command that groups them, as the help lists them: `name` and `description`                                                                                                                                                                                           |
+| `arguments`   | The positional arguments, in order: `name`, `description`, `required` and `multiple`                                                                                                                                                                                                       |
+| `passthrough` | Whether the command passes the arguments that it does not take on to another program, with [`passthrough`](./declarative.md#passing-arguments-to-another-program): `description`, the text that the help shows for them, or `null` without one. `null` for a command without `passthrough` |
+| `options`     | The options, the global options included, in the order of the help: the options of the command first, and the global options after them. Each has `name`, `short`, `description`, `type`, `value`, `required`, `multiple`, `default`, `choices`, `negatable` and `global`                  |
+| `json`        | Whether the command prints its result as JSON with `--json`: it spreads `jsonArgs`                                                                                                                                                                                                         |
 
 A value that is not there is `null`, and an empty list is `[]`, so that every key is there. On a terminal, the document is indented.
 
@@ -242,7 +243,9 @@ When the output is already fixed, such as an array that the readers expect, an e
 
 When `--json` is given to a command that does not spread `jsonArgs`, Gunshi stops it before it runs, with `json_not_supported`, so that a program does not take its text for JSON. `--help` and `--version` are still answered, as JSON: see [Help and Version](#help-and-version).
 
-`--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, and a command with it runs. `--json=false` asks for no JSON, and stays an unknown option, unless `strict: false` is given.
+A command with `passthrough` and without a `json` argument passes `--json` on to the other program instead, as the other options that it does not declare: it runs as without `--json`, its errors are printed as text, and `ctx.passthrough` has `--json`. See [Passing Arguments to Another Program](./declarative.md#passing-arguments-to-another-program).
+
+`--json` is not reported as an unknown option, since Gunshi knows what it means: a command without `jsonArgs` gets `json_not_supported`, a command with it runs, and a command with `passthrough` and without a `json` argument passes it on. For a command without a `json` argument, `--json=false` asks for no JSON, and stays an unknown option, unless `strict: false` is given or the command has `passthrough`.
 
 ## Lazy Commands
 

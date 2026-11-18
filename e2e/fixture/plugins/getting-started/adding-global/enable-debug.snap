@@ -57,6 +57,7 @@ Context: [Object: null prototype] {
   values: [Object: null prototype] { debug: true },
   positionals: [],
   rest: [],
+  passthrough: [],
   _: [ '--debug' ],
   tokens: [
     {

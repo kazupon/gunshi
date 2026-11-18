@@ -437,6 +437,23 @@ describe('plugin extensions', () => {
   })
 })
 
+describe('passthrough of the command context', () => {
+  test('is the arguments that are given, and an empty array if omitted', async () => {
+    const given = await createCommandContext({
+      argv: ['exec', 'run.js', '--watch', 'src', '--', 'x'],
+      rest: ['x'],
+      passthrough: ['--watch', 'src', 'x'],
+      command: { name: 'exec', passthrough: true, run: () => {} }
+    })
+    const omitted = await createCommandContext({ command: { name: 'build', run: () => {} } })
+
+    expect(given.passthrough).toEqual(['--watch', 'src', 'x'])
+    expect(given.rest).toEqual(['x'])
+    expect(omitted.passthrough).toEqual([])
+    expect(Object.isFrozen(given.passthrough)).toBe(true)
+  })
+})
+
 describe('CommandContextCore type', () => {
   test('is readonly version of CommandContext', async () => {
     const args = { flag: { type: 'boolean' as const } }
