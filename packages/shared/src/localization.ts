@@ -60,12 +60,23 @@ export function localizable<
       return translate(key, values)
     }
 
+    /**
+     * NOTE(kazupon): a key that starts with `_:` or `err:` is a built-in key or the key of an error only
+     * when the built-in resources have it. The keys of the resources of a command start with its name, so
+     * those of a command named `_` or `err`, such as `_:description`, start as these keys do, and are read
+     * below as the keys of the command.
+     */
     if ((key as string).startsWith(BUILD_IN_PREFIX_AND_KEY_SEPARATOR)) {
       const resKey = (key as string).slice(BUILD_IN_PREFIX_AND_KEY_SEPARATOR.length)
-      return resolveAndFormatResource(resKey, key as string, values)
+      if (Object.hasOwn(DefaultResource, resKey)) {
+        return resolveAndFormatResource(resKey, key as string, values)
+      }
     }
 
-    if ((key as string).startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)) {
+    if (
+      (key as string).startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR) &&
+      Object.hasOwn(DefaultResource, key as string)
+    ) {
       return resolveAndFormatResource(key as string, key as string, values)
     }
 

@@ -2,7 +2,7 @@ import { define } from 'gunshi'
 import { createCommandContext } from 'gunshi/context'
 import { describe, expect, test, vi } from 'vite-plus/test'
 import { localizable } from './localization.ts'
-import { resolveArgKey, resolveBuiltInKey } from './utils.ts'
+import { resolveArgKey, resolveBuiltInKey, resolveKey } from './utils.ts'
 
 import type { Args } from 'gunshi'
 
@@ -113,6 +113,56 @@ describe('without translation function', () => {
     expect(await localize('command1:passthrough')).toEqual('')
     // other keys
     expect(await localize('other_key')).toEqual('other_key')
+  })
+})
+
+/**
+ * The keys of the resources of a command start with its name, so those of a command named `_` or `err`
+ * start as the built-in keys (`_:`) and the keys of the errors (`err:`) do. They are the keys of the
+ * command unless the built-in resources have them.
+ */
+describe('a command whose name looks like a built-in key', () => {
+  async function setupNamed(name: string) {
+    const command = define({
+      name,
+      description: `The command named ${name}`,
+      args,
+      examples: () => `${name} --foo value --no-bar`
+    })
+    const ctx = await createCommandContext({ args: command.args, callMode: 'subCommand', command })
+    return { ctx, command }
+  }
+
+  test.each(['_', 'err'])('reads the keys of a command named %s as its own', async name => {
+    const { ctx, command } = await setupNamed(name)
+    const localize = localizable(ctx, command)
+
+    expect(await localize(resolveKey('description', name))).toEqual('')
+    expect(await localize(resolveKey('examples', name))).toEqual(`${name} --foo value --no-bar`)
+    expect(await localize(resolveKey('passthrough', name))).toEqual('')
+    expect(await localize(resolveArgKey('foo', name))).toEqual('Foo argument description')
+    expect(await localize(resolveArgKey('no-bar', name))).toEqual('Negate --bar')
+  })
+
+  test.each(['_', 'err'])(
+    'reads the built-in keys and the keys of the errors as before in a command named %s',
+    async name => {
+      const { ctx, command } = await setupNamed(name)
+      const localize = localizable(ctx, command)
+
+      expect(await localize(resolveBuiltInKey('USAGE'))).toEqual('USAGE')
+      expect(await localize(resolveBuiltInKey('help'))).toEqual('Display this help message')
+      expect(await localize('err:arg:required-option', { displayName: "'--id'" })).toEqual(
+        "Option '--id' is required"
+      )
+    }
+  )
+
+  test('returns a key that starts with `_:` and that the built-in resources do not have as it is', async () => {
+    const { ctx, command1 } = await setup()
+    const localize = localizable(ctx, command1)
+
+    expect(await localize('_:NOT_BUILT_IN')).toEqual('_:NOT_BUILT_IN')
   })
 })
 
