@@ -518,7 +518,14 @@ Configure plugins based on your environment or user preferences.
 Load plugins conditionally:
 
 ```js
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
+
+const command = define({
+  name: 'hello',
+  run: () => {
+    console.log('Hello!')
+  }
+})
 
 const plugins = []
 
@@ -568,6 +575,10 @@ yarn add @gunshi/bone @gunshi/plugin-global @gunshi/plugin-renderer
 import { cli } from '@gunshi/bone'
 import global from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
+
+const command = () => {
+  console.log('Hello!')
+}
 
 // Only includes plugins you explicitly add
 await cli(process.argv.slice(2), command, {
