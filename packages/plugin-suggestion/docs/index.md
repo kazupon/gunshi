@@ -9,7 +9,6 @@ import { cli } from 'gunshi'
 import { suggestion } from '@gunshi/plugin-suggestion'
 
 await cli(process.argv.slice(2), command, {
-  strict: true,
   plugins: [
     suggestion()
   ]
