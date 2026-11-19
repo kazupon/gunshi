@@ -3,6 +3,10 @@
 Extended command context which provides utilities via global options plugin.
 These utilities are available via `CommandContext.extensions['g:global']`.
 
+The functions that show the version, the header and the usage print with `ctx.log`. So they print
+nothing when `ctx.log` is silenced, with `usageSilent` or when a command that spreads `jsonArgs` is
+asked for JSON with `--json`, and return the text only.
+
 ## Signature
 
 ```ts

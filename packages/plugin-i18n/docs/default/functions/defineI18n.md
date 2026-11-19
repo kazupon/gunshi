@@ -14,7 +14,11 @@ export function defineI18n<
 >(definition: C & { args?: A } & Omit<
       I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>,
       'resource' | 'args'
-    > & { resource?: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }> }): I18nCommandDefinitionResult<{ args: A; extensions: ExtractExtensions<G> }, C>
+    > & {
+      resource?: CommandResourceFetcher<{ args: A; extensions: ExtractExtensions<G> }>
+    } & UnknownKeys<C, I18nCommand<{ args: A; extensions: ExtractExtensions<G> }>> & {
+      args?: UnknownArgKeys<A>
+    }): I18nCommandDefinitionResult<{ args: A; extensions: ExtractExtensions<G> }, C>
 ```
 
 ## Type Parameters
@@ -29,7 +33,7 @@ export function defineI18n<
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `definition` | `C` & { `args`?: `A` } & `Omit`\<[`I18nCommand`](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md)\<{ `args`: `A`; `extensions`: `ExtractExtensions`\<`G`\> }\>, 'resource' \| 'args'\> & { `resource`?: [`CommandResourceFetcher`](/packages/plugin-i18n/docs/default/type-aliases/CommandResourceFetcher.md)\<{ `args`: `A`; `extensions`: `ExtractExtensions`\<`G`\> }\> } | A [command](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md) definition with i18n support |
+| `definition` | `C` & { `args`?: `A` } & `Omit`\<[`I18nCommand`](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md)\<{ `args`: `A`; `extensions`: `ExtractExtensions`\<`G`\> }\>, 'resource' \| 'args'\> & { `resource`?: [`CommandResourceFetcher`](/packages/plugin-i18n/docs/default/type-aliases/CommandResourceFetcher.md)\<{ `args`: `A`; `extensions`: `ExtractExtensions`\<`G`\> }\> } & `UnknownKeys`\<`C`, [`I18nCommand`](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md)\<{ `args`: `A`; `extensions`: `ExtractExtensions`\<`G`\> }\>\> & { `args`?: `UnknownArgKeys`\<`A`\> } | A [command](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md) definition with i18n support |
 
 ## Returns
 
