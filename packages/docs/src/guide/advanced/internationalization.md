@@ -633,6 +633,10 @@ const locale = (() => {
   // Fallback: read locale from environment variables
   const env = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || 'en-US'
   const base = env.split(/[.@]/)[0].replace('_', '-')
+  // C and POSIX are the locale that does not translate
+  if (base === 'C' || base === 'POSIX') {
+    return 'en-US'
+  }
   try {
     // Normalize and validate with Intl.Locale
     return new Intl.Locale(base).toString()
