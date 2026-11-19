@@ -154,8 +154,8 @@ const command = defineI18n({
     // Access the i18n plugin extension via its namespaced ID 'g:i18n'
     // (All Gunshi plugins use the 'g:' prefix to prevent naming conflicts)
     const t = ctx.extensions['g:i18n'].translate
-    console.log(t(resolveKey('greeting', ctx), { name: ctx.values.name }))
-    console.log(t(resolveKey('farewell', ctx)))
+    console.log(t(resolveKey('greeting', ctx.name), { name: ctx.values.name }))
+    console.log(t(resolveKey('farewell', ctx.name)))
   }
 })
 
@@ -476,9 +476,9 @@ const buildCommand = defineI18n({
   },
   run: ctx => {
     const t = ctx.extensions['g:i18n'].translate
-    console.log(t(resolveKey('start', ctx), { mode: ctx.values.mode }))
+    console.log(t(resolveKey('start', ctx.name), { mode: ctx.values.mode }))
     // Build logic here
-    console.log(t(resolveKey('success', ctx)))
+    console.log(t(resolveKey('success', ctx.name)))
   }
 })
 
