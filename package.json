@@ -70,7 +70,7 @@
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitepress-api-references": "catalog:",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   },
   "devEngines": {
     "runtime": [
