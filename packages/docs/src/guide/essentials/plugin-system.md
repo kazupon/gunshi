@@ -180,7 +180,7 @@ await cli(process.argv.slice(2), command, {
 Key benefits:
 
 - The `defineI18n` helper simplifies i18n setup for commands
-- Automatic locale detection from system settings
+- The locale can be a language tag, such as `ja-JP`, or the POSIX locale of `LANG`, such as `ja_JP.UTF-8`
 - Simple interpolation syntax for dynamic values
 - Fallback to default locale when translation is missing
 - Plugin functionality is accessible via `ctx.extensions` in your command runners
