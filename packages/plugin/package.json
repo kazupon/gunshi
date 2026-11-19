@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/plugin",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.11",
   "description": "plugin development kit for gunshi",
   "keywords": [
     "cli",
