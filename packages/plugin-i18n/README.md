@@ -79,7 +79,7 @@ await cli(process.argv.slice(2), command, {
 
 - Type: `string | Intl.Locale`
 - Default: `'en-US'`
-- Description: The locale to use for translations. Can be a BCP 47 language tag string or an `Intl.Locale` object.
+- Description: The locale to use for translations. Can be a BCP 47 language tag string, such as `ja-JP`, an `Intl.Locale` object, or a POSIX locale, such as `ja_JP.UTF-8` of the `LANG` environment variable, which is used as the language tag of its language and territory (`ja-JP`). `C`, `POSIX` and an empty string are the default locale (`en-US`).
 
 ### `builtinResources`
 

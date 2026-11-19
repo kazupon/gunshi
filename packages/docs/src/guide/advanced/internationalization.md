@@ -598,7 +598,7 @@ Bad Nested structure (won't work with `translate('messages.greeting')`):
 
 ## Detecting User Locale
 
-The i18n plugin can automatically detect the user's locale:
+The i18n plugin uses the locale that you give it, and `en-US` without one. Give it the locale of the user, such as from an environment variable:
 
 ```js
 import i18n from '@gunshi/plugin-i18n'
@@ -616,6 +616,8 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
+The locale can also be the POSIX locale of `LANG` as it is, such as `ja_JP.UTF-8`: the plugin uses its language and territory, `ja-JP`, and uses `en-US` for `C` and `POSIX`.
+
 In Node.js v21 and later, you can also detect locale using the navigator API:
 
 <!-- eslint-skip -->
@@ -630,7 +632,7 @@ const locale = (() => {
   }
   // Fallback: read locale from environment variables
   const env = process.env.LC_ALL || process.env.LC_MESSAGES || process.env.LANG || 'en-US'
-  const base = env.split('.')[0].replace('_', '-')
+  const base = env.split(/[.@]/)[0].replace('_', '-')
   try {
     // Normalize and validate with Intl.Locale
     return new Intl.Locale(base).toString()

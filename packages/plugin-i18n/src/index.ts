@@ -220,12 +220,17 @@ export default function i18n(
       ): Promise<boolean> {
         let loaded = false
 
-        const originalResource = await loadCommandResource(toLocale(locale), cmd)
+        /**
+         * NOTE(kazupon): the resources are keyed by the language tag of the locale, since `translate()` looks
+         * them up by that of the locale of the plugin. Both `ja_JP.UTF-8` and `ja-jp` load the resources of `ja-JP`.
+         */
+        const targetLocale = toLocale(locale)
+        const originalResource = await loadCommandResource(targetLocale, cmd)
         if (originalResource) {
           loaded = true
         }
 
-        const localeStr = toLocaleString(locale)
+        const localeStr = toLocaleString(targetLocale)
         const resource = originalResource
           ? await normalizeResource(originalResource, ctx)
           : (Object.create(null) as Record<string, string>)
@@ -319,11 +324,34 @@ export default function i18n(
 }
 
 function toLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
+  /**
+   * NOTE(kazupon): an empty locale, such as an empty `LANG`, is the default locale, as no locale is.
+   * POSIX also says that an empty `LANG` means the default locale.
+   */
   return locale instanceof Intl.Locale
     ? locale
-    : typeof locale === 'string'
-      ? new Intl.Locale(locale)
+    : typeof locale === 'string' && locale !== ''
+      ? new Intl.Locale(fromPosixLocale(locale) ?? locale)
       : new Intl.Locale(DEFAULT_LOCALE)
+}
+
+/**
+ * The language tag of a POSIX locale, such as `ja_JP.UTF-8` of `LANG`, which `Intl.Locale` does not take:
+ * the language and the territory of the locale, without its codeset and its modifier, such as `ja-JP`.
+ * `C` and `POSIX` are the locale that does not translate, so they are the default locale.
+ *
+ * @param locale - A locale
+ * @returns The language tag, or `undefined` for a locale that is not a POSIX one, such as a language tag
+ */
+function fromPosixLocale(locale: string): string | undefined {
+  const [base] = locale.split(/[.@]/)
+  if (base === 'C' || base === 'POSIX') {
+    return DEFAULT_LOCALE
+  }
+  return /^[a-z]{2,3}_(?:[a-z]{2}|\d{3})$/i.test(base) ||
+    (base !== locale && /^[a-z]{2,3}$/i.test(base))
+    ? base.replace('_', '-')
+    : undefined
 }
 
 function toLocaleString(locale: string | Intl.Locale): string {
