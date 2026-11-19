@@ -28,7 +28,7 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `locale` | `string \| Intl.Locale` | A locale to load resources for |
+| `locale` | `string \| Intl.Locale` | A locale to load resources for, which can be a POSIX locale, as the `locale` option of the plugin can |
 | `ctx` | `CommandContext` | A `command context` |
 | `command` | `Command` | A `command` to load resources for |
 
