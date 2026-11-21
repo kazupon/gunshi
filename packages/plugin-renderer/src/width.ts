@@ -12,11 +12,13 @@
  *
  * JavaScript has no `\p{East_Asian_Width=Wide}` escape. Wide columns are those the engine already
  * classifies as Han / Hiragana / Katakana / Hangul or emoji-presentation, plus the fullwidth slice
- * of Halfwidth and Fullwidth Forms. That covers CLI names; the rest of the East Asian Width table
- * is symbols that do not appear there. Unicode updates then come with the runtime.
+ * of Halfwidth and Fullwidth Forms. Katakana is matched by script extensions, which include wide
+ * characters of the Common script such as `ー`, `・`, `、` and `「`. This approximation counts some
+ * wide or fullwidth characters as one column, including `〒`, `㈱` and the ideographic space.
+ * Unicode updates then come with the runtime.
  */
 const WIDE =
-  /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Emoji_Presentation}]/u
+  /[\p{Script=Han}\p{Script=Hiragana}\p{Script_Extensions=Katakana}\p{Script=Hangul}\p{Emoji_Presentation}]/u
 
 const ZERO_WIDTH = /[\p{Default_Ignorable_Code_Point}\p{Mn}]/u
 
@@ -26,9 +28,8 @@ function graphemeWidth(codePoint: number): number {
     return 0
   }
   /**
-   * Halfwidth and Fullwidth Forms: only the fullwidth slices are two columns. The rest of the
-   * block is halfwidth katakana / hangul, which `\p{Script=Katakana}` and `\p{Script=Hangul}`
-   * would otherwise count as wide.
+   * Halfwidth and Fullwidth Forms: only the fullwidth slices are two columns. The halfwidth
+   * Katakana and Hangul forms in this block would otherwise match WIDE.
    */
   if (codePoint >= 0xff00 && codePoint <= 0xffef) {
     if (

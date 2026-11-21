@@ -1976,6 +1976,23 @@ describe('#749 - the columns are aligned by the width a terminal draws', () => {
     expect(new Set(descriptionColumns(usage, 'ARGUMENTS')).size).toEqual(1)
   })
 
+  test('the CLI help lines up when a command contains prolonged sound marks (#960)', async () => {
+    const usage = (await cli(['--help'], define({ name: 'main', description: 'Main', run: NOOP }), {
+      name: 'tool',
+      usageSilent: true,
+      subCommands: {
+        サーバー: define({ name: 'サーバー', description: 'Start the server', run: NOOP }),
+        ビルド: define({ name: 'ビルド', description: 'Build the app', run: NOOP })
+      }
+    }))!
+    const lines = usage.split('\n')
+
+    // サーバー is eight columns wide, so the six-column names need two more spaces.
+    expect(lines).toContain('  サーバー          Start the server')
+    expect(lines).toContain('  ビルド            Build the app')
+    expect(lines).toContain('  [main]            Main')
+  })
+
   test('the options section lines up with a full-width name', async () => {
     const usage = await usageOf({
       出力: { type: 'string', description: 'Output' },
