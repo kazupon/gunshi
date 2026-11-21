@@ -1,0 +1,151 @@
+# Measures the startup of the small CLIs of bench/startup/ with the base and the head of a pull
+# request, both built in this job and run in turns, and writes the results to the summary of the
+# run. On a pull request from a branch of this repository, the `comment` job creates or updates one
+# comment on the pull request. A pull request from a fork has a read-only token, so its results
+# stay in the summary of the run and in the artifact.
+name: Startup Benchmark
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'packages/**'
+      - '!packages/docs/**'
+      - 'bench/startup/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/startup-benchmark.yml'
+  workflow_dispatch:
+    inputs:
+      base:
+        description: The ref to compare the head with. Empty compares the head with itself
+        required: false
+        default: ''
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  measure:
+    name: Measure the startup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read # check out the base and the head
+    steps:
+      - name: Checkout the head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: head
+
+      - name: Checkout the base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.sha || inputs.base || github.sha }}
+          path: base
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: head/package.json
+
+      - name: Setup node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: head/pnpm-lock.yaml
+
+      # the packages only: the docs are not measured
+      - name: Build the base
+        working-directory: base
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --recursive --filter '!@gunshi/docs' build
+
+      - name: Build the head
+        working-directory: head
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --recursive --filter '!@gunshi/docs' build
+
+      - name: Measure
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          bench=head/bench/startup
+          out="$RUNNER_TEMP/startup-benchmark"
+          result="$out/result"
+          mkdir -p "$result"
+          node "$bench/setup.mjs" base "$out/base"
+          node "$bench/setup.mjs" head "$out/head"
+          node "$bench/inspect.mjs" --out "$result/inspect.json" base="$out/base" head="$out/head"
+          base_sha="$(git -C base rev-parse HEAD)"
+          node "$bench/bench.mjs" --base-sha "$base_sha" --head-sha "$HEAD_SHA" \
+            --out "$result/timing.json" base="$out/base" head="$out/head"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          node "$bench/render.mjs" --timing "$result/timing.json" --inspect "$result/inspect.json" \
+            --run-url "$run_url" > "$result/comment.md"
+          cat "$result/comment.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the results
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: startup-benchmark
+          path: ${{ runner.temp }}/startup-benchmark/result/
+          retention-days: 14
+
+  comment:
+    name: Comment on the pull request
+    needs: measure
+    # a pull request from a fork has a read-only token: its results stay in the summary of the run
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write # create or update the comment on the pull request
+    steps:
+      - name: Download the results
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: startup-benchmark
+          path: ${{ runner.temp }}/startup-benchmark
+
+      - name: Create or update the comment
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          COMMENT: ${{ runner.temp }}/startup-benchmark/comment.md
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        with:
+          script: |
+            const fs = require('node:fs')
+            const { owner, repo } = context.repo
+            const issue_number = Number(process.env.PR_NUMBER)
+            const marker = '<!-- gunshi-startup-benchmark -->'
+            const body = fs.readFileSync(process.env.COMMENT, 'utf8')
+            if (!body.startsWith(marker)) {
+              throw new Error('the comment does not start with the marker')
+            }
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100
+            })
+            const previous = comments.find(
+              c => c.user?.login === 'github-actions[bot]' && c.body?.startsWith(marker)
+            )
+            if (previous) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previous.id, body })
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body })
+            }
