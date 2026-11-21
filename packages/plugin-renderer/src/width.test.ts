@@ -18,13 +18,23 @@ describe('displayWidth', () => {
   test.each([
     ['CJK', '配置', 4],
     ['Hangul', '한국어', 6],
-    ['fullwidth latin', 'ＡＢＣ', 6]
+    ['fullwidth latin', 'ＡＢＣ', 6],
+    ['katakana with prolonged sound marks', 'サーバー', 8],
+    ['ideographic comma', '、', 2],
+    ['ideographic full stop', '。', 2],
+    ['left corner bracket', '「', 2],
+    ['katakana middle dot', '・', 2]
   ])('a wide character takes two columns (%s)', (_, value, width) => {
     expect(displayWidth(value)).toEqual(width)
   })
 
   test('halfwidth katakana stays one column', () => {
     expect(displayWidth('ｱｲｳ')).toEqual(3)
+    expect(displayWidth('ｻｰﾊﾞｰ･､｡｢')).toEqual(8)
+  })
+
+  test('the middle dot outside katakana stays one column', () => {
+    expect(displayWidth('·')).toEqual(1)
   })
 
   test('a mix of wide and narrow adds up', () => {
