@@ -19,8 +19,8 @@ import type {
 import type { EntryCommandable, NoInferParams } from './entry-types.ts'
 
 /**
- * Run the command, without the built-in plugins: `--help` and `--version` are unknown options, which make `cli` reject,
- * unless you add the plugins. To have them, use `cli` from `gunshi`.
+ * Run the command, without the built-in plugins: by default, `--help` and `--version` are unknown options, which make
+ * `cli` reject, unless you add the plugins. To have them, use `cli` from `gunshi`.
  *
  * An object written as the entry command is typed by its `args`, as with `define`: `ctx.values` of its `run` are
  * inferred from them, and a key that an argument does not have is an error.
@@ -46,8 +46,8 @@ export async function cli<
 ): Promise<string | undefined>
 
 /**
- * Run the command, without the built-in plugins: `--help` and `--version` are unknown options, which make `cli` reject,
- * unless you add the plugins. To have them, use `cli` from `gunshi`.
+ * Run the command, without the built-in plugins: by default, `--help` and `--version` are unknown options, which make
+ * `cli` reject, unless you add the plugins. To have them, use `cli` from `gunshi`.
  *
  * @typeParam E - An {@linkcode ExtendContext} type to specify the shape of command and cli options.
  *
@@ -66,8 +66,8 @@ export async function cli<
 ): Promise<string | undefined>
 
 /**
- * Run the command, without the built-in plugins: `--help` and `--version` are unknown options, which make `cli` reject,
- * unless you add the plugins. To have them, use `cli` from `gunshi`.
+ * Run the command, without the built-in plugins: by default, `--help` and `--version` are unknown options, which make
+ * `cli` reject, unless you add the plugins. To have them, use `cli` from `gunshi`.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
  *
@@ -83,8 +83,8 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
 ): Promise<string | undefined>
 
 /**
- * Run the command, without the built-in plugins: `--help` and `--version` are unknown options, which make `cli` reject,
- * unless you add the plugins. To have them, use `cli` from `gunshi`.
+ * Run the command, without the built-in plugins: by default, `--help` and `--version` are unknown options, which make
+ * `cli` reject, unless you add the plugins. To have them, use `cli` from `gunshi`.
  *
  * This overload takes a command of another copy of the types of gunshi, such as a command of `@gunshi/definition`,
  * whose types the overloads above cannot compare. `@gunshi/bone` exports no `define`, so a CLI on it defines its
@@ -103,8 +103,8 @@ export async function cli(
 ): Promise<string | undefined>
 
 /**
- * Run the command, without the built-in plugins: `--help` and `--version` are unknown options, which make `cli` reject,
- * unless you add the plugins. To have them, use `cli` from `gunshi`.
+ * Run the command, without the built-in plugins: by default, `--help` and `--version` are unknown options, which make
+ * `cli` reject, unless you add the plugins. To have them, use `cli` from `gunshi`.
  *
  * @typeParam G - A type extending {@linkcode GunshiParams} to specify the shape of command and cli options.
  *
