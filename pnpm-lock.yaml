@@ -444,8 +444,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@intlify/core-base':
-        specifier: 12.0.0-alpha.10
-        version: 12.0.0-alpha.10
+        specifier: 12.0.0-alpha.11
+        version: 12.0.0-alpha.11
       gunshi:
         specifier: workspace:*
         version: link:../gunshi
@@ -1167,20 +1167,20 @@ packages:
   '@iconify/utils@3.1.3':
     resolution: {integrity: sha512-LPKOXPn/zV+zis1oOfGWogaXVpqUybF3ZS6SCZIsz8vg0ivVp9+fVqyYB7xq0aiST/VhUQYGO1qo6uoYSiEJqw==}
 
-  '@intlify/core-base@12.0.0-alpha.10':
-    resolution: {integrity: sha512-4Bwrysd/iXyE8VDBvgbMX1xYq9BtiR45kyqHxLaggvL1OFCTp7urQT4TdGw/6GHyzlQwL+e40FHJilwKwCw9IA==}
+  '@intlify/core-base@12.0.0-alpha.11':
+    resolution: {integrity: sha512-pDQud5VdKAYO2y3p5EpvOSYZlxW57Ed30fG4geJXeZZYiAH2cEdvM+O+HT3F4++bv5kAT7jmY8H39wV6ZbKHfA==}
     engines: {node: '>= 22'}
 
-  '@intlify/devtools-types@12.0.0-alpha.10':
-    resolution: {integrity: sha512-iTtk4ZGFFtbAHZ2K36mC6xVpLvW0euFw2BPKvcfAmYI/zyjsFZzPAFdOq9DITX11zvPZX+mZ8IljLo1ki4l9pg==}
+  '@intlify/devtools-types@12.0.0-alpha.11':
+    resolution: {integrity: sha512-fYNZU8+JMSABfoBCLvioQOL7Vo5XZ6g4H+5CnjML5wFY4GcMDWXA7Ah0t2Cq7Ym9f6Bsy59A8pj+d/e6myCPbQ==}
     engines: {node: '>= 22'}
 
-  '@intlify/message-compiler@12.0.0-alpha.10':
-    resolution: {integrity: sha512-xBEgx662GU3tQ1HljfcGZA+HkqXaeZjPnaPUTAOhsiPnWy1VTRaZGuFzbnPMXRCOxsGviLBc/dNy4kL4v2kXxQ==}
+  '@intlify/message-compiler@12.0.0-alpha.11':
+    resolution: {integrity: sha512-Hbk8DJZxGBUg+I7BbV7RcOeBqOOVQ1xs6vz2fguICLpidY/bkjlIjSCriWQ6Am03x2+z4Nukr6NRP2TA++2D7Q==}
     engines: {node: '>= 22'}
 
-  '@intlify/shared@12.0.0-alpha.10':
-    resolution: {integrity: sha512-X3EJ2Mq0WG1Eq2kiAMRjgikh/CEDinEhAPKg2DiXqOsHoAn87I1eZL3dLAKJOceLpPc/VOyJZk2Qxj4PyP8XCw==}
+  '@intlify/shared@12.0.0-alpha.11':
+    resolution: {integrity: sha512-hOwvi2x0BbABV0MgmPHp+E5hL6y0Q+w4JzpNKAKXSjNuDYwzZgz/C9pfJ+kD98hSAiVjBCcCVHZ0MFnIdUUXtg==}
     engines: {node: '>= 22'}
 
   '@jridgewell/resolve-uri@3.1.2':
@@ -5003,23 +5003,23 @@ snapshots:
       '@iconify/types': 2.0.0
       import-meta-resolve: 4.2.0
 
-  '@intlify/core-base@12.0.0-alpha.10':
+  '@intlify/core-base@12.0.0-alpha.11':
     dependencies:
-      '@intlify/devtools-types': 12.0.0-alpha.10
-      '@intlify/message-compiler': 12.0.0-alpha.10
-      '@intlify/shared': 12.0.0-alpha.10
+      '@intlify/devtools-types': 12.0.0-alpha.11
+      '@intlify/message-compiler': 12.0.0-alpha.11
+      '@intlify/shared': 12.0.0-alpha.11
 
-  '@intlify/devtools-types@12.0.0-alpha.10':
+  '@intlify/devtools-types@12.0.0-alpha.11':
     dependencies:
-      '@intlify/core-base': 12.0.0-alpha.10
-      '@intlify/shared': 12.0.0-alpha.10
+      '@intlify/core-base': 12.0.0-alpha.11
+      '@intlify/shared': 12.0.0-alpha.11
 
-  '@intlify/message-compiler@12.0.0-alpha.10':
+  '@intlify/message-compiler@12.0.0-alpha.11':
     dependencies:
-      '@intlify/shared': 12.0.0-alpha.10
+      '@intlify/shared': 12.0.0-alpha.11
       source-map-js: 1.2.2
 
-  '@intlify/shared@12.0.0-alpha.10': {}
+  '@intlify/shared@12.0.0-alpha.11': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
