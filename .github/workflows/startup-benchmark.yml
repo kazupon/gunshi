@@ -33,7 +33,7 @@ concurrency:
 jobs:
   measure:
     name: Measure the startup
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     permissions:
       contents: read # check out the base and the head
@@ -109,7 +109,7 @@ jobs:
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       pull-requests: write # create or update the comment on the pull request
