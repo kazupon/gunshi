@@ -142,8 +142,9 @@ const second = toConfirm.length > 0 ? measure(toConfirm, confirmRuns) : undefine
 for (const c of toConfirm) {
   const row = rows.find(r => r.id === c.id)
   row.first = { cpu: row.cpu, wall: row.wall }
-  row.cpu = stats(second.samples[c.id], second.baseline, 'cpu')
-  row.wall = stats(second.samples[c.id], second.baseline, 'wall')
+  // over the baseline of the first runs, which the results report
+  row.cpu = stats(second.samples[c.id], first.baseline, 'cpu')
+  row.wall = stats(second.samples[c.id], first.baseline, 'wall')
   // the second runs confirm the change only in the direction that the first runs showed
   row.confirmed = flagged(row.cpu) && Math.sign(row.cpu.delta) === Math.sign(row.first.cpu.delta)
   row.samples = second.samples[c.id]
