@@ -21,9 +21,11 @@ const variants = Object.fromEntries(
 if (positionals.length !== 2 || !variants.base || !variants.head) {
   throw new Error('give the two places, as base=<place> head=<place>')
 }
+// absolute, since each run writes there from its place
 const tmp = values.tmp
-  ? (mkdirSync(values.tmp, { recursive: true }), values.tmp)
+  ? path.resolve(values.tmp)
   : mkdtempSync(path.join(os.tmpdir(), 'startup-bench-'))
+mkdirSync(tmp, { recursive: true })
 const hook = path.join(import.meta.dirname, 'inspect-hook.mjs')
 
 function summarize(data, fixture) {

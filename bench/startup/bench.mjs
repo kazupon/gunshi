@@ -144,7 +144,8 @@ for (const c of toConfirm) {
   row.first = { cpu: row.cpu, wall: row.wall }
   row.cpu = stats(second.samples[c.id], second.baseline, 'cpu')
   row.wall = stats(second.samples[c.id], second.baseline, 'wall')
-  row.confirmed = flagged(row.cpu)
+  // the second runs confirm the change only in the direction that the first runs showed
+  row.confirmed = flagged(row.cpu) && Math.sign(row.cpu.delta) === Math.sign(row.first.cpu.delta)
   row.samples = second.samples[c.id]
 }
 
