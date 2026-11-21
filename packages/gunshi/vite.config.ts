@@ -15,6 +15,19 @@ export default defineConfig({
       './src/agent.ts'
     ],
     outDir: 'lib',
+    // NOTE(kazupon): put the JavaScript that two or more entries use in one shared chunk, so that importing
+    // `gunshi` loads two files, the entry and the shared chunk. Node.js spends time on each module that it loads,
+    // by their number more than by their size, and the default splitting made ten of them. `minShareCount: 2`
+    // keeps the code that only one entry uses in the file of that entry, such as the bundled std-env of
+    // `gunshi/agent`, which reads `process.stdout` when it is loaded. The declarations are left out of the group,
+    // which would otherwise give their shared chunk the name of the JavaScript one, so they are split as before.
+    outputOptions: {
+      codeSplitting: {
+        groups: [
+          { name: 'shared', test: (id: string) => !/\.d\.[cm]?ts$/.test(id), minShareCount: 2 }
+        ]
+      }
+    },
     publint: true,
     fixedExtension: false,
     dts: true,
