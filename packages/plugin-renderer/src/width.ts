@@ -10,9 +10,12 @@
  * written with. The text is walked by grapheme, so that a mark or a joiner is part of the character
  * it belongs to, and each grapheme is measured by the code point it starts with.
  *
- * JavaScript has no `\p{East_Asian_Width=Wide}` escape. Approximate wide columns using Han,
- * Hiragana, Katakana, Hangul, emoji presentation, and fullwidth forms. Katakana script extensions
- * include shared wide characters such as `ー` and `、` whose primary script is Common.
+ * JavaScript has no `\p{East_Asian_Width=Wide}` escape. Wide columns are those the engine already
+ * classifies as Han / Hiragana / Katakana / Hangul or emoji-presentation, plus the fullwidth slice
+ * of Halfwidth and Fullwidth Forms. Katakana is matched by script extensions, which include wide
+ * characters of the Common script such as `ー`, `・`, `、` and `「`. This approximation counts some
+ * wide or fullwidth characters as one column, including `〒`, `㈱` and the ideographic space.
+ * Unicode updates then come with the runtime.
  */
 const WIDE =
   /[\p{Script=Han}\p{Script=Hiragana}\p{Script_Extensions=Katakana}\p{Script=Hangul}\p{Emoji_Presentation}]/u
