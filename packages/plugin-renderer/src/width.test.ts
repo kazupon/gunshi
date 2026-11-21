@@ -1,9 +1,18 @@
-import { describe, expect, test } from 'vite-plus/test'
+import { describe, expect, test, vi } from 'vite-plus/test'
 import { displayWidth, padEndToWidth } from './width.ts'
 
 describe('displayWidth', () => {
   test('ascii is one column per character', () => {
     expect(displayWidth('build')).toEqual(5)
+  })
+
+  test('printable ascii is measured as the segmenter measures it', () => {
+    const printable = Array.from({ length: 0x7f - 0x20 }, (_, i) =>
+      String.fromCodePoint(0x20 + i)
+    ).join('')
+    expect(displayWidth(printable)).toEqual(95)
+    // the wide character leads the string past printable ascii, to the segmenter
+    expect(displayWidth(`配${printable}`)).toEqual(2 + 95)
   })
 
   test.each([
@@ -46,6 +55,27 @@ describe('displayWidth', () => {
 
   test('an empty string is no columns', () => {
     expect(displayWidth('')).toEqual(0)
+  })
+})
+
+describe('the segmenter', () => {
+  test('is made when a string that is not printable ascii is measured first, not on load', async () => {
+    vi.resetModules()
+    const segmenter = vi.spyOn(Intl, 'Segmenter')
+    try {
+      const width = await import('./width.ts')
+      expect(segmenter).not.toHaveBeenCalled()
+
+      expect(width.displayWidth('-n, --name <name>')).toEqual(17)
+      expect(width.padEndToWidth('build', 8)).toEqual('build'.padEnd(8))
+      expect(segmenter).not.toHaveBeenCalled()
+
+      expect(width.displayWidth('[オプション]')).toEqual(12)
+      expect(width.displayWidth('café')).toEqual(4)
+      expect(segmenter).toHaveBeenCalledTimes(1)
+    } finally {
+      segmenter.mockRestore()
+    }
   })
 })
 

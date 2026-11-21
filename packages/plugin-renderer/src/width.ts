@@ -42,7 +42,16 @@ function graphemeWidth(codePoint: number): number {
   return WIDE.test(ch) ? 2 : 1
 }
 
-const segmenter = new Intl.Segmenter()
+/**
+ * NOTE(kazupon): the segmenter is made when a string first needs it, not when the module is loaded.
+ * The first `Intl` service of a process starts ICU, which takes milliseconds on Node.js, and every
+ * run of a CLI loads this module, while only the usage measures strings. The names, the options and
+ * the value symbols of the usage are mostly printable ASCII, where each character is a grapheme of its
+ * own and one column wide, so such a string is measured by its length, and needs no segmenter.
+ */
+let segmenter: Intl.Segmenter | undefined
+
+const PRINTABLE_ASCII = /^[\x20-\x7e]*$/
 
 /**
  * Measure the columns a terminal draws a string in.
@@ -51,6 +60,10 @@ const segmenter = new Intl.Segmenter()
  * @returns The number of columns
  */
 export function displayWidth(value: string): number {
+  if (PRINTABLE_ASCII.test(value)) {
+    return value.length
+  }
+  segmenter ??= new Intl.Segmenter()
   let width = 0
   for (const { segment } of segmenter.segment(value)) {
     width += graphemeWidth(segment.codePointAt(0)!)
