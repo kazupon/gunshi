@@ -1055,6 +1055,50 @@ describe('#768 - plugin-added commands include the entry in top-level help', () 
   })
 })
 
+describe('the order of the commands section', () => {
+  function commandRows(usage: string): string[] {
+    const lines = usage.split('\n')
+    const start = lines.indexOf('COMMANDS:')
+    const end = lines.indexOf('', start)
+    return lines.slice(start + 1, end).map(line => line.trim().split(/\s{2,}/)[0])
+  }
+
+  test('lists the commands by name in the collation of English, not of the default locale', async () => {
+    const localeCompare = vi.spyOn(String.prototype, 'localeCompare')
+    try {
+      const subCommands = Object.fromEntries(
+        ['deploy', 'Build', 'apply', 'b_c', 'check', 'Chat'].map(name => [
+          name,
+          define({ name, description: `Run ${name}`, run: NOOP })
+        ])
+      )
+      const usage = await cli(
+        ['--help'],
+        define({ name: 'main', description: 'Main', run: NOOP }),
+        {
+          name: 'tool',
+          renderHeader: null,
+          usageSilent: true,
+          subCommands
+        }
+      )
+
+      expect(commandRows(usage!)).toEqual([
+        '[main]',
+        'apply',
+        'b_c',
+        'Build',
+        'Chat',
+        'check',
+        'deploy'
+      ])
+      expect(localeCompare).not.toHaveBeenCalled()
+    } finally {
+      localeCompare.mockRestore()
+    }
+  })
+})
+
 describe('#727 - the commands section describes each listed command', () => {
   type TestCommand = Command<GunshiParams<{ args: Args }>>
   type TestLazyCommand = LazyCommand<GunshiParams<{ args: Args }>>
