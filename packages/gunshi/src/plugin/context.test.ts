@@ -7,7 +7,7 @@ import type { Args } from 'args-tokens'
 import type { MockInstance } from 'vite-plus/test'
 import type { GunshiParams } from '../types.ts'
 
-describe('PluginContext#addGlobalOpttion', () => {
+describe('PluginContext#addGlobalOption', () => {
   test('basic', () => {
     const decorators = createDecorators()
     const ctx = createPluginContext(decorators)
