@@ -42,6 +42,12 @@
       "require": "./lib/index.js",
       "default": "./lib/index.js"
     },
+    "./utils": {
+      "types": "./lib/utils.d.ts",
+      "import": "./lib/utils.js",
+      "require": "./lib/utils.js",
+      "default": "./lib/utils.js"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {

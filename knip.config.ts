@@ -15,7 +15,7 @@ export default {
         'src/plugin.ts',
         'src/renderer.ts',
         'src/generator.ts',
-        'src/utils.ts',
+        'src/utils-entry.ts',
         'src/combinators.ts',
         'src/agent.ts',
         'src/constants.ts'
@@ -31,7 +31,7 @@ export default {
       entry: ['src/index.ts']
     },
     'packages/plugin': {
-      entry: ['src/index.ts']
+      entry: ['src/index.ts', 'src/utils.ts']
     },
     'packages/plugin-dryrun': {
       entry: ['src/index.ts']
