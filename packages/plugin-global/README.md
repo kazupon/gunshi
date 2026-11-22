@@ -198,5 +198,5 @@ See the [API References](./docs/index.md)
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-global?style=flat
-[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-global@alpha
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-global
 [install-size-src]: https://pkg-size.dev/badge/install/39632

@@ -82,5 +82,5 @@ About details, See the below official docs sections:
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/definition?style=flat
-[npm-version-href]: https://npmjs.com/package/@gunshi/definition@alpha
+[npm-version-href]: https://npmjs.com/package/@gunshi/definition
 [install-size-src]: https://pkg-size.dev/badge/install/23122
