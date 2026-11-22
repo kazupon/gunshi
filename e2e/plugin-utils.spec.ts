@@ -3,23 +3,38 @@
  *
  * `@gunshi/plugin` builds its entries one by one, so that importing it loads one file: built together, the code that
  * they share goes to a chunk that every CLI with an official plugin loads. These tests run small programs with a load
- * hook of `node:module`, in a place where only `@gunshi/plugin` is installed. Run `pnpm build` first.
+ * hook of `node:module`, in a place where only a copy of what `@gunshi/plugin` publishes is installed: through a
+ * symlink, an import would find the development dependencies of the workspace, `gunshi` among them. Run `pnpm build`
+ * first.
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  writeFileSync
+} from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { afterAll, beforeAll, expect, test } from 'vite-plus/test'
 
-const PACKAGES = path.resolve(import.meta.dirname, '..', 'packages')
-const PLUGIN = path.join(PACKAGES, 'plugin')
+const PLUGIN = path.resolve(import.meta.dirname, '..', 'packages', 'plugin')
 const LIB = path.join(PLUGIN, 'lib')
 const HELPERS = ['getCommandSubCommands', 'isLazyCommand', 'kebabnize', 'resolveLazyCommand']
 
-const HOOK = `import { registerHooks } from 'node:module'
+/**
+ * A load hook that tells on stderr each file of a lib that is loaded, by its name in the lib.
+ *
+ * @param lib - The directory of the lib
+ * @returns The source of the hook
+ */
+const hook = (lib: string) => `import { registerHooks } from 'node:module'
 import { fileURLToPath } from 'node:url'
-const lib = ${JSON.stringify(LIB + path.sep)}
+const lib = ${JSON.stringify(lib + path.sep)}
 registerHooks({
   load(url, context, nextLoad) {
     if (url.startsWith('file:')) {
@@ -39,11 +54,14 @@ beforeAll(() => {
   if (!existsSync(path.join(LIB, 'utils.js'))) {
     throw new Error('packages/plugin/lib/utils.js is not found. Run `pnpm build` first.')
   }
-  dir = mkdtempSync(path.join(os.tmpdir(), 'gunshi-plugin-utils-'))
-  mkdirSync(path.join(dir, 'node_modules', '@gunshi'), { recursive: true })
-  symlinkSync(PLUGIN, path.join(dir, 'node_modules', '@gunshi', 'plugin'))
+  // the real path, as the load hook sees it: the temporary directory of macOS is behind a symlink
+  dir = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'gunshi-plugin-utils-')))
+  const installed = path.join(dir, 'node_modules', '@gunshi', 'plugin')
+  mkdirSync(installed, { recursive: true })
+  cpSync(path.join(PLUGIN, 'package.json'), path.join(installed, 'package.json'))
+  cpSync(LIB, path.join(installed, 'lib'), { recursive: true })
   writeFileSync(path.join(dir, 'package.json'), '{ "type": "module" }\n')
-  writeFileSync(path.join(dir, 'hook.mjs'), HOOK)
+  writeFileSync(path.join(dir, 'hook.mjs'), hook(path.join(installed, 'lib')))
   writeFileSync(
     path.join(dir, 'plugin.mjs'),
     `import { plugin } from '@gunshi/plugin'\nplugin({ id: 'x' })\n`
