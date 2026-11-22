@@ -8,6 +8,12 @@ export default defineConfig({
     publint: true,
     dts: true,
     fixedExtension: false,
+    // NOTE(kazupon): `@gunshi/plugin-i18n` is an optional peer dependency, and the sources import only its types.
+    // Without this, the bundled `.d.ts` keeps an empty `import "@gunshi/plugin-i18n"`, which is a type error with
+    // `skipLibCheck: false` where the plugin is not installed.
+    treeshake: {
+      moduleSideEffects: [{ test: /^@gunshi\/plugin-i18n$/, external: true, sideEffects: false }]
+    },
     deps: {
       neverBundle: ['@gunshi/plugin']
     },

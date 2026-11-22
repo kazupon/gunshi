@@ -754,5 +754,5 @@ See the [API References](./docs/index.md)
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-i18n?style=flat
-[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-i18n@alpha
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-i18n
 [install-size-src]: https://pkg-size.dev/badge/install/67599

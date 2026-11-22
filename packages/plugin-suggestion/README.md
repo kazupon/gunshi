@@ -79,7 +79,7 @@ suggestion({
 
 ## Internationalization
 
-The plugin can be combined with `@gunshi/plugin-i18n`.
+The plugin can be combined with `@gunshi/plugin-i18n`, an optional peer dependency that you install in your project to use it.
 The suggestion hint uses the built-in resource key `err:suggestion:did-you-mean`.
 
 ```ts

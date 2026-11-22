@@ -200,7 +200,7 @@ await cli(process.argv.slice(2), command, {
 
 ### Integration with i18n Plugin
 
-The renderer plugin has an optional dependency on the `@gunshi/plugin-i18n`. When both plugins are used together, all rendered text automatically uses translations:
+The renderer plugin has an optional peer dependency on `@gunshi/plugin-i18n`, so install it in your project to use it. When both plugins are used together, all rendered text automatically uses translations:
 
 ```ts
 import { cli } from 'gunshi'
@@ -265,5 +265,5 @@ See the [API References](./docs/index.md)
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin-renderer?style=flat
-[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-renderer@alpha
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin-renderer
 [install-size-src]: https://pkg-size.dev/badge/install/101075

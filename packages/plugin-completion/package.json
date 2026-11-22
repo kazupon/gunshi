@@ -8,6 +8,7 @@
     "gunshi",
     "plugin"
   ],
+  "homepage": "https://gunshi.dev",
   "bugs": {
     "url": "https://github.com/kazupon/gunshi/issues"
   },
@@ -68,6 +69,11 @@
   },
   "peerDependencies": {
     "@gunshi/plugin-i18n": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@gunshi/plugin-i18n": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">= 22"
