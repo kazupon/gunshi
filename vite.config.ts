@@ -30,7 +30,9 @@ export default defineConfig({
         'packages/shared/src/**/*.ts',
         'packages/resources/src/**/*.ts',
         'packages/plugin-**/src/**/*.ts'
-      ]
+      ],
+      // NOTE(kazupon): the type tests never run, so they would count as uncovered source
+      exclude: ['**/*.test-d.ts']
     }
   },
   lint: defineLintConfig({
