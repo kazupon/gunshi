@@ -9,6 +9,7 @@
     "internationalization",
     "plugin"
   ],
+  "homepage": "https://gunshi.dev",
   "bugs": {
     "url": "https://github.com/kazupon/gunshi/issues"
   },
