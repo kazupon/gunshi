@@ -120,8 +120,8 @@ export function isLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiPa
  *
  * @param cmd - A {@link Commandable} or {@link LazyCommand} to resolve
  * @param name - Optional name of the command, if not provided, it will use the name from the command itself.
- * @param needRunResolving - Whether to run the resolving function of the lazy command.
- * @returns A resolved {@link Command}
+ * @param needRunResolving - Whether to run the loader of a lazy command. It runs on every call, as its result is not kept.
+ * @returns A resolved {@link Command}, which is frozen
  */
 export async function resolveLazyCommand<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   cmd: Commandable<G>,
@@ -224,6 +224,8 @@ export function log(...args: unknown[]): void {
  * Get the sub-commands of a command as a normalized Map.
  *
  * An array of sub-commands is keyed by the names of the commands (`commandName` for a lazy command).
+ * A lazy command gives the sub-commands of its definition. To read the ones that only its loader returns,
+ * resolve it first with {@link resolveLazyCommand} and `needRunResolving`.
  *
  * @param cmd - A command or lazy command
  * @returns A Map of sub-commands, or undefined if the command has no sub-commands.

@@ -116,6 +116,71 @@ import { plugin } from 'gunshi/plugin'
 import { plugin } from '@gunshi/plugin'
 ```
 
+### Walking the Commands of a CLI
+
+A plugin that reads every command of a CLI, for example to write a specification of the CLI, walks them with four helpers. `@gunshi/plugin/utils` exports them, and `gunshi/utils` exports the same four for a plugin that depends on `gunshi`.
+
+| Helper                                                | What it does                                                                                                                 |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `getCommandSubCommands(command)`                      | Returns the sub-commands of a command as a `Map`, whether they are written as an object, an array or a `Map`, or `undefined` |
+| `isLazyCommand(command)`                              | Tells whether a command is a lazy command                                                                                    |
+| `resolveLazyCommand(command, name, needRunResolving)` | Returns the command as a frozen object. With `true`, it runs the loader of a lazy command, and what the loader returns wins  |
+| `kebabnize(name)`                                     | Converts a name to kebab-case, as `toKebab` does                                                                             |
+
+This plugin adds a `commands` command that prints each command with its options:
+
+```ts
+import { plugin } from '@gunshi/plugin'
+import {
+  getCommandSubCommands,
+  isLazyCommand,
+  kebabnize,
+  resolveLazyCommand
+} from '@gunshi/plugin/utils'
+
+import type { Command, LazyCommand } from '@gunshi/plugin'
+
+async function listCommands(
+  commands: Map<string, Command | LazyCommand>,
+  parent = ''
+): Promise<string[]> {
+  const lines: string[] = []
+  for (const [name, command] of commands) {
+    const path = parent ? `${parent} ${name}` : name
+    // load a lazy command, to read what only the loaded command defines
+    const resolved = await resolveLazyCommand(command, name, isLazyCommand(command))
+    const options = Object.keys(resolved.args ?? {}).map(
+      key => `--${resolved.toKebab ? kebabnize(key) : key}`
+    )
+    lines.push([path, ...options].join(' '))
+
+    const subCommands = getCommandSubCommands(resolved)
+    if (subCommands) {
+      lines.push(...(await listCommands(subCommands, path)))
+    }
+  }
+  return lines
+}
+
+export default function commandList() {
+  return plugin({
+    id: 'my:command-list',
+    setup: ctx => {
+      ctx.addCommand('commands', {
+        name: 'commands',
+        description: 'List the commands and their options',
+        run: async cmdCtx => {
+          const lines = await listCommands(cmdCtx.env.subCommands ?? new Map())
+          console.log(lines.join('\n'))
+        }
+      })
+    }
+  })
+}
+```
+
+`resolveLazyCommand()` runs the loader on every call with `true`, so keep the command that it returns rather than resolving the same command again. Without `true`, it does not run the loader, and `getCommandSubCommands()` sees only the sub-commands of the definition that is given to `lazy()`.
+
 ### Factory Function Approach
 
 Create plugins as factory functions to allow configuration at initialization.

@@ -44,7 +44,8 @@ export default defineConfig(
           { path: 'packages/gunshi/src/generator.ts', name: 'generator' },
           { path: 'packages/gunshi/src/renderer.ts', name: 'renderer' },
           { path: 'packages/gunshi/src/combinators.ts', name: 'combinators' },
-          { path: 'packages/gunshi/src/agent.ts', name: 'agent' }
+          { path: 'packages/gunshi/src/agent.ts', name: 'agent' },
+          { path: 'packages/gunshi/src/utils-entry.ts', name: 'utils' }
         ],
         outDir: 'packages/docs/src/api',
         basePath: '/api',
