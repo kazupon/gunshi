@@ -2,18 +2,18 @@ import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
   pack: {
-    entry: [
-      './src/index.ts',
-      './src/bone.ts',
-      './src/definition.ts',
-      './src/context.ts',
-      './src/plugin.ts',
-      './src/renderer.ts',
-      './src/generator.ts',
-      './src/utils.ts',
-      './src/combinators.ts',
-      './src/agent.ts'
-    ],
+    entry: {
+      index: './src/index.ts',
+      bone: './src/bone.ts',
+      definition: './src/definition.ts',
+      context: './src/context.ts',
+      plugin: './src/plugin.ts',
+      renderer: './src/renderer.ts',
+      generator: './src/generator.ts',
+      utils: './src/utils-entry.ts',
+      combinators: './src/combinators.ts',
+      agent: './src/agent.ts'
+    },
     outDir: 'lib',
     // NOTE(kazupon): put the JavaScript that two or more entries use in one shared chunk, so that importing
     // `gunshi` loads two files, the entry and the shared chunk. Node.js spends time on each module that it loads,

@@ -148,6 +148,7 @@ packages/gunshi/src/
 ├── renderer.ts           # Usage/help rendering
 ├── agent.ts              # AI agent detection (`gunshi/agent`)
 ├── utils.ts              # Command utilities (lazy command resolution, sub-command lookup)
+├── utils-entry.ts        # Entry of `gunshi/utils`: the helpers that plugins use to walk the commands
 ├── types.ts              # TypeScript type definitions
 ├── constants.ts          # Constants and defaults
 ├── plugin.ts             # Plugin entry (`gunshi/plugin`)

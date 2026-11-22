@@ -8,7 +8,6 @@ export default defineConfig({
     fixedExtension: false,
     dts: true,
     deps: {
-      alwaysBundle: ['gunshi/utils'],
       // NOTE(kazupon): Inline `args-tokens` types into the bundled `.d.ts` to hide it as a transitive
       // type dependency for consumers. Declarations follow the JS bundling by default (tsdown
       // 0.22.1+), and `args-tokens` is not a dependency, so it is bundled anyway. `deps.dts` states

@@ -15,7 +15,7 @@ export default {
         'src/plugin.ts',
         'src/renderer.ts',
         'src/generator.ts',
-        'src/utils.ts',
+        'src/utils-entry.ts',
         'src/combinators.ts',
         'src/agent.ts',
         'src/constants.ts'

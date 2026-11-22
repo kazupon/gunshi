@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-export * from 'gunshi/utils'
+export * from '../../gunshi/src/utils.ts'
 export * from './constants.ts'
 export * from './deprecation.ts'
 export * from './localization.ts'

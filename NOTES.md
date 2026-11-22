@@ -21,7 +21,7 @@ Verified with: `vp pack` of `vite-plus@1.6.0` (`tsdown@0.23.4` + `rolldown-plugi
 | `gunshi`          | Core implementation (uses `parseArgs` / `resolveArgs` directly) | Yes (`combinators.js`, `core-*.js`, `utils-*.js`) | Yes                  | JS impl included |
 | `bone`            | `export * from 'gunshi/bone'`                                   | Yes (`index.js` contains parser/utils/resolver)   | Yes                  | JS impl included |
 | `combinators`     | `export * from 'gunshi/combinators'`                            | Yes (`index.js` contains combinators)             | Yes                  | JS impl included |
-| `shared`          | `export * from 'gunshi/utils'` + own logic                      | Yes (`index.js` contains utils)                   | Yes                  | JS impl included |
+| `shared`          | `export *` from the source of `gunshi/utils` + own logic        | Yes (`index.js` contains utils)                   | Yes                  | JS impl included |
 | `definition`      | Type-only references from `gunshi/context`                      | No                                                | Yes                  | Types only       |
 | `plugin`          | Type-only references from `gunshi`                              | No                                                | Yes                  | Types only       |
 | `plugin-i18n`     | Type-only references from `gunshi` / `@gunshi/*`                | No                                                | Yes                  | Types only       |

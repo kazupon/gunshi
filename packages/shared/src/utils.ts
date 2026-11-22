@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { create, kebabnize } from 'gunshi/utils'
+import { create, kebabnize } from '../../gunshi/src/utils.ts'
 import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, PLUGIN_PREFIX } from './constants.ts'
 
 import type {
