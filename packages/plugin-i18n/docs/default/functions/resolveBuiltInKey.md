@@ -7,7 +7,7 @@ Built-in keys are prefixed with "_:".
 ## Signature
 
 ```ts
-declare function resolveBuiltInKey<K extends string = CommandBuiltinResourceKeys>(key: K): GenerateNamespacedKey<K>
+export declare function resolveBuiltInKey<K extends string = CommandBuiltinResourceKeys>(key: K): GenerateNamespacedKey<K>
 ```
 
 ## Type Parameters

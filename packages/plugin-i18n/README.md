@@ -27,7 +27,7 @@ bun add @gunshi/plugin-i18n
 
 ```ts
 import { cli } from 'gunshi'
-import i18n, { pluginId as i18nId, defineI18nWithTypes } from '@gunshi/plugin-i18n'
+import i18n, { pluginId as i18nId, defineI18nWithTypes, resolveKey } from '@gunshi/plugin-i18n'
 
 import type { I18nExtension } from '@gunshi/plugin-i18n'
 
@@ -59,12 +59,12 @@ const command = defineI18nWithTypes<{ extensions: { [i18nId]: I18nExtension } }>
   run: ctx => {
     const { name } = ctx.values
     // Use translate function from context
-    console.log(ctx.extensions[i18nId].translate('greeting', { name }))
+    console.log(ctx.extensions[i18nId].translate(resolveKey('greeting', ctx.name), { name }))
   }
 })
 
 // Run CLI with i18n plugin
-await cli(process.argv.slice(2), greetCommand, {
+await cli(process.argv.slice(2), command, {
   plugins: [
     i18n({
       locale: 'en-US' // or use process.env.LANG, navigator.language, etc.
@@ -79,7 +79,7 @@ await cli(process.argv.slice(2), greetCommand, {
 
 - Type: `string | Intl.Locale`
 - Default: `'en-US'`
-- Description: The locale to use for translations. Can be a BCP 47 language tag string or an `Intl.Locale` object.
+- Description: The locale to use for translations. Can be a BCP 47 language tag string, such as `ja-JP`, an `Intl.Locale` object, or a POSIX locale, such as `ja_JP.UTF-8` of the `LANG` environment variable, which is used as the language tag of its language and territory (`ja-JP`). `C`, `POSIX` and an empty string are the default locale (`en-US`).
 
 ### `builtinResources`
 
@@ -442,12 +442,9 @@ This section covers important implementation details that can help you better un
 
 ### Translation Return Values
 
-The `translate` function has different behaviors depending on the key type:
+The `translate` function returns an empty string (`''`) when it does not find the key.
 
-- **Custom keys**: Returns an empty string (`''`) if the key is not found
-- **Built-in keys** (internally prefixed with `_:`): Returns the key itself if not found
-
-This difference is important for error handling and fallback displays:
+The built-in keys start with `_:`, such as `_:USAGE` (`resolveBuiltInKey('USAGE')`), and the keys of the errors start with `err:`, such as `err:arg:missing-value`. A key that starts with them is a built-in key only when the built-in resources have it, so the keys of a command named `_` or `err`, such as `_:description`, are the keys of that command, as `deploy:description` is a key of `deploy`.
 
 ```ts
 import { resolveKey, resolveBuiltInKey } from '@gunshi/plugin-i18n'
@@ -457,7 +454,7 @@ const { translate } = ctx.extensions['g:i18n']
 // Custom key not found
 translate(resolveKey('nonexistent_key', ctx.name)) // Returns: ''
 
-// Built-in key not found (if not overridden)
+// Built-in key, in en-US
 translate(resolveBuiltInKey('USAGE')) // Returns: 'USAGE'
 ```
 
@@ -526,10 +523,10 @@ const resource = {
 }
 // In your command
 const { translate } = ctx.extensions[i18nId]
-translate(resolveKey('welcome'), { name: 'John' }) // "Welcome, John!"
-translate(resolveKey('items_count'), { count: 5 }) // "You have 5 items"
-translate(resolveKey('file_deleted'), { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
-translate(resolveKey('error_message'), { error: 'File not found' }) // "Error: File not found"
+translate(resolveKey('welcome', ctx.name), { name: 'John' }) // "Welcome, John!"
+translate(resolveKey('items_count', ctx.name), { count: 5 }) // "You have 5 items"
+translate(resolveKey('file_deleted', ctx.name), { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
+translate(resolveKey('error_message', ctx.name), { error: 'File not found' }) // "Error: File not found"
 ```
 
 <!-- eslint-disable markdown/no-missing-label-refs -->

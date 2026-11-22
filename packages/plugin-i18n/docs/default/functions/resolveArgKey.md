@@ -8,7 +8,7 @@ If the command name is provided, it will be prefixed with the command name (e.g.
 ## Signature
 
 ```ts
-declare function resolveArgKey<A extends Args = DefaultGunshiParams['args'], K extends string = KeyOfArgs<RemovedIndex<A>>>(key: K, name?: string): string
+export declare function resolveArgKey<A extends Args = DefaultGunshiParams['args'], K extends string = KeyOfArgs<RemovedIndex<A>>>(key: K, name?: string): string
 ```
 
 ## Type Parameters

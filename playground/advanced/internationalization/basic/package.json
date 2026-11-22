@@ -10,5 +10,5 @@
     "@gunshi/resources": "file:../../../../packages/resources",
     "gunshi": "file:../../../../packages/gunshi"
   },
-  "packageManager": "pnpm@12.19.0"
+  "packageManager": "pnpm@12.21.0"
 }

@@ -28,7 +28,7 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `locale` | `string \| Intl.Locale` | A locale to load resources for |
+| `locale` | `string \| Intl.Locale` | A locale to load resources for, which can be a POSIX locale, as the `locale` option of the plugin can |
 | `ctx` | `CommandContext` | A `command context` |
 | `command` | `Command` | A `command` to load resources for |
 
@@ -65,4 +65,4 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
 
 ### translate Returns
 
-`string` — Translated message. If the key is not found: - For custom keys: returns an empty string ('') - For built-in keys (prefixed with '_:'): returns the key itself
+`string` — Translated message, or an empty string (`''`) when the key is not found. A key that starts with `_:` or `err:` is a built-in key only when the built-in resources have it, and any other key, such as `_:description` of a command named `_`, is looked up in the resources of the commands

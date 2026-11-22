@@ -12,11 +12,13 @@
  *
  * JavaScript has no `\p{East_Asian_Width=Wide}` escape. Wide columns are those the engine already
  * classifies as Han / Hiragana / Katakana / Hangul or emoji-presentation, plus the fullwidth slice
- * of Halfwidth and Fullwidth Forms. That covers CLI names; the rest of the East Asian Width table
- * is symbols that do not appear there. Unicode updates then come with the runtime.
+ * of Halfwidth and Fullwidth Forms. Katakana is matched by script extensions, which include wide
+ * characters of the Common script such as `ー`, `・`, `、` and `「`. This approximation counts some
+ * wide or fullwidth characters as one column, including `〒`, `㈱` and the ideographic space.
+ * Unicode updates then come with the runtime.
  */
 const WIDE =
-  /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Emoji_Presentation}]/u
+  /[\p{Script=Han}\p{Script=Hiragana}\p{Script_Extensions=Katakana}\p{Script=Hangul}\p{Emoji_Presentation}]/u
 
 const ZERO_WIDTH = /[\p{Default_Ignorable_Code_Point}\p{Mn}]/u
 
@@ -26,9 +28,8 @@ function graphemeWidth(codePoint: number): number {
     return 0
   }
   /**
-   * Halfwidth and Fullwidth Forms: only the fullwidth slices are two columns. The rest of the
-   * block is halfwidth katakana / hangul, which `\p{Script=Katakana}` and `\p{Script=Hangul}`
-   * would otherwise count as wide.
+   * Halfwidth and Fullwidth Forms: only the fullwidth slices are two columns. The halfwidth
+   * Katakana and Hangul forms in this block would otherwise match WIDE.
    */
   if (codePoint >= 0xff00 && codePoint <= 0xffef) {
     if (
@@ -42,7 +43,16 @@ function graphemeWidth(codePoint: number): number {
   return WIDE.test(ch) ? 2 : 1
 }
 
-const segmenter = new Intl.Segmenter()
+/**
+ * NOTE(kazupon): the segmenter is made when a string first needs it, not when the module is loaded.
+ * The first `Intl` service of a process starts ICU, which takes milliseconds on Node.js, and every
+ * run of a CLI loads this module, while only the usage measures strings. The names, the options and
+ * the value symbols of the usage are mostly printable ASCII, where each character is a grapheme of its
+ * own and one column wide, so such a string is measured by its length, and needs no segmenter.
+ */
+let segmenter: Intl.Segmenter | undefined
+
+const PRINTABLE_ASCII = /^[\x20-\x7e]*$/
 
 /**
  * Measure the columns a terminal draws a string in.
@@ -51,6 +61,10 @@ const segmenter = new Intl.Segmenter()
  * @returns The number of columns
  */
 export function displayWidth(value: string): number {
+  if (PRINTABLE_ASCII.test(value)) {
+    return value.length
+  }
+  segmenter ??= new Intl.Segmenter()
   let width = 0
   for (const { segment } of segmenter.segment(value)) {
     width += graphemeWidth(segment.codePointAt(0)!)

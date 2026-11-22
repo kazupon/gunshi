@@ -38,6 +38,7 @@ import {
   resolveLazyCommand
 } from '@gunshi/shared'
 import { renderHeader } from './header.ts'
+import { compareNames } from './order.ts'
 import { recordContextCommand, recordRunner } from './runner.ts'
 import { pluginId as id } from './types.ts'
 import { renderUsage } from './usage.ts'
@@ -139,7 +140,7 @@ export default function renderer(): PluginWithExtension<UsageRendererExtension> 
 
           // then sort by name
           if (a.name && b.name) {
-            return a.name.localeCompare(b.name)
+            return compareNames(a.name, b.name)
           }
 
           // handle cases where one or both names are missing

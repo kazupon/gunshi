@@ -53,9 +53,9 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
    *
    * @param key - Translation key
    * @param values - Values to interpolate
-   * @returns Translated message. If the key is not found:
-   *   - For custom keys: returns an empty string ('')
-   *   - For built-in keys (prefixed with '_:'): returns the key itself
+   * @returns Translated message, or an empty string (`''`) when the key is not found. A key that starts
+   *   with `_:` or `err:` is a built-in key only when the built-in resources have it, and any other key,
+   *   such as `_:description` of a command named `_`, is looked up in the resources of the commands
    */
   translate: <
     A extends Args = G['args'],
@@ -69,7 +69,7 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
   /**
    * Load command resources.
    *
-   * @param locale - A locale to load resources for
+   * @param locale - A locale to load resources for, which can be a POSIX locale, as the `locale` option of the plugin can
    * @param ctx - A {@linkcode CommandContext | command context}
    * @param command - A {@linkcode Command | command} to load resources for
    * @returns Whether the resources were loaded successfully
@@ -93,7 +93,9 @@ export interface I18nExtension<G extends GunshiParams<any> = DefaultGunshiParams
  */
 export interface I18nPluginOptions {
   /**
-   * Locale to use for translations
+   * Locale to use for translations: a BCP 47 language tag, such as `ja-JP`, an `Intl.Locale`, or a POSIX locale,
+   * such as `ja_JP.UTF-8` of `LANG`, which is used as the language tag of its language and territory, `ja-JP`.
+   * `C`, `POSIX` and an empty string are the default locale, `en-US`
    */
   locale?: string | Intl.Locale
   /**

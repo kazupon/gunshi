@@ -7,7 +7,7 @@ Non-built-in keys are not prefixed with any special characters. If the command n
 ## Signature
 
 ```ts
-declare function resolveKey<T extends Record<string, string> = {}, K extends string = keyof T extends string ? keyof T : string>(key: K, name?: string): string
+export declare function resolveKey<T extends Record<string, string> = {}, K extends string = keyof T extends string ? keyof T : string>(key: K, name?: string): string
 ```
 
 ## Type Parameters

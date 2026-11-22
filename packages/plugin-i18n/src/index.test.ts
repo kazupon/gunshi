@@ -52,6 +52,89 @@ describe('extension: locale', () => {
 
     expect(extension.locale.toString()).toBe('ja-JP')
   })
+
+  test.each([
+    ['ja_JP.UTF-8', 'ja-JP'],
+    ['en_US.utf8', 'en-US'],
+    ['de_DE@euro', 'de-DE'],
+    ['sr_RS.UTF-8@latin', 'sr-RS'],
+    ['es_419.UTF-8', 'es-419'],
+    ['ja_JP', 'ja-JP'],
+    ['ja.UTF-8', 'ja']
+  ])(
+    'a POSIX locale, such as that of LANG, is the language tag of its language and territory: %s is %s',
+    async (locale, expected) => {
+      const plugin = i18n({ locale })
+      const ctx = await createCommandContext({})
+      const extension = await plugin.extension.factory(ctx, {} as Command)
+
+      expect(extension.locale.toString()).toBe(expected)
+    }
+  )
+
+  test.each(['C', 'C.UTF-8', 'POSIX', ''])('%j is the default locale', async locale => {
+    const plugin = i18n({ locale })
+    const ctx = await createCommandContext({})
+    const extension = await plugin.extension.factory(ctx, {} as Command)
+
+    expect(extension.locale.toString()).toBe(DEFAULT_LOCALE)
+  })
+
+  test.each(['ja', 'ja-JP', 'zh-Hant-TW', 'es-419'])(
+    'a language tag is used as it is: %s',
+    async locale => {
+      const plugin = i18n({ locale })
+      const ctx = await createCommandContext({})
+      const extension = await plugin.extension.factory(ctx, {} as Command)
+
+      expect(extension.locale.toString()).toBe(locale)
+    }
+  )
+
+  test('an Intl.Locale is used as it is', async () => {
+    const locale = new Intl.Locale('ja-JP')
+    const plugin = i18n({ locale })
+    const ctx = await createCommandContext({})
+    const extension = await plugin.extension.factory(ctx, {} as Command)
+
+    expect(extension.locale).toBe(locale)
+  })
+
+  test('a locale that is neither a language tag nor a POSIX locale throws a RangeError', () => {
+    expect(() => i18n({ locale: 'UTF-8' })).toThrow(RangeError)
+  })
+
+  test('a POSIX locale gives the built-in texts and the resource of the command of its language tag', async () => {
+    const jaJPResource = await import('@gunshi/resources/ja-JP', { with: { type: 'json' } }).then(
+      m => m.default || m
+    )
+    const resources: Record<string, CommandResource> = {
+      'ja-JP': { description: 'あいさつする' }
+    }
+    const received: string[] = []
+    let texts: string[] = []
+    const command = defineI18n<{ extensions: Record<PluginId, I18nExtension> }>({
+      name: 'greet',
+      resource: locale => {
+        received.push(locale.toString())
+        return Promise.resolve(resources[locale.toString()])
+      },
+      run: ctx => {
+        const { translate } = ctx.extensions[pluginId]
+        texts = [
+          translate(resolveBuiltInKey('USAGE')),
+          translate(resolveKey('description', ctx.name))
+        ]
+      }
+    })
+
+    await cli([], command, {
+      plugins: [i18n({ locale: 'ja_JP.UTF-8', builtinResources: { 'ja-JP': jaJPResource } })]
+    })
+
+    expect(received).toEqual(['ja-JP'])
+    expect(texts).toEqual(['使い方', 'あいさつする'])
+  })
 })
 
 describe('extension: translate', () => {
@@ -217,6 +300,71 @@ describe('extension: translate', () => {
     // test non-existent key
     expect(extension.translate('non-existent-key')).toBe('')
   })
+
+  /**
+   * The keys of the resources of a command start with its name, so those of a command named `_` or
+   * `err` start as the built-in keys and the keys of the errors do, and those of a command named
+   * `_internal` start with `_`. They are the keys of the command unless the built-in resources have them.
+   */
+  describe('a command whose name looks like a built-in key', () => {
+    const args = {
+      foo: {
+        type: 'string',
+        description: 'The foo option'
+      }
+    } satisfies Args
+
+    async function extensionWith(name: string) {
+      const plugin = i18n()
+      const command = defineI18n({
+        name,
+        args,
+        run: () => {},
+        resource: () =>
+          Promise.resolve({
+            description: `Translated ${name}`,
+            'arg:foo': `The translated foo of ${name}`
+          })
+      }) as unknown as Command
+      const ctx = await createCommandContext({ args, command, callMode: 'subCommand' })
+      const extension = await plugin.extension.factory(ctx, command)
+      await extension.loadResource(DEFAULT_LOCALE, ctx, command)
+      return extension
+    }
+
+    test.each(['_', '_internal', 'err'])(
+      'the keys of a command named %s are translated by its resource',
+      async name => {
+        const extension = await extensionWith(name)
+
+        expect(extension.translate(resolveKey('description', name))).toBe(`Translated ${name}`)
+        expect(extension.translate(resolveArgKey('foo', name))).toBe(
+          `The translated foo of ${name}`
+        )
+      }
+    )
+
+    test.each(['_', '_internal', 'err'])(
+      'the built-in keys and the keys of the errors are translated as before with a command named %s',
+      async name => {
+        const extension = await extensionWith(name)
+
+        expect(extension.translate(resolveBuiltInKey('USAGE'))).toBe('USAGE')
+        expect(extension.translate(resolveBuiltInKey('FORMORE'))).toBe(
+          'For more info, run any command with the `--help` flag'
+        )
+        expect(extension.translate('err:arg:required-option', { displayName: "'--id'" })).toBe(
+          "Option '--id' is required"
+        )
+      }
+    )
+
+    test('a key that starts with `_:` and that the built-in resources do not have is not found', async () => {
+      const extension = await extensionWith('main')
+
+      expect(extension.translate('_:NOT_BUILT_IN')).toBe('')
+    })
+  })
 })
 
 describe('extension: registerGlobalOptionResources', () => {
@@ -322,6 +470,23 @@ describe('extension: loadResource', () => {
 
     expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('ふたつめ')
   })
+
+  test.each(['ja_JP.UTF-8', 'ja-jp'])(
+    'the resource loaded for %s is that of the language tag ja-JP',
+    async locale => {
+      const extension = await createExtension()
+      const command = defineCommand('cmd1', { description: 'これはコマンド1です' })
+      const ctx = await createCommandContext({
+        args: command.args,
+        command,
+        callMode: 'subCommand'
+      })
+
+      await extension.loadResource(locale, ctx, command)
+
+      expect(extension.translate(resolveKey('description', 'cmd1'))).toEqual('これはコマンド1です')
+    }
+  )
 
   test('merge into the resource that the adapter holds', async () => {
     let adapter: TranslationAdapter | undefined

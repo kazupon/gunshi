@@ -56,7 +56,6 @@
  * @license MIT
  */
 
-import { RootCommand } from '@bomb.sh/tab'
 import { ArgsValidationError, ArgsValidationErrorKeys, CommandError, plugin } from '@gunshi/plugin'
 import { namespacedId } from '@gunshi/shared'
 import { COMPLETE_COMMAND_NAME, registerForCompletion } from './registration.ts'
@@ -176,8 +175,11 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
           /**
            * NOTE(kazupon): the completion tree is built here, and only here.
            * Building it for every command run, which is what the `onExtension` hook would do,
-           * costs the whole command tree on runs that never complete anything.
+           * costs the whole command tree on runs that never complete anything. `@bomb.sh/tab` is
+           * imported here too, for the same reason: it loads `node:assert` and the scripts of the
+           * shells when it is loaded.
            */
+          const { RootCommand } = await import('@bomb.sh/tab')
           const t = new RootCommand()
           if (shell === undefined) {
             const args = cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1)

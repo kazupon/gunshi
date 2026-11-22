@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/plugin-dryrun",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.12",
   "description": "dry-run option plugin for gunshi",
   "keywords": [
     "cli",

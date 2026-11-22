@@ -42,6 +42,12 @@ const NOOP_HANDLER = () => {
  * the empty string is skipped when the candidates are listed, while the arity of an option is
  * looked up in every registered command. Registering a hidden option there keeps it out of the
  * candidates without losing its arity.
+ *
+ * This relies on the default lookup of `@bomb.sh/tab`, which looks up the arity of an option in
+ * every registered command. `optionLookupMode`, which 0.0.23 added, looks only in the commands of
+ * the typed path and leaves the holder out, so it is left unset. A fix of
+ * https://github.com/bombshell-dev/tab/issues/153 that scopes the default lookup in the same way
+ * needs another place for these options.
  */
 const HIDDEN_HOLDER_NAME = ''
 

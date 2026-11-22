@@ -150,7 +150,7 @@ The i18n plugin provides translation capabilities through context extensions:
 
 ```ts
 import { define } from 'gunshi'
-import { pluginId as i18nId } from '@gunshi/plugin-i18n'
+import { pluginId as i18nId, resolveKey } from '@gunshi/plugin-i18n'
 
 const command = define({
   run: ctx => {
@@ -161,7 +161,7 @@ const command = define({
       console.log(`Running in ${i18n.locale} locale`)
 
       // Use translation function
-      const message = i18n.translate('welcome')
+      const message = i18n.translate(resolveKey('welcome', ctx.name))
       console.log(message)
     }
   }

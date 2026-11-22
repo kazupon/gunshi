@@ -36,7 +36,7 @@
 import { plugin } from '@gunshi/plugin'
 import {
   ARG_PREFIX_AND_KEY_SEPARATOR,
-  BUILT_IN_PREFIX,
+  BUILD_IN_PREFIX_AND_KEY_SEPARATOR,
   COMMON_ARGS,
   DefaultResource,
   ERROR_PREFIX_AND_KEY_SEPARATOR,
@@ -71,8 +71,6 @@ export * from './types.ts'
  * The default locale string, which format is BCP 47 language tag.
  */
 export const DEFAULT_LOCALE = 'en-US'
-
-const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 
 /**
  * i18n plugin
@@ -160,10 +158,10 @@ export default function i18n(
         values: Record<string, unknown> = Object.create(null) as Record<string, unknown>
       ): string {
         const strKey = key as string
-        if (isBuiltinResourceKey(strKey)) {
+        const resource = localeBuiltinResources.get(localeStr)
+        const defaultResource = localeBuiltinResources.get(DEFAULT_LOCALE)!
+        if (isBuiltinResourceKey(strKey, resource, defaultResource)) {
           // handle built-in keys
-          const resource = localeBuiltinResources.get(localeStr)
-          const defaultResource = localeBuiltinResources.get(DEFAULT_LOCALE)!
           return formatResource(resource?.[strKey] ?? defaultResource[strKey], values) || strKey
         } else {
           // handle command-specific keys
@@ -222,12 +220,17 @@ export default function i18n(
       ): Promise<boolean> {
         let loaded = false
 
-        const originalResource = await loadCommandResource(toLocale(locale), cmd)
+        /**
+         * NOTE(kazupon): the resources are keyed by the language tag of the locale, since `translate()` looks
+         * them up by that of the locale of the plugin. Both `ja_JP.UTF-8` and `ja-jp` load the resources of `ja-JP`.
+         */
+        const targetLocale = toLocale(locale)
+        const originalResource = await loadCommandResource(targetLocale, cmd)
         if (originalResource) {
           loaded = true
         }
 
-        const localeStr = toLocaleString(locale)
+        const localeStr = toLocaleString(targetLocale)
         const resource = originalResource
           ? await normalizeResource(originalResource, ctx)
           : (Object.create(null) as Record<string, string>)
@@ -321,11 +324,34 @@ export default function i18n(
 }
 
 function toLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
+  /**
+   * NOTE(kazupon): an empty locale, such as an empty `LANG`, is the default locale, as no locale is.
+   * POSIX also says that an empty `LANG` means the default locale.
+   */
   return locale instanceof Intl.Locale
     ? locale
-    : typeof locale === 'string'
-      ? new Intl.Locale(locale)
+    : typeof locale === 'string' && locale !== ''
+      ? new Intl.Locale(fromPosixLocale(locale) ?? locale)
       : new Intl.Locale(DEFAULT_LOCALE)
+}
+
+/**
+ * The language tag of a POSIX locale, such as `ja_JP.UTF-8` of `LANG`, which `Intl.Locale` does not take:
+ * the language and the territory of the locale, without its codeset and its modifier, such as `ja-JP`.
+ * `C` and `POSIX` are the locale that does not translate, so they are the default locale.
+ *
+ * @param locale - A locale
+ * @returns The language tag, or `undefined` for a locale that is not a POSIX one, such as a language tag
+ */
+function fromPosixLocale(locale: string): string | undefined {
+  const [base] = locale.split(/[.@]/)
+  if (base === 'C' || base === 'POSIX') {
+    return DEFAULT_LOCALE
+  }
+  return /^[a-z]{2,3}_(?:[a-z]{2}|\d{3})$/i.test(base) ||
+    (base !== locale && /^[a-z]{2,3}$/i.test(base))
+    ? base.replace('_', '-')
+    : undefined
 }
 
 function toLocaleString(locale: string | Intl.Locale): string {
@@ -374,9 +400,26 @@ function mapResourceWithBuiltinKey(
   )
 }
 
-function isBuiltinResourceKey(key: string): boolean {
+/**
+ * Whether a key is a built-in key or the key of an error, which the built-in resources translate.
+ *
+ * NOTE(kazupon): a key that starts with `_:` or `err:` is one only when the built-in resources have it.
+ * The keys of the resources of a command start with its name, so those of a command named `_` or `err`,
+ * such as `_:description`, start as these keys do, and are the keys of the command, as
+ * `deploy:description` is a key of `deploy`.
+ *
+ * @param key - The key to translate
+ * @param resources - The built-in resources of the locale and of the default locale
+ * @returns `true` when the key is a built-in key or the key of an error
+ */
+function isBuiltinResourceKey(
+  key: string,
+  ...resources: (Record<string, string> | undefined)[]
+): boolean {
   return (
-    key.codePointAt(0) === BUILT_IN_PREFIX_CODE || key.startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)
+    (key.startsWith(BUILD_IN_PREFIX_AND_KEY_SEPARATOR) ||
+      key.startsWith(ERROR_PREFIX_AND_KEY_SEPARATOR)) &&
+    resources.some(resource => resource != null && Object.hasOwn(resource, key))
   )
 }
 

@@ -5,7 +5,10 @@ Add i18n resource to an existing command
 ## Signature
 
 ```ts
-export function withI18nResource<G extends GunshiParamsConstraint, C extends Command<G>>(command: C, resource: CommandResourceFetcher<G>): WithI18nResourceResult<G, C>
+export function withI18nResource<
+  G extends GunshiParamsConstraint,
+  C extends Command<G> | SubCommandable
+>(command: C & UnknownKeys<C, I18nCommand<G> & SubCommandable>, resource: CommandResourceFetcher<G>): WithI18nResourceResult<G, C>
 ```
 
 ## Type Parameters
@@ -13,18 +16,18 @@ export function withI18nResource<G extends GunshiParamsConstraint, C extends Com
 | Name |
 | --- |
 | `G` *extends* `GunshiParamsConstraint` |
-| `C` *extends* `Command<G>` |
+| `C` *extends* `Command<G> \| SubCommandable` |
 
 ## Parameters
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `command` | `C` | A defined command with `define` function |
+| `command` | `C` & `UnknownKeys`\<`C`, [`I18nCommand`](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md)\<`G`\> & `SubCommandable`\> | A command defined with `define`, or a lazy command defined with `lazy`, which stays a lazy command |
 | `resource` | [`CommandResourceFetcher`](/packages/plugin-i18n/docs/default/type-aliases/CommandResourceFetcher.md)\<`G`\> | A [resource fetcher](/packages/plugin-i18n/docs/default/type-aliases/CommandResourceFetcher.md) for the command |
 
 ## Returns
 
-`WithI18nResourceResult<G, C>` — A [command](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md) with i18n resource support
+`WithI18nResourceResult<G, C>` — A [command](/packages/plugin-i18n/docs/default/interfaces/I18nCommand.md) with i18n resource support, or a lazy command for a lazy command
 
 ## Examples
 
@@ -42,7 +45,7 @@ const myCommand = define({
   }
 })
 
-const i18nCommand = withI18nResource(basicCommand, async locale => {
+const i18nCommand = withI18nResource(myCommand, async locale => {
   const resource = await import(
     `./path/to/resources/test/${locale.toString()}.json`,
     { with: { type: 'json' } }

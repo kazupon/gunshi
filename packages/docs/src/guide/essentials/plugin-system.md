@@ -154,8 +154,8 @@ const command = defineI18n({
     // Access the i18n plugin extension via its namespaced ID 'g:i18n'
     // (All Gunshi plugins use the 'g:' prefix to prevent naming conflicts)
     const t = ctx.extensions['g:i18n'].translate
-    console.log(t(resolveKey('greeting', ctx), { name: ctx.values.name }))
-    console.log(t(resolveKey('farewell', ctx)))
+    console.log(t(resolveKey('greeting', ctx.name), { name: ctx.values.name }))
+    console.log(t(resolveKey('farewell', ctx.name)))
   }
 })
 
@@ -180,7 +180,7 @@ await cli(process.argv.slice(2), command, {
 Key benefits:
 
 - The `defineI18n` helper simplifies i18n setup for commands
-- Automatic locale detection from system settings
+- The locale can be a language tag, such as `ja-JP`, or the POSIX locale of `LANG`, such as `ja_JP.UTF-8`
 - Simple interpolation syntax for dynamic values
 - Fallback to default locale when translation is missing
 - Plugin functionality is accessible via `ctx.extensions` in your command runners
@@ -476,9 +476,9 @@ const buildCommand = defineI18n({
   },
   run: ctx => {
     const t = ctx.extensions['g:i18n'].translate
-    console.log(t(resolveKey('start', ctx), { mode: ctx.values.mode }))
+    console.log(t(resolveKey('start', ctx.name), { mode: ctx.values.mode }))
     // Build logic here
-    console.log(t(resolveKey('success', ctx)))
+    console.log(t(resolveKey('success', ctx.name)))
   }
 })
 
@@ -518,7 +518,14 @@ Configure plugins based on your environment or user preferences.
 Load plugins conditionally:
 
 ```js
-import { cli } from 'gunshi'
+import { cli, define } from 'gunshi'
+
+const command = define({
+  name: 'hello',
+  run: () => {
+    console.log('Hello!')
+  }
+})
 
 const plugins = []
 
@@ -568,6 +575,10 @@ yarn add @gunshi/bone @gunshi/plugin-global @gunshi/plugin-renderer
 import { cli } from '@gunshi/bone'
 import global from '@gunshi/plugin-global'
 import renderer from '@gunshi/plugin-renderer'
+
+const command = () => {
+  console.log('Hello!')
+}
 
 // Only includes plugins you explicitly add
 await cli(process.argv.slice(2), command, {

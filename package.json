@@ -1,6 +1,6 @@
 {
   "name": "gunshi-monorepo",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.12",
   "private": true,
   "description": "Monorepo for gunshi - JavaScript command-line library, your strategist for CLIs that people and AI agents use",
   "bugs": {
@@ -70,7 +70,7 @@
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitepress-api-references": "catalog:",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   },
   "devEngines": {
     "runtime": [
@@ -89,5 +89,5 @@
   "engines": {
     "node": ">= 22"
   },
-  "packageManager": "pnpm@12.19.0"
+  "packageManager": "pnpm@12.21.0"
 }
