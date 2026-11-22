@@ -13,6 +13,7 @@
     "llms",
     "option"
   ],
+  "homepage": "https://gunshi.dev",
   "license": "MIT",
   "author": {
     "name": "kazuya kawaguchi",
