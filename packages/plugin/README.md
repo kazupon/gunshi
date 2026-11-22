@@ -5,7 +5,7 @@
 
 > plugin development kit for gunshi
 
-This package provides comprehensive APIs and TypeScript type definitions for creating plugins for gunshi, a modern JavaScript command-line library.
+This package provides comprehensive APIs and TypeScript type definitions for creating plugins for gunshi, a JavaScript command-line library, your strategist for CLIs that people and AI agents use.
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
