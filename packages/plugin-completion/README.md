@@ -314,7 +314,7 @@ completion({
 
 ### Internationalization Support
 
-When used with `@gunshi/plugin-i18n`, completion descriptions are automatically localized:
+When used with `@gunshi/plugin-i18n`, completion descriptions are automatically localized. It is an optional peer dependency, so install it in your project to use it:
 
 ```ts
 import completion from '@gunshi/plugin-completion'
