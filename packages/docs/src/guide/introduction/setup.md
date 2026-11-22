@@ -85,4 +85,4 @@ Gunshi requires:
   - **Node.js**: v22 or later
   - **Bun**: v1.1 or later
 - **ES Modules**: `"type": "module"` in `package.json`
-- **TypeScript**: Version 5.0 or higher (if using TypeScript)
+- **TypeScript**: Version 5.4 or higher (if using TypeScript)
