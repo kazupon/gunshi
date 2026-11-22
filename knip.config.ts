@@ -31,7 +31,7 @@ export default {
       entry: ['src/index.ts']
     },
     'packages/plugin': {
-      entry: ['src/index.ts']
+      entry: ['src/index.ts', 'src/utils.ts']
     },
     'packages/plugin-dryrun': {
       entry: ['src/index.ts']

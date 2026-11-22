@@ -80,6 +80,7 @@ The repository contains the following packages:
 - **`packages/plugin/`** - Plugin development kit (`@gunshi/plugin`)
   - Type definitions and APIs for creating plugins
   - Same exports as `gunshi/plugin` but with smaller footprint
+  - `@gunshi/plugin/utils`: the same helpers as `gunshi/utils`, to walk the commands of a CLI
   - Published to: npm
 
 ### Support Packages
