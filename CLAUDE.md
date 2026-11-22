@@ -80,6 +80,7 @@ The repository contains the following packages:
 - **`packages/plugin/`** - Plugin development kit (`@gunshi/plugin`)
   - Type definitions and APIs for creating plugins
   - Same exports as `gunshi/plugin` but with smaller footprint
+  - `@gunshi/plugin/utils`: the same helpers as `gunshi/utils`, to walk the commands of a CLI
   - Published to: npm
 
 ### Support Packages
@@ -148,6 +149,7 @@ packages/gunshi/src/
 ├── renderer.ts           # Usage/help rendering
 ├── agent.ts              # AI agent detection (`gunshi/agent`)
 ├── utils.ts              # Command utilities (lazy command resolution, sub-command lookup)
+├── utils-entry.ts        # Entry of `gunshi/utils`: the helpers that plugins use to walk the commands
 ├── types.ts              # TypeScript type definitions
 ├── constants.ts          # Constants and defaults
 ├── plugin.ts             # Plugin entry (`gunshi/plugin`)
