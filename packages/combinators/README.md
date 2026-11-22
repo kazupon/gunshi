@@ -95,5 +95,5 @@ About details, See the below official docs sections:
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/combinators?style=flat
-[npm-version-href]: https://npmjs.com/package/@gunshi/combinators@alpha
+[npm-version-href]: https://npmjs.com/package/@gunshi/combinators
 [install-size-src]: https://pkg-size.dev/badge/install/23122

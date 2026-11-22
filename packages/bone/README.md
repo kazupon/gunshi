@@ -69,5 +69,5 @@ await cli(process.argv.slice(2), entry, {
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/bone?style=flat
-[npm-version-href]: https://npmjs.com/package/@gunshi/bone@alpha
+[npm-version-href]: https://npmjs.com/package/@gunshi/bone
 [install-size-src]: https://pkg-size.dev/badge/install/57026

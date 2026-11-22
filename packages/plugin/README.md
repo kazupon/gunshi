@@ -24,5 +24,5 @@ About details, See [the plugin development guides](https://gunshi.dev/guide/plug
 <!-- Badges -->
 
 [npm-version-src]: https://img.shields.io/npm/v/@gunshi/plugin?style=flat
-[npm-version-href]: https://npmjs.com/package/@gunshi/plugin@alpha
+[npm-version-href]: https://npmjs.com/package/@gunshi/plugin
 [install-size-src]: https://pkg-size.dev/badge/install/27672
