@@ -1,5 +1,4 @@
-// NOTE: Uncomment below when enabling the release banner
-// import { readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -114,9 +113,8 @@ export default defineConfig(
         ],
         ['meta', { property: 'og:image', content: 'https://gunshi.dev/og-image.png' }],
         ['meta', { property: 'og:site_name', content: 'Gunshi' }],
-        ['meta', { property: 'og:url', content: 'https://gunshi.dev/' }]
-        // NOTE: Uncomment below to show a release banner
-        // ['script', {}, readFileSync(path.resolve(__dirname, './banner.js'), 'utf8')]
+        ['meta', { property: 'og:url', content: 'https://gunshi.dev/' }],
+        ['script', {}, readFileSync(path.resolve(__dirname, './banner.js'), 'utf8')]
       ],
 
       themeConfig: {
