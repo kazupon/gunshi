@@ -2,364 +2,370 @@ import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import i18n from '@gunshi/plugin-i18n'
 import { cli, define } from 'gunshi'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test'
-import { runCommand } from '../../../scripts/utils.ts'
 import completion from './index.ts'
 
-const SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/basic.node.ts complete --`
+type Env = Record<string, string>
+
+// runs an example in this process, as `<example> complete -- ...args` would, and returns what it
+// prints to stdout. The modules are loaded again for each run, like in a new process.
+async function runExample(load: () => Promise<unknown>, args: string[], env: Env): Promise<string> {
+  const argv = process.argv
+  const lines: string[] = []
+  const log = vi.spyOn(console, 'log').mockImplementation((...values: unknown[]) => {
+    lines.push(values.map(value => String(value)).join(' '))
+  })
+  for (const [name, value] of Object.entries(env)) {
+    vi.stubEnv(name, value)
+  }
+  process.argv = ['node', 'example', 'complete', '--', ...args]
+  vi.resetModules()
+
+  let exitCode: typeof process.exitCode
+  try {
+    await load()
+  } finally {
+    exitCode = process.exitCode
+    process.exitCode = undefined
+    process.argv = argv
+    vi.unstubAllEnvs()
+    log.mockRestore()
+  }
+
+  // a process that fails has no output to compare
+  expect(exitCode ?? 0).toBe(0)
+  return lines.map(line => `${line}\n`).join('')
+}
+
+function defineRunner(load: () => Promise<unknown>, defaultEnv: Env = {}) {
+  return (args: string[] = [], env: Env = {}) => runExample(load, args, { ...defaultEnv, ...env })
+}
+
+const JA_JP = { MY_LOCALE: 'ja-JP' }
+
+const runBasic = defineRunner(() => import('../examples/basic.node.ts'))
+const runNoSubCommands = defineRunner(() => import('../examples/no-subcommands.node.ts'))
+const runNested = defineRunner(() => import('../examples/nested.node.ts'))
+const runEntrySubCommands = defineRunner(() => import('../examples/entry-subcommands.node.ts'))
+const runNestedI18n = defineRunner(() => import('../examples/nested-i18n.node.ts'), JA_JP)
+const runI18n = defineRunner(() => import('../examples/i18n.node.ts'), JA_JP)
 
 test('no input', async () => {
-  const output = await runCommand(`${SCRIPT}`)
+  const output = await runBasic()
   expect(output).toMatchSnapshot()
 })
 
 describe('default command', () => {
   test('suggest for inputting', async () => {
-    const output = await runCommand(`${SCRIPT} --`)
+    const output = await runBasic(['--'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for long option', async () => {
-    const output = await runCommand(`${SCRIPT} --config`)
+    const output = await runBasic(['--config'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest duplicate options', async () => {
-    const output = await runCommand(`${SCRIPT} --config vite.config.js --`)
+    const output = await runBasic(['--config', 'vite.config.js', '--'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest value if option values correctly', async () => {
-    const output = await runCommand(`${SCRIPT} --config vite.config`)
+    const output = await runBasic(['--config', 'vite.config'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for short option', async () => {
-    const output = await runCommand(`${SCRIPT} -c `)
+    const output = await runBasic(['-c'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest duplicate options for short option', async () => {
-    const output = await runCommand(`${SCRIPT} -c vite.config.js --`)
+    const output = await runBasic(['-c', 'vite.config.js', '--'])
     expect(output).toMatchSnapshot()
   })
 })
 
 describe('subcommand', () => {
   test('suggest for command only', async () => {
-    const output = await runCommand(`${SCRIPT} dev`)
+    const output = await runBasic(['dev'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for option inputting', async () => {
-    const output = await runCommand(`${SCRIPT} dev --`)
+    const output = await runBasic(['dev', '--'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for long option', async () => {
-    const output = await runCommand(`${SCRIPT} dev --port`)
+    const output = await runBasic(['dev', '--port'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for short option', async () => {
-    const output = await runCommand(`${SCRIPT} dev -H`)
+    const output = await runBasic(['dev', '-H'])
     expect(output).toMatchSnapshot()
   })
 
   test('not handle if unknown option', async () => {
-    const output = await runCommand(`${SCRIPT} dev --unknown`)
+    const output = await runBasic(['dev', '--unknown'])
     expect(output).toMatchSnapshot()
   })
 
   test('resolve value if long option and value', async () => {
-    const output = await runCommand(`${SCRIPT} dev --port=3`)
+    const output = await runBasic(['dev', '--port=3'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest if user ends with space after `--port`', async () => {
-    const output = await runCommand(`${SCRIPT} dev --port ""`)
+    const output = await runBasic(['dev', '--port', ''])
     expect(output).toMatchSnapshot()
   })
 
   test(`keep suggesting the --port option if user typed partial but didn't end with space`, async () => {
-    const output = await runCommand(`${SCRIPT} dev --po`)
+    const output = await runBasic(['dev', '--po'])
     expect(output).toMatchSnapshot()
   })
 
   test("user typed `--port=` and hasn't typed a space or value yet", async () => {
-    const output = await runCommand(`${SCRIPT} dev --port=`)
+    const output = await runBasic(['dev', '--port='])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest short option with equals sign', async () => {
-    const output = await runCommand(`${SCRIPT} dev -p=3`)
+    const output = await runBasic(['dev', '-p=3'])
     expect(output).toMatchSnapshot()
   })
 })
 
 describe('positional arguments', () => {
   test('suggest positional arguments when ending with space', async () => {
-    const output = await runCommand(`${SCRIPT} lint ""`)
+    const output = await runBasic(['lint', ''])
     expect(output).toMatchSnapshot()
   })
 
   test('positional arguments when ending with part of the value', async () => {
-    const output = await runCommand(`${SCRIPT} lint ind`)
+    const output = await runBasic(['lint', 'ind'])
     expect(output).toMatchSnapshot()
   })
 
   test('multiple positional argument when ending with space', async () => {
-    const output = await runCommand(`${SCRIPT} lint main.ts ""`, {
-      env: {
-        G_COMPLETION_TEST_MULTIPLE: '1'
-      }
-    })
+    const output = await runBasic(['lint', 'main.ts', ''], { G_COMPLETION_TEST_MULTIPLE: '1' })
     expect(output).toMatchSnapshot()
   })
 })
 
-const NO_SUBCOMMANDS_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/no-subcommands.node.ts complete --`
-
 describe('no sub-commands', () => {
   test('no input', async () => {
-    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT}`)
+    const output = await runNoSubCommands()
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for inputting', async () => {
-    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} --`)
+    const output = await runNoSubCommands(['--'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for long option', async () => {
-    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} --config`)
+    const output = await runNoSubCommands(['--config'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest for short option', async () => {
-    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} -c `)
+    const output = await runNoSubCommands(['-c'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest value if option values correctly', async () => {
-    const output = await runCommand(`${NO_SUBCOMMANDS_SCRIPT} --config prod`)
+    const output = await runNoSubCommands(['--config', 'prod'])
     expect(output).toMatchSnapshot()
   })
 })
 
-const NESTED_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/nested.node.ts complete --`
-
 describe('nested sub-commands', () => {
   test('suggest top-level commands', async () => {
-    const output = await runCommand(`${NESTED_SCRIPT}`)
+    const output = await runNested()
     expect(output).toMatchSnapshot()
   })
 
   test('suggest nested sub-commands for remote', async () => {
-    const output = await runCommand(`${NESTED_SCRIPT} remote`)
+    const output = await runNested(['remote'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest options for nested remote add', async () => {
-    const output = await runCommand(`${NESTED_SCRIPT} remote add --`)
+    const output = await runNested(['remote', 'add', '--'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest option value for remote add --url', async () => {
-    const output = await runCommand(`${NESTED_SCRIPT} remote add --url`)
+    const output = await runNested(['remote', 'add', '--url'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest positional for remote remove', async () => {
-    const output = await runCommand(`${NESTED_SCRIPT} remote remove ""`)
+    const output = await runNested(['remote', 'remove', ''])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest options for top-level status', async () => {
-    const output = await runCommand(`${NESTED_SCRIPT} status --`)
+    const output = await runNested(['status', '--'])
     expect(output).toMatchSnapshot()
   })
 })
 
-const ENTRY_SUBCOMMANDS_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/entry-subcommands.node.ts complete --`
-
 describe('sub-commands on the entry command, given as arrays', () => {
   test('suggest the sub-commands of the entry', async () => {
-    const output = await runCommand(`${ENTRY_SUBCOMMANDS_SCRIPT}`)
+    const output = await runEntrySubCommands()
     expect(output).toMatchSnapshot()
   })
 
   test('suggest the nested sub-commands of an array', async () => {
-    const output = await runCommand(`${ENTRY_SUBCOMMANDS_SCRIPT} remote ""`)
+    const output = await runEntrySubCommands(['remote', ''])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest the options of a sub-command', async () => {
-    const output = await runCommand(`${ENTRY_SUBCOMMANDS_SCRIPT} status --`)
+    const output = await runEntrySubCommands(['status', '--'])
     expect(output).toMatchSnapshot()
   })
 })
 
-const NESTED_I18N_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/nested-i18n.node.ts complete --`
-const NESTED_I18N_ENV = { MY_LOCALE: 'ja-JP' }
-
-function runNestedLocalizedCommand(command: string, env: NodeJS.ProcessEnv = {}) {
-  return runCommand(command, {
-    env: {
-      ...NESTED_I18N_ENV,
-      ...env
-    }
-  })
-}
-
 describe('nested sub-commands with i18n', () => {
   test('suggest top-level commands with localized descriptions', async () => {
-    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT}`)
+    const output = await runNestedI18n()
     expect(output).toMatchSnapshot()
   })
 
   test('suggest nested sub-commands for remote with localized description', async () => {
-    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote`)
+    const output = await runNestedI18n(['remote'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest options for nested remote add with localized description', async () => {
-    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote add --`)
+    const output = await runNestedI18n(['remote', 'add', '--'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest localized option value for remote add --url', async () => {
-    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote add --url`)
+    const output = await runNestedI18n(['remote', 'add', '--url'])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest localized positional for remote remove', async () => {
-    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} remote remove ""`)
+    const output = await runNestedI18n(['remote', 'remove', ''])
     expect(output).toMatchSnapshot()
   })
 
   test('suggest options for top-level status with localized description', async () => {
-    const output = await runNestedLocalizedCommand(`${NESTED_I18N_SCRIPT} status --`)
+    const output = await runNestedI18n(['status', '--'])
     expect(output).toMatchSnapshot()
   })
 })
 
-const LOCALIZABLE_SCRIPT = `pnpm exec tsx packages/plugin-completion/examples/i18n.node.ts complete --`
-const I18N_ENV = { MY_LOCALE: 'ja-JP' }
-
-function runLocalizedCommand(command: string, env: NodeJS.ProcessEnv = {}) {
-  return runCommand(command, {
-    env: {
-      ...I18N_ENV,
-      ...env
-    }
-  })
-}
-
 describe('i18n support', () => {
   test('no input', async () => {
-    const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT}`)
+    const output = await runI18n()
     expect(output).toMatchSnapshot()
   })
 
   describe('default command', () => {
     test('suggest for inputting', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} --`)
+      const output = await runI18n(['--'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for long option', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} --config`)
+      const output = await runI18n(['--config'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest duplicate options', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} --config vite.config.js --`)
+      const output = await runI18n(['--config', 'vite.config.js', '--'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest value if option values correctly', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} --config vite.config`)
+      const output = await runI18n(['--config', 'vite.config'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for short option', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} -c `)
+      const output = await runI18n(['-c'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest duplicate options for short option', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} -c vite.config.js --`)
+      const output = await runI18n(['-c', 'vite.config.js', '--'])
       expect(output).toMatchSnapshot()
     })
   })
 
   describe('subcommand', () => {
     test('suggest for command only', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev`)
+      const output = await runI18n(['dev'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for option inputting', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev --`)
+      const output = await runI18n(['dev', '--'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for long option', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev --port`)
+      const output = await runI18n(['dev', '--port'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest for short option', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev -H`)
+      const output = await runI18n(['dev', '-H'])
       expect(output).toMatchSnapshot()
     })
 
     test('not handle if unknown option', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev --unknown`)
+      const output = await runI18n(['dev', '--unknown'])
       expect(output).toMatchSnapshot()
     })
 
     test('resolve value if long option and value', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev --port=3`)
+      const output = await runI18n(['dev', '--port=3'])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest if user ends with space after `--port`', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev --port ""`)
+      const output = await runI18n(['dev', '--port', ''])
       expect(output).toMatchSnapshot()
     })
 
     test(`keep suggesting the --port option if user typed partial but didn't end with space`, async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev --po`)
+      const output = await runI18n(['dev', '--po'])
       expect(output).toMatchSnapshot()
     })
 
     test("user typed `--port=` and hasn't typed a space or value yet", async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev --port=`)
+      const output = await runI18n(['dev', '--port='])
       expect(output).toMatchSnapshot()
     })
 
     test('suggest short option with equals sign', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} dev -p=3`)
+      const output = await runI18n(['dev', '-p=3'])
       expect(output).toMatchSnapshot()
     })
   })
 
   describe('positional arguments', () => {
     test('suggest positional arguments when ending with space', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} lint ""`)
+      const output = await runI18n(['lint', ''])
       expect(output).toMatchSnapshot()
     })
 
     test('positional arguments when ending with part of the value', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} lint ind`)
+      const output = await runI18n(['lint', 'ind'])
       expect(output).toMatchSnapshot()
     })
 
     test('multiple positional argument when ending with space', async () => {
-      const output = await runLocalizedCommand(`${LOCALIZABLE_SCRIPT} lint main.ts ""`, {
-        G_COMPLETION_TEST_MULTIPLE: '1'
-      })
+      const output = await runI18n(['lint', 'main.ts', ''], { G_COMPLETION_TEST_MULTIPLE: '1' })
       expect(output).toMatchSnapshot()
     })
   })
