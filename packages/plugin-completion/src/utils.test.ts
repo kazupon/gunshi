@@ -61,6 +61,23 @@ describe('quoteExec', () => {
     vi.unstubAllGlobals()
   })
 
+  test.each([
+    { isStandaloneExecutable: true, command: '/opt/bin/bun' },
+    { isStandaloneExecutable: false, command: '/opt/bin/bun /opt/cli.js' }
+  ])(
+    'gives the Bun global to the check (isStandaloneExecutable: $isStandaloneExecutable)',
+    ({ isStandaloneExecutable, command }) => {
+      vi.stubGlobal('Bun', { isStandaloneExecutable })
+      vi.stubGlobal('process', {
+        argv: ['/opt/bin/bun', '/opt/cli.js'],
+        execArgv: [],
+        execPath: '/opt/bin/bun'
+      })
+
+      expect(quoteExec()).toBe(command)
+    }
+  )
+
   test('throws on Deno', () => {
     vi.stubGlobal('Deno', {})
 
@@ -100,11 +117,43 @@ describe('resolveBunExecParts', () => {
     ).toEqual(['/usr/local/bin/bun', '--smol', './src/cli.ts'])
   })
 
+  test.each(['bun.native', 'bun-canary', 'runtime'])(
+    'resolves Bun source execution by a launcher named %s',
+    name => {
+      const execPath = `/opt/bun/bin/${name}`
+
+      expect(
+        resolveBunExecParts(createProcess({ argv: [execPath, './src/cli.ts'], execPath }))
+      ).toEqual([execPath, './src/cli.ts'])
+    }
+  )
+
+  test('takes a process with `Bun.isStandaloneExecutable` for a compiled executable', () => {
+    expect(
+      resolveBunExecParts(
+        createProcess({ argv: ['bun', '/another/virtual/root/my-cli'], execPath: '/tmp/my-cli' }),
+        { isStandaloneExecutable: true }
+      )
+    ).toEqual(['/tmp/my-cli'])
+  })
+
+  test('trusts `Bun.isStandaloneExecutable` over the shape of the entry', () => {
+    expect(
+      resolveBunExecParts(
+        createProcess({
+          argv: ['/usr/local/bin/bun', '/$bunfs/root/main.js'],
+          execPath: '/usr/local/bin/bun'
+        }),
+        { isStandaloneExecutable: false }
+      )
+    ).toEqual(['/usr/local/bin/bun', '/$bunfs/root/main.js'])
+  })
+
   test('resolves Bun single binary on Unix', () => {
     expect(
       resolveBunExecParts(
         createProcess({
-          argv: ['/tmp/my-cli'],
+          argv: ['bun', '/$bunfs/root/my-cli'],
           execPath: '/tmp/my-cli'
         })
       )
@@ -115,7 +164,7 @@ describe('resolveBunExecParts', () => {
     expect(
       resolveBunExecParts(
         createProcess({
-          argv: ['C:\\tools\\my-cli.exe'],
+          argv: ['bun', 'B:/~BUN/root/my-cli.exe'],
           execPath: 'C:\\tools\\my-cli.exe'
         })
       )

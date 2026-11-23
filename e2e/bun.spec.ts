@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from 'node:fs/promises'
+import { copyFile, mkdtemp, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { expect, test } from 'vite-plus/test'
@@ -29,12 +29,30 @@ test('bun source completion', async () => {
   const script = await runCommand(`${command} complete zsh`, {
     cwd: ROOT
   })
-  expect(script).include('bun')
+  expect(script).include(`${fixture} complete --`)
 
   const output = await runCommand(`${command} complete -- --config vite.config`, {
     cwd: ROOT
   })
   expect(output).include('vite.config.ts')
+})
+
+test('bun source completion by a launcher with another name', async () => {
+  const fixture = path.resolve(ROOT, 'packages/plugin-completion/examples/basic.node.ts')
+  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'gunshi-completion-bun-'))
+  const launcher = path.join(tmpDir, 'bun.native')
+
+  try {
+    const bun = (await runCommand('bun -p process.execPath', { cwd: ROOT })).trim()
+    await copyFile(bun, launcher)
+
+    const script = await runCommand(`${shellQuote(launcher)} ${shellQuote(fixture)} complete zsh`, {
+      cwd: ROOT
+    })
+    expect(script).include(`${launcher} ${fixture} complete --`)
+  } finally {
+    await rm(tmpDir, { force: true, recursive: true })
+  }
 })
 
 test('bun single binary completion', async () => {
