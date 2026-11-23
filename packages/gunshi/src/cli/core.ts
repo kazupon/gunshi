@@ -902,7 +902,7 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
      * NOTE(kazupon): a name is the key of the translations and the examples of a command and of its row
      * in the help, so two commands cannot share it. The entry would replace the other command here.
      */
-    if (declared !== undefined && !isSameCommand(declared, entry)) {
+    if (declared && isAnotherCommand(declared, entry)) {
       throw new TypeError(
         `Sub-command '${entryName}' has the same name as the entry command: rename one of them`
       )
@@ -914,35 +914,42 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
 }
 
 /**
- * Check whether two commands are one command, such as a command and the copy of it that
- * `withI18nResource()` makes: a copy shares what the command runs and declares. A copy of a lazy command
- * is another function, so two lazy commands that declare the same count as one.
+ * Check whether a command that is declared under a name is certainly another command than the one
+ * that has the name, so that a CLI that works is not rejected for what cannot be told:
  *
- * @param a - A command
- * @param b - Another command
- * @returns `true` if they are one command
+ * - a copy shares what the command runs and declares, such as the one that `withI18nResource()` makes
+ * - a runner declares no name: it goes by the name of its function, which a minifier changes
+ * - a loader, or a lazy command next to a command object, may load that same command
+ * - a command marked as an entry is the entry of another `cli()`, given with its environment
+ *
+ * @param declared - The command that is declared under the name
+ * @param command - The command that has the name
+ * @returns `true` if they are different commands
  */
-function isSameCommand<G extends GunshiParamsConstraint>(
-  a: Command<G> | CommandRunner<G> | LazyCommand<G>,
-  b: Command<G> | CommandRunner<G> | LazyCommand<G>
+function isAnotherCommand<G extends GunshiParamsConstraint>(
+  declared: Command<G> | LazyCommand<G>,
+  command: Command<G> | CommandRunner<G> | LazyCommand<G>
 ): boolean {
-  if (a === b) {
-    return true
+  if (declared === command || declared.entry || typeof declared !== typeof command) {
+    return false
   }
-  if (isLazyCommand<G>(a) && isLazyCommand<G>(b)) {
-    return (
-      a.commandName === b.commandName &&
-      a.description === b.description &&
-      a.args === b.args &&
-      a.subCommands === b.subCommands
-    )
+  if (
+    typeof declared === 'function' &&
+    !(isLazyCommand<G>(declared) && isLazyCommand<G>(command))
+  ) {
+    return false
   }
+  if (typeof declared !== 'function' && typeof declared !== 'object') {
+    return false
+  }
+  const [a, b] = [declared, command] as (Partial<Command<G>> & { commandName?: string })[]
   return (
-    typeof a === 'object' &&
-    typeof b === 'object' &&
-    a.run === b.run &&
-    a.args === b.args &&
-    a.subCommands === b.subCommands
+    a.run !== b.run ||
+    a.commandName !== b.commandName ||
+    a.description !== b.description ||
+    a.args !== b.args ||
+    a.subCommands !== b.subCommands ||
+    a.aliases !== b.aliases
   )
 }
 
@@ -964,7 +971,7 @@ function assertNoChildWithParentName<G extends GunshiParamsConstraint>(
     const command: Command<G> | LazyCommand<G> | undefined = level?.get(name)
     level = command && getCommandSubCommands<G>(command)
     const child = level?.get(name)
-    if (command && child && !isSameCommand(child, command)) {
+    if (command && child && isAnotherCommand(child, command)) {
       throw new TypeError(
         `Sub-command '${name}' has the same name as its parent command: rename one of them`
       )
