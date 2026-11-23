@@ -10,7 +10,7 @@ import {
   parseArgs,
   resolveArgs
 } from 'args-tokens'
-import { ANONYMOUS_COMMAND_NAME, NOOP } from '../constants.ts'
+import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import {
@@ -23,7 +23,6 @@ import {
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
 import {
-  assignCliOptions,
   create,
   getCommandSubCommands,
   isLazyCommand,
@@ -908,14 +907,31 @@ function normalizeCliOptions<G extends GunshiParamsConstraint>(
   // get the latest sub commands from plugin context (already includes entry command)
   const subCommands = new Map(pluginContext.subCommands)
 
+  const resolvedOptions = Object.assign(
+    create<CliOptions<G>>(),
+    CLI_OPTIONS_DEFAULT,
+    options
+  ) as InternalCliOptions<G>
+
+  /**
+   * NOTE(kazupon): an option that is `undefined` counts as not given, and keeps its default, so that
+   * `{ strict: isLegacy ? false : undefined }` leaves `strict` on. Only the options that are given are
+   * looked at, since this runs at every startup.
+   */
+  for (const key in options) {
+    if (options[key as keyof CliOptions<G>] === undefined) {
+      ;(resolvedOptions as Record<string, unknown>)[key] = (
+        CLI_OPTIONS_DEFAULT as Record<string, unknown>
+      )[key]
+    }
+  }
+
   /**
    * NOTE(kazupon): the entry command is part of `subCommands` only when the user passes sub-commands,
    * so it is exposed on its own for the plugins that add commands to a CLI without sub-commands.
    */
-  const resolvedOptions = Object.assign(assignCliOptions(create<CliOptions<G>>(), options), {
-    subCommands,
-    entryCommand
-  }) as InternalCliOptions<G>
+  resolvedOptions.subCommands = subCommands
+  resolvedOptions.entryCommand = entryCommand
 
   // set default renderers if not provided via cli options
   if (resolvedOptions.renderHeader === undefined) {

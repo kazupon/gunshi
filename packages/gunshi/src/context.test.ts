@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vite-plus/test'
 import { hasPrototype } from '../test/utils.ts'
-import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { jsonArgs } from './json.ts'
 
@@ -170,27 +170,6 @@ test('default', async () => {
     renderValidationErrors: undefined
   })
   expect(Object.isFrozen(ctx.explicit)).toEqual(true)
-})
-
-test('an option that is undefined keeps its default', async () => {
-  const cliOptions = Object.fromEntries(
-    Object.keys(CLI_OPTIONS_DEFAULT).map(key => [key, undefined])
-  )
-
-  const ctx = await createCommandContext({ command: { run: vi.fn<() => void>() }, cliOptions })
-
-  expect(ctx.env).toMatchObject({
-    usageSilent: false,
-    leftMargin: 2,
-    middleMargin: 10,
-    usageOptionType: false,
-    usageOptionValue: true,
-    strict: true,
-    strictPositionals: false,
-    helpHint: true,
-    validationErrorExitCode: 1,
-    fallbackToEntry: false
-  })
 })
 
 describe('plugin extensions', () => {

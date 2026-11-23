@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, JSON_ARG } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, JSON_ARG } from './constants.ts'
 
 import type {
   Args,
@@ -209,27 +209,6 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
  */
 export function create<T>(obj: object | null = null): T {
   return Object.create(obj) as T
-}
-
-/**
- * Put the options of `cli()` over the default options, into an object.
- *
- * NOTE(kazupon): an option that is `undefined` counts as not given, and keeps its default, so that
- * `{ strict: isLegacy ? false : undefined }` leaves `strict` on.
- *
- * @param target - The object to put them into
- * @param options - The options
- * @returns The object
- */
-export function assignCliOptions<T extends object>(target: T, options: object): T {
-  Object.assign(target, CLI_OPTIONS_DEFAULT, options)
-  const resolved = target as Record<string, unknown>
-  for (const [key, value] of Object.entries(CLI_OPTIONS_DEFAULT)) {
-    if (resolved[key] === undefined) {
-      resolved[key] = value
-    }
-  }
-  return target
 }
 
 /**

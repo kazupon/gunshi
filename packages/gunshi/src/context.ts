@@ -15,16 +15,9 @@
  * @license MIT
  */
 
-import { ANONYMOUS_COMMAND_NAME, NOOP } from './constants.ts'
+import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { isFailureExitCode } from './error.ts'
-import {
-  assignCliOptions,
-  create,
-  deepFreeze,
-  isLazyCommand,
-  log,
-  resolveJsonRequest
-} from './utils.ts'
+import { create, deepFreeze, isLazyCommand, log, resolveJsonRequest } from './utils.ts'
 
 import type {
   Args,
@@ -188,7 +181,7 @@ export async function createCommandContext<
    * setup the environment
    */
 
-  const env = assignCliOptions(create<CommandEnvironment<G>>(), cliOptions)
+  const env = Object.assign(create<CommandEnvironment<G>>(), CLI_OPTIONS_DEFAULT, cliOptions)
 
   /**
    * NOTE(kazupon): the exit code of the validation errors is an exit code of a failure, as the `exitCode`

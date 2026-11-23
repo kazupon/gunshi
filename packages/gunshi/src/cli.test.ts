@@ -7,6 +7,7 @@ import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockErrorLog, defineMockLog, helpHint } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
+import { CLI_OPTIONS_DEFAULT } from './constants.ts'
 import { define, lazy } from './definition.ts'
 import {
   CommandError,
@@ -2216,6 +2217,26 @@ describe('command lifecycle hooks', () => {
       expect(mockCommand).not.toHaveBeenCalled()
       expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
       expect(process.exitCode).toBe(1)
+    })
+
+    test('keeps every default with options that are `undefined`', async () => {
+      const entry = define({
+        name: 'tool',
+        args: { level: { type: 'number', default: 3, description: 'The level' } },
+        run: vi.fn<() => void>()
+      })
+      const undefinedOptions = Object.fromEntries(
+        Object.keys(CLI_OPTIONS_DEFAULT).map(key => [key, undefined])
+      )
+
+      const usage = await cli(['--help'], entry, { name: 'tool', usageSilent: true })
+      const usageWithUndefined = await cli(['--help'], entry, {
+        ...undefinedOptions,
+        name: 'tool',
+        usageSilent: true
+      })
+
+      expect(usageWithUndefined).toBe(usage)
     })
 
     test('keeps the arguments after -- in rest by default', async () => {
