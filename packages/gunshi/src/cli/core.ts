@@ -1639,10 +1639,13 @@ function createCommandNotFoundError<G extends GunshiParamsConstraint>(
      * NOTE(kazupon): the candidates are what `@gunshi/plugin-suggestion` offers as "Did you mean". An internal
      * command is left out of them, as the help, shell completion and the help as JSON leave it out: it still
      * runs when it is typed, but nothing shows it to the user. So is a deprecated command, whose replacement is
-     * what to offer.
+     * what to offer. So is an entry command without a name, which has no name to type.
      */
     candidates: [...(resolved.parentSubCommands || [])]
-      .filter(([, command]) => !command.internal && !isDeprecated(command.deprecated))
+      .filter(
+        ([name, command]) =>
+          name !== ANONYMOUS_COMMAND_NAME && !command.internal && !isDeprecated(command.deprecated)
+      )
       .map(([name]) => name),
     commandPath: resolved.parentCommandPath || []
   })
