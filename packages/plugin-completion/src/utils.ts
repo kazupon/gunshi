@@ -57,6 +57,18 @@ export interface RuntimeGlobals {
   process?: ProcessLike
 }
 
+/**
+ * The part of the Bun global that tells a compiled executable.
+ */
+export interface BunLike {
+  /**
+   * Whether the process is an executable built with `bun build --compile`. Bun has it since 1.4.0.
+   *
+   * @see https://bun.com/docs/compiler/executables#detecting-standalone-mode-at-runtime
+   */
+  isStandaloneExecutable?: boolean
+}
+
 function getRuntimeGlobals(): RuntimeGlobals {
   return globalThis as unknown as RuntimeGlobals
 }
@@ -122,21 +134,16 @@ function escapeDoubleQuotedShellString(value: string): string {
   return value.replaceAll(/[$`"\\]/g, '\\$&')
 }
 
-function basename(path: string): string {
-  const slash = path.lastIndexOf('/')
-  const backslash = path.lastIndexOf('\\')
-  return path.slice(Math.max(slash, backslash) + 1)
-}
-
 /**
  * Check if the entry is a Bun virtual entry.
  *
  * @param entry - The entry to check
  * @returns Whether the entry is a Bun virtual entry
  *
- * Bun compiled executables may surface internal virtual paths in `process.argv`
- * instead of the original source entry. These markers are intentionally private
- * to keep the single-binary check heuristic rather than a public contract.
+ * Bun compiled executables surface internal virtual paths in `process.argv`
+ * instead of the original source entry. These markers are private to Bun, so
+ * they only tell a compiled executable on a Bun older than 1.4, which has no
+ * `Bun.isStandaloneExecutable`.
  *
  * @see https://github.com/oven-sh/bun/blob/main/src/standalone_graph/StandaloneModuleGraph.rs#L44-L70
  * @see https://github.com/oven-sh/bun/blob/main/test/regression/issue/22157.test.ts#L47-L55
@@ -147,32 +154,6 @@ function isBunVirtualEntry(entry?: string): boolean {
     entry?.startsWith('B:\\~BUN\\') === true ||
     entry?.startsWith('B:/~BUN/') === true
   )
-}
-
-/**
- * Check if the executable is a likely Bun single binary.
- *
- * @param execPath - The executable path
- * @param entry - The entry to check
- * @returns Whether the executable is a likely Bun single binary
- *
- * Bun documents `bun build --compile` as producing a single-file executable,
- * but it does not expose a stable "compiled executable" runtime flag.
- * Prefer calling the current executable when `process.execPath` is no longer
- * the Bun launcher, because the shell completion script needs to re-enter the
- * compiled CLI rather than the original source file.
- *
- * @see https://bun.com/docs/bundler/executables
- * @see https://github.com/oven-sh/bun/issues/14676
- */
-function isLikelyBunSingleBinary(execPath: string, entry?: string): boolean {
-  const name = basename(execPath).toLowerCase()
-
-  if (name !== 'bun' && name !== 'bun.exe') {
-    return true
-  }
-
-  return isBunVirtualEntry(entry)
 }
 
 /**
@@ -190,12 +171,20 @@ export function resolveNodeExecParts(process: ProcessLike): string[] {
  * Resolve executable command parts for Bun source and compiled execution.
  *
  * @param process - Bun process global
+ * @param bun - Bun global
  * @returns Executable command parts
  */
-export function resolveBunExecParts(process: ProcessLike): string[] {
+export function resolveBunExecParts(process: ProcessLike, bun?: BunLike): string[] {
   const entry = process.argv[1]
 
-  if (isLikelyBunSingleBinary(process.execPath, entry)) {
+  /**
+   * NOTE(kazupon): a compiled executable is told by `Bun.isStandaloneExecutable`, and by its virtual
+   * entry on a Bun older than 1.4, which does not have it. The name of `process.execPath` does not
+   * tell: the Bun launcher can have another name, such as the `bun.native` of Vite+, and a compiled
+   * executable can be named `bun`. The completion script re-enters a compiled executable, whose
+   * entry is inside it.
+   */
+  if (bun?.isStandaloneExecutable ?? isBunVirtualEntry(entry)) {
     return [process.execPath]
   }
 
@@ -233,7 +222,7 @@ export function quoteExec(): string {
       throw new Error('Deno runtime is not supported for completion script generation.')
     }
     case 'bun': {
-      return joinExecParts(resolveBunExecParts(globals.process!))
+      return joinExecParts(resolveBunExecParts(globals.process!, globals.Bun as BunLike))
     }
     default: {
       throw new Error('Unsupported JavaScript runtime for completion script generation.')
