@@ -182,9 +182,7 @@ export class CommandNotFoundError extends Error {
 /**
  * Error raised when command routing cannot produce one consistent command.
  *
- * The own registry brand is the cross-bundle contract. Unlike the legacy command-not-found
- * guard, the new guard deliberately has no name-based fallback because this error type is new and
- * must not classify arbitrary errors from older versions.
+ * The own registry brand is the cross-bundle contract, so the guard does not read `name`.
  */
 export class CommandResolutionError extends Error {
   readonly code?: CommandResolutionErrorCode
@@ -305,15 +303,10 @@ export function isCommandNotFoundError(error: unknown): error is CommandNotFound
     return false
   }
   // Accept only an own brand, so that an inherited one cannot mark arbitrary objects.
-  if (
+  return (
     Object.hasOwn(error, COMMAND_NOT_FOUND_ERROR_BRAND) &&
     error[COMMAND_NOT_FOUND_ERROR_BRAND] === true
-  ) {
-    return true
-  }
-  // NOTE(kazupon): Structural fallback for copies of gunshi older than the brand, which
-  // only set `name`. Drop it in the next major.
-  return error instanceof Error && error.name === 'CommandNotFoundError'
+  )
 }
 
 /**
@@ -457,11 +450,8 @@ export function isJsonOutputError(error: unknown): error is JsonOutputError {
  * Prefer this over the `args-tokens` guard of the same name. Both recognize errors from another
  * bundled copy through the `Symbol.for('args-tokens.ArgsValidationError')` brand that
  * `args-tokens` 0.29.0 or later sets, including subclasses such as `ArgResolveError` that
- * override `name` with the argument name. This guard additionally:
- *
- * - recognizes direct `ArgsValidationError` instances from copies bundling `args-tokens`
- *   older than 0.29.0, which do not set the brand
- * - checks that `code` and `values` of an error from another copy have the expected types
+ * override `name` with the argument name. This guard additionally checks that `code` and `values`
+ * of an error from another copy have the expected types.
  *
  * The guard narrows only to {@link ArgsValidationError}: across copies,
  * `instanceof ArgResolveError` still fails, so do not rely on `type` or `schema` for such errors.
@@ -479,13 +469,7 @@ export function isArgsValidationError(error: unknown): error is ArgsValidationEr
     return false
   }
   // `args-tokens` checks its registry brand, which also covers subclasses from another copy.
-  if (isBrandedArgsValidationError(error)) {
-    return true
-  }
-  // NOTE(kazupon): Structural fallback for copies bundling `args-tokens` older than 0.29.0,
-  // which do not set the brand. It matches only direct `ArgsValidationError` instances,
-  // because `ArgResolveError` overrides `name`. Drop it in the next major.
-  return error instanceof Error && error.name === 'ArgsValidationError'
+  return isBrandedArgsValidationError(error)
 }
 
 function isRecord(value: unknown): value is Record<PropertyKey, unknown> {

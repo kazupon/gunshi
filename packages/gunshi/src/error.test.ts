@@ -24,11 +24,15 @@ import {
 
 import type { Args } from 'args-tokens'
 
+// the registry keys are the contract shared with other bundled copies of gunshi and args-tokens
+const COMMAND_NOT_FOUND_ERROR_BRAND = Symbol.for('gunshi.CommandNotFoundError')
+const ARGS_VALIDATION_ERROR_BRAND = Symbol.for('args-tokens.ArgsValidationError')
+
 /**
  * Stand-ins for the duplicated class copies that `@gunshi/plugin` ships: it is bundled
  * with `noExternal: ['gunshi/plugin']`, so a plugin importing these guards holds a
  * different class object than the one `gunshi` throws with, and `instanceof` cannot match.
- * Like the real constructors, they set every property of the class, but no brand.
+ * Like the real constructors, they set every property of the class, and the brand.
  */
 class DuplicatedCommandNotFoundError extends Error {
   readonly code = CommandNotFoundErrorKeys.notFound
@@ -42,6 +46,7 @@ class DuplicatedCommandNotFoundError extends Error {
     this.values = { commandName }
     this.commandName = commandName
     this.candidates = candidates
+    Object.defineProperty(this, COMMAND_NOT_FOUND_ERROR_BRAND, { value: true })
   }
 }
 
@@ -53,12 +58,9 @@ class DuplicatedArgsValidationError extends Error {
     this.name = 'ArgsValidationError'
     this.code = code
     this.values = values
+    Object.defineProperty(this, ARGS_VALIDATION_ERROR_BRAND, { value: true })
   }
 }
-
-// the registry keys are the contract shared with other bundled copies of gunshi and args-tokens
-const COMMAND_NOT_FOUND_ERROR_BRAND = Symbol.for('gunshi.CommandNotFoundError')
-const ARGS_VALIDATION_ERROR_BRAND = Symbol.for('args-tokens.ArgsValidationError')
 
 describe('isCommandNotFoundError', () => {
   test('matches an instance of the class', () => {
@@ -76,6 +78,18 @@ describe('isCommandNotFoundError', () => {
     expect(isCommandNotFoundError(new Error('boom'))).toBe(false)
     expect(isCommandNotFoundError({ name: 'CommandNotFoundError' })).toBe(false)
     expect(isCommandNotFoundError(undefined)).toBe(false)
+  })
+
+  test('does not match an error that has the name and the shape, but no brand', () => {
+    const error = Object.assign(new Error('not found'), {
+      name: 'CommandNotFoundError',
+      code: CommandNotFoundErrorKeys.notFound,
+      values: {},
+      commandName: 'lod',
+      candidates: ['load'],
+      commandPath: []
+    })
+    expect(isCommandNotFoundError(error)).toBe(false)
   })
 
   test('does not match an error whose properties have the wrong shape', () => {
@@ -311,11 +325,21 @@ describe('isArgsValidationError', () => {
   test('matches a duplicated-copy error without a `code`', () => {
     // `code` is optional on `ArgsValidationError`, so `undefined` is a valid shape
     const error = Object.assign(new Error('bad'), {
+      [ARGS_VALIDATION_ERROR_BRAND]: true,
       name: 'ArgsValidationError',
       code: undefined,
       values: {}
     })
     expect(isArgsValidationError(error)).toBe(true)
+  })
+
+  test('does not match an error that has the name and the shape, but no brand', () => {
+    const error = Object.assign(new Error('unknown option'), {
+      name: 'ArgsValidationError',
+      code: ArgsValidationErrorKeys.unknownOption,
+      values: { name: 'alow-reload' }
+    })
+    expect(isArgsValidationError(error)).toBe(false)
   })
 
   test('does not match an error whose properties have the wrong shape', () => {
