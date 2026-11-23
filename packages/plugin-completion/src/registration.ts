@@ -250,7 +250,11 @@ export async function registerForCompletion({
   }
 
   alignRootShortArity(t, registered, commandIndexes, previousArgs)
-  alignHiddenArity(t, registered, commandIndexes, previousArgs)
+  // only a CLI with hidden options compiles the function, as this runs for every request
+  const holder = t.commands.get(HIDDEN_HOLDER_NAME)
+  if (holder) {
+    alignHiddenArity(holder, registered, commandIndexes, previousArgs)
+  }
 
   // 3. the commands that can be completed at the cursor, with their names and descriptions only
   const lastArg = previousArgs.at(-1)
@@ -642,21 +646,17 @@ function alignRootShortArity(
  * an option of a command read as a command name. The holder is made to agree for this request, and only for
  * what was typed behind that command.
  *
- * @param t - The completion root command
+ * @param holder - The {@linkcode HIDDEN_HOLDER_NAME | holder} of the hidden options
  * @param registered - The completion commands registered so far, the completion root first
  * @param commandIndexes - The index in `previousArgs` at which each command of the path was named
  * @param previousArgs - The words before the one being completed
  */
 function alignHiddenArity(
-  t: RootCommand,
+  holder: TabCommand,
   registered: TabCommand[],
   commandIndexes: number[],
   previousArgs: string[]
 ): void {
-  const holder = t.commands.get(HIDDEN_HOLDER_NAME)
-  if (!holder) {
-    return
-  }
   for (const [position, command] of registered.slice(1).entries()) {
     for (const arg of previousArgs.slice(commandIndexes[position] + 1)) {
       const option = arg.startsWith('-') ? findOption(command, arg) : undefined
