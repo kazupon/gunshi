@@ -106,6 +106,7 @@ function setExitCode(code: number): void {
 interface Stdout {
   isTTY?: boolean
   writableLength?: number
+  write?: (chunk: string, callback: (error?: Error | null) => void) => unknown
   once?: (event: string, listener: () => void) => unknown
   removeListener?: (event: string, listener: () => void) => unknown
 }
@@ -116,12 +117,15 @@ function getStdout(): Stdout | undefined {
 }
 
 /**
- * Wait until stdout has written what it holds, when it holds something: it drains, fails, or closes.
+ * Wait until stdout has written what it holds, when it holds something: the callback of an empty write
+ * comes after it. The wait also ends when stdout fails or closes.
  *
  * NOTE(kazupon): Node.js writes to a pipe later, and `process.exit()` does not wait for it, so a large
  * JSON document is cut at 64KB or so when the app calls `process.exit()` after `cli()`. The wait has no
  * limit: a limit would cut the document only when the reader is slow. It does not keep the process
- * alive any longer than the write does.
+ * alive any longer than the write does. `drain` cannot end the wait: a stream emits it only after a
+ * `write()` that returned `false`, so a document that fits the buffer of the stream, on a pipe that
+ * cannot take it yet, would never end it.
  */
 async function flushStdout(): Promise<void> {
   const stdout = getStdout()
@@ -129,21 +133,35 @@ async function flushStdout(): Promise<void> {
     stdout === undefined ||
     typeof stdout.writableLength !== 'number' ||
     stdout.writableLength === 0 ||
+    typeof stdout.write !== 'function' ||
     typeof stdout.once !== 'function'
   ) {
     return
   }
+  const write = stdout.write.bind(stdout)
   const once = stdout.once.bind(stdout)
   await new Promise<void>(resolve => {
     const done = () => {
-      for (const event of ['drain', 'error', 'close']) {
+      for (const event of ['error', 'close']) {
         stdout.removeListener?.(event, done)
       }
       resolve()
     }
-    for (const event of ['drain', 'error', 'close']) {
+    for (const event of ['error', 'close']) {
       once(event, done)
     }
+    write('', error => {
+      if (error == null) {
+        done()
+        return
+      }
+      /**
+       * NOTE(kazupon): a stream calls back a failed write before it emits `error`, so the listener stays
+       * until then: without it, a reader that stops early would crash the CLI. A stream that is already
+       * destroyed emits neither, so the timer ends the wait.
+       */
+      setTimeout(done)
+    })
   })
 }
 
@@ -365,18 +383,27 @@ const decorator: CommandDecorator<{
    * command line: the help is what tells how to use the command. With `--json`, they are printed as one
    * JSON document, so that stdout has the JSON only, whether the command spreads `jsonArgs` or not: they
    * are answered by gunshi, not by the command, a command with `passthrough` included. A command with a
-   * `json` argument of its own takes `--json` itself, and gets the text.
+   * `json` argument of its own takes `--json` itself, and gets the text. A JSON document is waited for,
+   * as the result of a command is, so that `process.exit()` after `cli()` does not cut it.
    */
   const write: Writer = ctx.env.usageSilent ? NOOP : log
 
   if (values.help && globalOptions?.has('help')) {
-    return jsonRequest === undefined
-      ? await writeUsage(ctx, write)
-      : await writeUsageJson(ctx, write)
+    if (jsonRequest === undefined) {
+      return await writeUsage(ctx, write)
+    }
+    const json = await writeUsageJson(ctx, write)
+    await flushStdout()
+    return json
   }
 
   if (values.version && globalOptions?.has('version')) {
-    return jsonRequest === undefined ? writeVersion(ctx, write) : writeVersionJson(ctx, write)
+    if (jsonRequest === undefined) {
+      return writeVersion(ctx, write)
+    }
+    const json = writeVersionJson(ctx, write)
+    await flushStdout()
+    return json
   }
 
   /**

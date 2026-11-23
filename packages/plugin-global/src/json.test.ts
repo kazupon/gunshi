@@ -136,6 +136,43 @@ function setTerminal(isTTY: boolean) {
 }
 
 /**
+ * Make stdout hold what it was given, until the test ends the write.
+ *
+ * @returns The function that calls back the writes, and the numbers of the listeners
+ */
+function holdStdout() {
+  const listeners = () => ({
+    error: process.stdout.listenerCount('error'),
+    close: process.stdout.listenerCount('close')
+  })
+  const listenersBefore = listeners()
+  const callbacks: ((error?: Error) => void)[] = []
+  Object.defineProperty(process.stdout, 'writableLength', { get: () => 1, configurable: true })
+  const write = vi.spyOn(process.stdout, 'write').mockImplementation(((
+    _chunk: unknown,
+    callback?: (error?: Error) => void
+  ) => {
+    if (typeof callback === 'function') {
+      callbacks.push(callback)
+    }
+    return true
+  }) as typeof process.stdout.write)
+  onTestFinished(() => {
+    write.mockRestore()
+    delete (process.stdout as { writableLength?: number }).writableLength
+  })
+  return {
+    finish: (error?: Error) => {
+      for (const callback of callbacks.splice(0)) {
+        callback(error)
+      }
+    },
+    listeners,
+    listenersBefore
+  }
+}
+
+/**
  * Mark the context of a run whose command has `passthrough`, as the core does in `cli()`.
  *
  * @param ctx - The command context of the run
@@ -221,11 +258,7 @@ describe('the result', () => {
     captureOutput()
     setTerminal(false)
     const { ctx } = await createRun()
-    Object.defineProperty(process.stdout, 'writableLength', { get: () => 1, configurable: true })
-    onTestFinished(() => {
-      delete (process.stdout as { writableLength?: number }).writableLength
-    })
-    const listeners = process.stdout.listenerCount('drain')
+    const stdout = holdStdout()
 
     let done = false
     const running = Promise.resolve(decorator(() => ({ ok: true }))(ctx)).then(() => {
@@ -234,12 +267,82 @@ describe('the result', () => {
     await new Promise(resolve => setTimeout(resolve, 10))
     expect(done).toBe(false)
 
-    process.stdout.emit('drain')
+    // the write ends the wait without `drain`, which a stream emits only for a full buffer
+    stdout.finish()
     await running
 
     expect(done).toBe(true)
     // the listeners are removed after the wait
-    expect(process.stdout.listenerCount('drain')).toBe(listeners)
+    expect(stdout.listeners()).toEqual(stdout.listenersBefore)
+  })
+
+  test.each([
+    { title: 'the help', values: { help: true } },
+    { title: 'the version', values: { version: true } }
+  ])('waits until stdout has written $title as JSON', async ({ values }) => {
+    captureOutput()
+    const { ctx } = await createRun({ args: { ...COMMON_ARGS }, values })
+    const stdout = holdStdout()
+
+    let done = false
+    const running = Promise.resolve(decorator(() => {})(ctx)).then(() => {
+      done = true
+    })
+    await new Promise(resolve => setTimeout(resolve, 10))
+    expect(done).toBe(false)
+
+    stdout.finish()
+    await running
+
+    expect(done).toBe(true)
+  })
+
+  test('ends the wait when the write fails, and handles the error that follows', async () => {
+    captureOutput()
+    setTerminal(false)
+    const { ctx } = await createRun()
+    const stdout = holdStdout()
+    const running = Promise.resolve(decorator(() => ({ ok: true }))(ctx))
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    const error = new Error('write EPIPE')
+    stdout.finish(error)
+
+    // a stream calls back a failed write first, so the listener must still be there for the event
+    expect(stdout.listeners().error).toBe(stdout.listenersBefore.error + 1)
+    process.stdout.emit('error', error)
+    await running
+
+    expect(stdout.listeners()).toEqual(stdout.listenersBefore)
+  })
+
+  test('ends the wait when a failed write is followed by no event', async () => {
+    captureOutput()
+    setTerminal(false)
+    const { ctx } = await createRun()
+    const stdout = holdStdout()
+    const running = Promise.resolve(decorator(() => ({ ok: true }))(ctx))
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    // a stream that is already destroyed calls back with an error, and emits nothing
+    stdout.finish(new Error('Cannot call write after a stream was destroyed'))
+    await running
+
+    expect(stdout.listeners()).toEqual(stdout.listenersBefore)
+  })
+
+  test('ends the wait when stdout closes', async () => {
+    captureOutput()
+    setTerminal(false)
+    const { ctx } = await createRun()
+    const stdout = holdStdout()
+    const running = Promise.resolve(decorator(() => ({ ok: true }))(ctx))
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    process.stdout.emit('close')
+    await running
+
+    expect(stdout.listeners()).toEqual(stdout.listenersBefore)
   })
 })
 

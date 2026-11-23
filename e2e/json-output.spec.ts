@@ -36,6 +36,14 @@ const big = define({
   })
 })
 
+const sized = define({
+  name: 'sized',
+  args: { ...jsonArgs },
+  run: () => ({ data: 'x'.repeat(Number(process.env.SIZE)) })
+})
+
+const wordy = define({ name: 'wordy', description: 'd'.repeat(100000), run: () => {} })
+
 const fail = define({
   name: 'fail',
   args: { ...jsonArgs },
@@ -48,7 +56,7 @@ const legacy = define({ name: 'legacy', run: () => console.log('legacy output') 
 
 await cli(process.argv.slice(2), define({ name: 'demo', run: () => {} }), {
   name: 'demo',
-  subCommands: { list, big, fail, legacy }
+  subCommands: { list, big, sized, wordy, fail, legacy }
 })
 
 // as an app may do after cli()
@@ -157,6 +165,22 @@ describe.each(runtimes)('$name', ({ command }) => {
     const length = shell('$CLI big --json | (sleep 0.3; wc -c)', { EXIT_NOW: '1' })
 
     expect(Number(length)).toBe(BIG_LENGTH)
+  })
+
+  test('cli() returns when a pipe that already holds data cannot take the whole document', () => {
+    const code = shell(
+      '{ SIZE=60000 $CLI sized --json; SIZE=10000 $CLI sized --json; echo "$?" > code; } | (sleep 0.5; cat > /dev/null); cat code'
+    )
+
+    expect(code).toBe('0')
+  })
+
+  test('a large help as JSON reaches a slow reader whole, though the app exits right after cli()', () => {
+    const whole = shell('$CLI wordy --help --json > help.json; wc -c < help.json')
+    const length = shell('$CLI wordy --help --json | (sleep 0.3; wc -c)', { EXIT_NOW: '1' })
+
+    expect(Number(whole)).toBeGreaterThan(100000)
+    expect(Number(length)).toBe(Number(whole))
   })
 
   test('a reader that stops early does not make the CLI fail', () => {
