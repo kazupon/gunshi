@@ -48,10 +48,6 @@ export interface CompletionExtension {}
  */
 export interface CompletionConfig {
   /**
-   * The {@linkcode CompletionHandler | handler} for the completion.
-   */
-  handler?: CompletionHandler
-  /**
    * The command arguments for the completion.
    */
   args?: Record<string, { handler: CompletionHandler }>
