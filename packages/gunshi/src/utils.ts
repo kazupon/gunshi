@@ -198,7 +198,11 @@ export async function resolveLazyCommand<G extends GunshiParamsConstraint = Defa
     command.name = name
   }
 
-  return deepFreeze(command)
+  /**
+   * NOTE(kazupon): only the resolved command is frozen. What it holds, such as its arguments, is the
+   * definition of the user, which must stay as it is.
+   */
+  return Object.freeze(command)
 }
 
 /**
@@ -287,7 +291,8 @@ export function getCommandSubCommands<G extends GunshiParamsConstraint = Default
 }
 
 /**
- * Deep freeze an object, making it immutable.
+ * Deep freeze an object, making it immutable. An object that is already frozen is not walked, so that
+ * a cycle ends the walk, and so that what is frozen on its own keeps the objects that it holds as they are.
  *
  * @param obj - The object to freeze
  * @param ignores - Properties to ignore during freezing
@@ -297,10 +302,11 @@ export function deepFreeze<T extends Record<string, any>>(
   obj: T,
   ignores: string[] = []
 ): Readonly<T> {
-  if (obj === null || typeof obj !== 'object') {
+  if (obj === null || typeof obj !== 'object' || Object.isFrozen(obj)) {
     return obj
   }
 
+  Object.freeze(obj)
   for (const key of Object.keys(obj)) {
     const value = obj[key]
     if (ignores.includes(key)) {
@@ -311,5 +317,5 @@ export function deepFreeze<T extends Record<string, any>>(
     }
   }
 
-  return Object.freeze(obj)
+  return obj
 }

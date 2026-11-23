@@ -4601,6 +4601,115 @@ describe('entry command in the command environment', () => {
   })
 })
 
+describe('what the caller owns', () => {
+  test('keeps argv and the plugins as they are, and the arrays of the context frozen', async () => {
+    const argv = ['--name', 'gunshi']
+    const plugins: Plugin[] = []
+    let given: readonly string[] | undefined
+    let givenPlugins: unknown
+
+    await cli(
+      argv,
+      define({
+        name: 'hello',
+        args: { name: { type: 'string' } },
+        run: ctx => {
+          given = ctx._
+          givenPlugins = (ctx.env as { plugins?: unknown }).plugins
+        }
+      }),
+      { name: 'hello', plugins }
+    )
+
+    expect(Object.isFrozen(argv)).toBe(false)
+    expect(Object.isFrozen(plugins)).toBe(false)
+    expect(given).toEqual(argv)
+    expect(Object.isFrozen(given)).toBe(true)
+    expect(Object.isFrozen(givenPlugins)).toBe(true)
+  })
+
+  test('keeps the choices of an argument as they are, and its schema frozen', async () => {
+    const choices = ['dev', 'prod']
+    let schema: unknown
+    let values: unknown
+
+    await cli(
+      [],
+      define({
+        name: 'deploy',
+        args: { env: { type: 'enum', choices, default: 'dev' } },
+        run: ctx => {
+          schema = ctx.args.env
+          values = ctx.values
+        }
+      })
+    )
+
+    expect(Object.isFrozen(choices)).toBe(false)
+    expect(Object.isFrozen(schema)).toBe(true)
+    expect(Object.isFrozen(values)).toBe(true)
+  })
+
+  class Counter {
+    count = 0
+    increment() {
+      this.count++
+    }
+  }
+  const cycle: Record<string, unknown> = { value: 1 }
+  cycle.self = cycle
+
+  test.each([
+    { title: 'a Buffer', value: Buffer.from('abc') },
+    { title: 'a typed array', value: new Uint8Array(4) },
+    { title: 'an object with a cycle', value: cycle },
+    { title: 'an instance of a class', value: new Counter() }
+  ])('gives $title that parse returns to the command', async ({ value }) => {
+    let received: unknown
+
+    await cli(
+      ['--data', 'x'],
+      define({
+        name: 'read',
+        args: { data: { type: 'custom', parse: () => value } },
+        run: ctx => {
+          received = ctx.values.data
+          if (received instanceof Counter) {
+            received.increment()
+          }
+        }
+      })
+    )
+
+    expect(received).toBe(value)
+  })
+
+  test('renders the help of the commands, and keeps their definitions as they are', async () => {
+    const utils = await import('./utils.ts')
+    const log = defineMockLog(utils)
+    const choices = ['dev']
+    const args = { env: { type: 'enum', choices, default: 'dev' } } satisfies Args
+    const lazyArgs = { env: { type: 'enum', choices, default: 'dev' } } satisfies Args
+
+    await cli(['--help'], define({ name: 'main', run: vi.fn<() => void>() }), {
+      name: 'app',
+      subCommands: {
+        sub: define({ name: 'sub', description: 'A command', args, run: vi.fn<() => void>() }),
+        later: lazy(() => vi.fn<() => void>(), {
+          name: 'later',
+          description: 'A lazy command',
+          args: lazyArgs
+        })
+      }
+    })
+
+    expect(log()).toContain('A lazy command')
+    for (const value of [args, args.env, lazyArgs, lazyArgs.env, choices]) {
+      expect(Object.isFrozen(value)).toBe(false)
+    }
+  })
+})
+
 describe('arguments read by args-tokens 1.0', () => {
   interface Ran {
     commandPath: string[]
