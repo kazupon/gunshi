@@ -203,7 +203,7 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   usageOptionType: boolean
   /**
-   * Whether to display the option value.
+   * Whether to display the default value and the choices of an option in the usage.
    *
    * @default true
    * @see {@linkcode CliOptions.usageOptionValue}
@@ -373,7 +373,10 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    */
   usageOptionType?: boolean
   /**
-   * Whether to display the optional argument value.
+   * Whether to display the default value and the choices of an option in the usage, such as
+   * `(default: dev, choices: dev | prod)`. The help as JSON lists them either way.
+   *
+   * @default true
    */
   usageOptionValue?: boolean
   /**
