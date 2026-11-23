@@ -330,6 +330,40 @@ describe('lazy', () => {
     expect(await push()).toBe(run)
   })
 
+  test('keeps a lazy command without a definition apart from one with a definition', async () => {
+    const run = vi.fn<CommandRunner>()
+    const loader = () => run
+
+    const first = lazy(loader)
+    const second = lazy(loader, { name: 'push', deprecated: 'Use deploy' })
+
+    expect(first).toBe(loader)
+    expect(second).not.toBe(first)
+    expect(first.commandName).toBeUndefined()
+    expect(first.deprecated).toBeUndefined()
+    expect(second.commandName).toBe('push')
+    expect(await second()).toBe(run)
+  })
+
+  test('a function that calls the loader has the name of the loader', () => {
+    const run = vi.fn<CommandRunner>()
+    function load() {
+      return run
+    }
+    function loadFrozen() {
+      return run
+    }
+
+    lazy(load, { name: 'first' })
+    const second = lazy(load, { description: 'Without a name' })
+    const frozen = lazy(Object.freeze(loadFrozen))
+
+    expect(second).not.toBe(load)
+    expect(second.name).toBe('load')
+    expect(frozen).not.toBe(loadFrozen)
+    expect(frozen.name).toBe('loadFrozen')
+  })
+
   test('runs and lists two lazy commands with one loader as two commands', async () => {
     const stderr = vi.spyOn(console, 'error').mockImplementation(() => {})
     const names: (string | undefined)[] = []
