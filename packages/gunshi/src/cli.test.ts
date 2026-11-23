@@ -2207,6 +2207,17 @@ describe('command lifecycle hooks', () => {
       expect(mockCommand).toHaveBeenCalledOnce()
     })
 
+    test('keeps the default with `strict: undefined`', async () => {
+      const stderr = defineMockErrorLog()
+      const mockCommand = vi.fn<() => void>()
+
+      await cli(['--alow-reload'], { run: mockCommand }, { strict: undefined })
+
+      expect(mockCommand).not.toHaveBeenCalled()
+      expect(stderr()).toBe('Unknown option: --alow-reload' + helpHint())
+      expect(process.exitCode).toBe(1)
+    })
+
     test('keeps the arguments after -- in rest by default', async () => {
       const mockCommand = vi.fn<() => void>()
 

@@ -10,7 +10,7 @@ import {
   parseArgs,
   resolveArgs
 } from 'args-tokens'
-import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
+import { ANONYMOUS_COMMAND_NAME, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import {
@@ -23,6 +23,7 @@ import {
 import { createPluginContext } from '../plugin/context.ts'
 import { resolveDependencies } from '../plugin/dependency.ts'
 import {
+  assignCliOptions,
   create,
   getCommandSubCommands,
   isLazyCommand,
@@ -911,7 +912,7 @@ function normalizeCliOptions<G extends GunshiParamsConstraint>(
    * NOTE(kazupon): the entry command is part of `subCommands` only when the user passes sub-commands,
    * so it is exposed on its own for the plugins that add commands to a CLI without sub-commands.
    */
-  const resolvedOptions = Object.assign(create<CliOptions<G>>(), CLI_OPTIONS_DEFAULT, options, {
+  const resolvedOptions = Object.assign(assignCliOptions(create<CliOptions<G>>(), options), {
     subCommands,
     entryCommand
   }) as InternalCliOptions<G>
