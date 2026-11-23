@@ -355,7 +355,7 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * A value of the object or the Map may also be a loader, a function that returns the command or its runner,
    * which runs as a lazy command named after its key.
    * When this is not given, the {@linkcode Command.subCommands} of the entry command are the sub-commands.
-   * A sub-command cannot have the name of the entry command, or of the command that it belongs to.
+   * Another command cannot have the name of the entry command, or of the command that it belongs to.
    */
   subCommands?:
     | Record<string, SubCommandable | SubCommandLoader>
@@ -873,7 +873,7 @@ export interface Command<G extends GunshiParamsConstraint = DefaultGunshiParams>
    * An array of commands is keyed by the names of the commands.
    *
    * On the entry command, these are the top-level sub-commands when {@linkcode CliOptions.subCommands} is not given.
-   * A sub-command cannot have the name of the entry command, or of the command that it belongs to.
+   * Another command cannot have the name of the entry command, or of the command that it belongs to.
    *
    * @since v0.28.0
    */

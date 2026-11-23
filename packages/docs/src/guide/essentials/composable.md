@@ -128,7 +128,7 @@ await cli(process.argv.slice(2), mainCommand, {
 
 When both are given, the `subCommands` option of `cli()` is used for the CLI, and the sub-commands of the main command are reached under its name, as [nested sub-commands](#nested-sub-commands).
 
-A sub-command cannot have the name of the main command, or of the command that it belongs to, since a command is looked up by its name for its translations and its examples. `cli()` rejects a sub-command of the CLI with the name of the main command when it starts, and a sub-command with the name of its parent command when the command line goes through the parent.
+Another command cannot have the name of the main command, or of the command that it belongs to, since a command is looked up by its name for its translations and its examples. `cli()` rejects a sub-command of the CLI with the name of the main command when it starts, and a sub-command with the name of its parent command when the command line goes through the parent. Giving the same command again is fine, such as the main command among the sub-commands of `cli()`.
 
 ## Aliases of Sub-commands
 
