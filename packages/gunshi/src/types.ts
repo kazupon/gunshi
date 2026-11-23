@@ -203,13 +203,6 @@ export interface CommandEnvironment<G extends GunshiParamsConstraint = DefaultGu
    */
   usageOptionType: boolean
   /**
-   * Whether to display the option value.
-   *
-   * @default true
-   * @see {@linkcode CliOptions.usageOptionValue}
-   */
-  usageOptionValue: boolean
-  /**
    * Whether to keep usage, header, version, and validation-error text off the terminal
    * (they are still returned as strings) and to silence {@linkcode CommandContext.log}.
    *
@@ -372,10 +365,6 @@ export interface CliOptions<G extends GunshiParamsConstraint = DefaultGunshiPara
    * Whether to display the usage optional argument type.
    */
   usageOptionType?: boolean
-  /**
-   * Whether to display the optional argument value.
-   */
-  usageOptionValue?: boolean
   /**
    * Whether to keep usage, header, version, and validation-error text off the terminal
    * (they are still returned as strings) and to silence {@linkcode CommandContext.log}.
