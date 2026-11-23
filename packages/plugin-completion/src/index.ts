@@ -167,10 +167,11 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
           header: null // disable header rendering for completion command
         },
         run: async cmdCtx => {
-          let shell: string | undefined = cmdCtx._[1]
-          if (shell === TERMINATOR) {
-            shell = undefined
-          }
+          /**
+           * NOTE(kazupon): the shell is read from its argument, since a global option can come before
+           * it, or before the name of the command, in the raw arguments.
+           */
+          const shell = cmdCtx.values.shell as string | undefined
 
           /**
            * NOTE(kazupon): the completion tree is built here, and only here.
