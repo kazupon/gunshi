@@ -96,7 +96,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 
   const entryCommand = createEntryCommand(entry)
 
-  const initialSubCommands = createInitialSubCommands(options, entryCommand)
+  const initialSubCommands = createInitialSubCommands(options, entry, entryCommand)
 
   const pluginContext = createPluginContext<G>(decorators, initialSubCommands)
 
@@ -870,6 +870,7 @@ function createEntryCommand<G extends GunshiParamsConstraint>(
 
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   entryCommand: Command<G> | LazyCommand<G> | undefined
 ): Map<string, Command<G> | LazyCommand<G>> {
   // NOTE(kazupon): SubCommandable is intentionally loose to accept any command type from user code.
@@ -892,7 +893,15 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
 
   // add entry command to sub commands if there are sub commands
   if (subCommands.size > 0 && entryCommand) {
-    subCommands.set(resolveEntryName(entryCommand), entryCommand)
+    const entryName = resolveEntryName(entryCommand)
+    const declared = subCommands.get(entryName)
+    /**
+     * NOTE(kazupon): another command that the user declares under the name of the entry keeps the name,
+     * so that the name runs it. The entry still runs without a sub-command, and the help lists it.
+     */
+    if (declared === undefined || declared === entry) {
+      subCommands.set(entryName, entryCommand)
+    }
   }
 
   return subCommands
@@ -1143,7 +1152,11 @@ function resolveCommandTreeFromPositionals<G extends GunshiParamsConstraint>(
         entry: true
       }) as Command<G>
     }
-    levelSubCommands.set(resolvedName || resolveEntryName(entryCopy), entryCopy)
+    // a child that has the name of the group keeps it, as a sub-command with the name of the entry does
+    const groupName = resolvedName || resolveEntryName(entryCopy)
+    if (!levelSubCommands.has(groupName)) {
+      levelSubCommands.set(groupName, entryCopy)
+    }
   }
 
   return {
@@ -1639,10 +1652,13 @@ function createCommandNotFoundError<G extends GunshiParamsConstraint>(
      * NOTE(kazupon): the candidates are what `@gunshi/plugin-suggestion` offers as "Did you mean". An internal
      * command is left out of them, as the help, shell completion and the help as JSON leave it out: it still
      * runs when it is typed, but nothing shows it to the user. So is a deprecated command, whose replacement is
-     * what to offer.
+     * what to offer. So is an entry command without a name, which has no name to type.
      */
     candidates: [...(resolved.parentSubCommands || [])]
-      .filter(([, command]) => !command.internal && !isDeprecated(command.deprecated))
+      .filter(
+        ([name, command]) =>
+          name !== ANONYMOUS_COMMAND_NAME && !command.internal && !isDeprecated(command.deprecated)
+      )
       .map(([name]) => name),
     commandPath: resolved.parentCommandPath || []
   })

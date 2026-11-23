@@ -341,6 +341,25 @@ describe('execute command', () => {
     expect(mockDebug).toHaveBeenCalledOnce()
   })
 
+  test('an entry command without a name is not a candidate of an unknown command', async () => {
+    const subCommands = { deploy: define({ name: 'deploy', run: vi.fn<() => void>() }) }
+
+    defineMockErrorLog()
+    let capturedError: AggregateError | undefined
+    await cli(
+      ['anonymous'],
+      { run: vi.fn<() => void>() },
+      {
+        subCommands,
+        onErrorCommand: (_ctx, error) => {
+          capturedError = error as AggregateError
+        }
+      }
+    )
+
+    expect(findCommandNotFoundError(capturedError).candidates).toEqual(['deploy'])
+  })
+
   test('command not found exposes structured metadata', async () => {
     const mockEntry = vi.fn<() => void>()
     const entry = define({
@@ -4598,6 +4617,87 @@ describe('entry command in the command environment', () => {
     expect(Object.isFrozen(entry)).toBe(false)
     expect(Object.isFrozen(args)).toBe(false)
     expect(Object.isFrozen(args.config)).toBe(false)
+  })
+})
+
+describe('a command with the name of the entry or of its group', () => {
+  test('a sub-command with the name of the entry runs by that name', async () => {
+    const entryRun = vi.fn<() => void>()
+    const subRun = vi.fn<() => void>()
+    const entry = define({ name: 'app', description: 'The entry', run: entryRun })
+    const sub = define({ name: 'app', description: 'A sub-command', run: subRun })
+    const options = { name: 'tool', subCommands: { app: sub } }
+
+    await cli(['app'], entry, options)
+    expect(subRun).toHaveBeenCalledOnce()
+    expect(entryRun).not.toHaveBeenCalled()
+
+    await cli([], entry, options)
+    expect(entryRun).toHaveBeenCalledOnce()
+    expect(subRun).toHaveBeenCalledOnce()
+  })
+
+  test('the help lists the entry and the sub-command with its name', async () => {
+    const entry = define({ name: 'app', description: 'The entry', run: vi.fn<() => void>() })
+    const sub = define({ name: 'app', description: 'A sub-command', run: vi.fn<() => void>() })
+
+    const usage = await cli(['--help'], entry, {
+      name: 'tool',
+      usageSilent: true,
+      subCommands: { app: sub }
+    })
+
+    expect(usage).toMatch(/^\s+\[app\]\s+The entry$/m)
+    expect(usage).toMatch(/^\s+app\s+A sub-command$/m)
+  })
+
+  test('a sub-command of the entry with its name runs by that name', async () => {
+    const entryRun = vi.fn<() => void>()
+    const childRun = vi.fn<() => void>()
+    const entry = define({
+      name: 'app',
+      subCommands: { app: define({ name: 'app', run: childRun }) },
+      run: entryRun
+    })
+
+    await cli(['app'], entry, { name: 'tool' })
+
+    expect(childRun).toHaveBeenCalledOnce()
+    expect(entryRun).not.toHaveBeenCalled()
+  })
+
+  test('the entry given as a sub-command too stays one command', async () => {
+    const run = vi.fn<() => void>()
+    const entry = define({ name: 'app', description: 'The entry', run })
+    const other = define({ name: 'other', description: 'Another', run: vi.fn<() => void>() })
+    const options = { name: 'tool', subCommands: { app: entry, other } }
+
+    const usage = await cli(['--help'], entry, { ...options, usageSilent: true })
+    await cli(['app'], entry, options)
+
+    expect(usage).toMatch(/^\s+\[app\]\s+The entry$/m)
+    expect(usage).not.toMatch(/^\s+app\s/m)
+    expect(run).toHaveBeenCalledOnce()
+  })
+
+  test('a child with the name of its group runs by that name, and is listed', async () => {
+    const childRun = vi.fn<() => void>()
+    const child = define({ name: 'git', description: 'The child', run: childRun })
+    const other = define({ name: 'other', description: 'Another child', run: vi.fn<() => void>() })
+    const group = define({
+      name: 'git',
+      description: 'The group',
+      subCommands: { git: child, other }
+    })
+    const entry = define({ name: 'main', run: vi.fn<() => void>() })
+    const options = { name: 'tool', subCommands: { git: group } }
+
+    const usage = await cli(['git', '--help'], entry, { ...options, usageSilent: true })
+    await cli(['git', 'git'], entry, options)
+
+    expect(usage).toMatch(/^\s+git\s+The child$/m)
+    expect(usage).toMatch(/^\s+other\s+Another child$/m)
+    expect(childRun).toHaveBeenCalledOnce()
   })
 })
 
