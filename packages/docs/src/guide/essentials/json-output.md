@@ -231,6 +231,8 @@ A value that is not there is `null`, and an empty list is `[]`, so that every ke
 
 `--version --json` prints `{"version":"1.2.3"}`, with the `version` given to `cli()`, or `{"version":null}` without it.
 
+As with the result, Gunshi waits until stdout has written these documents before `cli()` returns, so a large help is not cut when the app calls `process.exit()` after `cli()`.
+
 A command with a `json` argument of its own takes `--json` itself, and gets the help and the version as text. With `usageSilent`, or `renderUsage: null`, nothing is printed, as for the help as text.
 
 ## `jsonArgs` or a `json` of Your Own
