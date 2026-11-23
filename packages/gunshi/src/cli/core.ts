@@ -948,8 +948,14 @@ function isAnotherCommand<G extends GunshiParamsConstraint>(
     a.commandName !== b.commandName ||
     a.description !== b.description ||
     a.args !== b.args ||
-    a.subCommands !== b.subCommands ||
-    a.aliases !== b.aliases
+    a.examples !== b.examples ||
+    a.toKebab !== b.toKebab ||
+    a.internal !== b.internal ||
+    a.aliases !== b.aliases ||
+    a.deprecated !== b.deprecated ||
+    a.passthrough !== b.passthrough ||
+    a.rendering !== b.rendering ||
+    a.subCommands !== b.subCommands
   )
 }
 

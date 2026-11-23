@@ -4799,6 +4799,24 @@ describe('a sub-command with the name of the entry or of its parent command', ()
     expect(run).not.toHaveBeenCalled()
   })
 
+  test.each([
+    { key: 'examples', value: 'tool app' },
+    { key: 'toKebab', value: true },
+    { key: 'internal', value: true },
+    { key: 'deprecated', value: true },
+    { key: 'passthrough', value: true },
+    { key: 'rendering', value: { header: null } }
+  ])('rejects a command that differs from the entry only in `$key`', async ({ key, value }) => {
+    const run = vi.fn<() => void>()
+    const entry = define({ name: 'app', run })
+    const sub = { name: 'app', run, [key]: value } as Command
+
+    await expect(cli(['app'], entry, { name: 'tool', subCommands: { app: sub } })).rejects.toThrow(
+      entryError
+    )
+    expect(run).not.toHaveBeenCalled()
+  })
+
   test('accepts a runner and a command that runs it', async () => {
     const build = vi.fn<() => void>()
     function main() {
