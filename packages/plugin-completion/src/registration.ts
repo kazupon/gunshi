@@ -250,6 +250,11 @@ export async function registerForCompletion({
   }
 
   alignRootShortArity(t, registered, commandIndexes, previousArgs)
+  // only a CLI with hidden options compiles the function, as this runs for every request
+  const holder = t.commands.get(HIDDEN_HOLDER_NAME)
+  if (holder) {
+    alignHiddenArity(holder, registered, commandIndexes, previousArgs)
+  }
 
   // 3. the commands that can be completed at the cursor, with their names and descriptions only
   const lastArg = previousArgs.at(-1)
@@ -627,6 +632,43 @@ function alignRootShortArity(
         t.option(short, rootOption.description ?? '')
       } else {
         t.option(short, rootOption.description ?? '', () => {})
+      }
+    }
+  }
+}
+
+/**
+ * Make the holder of the `hidden` options agree with a command about what an option of the same name takes.
+ *
+ * NOTE(kazupon): as {@linkcode alignRootShortArity} says, `@bomb.sh/tab` keeps one arity per option for
+ * the whole request. It looks in the registered commands in order, and the holder of the hidden options of
+ * the entry comes before the commands of the typed path, so a hidden boolean option would make the value of
+ * an option of a command read as a command name. The holder is made to agree for this request, and only for
+ * what was typed behind that command.
+ *
+ * @param holder - The {@linkcode HIDDEN_HOLDER_NAME | holder} of the hidden options
+ * @param registered - The completion commands registered so far, the completion root first
+ * @param commandIndexes - The index in `previousArgs` at which each command of the path was named
+ * @param previousArgs - The words before the one being completed
+ */
+function alignHiddenArity(
+  holder: TabCommand,
+  registered: TabCommand[],
+  commandIndexes: number[],
+  previousArgs: string[]
+): void {
+  for (const [position, command] of registered.slice(1).entries()) {
+    for (const arg of previousArgs.slice(commandIndexes[position] + 1)) {
+      const option = arg.startsWith('-') ? findOption(command, arg) : undefined
+      const hiddenOption = option && findOption(holder, arg)
+      if (!hiddenOption || (hiddenOption.isBoolean ?? false) === (option.isBoolean ?? false)) {
+        continue
+      }
+      // keyed by the word as it is typed, so that the other name of the hidden option keeps its arity
+      if (option.isBoolean) {
+        holder.option(arg, '')
+      } else {
+        holder.option(arg, '', () => {})
       }
     }
   }
