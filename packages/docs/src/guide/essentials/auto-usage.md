@@ -169,6 +169,56 @@ OPTIONS:
   -v, --version                        [boolean] Display this version
 ```
 
+### Hiding Default Values and Choices
+
+The help shows the default value and the choices of an option after its description. Set `usageOptionValue` to `false` to leave them out, for example when a default depends on the machine:
+
+```js
+import { cli, define } from 'gunshi'
+
+const command = define({
+  name: 'deploy',
+  args: {
+    env: {
+      type: 'enum',
+      short: 'e',
+      choices: ['staging', 'production'],
+      default: 'staging',
+      description: 'Environment to deploy to'
+    },
+    config: {
+      type: 'string',
+      short: 'c',
+      default: './deploy.json',
+      description: 'Path to the configuration file'
+    }
+  },
+  run: ctx => {
+    console.log(`Deploying to ${ctx.values.env}`)
+  }
+})
+
+await cli(process.argv.slice(2), command, {
+  name: 'app',
+  version: '1.0.0',
+  usageOptionValue: false // Leave out default values and choices
+})
+```
+
+The options keep their names, their values, and their descriptions:
+
+```sh
+OPTIONS:
+  -e, --env <env>                Environment to deploy to
+  -c, --config <config>          Path to the configuration file
+  -h, --help                     Display this help message
+  -v, --version                  Display this version
+```
+
+Without `usageOptionValue: false`, the first two rows end with `(default: staging, choices: staging | production)` and `(default: ./deploy.json)`.
+
+This changes the help for people only. [`--help --json`](./json-output.md#help-and-version) still lists the default values and the choices, so `usageOptionValue` does not keep a default value secret.
+
 ## Sub-command Help Generation
 
 For CLIs with sub-commands (see [Composable Sub-commands](./composable.md) for implementation), Gunshi generates hierarchical help documentation.
@@ -293,6 +343,7 @@ When working with auto-generated usage:
 - The USAGE line shows `[OPTIONS]` for the options that can be left out, and spells out each required option, such as `--name <name>`
 - Boolean options declared with `negatable: true` get negated forms (`--no-` prefix), which the help lists and describes
 - The `usageOptionType` CLI option adds type annotations to help output
+- The `usageOptionValue` CLI option, set to `false`, leaves default values and choices out of help output
 
 ## Next Steps
 

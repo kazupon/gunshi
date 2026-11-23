@@ -1,6 +1,6 @@
 import jaJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import i18n from '@gunshi/plugin-i18n'
-import { cli, define } from 'gunshi'
+import { cli, define, plugin } from 'gunshi'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test'
 import completion from './index.ts'
 
@@ -411,6 +411,55 @@ describe('the complete command', () => {
 
     expect(output).toEqual(['add\tAdd a task', ':4'])
     expect(errors).toEqual([])
+  })
+
+  test.each([
+    { title: 'after the name of the command', argv: ['complete', '--verbose', 'zsh'] },
+    { title: 'before the name of the command', argv: ['--verbose', 'complete', 'zsh'] }
+  ])('prints the script with a global option $title', async ({ argv }) => {
+    const verbose = plugin({
+      id: 'verbose',
+      setup: ctx => {
+        ctx.addGlobalOption('verbose', { type: 'boolean', description: 'Verbose' })
+      }
+    })
+    const options = { name: 'todo', subCommands: { add }, plugins: [verbose, completion()] }
+
+    await cli(['complete', 'zsh'], entry, options)
+    const script = [...output]
+    output.length = 0
+    await cli(argv, entry, options)
+
+    expect(script.join('\n')).toContain('#compdef todo')
+    expect(output).toEqual(script)
+    expect(process.exitCode ?? 0).toBe(0)
+  })
+
+  test('completes a request after a global option before the name of the command', async () => {
+    const verbose = plugin({
+      id: 'verbose',
+      setup: ctx => {
+        ctx.addGlobalOption('verbose', { type: 'boolean', description: 'Verbose' })
+      }
+    })
+
+    await cli(['--verbose', 'complete', '--', 'a'], entry, {
+      name: 'todo',
+      subCommands: { add },
+      plugins: [verbose, completion()]
+    })
+
+    expect(output).toEqual(['add\tAdd a task', ':4'])
+  })
+
+  test('takes a word after -- for a word to complete, not for the name of a shell', async () => {
+    await cli(['complete', '--', 'zsh'], entry, {
+      name: 'todo',
+      subCommands: { add },
+      plugins: [completion()]
+    })
+
+    expect(output).toEqual([':4'])
   })
 
   test('describes a command whose name looks like a built-in key with its description', async () => {

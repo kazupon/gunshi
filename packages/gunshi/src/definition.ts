@@ -367,11 +367,15 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   // Definition metadata and marker properties are copied onto the loader below.
   // Preserve its identity whenever the function object can be extended, and use
   // a delegating wrapper when the loader cannot be modified.
-  if (
+  if (definition != null && 'commandName' in lazyCommand) {
+    // NOTE(kazupon): the loader is already a lazy command, as when one loader serves a command and its
+    // old name. The wrapper keeps the two commands apart, and takes nothing from the other definition.
+    lazyCommand = delegateTo(loader)
+  } else if (
     (definition != null || !('commandName' in lazyCommand)) &&
     !Object.isExtensible(lazyCommand)
   ) {
-    lazyCommand = Object.assign(() => loader(), loader) as LazyCommand<G, any>
+    lazyCommand = Object.assign(delegateTo(loader), loader)
   }
 
   if (definition == null && !('commandName' in lazyCommand)) {
@@ -401,6 +405,21 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   }
 
   return lazyCommand
+}
+
+/**
+ * Create a function that calls a loader, under the name of the loader: a lazy command without a name
+ * in its definition is named after its function.
+ *
+ * @param loader - A {@link CommandLoader | command loader} function
+ * @returns A function that calls the loader
+ */
+function delegateTo<G extends GunshiParamsConstraint>(
+  loader: CommandLoader<G>
+): LazyCommand<G, any> {
+  const delegate = () => loader()
+  Object.defineProperty(delegate, 'name', { value: loader.name, configurable: true })
+  return delegate as LazyCommand<G, any>
 }
 
 /**

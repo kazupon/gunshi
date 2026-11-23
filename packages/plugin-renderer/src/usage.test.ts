@@ -645,6 +645,43 @@ test('multiple positional arguments with required', async () => {
   expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
+test('shows the default of an option named like a built-in option or a negated form', async () => {
+  const command = define({
+    name: 'tool',
+    args: {
+      version: { type: 'string', default: '2', description: 'The version to use' },
+      'no-cache': { type: 'string', default: 'dir', description: 'Where not to cache' },
+      force: { type: 'boolean', negatable: true, default: true, description: 'Force' }
+    },
+    run: vi.fn<() => void>()
+  })
+
+  const usage = (await cli(['--help'], command, { name: 'tool', usageSilent: true })) as string
+  const row = (option: string) => usage.split('\n').find(line => line.includes(option))
+
+  expect(row('--version <version>')).toContain('The version to use (default: 2)')
+  expect(row('--no-cache <no-cache>')).toContain('Where not to cache (default: dir)')
+  expect(row('--force')).toContain('Force (default: true)')
+  // the negated form, and the built-in `--help`, have no default
+  expect(row('--no-force')).not.toContain('default')
+  expect(row('--help')).not.toContain('default')
+})
+
+test('a negated form that has the key of another argument shows no default', async () => {
+  const command = define({
+    name: 'tool',
+    args: {
+      'no-dryRun': { type: 'string', default: 'x' },
+      dryRun: { type: 'boolean', negatable: true, toKebab: true }
+    },
+    run: vi.fn<() => void>()
+  })
+
+  const usage = (await cli(['--help'], command, { name: 'tool', usageSilent: true })) as string
+
+  expect(usage.split('\n').find(line => line.includes('--no-dry-run'))).not.toContain('default')
+})
+
 test('no examples', async () => {
   const command = {
     args: {
@@ -2151,6 +2188,71 @@ describe('#872 - a row without a description has no trailing spaces', () => {
       expect(count.indexOf('(default: 1)')).toBe(output.indexOf('The output') + 1)
     }
   )
+})
+
+describe('usageOptionValue', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  const args: Args = {
+    target: { type: 'string', default: 'node', description: 'The target' },
+    mode: { type: 'enum', choices: ['dev', 'prod'], default: 'dev', description: 'The mode' },
+    level: { type: 'enum', choices: ['low', 'high'], description: 'The level' },
+    count: { type: 'number', default: 0 },
+    cache: { type: 'boolean', default: true, negatable: true, description: 'Use the cache' }
+  }
+
+  async function optionRows(
+    options: Pick<CliOptions, 'usageOptionType' | 'usageOptionValue'>
+  ): Promise<string[]> {
+    const command = { args, name: 'main', description: 'Main', run: NOOP } as TestCommand
+    const ctx = await createCommandContext({
+      args,
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { cwd: '/path/to/main', name: 'my-cli', version: '0.0.0', ...options }
+    })
+    const lines = (await renderUsage<WithRendererOnly>(ctx)).split('\n')
+    const start = lines.indexOf('OPTIONS:') + 1
+    const end = lines.findIndex((line, index) => index >= start && line.trim() === '')
+    return lines.slice(start, end === -1 ? undefined : end)
+  }
+
+  test('`false` leaves out the default values and the choices', async () => {
+    expect(await optionRows({ usageOptionValue: false })).toEqual([
+      '  --target <target>          The target',
+      '  --mode <mode>              The mode',
+      '  --level <level>            The level',
+      '  --count <count>',
+      '  --cache                    Use the cache',
+      '  --no-cache                 Negate --cache'
+    ])
+  })
+
+  test.each([
+    { title: 'left out', options: {} },
+    { title: '`true`', options: { usageOptionValue: true } },
+    { title: '`undefined`', options: { usageOptionValue: undefined } }
+  ])('shows them when it is $title', async ({ options }) => {
+    expect(await optionRows(options)).toEqual([
+      '  --target <target>          The target (default: node)',
+      '  --mode <mode>              The mode (default: dev, choices: dev | prod)',
+      '  --level <level>            The level (choices: low | high)',
+      '  --count <count>             (default: 0)',
+      '  --cache                    Use the cache (default: true)',
+      '  --no-cache                 Negate --cache'
+    ])
+  })
+
+  test('`false` keeps the type of an option', async () => {
+    expect(await optionRows({ usageOptionType: true, usageOptionValue: false })).toEqual([
+      '  --target <target>          [string]  The target',
+      '  --mode <mode>              [enum]    The mode',
+      '  --level <level>            [enum]    The level',
+      '  --count <count>            [number]',
+      '  --cache                    [boolean] Use the cache',
+      '  --no-cache                 [boolean] Negate --cache'
+    ])
+  })
 })
 
 describe('the usage of a group', () => {

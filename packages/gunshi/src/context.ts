@@ -191,6 +191,11 @@ export async function createCommandContext<
     env.validationErrorExitCode = 1
   }
 
+  // the array of the caller stays as it is when the context is frozen
+  if (env.plugins) {
+    env.plugins = [...env.plugins]
+  }
+
   /**
    * apply Command definition's rendering option with highest priority
    */
@@ -236,7 +241,7 @@ export async function createCommandContext<
     positionals,
     rest,
     passthrough,
-    _: argv,
+    _: [...argv],
     tokens,
     toKebab: command.toKebab,
     log: silent ? NOOP : log,
@@ -265,7 +270,14 @@ export async function createCommandContext<
   /**
    * NOTE(kazupon): `env.entryCommand` is not frozen, like the commands in `env.subCommands`.
    * It shares the argument schemas with the command that the user defined, which must stay mutable.
+   * So do the choices and the defaults in the schemas, and the values, which `parse` may return as
+   * anything: a `Buffer` cannot be frozen, and an instance of a class may change its own state. The
+   * schemas and the values are frozen on their own, so that the walk stops at them.
    */
+  for (const schema of Object.values(_args)) {
+    Object.freeze(schema)
+  }
+  Object.freeze(values)
   const ctx = deepFreeze(core, ['extensions', 'entryCommand'])
 
   return ctx as CommandContextResult<G, E>
