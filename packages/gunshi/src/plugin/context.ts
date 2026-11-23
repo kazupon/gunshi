@@ -117,7 +117,7 @@ export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiP
   /**
    * Decorate the command execution.
    *
-   * Decorators are applied in reverse order (last registered is executed first).
+   * The first registered decorator is the outermost one, and runs first.
    *
    * @typeParam L - An extensions type to specify the shape of {@linkcode CommandContext}'s extensions.
    *
