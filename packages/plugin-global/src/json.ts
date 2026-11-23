@@ -667,13 +667,17 @@ export async function createHelpDocument(ctx: Context): Promise<JsonHelp> {
 }
 
 /**
- * Check whether a positional argument must be given, as the help shows it: unless the schema says
- * otherwise, an argument without a default must be given.
+ * Check whether a positional argument must be given, as the help shows it: an argument that takes many
+ * values must be given only with `required: true`, and an argument that takes one value must be given,
+ * unless the schema says otherwise or it has a default.
  *
  * @param schema - The schema of the positional argument
  * @returns `true` when the argument must be given
  */
 function isRequiredPositional(schema: ArgSchema): boolean {
+  if (schema.multiple) {
+    return schema.required === true
+  }
   if (schema.required === true || schema.required === false) {
     return schema.required
   }
