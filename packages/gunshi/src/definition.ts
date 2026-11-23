@@ -367,7 +367,12 @@ export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   // Definition metadata and marker properties are copied onto the loader below.
   // Preserve its identity whenever the function object can be extended, and use
   // a delegating wrapper when the loader cannot be modified.
-  if (
+  if (definition != null && 'args' in lazyCommand) {
+    // NOTE(kazupon): the loader already has the definition of another lazy command, as when one loader
+    // serves a command and its old name. The wrapper keeps the two commands apart, and takes nothing
+    // from the other definition.
+    lazyCommand = (() => loader()) as LazyCommand<G, any>
+  } else if (
     (definition != null || !('commandName' in lazyCommand)) &&
     !Object.isExtensible(lazyCommand)
   ) {

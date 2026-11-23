@@ -310,6 +310,47 @@ describe('lazy', () => {
     expect(loaderCalls).toBe(1)
   })
 
+  test('keeps two lazy commands with one loader apart', async () => {
+    const run = vi.fn<CommandRunner>()
+    const loader = () => run
+    const subCommands = { nested: define({ name: 'nested', run: vi.fn<CommandRunner>() }) }
+
+    const deploy = lazy(loader, { name: 'deploy', description: 'Deploy the app', subCommands })
+    const push = lazy(loader, { name: 'push', deprecated: 'Use deploy' })
+
+    expect(deploy).toBe(loader)
+    expect(push).not.toBe(deploy)
+    expect(deploy.commandName).toBe('deploy')
+    expect(deploy.description).toBe('Deploy the app')
+    expect(deploy.deprecated).toBeUndefined()
+    expect(push.commandName).toBe('push')
+    expect(push.deprecated).toBe('Use deploy')
+    expect(push.description).toBeUndefined()
+    expect(push.subCommands).toBeUndefined()
+    expect(await push()).toBe(run)
+  })
+
+  test('runs and lists two lazy commands with one loader as two commands', async () => {
+    const stderr = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const names: (string | undefined)[] = []
+    const loader = (): CommandRunner => ctx => {
+      names.push(ctx.name)
+    }
+    const subCommands = {
+      deploy: lazy(loader, { name: 'deploy', description: 'Deploy the app' }),
+      push: lazy(loader, { name: 'push', description: 'An old name', deprecated: 'Use deploy' })
+    }
+    const entry = define({ name: 'app', run: vi.fn<CommandRunner>() })
+
+    await cli(['deploy'], entry, { name: 'app', subCommands })
+    const usage = await cli(['--help'], entry, { name: 'app', usageSilent: true, subCommands })
+
+    expect(names).toEqual(['deploy'])
+    expect(stderr).not.toHaveBeenCalled()
+    expect(usage).toContain('Deploy the app')
+    stderr.mockRestore()
+  })
+
   test('basic', async () => {
     const subCommands = new Map()
     const test = define({
