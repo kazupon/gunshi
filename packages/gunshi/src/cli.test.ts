@@ -341,6 +341,25 @@ describe('execute command', () => {
     expect(mockDebug).toHaveBeenCalledOnce()
   })
 
+  test('an entry command without a name is not a candidate of an unknown command', async () => {
+    const subCommands = { deploy: define({ name: 'deploy', run: vi.fn<() => void>() }) }
+
+    defineMockErrorLog()
+    let capturedError: AggregateError | undefined
+    await cli(
+      ['anonymous'],
+      { run: vi.fn<() => void>() },
+      {
+        subCommands,
+        onErrorCommand: (_ctx, error) => {
+          capturedError = error as AggregateError
+        }
+      }
+    )
+
+    expect(findCommandNotFoundError(capturedError).candidates).toEqual(['deploy'])
+  })
+
   test('command not found exposes structured metadata', async () => {
     const mockEntry = vi.fn<() => void>()
     const entry = define({
