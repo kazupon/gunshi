@@ -3,7 +3,7 @@ import renderer from '@gunshi/plugin-renderer'
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vite-plus/test'
 import { z } from 'zod/v4-mini'
-import i18n from '../../plugin-i18n/src/index.ts'
+import i18n, { withI18nResource } from '../../plugin-i18n/src/index.ts'
 import { defineMockErrorLog, defineMockLog, helpHint } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
@@ -4756,6 +4756,240 @@ describe('what the caller owns', () => {
     for (const value of [args, args.env, lazyArgs, lazyArgs.env, choices]) {
       expect(Object.isFrozen(value)).toBe(false)
     }
+  })
+})
+
+describe('a sub-command with the name of the entry or of its parent command', () => {
+  const entryError = new TypeError(
+    `Sub-command 'app' has the same name as the entry command: rename one of them`
+  )
+  const parentError = new TypeError(
+    `Sub-command 'git' has the same name as its parent command: rename one of them`
+  )
+  const command = (name: string, description = name) =>
+    define({ name, description, run: vi.fn<() => void>() })
+
+  test.each([
+    { title: 'a command', argv: ['app'] },
+    { title: 'no command', argv: [] },
+    { title: 'the help', argv: ['--help'] },
+    { title: 'another command', argv: ['other'] }
+  ])('rejects one with the name of the entry for $title', async ({ argv }) => {
+    const entry = command('app')
+    const subCommands = { app: command('app', 'A sub-command'), other: command('other') }
+
+    await expect(cli(argv, entry, { name: 'tool', subCommands })).rejects.toThrow(entryError)
+    await expect(boneCli(argv, entry, { name: 'tool', subCommands })).rejects.toThrow(entryError)
+    expect(entry.run).not.toHaveBeenCalled()
+    expect(subCommands.app.run).not.toHaveBeenCalled()
+  })
+
+  test('rejects one among the sub-commands of the entry', async () => {
+    const entry = define({
+      name: 'app',
+      subCommands: { app: command('app', 'A sub-command') },
+      run: vi.fn<() => void>()
+    })
+
+    await expect(cli(['app'], entry, { name: 'tool' })).rejects.toThrow(entryError)
+  })
+
+  test('accepts the entry given as a sub-command too', async () => {
+    const entry = command('app')
+    const other = command('other')
+
+    await cli(['app'], entry, { name: 'tool', subCommands: { app: entry, other } })
+
+    expect(entry.run).toHaveBeenCalledOnce()
+  })
+
+  test('accepts the entry as a copy of a sub-command, with its resource', async () => {
+    const resource = () => Promise.resolve({ description: 'A resource' })
+    const main = command('main')
+    const later = lazy(() => vi.fn<() => void>(), { name: 'later', description: 'Later' })
+    const other = command('other')
+
+    await cli(['main'], withI18nResource(main, resource), {
+      name: 'tool',
+      subCommands: { main, other }
+    })
+    await cli(['later'], withI18nResource(later, resource), {
+      name: 'tool',
+      subCommands: { later, other }
+    })
+
+    expect(main.run).toHaveBeenCalledOnce()
+  })
+
+  test.each([
+    { title: 'the group', argv: ['git'] },
+    { title: 'the child', argv: ['git', 'git'] },
+    { title: 'the help of the group', argv: ['git', '--help'] },
+    { title: 'an unknown child', argv: ['git', 'nope'] }
+  ])('rejects a child with the name of its group for $title', async ({ argv }) => {
+    const group = define({
+      name: 'git',
+      subCommands: { git: command('git', 'The child'), other: command('other') }
+    })
+
+    await expect(
+      cli(argv, command('main'), { name: 'tool', subCommands: { git: group } })
+    ).rejects.toThrow(parentError)
+  })
+
+  test('rejects a command that shares only what it runs with the entry', async () => {
+    const run = vi.fn<() => void>()
+    const entry = define({ name: 'app', description: 'The entry', run })
+    const sub = define({ name: 'app', description: 'A sub-command', aliases: ['a'], run })
+
+    await expect(cli(['a'], entry, { name: 'tool', subCommands: { app: sub } })).rejects.toThrow(
+      entryError
+    )
+    expect(run).not.toHaveBeenCalled()
+  })
+
+  test.each([
+    { key: 'examples', value: 'tool app' },
+    { key: 'toKebab', value: true },
+    { key: 'internal', value: true },
+    { key: 'deprecated', value: true },
+    { key: 'passthrough', value: true },
+    { key: 'rendering', value: { header: null } }
+  ])('rejects a command that differs from the entry only in `$key`', async ({ key, value }) => {
+    const run = vi.fn<() => void>()
+    const entry = define({ name: 'app', run })
+    const sub = { name: 'app', run, [key]: value } as Command
+
+    await expect(cli(['app'], entry, { name: 'tool', subCommands: { app: sub } })).rejects.toThrow(
+      entryError
+    )
+    expect(run).not.toHaveBeenCalled()
+  })
+
+  test('accepts a runner and a command that runs it', async () => {
+    const build = vi.fn<() => void>()
+    function main() {
+      build()
+    }
+    const sub = define({ name: 'main', run: main })
+
+    await cli(['main'], main, { name: 'tool', subCommands: { main: sub } })
+
+    expect(build).toHaveBeenCalledOnce()
+  })
+
+  test('does not take the name of a runner for a name that it declares', async () => {
+    // a minifier renames a function, and the new name may be the name of a sub-command
+    const ran = vi.fn<() => void>()
+    function e() {
+      ran()
+    }
+    const other = command('other')
+
+    await cli(['other'], e, { name: 'tool', subCommands: { e: command('e'), other } })
+
+    expect(other.run).toHaveBeenCalledOnce()
+  })
+
+  test('accepts a loader that may load the entry', async () => {
+    const main = command('main')
+    const other = command('other')
+
+    await cli(['other'], main, {
+      name: 'tool',
+      subCommands: { main: () => main, other }
+    })
+
+    expect(other.run).toHaveBeenCalledOnce()
+  })
+
+  test('accepts a lazy entry and a command object with one name', async () => {
+    const definition = { name: 'main', description: 'Main' }
+    const other = command('other')
+
+    await cli(
+      ['other'],
+      lazy(() => vi.fn<() => void>(), definition),
+      {
+        name: 'tool',
+        subCommands: { main: define({ ...definition, run: vi.fn<() => void>() }), other }
+      }
+    )
+
+    expect(other.run).toHaveBeenCalledOnce()
+  })
+
+  test('rejects two lazy commands that declare different things', async () => {
+    const later = (description: string) =>
+      lazy(() => vi.fn<() => void>(), { name: 'app', description })
+
+    await expect(
+      cli(['app'], later('The entry'), { name: 'tool', subCommands: { app: later('Another') } })
+    ).rejects.toThrow(entryError)
+  })
+
+  test('accepts the environment of another cli()', async () => {
+    const inner = vi.fn<() => void>()
+    const nested = define({
+      name: 'nested',
+      run: async ctx => {
+        await cli([], define({ name: 'main', run: inner }), { ...ctx.env } as CliOptions)
+      }
+    })
+
+    await cli(['nested'], define({ name: 'main', run: vi.fn<() => void>() }), {
+      name: 'tool',
+      subCommands: { nested }
+    })
+
+    expect(inner).toHaveBeenCalledOnce()
+  })
+
+  test.each([
+    { title: 'null', value: null },
+    { title: 'false', value: false }
+  ])('accepts $title under the name of the entry', async ({ value }) => {
+    const other = command('other')
+
+    await cli(['other'], command('main'), {
+      name: 'tool',
+      subCommands: { main: value, other } as never
+    })
+
+    expect(other.run).toHaveBeenCalledOnce()
+  })
+
+  test('accepts a command line that does not go through that group', async () => {
+    const group = define({
+      name: 'git',
+      subCommands: { git: command('git', 'The child') }
+    })
+    const other = command('other')
+    const globals = plugin({
+      id: 'globals',
+      setup: ctx => {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+
+    // `git` is the value of the option here
+    await cli(['--config', 'git', 'other'], command('main'), {
+      name: 'tool',
+      subCommands: { git: group, other },
+      plugins: [globals]
+    })
+
+    expect(other.run).toHaveBeenCalledOnce()
+  })
+
+  test('accepts a command with the name of a command in another branch', async () => {
+    const add = command('add')
+    const remote = define({ name: 'remote', subCommands: { add } })
+    const branch = define({ name: 'branch', subCommands: { add: command('add', 'Another') } })
+
+    await cli(['remote', 'add'], command('main'), { name: 'tool', subCommands: { remote, branch } })
+
+    expect(add.run).toHaveBeenCalledOnce()
   })
 })
 

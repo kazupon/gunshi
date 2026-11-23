@@ -96,7 +96,7 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
 
   const entryCommand = createEntryCommand(entry)
 
-  const initialSubCommands = createInitialSubCommands(options, entryCommand)
+  const initialSubCommands = createInitialSubCommands(options, entry, entryCommand)
 
   const pluginContext = createPluginContext<G>(decorators, initialSubCommands)
 
@@ -129,6 +129,9 @@ export async function cliCore<G extends GunshiParamsConstraint = DefaultGunshiPa
   const selection = resolveCommandSelection(tokens, entry, cliOptions, pluginContext.globalOptions)
   const resolved = selection.context
   const { commandName: name, command, callMode, commandPath, depth, levelSubCommands } = resolved
+  if (commandPath.length > 0) {
+    assertNoChildWithParentName(commandPath, cliOptions.subCommands)
+  }
 
   let targetCommand = command
   let targetCommandName = name
@@ -870,6 +873,7 @@ function createEntryCommand<G extends GunshiParamsConstraint>(
 
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
+  entry: Command<G> | CommandRunner<G> | LazyCommand<G>,
   entryCommand: Command<G> | LazyCommand<G> | undefined
 ): Map<string, Command<G> | LazyCommand<G>> {
   // NOTE(kazupon): SubCommandable is intentionally loose to accept any command type from user code.
@@ -892,10 +896,93 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
 
   // add entry command to sub commands if there are sub commands
   if (subCommands.size > 0 && entryCommand) {
-    subCommands.set(resolveEntryName(entryCommand), entryCommand)
+    const entryName = resolveEntryName(entryCommand)
+    const declared = subCommands.get(entryName)
+    /**
+     * NOTE(kazupon): a name is the key of the translations and the examples of a command and of its row
+     * in the help, so two commands cannot share it. The entry would replace the other command here.
+     */
+    if (declared && isAnotherCommand(declared, entry)) {
+      throw new TypeError(
+        `Sub-command '${entryName}' has the same name as the entry command: rename one of them`
+      )
+    }
+    subCommands.set(entryName, entryCommand)
   }
 
   return subCommands
+}
+
+/**
+ * Check whether a command that is declared under a name is certainly another command than the one
+ * that has the name, so that a CLI that works is not rejected for what cannot be told:
+ *
+ * - a copy shares what the command runs and declares, such as the one that `withI18nResource()` makes
+ * - a runner declares no name: it goes by the name of its function, which a minifier changes
+ * - a loader, or a lazy command next to a command object, may load that same command
+ * - a command marked as an entry is the entry of another `cli()`, given with its environment
+ *
+ * @param declared - The command that is declared under the name
+ * @param command - The command that has the name
+ * @returns `true` if they are different commands
+ */
+function isAnotherCommand<G extends GunshiParamsConstraint>(
+  declared: Command<G> | LazyCommand<G>,
+  command: Command<G> | CommandRunner<G> | LazyCommand<G>
+): boolean {
+  if (declared === command || declared.entry || typeof declared !== typeof command) {
+    return false
+  }
+  if (
+    typeof declared === 'function' &&
+    !(isLazyCommand<G>(declared) && isLazyCommand<G>(command))
+  ) {
+    return false
+  }
+  if (typeof declared !== 'function' && typeof declared !== 'object') {
+    return false
+  }
+  const [a, b] = [declared, command] as (Partial<Command<G>> & { commandName?: string })[]
+  return (
+    a.run !== b.run ||
+    a.commandName !== b.commandName ||
+    a.description !== b.description ||
+    a.args !== b.args ||
+    a.examples !== b.examples ||
+    a.toKebab !== b.toKebab ||
+    a.internal !== b.internal ||
+    a.aliases !== b.aliases ||
+    a.deprecated !== b.deprecated ||
+    a.passthrough !== b.passthrough ||
+    a.rendering !== b.rendering ||
+    a.subCommands !== b.subCommands
+  )
+}
+
+/**
+ * Reject a sub-command that has the name of the command it belongs to, on the path of the command line.
+ *
+ * NOTE(kazupon): only the path is checked, as walking every command would cost each startup. The names
+ * of the top level are checked with the entry command in {@linkcode createInitialSubCommands}.
+ *
+ * @param commandPath - The names of the commands on the path
+ * @param subCommands - The top-level sub-commands
+ */
+function assertNoChildWithParentName<G extends GunshiParamsConstraint>(
+  commandPath: string[],
+  subCommands: Map<string, Command<G> | LazyCommand<G>>
+): void {
+  let level: Map<string, Command<G> | LazyCommand<G>> | undefined = subCommands
+  for (const name of commandPath) {
+    const command: Command<G> | LazyCommand<G> | undefined = level?.get(name)
+    level = command && getCommandSubCommands<G>(command)
+    const child = level?.get(name)
+    if (command && child && isAnotherCommand(child, command)) {
+      throw new TypeError(
+        `Sub-command '${name}' has the same name as its parent command: rename one of them`
+      )
+    }
+  }
 }
 
 function normalizeCliOptions<G extends GunshiParamsConstraint>(
