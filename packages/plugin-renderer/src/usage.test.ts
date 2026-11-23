@@ -2190,6 +2190,71 @@ describe('#872 - a row without a description has no trailing spaces', () => {
   )
 })
 
+describe('usageOptionValue', () => {
+  type TestCommand = Command<GunshiParams<{ args: Args }>>
+
+  const args: Args = {
+    target: { type: 'string', default: 'node', description: 'The target' },
+    mode: { type: 'enum', choices: ['dev', 'prod'], default: 'dev', description: 'The mode' },
+    level: { type: 'enum', choices: ['low', 'high'], description: 'The level' },
+    count: { type: 'number', default: 0 },
+    cache: { type: 'boolean', default: true, negatable: true, description: 'Use the cache' }
+  }
+
+  async function optionRows(
+    options: Pick<CliOptions, 'usageOptionType' | 'usageOptionValue'>
+  ): Promise<string[]> {
+    const command = { args, name: 'main', description: 'Main', run: NOOP } as TestCommand
+    const ctx = await createCommandContext({
+      args,
+      command,
+      extensions: { [rendererPlugin.id]: rendererPlugin.extension },
+      cliOptions: { cwd: '/path/to/main', name: 'my-cli', version: '0.0.0', ...options }
+    })
+    const lines = (await renderUsage<WithRendererOnly>(ctx)).split('\n')
+    const start = lines.indexOf('OPTIONS:') + 1
+    const end = lines.findIndex((line, index) => index >= start && line.trim() === '')
+    return lines.slice(start, end === -1 ? undefined : end)
+  }
+
+  test('`false` leaves out the default values and the choices', async () => {
+    expect(await optionRows({ usageOptionValue: false })).toEqual([
+      '  --target <target>          The target',
+      '  --mode <mode>              The mode',
+      '  --level <level>            The level',
+      '  --count <count>',
+      '  --cache                    Use the cache',
+      '  --no-cache                 Negate --cache'
+    ])
+  })
+
+  test.each([
+    { title: 'left out', options: {} },
+    { title: '`true`', options: { usageOptionValue: true } },
+    { title: '`undefined`', options: { usageOptionValue: undefined } }
+  ])('shows them when it is $title', async ({ options }) => {
+    expect(await optionRows(options)).toEqual([
+      '  --target <target>          The target (default: node)',
+      '  --mode <mode>              The mode (default: dev, choices: dev | prod)',
+      '  --level <level>            The level (choices: low | high)',
+      '  --count <count>             (default: 0)',
+      '  --cache                    Use the cache (default: true)',
+      '  --no-cache                 Negate --cache'
+    ])
+  })
+
+  test('`false` keeps the type of an option', async () => {
+    expect(await optionRows({ usageOptionType: true, usageOptionValue: false })).toEqual([
+      '  --target <target>          [string]  The target',
+      '  --mode <mode>              [enum]    The mode',
+      '  --level <level>            [enum]    The level',
+      '  --count <count>            [number]',
+      '  --cache                    [boolean] Use the cache',
+      '  --no-cache                 [boolean] Negate --cache'
+    ])
+  })
+})
+
 describe('the usage of a group', () => {
   const add = define({ name: 'add', description: 'Add a record', run: NOOP })
   const list = define({ name: 'list', description: 'List the records', run: NOOP })

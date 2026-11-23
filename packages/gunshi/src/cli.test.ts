@@ -915,6 +915,36 @@ describe('auto generate usage', () => {
   })
 })
 
+describe('usageOptionValue', () => {
+  const entry = define({
+    name: 'demo',
+    args: {
+      mode: { type: 'enum', choices: ['dev', 'prod'], default: 'dev', description: 'The mode' }
+    },
+    run: vi.fn<() => void>()
+  })
+  const silent = { name: 'demo', usageSilent: true, usageOptionValue: false }
+
+  test('`false` leaves the default values and the choices out of the help', async () => {
+    const usage = await cli(['--help'], entry, silent)
+
+    expect(usage).toContain('The mode')
+    expect(usage).not.toContain('(default:')
+    expect(usage).not.toContain('choices:')
+  })
+
+  test('the help as JSON lists them either way', async () => {
+    const json = JSON.parse((await cli(['--help', '--json'], entry, silent)) as string) as {
+      help: { options: { name: string; default: unknown; choices: unknown[] | null }[] }
+    }
+
+    expect(json.help.options.find(option => option.name === '--mode')).toMatchObject({
+      default: 'dev',
+      choices: ['dev', 'prod']
+    })
+  })
+})
+
 describe('custom generate usage', () => {
   test('basic', async () => {
     const utils = await import('./utils.ts')

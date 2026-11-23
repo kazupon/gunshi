@@ -747,7 +747,10 @@ async function generateOptionalArgsUsage<
         }
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
-      const valueDesc = isNegatedRow(ctx, key, value) ? '' : await resolveDisplayValue(ctx, key)
+      const valueDesc =
+        ctx.env.usageOptionValue === false || isNegatedRow(ctx, key, value)
+          ? ''
+          : await resolveDisplayValue(ctx, key)
       /**
        * NOTE(kazupon): a row is padded only where something follows, so that a row without a description
        * has no trailing spaces (#872), as a row of the commands section has none (#727). The `[]` symbols are
