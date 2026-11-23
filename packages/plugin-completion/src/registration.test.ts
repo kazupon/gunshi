@@ -1898,6 +1898,64 @@ describe('hidden', () => {
     expect(await complete(['deploy', 'prod', 'legacy-a', ''])).toEqual(['extra-1\t', ':4'])
   })
 
+  describe('with an option of a command of the same name', () => {
+    const child = defineCommand({
+      name: 'child',
+      args: { deep: { type: 'boolean', description: 'Go deep' } },
+      run: NOOP
+    })
+    const sub = defineCommand({
+      name: 'sub',
+      args: { secret: { type: 'string', description: 'A value' } },
+      subCommands: { child },
+      run: NOOP
+    })
+
+    async function completeWith(secret: 'boolean' | 'string', request: string[]) {
+      output.length = 0
+      await cli(
+        ['complete', '--', ...request],
+        defineCommand({
+          name: 'app',
+          args: { secret: { type: secret, hidden: true } },
+          run: NOOP
+        }),
+        {
+          name: 'mycli',
+          usageSilent: true,
+          subCommands: { sub },
+          plugins: [
+            completion({
+              config: {
+                subCommands: { sub: { args: { secret: { handler: () => [{ value: 'val' }] } } } }
+              }
+            })
+          ]
+        }
+      )
+      return [...output]
+    }
+
+    test('the command decides what the option takes behind its name', async () => {
+      expect(await completeWith('boolean', ['sub', '--secret', 'val', 'child', '--d'])).toEqual([
+        '--deep\tGo deep',
+        ':4'
+      ])
+      expect(await completeWith('boolean', ['sub', '--secret', ''])).toEqual(['val\t', ':4'])
+    })
+
+    test('the hidden option decides what it takes before the name of the command', async () => {
+      expect(await completeWith('boolean', ['--secret', 'sub', 'child', '--d'])).toEqual([
+        '--deep\tGo deep',
+        ':4'
+      ])
+      expect(await completeWith('string', ['--secret', 'x', 'sub', 'child', '--d'])).toEqual([
+        '--deep\tGo deep',
+        ':4'
+      ])
+    })
+  })
+
   test('a typed hidden boolean option does not stop the completion of commands', async () => {
     // the walk that decides which commands to register mirrors `RootCommand#stripOptions`,
     // so it has to know the arity of a hidden option too (#710)
