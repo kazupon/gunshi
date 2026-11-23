@@ -661,8 +661,14 @@ function alignHiddenArity(
     for (const arg of previousArgs.slice(commandIndexes[position] + 1)) {
       const option = arg.startsWith('-') ? findOption(command, arg) : undefined
       const hiddenOption = option && findOption(holder, arg)
-      if (hiddenOption) {
-        hiddenOption.isBoolean = option.isBoolean
+      if (!hiddenOption || (hiddenOption.isBoolean ?? false) === (option.isBoolean ?? false)) {
+        continue
+      }
+      // keyed by the word as it is typed, so that the other name of the hidden option keeps its arity
+      if (option.isBoolean) {
+        holder.option(arg, '')
+      } else {
+        holder.option(arg, '', () => {})
       }
     }
   }

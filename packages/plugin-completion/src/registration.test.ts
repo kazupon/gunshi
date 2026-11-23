@@ -1944,6 +1944,48 @@ describe('hidden', () => {
       expect(await completeWith('boolean', ['sub', '--secret', ''])).toEqual(['val\t', ':4'])
     })
 
+    test('a short name of a command leaves the long name of the hidden option as it is', async () => {
+      output.length = 0
+      await cli(
+        ['complete', '--', 'sub', '-s', '--secret', 'val', 'child', '--d'],
+        defineCommand({
+          name: 'app',
+          args: { secret: { type: 'string', short: 's', hidden: true } },
+          run: NOOP
+        }),
+        {
+          name: 'mycli',
+          usageSilent: true,
+          subCommands: {
+            sub: defineCommand({
+              name: 'sub',
+              args: { size: { type: 'boolean', short: 's', description: 'Size' } },
+              subCommands: { child },
+              run: NOOP
+            })
+          },
+          plugins: [completion()]
+        }
+      )
+
+      expect(output).toEqual(['--deep\tGo deep', ':4'])
+    })
+
+    test('a long name of a command leaves the short name of the hidden option as it is', async () => {
+      output.length = 0
+      await cli(
+        ['complete', '--', 'sub', '--secret', 'val', '-s', 'child', '--d'],
+        defineCommand({
+          name: 'app',
+          args: { secret: { type: 'boolean', short: 's', hidden: true } },
+          run: NOOP
+        }),
+        { name: 'mycli', usageSilent: true, subCommands: { sub }, plugins: [completion()] }
+      )
+
+      expect(output).toEqual(['--deep\tGo deep', ':4'])
+    })
+
     test('the hidden option decides what it takes before the name of the command', async () => {
       expect(await completeWith('boolean', ['--secret', 'sub', 'child', '--d'])).toEqual([
         '--deep\tGo deep',
