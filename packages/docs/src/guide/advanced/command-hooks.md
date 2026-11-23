@@ -292,7 +292,7 @@ graph TD
 
 1. **`onBeforeCommand` Hook** - Pre-execution setup and validation
 2. **Plugin Decorator Chain** - Command wrapping by plugins
-   - Applied in reverse order (LIFO - last registered, first executed)
+   - The first registered decorator is the outermost one, and runs first
    - Each decorator wraps the next runner in the chain
 3. **Command Runner** - Actual command execution
 4. **`onAfterCommand` Hook** - Post-success processing

@@ -438,7 +438,6 @@ The values after an alias are completed by the handlers that are configured for 
 
 ```ts
 interface CompletionConfig {
-  handler?: CompletionHandler // Handler for command-level completions
   args?: Record<
     string,
     {

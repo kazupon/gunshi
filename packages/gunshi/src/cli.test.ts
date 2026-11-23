@@ -6411,6 +6411,46 @@ describe('--help and --version with --json', () => {
     expect(add.run).not.toHaveBeenCalled()
   })
 
+  test.each<{ title: string; schema: ArgSchema; required: boolean }>([
+    { title: 'one value', schema: { type: 'positional' }, required: true },
+    {
+      title: 'one value with `required: false`',
+      schema: { type: 'positional', required: false },
+      required: false
+    },
+    {
+      title: 'one value with a default',
+      schema: { type: 'positional', default: 'a.txt' },
+      required: false
+    },
+    { title: 'many values', schema: { type: 'positional', multiple: true }, required: false },
+    {
+      title: 'many values with `required: true`',
+      schema: { type: 'positional', multiple: true, required: true },
+      required: true
+    },
+    {
+      title: 'many values with `required: false`',
+      schema: { type: 'positional', multiple: true, required: false },
+      required: false
+    }
+  ])(
+    'the help as JSON tells what the command requires for $title',
+    async ({ schema, required }) => {
+      const run = vi.fn<() => void>()
+      const command = define({ name: 'cat', args: { files: schema }, run })
+      const silent = { name: 'demo', usageSilent: true }
+
+      const json = JSON.parse((await cli(['--help', '--json'], command, silent)) as string) as {
+        help: { arguments: { required: boolean }[] }
+      }
+      await cli([], command, silent).catch(() => {})
+
+      expect(json.help.arguments[0]?.required).toBe(required)
+      expect(run).toHaveBeenCalledTimes(required ? 0 : 1)
+    }
+  )
+
   test('--help prints the help of a command without jsonArgs as JSON too', async () => {
     const utils = await import('./utils.ts')
     const log = defineMockLog(utils)

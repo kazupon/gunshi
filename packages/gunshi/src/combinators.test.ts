@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, test, vi } from 'vite-plus/test'
+import { describe, expect, test, vi } from 'vite-plus/test'
 import { cli } from './cli.ts'
 import {
   args,
@@ -274,85 +274,5 @@ describe('schema composition with define', () => {
     })
 
     expect(log).toHaveBeenCalledWith(3000)
-  })
-})
-
-describe('type inference with combinators', () => {
-  test('withDefault makes values non-optional', async () => {
-    const command = define({
-      name: 'test',
-      args: {
-        host: withDefault(string(), 'localhost'),
-        port: withDefault(integer(), 8080)
-      },
-      run: ctx => {
-        expectTypeOf(ctx.values.host).toEqualTypeOf<string>()
-        expectTypeOf(ctx.values.port).toEqualTypeOf<number>()
-      }
-    })
-
-    await cli(['test'], command, { usageSilent: true })
-  })
-
-  test('required string', async () => {
-    const command = define({
-      name: 'test',
-      args: {
-        name: required(string())
-      },
-      run: ctx => {
-        expectTypeOf(ctx.values.name).toEqualTypeOf<string>()
-      }
-    })
-
-    await cli(['test', '--name', 'hello'], command, { usageSilent: true })
-  })
-
-  test('optional combinators', async () => {
-    const command = define({
-      name: 'test',
-      args: {
-        flag: boolean(),
-        value: string()
-      },
-      run: ctx => {
-        expectTypeOf(ctx.values.flag).toEqualTypeOf<boolean | undefined>()
-        expectTypeOf(ctx.values.value).toEqualTypeOf<string | undefined>()
-      }
-    })
-
-    await cli(['test'], command, { usageSilent: true })
-  })
-
-  test('unrequired positional combinator', async () => {
-    const command = define({
-      name: 'test',
-      args: {
-        query: unrequired(positional()),
-        file: positional()
-      },
-      run: ctx => {
-        expectTypeOf(ctx.values.query).toEqualTypeOf<string | undefined>()
-        expectTypeOf(ctx.values.file).toEqualTypeOf<string>()
-      }
-    })
-
-    await cli(['input.sql'], command, { usageSilent: true })
-  })
-
-  test('choice literal type inference', async () => {
-    const command = define({
-      name: 'test',
-      args: {
-        level: choice(['debug', 'info', 'warn', 'error'] as const)
-      },
-      run: ctx => {
-        expectTypeOf(ctx.values.level).toEqualTypeOf<
-          'debug' | 'info' | 'warn' | 'error' | undefined
-        >()
-      }
-    })
-
-    await cli(['test', '--level', 'info'], command, { usageSilent: true })
   })
 })

@@ -29,7 +29,6 @@
  * @license MIT
  */
 
-export { DefaultTranslation } from '@gunshi/plugin-i18n' // TODO(kazupon): remove this import after the next major release
 export { ArgsValidationError, ArgsValidationErrorKeys, parseArgs, resolveArgs } from 'args-tokens'
 export * from './cli.ts'
 export { ANONYMOUS_COMMAND_NAME } from './constants.ts'

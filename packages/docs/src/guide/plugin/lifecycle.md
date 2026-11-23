@@ -136,7 +136,7 @@ const myPlugin = plugin({
       run: ctx => console.log('Plugin command')
     })
 
-    // Add decorators (they stack in LIFO order)
+    // Add decorators (the first registered is the outermost one, and runs first)
     ctx.decorateCommand(baseRunner => async ctx => {
       console.log('Before command (from plugin)')
       const result = await baseRunner(ctx)
@@ -199,7 +199,7 @@ This sequential processing ensures extensions from dependencies are available to
 
 The command runner executes with:
 
-- All decorators applied in LIFO (Last In, First Out) order
+- All decorators applied, with the first registered as the outermost one
 - Full access to all plugin extensions via `ctx.extensions`
 - Complete CommandContext with validated arguments
 
@@ -209,7 +209,7 @@ This example illustrates the command execution with decorator wrapping and exten
 import { define } from 'gunshi'
 
 // If plugins A, B, C add decorators in that order:
-// Execution order: C → B → A → original command → A → B → C
+// Execution order: A → B → C → original command → C → B → A
 
 const command = define({
   name: 'build',
@@ -315,7 +315,7 @@ export default plugin({
       run: ctx => console.log('Status: OK')
     })
 
-    // Register decorators (LIFO order)
+    // Register decorators (the first registered runs first)
     ctx.decorateCommand(runner => async ctx => {
       console.log('5. Command decorator (before)')
       const result = await runner(ctx)

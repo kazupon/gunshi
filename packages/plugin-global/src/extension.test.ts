@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vite-plus/test'
+import { describe, expect, test, vi } from 'vite-plus/test'
 import { createCommandContext } from '../../gunshi/src/context.ts'
 import { defineMockErrorLog, defineMockLog } from '../../gunshi/test/utils.ts'
 import extension from './extension.ts'
@@ -6,9 +6,10 @@ import { pluginId } from './types.ts'
 
 describe('showVersion', () => {
   test('basic', async () => {
+    using log = vi.spyOn(console, 'log').mockImplementation(() => {})
     const version = '1.0.0'
     const ctx = await createCommandContext({
-      cliOptions: { version, usageSilent: true },
+      cliOptions: { version },
       extensions: {
         [pluginId]: {
           key: Symbol(pluginId),
@@ -20,6 +21,7 @@ describe('showVersion', () => {
     const rendered = global.showVersion()
 
     expect(rendered).toEqual(version)
+    expect(log).toHaveBeenCalledWith(version)
   })
 
   test('no version', async () => {
@@ -39,6 +41,7 @@ describe('showVersion', () => {
   })
 
   test('usageSilent', async () => {
+    using log = vi.spyOn(console, 'log').mockImplementation(() => {})
     const version = '1.0.0'
     const ctx = await createCommandContext({
       cliOptions: { version, usageSilent: true },
@@ -53,6 +56,7 @@ describe('showVersion', () => {
     const rendered = global.showVersion()
 
     expect(rendered).toEqual(version)
+    expect(log).not.toHaveBeenCalled()
   })
 })
 

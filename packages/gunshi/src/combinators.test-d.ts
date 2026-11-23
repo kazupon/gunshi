@@ -1,4 +1,4 @@
-import { expectTypeOf, test } from 'vite-plus/test'
+import { describe, expectTypeOf, test } from 'vite-plus/test'
 import {
   args,
   boolean,
@@ -76,4 +76,74 @@ test('hidden combinator marks schema as hidden', () => {
   const s = hidden(string())
   expectTypeOf(s).toMatchTypeOf<ArgSchema>()
   expectTypeOf(s.hidden).toEqualTypeOf<true>()
+})
+
+describe('type inference with combinators', () => {
+  test('withDefault makes values non-optional', () => {
+    define({
+      name: 'test',
+      args: {
+        host: withDefault(string(), 'localhost'),
+        port: withDefault(integer(), 8080)
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.host).toEqualTypeOf<string>()
+        expectTypeOf(ctx.values.port).toEqualTypeOf<number>()
+      }
+    })
+  })
+
+  test('required string', () => {
+    define({
+      name: 'test',
+      args: {
+        name: required(string())
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.name).toEqualTypeOf<string>()
+      }
+    })
+  })
+
+  test('optional combinators', () => {
+    define({
+      name: 'test',
+      args: {
+        flag: boolean(),
+        value: string()
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.flag).toEqualTypeOf<boolean | undefined>()
+        expectTypeOf(ctx.values.value).toEqualTypeOf<string | undefined>()
+      }
+    })
+  })
+
+  test('unrequired positional combinator', () => {
+    define({
+      name: 'test',
+      args: {
+        query: unrequired(positional()),
+        file: positional()
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.query).toEqualTypeOf<string | undefined>()
+        expectTypeOf(ctx.values.file).toEqualTypeOf<string>()
+      }
+    })
+  })
+
+  test('choice literal type inference', () => {
+    define({
+      name: 'test',
+      args: {
+        level: choice(['debug', 'info', 'warn', 'error'] as const)
+      },
+      run: ctx => {
+        expectTypeOf(ctx.values.level).toEqualTypeOf<
+          'debug' | 'info' | 'warn' | 'error' | undefined
+        >()
+      }
+    })
+  })
 })

@@ -135,7 +135,7 @@ About more details and usage, see [documentations](https://gunshi.dev)
 
 ## Contributing guidelines
 
-If you are interested in contributing to `gunshi`, I highly recommend checking out [the contributing guidelines](/CONTRIBUTING.md) here. You'll find all the relevant information such as [how to make a PR](/CONTRIBUTING.md#pull-request-guidelines), [how to setup development](/CONTRIBUTING.md#development-setup)) etc., there.
+If you are interested in contributing to `gunshi`, I highly recommend checking out [the contributing guidelines](https://github.com/kazupon/gunshi/blob/main/CONTRIBUTING.md) here. You'll find all the relevant information such as [how to make a PR](https://github.com/kazupon/gunshi/blob/main/CONTRIBUTING.md#pull-request-guidelines), [how to setup development](https://github.com/kazupon/gunshi/blob/main/CONTRIBUTING.md#development-setup) etc., there.
 
 ## Credits
 
