@@ -645,6 +645,28 @@ test('multiple positional arguments with required', async () => {
   expect(await renderUsage<WithI18nAndRenderer>(ctx)).toMatchSnapshot()
 })
 
+test('shows the default of an option named like a built-in option or a negated form', async () => {
+  const command = define({
+    name: 'tool',
+    args: {
+      version: { type: 'string', default: '2', description: 'The version to use' },
+      'no-cache': { type: 'string', default: 'dir', description: 'Where not to cache' },
+      force: { type: 'boolean', negatable: true, default: true, description: 'Force' }
+    },
+    run: vi.fn<() => void>()
+  })
+
+  const usage = (await cli(['--help'], command, { name: 'tool', usageSilent: true })) as string
+  const row = (option: string) => usage.split('\n').find(line => line.includes(option))
+
+  expect(row('--version <version>')).toContain('The version to use (default: 2)')
+  expect(row('--no-cache <no-cache>')).toContain('Where not to cache (default: dir)')
+  expect(row('--force')).toContain('Force (default: true)')
+  // the negated form, and the built-in `--help`, have no default
+  expect(row('--no-force')).not.toContain('default')
+  expect(row('--help')).not.toContain('default')
+})
+
 test('no examples', async () => {
   const command = {
     args: {

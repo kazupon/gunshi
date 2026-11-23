@@ -653,10 +653,6 @@ async function resolveDisplayValue<
     extensions: Extensions
   }>
 >(ctx: Readonly<CommandContext<G>>, key: string): Promise<string> {
-  if (COMMON_ARGS_KEYS.includes(key)) {
-    return ''
-  }
-
   const schema = ctx.args[key]
   if (
     (schema.type === 'boolean' ||
@@ -729,9 +725,8 @@ async function generateOptionalArgsUsage<
         }
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
-      const valueDesc = key.startsWith(ARG_NEGATABLE_PREFIX)
-        ? ''
-        : await resolveDisplayValue(ctx, key)
+      // a key that no argument answers to is the negated form of an option, which has no default
+      const valueDesc = ctx.args[key] ? await resolveDisplayValue(ctx, key) : ''
       /**
        * NOTE(kazupon): a row is padded only where something follows, so that a row without a description
        * has no trailing spaces (#872), as a row of the commands section has none (#727). The `[]` symbols are
