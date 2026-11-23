@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/plugin-i18n",
-  "version": "1.0.0-rc.12",
+  "version": "1.0.0-rc.13",
   "description": "internationalization plugin for gunshi",
   "keywords": [
     "cli",

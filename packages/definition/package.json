@@ -1,6 +1,6 @@
 {
   "name": "@gunshi/definition",
-  "version": "1.0.0-rc.12",
+  "version": "1.0.0-rc.13",
   "description": "utilities for gunshi command definition",
   "keywords": [
     "cli",
