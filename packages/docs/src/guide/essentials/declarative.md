@@ -564,7 +564,7 @@ To print everything yourself, set `renderValidationErrors` to `null`, and catch 
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> Use `isCommandNotFoundError` and `isArgsValidationError` instead of `instanceof` checks. `gunshi`, `@gunshi/plugin`, and `@gunshi/bone` each bundle their own copy of the error classes, so `instanceof` fails when an error is thrown by one package and checked with a class imported from another. The guards recognize errors from every copy, including argument errors such as a missing required option or an invalid value, whose `name` is overridden with the argument name. Keep all `gunshi` and `@gunshi/*` packages on the same version. Older copies do not mark those argument errors, so the guards cannot recognize them when an older copy throws them. Unknown option and command not found errors from older copies are still recognized.
+> Use `isCommandNotFoundError` and `isArgsValidationError` instead of `instanceof` checks. `gunshi`, `@gunshi/plugin`, and `@gunshi/bone` each bundle their own copy of the error classes, so `instanceof` fails when an error is thrown by one package and checked with a class imported from another. The guards recognize errors from every copy, including argument errors such as a missing required option or an invalid value, whose `name` is overridden with the argument name. Keep all `gunshi` and `@gunshi/*` packages on the same version. Copies older than 0.37.3 do not mark their errors, so the guards do not recognize the errors that such a copy throws.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
