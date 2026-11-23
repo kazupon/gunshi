@@ -3,7 +3,7 @@ import renderer from '@gunshi/plugin-renderer'
 import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { afterEach, beforeEach, describe, expect, onTestFinished, test, vi } from 'vite-plus/test'
 import { z } from 'zod/v4-mini'
-import i18n from '../../plugin-i18n/src/index.ts'
+import i18n, { withI18nResource } from '../../plugin-i18n/src/index.ts'
 import { defineMockErrorLog, defineMockLog, helpHint } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { cli as boneCli } from './cli/bone.ts'
@@ -4707,6 +4707,118 @@ describe('what the caller owns', () => {
     for (const value of [args, args.env, lazyArgs, lazyArgs.env, choices]) {
       expect(Object.isFrozen(value)).toBe(false)
     }
+  })
+})
+
+describe('a sub-command with the name of the entry or of its parent command', () => {
+  const entryError = new TypeError(
+    `Sub-command 'app' has the same name as the entry command: rename one of them`
+  )
+  const parentError = new TypeError(
+    `Sub-command 'git' has the same name as its parent command: rename one of them`
+  )
+  const command = (name: string, description = name) =>
+    define({ name, description, run: vi.fn<() => void>() })
+
+  test.each([
+    { title: 'a command', argv: ['app'] },
+    { title: 'no command', argv: [] },
+    { title: 'the help', argv: ['--help'] },
+    { title: 'another command', argv: ['other'] }
+  ])('rejects one with the name of the entry for $title', async ({ argv }) => {
+    const entry = command('app')
+    const subCommands = { app: command('app', 'A sub-command'), other: command('other') }
+
+    await expect(cli(argv, entry, { name: 'tool', subCommands })).rejects.toThrow(entryError)
+    await expect(boneCli(argv, entry, { name: 'tool', subCommands })).rejects.toThrow(entryError)
+    expect(entry.run).not.toHaveBeenCalled()
+    expect(subCommands.app.run).not.toHaveBeenCalled()
+  })
+
+  test('rejects one among the sub-commands of the entry', async () => {
+    const entry = define({
+      name: 'app',
+      subCommands: { app: command('app', 'A sub-command') },
+      run: vi.fn<() => void>()
+    })
+
+    await expect(cli(['app'], entry, { name: 'tool' })).rejects.toThrow(entryError)
+  })
+
+  test('accepts the entry given as a sub-command too', async () => {
+    const entry = command('app')
+    const other = command('other')
+
+    await cli(['app'], entry, { name: 'tool', subCommands: { app: entry, other } })
+
+    expect(entry.run).toHaveBeenCalledOnce()
+  })
+
+  test('accepts the entry as a copy of a sub-command, with its resource', async () => {
+    const resource = () => Promise.resolve({ description: 'A resource' })
+    const main = command('main')
+    const later = lazy(() => vi.fn<() => void>(), { name: 'later', description: 'Later' })
+    const other = command('other')
+
+    await cli(['main'], withI18nResource(main, resource), {
+      name: 'tool',
+      subCommands: { main, other }
+    })
+    await cli(['later'], withI18nResource(later, resource), {
+      name: 'tool',
+      subCommands: { later, other }
+    })
+
+    expect(main.run).toHaveBeenCalledOnce()
+  })
+
+  test.each([
+    { title: 'the group', argv: ['git'] },
+    { title: 'the child', argv: ['git', 'git'] },
+    { title: 'the help of the group', argv: ['git', '--help'] },
+    { title: 'an unknown child', argv: ['git', 'nope'] }
+  ])('rejects a child with the name of its group for $title', async ({ argv }) => {
+    const group = define({
+      name: 'git',
+      subCommands: { git: command('git', 'The child'), other: command('other') }
+    })
+
+    await expect(
+      cli(argv, command('main'), { name: 'tool', subCommands: { git: group } })
+    ).rejects.toThrow(parentError)
+  })
+
+  test('accepts a command line that does not go through that group', async () => {
+    const group = define({
+      name: 'git',
+      subCommands: { git: command('git', 'The child') }
+    })
+    const other = command('other')
+    const globals = plugin({
+      id: 'globals',
+      setup: ctx => {
+        ctx.addGlobalOption('config', { type: 'string' })
+      }
+    })
+
+    // `git` is the value of the option here
+    await cli(['--config', 'git', 'other'], command('main'), {
+      name: 'tool',
+      subCommands: { git: group, other },
+      plugins: [globals]
+    })
+
+    expect(other.run).toHaveBeenCalledOnce()
+  })
+
+  test('accepts a command with the name of a command in another branch', async () => {
+    const add = command('add')
+    const remote = define({ name: 'remote', subCommands: { add } })
+    const branch = define({ name: 'branch', subCommands: { add: command('add', 'Another') } })
+
+    await cli(['remote', 'add'], command('main'), { name: 'tool', subCommands: { remote, branch } })
+
+    expect(add.run).toHaveBeenCalledOnce()
   })
 })
 
