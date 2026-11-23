@@ -667,6 +667,21 @@ test('shows the default of an option named like a built-in option or a negated f
   expect(row('--help')).not.toContain('default')
 })
 
+test('a negated form that has the key of another argument shows no default', async () => {
+  const command = define({
+    name: 'tool',
+    args: {
+      'no-dryRun': { type: 'string', default: 'x' },
+      dryRun: { type: 'boolean', negatable: true, toKebab: true }
+    },
+    run: vi.fn<() => void>()
+  })
+
+  const usage = (await cli(['--help'], command, { name: 'tool', usageSilent: true })) as string
+
+  expect(usage.split('\n').find(line => line.includes('--no-dry-run'))).not.toContain('default')
+})
+
 test('no examples', async () => {
   const command = {
     args: {

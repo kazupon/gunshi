@@ -627,6 +627,28 @@ function getOptionalArgsPairs<G extends GunshiParams>(
 
 const resolveNegatableKey = (key: string): string => key.slice(ARG_NEGATABLE_PREFIX.length)
 
+/**
+ * Check whether a row of the options is the negated form of an option, which has no default: its key
+ * is one that no argument answers to, or the key of an argument that is rendered under another name, as
+ * `toKebab` of one of the two can make them.
+ *
+ * @param ctx - A {@link CommandContext | command context}
+ * @param key - The key of the row
+ * @param value - The option as the row renders it
+ * @returns `true` if the row is a negated form
+ */
+function isNegatedRow<G extends GunshiParams>(
+  ctx: Readonly<CommandContext<G>>,
+  key: string,
+  value: string
+): boolean {
+  if (!key.startsWith(ARG_NEGATABLE_PREFIX)) {
+    return false
+  }
+  const schema = ctx.args[key]
+  return !schema || !value.includes(`--${resolveDisplayName(key, schema, ctx.toKebab)}`)
+}
+
 function resolveNegatableType<G extends GunshiParams>(
   key: string,
   ctx: Readonly<CommandContext<G>>
@@ -725,8 +747,7 @@ async function generateOptionalArgsUsage<
         }
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
-      // a key that no argument answers to is the negated form of an option, which has no default
-      const valueDesc = ctx.args[key] ? await resolveDisplayValue(ctx, key) : ''
+      const valueDesc = isNegatedRow(ctx, key, value) ? '' : await resolveDisplayValue(ctx, key)
       /**
        * NOTE(kazupon): a row is padded only where something follows, so that a row without a description
        * has no trailing spaces (#872), as a row of the commands section has none (#727). The `[]` symbols are
