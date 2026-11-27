@@ -37,7 +37,7 @@ catalog:
   vite-plus: 1.8.0
   '@kazupon/vp-config': 1.1.1
   "@types/node": ^26.0.0
-  vitepress-api-references: ^0.4.0
+  vitepress-api-references: ^0.5.0
   tsx: ^4.21.0
   args-tokens: 1.4.0
 minimumReleaseAge: 1440

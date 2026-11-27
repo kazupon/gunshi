@@ -195,8 +195,8 @@ catalogs:
       specifier: 1.8.0
       version: 1.8.0
     vitepress-api-references:
-      specifier: ^0.4.0
-      version: 0.4.0
+      specifier: ^0.5.0
+      version: 0.5.0
     zod:
       specifier: ^4.4.3
       version: 4.4.3
@@ -243,10 +243,10 @@ importers:
         version: 1.8.0(@types/node@26.6.4)(@vitest/coverage-v8@5.1.1)(esbuild@0.28.0)(jiti@2.7.0)(publint@0.3.21)(tsx@4.22.4)(typescript@7.0.2)(unrun@0.2.39(synckit@0.11.13))(yaml@2.9.0)
       vitepress-api-references:
         specifier: 'catalog:'
-        version: 0.4.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.28)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0))
+        version: 0.5.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.32)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0))
       vitest:
         specifier: 5.1.2
-        version: 5.1.2(@types/node@26.6.4)(@vitest/browser-preview@5.1.1)(@vitest/coverage-v8@5.1.1)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 5.1.2(@types/node@26.6.4)(@vitest/coverage-v8@5.1.1)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
 
   packages/bone:
     devDependencies:
@@ -312,7 +312,7 @@ importers:
         version: 2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.28)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0)
       vitepress-api-references:
         specifier: 'catalog:'
-        version: 0.4.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.28)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0))
+        version: 0.5.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.28)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0))
       vitepress-plugin-group-icons:
         specifier: ^1.5.5
         version: 1.7.5(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -1223,47 +1223,47 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@ox-content/binding-darwin-arm64@3.2.13':
-    resolution: {integrity: sha512-0lVkMuceExP2sm/XNloekSKjMYTLuFYxLfwg0lbURU8kbkYyFvn6QOTacz5zWZNipMngVjj6P4NnyoVW2QcCYg==}
+  '@ox-content/binding-darwin-arm64@3.8.3':
+    resolution: {integrity: sha512-cAfI+uucq8QBVwNULWyDzAjoI8kspIbF+dHgOSN2Y21ufld/D5tlcrCy/KZHKotVPMIZRKNWqXuVtwG0kLYaQA==}
     cpu: [arm64]
     os: [darwin]
 
-  '@ox-content/binding-darwin-x64@3.2.13':
-    resolution: {integrity: sha512-YChsHO5N13n7++m0Y4gjhaPOTYuldcMEEI0smYMflgozPwa2mHm1lpaAHIyyzIlag40S2Nx0dtPDzoJ11BspZw==}
+  '@ox-content/binding-darwin-x64@3.8.3':
+    resolution: {integrity: sha512-DqIGD0DTjHV1AfNiFkGe2joxaDpigsbm4UUWO/S89NHHjgHE/0BmowxZRZql1IF6TcHjYWAVWT3aM/GJOTaNow==}
     cpu: [x64]
     os: [darwin]
 
-  '@ox-content/binding-linux-arm64-gnu@3.2.13':
-    resolution: {integrity: sha512-B2VB5oVKSYtvB39OBer7k+H776HF6+FJEO/r7uxRCM5UpWdswlzVG8NCJEHtF6Zgctg2p+xmumUvyOyWas/Qsw==}
+  '@ox-content/binding-linux-arm64-gnu@3.8.3':
+    resolution: {integrity: sha512-hPamZBmHBq5r9YIZzZx9XNFsLb7E6jA49yxdJ8sSMX30O97+032FzRZACWI3nIUjEOk17J6N38ZaSy4HhYqfWA==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@ox-content/binding-linux-arm64-musl@3.2.13':
-    resolution: {integrity: sha512-2TjR+4FYNx97MoFUkzIvUejY3T4U/FinHdW8RVkeCmHXPix51Gh1219lycakZFTp+iNXs2PhR/p3FYYHLDNgtQ==}
+  '@ox-content/binding-linux-arm64-musl@3.8.3':
+    resolution: {integrity: sha512-tGaZh0T0J5u2bkBHUMjGkwZawN5pqnsnkM/VOAJy+f51kwtjTkDog24S3hJ4ibx8/VBrrGEqKgFUL4DNEtGRVg==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@ox-content/binding-linux-x64-gnu@3.2.13':
-    resolution: {integrity: sha512-OxBVesfjRF/b2xHMsE3dIR67YD/2RFGrVupTsQ6U7Aj0sufiiIF+xT/4oj795fJqMqG6vE0RGXf4hhm29LBh1w==}
+  '@ox-content/binding-linux-x64-gnu@3.8.3':
+    resolution: {integrity: sha512-0tlx46aJsyV90NOSh+uMA+Z5sW/spiQW/IcMJY/VfvFfucAoBbXbZ0hZ0rb2C6vavSzik1H+2ywJKlEnALe7uw==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@ox-content/binding-linux-x64-musl@3.2.13':
-    resolution: {integrity: sha512-D46XCgyL5MzxjmQ8EeUVOskOKvU4noFa8ayXp0+PlrtN7J/UPFlogCdwYYTxwOoHYoBjpwZDx2t1NrIhrL/Yfg==}
+  '@ox-content/binding-linux-x64-musl@3.8.3':
+    resolution: {integrity: sha512-hzgr40HH8jRD5NQRnhtUx7MNCmqta9f+xi1CQaRCWqpr5uSZkn4KkU80/ckV7q2QOuhjC5z0f4XKDr3Mh/8eEQ==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@ox-content/binding-win32-x64-msvc@3.2.13':
-    resolution: {integrity: sha512-dBlaXaODeavKErGQU9E6NEwEq+jRiFpFaZ6q8J9uZEPyQT93uLEySzDgL7BZU3Jo0VqjpatmqCUPBDJti+bY7g==}
+  '@ox-content/binding-win32-x64-msvc@3.8.3':
+    resolution: {integrity: sha512-H/WLLpV/nE99RMU01W+rPRylbjc+UUn6LaIlcFc5t6zhyneLK8muWAOacnl3sfPjhb0X8Nhy5gcOxpV82/DFYQ==}
     cpu: [x64]
     os: [win32]
 
-  '@ox-content/napi@3.2.13':
-    resolution: {integrity: sha512-F5PvzfzNnOUhDKFjEqPOrYWjcFFN4YlQY7qrrisw56uBYw/3RCRgNly08TcuyZ2/FfzAe5Pv3ZucMxivs5fbBw==}
+  '@ox-content/napi@3.8.3':
+    resolution: {integrity: sha512-cJmk2DM3AuuIx5bZSdJXzMgNCnvUOQFy2F+Xhlp8Yc7zQ7aUXhtyIwMhzpzca8alGtrt2BpW2RGCYbUzYpxAoQ==}
 
   '@ox-jsdoc/binding-darwin-arm64@0.1.1':
     resolution: {integrity: sha512-jwFZlHOjRBUvONQBoY6NaxVUfSV/8p21xfn/27qwWH7FHIRGqfwvG++Bpu5jvzn6yJeKpB/zyrZ9tnHT0Xfp2A==}
@@ -4508,8 +4508,8 @@ packages:
       yaml:
         optional: true
 
-  vitepress-api-references@0.4.0:
-    resolution: {integrity: sha512-h8cwjJreLmuZUbTr9cjac+5/OQWgdUw3xXl8wPyxXoJ14czdITkWVdDpMPVeFMg1Bxu12bx5exnVSiwpdVdLtQ==}
+  vitepress-api-references@0.5.0:
+    resolution: {integrity: sha512-LrTG8A0RfJsnu9Mzz7V5YRKVx7FhkWoPo7e8S5gCRFTjz79VjhkxK2jXPeBfTkRetbWtPTcb7KS7m9VltpiCcg==}
     engines: {node: '>= 22'}
     peerDependencies:
       vite: '>=5'
@@ -5081,36 +5081,36 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@ox-content/binding-darwin-arm64@3.2.13':
+  '@ox-content/binding-darwin-arm64@3.8.3':
     optional: true
 
-  '@ox-content/binding-darwin-x64@3.2.13':
+  '@ox-content/binding-darwin-x64@3.8.3':
     optional: true
 
-  '@ox-content/binding-linux-arm64-gnu@3.2.13':
+  '@ox-content/binding-linux-arm64-gnu@3.8.3':
     optional: true
 
-  '@ox-content/binding-linux-arm64-musl@3.2.13':
+  '@ox-content/binding-linux-arm64-musl@3.8.3':
     optional: true
 
-  '@ox-content/binding-linux-x64-gnu@3.2.13':
+  '@ox-content/binding-linux-x64-gnu@3.8.3':
     optional: true
 
-  '@ox-content/binding-linux-x64-musl@3.2.13':
+  '@ox-content/binding-linux-x64-musl@3.8.3':
     optional: true
 
-  '@ox-content/binding-win32-x64-msvc@3.2.13':
+  '@ox-content/binding-win32-x64-msvc@3.8.3':
     optional: true
 
-  '@ox-content/napi@3.2.13':
+  '@ox-content/napi@3.8.3':
     optionalDependencies:
-      '@ox-content/binding-darwin-arm64': 3.2.13
-      '@ox-content/binding-darwin-x64': 3.2.13
-      '@ox-content/binding-linux-arm64-gnu': 3.2.13
-      '@ox-content/binding-linux-arm64-musl': 3.2.13
-      '@ox-content/binding-linux-x64-gnu': 3.2.13
-      '@ox-content/binding-linux-x64-musl': 3.2.13
-      '@ox-content/binding-win32-x64-msvc': 3.2.13
+      '@ox-content/binding-darwin-arm64': 3.8.3
+      '@ox-content/binding-darwin-x64': 3.8.3
+      '@ox-content/binding-linux-arm64-gnu': 3.8.3
+      '@ox-content/binding-linux-arm64-musl': 3.8.3
+      '@ox-content/binding-linux-x64-gnu': 3.8.3
+      '@ox-content/binding-linux-x64-musl': 3.8.3
+      '@ox-content/binding-win32-x64-msvc': 3.8.3
 
   '@ox-jsdoc/binding-darwin-arm64@0.1.1':
     optional: true
@@ -5963,7 +5963,7 @@ snapshots:
       obug: 3.0.0
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 5.1.2(@types/node@26.6.4)(@vitest/browser-preview@5.1.1)(@vitest/coverage-v8@5.1.1)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitest: 5.1.2(@types/node@26.6.4)(@vitest/coverage-v8@5.1.1)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
 
   '@vitest/istanbul-lib-coverage@2.1.0': {}
 
@@ -8098,11 +8098,17 @@ snapshots:
       tsx: 4.22.4
       yaml: 2.9.0
 
-  vitepress-api-references@0.4.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.28)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0)):
+  vitepress-api-references@0.5.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.28)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0)):
     dependencies:
-      '@ox-content/napi': 3.2.13
+      '@ox-content/napi': 3.8.3
       vite: 8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
       vitepress: 2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.28)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0)
+
+  vitepress-api-references@0.5.0(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.32)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0)):
+    dependencies:
+      '@ox-content/napi': 3.8.3
+      vite: 8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
+      vitepress: 2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.32)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0)
 
   vitepress-plugin-group-icons@1.7.5(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
@@ -8185,6 +8191,53 @@ snapshots:
       - universal-cookie
       - yaml
 
+  vitepress@2.0.0-alpha.20(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(postcss@8.5.32)(tsx@4.22.4)(typescript@7.0.2)(yaml@2.9.0):
+    dependencies:
+      '@docsearch/css': 4.7.0
+      '@docsearch/js': 4.7.0
+      '@docsearch/sidepanel-js': 4.7.0
+      '@iconify-json/simple-icons': 1.2.98
+      '@shikijs/transformers': 4.4.3
+      '@types/markdown-it': 14.1.2
+      '@vitejs/plugin-vue': 6.0.9(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(vue@3.5.43(typescript@7.0.2))
+      '@vue/devtools-api': 8.2.1
+      '@vue/shared': 3.5.43
+      '@vueuse/core': 14.4.0(vue@3.5.43(typescript@7.0.2))
+      '@vueuse/integrations': 14.4.0(focus-trap@8.2.2)(vue@3.5.43(typescript@7.0.2))
+      focus-trap: 8.2.2
+      mark.js: 8.11.1
+      minisearch: 7.2.0
+      shiki: 4.4.3
+      vite: 8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
+      vue: 3.5.43(typescript@7.0.2)
+    optionalDependencies:
+      postcss: 8.5.32
+    transitivePeerDependencies:
+      - '@types/node'
+      - '@vitejs/devtools'
+      - async-validator
+      - axios
+      - change-case
+      - drauu
+      - esbuild
+      - fuse.js
+      - idb-keyval
+      - jiti
+      - jwt-decode
+      - less
+      - nprogress
+      - qrcode
+      - sass
+      - sass-embedded
+      - sortablejs
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - typescript
+      - universal-cookie
+      - yaml
+
   vitest@5.1.1(@types/node@26.6.4)(@vitest/browser-preview@5.1.1)(@vitest/coverage-v8@5.1.1)(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(publint@0.3.21)(tsx@4.22.4)(typescript@7.0.2)(unrun@0.2.39(synckit@0.11.13))(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.3
@@ -8208,7 +8261,7 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  vitest@5.1.2(@types/node@26.6.4)(@vitest/browser-preview@5.1.1)(@vitest/coverage-v8@5.1.1)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)):
+  vitest@5.1.2(@types/node@26.6.4)(@vitest/coverage-v8@5.1.1)(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/mocker': 5.1.2(vite@8.3.0(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -8226,7 +8279,6 @@ snapshots:
       why-is-node-running: 3.2.1
     optionalDependencies:
       '@types/node': 26.6.4
-      '@vitest/browser-preview': 5.1.1(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.4)(esbuild@0.28.0)(jiti@2.7.0)(publint@0.3.21)(tsx@4.22.4)(typescript@7.0.2)(unrun@0.2.39(synckit@0.11.13))(yaml@2.9.0))(vitest@5.1.1)
       '@vitest/coverage-v8': 5.1.1(vitest@5.1.2)
     transitivePeerDependencies:
       - msw
