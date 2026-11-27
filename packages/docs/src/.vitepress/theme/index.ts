@@ -1,6 +1,5 @@
 import 'virtual:group-icons.css'
 import Theme from 'vitepress/theme'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { defineAsyncComponent, h } from 'vue'
 // @ts-expect-error -- FIXME: missing types
 import CopyPageAction from './components/CopyPageAction.vue'
@@ -13,10 +12,9 @@ export default {
   Layout() {
     return h(Theme.Layout, null, {
       'doc-before': () => h(CopyPageAction),
-      'home-features-after': () => h(HomeSponsors)
-      // NOTE: Uncomment below to show a release banner
+      'home-features-after': () => h(HomeSponsors),
       // @ts-expect-error -- FIXME: missing types
-      // 'layout-top': () => h(defineAsyncComponent(() => import('./components/GunshiBanner.vue')))
+      'layout-top': () => h(defineAsyncComponent(() => import('./components/GunshiBanner.vue')))
     })
   },
   enhanceApp({ _app, _router, _siteData }) {
