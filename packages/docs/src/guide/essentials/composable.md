@@ -497,8 +497,6 @@ Throughout this guide, you've learned how to build composable sub-commands that 
 
 You've seen how Gunshi maintains type safety across nested command structures, enables powerful routing patterns with default commands, and supports both synchronous and asynchronous command execution.
 
-Now that you understand how to compose commands into well-organized hierarchies, you're ready to explore how to optimize their performance.
+Now that you understand how to compose commands into well-organized hierarchies, you're ready to let scripts and AI agents read what they print.
 
-The next section on [Lazy & Async Command Loading](./lazy-async.md) will show you how to significantly improve your CLI's startup time by loading commands only when they're actually needed.
-
-With composable sub-commands as your foundation, adding lazy loading will make your CLI applications both powerful and performant, especially as they grow to include many commands with varying resource requirements.
+The next section on [JSON Output](./json-output.md) will show you how a command supports `--json`, and how Gunshi prints its result and its errors as JSON.

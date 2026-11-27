@@ -177,7 +177,7 @@ The exit code is `1`, or the `validationErrorExitCode` of `cli()` for the errors
 
 ### Failures of the Command
 
-To report a failure that the command expects, throw a `CommandError`, as without `--json`. Its `code` is the `reason`, as it is, so write it in snake_case, such as `not_found` or `network_error`. The messages of its causes are in `data.causes`:
+To report a failure that the command expects, throw a `CommandError`, as without `--json` (see [Expected Failures](./errors.md#expected-failures)). Its `code` is the `reason`, as it is, so write it in snake_case, such as `not_found` or `network_error`. The messages of its causes are in `data.causes`:
 
 ```js
 throw new CommandError(`Project ${name} not found`, { code: 'not_found', cause: error })
@@ -297,4 +297,4 @@ The errors of the command and of the result are printed as JSON with these optio
 
 ## Next Steps
 
-Learn about the [Plugin System](./plugin-system.md) to extend your CLI with plugins for features like i18n and shell completion.
+Learn how to load commands only when they run, to keep the startup of your CLI fast, in [Lazy & Async Command Loading](./lazy-async.md).

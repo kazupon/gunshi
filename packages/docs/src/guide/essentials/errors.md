@@ -216,4 +216,4 @@ To report only the argument errors yourself, set `renderValidationErrors` to `nu
 
 ## Next Steps
 
-Learn how a command supports `--json`, and how Gunshi prints its result and its errors as JSON, in [JSON Output](./json-output.md).
+Learn about the [Plugin System](./plugin-system.md) to extend your CLI with plugins for features like i18n and shell completion.

@@ -3,7 +3,7 @@
 <!-- eslint-disable markdown/no-missing-label-refs -->
 
 > [!NOTE]
-> This chapter continues using TypeScript for code examples, building upon the type safety concepts introduced in the [previous chapter](./type-safe.md). While all Gunshi features work with JavaScript, the TypeScript examples provide better IDE support and compile-time checking.
+> This chapter uses TypeScript for code examples, building upon the type safety concepts introduced in [Type Safe](./type-safe.md). While all Gunshi features work with JavaScript, the TypeScript examples provide better IDE support and compile-time checking.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
 
