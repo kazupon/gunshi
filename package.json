@@ -65,7 +65,7 @@
     "gunshi019": "npm:gunshi@0.19.0",
     "knip": "^6.45.1",
     "mitata": "^1.0.34",
-    "pkg-pr-new": "^0.0.94",
+    "pkg-pr-new": "^0.0.95",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
